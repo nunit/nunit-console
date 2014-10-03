@@ -24,7 +24,13 @@
 using System;
 using NUnit.Framework;
 
+#if NUNIT_CONSOLE
 namespace NUnit.ConsoleRunner.Utilities.Tests
+#elif NUNITLITE
+namespace NUnitLite.Runner.Tests
+#else
+namespace NUnit.Common.Tests
+#endif
 {
     public class TestNameParserTests
     {
