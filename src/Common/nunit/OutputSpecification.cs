@@ -23,12 +23,26 @@
 
 using System;
 
+#if NUNIT_CONSOLE
 namespace NUnit.ConsoleRunner
+#elif NUNITLITE
+namespace NUnitLite.Runner
+#else
+namespace NUnit.Common
+#endif
 {
+    /// <summary>
+    /// OutputSpecification encapsulates a file output path and format
+    /// for use in saving the results of a run.
+    /// </summary>
     public class OutputSpecification
     {
         #region Constructor
 
+        /// <summary>
+        /// Construct an OutputSpecification from an option value.
+        /// </summary>
+        /// <param name="spec">The option value string.</param>
         public OutputSpecification(string spec)
         {
             if (spec == null)
@@ -81,10 +95,19 @@ namespace NUnit.ConsoleRunner
 
         #region Properties
 
+        /// <summary>
+        /// Gets the path to which output will be written
+        /// </summary>
         public string OutputPath { get; private set; }
 
+        /// <summary>
+        /// Gets the name of the format to be used
+        /// </summary>
         public string Format { get; private set; }
 
+        /// <summary>
+        /// Gets the file name of a transform to be applied
+        /// </summary>
         public string Transform { get; private set; }
 
         #endregion
