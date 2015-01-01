@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,11 +26,16 @@ using System.Collections.Generic;
 using System.IO;
 using Mono.Options;
 
+#if NUNIT_CONSOLE
 namespace NUnit.ConsoleRunner.Options
+#elif NUNITLITE
+namespace NUnitLite.Runner.Options
+#endif
 {
-    using Utilities;
-
-    /// <summary>
+#if NUNIT_CONSOLE
+using Utilities;
+#endif
+	/// <summary>
     /// ConsoleOptions encapsulates the option settings for
     /// the nunit-console program. It inherits from the Mono
     /// Options OptionSet class and provides a central location
@@ -45,7 +50,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public ConsoleOptions(params string[] args)
         {
-            // NOTE: The order in which patterns are added 
+            // NOTE: The order in which patterns are added
             // determines the display order for the help.
 
             // Old Options no longer supported:
@@ -63,13 +68,45 @@ namespace NUnit.ConsoleRunner.Options
             this.Add("test=", "Comma-separated list of {NAMES} of tests to run or explore. This option may be repeated.",
                 v => ((List<string>)TestList).AddRange(TestNameParser.Parse(RequiredValue(v, "--test"))));
 
+            this.Add("testlist=", "File {PATH} containing a list of tests to run, one per line. This option may be repeated.",
+                v =>
+            {
+                string testListFile = RequiredValue(v, "--testlist");
+
+                var fullTestListPath = ExpandToFullPath(testListFile);
+
+                if (!File.Exists(fullTestListPath))
+                    ErrorMessages.Add("Unable to locate file: " + testListFile);
+                else
+                {
+                    try
+                    {
+                        using (var rdr = new StreamReader(fullTestListPath))
+                        {
+                            while (!rdr.EndOfStream)
+                            {
+                                var line = rdr.ReadLine().Trim();
+
+                                if (line[0] != '#')
+                                    ((List<string>)TestList).Add(line);
+                            }
+                        }
+                    }
+                    catch (IOException)
+                    {
+                        ErrorMessages.Add("Unable to read file: " + testListFile);
+                    }
+                }
+            });
+
             this.Add("include=", "Test {CATEGORIES} to be included. May be a single category, a comma-separated list of categories or a category expression.",
                 v => Include = RequiredValue(v, "--include"));
 
             this.Add("exclude=", "Test {CATEGORIES} to be excluded. May be a single category, a comma-separated list of categories or a category expression.",
                 v => Exclude = RequiredValue(v, "--exclude"));
 
-            this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).", 
+#if !NUNITLITE
+            this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).",
                 v => ActiveConfig = RequiredValue(v, "--config"));
 
             // Where to Run Tests
@@ -88,6 +125,7 @@ namespace NUnit.ConsoleRunner.Options
 
             this.Add("dispose-runners", "Dispose each test runner after it has finished running its tests.",
                 v => DisposeRunners = v != null);
+#endif
 
             this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
                 v => defaultTimeout = RequiredInt(v, "--timeout"));
@@ -117,20 +155,23 @@ namespace NUnit.ConsoleRunner.Options
             this.Add("err=", "File {PATH} to contain error output from the tests.",
                 v => ErrFile = RequiredValue(v, "--err"));
 
-            this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.", 
+            this.Add("full", "Prints full report of all test results.",
+                v => Full = v != null);
+
+            this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.",
                 v => resultOutputSpecifications.Add(new OutputSpecification(RequiredValue(v, "--resultxml"))));
 
-            this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v => 
-                {
-                    Explore = true;
-                    if (v != null)
-                        ExploreOutputSpecifications.Add(new OutputSpecification(v));
-                });
+            this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
+            {
+                Explore = true;
+                if (v != null)
+                    ExploreOutputSpecifications.Add(new OutputSpecification(v));
+            });
 
-            this.Add("noresult", "Don't save any test results.", 
+            this.Add("noresult", "Don't save any test results.",
                 v => noresult = v != null);
 
-            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, All", 
+            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, All",
                 v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "All"));
 
             this.Add("trace=", "Set internal trace {LEVEL}.\nValues: Off, Error, Warning, Info, Verbose (Debug)",
@@ -148,7 +189,7 @@ namespace NUnit.ConsoleRunner.Options
             this.Add("verbose|v", "Display additional information as the test runs.",
                 v => Verbose = v != null);
 
-            this.Add("help|h", "Display this message and exit.", 
+            this.Add("help|h", "Display this message and exit.",
                 v => ShowHelp = v != null);
 
             // Default
@@ -173,7 +214,6 @@ namespace NUnit.ConsoleRunner.Options
         public bool Explore { get; private set; }
 
         public bool ShowHelp { get; private set; }
-
 
         // Select tests
 
@@ -238,10 +278,13 @@ namespace NUnit.ConsoleRunner.Options
 
         public string InternalTraceLevel { get; private set; }
 
+        /// <summary>Indicates whether a full report should be displayed.</summary>
+        public bool Full { get; private set; }
+
         private List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
         public IList<OutputSpecification> ResultOutputSpecifications
         {
-            get 
+            get
             {
                 if (noresult)
                     return new OutputSpecification[0];
@@ -249,7 +292,7 @@ namespace NUnit.ConsoleRunner.Options
                 if (resultOutputSpecifications.Count == 0)
                     resultOutputSpecifications.Add(new OutputSpecification("TestResult.xml"));
 
-                return resultOutputSpecifications; 
+                return resultOutputSpecifications;
             }
         }
 
@@ -287,7 +330,7 @@ namespace NUnit.ConsoleRunner.Options
         /// </summary>
         private string RequiredValue(string val, string option, params string[] validValues)
         {
-            if (val == null || val == string.Empty)
+            if (string.IsNullOrEmpty(val))
                 ErrorMessages.Add("Missing required value for option '" + option + "'.");
 
             bool isValid = true;
@@ -297,7 +340,7 @@ namespace NUnit.ConsoleRunner.Options
                 isValid = false;
 
                 foreach (string valid in validValues)
-                    if (string.Compare(valid, val, true) == 0)
+                    if (string.Compare(valid, val, StringComparison.InvariantCultureIgnoreCase) == 0)
                         return valid;
 
             }
@@ -310,23 +353,45 @@ namespace NUnit.ConsoleRunner.Options
 
         private int RequiredInt(string val, string option)
         {
-            // We have to return something even though the value will 
+            // We have to return something even though the value will
             // be ignored if an error is reported. The -1 value seems
             // like a safe bet in case it isn't ignored due to a bug.
             int result = -1;
 
-            if (val == null || val == string.Empty)
+            if (string.IsNullOrEmpty(val))
                 ErrorMessages.Add("Missing required value for option '" + option + "'.");
-            else 
+            else
             {
+#if NETCF   // NETCF: Create compatibiility method for TryParse
+                try
+                {
+                    result = int.Parse(val);
+                }
+                catch (Exception)
+                {
+                    ErrorMessages.Add("An int value was exprected for option '{0}' but a value of '{1}' was used");
+                }
+#else
                 int r;
                 if (int.TryParse(val, out r))
                     result = r;
                 else
                     ErrorMessages.Add("An int value was exprected for option '{0}' but a value of '{1}' was used");
+#endif
             }
-                
+
             return result;
+        }
+
+        private string ExpandToFullPath(string path)
+        {
+            if (path == null) return null;
+
+#if NETCF
+            return Path.Combine(NUnit.Env.DocumentFolder, path);
+#else
+            return Path.GetFullPath(path);
+#endif
         }
 
         #endregion
