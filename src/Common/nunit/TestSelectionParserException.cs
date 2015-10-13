@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2015 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,36 +22,40 @@
 // ***********************************************************************
 
 using System;
-using System.Xml;
+using System.Runtime.Serialization;
 
+#if NUNIT_ENGINE
 namespace NUnit.Engine
+#else
+namespace NUnit.Common
+#endif
 {
     /// <summary>
-    /// Abstract base for all test filters. A filter is represented
-    /// by an XmlNode with &lt;filter&gt; as it's topmost element.
-    /// In the console runner, filters serve only to carry this
-    /// XML representation, as all filtering is done by the engine.
+    /// TestSelectionParserException is thrown when an error 
+    /// is found while parsing the selection expression.
     /// </summary>
+#if !PORTABLE
     [Serializable]
-    public class TestFilter
+#endif
+    public class TestSelectionParserException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestFilter"/> class.
+        /// Construct with a message
         /// </summary>
-        /// <param name="xmlText">The XML text that specifies the filter.</param>
-        public TestFilter(string xmlText)
-        {
-            Text = xmlText;
-        }
+        public TestSelectionParserException(string message) : base(message) { }
 
         /// <summary>
-        /// The empty filter - one that always passes.
+        /// Construct with a message and inner exception
         /// </summary>
-        public static readonly TestFilter Empty = new TestFilter("<filter/>");
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+        public TestSelectionParserException(string message, Exception innerException) : base(message, innerException) { }
 
+#if !NETCF && !SILVERLIGHT && !PORTABLE
         /// <summary>
-        /// Gets the XML representation of this filter as a string.
+        /// Serialization constructor
         /// </summary>
-        public string Text { get; private set; }
+        public TestSelectionParserException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#endif
     }
 }
