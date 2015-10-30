@@ -72,9 +72,9 @@ namespace NUnit.ConsoleRunner
             //if (options.trace != InternalTraceLevel.Default)
             //    level = options.trace;
 
-            //InternalTrace.Initialize("nunit-console_%p.log", level);
+            //InternalTrace.Initialize("nunit3-console_%p.log", level);
             
-            //log.Info("NUnit-console.exe starting");
+            //log.Info("NUnit3-console.exe starting");
             try
             {
                 if (!Options.NoHeader)
@@ -147,7 +147,7 @@ namespace NUnit.ConsoleRunner
                             }
                         }
 
-                        //    log.Info( "NUnit-console.exe terminating" );
+                        //    log.Info( "NUnit3-console.exe terminating" );
                     }
                 }
             }
@@ -192,7 +192,7 @@ namespace NUnit.ConsoleRunner
         private static void WriteHelpText()
         {
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.Header, "NUNIT-CONSOLE [inputfiles] [options]");
+            OutWriter.WriteLine(ColorStyle.Header, "NUNIT3-CONSOLE [inputfiles] [options]");
             OutWriter.WriteLine();
             OutWriter.WriteLine(ColorStyle.Default, "Runs a set of NUnit tests from the console.");
             OutWriter.WriteLine();
@@ -216,13 +216,13 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      The --where option is intended to extend or replace the earlier");
                 OutWriter.WriteLine("      --test, --include and --exclude options by use of a selection expression");
                 OutWriter.WriteLine("      describing exactly which tests to use. Examples of usage are:");
-                OutWriter.WriteLine("          --where:category==Data");
+                OutWriter.WriteLine("          --where:cat==Data");
                 OutWriter.WriteLine("          --where \"method =~ /DataTest*/ && cat = Slow\"");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      Care should be taken in combining --where with --test, --testlist,");
-                OutWriter.WriteLine("      --include or --exclude. The specifications created by each of these");
-                OutWriter.WriteLine("      are implicitly joined using &&, so that ALL of the criteria specified");
-                OutWriter.WriteLine("      must be satisfied in order for a test to run. See the docs for more");
+                OutWriter.WriteLine("      Care should be taken in combining --where with --test or --testlist.");
+                OutWriter.WriteLine("      The test and where specifications are implicitly joined using &&, so");
+                OutWriter.WriteLine("      that BOTH sets of criteria must be satisfied in order for a test to run.");
+                OutWriter.WriteLine("      See the docs for more information and a full description of the syntax");
                 OutWriter.WriteLine("      information and a full description of the syntax.");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      Several options that specify processing of XML output take");
