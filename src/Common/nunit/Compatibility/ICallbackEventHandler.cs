@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2010-2014 Charlie Poole
+// Copyright (c) 2015 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,35 +21,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Xml;
-
-namespace NUnit.Engine
+#if PORTABLE || SILVERLIGHT || NETCF
+namespace System.Web.UI
 {
-    internal class RunTestsCallbackHandler : CallbackHandler
+    /// <summary>
+    /// A shim of the .NET interface for platforms that do not support it.
+    /// Used to indicate that a control can be the target of a callback event on the server.
+    /// </summary>
+    public interface ICallbackEventHandler
     {
-        private ITestEventListener listener;
+        /// <summary>
+        /// Processes a callback event that targets a control.
+        /// </summary>
+        /// <param name="report"></param>
+        void RaiseCallbackEvent(string report);
 
-        public RunTestsCallbackHandler(ITestEventListener listener)
-        {
-            // TODO: Move this substitution into the framework?
-            this.listener = listener ?? new NullListener();
-        }
-
-        public override void ReportProgress(string state)
-        {
-            listener.OnTestEvent(state);
-        }
-
-        #region Nested NullListener class
-        class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string report)
-            {
-            }
-        }
-        #endregion
+        /// <summary>
+        /// Returns the results of a callback event that targets a control.
+        /// </summary>
+        /// <returns></returns>
+        string GetCallbackResult();
     }
 }
+#endif

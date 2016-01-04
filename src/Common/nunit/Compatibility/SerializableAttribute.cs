@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2010-2014 Charlie Poole
+// Copyright (c) 2012 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,35 +21,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Xml;
-
-namespace NUnit.Engine
+#if SILVERLIGHT || PORTABLE
+namespace System
 {
-    internal class RunTestsCallbackHandler : CallbackHandler
+    /// <summary>
+    /// A shim of the .NET attribute for platforms that do not support it.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
+    public sealed class SerializableAttribute : Attribute
     {
-        private ITestEventListener listener;
-
-        public RunTestsCallbackHandler(ITestEventListener listener)
-        {
-            // TODO: Move this substitution into the framework?
-            this.listener = listener ?? new NullListener();
-        }
-
-        public override void ReportProgress(string state)
-        {
-            listener.OnTestEvent(state);
-        }
-
-        #region Nested NullListener class
-        class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string report)
-            {
-            }
-        }
-        #endregion
     }
 }
+#endif

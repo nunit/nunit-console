@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2010-2014 Charlie Poole
+// Copyright (c) 2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,34 +22,27 @@
 // ***********************************************************************
 
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Xml;
+using System.Web.UI;
 
 namespace NUnit.Engine
 {
-    internal class RunTestsCallbackHandler : CallbackHandler
+    internal class CallbackHandler : ICallbackEventHandler
     {
-        private ITestEventListener listener;
+        public string Result { get; private set; }
 
-        public RunTestsCallbackHandler(ITestEventListener listener)
+        public virtual void ReportProgress(string report)
         {
-            // TODO: Move this substitution into the framework?
-            this.listener = listener ?? new NullListener();
         }
 
-        public override void ReportProgress(string state)
+        public string GetCallbackResult()
         {
-            listener.OnTestEvent(state);
+            throw new NotImplementedException();
         }
 
-        #region Nested NullListener class
-        class NullListener : ITestEventListener
+        public void RaiseCallbackEvent(string report)
         {
-            public void OnTestEvent(string report)
-            {
-            }
+            Result = report;
+            ReportProgress(report);
         }
-        #endregion
     }
 }
