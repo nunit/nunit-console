@@ -1,5 +1,5 @@
-// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+﻿// ***********************************************************************
+// Copyright (c) 2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,21 +21,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using NUnitLite;
+using System.Resources;
+using System.Reflection;
 
-namespace NUnitLite.Tests
-{
-    public class Program
-    {
-        /// <summary>
-        /// The main program executes the tests. Output may be routed to
-        /// various locations, depending on the arguments passed.
-        /// </summary>
-        /// <remarks>Run with --help for a full list of arguments supported</remarks>
-        /// <param name="args"></param>
-        public static int Main(string[] args)
-        {
-            return new AutoRun().Execute(args);
-        }
-    }
-}
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+[assembly: AssemblyTitle("nunit.driver.tests")]
+[assembly: AssemblyDescription("Tests for nunit.driver")]

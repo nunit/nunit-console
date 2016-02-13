@@ -1,5 +1,5 @@
-// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+﻿// ***********************************************************************
+// Copyright (c) 2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,21 +21,27 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using NUnitLite;
+using System;
 
-namespace NUnitLite.Tests
+namespace NUnit.Engine
 {
-    public class Program
+    /// <summary>
+    /// NUnitDriverException is thrown when the driver has been
+    /// called with improper values or when a particular facility
+    /// is not available.
+    /// </summary>
+    public class NUnitPortableDriverException : Exception
     {
         /// <summary>
-        /// The main program executes the tests. Output may be routed to
-        /// various locations, depending on the arguments passed.
+        /// Construct with a message
         /// </summary>
-        /// <remarks>Run with --help for a full list of arguments supported</remarks>
-        /// <param name="args"></param>
-        public static int Main(string[] args)
-        {
-            return new AutoRun().Execute(args);
-        }
+        public NUnitPortableDriverException(string message) : base(message) { }
+
+        /// <summary>
+        /// Construct with a message and inner exception
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="innerException"></param>
+        public NUnitPortableDriverException(string message, Exception innerException) : base(message, innerException) { }
     }
 }
