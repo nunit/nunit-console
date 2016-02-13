@@ -1,5 +1,5 @@
-// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+﻿// ***********************************************************************
+// Copyright (c) 2012 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,21 +21,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using NUnitLite;
-
-namespace NUnitLite.Tests
+#if SILVERLIGHT || PORTABLE
+namespace System
 {
-    public class Program
+    /// <summary>
+    /// A shim of the .NET attribute for platforms that do not support it.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
+    public sealed class SerializableAttribute : Attribute
     {
-        /// <summary>
-        /// The main program executes the tests. Output may be routed to
-        /// various locations, depending on the arguments passed.
-        /// </summary>
-        /// <remarks>Run with --help for a full list of arguments supported</remarks>
-        /// <param name="args"></param>
-        public static int Main(string[] args)
-        {
-            return new AutoRun().Execute(args);
-        }
     }
 }
+#endif

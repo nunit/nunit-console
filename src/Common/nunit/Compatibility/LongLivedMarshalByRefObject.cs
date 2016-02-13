@@ -1,4 +1,4 @@
-// ***********************************************************************
+﻿// ***********************************************************************
 // Copyright (c) 2015 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -21,21 +21,33 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using NUnitLite;
+using System;
 
-namespace NUnitLite.Tests
+#if NUNIT_ENGINE
+namespace NUnit.Engine.Compatibility
+#elif NUNIT_FRAMEWORK
+namespace NUnit.Framework.Compatibility
+#else
+namespace NUnit.Common.Compatibility
+#endif
 {
-    public class Program
+    /// <summary>
+    /// A MarshalByRefObject that lives forever
+    /// </summary>
+#if PORTABLE || SILVERLIGHT || NETCF
+    public class LongLivedMarshalByRefObject
+    {
+    }
+#else
+    public class LongLivedMarshalByRefObject : MarshalByRefObject
     {
         /// <summary>
-        /// The main program executes the tests. Output may be routed to
-        /// various locations, depending on the arguments passed.
+        /// Obtains a lifetime service object to control the lifetime policy for this instance.
         /// </summary>
-        /// <remarks>Run with --help for a full list of arguments supported</remarks>
-        /// <param name="args"></param>
-        public static int Main(string[] args)
+        public override object InitializeLifetimeService()
         {
-            return new AutoRun().Execute(args);
+            return null;
         }
     }
+#endif
 }
