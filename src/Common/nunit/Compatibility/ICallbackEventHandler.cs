@@ -1,4 +1,4 @@
-// ***********************************************************************
+﻿// ***********************************************************************
 // Copyright (c) 2015 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -21,21 +21,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using NUnitLite;
-
-namespace NUnitLite.Tests
+#if PORTABLE || SILVERLIGHT || NETCF
+namespace System.Web.UI
 {
-    public class Program
+    /// <summary>
+    /// A shim of the .NET interface for platforms that do not support it.
+    /// Used to indicate that a control can be the target of a callback event on the server.
+    /// </summary>
+    public interface ICallbackEventHandler
     {
         /// <summary>
-        /// The main program executes the tests. Output may be routed to
-        /// various locations, depending on the arguments passed.
+        /// Processes a callback event that targets a control.
         /// </summary>
-        /// <remarks>Run with --help for a full list of arguments supported</remarks>
-        /// <param name="args"></param>
-        public static int Main(string[] args)
-        {
-            return new AutoRun().Execute(args);
-        }
+        /// <param name="report"></param>
+        void RaiseCallbackEvent(string report);
+
+        /// <summary>
+        /// Returns the results of a callback event that targets a control.
+        /// </summary>
+        /// <returns></returns>
+        string GetCallbackResult();
     }
 }
+#endif
