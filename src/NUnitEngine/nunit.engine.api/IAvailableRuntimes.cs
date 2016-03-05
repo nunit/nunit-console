@@ -1,5 +1,5 @@
-// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+﻿// ***********************************************************************
+// Copyright (c) 2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,10 +21,18 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System.Reflection;
+using System.Collections.Generic;
 
-//
-// Current version for the NUnit Console
-//
-[assembly: AssemblyVersion("3.1.0.0")]
-[assembly: AssemblyFileVersion("3.1.0.0")]
+namespace NUnit.Engine
+{
+    /// <summary>
+    /// Interface that returns a list of available runtime frameworks.
+    /// </summary>
+    public interface IAvailableRuntimes
+    {
+        /// <summary>
+        /// Gets a list of available runtime frameworks.
+        /// </summary>
+        IList<IRuntimeFramework> AvailableRuntimes { get; }
+    }
+}
