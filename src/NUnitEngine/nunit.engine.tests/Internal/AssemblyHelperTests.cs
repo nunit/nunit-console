@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2012 Charlie Poole
+// Copyright (c) 2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,43 +21,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !SILVERLIGHT && !PORTABLE
-using System;
 using System.IO;
-using System.Reflection;
 using NUnit.Framework;
 
-#if NUNIT_ENGINE
 namespace NUnit.Engine.Internal.Tests
-#elif NUNIT_FRAMEWORK
-namespace NUnit.Framework.Internal.Tests
-#else
-namespace NUnit.Common.Tests
-#endif
 {
     [TestFixture]
     public class AssemblyHelperTests
     {
-#if NUNIT_ENGINE
         private static readonly string THIS_ASSEMBLY_PATH = "nunit.engine.tests.dll";
-        private static readonly string THIS_ASSEMBLY_NAME = "nunit.engine.tests";
-#else
-#if NETCF
-        private static readonly string THIS_ASSEMBLY_PATH = "nunit.framework.tests.exe";
-#else
-        private static readonly string THIS_ASSEMBLY_PATH = "nunit.framework.tests.dll";
-#endif
-        private static readonly string THIS_ASSEMBLY_NAME = "nunit.framework.tests";
-#endif
 
-        public void GetNameForAssembly()
-        {
-            var assemblyName = AssemblyHelper.GetAssemblyName(this.GetType().Assembly);
-            Assert.That(assemblyName.Name, Is.EqualTo(THIS_ASSEMBLY_NAME).IgnoreCase);
-            Assert.That(assemblyName.FullName, Is.EqualTo(THIS_ASSEMBLY_PATH).IgnoreCase);
-        }
-
-#if !SILVERLIGHT && !PORTABLE
         [Test]
         public void GetPathForAssembly()
         {
@@ -66,15 +39,6 @@ namespace NUnit.Common.Tests
             Assert.That(File.Exists(path));
         }
 
-        [Test]
-        public void GetPathForType()
-        {
-            string path = AssemblyHelper.GetAssemblyPath(this.GetType());
-            Assert.That(Path.GetFileName(path), Is.EqualTo(THIS_ASSEMBLY_PATH).IgnoreCase);
-            Assert.That(File.Exists(path));
-        }
-
-#if !NETCF
         // The following tests are only useful to the extent that the test cases
         // match what will actually be provided to the method in production.
         // As currently used, NUnit's codebase can only use the file: schema,
@@ -107,8 +71,5 @@ namespace NUnit.Common.Tests
             string localPath = AssemblyHelper.GetAssemblyPathFromCodeBase(uri);
             Assert.That(localPath, Is.SamePath(expectedPath));
         }
-#endif
-#endif
     }
 }
-#endif
