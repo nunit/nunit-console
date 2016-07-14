@@ -21,53 +21,63 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if NUNIT_ENGINE
 namespace NUnit.Engine
-#elif NUNIT_FRAMEWORK
-namespace NUnit.Framework.Internal
-#else
-namespace NUnit.Common
-#endif
 {
     /// <summary>
-    /// InternalTraceLevel is an enumeration controlling the
-    /// level of detailed presented in the internal log.
+    /// Interface for logging within the engine
     /// </summary>
-    public enum InternalTraceLevel
+    public interface ILogger
     {
         /// <summary>
-        /// Use the default settings as specified by the user.
+        /// Logs the specified message at the error level.
         /// </summary>
-        Default,
+        /// <param name="message">The message.</param>
+        void Error(string message);
 
         /// <summary>
-        /// Do not display any trace messages
+        /// Logs the specified message at the error level.
         /// </summary>
-        Off,
+        /// <param name="message">The message.</param>
+        /// <param name="args">The arguments.</param>
+        void Error(string message, params object[] args);
 
         /// <summary>
-        /// Display Error messages only
+        /// Logs the specified message at the warning level.
         /// </summary>
-        Error,
+        /// <param name="message">The message.</param>
+        void Warning(string message);
 
         /// <summary>
-        /// Display Warning level and higher messages
+        /// Logs the specified message at the warning level.
         /// </summary>
-        Warning,
+        /// <param name="message">The message.</param>
+        /// <param name="args">The arguments.</param>
+        void Warning(string message, params object[] args);
 
         /// <summary>
-        /// Display informational and higher messages
+        /// Logs the specified message at the info level.
         /// </summary>
-        Info,
+        /// <param name="message">The message.</param>
+        void Info(string message);
 
         /// <summary>
-        /// Display debug messages and higher - i.e. all messages
+        /// Logs the specified message at the info level.
         /// </summary>
-        Debug,
+        /// <param name="message">The message.</param>
+        /// <param name="args">The arguments.</param>
+        void Info(string message, params object[] args);
 
         /// <summary>
-        /// Display debug messages and higher - i.e. all messages
+        /// Logs the specified message at the debug level.
         /// </summary>
-        Verbose = Debug
+        /// <param name="message">The message.</param>
+        void Debug(string message);
+
+        /// <summary>
+        /// Logs the specified message at the debug level.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="args">The arguments.</param>
+        void Debug(string message, params object[] args);
     }
 }
