@@ -24,13 +24,7 @@
 using System;
 using System.IO;
 
-#if NUNIT_ENGINE
 namespace NUnit.Engine.Internal
-#elif NUNIT_FRAMEWORK
-namespace NUnit.Framework.Internal
-#else
-namespace NUnit.Common
-#endif
 {
     /// <summary>
     /// Provides internal logging to the NUnit framework
@@ -171,13 +165,7 @@ namespace NUnit.Common
             writer.WriteLine(TRACE_FMT,
                 DateTime.Now.ToString(TIME_FMT),
                 level == InternalTraceLevel.Verbose ? "Debug" : level.ToString(),
-#if PORTABLE
-                System.Environment.CurrentManagedThreadId,
-#else
-                System.Threading.Thread.CurrentThread.ManagedThreadId,
-#endif
-                name,
-                message);
+                System.Threading.Thread.CurrentThread.ManagedThreadId, name, message);
         }
 
 #endregion
