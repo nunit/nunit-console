@@ -23,12 +23,12 @@
 
 using System.IO;
 
-namespace NUnit.Common
+namespace NUnit.ConsoleRunner
 {
     /// <summary>
     /// ExtendedTextWriter extends the TextWriter abstract class 
     /// to support displaying text in color.
-    /// $</summary>
+    /// </summary>
     public abstract class ExtendedTextWriter : TextWriter
     {
         #region Extended Methods

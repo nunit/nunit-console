@@ -21,14 +21,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !PORTABLE
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
 
-namespace NUnit.Common.Tests
+namespace NUnit.ConsoleRunner.Tests
 {
     public class ExtendedTextWrapperTests
     {
@@ -104,4 +103,3 @@ namespace NUnit.Common.Tests
         }
     }
 }
-#endif
