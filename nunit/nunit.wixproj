@@ -6,8 +6,7 @@
     <Version Condition=" '$(Version)' == '' ">3.0</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <InstallImage Condition=" '$(Image)' == '' ">..\image</InstallImage>
-    <InstallImage Condition=" '$(Image)' != '' ">$(Image)</InstallImage>
+    <Image Condition=" '$(Image)' == '' ">..\image</Image>
     <ProductVersion>3.9</ProductVersion>
     <WixVariables>Build=$(Configuration)</WixVariables>
     <SuppressIces>ICE61</SuppressIces>
@@ -21,10 +20,10 @@
     <Name>nunit</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DefineConstants>Debug;Version=$(Version);InstallImage=$(InstallImage)</DefineConstants>
+    <DefineConstants>Debug;Version=$(Version);InstallImage=$(Image)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DefineConstants>Version=$(Version);InstallImage=$(InstallImage)</DefineConstants>
+    <DefineConstants>Version=$(Version);InstallImage=$(Image)</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="nunit.wxs" />

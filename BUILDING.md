@@ -16,16 +16,19 @@ to the build. Use set CAKE_ARGS=-Experimental to ensure this is always done and 
 it out each time.
 
 Key arguments to build.cmd / build:
- * -Target, -t <task>                 The task to run - see below.
- * -Configuration, -c [Release|Debug] The configuration to use (default is Release).
- * -Experimental, -e                  Use the experimental build of Roslyn.
- * -version                           Pass required version of the installer to build. A default value is specified in the Cake script.
+
+```
+ -Target, -t <task>                 The task to run - see below.
+ -Configuration, -c [Release|Debug] The configuration to use (default is Release).
+ -Experimental, -e                  Use the experimental build of Roslyn.
+ -version                           Pass required version of the installer to build. A default value is specified in the Cake script.
+ ```
 
 The build.cake script contains a number of interdependent tasks. The most 
 important top-level tasks to use are listed here:
 
 ```
- * FetchPackages           Retrieves the latest versions of the required assemblies, from the lates NuGet packages.
- * CreateImage             Extracts the assemblies from the NuGet packages, and adds other required files to an image directory.
- * PackageMsi              Builds the MSI.
+ FetchPackages           Retrieves the latest versions of the required assemblies, from the lates NuGet packages.
+ CreateImage             Extracts the assemblies from the NuGet packages, and adds other required files to an image directory.
+ PackageMsi              Builds the MSI.
 ```
