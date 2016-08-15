@@ -38,6 +38,14 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NUnit.System.Linq, Version=0.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\NUnit.System.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Remoting" />
@@ -106,9 +114,9 @@
     <Compile Include="XmlHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitFramework\framework\nunit.framework-2.0.csproj">
-      <Project>{12B66B03-90F1-4992-BD33-BDF3C69AE49E}</Project>
-      <Name>nunit.framework-2.0</Name>
+    <ProjectReference Include="..\mock-assembly\mock-assembly.csproj">
+      <Project>{d2c80e4b-1117-4f02-ab02-e453bda0c58e}</Project>
+      <Name>mock-assembly</Name>
     </ProjectReference>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj">
       <Project>{775FAD50-3623-4922-97C4-DFB29A8BE4C7}</Project>
@@ -117,10 +125,6 @@
     <ProjectReference Include="..\nunit.engine\nunit.engine.csproj">
       <Project>{372A3447-D657-40FF-A089-77C19FEC30C8}</Project>
       <Name>nunit.engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NUnitFramework\mock-assembly\mock-assembly-2.0.csproj">
-      <Project>{2E368281-3BA8-4050-B05E-0E0E43F8F446}</Project>
-      <Name>mock-assembly-2.0</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

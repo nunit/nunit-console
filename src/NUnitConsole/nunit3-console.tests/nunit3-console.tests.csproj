@@ -34,6 +34,14 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NUnit.System.Linq, Version=0.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\NUnit.System.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -71,13 +79,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj">
+      <Project>{d2c80e4b-1117-4f02-ab02-e453bda0c58e}</Project>
+      <Name>mock-assembly</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj">
       <Project>{372A3447-D657-40FF-A089-77C19FEC30C8}</Project>
       <Name>nunit.engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NUnitFramework\framework\nunit.framework-2.0.csproj">
-      <Project>{12B66B03-90F1-4992-BD33-BDF3C69AE49E}</Project>
-      <Name>nunit.framework-2.0</Name>
     </ProjectReference>
     <ProjectReference Include="..\nunit3-console\nunit3-console.csproj">
       <Project>{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}</Project>
@@ -86,10 +94,6 @@
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj">
       <Project>{775FAD50-3623-4922-97C4-DFB29A8BE4C7}</Project>
       <Name>nunit.engine.api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NUnitFramework\mock-assembly\mock-assembly-2.0.csproj">
-      <Project>{2E368281-3BA8-4050-B05E-0E0E43F8F446}</Project>
-      <Name>mock-assembly-2.0</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -100,7 +104,9 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
