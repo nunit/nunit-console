@@ -1,7 +1,7 @@
 # Building NUnit 3.0 Console and Engine
 
-NUnit 3.0 consists of two parts: the Engine and the Console Runner. 
-The source code is kept in a single GitHub repository at http://github.com/nunit/nunit-console.git.
+NUnit 3.0 consists of three separate layers: the Framework, the Engine and the Console Runner. This
+repository contains the Engine and Console Runner. The source code is kept in the GitHub repository at https://github.com/nunit/nunit-console. Source for the framework can be found at https://github.com/nunit/nunit
 
 Note that assemblies in one layer must not reference those in any other layer, except as follows:
  * The console runner references the nunit.engine.api assembly, but not the nunit.engine assembly.
