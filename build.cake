@@ -18,27 +18,9 @@ var ErrorDetail = new List<string>();
 var version = "3.5.0";
 var modifier = "";
 
-var isCompactFrameworkInstalled = FileExists(Environment.GetEnvironmentVariable("windir") + "\\Microsoft.NET\\Framework\\v3.5\\Microsoft.CompactFramework.CSharp.targets");
-
-//Find program files on 32-bit or 64-bit Windows
-var programFiles = Environment.GetEnvironmentVariable("ProgramFiles(x86)") ?? Environment.GetEnvironmentVariable("ProgramFiles");
-var isSilverlightSDKInstalled = FileExists(programFiles  + "\\MSBuild\\Microsoft\\Silverlight\\v5.0\\Microsoft.Silverlight.CSharp.targets");
-
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
 var packageVersion = version + modifier + dbgSuffix;
-
-//////////////////////////////////////////////////////////////////////
-// SUPPORTED FRAMEWORKS
-//////////////////////////////////////////////////////////////////////
-
-var WindowsFrameworks = new string[] {
-    "net-4.5", "net-4.0", "net-3.5", "net-2.0", "portable", "sl-5.0", "netcf-3.5" };
-
-var LinuxFrameworks = new string[] {
-    "net-4.5", "net-4.0", "net-3.5", "net-2.0" };
-
-var AllFrameworks = IsRunningOnWindows() ? WindowsFrameworks : LinuxFrameworks;
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
@@ -104,22 +86,31 @@ Task("InitializeBuild")
 			}
 			else
 			{
-				var buildNumber = AppVeyor.Environment.Build.Number;
+				var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
+				var branch = AppVeyor.Environment.Repository.Branch;
+				var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
 
-				var suffix = "-CI-" + buildNumber + dbgSuffix;
-
-				if (AppVeyor.Environment.PullRequest.IsPullRequest)
-					suffix += "-PR-" + AppVeyor.Environment.PullRequest.Number;
-				else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-					suffix += "-PRE-" + buildNumber;
+				if (branch == "master" && !isPullRequest)
+				{
+					packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+				}
 				else
-					suffix += "-" + AppVeyor.Environment.Repository.Branch;
+				{
+				    var suffix = "-ci-" + buildNumber + dbgSuffix;
 
-				// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-				if (suffix.Length > 21)
-					suffix = suffix.Substring(0, 21);
+					if (isPullRequest)
+						suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
+					else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+						suffix += "-pre-" + buildNumber;
+					else
+						suffix += "-" + branch;
 
-				packageVersion = version + suffix;
+					// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
+					if (suffix.Length > 21)
+						suffix = suffix.Substring(0, 21);
+
+					packageVersion = version + suffix;
+				}
 			}
 
 			AppVeyor.UpdateBuildVersion(packageVersion);
