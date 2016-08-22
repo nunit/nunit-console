@@ -26,9 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using NUnit.Core;
-using NUnit.Core.Filters;
 using NUnit.Engine.Extensibility;
-
 
 namespace NUnit.Engine.Drivers
 {
@@ -66,11 +64,32 @@ namespace NUnit.Engine.Drivers
 
             var initializer = DomainInitializer.CreateInstance(_testDomain);
             initializer.InitializeDomain((int)InternalTrace.Level);
-
-            _runner = RemoteTestRunner.CreateInstance(_testDomain, 1);
         }
 
         public string ID { get; set; }
+
+        private TestRunner Runner {
+            get
+            {
+                if (_runner == null)
+                {
+                    int runnerId;
+                    if (ID == null)
+                    {
+                        throw new NUnitEngineException("NUnit 2 Driver requires that ID must be defined at first.");
+                    }
+
+                    if (!int.TryParse(ID, out runnerId))
+                    {
+                        throw new NUnitEngineException("NUnit 2 Driver requires that ID must be defined as a string representation of an integer value.");
+                    }
+
+                    _runner = RemoteTestRunner.CreateInstance(_testDomain, runnerId);
+                }
+
+                return _runner;
+            }
+        }
 
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
@@ -85,10 +104,10 @@ namespace NUnit.Engine.Drivers
             foreach (var key in settings.Keys)
                 _package.Settings[key] = settings[key];
 
-            if (!_runner.Load(_package))
+            if (!Runner.Load(_package))
                 return string.Format(LOAD_RESULT_FORMAT, TestID, _name, _fullname, "No tests were found");
 
-            Core.ITest test = _runner.Test;
+            Core.ITest test = Runner.Test;
             // TODO: Handle error where test is null
 
             return test.ToXml(false).OuterXml;
@@ -97,32 +116,32 @@ namespace NUnit.Engine.Drivers
         public int CountTestCases(string filter)
         {
             ITestFilter v2Filter = CreateNUnit2TestFilter(filter);
-            return _runner.CountTestCases(v2Filter);
+            return Runner.CountTestCases(v2Filter);
         }
 
         public string Run(ITestEventListener listener, string filter)
         {
-            if (_runner.Test == null)
+            if (Runner.Test == null)
                 return String.Format(LOAD_RESULT_FORMAT, TestID, _name, _fullname, "Error loading test");
 
             ITestFilter v2Filter = CreateNUnit2TestFilter(filter);
 
-            var result = _runner.Run(new TestEventAdapter(listener), v2Filter, false, LoggingThreshold.Off);
+            var result = Runner.Run(new TestEventAdapter(listener), v2Filter, false, LoggingThreshold.Off);
 
             return result.ToXml(true).OuterXml;
         }
 
         public string Explore(string filter)
         {
-            if (_runner.Test == null)
+            if (Runner.Test == null)
                 return String.Format(LOAD_RESULT_FORMAT, TestID, _name, _fullname, "Error loading test");
 
-            return _runner.Test.ToXml(true).OuterXml;
+            return Runner.Test.ToXml(true).OuterXml;
         }
 
         public void StopRun(bool force)
         {
-            _runner.CancelRun();
+            Runner.CancelRun();
         }
 
         private static string Escape(string original)
