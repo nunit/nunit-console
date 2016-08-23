@@ -64,8 +64,10 @@ namespace NUnit.Engine.Runners
         /// <returns>
         /// A TestEngineResult.
         /// </returns>
-        protected override TestEngineResult ExploreTests(TestFilter filter)
+        public override TestEngineResult Explore(TestFilter filter)
         {
+            EnsurePackageIsLoaded();
+
             var result = new TestEngineResult();
 
             foreach (IFrameworkDriver driver in _drivers)
@@ -125,8 +127,10 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter</param>
         /// <returns>The count of test cases</returns>
-        protected override int CountTests(TestFilter filter)
+        public override int CountTestCases(TestFilter filter)
         {
+            EnsurePackageIsLoaded();
+
             int count = 0;
 
             foreach (IFrameworkDriver driver in _drivers)
@@ -146,6 +150,8 @@ namespace NUnit.Engine.Runners
         /// </returns>
         protected override TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
         {
+            EnsurePackageIsLoaded();
+
             var result = new TestEngineResult();
 
             foreach (IFrameworkDriver driver in _drivers)
@@ -178,6 +184,16 @@ namespace NUnit.Engine.Runners
         {
             foreach(var driver in _drivers)
                 driver.StopRun(force);
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void EnsurePackageIsLoaded()
+        {
+            if (!IsPackageLoaded)
+                LoadResult = LoadPackage();
         }
 
         #endregion

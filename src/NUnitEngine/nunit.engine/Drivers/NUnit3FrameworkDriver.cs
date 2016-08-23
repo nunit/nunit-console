@@ -85,8 +85,13 @@ namespace NUnit.Engine.Drivers
 
             CallbackHandler handler = new CallbackHandler();
 
-            log.Info("Loading {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
+            var fileName = Path.GetFileName(_testAssemblyPath);
+
+            log.Info("Loading {0} - see separate log file", fileName);
+
             CreateObject(LOAD_ACTION, _frameworkController, handler);
+
+            log.Info("Loaded {0}", fileName);
 
             return handler.Result;
         }

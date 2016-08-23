@@ -68,7 +68,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// Gets an indicator of whether the package has been loaded.
         /// </summary>
-        protected bool IsPackageLoaded
+        public bool IsPackageLoaded
         {
             get { return LoadResult != null;  }
         }
@@ -100,21 +100,6 @@ namespace NUnit.Engine.Runners
         public virtual void UnloadPackage()
         {
         }
-
-        /// <summary>
-        /// Explores a previously loaded TestPackage and returns information
-        /// about the tests found.
-        /// </summary>
-        /// <param name="filter">The TestFilter to be used to select tests</param>
-        /// <returns>A TestEngineResult.</returns>
-        protected abstract TestEngineResult ExploreTests(TestFilter filter);
-
-        /// <summary>
-        /// Count the test cases that would be run under the specified filter.
-        /// </summary>
-        /// <param name="filter">A TestFilter</param>
-        /// <returns>The count of test cases.</returns>
-        protected abstract int CountTests(TestFilter filter);
 
         /// <summary>
         /// Run the tests in the loaded TestPackage.
@@ -165,11 +150,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">The TestFilter to be used to select tests</param>
         /// <returns>A TestEngineResult.</returns>
-        public TestEngineResult Explore(TestFilter filter)
-        {
-            EnsurePackageIsLoaded();
-            return ExploreTests(filter);
-        }
+        public abstract TestEngineResult Explore(TestFilter filter);
 
         /// <summary>
         /// Loads the TestPackage for exploration or execution, saving the result.
@@ -208,11 +189,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter</param>
         /// <returns>The count of test cases.</returns>
-        public int CountTestCases(TestFilter filter)
-        {
-            EnsurePackageIsLoaded();
-            return CountTests(filter);
-        }
+        public abstract int CountTestCases(TestFilter filter);
 
         /// <summary>
         /// Run the tests in the TestPackage, loading the package
@@ -223,7 +200,6 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
         {
-            EnsurePackageIsLoaded();
             return RunTests(listener, filter);
         }
 
@@ -236,7 +212,6 @@ namespace NUnit.Engine.Runners
         /// <returns>An <see cref="AsyncTestEngineResult"/> that will provide the result of the test execution</returns>
         public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            EnsurePackageIsLoaded();
             return RunTestsAsync(listener, filter);
         }
         
@@ -270,15 +245,9 @@ namespace NUnit.Engine.Runners
         protected bool IsProjectPackage(TestPackage package)
         {
             return package != null
-                && package.FullName != null
-                && package.FullName != string.Empty
+                && ProjectService != null
+                && !string.IsNullOrEmpty(package.FullName)
                 && ProjectService.CanLoadFrom(package.FullName);
-        }
-
-        protected void EnsurePackageIsLoaded()
-        {
-            if (!IsPackageLoaded)
-                LoadResult = LoadPackage();
         }
 
         #endregion

@@ -79,6 +79,7 @@
     <Compile Include="Internal\SettingsGroupTests.cs" />
     <Compile Include="ResultHelperTests.cs" />
     <Compile Include="Runners\MultipleTestProcessRunnerTests.cs" />
+    <Compile Include="Runners\TestEngineRunnerTests.cs" />
     <Compile Include="Runners\ParallelTaskWorkerPoolTests.cs" />
     <Compile Include="RuntimeFrameworkTests.cs" />
     <Compile Include="Services\ExtensionAssemblyTests.cs" />
@@ -111,7 +112,7 @@
     <Compile Include="Services\TokenizerTests.cs" />
     <Compile Include="TempResourceFile.cs" />
     <Compile Include="TestEngineResultTests.cs" />
-    <Compile Include="Extensibility\ExtensionAttributeTests.cs" />
+    <Compile Include="Internal\Extensibility\ExtensionAttributeTests.cs" />
     <Compile Include="XmlHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>

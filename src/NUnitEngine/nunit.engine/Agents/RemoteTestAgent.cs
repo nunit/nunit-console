@@ -71,6 +71,7 @@ namespace NUnit.Engine.Agents
         public override ITestEngineRunner CreateRunner(TestPackage package)
         {
             _package = package;
+            _runner = Services.GetService<ITestRunnerFactory>().MakeTestRunner(_package);
             return this;
         }
 
@@ -121,17 +122,11 @@ namespace NUnit.Engine.Agents
         /// <returns>A TestEngineResult.</returns>
         public TestEngineResult Explore(TestFilter filter)
         {
-            if (_runner == null)
-                throw new InvalidOperationException("RemoteTestAgent: Explore called before Load");
-            
             return _runner.Explore(filter);
         }
 
         public TestEngineResult Load()
         {
-            //System.Diagnostics.Debug.Assert(false, "Attach debugger if desired");
-
-            _runner = Services.GetService<ITestRunnerFactory>().MakeTestRunner(_package);
             return _runner.Load();
         }
 
@@ -143,9 +138,6 @@ namespace NUnit.Engine.Agents
 
         public TestEngineResult Reload()
         {
-            if (_runner == null)
-                throw new InvalidOperationException("RemoteTestAgent: Reload called before Load");
-                
             return _runner.Reload();
         }
 
@@ -157,9 +149,6 @@ namespace NUnit.Engine.Agents
         /// <returns>The count of test cases</returns>
         public int CountTestCases(TestFilter filter)
         {
-            if (_runner == null)
-                throw new InvalidOperationException("RemoteTestAgent: CountTestCases called before Load");
-
             return _runner.CountTestCases(filter);
         }
 
@@ -172,9 +161,6 @@ namespace NUnit.Engine.Agents
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
         {
-            if (_runner == null)
-                throw new InvalidOperationException("RemoteTestAgent: Run called before Load");
-
             return _runner.Run(listener, filter);
         }
 
@@ -187,9 +173,6 @@ namespace NUnit.Engine.Agents
         /// <returns>A <see cref="AsyncTestEngineResult"/> that will provide the result of the test execution</returns>
         public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            if (_runner == null)
-                throw new InvalidOperationException("RemoteTestAgent: RunAsync called before Load");
-
             return _runner.RunAsync(listener, filter);
         }
 
