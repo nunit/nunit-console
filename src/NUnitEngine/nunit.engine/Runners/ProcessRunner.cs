@@ -120,7 +120,7 @@ namespace NUnit.Engine.Runners
             {
                 if (_remoteRunner != null)
                 {
-                    log.Info("Unloading remote runner");
+                    log.Info("Unloading " + TestPackage.Name);
                     _remoteRunner.Unload();
                     _remoteRunner = null;
                 }
@@ -160,9 +160,13 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestResult giving the result of the test execution</returns>
         protected override TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
         {
+            log.Info("Running " + TestPackage.Name);
+
             try
             {
-                return _remoteRunner.Run(listener, filter);
+                var result = _remoteRunner.Run(listener, filter);
+                log.Info("Done running " + TestPackage.Name);
+                return result;
             }
             catch (Exception e)
             {
@@ -181,6 +185,8 @@ namespace NUnit.Engine.Runners
         /// <returns>An AsyncTestRun that will provide the result of the test execution</returns>
         protected override AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
         {
+            log.Info("Running " + TestPackage.Name + " (async)");
+
             try
             {
                 return _remoteRunner.RunAsync(listener, filter);
@@ -218,7 +224,7 @@ namespace NUnit.Engine.Runners
             {
                 if (disposing && _agent != null)
                 {
-                    log.Info("Stopping remote agent");
+                    log.Debug("Stopping remote agent");
                     _agent.Stop();
                     _agent = null;
                 }
