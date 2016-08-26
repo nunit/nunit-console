@@ -103,8 +103,14 @@ namespace NUnit.Engine.Services
                 {
                     var extensionService = ServiceContext.GetService<ExtensionService>();
 
-                    if (extensionService != null && extensionService.Status == ServiceStatus.Started)
+                    if (extensionService == null)
+                        Status = ServiceStatus.Started;
+                    else if (extensionService.Status != ServiceStatus.Started)
+                        Status = ServiceStatus.Error;
+                    else
                     {
+                        Status = ServiceStatus.Started;
+
                         foreach (var node in extensionService.GetExtensionNodes<IProjectLoader>())
                         {
                             foreach (string ext in node.GetValues("FileExtension"))
@@ -118,11 +124,7 @@ namespace NUnit.Engine.Services
                                 }
                             }
                         }
-
-                        Status = ServiceStatus.Started;
                     }
-                    else
-                        Status = ServiceStatus.Error;
                 }
                 catch
                 {

@@ -59,7 +59,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns>A TestEngineResult.</returns>
-        protected override TestEngineResult ExploreTests(TestFilter filter)
+        public override TestEngineResult Explore(TestFilter filter)
         {
             var results = new List<TestEngineResult>();
 
@@ -81,7 +81,11 @@ namespace NUnit.Engine.Runners
         {
             var results = new List<TestEngineResult>();
 
-            foreach (ITestEngineRunner runner in _runners)
+            var packages = new List<TestPackage>(TestPackage.SubPackages);
+            if (packages.Count == 0)
+                packages.Add(TestPackage);
+
+            foreach (var runner in _runners)
                 results.Add(runner.Load());
 
             return ResultHelper.Merge(results);
@@ -102,7 +106,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter</param>
         /// <returns>The count of test cases</returns>
-        protected override int CountTests(TestFilter filter)
+        public override int CountTestCases(TestFilter filter)
         {
             int count = 0;
 

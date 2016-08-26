@@ -60,10 +60,11 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns>A TestEngineResult.</returns>
-        protected override TestEngineResult ExploreTests(TestFilter filter)
+        public override TestEngineResult Explore(TestFilter filter)
         {
             try
             {
+                CreateAgentAndRunner();
                 return _remoteRunner.Explore(filter);
             }
             catch (Exception e)
@@ -84,24 +85,11 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                if (_agent == null)
-                {
-                    // Increase the timeout to give time to attach a debugger
-                    bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
-                                 TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
-
-                    _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
-
-                    if (_agent == null)
-                        throw new Exception("Unable to acquire remote process agent");
-                }
-
-                if (_remoteRunner == null)
-                    _remoteRunner = _agent.CreateRunner(TestPackage);
+                CreateAgentAndRunner();
 
                 return _remoteRunner.Load();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 // TODO: Check if this is really needed
                 // Clean up if the load failed
@@ -139,10 +127,12 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter</param>
         /// <returns>The count of test cases</returns>
-        protected override int CountTests(TestFilter filter)
+        public override int CountTestCases(TestFilter filter)
         {
             try
             {
+                CreateAgentAndRunner();
+
                 return _remoteRunner.CountTestCases(filter);
             }
             catch (Exception e)
@@ -164,6 +154,8 @@ namespace NUnit.Engine.Runners
 
             try
             {
+                CreateAgentAndRunner();
+
                 var result = _remoteRunner.Run(listener, filter);
                 log.Info("Done running " + TestPackage.Name);
                 return result;
@@ -189,6 +181,8 @@ namespace NUnit.Engine.Runners
 
             try
             {
+                CreateAgentAndRunner();
+
                 return _remoteRunner.RunAsync(listener, filter);
             }
             catch (Exception e)
@@ -206,13 +200,16 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
-            try
+            if (_remoteRunner != null)
             {
-                _remoteRunner.StopRun(force);
-            }
-            catch (Exception e)
-            {
-                log.Error("Failed to stop the remote run. {0}", e.Message);
+                try
+                {
+                    _remoteRunner.StopRun(force);
+                }
+                catch (Exception e)
+                {
+                    log.Error("Failed to stop the remote run. {0}", e.Message);
+                }
             }
         }
 
@@ -234,6 +231,28 @@ namespace NUnit.Engine.Runners
                 log.Error("Failed to stop the remote agent. {0}", e.Message);
                 _agent = null;
             }
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void CreateAgentAndRunner()
+        {
+            if (_agent == null)
+            {
+                // Increase the timeout to give time to attach a debugger
+                bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
+                             TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
+
+                _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
+
+                if (_agent == null)
+                    throw new Exception("Unable to acquire remote process agent");
+            }
+
+            if (_remoteRunner == null)
+                _remoteRunner = _agent.CreateRunner(TestPackage);
         }
 
         TestEngineResult CreateFailedResult(Exception e)
