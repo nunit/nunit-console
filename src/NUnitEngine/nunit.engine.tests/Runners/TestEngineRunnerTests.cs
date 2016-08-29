@@ -35,8 +35,8 @@ namespace NUnit.Engine.Runners.Tests
     [TestFixture(typeof(ProcessRunner))]
     [TestFixture(typeof(MultipleTestDomainRunner), 1)]
     [TestFixture(typeof(MultipleTestDomainRunner), 3)]
-    [TestFixture(typeof(MultipleTestProcessRunner), 1)]
-    [TestFixture(typeof(MultipleTestProcessRunner), 3)]
+    //[TestFixture(typeof(MultipleTestProcessRunner), 1)]
+    //[TestFixture(typeof(MultipleTestProcessRunner), 3)]
     public class TestEngineRunnerTests<TRunner> where TRunner : AbstractTestRunner
     {
         protected TestPackage _package;

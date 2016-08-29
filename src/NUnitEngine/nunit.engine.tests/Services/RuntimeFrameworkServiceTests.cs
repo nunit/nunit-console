@@ -53,32 +53,17 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_runtimeService.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
-        [TestCase("mock-assembly.dll", "2.0.50727", false)]
-        [TestCase("net-2.0/mock-assembly.dll", "2.0.50727", false)]
-        [TestCase("net-4.0/mock-assembly.dll", "4.0.30319", false)]
-        // TODO: Change this case when the 4.0/4.5 bug is fixed
-        [TestCase("net-4.5/mock-assembly.dll", "4.0.30319", false)]
-        [TestCase("mock-cpp-clr-x64.dll", "4.0.30319", false)]
-        [TestCase("mock-cpp-clr-x86.dll", "4.0.30319", true)]
-        [TestCase("nunit-agent.exe", "2.0.50727", false)]
-        [TestCase("nunit-agent-x86.exe", "2.0.50727", true)]
-        // TODO: Make the following cases work correctly in case we want to use
-        // the engine to run them in the future.
-        [TestCase("netcf-3.5/mock-assembly.dll", "2.0.50727", false)]
-        [TestCase("sl-5.0/mock-assembly.dll", "4.0.30319", false)]
-        [TestCase("portable/mock-assembly.dll", "4.0.30319", false)]
-        public void SelectRuntimeFramework(string assemblyName, string expectedVersion, bool runAsX86)
+        [TestCase("mock-assembly.dll", false)]
+        [TestCase("nunit-agent.exe", false)]
+        [TestCase("nunit-agent-x86.exe", true)]
+        public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
         {
-            // Some files don't actually exist on our CI servers
-            Assume.That(assemblyName, Does.Exist);
             var package = new TestPackage(assemblyName);
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
-            var framework = RuntimeFramework.Parse(returnValue);
 
             Assert.That(package.GetSetting("RuntimeFramework", ""), Is.EqualTo(returnValue));
             Assert.That(package.GetSetting("RunAsX86", false), Is.EqualTo(runAsX86));
-            Assert.That(framework.ClrVersion.ToString(), Is.EqualTo(expectedVersion));
         }
 
         [Test]

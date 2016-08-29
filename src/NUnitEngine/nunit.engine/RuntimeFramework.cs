@@ -527,18 +527,22 @@ namespace NUnit.Engine
         {
             // Get Current runtime - it should be Mono, but check
             var current = RuntimeFramework.CurrentFramework;
-
-            // First check for profiles - only found for older framework versions
-            int originalCount = _availableFrameworks.Count;
-            string libMonoDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
-            string monoPrefix = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(libMonoDir)));
-            FindAllMonoProfiles(monoPrefix, current.MonoVersion);
-            if (_availableFrameworks.Count > originalCount)
-                return;
-
-            // If no profiles, we may be on a newer mono framework
             if (current.Runtime == RuntimeType.Mono)
+            {
+                // Multiple profiles are no longer supported with Mono 4.0
+                if (current.MonoVersion.Major < 4)
+                {
+                    int originalCount = _availableFrameworks.Count;
+                    string libMonoDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
+                    string monoPrefix = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(libMonoDir)));
+                    FindAllMonoProfiles(monoPrefix, current.MonoVersion);
+                    if (_availableFrameworks.Count > originalCount)
+                        return;
+                }
+
+                // If Mono 4.0+ or no profiles found use current runtime
                 _availableFrameworks.Add(RuntimeFramework.CurrentFramework);
+            }
         }
 
         private static void FindRecentMonoFrameworksOnWindows()
