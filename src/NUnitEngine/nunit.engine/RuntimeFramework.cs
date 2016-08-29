@@ -225,7 +225,21 @@ namespace NUnit.Engine
                         MethodInfo getDisplayNameMethod = monoRuntimeType.GetMethod(
                             "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
                         if (getDisplayNameMethod != null)
-                            _currentFramework.DisplayName = (string)getDisplayNameMethod.Invoke(null, new object[0]);
+                        {
+                            string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0]);
+
+                            int space = displayName.IndexOf(' ');
+                            if (space >= 3) // Minimum length of a version
+                            {
+                                string version = displayName.Substring(0, space);
+                                displayName = "Mono " + version;
+                                _currentFramework.MonoVersion = new Version(version);
+                            }
+                            else
+                                displayName = "Mono " + displayName;
+
+                            _currentFramework.DisplayName = displayName;
+                        }
                     }
                 }
 
@@ -306,6 +320,12 @@ namespace NUnit.Engine
         /// The CLR version for this runtime framework
         /// </summary>
         public Version ClrVersion { get; private set; }
+
+        /// <summary>
+        /// The version of Mono in use or null if not Mono runtime.
+        /// </summary>
+        /// <value>The mono version.</value>
+        public Version MonoVersion { get; set; }
 
         /// <summary>
         /// The Profile for this framwork, where relevant.
@@ -505,16 +525,18 @@ namespace NUnit.Engine
 
         private static void FindMonoFrameworksOnLinux()
         {
+            // Get Current runtime - it should be Mono, but check
+            var current = RuntimeFramework.CurrentFramework;
+
             // First check for profiles - only found for older framework versions
             int originalCount = _availableFrameworks.Count;
             string libMonoDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
-            var monoPrefix = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(libMonoDir)));
-            FindAllMonoProfiles(monoPrefix, null);
+            string monoPrefix = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(libMonoDir)));
+            FindAllMonoProfiles(monoPrefix, current.MonoVersion);
             if (_availableFrameworks.Count > originalCount)
                 return;
 
             // If no profiles, we may be on a newer mono framework
-            var current = RuntimeFramework.CurrentFramework;
             if (current.Runtime == RuntimeType.Mono)
                 _availableFrameworks.Add(RuntimeFramework.CurrentFramework);
         }
@@ -538,9 +560,6 @@ namespace NUnit.Engine
             if (monoVersion != null)
             {
                 AddMonoFramework(monoVersion, new Version(4, 5));
-                //var framework = new RuntimeFramework(RuntimeType.Mono, new Version(4, 5));
-                //framework.DisplayName = "Mono " + version;
-                //_availableFrameworks.Add(framework);
             }
         }
 
@@ -557,7 +576,7 @@ namespace NUnit.Engine
 
                 string monoPrefix = subKey.GetValue("SdkInstallRoot") as string;
                 if (monoPrefix != null)
-                    FindAllMonoProfiles(monoPrefix, version);
+                    FindAllMonoProfiles(monoPrefix, new Version(version));
             }
         }
 
@@ -585,40 +604,42 @@ namespace NUnit.Engine
         //    FindAllMonoProfiles(monoPrefix, version);
         //}
 
-        private static void FindAllMonoProfiles(string monoPrefix, string version)
+        private static void FindAllMonoProfiles(string monoPrefix, Version monoVersion)
         {
             if (monoPrefix != null)
             {
                 if (File.Exists(Path.Combine(monoPrefix, "lib/mono/1.0/mscorlib.dll")))
-                    AddMonoFramework(new Version(version), new Version(1, 1, 4322), "1.0");
+                    AddMonoFramework(monoVersion, new Version(1, 1, 4322), "1.0");
 
                 if (File.Exists(Path.Combine(monoPrefix, "lib/mono/2.0/mscorlib.dll")))
-                    AddMonoFramework(new Version(version), new Version(2, 0), "2.0");
+                    AddMonoFramework(monoVersion, new Version(2, 0), "2.0");
 
                 if (Directory.Exists(Path.Combine(monoPrefix, "lib/mono/3.5")))
-                    AddMonoFramework(new Version(version), new Version(3, 5), "3.5");
+                    AddMonoFramework(monoVersion, new Version(3, 5), "3.5");
 
                 if (File.Exists(Path.Combine(monoPrefix, "lib/mono/4.0/mscorlib.dll")))
-                    AddMonoFramework(new Version(version), new Version(4, 0), "4.0");
+                    AddMonoFramework(monoVersion, new Version(4, 0), "4.0");
 
                 if (File.Exists(Path.Combine(monoPrefix, "lib/mono/4.5/mscorlib.dll")))
-                    AddMonoFramework(new Version(version), new Version(4, 5), "4.5");
+                    AddMonoFramework(monoVersion, new Version(4, 5), "4.5");
             }
         }
 
         private static void AddMonoFramework(Version monoVersion, Version frameworkVersion)
         {
             var framework = new RuntimeFramework(RuntimeType.Mono, frameworkVersion);
-            if (monoVersion != null)
-                framework.DisplayName = "Mono " + monoVersion.ToString();
+            framework.DisplayName = monoVersion != null
+                ? "Mono " + monoVersion.ToString()
+                : "Mono";
             _availableFrameworks.Add(framework);
         }
 
         private static void AddMonoFramework(Version monoVersion, Version frameworkVersion, string profile)
         {
             var framework = new RuntimeFramework(RuntimeType.Mono, frameworkVersion, profile);
-            if (monoVersion != null)
-                framework.DisplayName = "Mono " + monoVersion.ToString() + " - " + profile + " Profile";
+            framework.DisplayName = monoVersion != null
+                ? "Mono " + monoVersion.ToString() + " - " + profile + " Profile"
+                : "Mono - " + profile + " Profile";
             _availableFrameworks.Add(framework);
         }
 
