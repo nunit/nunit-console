@@ -37,7 +37,7 @@ namespace NUnit.Engine.Runners
     {
         // The runners created by the derived class will (at least at the time
         // of writing this comment) be either TestDomainRunners or ProcessRunners.
-        protected readonly List<ITestEngineRunner> _runners = new List<ITestEngineRunner>();
+        private List<ITestEngineRunner> _runners;
 
         // Public for testing purposes
         public virtual int LevelOfParallelism
@@ -45,10 +45,26 @@ namespace NUnit.Engine.Runners
             get { return 1; }
         }
 
+        // Exposed for use by tests
+        public IList<ITestEngineRunner> Runners
+        {
+            get
+            {
+                if (_runners == null)
+                {
+                    _runners = new List<ITestEngineRunner>();
+                    foreach (var subPackage in TestPackage.SubPackages)
+                    {
+                        _runners.Add(CreateRunner(subPackage));
+                    }
+                }
+
+                return _runners;
+            }
+        }
+
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-            foreach (var subPackage in package.SubPackages)
-                _runners.Add(CreateRunner(subPackage));
         }
 
         #region AbstractTestRunner Overrides
@@ -63,14 +79,10 @@ namespace NUnit.Engine.Runners
         {
             var results = new List<TestEngineResult>();
 
-            foreach (ITestEngineRunner runner in _runners)
+            foreach (ITestEngineRunner runner in Runners)
                 results.Add(runner.Explore(filter));
 
-            TestEngineResult result = ResultHelper.Merge(results);
-
-            return IsProjectPackage(TestPackage)
-                ? result.MakePackageResult(TestPackage.Name, TestPackage.FullName)
-                : result;
+            return ResultHelper.Merge(results);
         }
 
         /// <summary>
@@ -85,7 +97,7 @@ namespace NUnit.Engine.Runners
             if (packages.Count == 0)
                 packages.Add(TestPackage);
 
-            foreach (var runner in _runners)
+            foreach (var runner in Runners)
                 results.Add(runner.Load());
 
             return ResultHelper.Merge(results);
@@ -96,7 +108,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         public override void UnloadPackage()
         {
-            foreach (ITestEngineRunner runner in _runners)
+            foreach (ITestEngineRunner runner in Runners)
                 runner.Unload();
         }
 
@@ -110,7 +122,7 @@ namespace NUnit.Engine.Runners
         {
             int count = 0;
 
-            foreach (ITestEngineRunner runner in _runners)
+            foreach (ITestEngineRunner runner in Runners)
                 count += runner.CountTestCases(filter);
 
             return count;
@@ -132,7 +144,7 @@ namespace NUnit.Engine.Runners
 
             if (LevelOfParallelism <= 1)
             {
-                foreach (ITestEngineRunner runner in _runners)
+                foreach (ITestEngineRunner runner in Runners)
                 {
                     results.Add(runner.Run(listener, filter));
                     if (disposeRunners) runner.Dispose();
@@ -143,7 +155,7 @@ namespace NUnit.Engine.Runners
                 var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
                 var tasks = new List<TestExecutionTask>();
 
-                foreach (ITestEngineRunner runner in _runners)
+                foreach (ITestEngineRunner runner in Runners)
                 {
                     var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
                     tasks.Add(task);
@@ -157,13 +169,9 @@ namespace NUnit.Engine.Runners
                     results.Add(task.Result());
             }
 
-            if (disposeRunners) _runners.Clear();
+            if (disposeRunners) Runners.Clear();
 
-            TestEngineResult result = ResultHelper.Merge(results);
-
-            return IsProjectPackage(TestPackage)
-                ? result.MakePackageResult(TestPackage.Name, TestPackage.FullName)
-                : result;
+            return ResultHelper.Merge(results);
         }
 
         /// <summary>
@@ -172,7 +180,7 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
-            foreach (var runner in _runners)
+            foreach (var runner in Runners)
                 runner.StopRun(force);
         }
 
@@ -180,19 +188,13 @@ namespace NUnit.Engine.Runners
         {
             base.Dispose(disposing);
 
-            foreach (var runner in _runners)
+            foreach (var runner in Runners)
                 runner.Dispose();
 
-            _runners.Clear();
+            Runners.Clear();
         }
 
         #endregion
-
-        // Exposed for use by tests
-        public IList<ITestEngineRunner> Runners
-        {
-            get { return _runners;  }
-        }
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {

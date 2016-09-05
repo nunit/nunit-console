@@ -39,9 +39,9 @@ namespace NUnit.Engine.Runners
         public AbstractTestRunner(IServiceLocator services, TestPackage package)
         {
             Services = services;
-            TestPackage = package;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
             ProjectService = Services.GetService<IProjectService>();
+            TestPackage = package;
         }
 
         #region Properties
@@ -214,7 +214,7 @@ namespace NUnit.Engine.Runners
         {
             return RunTestsAsync(listener, filter);
         }
-        
+
         #endregion
 
         #region IDisposable Members
@@ -236,18 +236,6 @@ namespace NUnit.Engine.Runners
 
                 _disposed = true;
             }
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        protected bool IsProjectPackage(TestPackage package)
-        {
-            return package != null
-                && ProjectService != null
-                && !string.IsNullOrEmpty(package.FullName)
-                && ProjectService.CanLoadFrom(package.FullName);
         }
 
         #endregion

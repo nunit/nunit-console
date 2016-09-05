@@ -22,7 +22,6 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -36,25 +35,26 @@ namespace NUnit.Engine.Runners
     public class MasterTestRunner : ITestRunner
     {
         private const string TEST_RUN_ELEMENT = "test-run";
-
-        private ITestEngineRunner _engineRunner;
-
-        private IServiceLocator _services;
-        private IRuntimeFrameworkService _runtimeService;
-        private ExtensionService _extensionService;
-        private IProjectService _projectService;
-        private ITestRunnerFactory _testRunnerFactory;
+        private readonly ITestEngineRunner _engineRunner;
+        private readonly IServiceLocator _services;
+        private readonly IRuntimeFrameworkService _runtimeService;
+        private readonly ExtensionService _extensionService;
+        private readonly IProjectService _projectService;
+        private bool _disposed;
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
+            if (services == null) throw new ArgumentNullException("services");
+            if (package == null) throw new ArgumentNullException("package");
+
             _services = services;
             TestPackage = package;
 
-            _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
             _projectService = _services.GetService<IProjectService>();
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
             _extensionService = _services.GetService<ExtensionService>();
-            _engineRunner = _testRunnerFactory.MakeTestRunner(package);
+            _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
+            LoadPackage();
         }
 
         #region Properties
@@ -139,7 +139,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode giving the result of the test execution</returns>
         public XmlNode Run(ITestEventListener listener, TestFilter filter)
         {
-            return RunTests(listener, filter).Xml;
+            return PrepareResult(RunTests(listener, filter)).Xml;
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            return _engineRunner.Explore(filter)
+            return PrepareResult(_engineRunner.Explore(filter))
                 .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName).Xml;
         }
 
@@ -184,8 +184,6 @@ namespace NUnit.Engine.Runners
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        private bool _disposed = false;
 
         /// <summary>
         /// Dispose of this object.
@@ -218,7 +216,7 @@ namespace NUnit.Engine.Runners
             // Some files in the top level package may be projects.
             // Expand them so that they contain subprojects for
             // each contained assembly.
-            ExpandProjects();
+            EnsurePackagesAreExpanded(TestPackage);
 
             // Use SelectRuntimeFramework for its side effects.
             // Info will be left behind in the package about
@@ -236,14 +234,51 @@ namespace NUnit.Engine.Runners
             LoadResult = _engineRunner.Load().Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
         }
 
-        private void ExpandProjects()
+        private TestEngineResult PrepareResult(TestEngineResult result)
         {
-            foreach (var package in TestPackage.SubPackages)
-            {
-                string packageName = package.FullName;
+            if (result == null) throw new ArgumentNullException("result");
 
-                if (File.Exists(packageName) && _projectService.CanLoadFrom(packageName))
-                    _projectService.ExpandProjectPackage(package);
+            if (!IsProjectPackage(TestPackage))
+            {
+                return result;
+            }
+
+            return result.MakePackageResult(TestPackage.Name, TestPackage.FullName);
+        }
+
+        private void EnsurePackagesAreExpanded(TestPackage package)
+        {
+            if (package == null) throw new ArgumentNullException("package");
+
+            foreach (var subPackage in package.SubPackages)
+            {
+                EnsurePackagesAreExpanded(subPackage);
+            }
+
+            if (package.SubPackages.Count == 0 && IsProjectPackage(package))
+            {
+                ExpandProjects(package);
+            }
+        }
+
+        private bool IsProjectPackage(TestPackage package)
+        {
+            if (package == null) throw new ArgumentNullException("package");
+
+            return 
+                _projectService != null
+                && !string.IsNullOrEmpty(package.FullName)
+                && _projectService.CanLoadFrom(package.FullName);
+        }
+
+        private void ExpandProjects(TestPackage package)
+        {
+            if (package == null) throw new ArgumentNullException("package");
+
+            string packageName = package.FullName;
+            if (File.Exists(packageName) && _projectService.CanLoadFrom(packageName))
+            {
+                _projectService.ExpandProjectPackage(package);
             }
         }
 
@@ -343,6 +378,11 @@ namespace NUnit.Engine.Runners
         {
             var doc = resultNode.OwnerDocument;
 
+            if (doc == null)
+            {
+                return;
+            }
+
             XmlNode cmd = doc.CreateElement("command-line");
             resultNode.InsertAfter(cmd, null);
 
@@ -356,12 +396,19 @@ namespace NUnit.Engine.Runners
             var tempNode = XmlHelper.CreateXmlNode(filter.Text);
 
             // Don't include it if it's an empty filter
-            if (tempNode.ChildNodes.Count > 0)
+            if (tempNode.ChildNodes.Count <= 0)
             {
-                var doc = resultNode.OwnerDocument;
-                var filterElement = doc.ImportNode(tempNode, true);
-                resultNode.InsertAfter(filterElement, null);
+                return;
             }
+
+            var doc = resultNode.OwnerDocument;
+            if (doc == null)
+            {
+                return;
+            }
+
+            var filterElement = doc.ImportNode(tempNode, true);
+            resultNode.InsertAfter(filterElement, null);
         }
 
         #endregion

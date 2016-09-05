@@ -38,7 +38,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class DriverService : Service, IDriverService
     {
-        IList<IDriverFactory> _factories = new List<IDriverFactory>();
+        readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 
         #region IDriverService Members
 
