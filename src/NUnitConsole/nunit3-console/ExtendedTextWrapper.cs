@@ -21,8 +21,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NUnit.ConsoleRunner
 {
@@ -56,6 +58,7 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         public override void Write(string value)
         {
+            value = UnescapeUnicodeChars(value);
             _writer.Write(value);
         }
 
@@ -64,6 +67,7 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         public override void WriteLine(string value)
         {
+            value = UnescapeUnicodeChars(value);
             _writer.WriteLine(value);
         }
 
@@ -149,6 +153,14 @@ namespace NUnit.ConsoleRunner
         public override void WriteLabelLine(string label, object option, ColorStyle valueStyle)
         {
             WriteLabelLine(label, option);
+        }
+
+        private static string UnescapeUnicodeChars(string text)
+        {
+            return Regex.Replace(text, @"\\[Uu]([0-9A-Fa-f]{4})", match => {
+                ushort value = ushort.Parse(match.Groups[1].Value, NumberStyles.AllowHexSpecifier);
+                return char.ToString((char)value);
+            });
         }
 
         #endregion
