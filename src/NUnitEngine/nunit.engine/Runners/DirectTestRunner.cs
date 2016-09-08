@@ -73,9 +73,6 @@ namespace NUnit.Engine.Runners
             foreach (IFrameworkDriver driver in _drivers)
                 result.Add(driver.Explore(filter.Text));
 
-            if (IsProjectPackage(TestPackage))
-                result = result.MakePackageResult(TestPackage.Name, TestPackage.FullName);
-
             return result;
         }
 
@@ -114,9 +111,6 @@ namespace NUnit.Engine.Runners
                 result.Add(driver.Load(testFile, subPackage.Settings));
                 _drivers.Add(driver);
             }
-
-            if (IsProjectPackage(TestPackage))
-                result = result.MakePackageResult(TestPackage.Name, TestPackage.FullName);
 
             return result;
         }
@@ -158,9 +152,6 @@ namespace NUnit.Engine.Runners
             {
                 result.Add(driver.Run(listener, filter.Text));
             }
-
-            if (IsProjectPackage(TestPackage))
-                result = result.MakePackageResult(TestPackage.Name, TestPackage.FullName);
 
             if (_assemblyResolver != null)
             {
