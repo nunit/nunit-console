@@ -24,6 +24,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using NUnit.Common;
 using NUnit.Options;
 using NUnit.Engine;
@@ -62,6 +63,17 @@ namespace NUnit.ConsoleRunner
                 WriteHeader();
                 OutWriter.WriteLine(ColorStyle.Error, string.Format(ex.Message, ex.OptionName));
                 return ConsoleRunner.INVALID_ARG;
+            }
+
+            if (!string.IsNullOrEmpty(Options.ConsoleEncoding)) {
+                try {
+                    Console.OutputEncoding = Encoding.GetEncoding(Options.ConsoleEncoding);
+                }
+                catch (Exception error) {
+                    WriteHeader();
+                    OutWriter.WriteLine(ColorStyle.Error, string.Format("Invalid Encoding! {0}", error.Message));
+                    return ConsoleRunner.INVALID_ARG;
+                }
             }
 
             //ColorConsole.Enabled = !Options.NoColor;

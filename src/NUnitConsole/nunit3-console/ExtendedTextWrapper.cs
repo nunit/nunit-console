@@ -157,10 +157,40 @@ namespace NUnit.ConsoleRunner
 
         private static string UnescapeUnicodeChars(string text)
         {
-            return Regex.Replace(text, @"\\[Uu]([0-9A-Fa-f]{4})", match => {
-                ushort value = ushort.Parse(match.Groups[1].Value, NumberStyles.AllowHexSpecifier);
-                return char.ToString((char)value);
-            });
+            if (string.IsNullOrEmpty(text)) return text;
+            StringBuilder builder = new StringBuilder();
+
+            int pos = 0;
+            for (int i = 0; i < text.Length; i++) {
+                char c = text[i];
+                if (c != '\\') continue;
+
+                if (i > pos) {
+                    builder.Append(text, pos, i - pos);
+                    pos = i;
+                }
+
+                switch (text[i + 1]) {
+                    case '\\':
+                        builder.Append('\\');
+                        pos += 2;
+                        i += 2;
+                        break;
+                    case 'u':
+                        if (i + 5 >= text.Length) continue;
+                        string unicodeText = text.Substring(i+2, 4);
+                        ushort unicodeValue = ushort.Parse(unicodeText, NumberStyles.AllowHexSpecifier);
+                        builder.Append((char)unicodeValue);
+                        pos += 6;
+                        i += 6;
+                        break;
+                }
+            }
+
+            if (pos < text.Length)
+                builder.Append(text, pos, text.Length - pos);
+
+            return builder.ToString();
         }
 
         #endregion
