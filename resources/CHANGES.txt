@@ -1,6 +1,6 @@
 ﻿NUnit msi Installer 3.5.0 - Date TBC
 
-* Framework is no longer installed, now solely distributed via NuGet.
+ * Framework is no longer installed, now solely distributed via NuGet.
 
 Components Installed:
  * NUnit.Engine 3.4.1
