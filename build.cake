@@ -4,18 +4,12 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var version = Argument("version", "3.5.0");
 
 //////////////////////////////////////////////////////////////////////
-// FILE PATHS
+// VERSION
 //////////////////////////////////////////////////////////////////////
 
-var ROOT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var WIX_PROJ = ROOT_DIR + "nunit/nunit.wixproj";
-var RESOURCES_DIR = ROOT_DIR + "resources/";
-var PACKAGES_DIR = ROOT_DIR + "packages/";
-var DISTRIBUTION_DIR = ROOT_DIR + "distribution/";
-var IMAGE_DIR = ROOT_DIR + "image/";
+var version = 3.5.0;
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGES
@@ -31,6 +25,17 @@ var NUGET_PACKAGES = new []
   "NUnit.Extension.NUnitV2ResultWriter",
   "NUnit.Extension.TeamCityEventListener"
 };
+
+//////////////////////////////////////////////////////////////////////
+// FILE PATHS
+//////////////////////////////////////////////////////////////////////
+
+var ROOT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
+var WIX_PROJ = ROOT_DIR + "nunit/nunit.wixproj";
+var RESOURCES_DIR = ROOT_DIR + "resources/";
+var PACKAGES_DIR = ROOT_DIR + "packages/";
+var DISTRIBUTION_DIR = ROOT_DIR + "distribution/";
+var IMAGE_DIR = ROOT_DIR + "image/";
 
 //////////////////////////////////////////////////////////////////////
 // TASK
