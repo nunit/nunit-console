@@ -9,7 +9,8 @@ var configuration = Argument("configuration", "Release");
 // VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = 3.5.0;
+var version = "3.5.0";
+var displayVersion = "3.5.0";
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGES
@@ -17,7 +18,6 @@ var version = 3.5.0;
 
 var NUGET_PACKAGES = new []
 {
-  "NUnit.Engine",
   "NUnit.ConsoleRunner",
   "NUnit.Extension.VSProjectLoader",
   "NUnit.Extension.NUnitProjectLoader",
@@ -85,6 +85,7 @@ Task("PackageMsi")
         .WithTarget("Rebuild")
         .SetConfiguration(configuration)
         .WithProperty("Version", version)
+        .WithProperty("DisplayVersion", displayVersion)
         .WithProperty("OutDir", DISTRIBUTION_DIR)
         .WithProperty("Image", IMAGE_DIR)
         .SetMSBuildPlatform(MSBuildPlatform.x86)

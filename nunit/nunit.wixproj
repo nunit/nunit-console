@@ -20,10 +20,10 @@
     <Name>nunit</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DefineConstants>Debug;Version=$(Version);InstallImage=$(Image)</DefineConstants>
+    <DefineConstants>Debug;Version=$(Version);InstallImage=$(Image);DisplayVersion=$(DisplayVersion)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DefineConstants>Version=$(Version);InstallImage=$(Image)</DefineConstants>
+    <DefineConstants>Version=$(Version);InstallImage=$(Image);DisplayVersion=$(DisplayVersion)</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="nunit.wxs" />
