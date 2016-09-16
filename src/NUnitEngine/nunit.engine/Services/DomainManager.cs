@@ -48,6 +48,8 @@ namespace NUnit.Engine.Services
 
         private ISettings _settingsService;
 
+        private int _domainIndex = 0;
+
         #region Create and Unload Domains
         /// <summary>
         /// Construct an application domain for running a test package
@@ -57,7 +59,7 @@ namespace NUnit.Engine.Services
         {
             AppDomainSetup setup = CreateAppDomainSetup(package);
 
-            string domainName = "test-domain-" + package.Name;
+            string domainName = "test-domain-" + Process.GetCurrentProcess().Id + "-" + _domainIndex++ + "-" + package.Name;
             // Setup the Evidence
             Evidence evidence = new Evidence(AppDomain.CurrentDomain.Evidence);
             if (evidence.Count == 0)
