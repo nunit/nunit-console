@@ -61,21 +61,29 @@ namespace NUnit.Engine.Internal
             {
                 if (_monoExePath == null && IsWindows())
                 {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
+                    string installDir = null;
+                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Mono");
                     if (key != null)
                     {
-                        string version = key.GetValue("DefaultCLR") as string;
-                        if (version != null)
+                        installDir = key.GetValue("SdkInstallRoot") as string;
+                    }
+                    else
+                    {
+                        key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
+                        if (key != null)
                         {
-                            key = key.OpenSubKey(version);
-                            if (key != null)
+                            string version = key.GetValue("DefaultCLR") as string;
+                            if (version != null)
                             {
-                                string installDir = key.GetValue("SdkInstallRoot") as string;
-                                if (installDir != null)
-                                    _monoExePath = Path.Combine(installDir, @"bin\mono.exe");
+                                key = key.OpenSubKey(version);
+                                if (key != null)
+                                    installDir = key.GetValue("SdkInstallRoot") as string;
                             }
                         }
                     }
+
+                    if (installDir != null)
+                        _monoExePath = Path.Combine(installDir, @"bin\mono.exe");
                 }
 
                 if (_monoExePath == null)
