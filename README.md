@@ -1,4 +1,4 @@
-nunit-distribution
+nunit-distribution ![Appveyor build](https://ci.appveyor.com/api/projects/status/github/nunit/nunit-distribution?branch=master&svg=true)
 ==================
 
 MSI installer which bundles multiple NUnit 3.X components. 
