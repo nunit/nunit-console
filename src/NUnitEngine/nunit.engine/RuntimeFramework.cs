@@ -502,111 +502,84 @@ namespace NUnit.Engine
             _availableFrameworks = new List<RuntimeFramework>();
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
                 FindDotNetFrameworks();
-                FindMonoFrameworksOnWindows();
-            }
-            else
-            {
-                FindMonoFrameworksOnLinux();
-            }
+
+            FindDefaultMonoFramework();
         }
 
         #endregion
 
         #region Helper Methods - Mono
 
-        private static void FindMonoFrameworksOnWindows()
+        private static void FindDefaultMonoFramework()
         {
-            FindRecentMonoFrameworksOnWindows();
-            FindOlderMonoFrameworksOnWindows();
-            //AppendDefaultMonoFrameworkOnWindows();
-        }
-
-        private static void FindMonoFrameworksOnLinux()
-        {
-            // Get Current runtime - it should be Mono, but check
-            var current = RuntimeFramework.CurrentFramework;
-            if (current.Runtime == RuntimeType.Mono)
+            if (CurrentFramework.Runtime == RuntimeType.Mono)
             {
-                // Multiple profiles are no longer supported with Mono 4.0
-                if (current.MonoVersion.Major < 4)
-                {
-                    int originalCount = _availableFrameworks.Count;
-                    string libMonoDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
-                    string monoPrefix = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(libMonoDir)));
-                    FindAllMonoProfiles(monoPrefix, current.MonoVersion);
-                    if (_availableFrameworks.Count > originalCount)
-                        return;
-                }
-
-                // If Mono 4.0+ or no profiles found use current runtime
-                _availableFrameworks.Add(RuntimeFramework.CurrentFramework);
+                UseCurrentMonoFramework();
+                return;
             }
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                FindBestMonoFrameworkOnWindows();
         }
 
-        private static void FindRecentMonoFrameworksOnWindows()
+        private static void UseCurrentMonoFramework()
         {
+            // Multiple profiles are no longer supported with Mono 4.0
+            if (CurrentFramework.MonoVersion.Major < 4)
+            {
+                int originalCount = _availableFrameworks.Count;
+                string libMonoDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
+                string monoPrefix = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(libMonoDir)));
+                FindAllMonoProfiles(monoPrefix, CurrentFramework.MonoVersion);
+                if (_availableFrameworks.Count > originalCount)
+                    return;
+            }
+
+            // If Mono 4.0+ or no profiles found, just use current runtime
+            _availableFrameworks.Add(RuntimeFramework.CurrentFramework);
+        }
+
+        private static void FindBestMonoFrameworkOnWindows()
+        {
+            // First, look for recent frameworks that use the Software\Mono Key
             RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Mono");
-            Version monoVersion = null;
 
             if (key != null && (int)key.GetValue("Installed", 0) == 1)
             {
-                var version = key.GetValue("Version") as string;
+                string version = key.GetValue("Version") as string;
                 if (version != null)
                 {
-                    monoVersion = new Version(version);
+                    AddMonoFramework(new Version(version), new Version(4, 5));
+                    return;
                 }
             }
-            else if (!Directory.Exists(@"C:\Program Files\Mono"))
-                return;
 
-            if (monoVersion != null)
+            // Some later 3.x Mono releases didn't use the registry
+            // so check in standard location for them.
+            if (Directory.Exists(@"C:\Program Files\Mono"))
             {
-                AddMonoFramework(monoVersion, new Version(4, 5));
+                AddMonoFramework(null, new Version(4, 5));
+            }
+            else // Look in the older Software\Novell key
+            {
+                key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
+                if (key != null)
+                {
+                    string version = key.GetValue("DefaultCLR") as string;
+                    if (version != null)
+                    {
+                        RegistryKey subKey = key.OpenSubKey(version);
+                        if (subKey != null)
+                        {
+                            string monoPrefix = subKey.GetValue("SdkInstallRoot") as string;
+                            if (monoPrefix != null)
+                                FindAllMonoProfiles(monoPrefix, new Version(version));
+                        }
+                    }
+                }
             }
         }
-
-        private static void FindOlderMonoFrameworksOnWindows()
-        {
-            // Use registry to find alternate versions
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
-            if (key == null) return;
-
-            foreach (string version in key.GetSubKeyNames())
-            {
-                RegistryKey subKey = key.OpenSubKey(version);
-                if (subKey == null) continue;
-
-                string monoPrefix = subKey.GetValue("SdkInstallRoot") as string;
-                if (monoPrefix != null)
-                    FindAllMonoProfiles(monoPrefix, new Version(version));
-            }
-        }
-
-        // Keeping this for the moment, till we are sure we don't want it
-        //private static void FindOlderMonoDefaultFrameworkOnWindows()
-        //{
-        //    string monoPrefix = null;
-        //    string version = null;
-
-        //    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-        //    {
-        //        RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
-        //        if (key != null)
-        //        {
-        //            version = key.GetValue("DefaultCLR") as string;
-        //            if (version != null && version != "")
-        //            {
-        //                key = key.OpenSubKey(version);
-        //                if (key != null)
-        //                    monoPrefix = key.GetValue("SdkInstallRoot") as string;
-        //            }
-        //        }
-        //    }
-
-        //    FindAllMonoProfiles(monoPrefix, version);
-        //}
 
         private static void FindAllMonoProfiles(string monoPrefix, Version monoVersion)
         {
