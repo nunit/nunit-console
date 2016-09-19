@@ -291,7 +291,7 @@ namespace NUnit.Engine
         {
             get
             {
-                return MonoPrefix != null
+                return MonoPrefix != null && Environment.OSVersion.Platform == PlatformID.Win32NT
                     ? Path.Combine(MonoPrefix, "bin/mono.exe")
                     : "mono";
             }
