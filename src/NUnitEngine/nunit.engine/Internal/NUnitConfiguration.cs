@@ -52,46 +52,6 @@ namespace NUnit.Engine.Internal
 
         #endregion
 
-        #region MonoExePath
-
-        private static string _monoExePath;
-        public static string MonoExePath
-        {
-            get
-            {
-                if (_monoExePath == null && IsWindows())
-                {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
-                    if (key != null)
-                    {
-                        string version = key.GetValue("DefaultCLR") as string;
-                        if (version != null)
-                        {
-                            key = key.OpenSubKey(version);
-                            if (key != null)
-                            {
-                                string installDir = key.GetValue("SdkInstallRoot") as string;
-                                if (installDir != null)
-                                    _monoExePath = Path.Combine(installDir, @"bin\mono.exe");
-                            }
-                        }
-                    }
-                }
-
-                if (_monoExePath == null)
-                    _monoExePath = "mono";
-
-                return _monoExePath;
-            }
-        }
-
-        private static bool IsWindows()
-        {
-            return Environment.OSVersion.Platform == PlatformID.Win32NT;
-        }
-
-        #endregion
-
         #region ApplicationDataDirectory
 
         private static string _applicationDirectory;
