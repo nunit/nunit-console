@@ -23,6 +23,7 @@
     <DefineConstants>TRACE;DEBUG;NUNIT_CONSOLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1685</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1685</NoWarn>
   </PropertyGroup>
@@ -32,21 +33,20 @@
     <DefineConstants>TRACE;NUNIT_CONSOLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1685</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1685</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NUnit.System.Linq, Version=0.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\NUnit.System.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="NUnit.System.Linq, Version=0.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\NUnit.System.Linq.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs">
@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj">
-      <Project>{d2c80e4b-1117-4f02-ab02-e453bda0c58e}</Project>
+      <Project>{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}</Project>
       <Name>mock-assembly</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj">

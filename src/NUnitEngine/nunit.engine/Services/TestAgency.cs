@@ -197,13 +197,12 @@ namespace NUnit.Engine.Services
             Guid agentId = Guid.NewGuid();
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
-            if (targetRuntime.ClrVersion.Build < 0)
-                targetRuntime = RuntimeFramework.GetBestAvailableFramework(targetRuntime);
+            targetRuntime = RuntimeFramework.GetBestAvailableFramework(targetRuntime);
 
             switch( targetRuntime.Runtime )
             {
                 case RuntimeType.Mono:
-                    p.StartInfo.FileName = NUnitConfiguration.MonoExePath;
+                    p.StartInfo.FileName = RuntimeFramework.MonoExePath;
                     string monoOptions = "--runtime=v" + targetRuntime.ClrVersion.ToString(3);
                     if (debugTests || debugAgent) monoOptions += " --debug";
                     p.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monoOptions, agentExePath, arglist);
