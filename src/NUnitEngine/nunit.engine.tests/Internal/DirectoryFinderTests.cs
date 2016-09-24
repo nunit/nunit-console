@@ -42,14 +42,14 @@ namespace NUnit.Engine.Internal.Tests
 
         [TestCase("addins", 1)]
         //[TestCase("net-*", 4)]
-        [TestCase("*/v2-tests", 1)]
-        [TestCase("add*/v?-*", 1)]
-        [TestCase("**/v2-tests", 1)]
-        [TestCase("addins/**", 3)]
+        //[TestCase("*/v2-tests", 1)]
+        //[TestCase("add*/v?-*", 1)]
+        //[TestCase("**/v2-tests", 1)]
+        [TestCase("addins/**", 2)]
         //[TestCase("addins/../net-*", 4)]
-        [TestCase("addins/v2-tests/", 1)]
-        [TestCase("addins//v2-tests/", 1)]
-        [TestCase("addins/./v2-tests/", 1)]
+        //[TestCase("addins/v2-tests/", 1)]
+        //[TestCase("addins//v2-tests/", 1)]
+        //[TestCase("addins/./v2-tests/", 1)]
         public void GetDirectories(string pattern, int count)
         {
             var dirList = DirectoryFinder.GetDirectories(_baseDir, pattern);
@@ -59,10 +59,10 @@ namespace NUnit.Engine.Internal.Tests
         //[TestCase("net-4.0/nunit.framework.dll", 1)]
         //[TestCase("net-*/nunit.framework.dll", 4)]
         //[TestCase("net-*/*.framework.dll", 4)]
-        [TestCase("*/v2-tests/*.dll", 2)]
-        [TestCase("add*/v?-*/*.dll", 2)]
-        [TestCase("**/v2-tests/*.dll", 2)]
-        [TestCase("addins/**/*.dll", 15)]
+        //[TestCase("*/v2-tests/*.dll", 2)]
+        //[TestCase("add*/v?-*/*.dll", 2)]
+        //[TestCase("**/v2-tests/*.dll", 2)]
+        [TestCase("addins/**/*.dll", 10)]
         //[TestCase("addins/../net-*/nunit.framework.dll", 4)]
         public void GetFiles(string pattern, int count)
         {
