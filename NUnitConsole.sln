@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}"
 	ProjectSection(SolutionItems) = preProject
@@ -53,17 +53,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "addin-tests", "src\NUnitEng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit-v2-result-writer", "src\NUnitEngine\Addins\nunit-v2-result-writer\nunit-v2-result-writer.csproj", "{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit.v2.driver", "src\NUnitEngine\Addins\nunit.v2.driver\nunit.v2.driver.csproj", "{379058E2-E834-4CC7-B5CD-AC8DFCF82AEA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit.v2.driver.tests", "src\NUnitEngine\Addins\nunit.v2.driver.tests\nunit.v2.driver.tests.csproj", "{B6D3AEAE-ECDA-4047-A9BA-CC6DA3EBEDF8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{B538DFF5-4309-497A-8E5D-415BE2FA3F8F}"
 	ProjectSection(SolutionItems) = preProject
 		nuget\extensions\nunit-project-loader.nuspec = nuget\extensions\nunit-project-loader.nuspec
 		nuget\extensions\nunit-v2-result-writer.nuspec = nuget\extensions\nunit-v2-result-writer.nuspec
-		nuget\extensions\nunit.v2.driver.addins = nuget\extensions\nunit.v2.driver.addins
-		nuget\extensions\nunit.v2.driver.nuspec = nuget\extensions\nunit.v2.driver.nuspec
-		nuget\extensions\teamcity-event-listener.nuspec = nuget\extensions\teamcity-event-listener.nuspec
 		nuget\extensions\vs-project-loader.nuspec = nuget\extensions\vs-project-loader.nuspec
 	EndProjectSection
 EndProject
@@ -151,14 +144,6 @@ Global
 		{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{379058E2-E834-4CC7-B5CD-AC8DFCF82AEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{379058E2-E834-4CC7-B5CD-AC8DFCF82AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{379058E2-E834-4CC7-B5CD-AC8DFCF82AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{379058E2-E834-4CC7-B5CD-AC8DFCF82AEA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6D3AEAE-ECDA-4047-A9BA-CC6DA3EBEDF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6D3AEAE-ECDA-4047-A9BA-CC6DA3EBEDF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6D3AEAE-ECDA-4047-A9BA-CC6DA3EBEDF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6D3AEAE-ECDA-4047-A9BA-CC6DA3EBEDF8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -181,8 +166,6 @@ Global
 		{E71A76CA-0089-4E1A-A7FB-210429DBED6E} = {B923C1E7-54DD-4E79-A1A9-B21123863B04}
 		{793CEC1B-D44D-4162-BE03-913BF1FDB458} = {B923C1E7-54DD-4E79-A1A9-B21123863B04}
 		{AECFA3FB-E55A-4151-9DEA-F715FBB972BA} = {B923C1E7-54DD-4E79-A1A9-B21123863B04}
-		{379058E2-E834-4CC7-B5CD-AC8DFCF82AEA} = {B923C1E7-54DD-4E79-A1A9-B21123863B04}
-		{B6D3AEAE-ECDA-4047-A9BA-CC6DA3EBEDF8} = {B923C1E7-54DD-4E79-A1A9-B21123863B04}
 		{B538DFF5-4309-497A-8E5D-415BE2FA3F8F} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{43A219A8-2995-4884-806F-FDB9CD25D403} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{BC87F477-1A7A-45D0-9AC1-9F7315264732} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}

@@ -46,7 +46,6 @@ var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var ADDIN_TESTS = "addins/tests/addin-tests.dll";
-var V2_DRIVER_TESTS = "addins/v2-tests/nunit.v2.driver.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
 
 // Packages
@@ -138,11 +137,9 @@ Task("BuildEngine")
         BuildProject("./src/NUnitEngine/Addins/nunit-project-loader/nunit-project-loader.csproj", configuration);
         BuildProject("./src/NUnitEngine/Addins/vs-project-loader/vs-project-loader.csproj", configuration);
         BuildProject("./src/NUnitEngine/Addins/nunit-v2-result-writer/nunit-v2-result-writer.csproj", configuration);
-        BuildProject("./src/NUnitEngine/Addins/nunit.v2.driver/nunit.v2.driver.csproj", configuration);
 
         // Addin tests
         BuildProject("./src/NUnitEngine/Addins/addin-tests/addin-tests.csproj", configuration);
-        BuildProject("./src/NUnitEngine/Addins/nunit.v2.driver.tests/nunit.v2.driver.tests.csproj", configuration);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -207,14 +204,6 @@ Task("TestAddins")
         RunTest(NUNIT3_CONSOLE, BIN_DIR, ADDIN_TESTS,"TestAddins", ref ErrorDetail);
     });
 
-Task("TestV2Driver")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunTest(NUNIT3_CONSOLE, BIN_DIR, V2_DRIVER_TESTS,"TestV2Driver", ref ErrorDetail);
-    });
-
 //////////////////////////////////////////////////////////////////////
 // TEST CONSOLE
 //////////////////////////////////////////////////////////////////////
@@ -267,9 +256,6 @@ var BinFiles = new FilePath[]
     "TextSummary.xslt",
     "addins/nunit-project-loader.dll",
     "addins/nunit-v2-result-writer.dll",
-    "addins/nunit.core.dll",
-    "addins/nunit.core.interfaces.dll",
-    "addins/nunit.v2.driver.dll",
     "addins/vs-project-loader.dll",
     "addins/tests/addin-tests.dll",
     "addins/tests/nunit-project-loader.dll",
@@ -278,9 +264,6 @@ var BinFiles = new FilePath[]
     "addins/tests/nunit.framework.dll",
     "addins/tests/nunit.framework.xml",
     "addins/tests/vs-project-loader.dll",
-    "addins/v2-tests/nunit.framework.dll",
-    "addins/v2-tests/nunit.framework.xml",
-    "addins/v2-tests/nunit.v2.driver.tests.dll"
 };
 
 Task("PackageSource")
@@ -371,14 +354,6 @@ Task("PackageExtensions")
         });
 
         NuGetPack("nuget/extensions/nunit-v2-result-writer.nuspec", new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = currentImageDir,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
-
-        NuGetPack("nuget/extensions/nunit.v2.driver.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
             BasePath = currentImageDir,
@@ -557,7 +532,6 @@ Task("Rebuild")
 Task("Test")
     .IsDependentOn("TestEngine")
     .IsDependentOn("TestAddins")
-    .IsDependentOn("TestV2Driver")
     .IsDependentOn("TestConsole");
 
 Task("Package")
