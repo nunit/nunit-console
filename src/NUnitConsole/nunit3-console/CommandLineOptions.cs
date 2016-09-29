@@ -375,7 +375,7 @@ namespace NUnit.Common
             this.Add("version|V", "Display the header and exit.",
                 v => ShowVersion = v != null);
 
-            this.Add("encoding=", "Specifies the encoding to use for Console standard output.",
+            this.Add("encoding=", "Specifies the encoding to use for Console standard output, for example utf-8, ascii, unicode.",
                 v => ConsoleEncoding = RequiredValue(v, "--encoding"));
 
             // Default

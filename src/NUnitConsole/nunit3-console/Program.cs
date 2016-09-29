@@ -74,7 +74,7 @@ namespace NUnit.ConsoleRunner
                 catch (Exception error)
                 {
                     WriteHeader();
-                    OutWriter.WriteLine(ColorStyle.Error, string.Format("Unsupported Encoding! {0}", error.Message));
+                    OutWriter.WriteLine(ColorStyle.Error, string.Format("Unsupported Encoding, {0}", error.Message));
                     return ConsoleRunner.INVALID_ARG;
                 }
             }
