@@ -35,6 +35,7 @@ namespace NUnit.Engine.Services.ProjectLoaders
     {
         static readonly char[] DELIMS = { '=', ',' };
         static readonly char[] TRIM_CHARS = { ' ', '"' };
+        static readonly Regex PathSeparatorLookup = new Regex(@"[/\\]");
         const string BUILD_MARKER = ".Build.0 =";
 
         IDictionary<string, VSProject> _projectLookup = new Dictionary<string, VSProject>();
@@ -118,7 +119,7 @@ namespace NUnit.Engine.Services.ProjectLoaders
                     if (line.StartsWith("Project("))
                     {
                         string[] parts = line.Split(DELIMS);
-                        string vsProjectPath = parts[2].Trim(TRIM_CHARS);
+                        string vsProjectPath = PathSeparatorLookup.Replace(parts[2].Trim(TRIM_CHARS), Path.DirectorySeparatorChar.ToString());
                         string vsProjectGuid = parts[3].Trim(TRIM_CHARS);
 
                         if (VSProject.IsProjectFile(vsProjectPath))
