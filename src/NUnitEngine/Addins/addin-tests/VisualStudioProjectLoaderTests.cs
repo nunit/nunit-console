@@ -26,12 +26,14 @@ using System.IO;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Tests.resources;
 using NUnit.Framework;
+using System.Text.RegularExpressions;
 
 namespace NUnit.Engine.Services.ProjectLoaders.Tests
 {
     [TestFixture]
     public class VisualStudioProjectLoaderTests
     {
+        private readonly Regex PathSeparatorLookup = new Regex(@"[/\\]");
         private VisualStudioProjectLoader _loader;
 
         [SetUp]
@@ -143,10 +145,10 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         [Test]
         public void FromVSSolution2003()
         {
-            using (new TestResource("legacy-csharp-sample.csproj", @"csharp\legacy-csharp-sample.csproj"))
-            using (new TestResource("legacy-jsharp-sample.vjsproj", @"jsharp\legacy-jsharp-sample.vjsproj"))
-            using (new TestResource("legacy-vb-sample.vbproj", @"vb\legacy-vb-sample.vbproj"))
-            using (new TestResource("legacy-cpp-sample.vcproj", @"cpp-sample\legacy-cpp-sample.vcproj"))
+            using (new TestResource("legacy-csharp-sample.csproj", NormalizePath(@"csharp\legacy-csharp-sample.csproj")))
+            using (new TestResource("legacy-jsharp-sample.vjsproj", NormalizePath(@"jsharp\legacy-jsharp-sample.vjsproj")))
+            using (new TestResource("legacy-vb-sample.vbproj", NormalizePath(@"vb\legacy-vb-sample.vbproj")))
+            using (new TestResource("legacy-cpp-sample.vcproj", NormalizePath(@"cpp-sample\legacy-cpp-sample.vcproj")))
             using (TestResource file = new TestResource("legacy-samples.sln"))
             {
                 IProject project = _loader.LoadFrom(file.Path);
@@ -160,10 +162,10 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         [Test]
         public void FromVSSolution2005()
         {
-            using (new TestResource("csharp-sample.csproj", @"csharp\csharp-sample.csproj"))
-            using (new TestResource("jsharp-sample.vjsproj", @"jsharp\jsharp-sample.vjsproj"))
-            using (new TestResource("vb-sample.vbproj", @"vb\vb-sample.vbproj"))
-            using (new TestResource("cpp-sample.vcproj", @"cpp-sample\cpp-sample.vcproj"))
+            using (new TestResource("csharp-sample.csproj", NormalizePath(@"csharp\csharp-sample.csproj")))
+            using (new TestResource("jsharp-sample.vjsproj", NormalizePath(@"jsharp\jsharp-sample.vjsproj")))
+            using (new TestResource("vb-sample.vbproj", NormalizePath(@"vb\vb-sample.vbproj")))
+            using (new TestResource("cpp-sample.vcproj", NormalizePath(@"cpp-sample\cpp-sample.vcproj")))
             using (TestResource file = new TestResource("samples.sln"))
             {
                 IProject project = _loader.LoadFrom(file.Path);
@@ -177,7 +179,7 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         [Test]
         public void FromWebApplication()
         {
-            using (new TestResource("legacy-csharp-sample.csproj", @"legacy-csharp-sample\legacy-csharp-sample.csproj"))
+            using (new TestResource("legacy-csharp-sample.csproj", NormalizePath(@"legacy-csharp-sample\legacy-csharp-sample.csproj")))
             using (TestResource file = new TestResource("solution-with-web-application.sln"))
             {
                 IProject project = _loader.LoadFrom(file.Path);
@@ -190,8 +192,8 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         [Test]
         public void WithUnmanagedCpp()
         {
-            using (new TestResource("legacy-csharp-sample.csproj", @"legacy-csharp-sample\legacy-csharp-sample.csproj"))
-            using (new TestResource("legacy-cpp-unmanaged.vcproj", @"legacy-cpp-unmanaged\legacy-cpp-unmanaged.vcproj"))
+            using (new TestResource("legacy-csharp-sample.csproj", NormalizePath(@"legacy-csharp-sample\legacy-csharp-sample.csproj")))
+            using (new TestResource("legacy-cpp-unmanaged.vcproj", NormalizePath(@"legacy-cpp-unmanaged\legacy-cpp-unmanaged.vcproj")))
             using (TestResource file = new TestResource("solution-with-unmanaged-cpp.sln"))
             {
                 IProject project = _loader.LoadFrom(file.Path);
@@ -205,8 +207,8 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         [Test]
         public void FromSolutionWithDisabledProject()
         {
-            using (new TestResource("csharp-sample.csproj", @"csharp-sample\csharp-sample.csproj"))
-            using (new TestResource("csharp-debug-only.csproj", @"csharp-debug-only\csharp-debug-only.csproj"))
+            using (new TestResource("csharp-sample.csproj", NormalizePath(@"csharp-sample\csharp-sample.csproj")))
+            using (new TestResource("csharp-debug-only.csproj", NormalizePath(@"csharp-debug-only\csharp-debug-only.csproj")))
             using (TestResource file = new TestResource("solution-with-disabled-project.sln"))
             {
                 IProject project = _loader.LoadFrom(file.Path);
@@ -219,8 +221,8 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         [Test]
         public void FromSolutionWithNonNunitTestProject()
         {
-            using (new TestResource("csharp-sample.csproj", @"csharp-sample\csharp-sample.csproj"))
-            using (new TestResource("csharp-debug-only-no-nunit.csproj", @"csharp-debug-only-no-nunit\csharp-debug-only-no-nunit.csproj"))
+            using (new TestResource("csharp-sample.csproj", NormalizePath(@"csharp-sample\csharp-sample.csproj")))
+            using (new TestResource("csharp-debug-only-no-nunit.csproj", NormalizePath(@"csharp-debug-only-no-nunit\csharp-debug-only-no-nunit.csproj")))
             using (TestResource file = new TestResource("solution-with-non-nunit-project.sln"))
             {
                 IProject project = _loader.LoadFrom(file.Path);
@@ -228,6 +230,11 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 Assert.AreEqual(1, project.GetTestPackage("Release").SubPackages.Count, "Release should have 2 assemblies");
                 Assert.AreEqual(1, project.GetTestPackage("Debug").SubPackages.Count, "Debug should have 1 assembly");
             }
+        }
+
+        private string NormalizePath(string path)
+        {
+            return this.PathSeparatorLookup.Replace(path, Path.DirectorySeparatorChar.ToString());
         }
     }
 }
