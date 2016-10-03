@@ -1,4 +1,38 @@
-﻿NUnit 3.4.1 - June 30, 2016
+﻿NUnit 3.5 - October ??, 2016
+
+This is the first version of NUnit where the framework will be released separately from the
+console runner, engine and other extensions. From this point forward, the NUnit console and engine will be
+released on its own schedule that is not bound to that of any other NUnit project and version numbers
+may diverge over time.
+
+This is also the first release where the NUnit Framework will not be included in the installer. Only
+the console runner, engine and extensions will be available as an MSI installer.
+
+Issues Resolved
+
+ * 1389 specifying solution and --agents is not working with nunit3-console
+ * 1595 Separate installer project
+ * 1596 Eliminate code sharing across projects to be split
+ * 1598 Split framework and console/engine into separate projects
+ * 1600 Split Engine Extensions into separarate projects
+ * 1610 Refactor dependencies in build.cake
+ * 1621 Remove console and command-line option files from common
+ * 1641 Create OSX CI Build on Travis
+ * 1677 Console help should indicate extension needed to use --teamcity
+ * 1687 Create nunit.engine.api NuGet package
+ * 1702 Create separate repo for teamcity event listener extension
+ * 1716 Move installer to new repository
+ * 1717 Change suffix for master builds
+ * 1719 Restore teamcity extension to NUnit.Console and NUnit.Runners packages
+ * 1723 Remove Cake target TestAll
+ * 1727 V2 Framework Driver does not include class or method name in XML
+ * 1732 NullReferenceException when using either --inprocess or --domain=Multiple options
+ * 1739 Create separate copies of MockAssembly for framework, engine and extensions
+ * 1741 --domain=None does not work
+ * 1776 Logger in DefaultTestAssemblyBuilder is retrieved before InternalTrace is initialized
+ * 1800 Remove Console/Engine projects from nunit.linux.sln
+
+NUnit 3.4.1 - June 30, 2016
 
 Console Runner
 
