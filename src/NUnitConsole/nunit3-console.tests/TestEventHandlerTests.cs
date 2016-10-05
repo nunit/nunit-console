@@ -60,17 +60,17 @@ namespace NUnit.ConsoleRunner.Tests
             // Start Events
             new TestCaseData("<start-test/>", "Off", ""),
             new TestCaseData("<start-test/>", "On", ""),
-            new TestCaseData("<start-test/>", "All", ""),
+            new TestCaseData("<start-test/>", "After", ""),
             new TestCaseData("<start-suite/>", "Off", ""),
             new TestCaseData("<start-suite/>", "On", ""),
-            new TestCaseData("<start-suite/>", "All", ""),
+            new TestCaseData("<start-suite/>", "After", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-case fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-case fullname='SomeName'/>", "All", "=> SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName'/>", "After", "=> SomeName\r\n"),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-suite fullname='SomeName'/>", "All", ""),
+            new TestCaseData("<test-suite fullname='SomeName'/>", "After", ""),
             // Finish Events - With Output
             new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
@@ -82,7 +82,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "=> SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
-                "All", 
+                "After", 
                 "=> SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
@@ -94,7 +94,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "=> SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
-                "All",
+                "After",
                 "=> SomeName\r\nOUTPUT\r\n"),
             // Output Events
             new TestCaseData(
@@ -107,7 +107,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT\r\n"),
             new TestCaseData(
                 "<test-output>OUTPUT</test-output>",
-                "All",
+                "After",
                 "OUTPUT\r\n")
         };
 #pragma warning restore 414

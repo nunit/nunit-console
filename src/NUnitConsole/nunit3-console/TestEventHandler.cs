@@ -78,7 +78,7 @@ namespace NUnit.ConsoleRunner
             var testName = testResult.Attributes["fullname"].Value;
             var outputNode = testResult.SelectSingleNode("output");
 
-            if (_displayLabels == "ALL")
+            if (_displayLabels == "AFTER")
                 WriteLabelLine(testName);
 
             if (outputNode != null)
@@ -97,7 +97,7 @@ namespace NUnit.ConsoleRunner
 
             if (outputNode != null)
             {
-                if (_displayLabels == "ON" || _displayLabels == "ALL")
+                if (_displayLabels == "ON" || _displayLabels == "AFTER")
                     WriteLabelLine(suiteName);
 
                 WriteOutputLine(outputNode.InnerText);
