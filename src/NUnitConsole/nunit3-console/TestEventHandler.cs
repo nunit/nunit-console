@@ -76,10 +76,11 @@ namespace NUnit.ConsoleRunner
         private void TestFinished(XmlNode testResult)
         {
             var testName = testResult.Attributes["fullname"].Value;
+            var resultStatus = testResult.Attributes["result"].Value.ToUpper();
             var outputNode = testResult.SelectSingleNode("output");
 
             if (_displayLabels == "AFTER")
-                WriteLabelLine(testName);
+                WriteLabelLine(testName, resultStatus);
 
             if (outputNode != null)
             {
@@ -123,6 +124,16 @@ namespace NUnit.ConsoleRunner
             {
                 using (new ColorConsole(ColorStyle.SectionHeader))
                     _outWriter.WriteLine("=> {0}", label);
+
+                _currentLabel = label;
+            }
+        }
+        private void WriteLabelLine(string label, string resultStatus)
+        {
+            if (label != _currentLabel)
+            {
+                using (new ColorConsole(ColorStyle.SectionHeader))
+                    _outWriter.WriteLine("{0} => {1}", resultStatus, label);
 
                 _currentLabel = label;
             }

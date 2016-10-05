@@ -65,27 +65,36 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData("<start-suite/>", "On", ""),
             new TestCaseData("<start-suite/>", "After", ""),
             // Finish Events - No Output
-            new TestCaseData("<test-case fullname='SomeName'/>", "Off", ""),
-            new TestCaseData("<test-case fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-case fullname='SomeName'/>", "After", "=> SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Off", ""),
+            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "On", ""),
+            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "After", "PASSED => SomeName\r\n"),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-suite fullname='SomeName'/>", "After", ""),
+            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "After", ""),
+
             // Finish Events - With Output
             new TestCaseData(
-                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "Off",
                 "OUTPUT\r\n"),
             new TestCaseData(
-                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "On",
                 "=> SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
-                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "After", 
-                "=> SomeName\r\nOUTPUT\r\n"),
+                "PASSED => SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
-                "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
+                "<test-case fullname='SomeName' result='Passed' />", 
+                "After", 
+                "PASSED => SomeName\r\n"),
+            new TestCaseData
+                ("<test-case fullname='SomeName' result='Failed' />", 
+                "After", 
+                "FAILED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
                 "Off", 
                 "OUTPUT\r\n"),
             new TestCaseData(
