@@ -76,7 +76,7 @@ namespace NUnit.ConsoleRunner
         private void TestFinished(XmlNode testResult)
         {
             var testName = testResult.Attributes["fullname"].Value;
-            var resultStatus = testResult.Attributes["result"].Value.ToUpper();
+            var resultStatus = testResult.Attributes["result"].Value;
             var outputNode = testResult.SelectSingleNode("output");
 
             if (_displayLabels == "AFTER")
@@ -132,8 +132,13 @@ namespace NUnit.ConsoleRunner
         {
             if (label != _currentLabel)
             {
-                using (new ColorConsole(ColorStyle.SectionHeader))
-                    _outWriter.WriteLine("{0} => {1}", resultStatus, label);
+                ColorStyle colorByResultStatus = resultStatus == "Passed" ? ColorStyle.Pass : resultStatus == "Failed"
+                            ? ColorStyle.Failure : resultStatus == "Warning"
+                    ? ColorStyle.Warning
+                    : ColorStyle.Output;
+
+                using (new ColorConsole(colorByResultStatus))
+                    _outWriter.WriteLine("{0} => {1}", resultStatus.ToUpper(), label);
 
                 _currentLabel = label;
             }
