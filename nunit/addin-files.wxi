@@ -22,6 +22,13 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="TEAMCITY.EVENT.LISTENER" Directory="ADDINS">
+            <Component Id="TEAMCITY.EVENT.LISTENER" Location="local" Guid="F7A37F5B-2D83-4B82-83E9-5A4EC0CBEB2F">
+                <File Id="teamcity_event_listener.dll"
+                      Source="$(var.InstallImage)\teamcity-event-listener.dll" />
+            </Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="NUNIT.V2.DRIVER" Directory="ADDINS">
             <Component Id="NUNIT.V2.DRIVER" Location="local" Guid="4A55D836-7719-40A2-BDFF-CE3980FE3B42">
                 <File Id="nunit.v2.driver.dll"
