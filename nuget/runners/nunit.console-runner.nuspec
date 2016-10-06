@@ -10,7 +10,7 @@
     <projectUrl>http://nunit.org</projectUrl>
     <iconUrl>http://nunit.org/nuget/nunitv3_32x32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Console runner for version 3.0 of the NUnit unit-testing framework, without any extensions.</summary>
+    <summary>Console runner for the NUnit 3 unit-testing framework, without any extensions.</summary>
     <description>
       This package includes the nunit3-console runner and test engine for version 3.0 of the NUnit unit-testing framework.
 

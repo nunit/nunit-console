@@ -29,6 +29,8 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
 {
+    using Fakes;
+
     public class DefaultTestRunnerFactoryTests
     {
         private ServiceContext _services;
@@ -39,7 +41,7 @@ namespace NUnit.Engine.Services.Tests
         {
             _services = new ServiceContext();
             _services.Add(new ExtensionService());
-            _services.Add(new ProjectService());
+            _services.Add(new FakeProjectService());
             _factory = new DefaultTestRunnerFactory();
             _services.Add(_factory);
             _services.ServiceManager.StartServices();
