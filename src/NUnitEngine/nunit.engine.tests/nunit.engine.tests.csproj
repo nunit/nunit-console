@@ -98,8 +98,6 @@
     <Compile Include="Services\DriverServiceTests.cs" />
     <Compile Include="Services\ProjectServiceTests.cs" />
     <Compile Include="Services\ResultServiceTests.cs" />
-    <Compile Include="Services\ResultWriters\NUnit2XmlResultWriterTests.cs" />
-    <Compile Include="Services\ResultWriters\NUnit2XmlValidationTests.cs" />
     <Compile Include="Services\RecentFilesTests.cs" />
     <Compile Include="Services\ResultWriters\SchemaValidator.cs" />
     <Compile Include="Services\ResultWriters\XmlOutputTest.cs" />

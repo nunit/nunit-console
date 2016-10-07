@@ -8,6 +8,9 @@ os:
   - linux
   - osx
 matrix:
+  exclude:
+    - os: osx
+      mono: 3.2.8
   allow_failures:
     - mono: latest
   fast_finish: true

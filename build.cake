@@ -45,7 +45,6 @@ var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
-var ADDIN_TESTS = "addins/tests/addin-tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
 
 // Packages
@@ -132,14 +131,6 @@ Task("BuildEngine")
 
         // Engine tests
         BuildProject("./src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj", configuration);
-
-        // Addins
-        BuildProject("./src/NUnitEngine/Addins/nunit-project-loader/nunit-project-loader.csproj", configuration);
-        BuildProject("./src/NUnitEngine/Addins/vs-project-loader/vs-project-loader.csproj", configuration);
-        BuildProject("./src/NUnitEngine/Addins/nunit-v2-result-writer/nunit-v2-result-writer.csproj", configuration);
-
-        // Addin tests
-        BuildProject("./src/NUnitEngine/Addins/addin-tests/addin-tests.csproj", configuration);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -196,14 +187,6 @@ Task("TestEngine")
         RunTest(NUNIT3_CONSOLE, BIN_DIR, ENGINE_TESTS, "TestEngine", ref ErrorDetail);
     });
 
-Task("TestAddins")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .IsDependentOn("Build")
-    .Does(() =>
-    {
-        RunTest(NUNIT3_CONSOLE, BIN_DIR, ADDIN_TESTS,"TestAddins", ref ErrorDetail);
-    });
-
 //////////////////////////////////////////////////////////////////////
 // TEST CONSOLE
 //////////////////////////////////////////////////////////////////////
@@ -238,7 +221,6 @@ var BinFiles = new FilePath[]
     "nunit-agent-x86.exe.config",
     "nunit-agent.exe",
     "nunit-agent.exe.config",
-    "nunit.engine.addin.xml",
     "nunit.engine.addins",
     "nunit.engine.api.dll",
     "nunit.engine.api.xml",
@@ -254,16 +236,6 @@ var BinFiles = new FilePath[]
     "nunit3-console.tests.dll",
     "TestListWithEmptyLine.tst",
     "TextSummary.xslt",
-    "addins/nunit-project-loader.dll",
-    "addins/nunit-v2-result-writer.dll",
-    "addins/vs-project-loader.dll",
-    "addins/tests/addin-tests.dll",
-    "addins/tests/nunit-project-loader.dll",
-    "addins/tests/nunit.engine.api.dll",
-    "addins/tests/nunit.engine.api.xml",
-    "addins/tests/nunit.framework.dll",
-    "addins/tests/nunit.framework.xml",
-    "addins/tests/vs-project-loader.dll",
 };
 
 Task("PackageSource")
@@ -329,39 +301,6 @@ Task("PackageEngine")
         });
     });
 
-Task("PackageExtensions")
-    .IsDependentOn("CreateImage")
-    .Does(() =>
-    {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-
-        CreateDirectory(PACKAGE_DIR);
-
-        NuGetPack("nuget/extensions/nunit-project-loader.nuspec", new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = currentImageDir,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
-
-        NuGetPack("nuget/extensions/vs-project-loader.nuspec", new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = currentImageDir,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
-
-        NuGetPack("nuget/extensions/nunit-v2-result-writer.nuspec", new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = currentImageDir,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
-    });
-
 Task("PackageConsole")
     .IsDependentOn("CreateImage")
     .Does(() =>
@@ -405,10 +344,7 @@ Task("PackageZip")
 
         var zipFiles =
             GetFiles(currentImageDir + "*.*") +
-            GetFiles(currentImageDir + "bin/*.*") +
-            GetFiles(currentImageDir + "bin/addins/*.*") +
-            GetFiles(currentImageDir + "bin/addins/tests/*.*") +
-            GetFiles(currentImageDir + "bin/addins/v2-tests/*.*");
+            GetFiles(currentImageDir + "bin/*.*");
         Zip(currentImageDir, File(ZIP_PACKAGE), zipFiles);
     });
 
@@ -531,13 +467,11 @@ Task("Rebuild")
 
 Task("Test")
     .IsDependentOn("TestEngine")
-    .IsDependentOn("TestAddins")
     .IsDependentOn("TestConsole");
 
 Task("Package")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
-    .IsDependentOn("PackageExtensions")
     .IsDependentOn("PackageConsole")
     .IsDependentOn("PackageZip");
 
