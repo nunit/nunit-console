@@ -16,9 +16,13 @@ var displayVersion = "3.5.0";
 // NUGET PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-var NUGET_PACKAGES = new []
+var CONSOLE_PACKAGES = new []
 {
-  "NUnit.ConsoleRunner",
+  "NUnit.ConsoleRunner"
+};
+
+var EXTENSION_PACKAGES = new []
+{
   "NUnit.Extension.VSProjectLoader",
   "NUnit.Extension.NUnitProjectLoader",
   "NUnit.Extension.NUnitV2Driver",
@@ -33,48 +37,57 @@ var NUGET_PACKAGES = new []
 var ROOT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var WIX_PROJ = ROOT_DIR + "nunit/nunit.wixproj";
 var RESOURCES_DIR = ROOT_DIR + "resources/";
-var PACKAGES_DIR = ROOT_DIR + "packages/";
+var RUNNER_PACKAGES_DIR = ROOT_DIR + "runner-packages/";
+var EXTENSION_PACKAGES_DIR = ROOT_DIR + "extension-packages/";
 var DISTRIBUTION_DIR = ROOT_DIR + "distribution/";
 var IMAGE_DIR = ROOT_DIR + "image/";
+var IMAGE_ADDINS_DIR = IMAGE_DIR + "addins/";
+var ZIP_FILE = string.Format("{0}NUnit.{1}.zip", DISTRIBUTION_DIR, version);
 
 //////////////////////////////////////////////////////////////////////
 // TASK
 //////////////////////////////////////////////////////////////////////
 
-Task("FetchPackages")
+Task("Clean")
 .Does(() =>
 {
-    CleanDirectory(PACKAGES_DIR);
+    CleanDirectory(RUNNER_PACKAGES_DIR);
+    CleanDirectory(EXTENSION_PACKAGES_DIR);
+    CleanDirectory(IMAGE_DIR);
+    CleanDirectory(DISTRIBUTION_DIR);
+});
 
-    var settings = new NuGetInstallSettings
+Task("FetchPackages")
+.IsDependentOn("Clean")
+.Does(() =>
+{
+    foreach(var package in CONSOLE_PACKAGES)
     {
-        OutputDirectory = PACKAGES_DIR
-    };
+        NuGetInstall(package, new NuGetInstallSettings { 
+						OutputDirectory = RUNNER_PACKAGES_DIR
+					});
+    }
 
-    foreach(var package in NUGET_PACKAGES)
+    foreach(var package in EXTENSION_PACKAGES)
     {
-        NuGetInstall(package, settings);
+        NuGetInstall(package, new NuGetInstallSettings { 
+						OutputDirectory = EXTENSION_PACKAGES_DIR
+					});
     }
 });
 
 Task("CreateImage")
+.IsDependentOn("Clean")
 .IsDependentOn("FetchPackages")
 .Does(() =>
 {
-    CleanDirectory(IMAGE_DIR);
     CopyDirectory(RESOURCES_DIR, IMAGE_DIR);
 
-    foreach(var directory in System.IO.Directory.GetDirectories(PACKAGES_DIR))
-    {
-        var lib = directory + "/lib";
-        var tools = directory + "/tools";
+    foreach(var packageDir in GetAllDirectories(RUNNER_PACKAGES_DIR))
+		CopyPackageContents(packageDir, IMAGE_DIR);
 
-        if (DirectoryExists(lib))
-        CopyDirectory(lib, IMAGE_DIR);
-
-        if (DirectoryExists(tools))
-        CopyDirectory(tools, IMAGE_DIR);
-    }
+    foreach(var packageDir in GetAllDirectories(EXTENSION_PACKAGES_DIR))
+		CopyPackageContents(packageDir, IMAGE_ADDINS_DIR);
 });
 
 Task("PackageMsi")
@@ -93,12 +106,37 @@ Task("PackageMsi")
         );
 });
 
+Task("PackageZip")
+.IsDependentOn("CreateImage")
+.Does(() =>
+{
+    Zip(IMAGE_DIR, ZIP_FILE);
+});
+
+Task("PackageAll")
+.IsDependentOn("PackageMsi")
+.IsDependentOn("PackageZip");
 
 Task("Appveyor")
-.IsDependentOn("PackageMsi");
+.IsDependentOn("PackageAll");
 
 Task("Default")
-.IsDependentOn("PackageMsi");
+.IsDependentOn("PackageAll");
+
+//////////////////////////////////////////////////////////////////////
+// HELPER METHODS
+//////////////////////////////////////////////////////////////////////
+
+public string[] GetAllDirectories(string dirPath)
+{
+    return System.IO.Directory.GetDirectories(dirPath);
+}
+
+public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
+{
+    var tools = packageDir + "/tools";
+	CopyDirectory(tools, outDir);
+}
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

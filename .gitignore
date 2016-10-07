@@ -162,7 +162,8 @@ $RECYCLE.BIN/
 
 distribution/
 image/
-packages/
+extension-packages/
+runner-packages/
 tools/*
 !tools/packages.config
 nunit/bin
