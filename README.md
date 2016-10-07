@@ -1,6 +1,6 @@
-# NUnit 3.0 #
+-# NUnit 3.0 #
 
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/3xfkxtnkrts1x06q/branch/master?svg=true)](https://ci.appveyor.com/project/CharliePoole/nunit/branch/master) [![Travis Build Status](https://travis-ci.org/nunit/nunit.svg?branch=master)](https://travis-ci.org/nunit/nunit) [![NuGet Version and Downloads count](https://buildstats.info/nuget/NUnit)](https://www.nuget.org/packages/NUnit) 
+[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/3xfkxtnkrts1x06q/branch/master?svg=true)](https://ci.appveyor.com/project/CharliePoole/nunit-console/branch/master) [![Travis Build Status](https://travis-ci.org/nunit/nunit-console.svg?branch=master)](https://travis-ci.org/nunit/nunit-console) [![NuGet Version and Downloads count](https://buildstats.info/nuget/NUnit.Console)](https://www.nuget.org/packages/NUnit.Console) 
 
 [![Follow NUnit](https://img.shields.io/twitter/follow/nunit.svg?style=social)](https://twitter.com/nunit)
 
