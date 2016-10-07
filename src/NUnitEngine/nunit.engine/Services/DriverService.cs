@@ -98,8 +98,6 @@ namespace NUnit.Engine.Services
 
             try
             {
-                _factories.Add(new NUnit3DriverFactory());
-
                 var extensionService = ServiceContext.GetService<ExtensionService>();
                 if (extensionService != null)
                 {
@@ -110,7 +108,9 @@ namespace NUnit.Engine.Services
                     if (node != null)
                         _factories.Add(new NUnit2DriverFactory(node));
                 }
- 
+
+                _factories.Add(new NUnit3DriverFactory());
+
                 Status = ServiceStatus.Started;
             }
             catch(Exception)
