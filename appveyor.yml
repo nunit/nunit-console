@@ -2,4 +2,5 @@ build_script:
   - ps: .\build.ps1 -Target "Appveyor"
 
 artifacts:
-- path: distribution\*.msi
+- path: distribution\*.msi 
+- path: distribution\*.zip
