@@ -215,27 +215,58 @@ namespace NUnit.Engine.Runners
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
+            // Disposal has to perform two actions, unloading the runner and
+            // stopping the agent. Both must be tried even if one fails so
+            // there can be up to two independent errors to be reported
+            // through an NUnitEngineException. We do that by combining messages.
+            if (!_disposed && disposing)
+            {
+                _disposed = true;
 
-            try
-            {
-                if (disposing && _agent != null)
+                string unloadError = null;
+
+                try
                 {
-                    log.Debug("Stopping remote agent");
-                    _agent.Stop();
-                    _agent = null;
+                    Unload();
                 }
-            }
-            catch (Exception e)
-            {
-                log.Error("Failed to stop the remote agent. {0}", e.Message);
-                _agent = null;
+                catch(Exception ex)
+                {
+                    // Save and log the unload error
+                    unloadError = ex.Message;
+                    log.Error(unloadError);
+                }
+
+                if (_agent != null)
+                {
+                    try
+                    {
+                        log.Debug("Stopping remote agent");
+                        _agent.Stop();
+                        _agent = null;
+                    }
+                    catch (Exception e)
+                    {
+                        string stopError = string.Format("Failed to stop the remote agent. {0}", e.Message);
+                        log.Error(stopError);
+                        _agent = null;
+
+                        // Stop error with no unload error, just rethrow
+                        if (unloadError == null)
+                            throw;
+
+                        // Both kinds of errors, throw exception with combined message
+                        throw new NUnitEngineException(unloadError + Environment.NewLine + stopError);
+                    }
+                }
+
+                if (unloadError != null) // Add message line indicating we managed to stop agent anyway
+                    throw (new NUnitEngineException(unloadError + "\nAgent Process was terminated successfully after error."));
             }
         }
 
-        #endregion
+#endregion
 
-        #region Helper Methods
+#region Helper Methods
 
         private void CreateAgentAndRunner()
         {
@@ -283,6 +314,6 @@ namespace NUnit.Engine.Runners
             return new TestEngineResult(suite);
         }
 
-        #endregion
+#endregion
     }
 }

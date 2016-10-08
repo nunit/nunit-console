@@ -70,6 +70,7 @@
     <Compile Include="AsyncTestEngineResultTests.cs" />
     <Compile Include="Drivers\NUnit3FrameworkDriverTests.cs" />
     <Compile Include="DummyExtensions.cs" />
+    <Compile Include="HangingAppDomainFixture.cs" />
     <Compile Include="Internal\AssemblyHelperTests.cs" />
     <Compile Include="Internal\DirectoryFinderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
