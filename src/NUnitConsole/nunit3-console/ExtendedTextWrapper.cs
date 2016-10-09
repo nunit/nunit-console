@@ -21,8 +21,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NUnit.ConsoleRunner
 {
@@ -56,6 +58,7 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         public override void Write(string value)
         {
+            value = UnescapeUnicodeChars(value);
             _writer.Write(value);
         }
 
@@ -64,6 +67,7 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         public override void WriteLine(string value)
         {
+            value = UnescapeUnicodeChars(value);
             _writer.WriteLine(value);
         }
 
@@ -149,6 +153,44 @@ namespace NUnit.ConsoleRunner
         public override void WriteLabelLine(string label, object option, ColorStyle valueStyle)
         {
             WriteLabelLine(label, option);
+        }
+
+        private static string UnescapeUnicodeChars(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            StringBuilder builder = new StringBuilder();
+
+            int pos = 0;
+            for (int i = 0; i < text.Length; i++) {
+                char c = text[i];
+                if (c != '\\') continue;
+
+                if (i > pos) {
+                    builder.Append(text, pos, i - pos);
+                    pos = i;
+                }
+
+                switch (text[i + 1]) {
+                    case '\\':
+                        builder.Append('\\');
+                        pos += 2;
+                        i += 2;
+                        break;
+                    case 'u':
+                        if (i + 5 >= text.Length) continue;
+                        string unicodeText = text.Substring(i+2, 4);
+                        ushort unicodeValue = ushort.Parse(unicodeText, NumberStyles.AllowHexSpecifier);
+                        builder.Append((char)unicodeValue);
+                        pos += 6;
+                        i += 6;
+                        break;
+                }
+            }
+
+            if (pos < text.Length)
+                builder.Append(text, pos, text.Length - pos);
+
+            return builder.ToString();
         }
 
         #endregion

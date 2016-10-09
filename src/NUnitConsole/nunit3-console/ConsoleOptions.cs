@@ -67,6 +67,8 @@ namespace NUnit.Common
 
         public bool LoadUserProfile { get; private set; }
 
+        public string ConsoleEncoding { get; private set; }
+
         private int maxAgents = -1;
         public int MaxAgents { get { return maxAgents; } }
         public bool MaxAgentsSpecified { get { return maxAgents >= 0; } }
@@ -147,6 +149,9 @@ namespace NUnit.Common
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
+
+            this.Add("encoding=", "Specifies the encoding to use for Console output.",
+                v => ConsoleEncoding = RequiredValue(v, "--encoding"));
 
 #if DEBUG
             this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",
