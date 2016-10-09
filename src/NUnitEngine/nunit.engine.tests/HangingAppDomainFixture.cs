@@ -22,29 +22,23 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Engine.Extensibility;
+using System.Threading;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Addins
+namespace NUnit.Engine.Tests
 {
-    public class NUnit2XmlResultWriterTests
+    [Explicit]
+    public class HangingAppDomainFixture
     {
         [Test]
-        public void CheckExtensionAttribute()
+        public void PassingTest()
         {
-            Assert.That(typeof(NUnit2XmlResultWriter),
-                Has.Attribute<ExtensionAttribute>());
+            Assert.Pass();
         }
 
-        [Test]
-        public void CheckExtensionPropertyAttribute()
+        ~HangingAppDomainFixture()
         {
-            Assert.That(typeof(NUnit2XmlResultWriter),
-                Has.Attribute<ExtensionPropertyAttribute>()
-                    .With.Property("Name").EqualTo("Format")
-                    .And.Property("Value").EqualTo("nunit2"));
+            Thread.Sleep(TimeSpan.FromDays(1));
         }
     }
 }
