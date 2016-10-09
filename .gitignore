@@ -177,3 +177,5 @@ package
 images
 MockAssemblyResult.xml
 PortabilityAnalysis*.html
+tools
+!tools/packages.config
