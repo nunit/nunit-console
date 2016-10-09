@@ -21,10 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
+using System;
 
 namespace NUnit.ConsoleRunner.Tests
 {
@@ -70,6 +68,12 @@ namespace NUnit.ConsoleRunner.Tests
             Console.WriteLine("Test: Console.WriteLine()");
             Console.Error.WriteLine("Test: Console.Error.WriteLine()");
             TestContext.WriteLine("Test: TestContext.WriteLine()");
+        }
+
+        [Test]
+        public void ConsoleEncoding()
+        {
+            TestContext.WriteLine("•ÑÜńĭŧ·");
         }
     }
 }

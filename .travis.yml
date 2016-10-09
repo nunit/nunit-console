@@ -3,7 +3,6 @@ sudo: false
 mono:
   - latest
   - 4.2.4
-  - 3.2.8
 os:
   - linux
   - osx

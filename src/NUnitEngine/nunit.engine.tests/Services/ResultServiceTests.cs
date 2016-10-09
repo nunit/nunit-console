@@ -53,11 +53,11 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AvailableFormats()
         {
-            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "nunit2", "cases", "user" }));
+            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
         }
 
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]
-        [TestCase("nunit2", null, ExpectedResult = "NUnit2XmlResultWriter")]
+        //[TestCase("nunit2", null, ExpectedResult = "NUnit2XmlResultWriter")]
         [TestCase("cases", null, ExpectedResult = "TestCaseResultWriter")]
         [TestCase("user", new object[] { "TextSummary.xslt" }, ExpectedResult = "XmlTransformResultWriter")]
         public string CanGetWriter(string format, object[] args)
