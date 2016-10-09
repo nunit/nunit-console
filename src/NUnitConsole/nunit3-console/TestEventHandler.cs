@@ -55,6 +55,10 @@ namespace NUnit.ConsoleRunner
             var testEvent = doc.FirstChild;
             switch (testEvent.Name)
             {
+                case "start-test":
+                    TestStarted(testEvent);
+                    break;
+
                 case "test-case":
                     TestFinished(testEvent);
                     break;
@@ -73,13 +77,18 @@ namespace NUnit.ConsoleRunner
 
         #region Individual Handlers
 
+        private void TestStarted(XmlNode testResult)
+        {
+            var testName = testResult.Attributes["fullname"].Value;
+
+            if (_displayLabels == "ALL")
+                WriteLabelLine(testName);
+        }
+
         private void TestFinished(XmlNode testResult)
         {
             var testName = testResult.Attributes["fullname"].Value;
             var outputNode = testResult.SelectSingleNode("output");
-
-            if (_displayLabels == "ALL")
-                WriteLabelLine(testName);
 
             if (outputNode != null)
             {
@@ -97,7 +106,7 @@ namespace NUnit.ConsoleRunner
 
             if (outputNode != null)
             {
-                if (_displayLabels == "ON" || _displayLabels == "ALL")
+                if (_displayLabels == "ON")
                     WriteLabelLine(suiteName);
 
                 WriteOutputLine(outputNode.InnerText);
