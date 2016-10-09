@@ -132,10 +132,7 @@ namespace NUnit.ConsoleRunner
         {
             if (label != _currentLabel)
             {
-                ColorStyle colorByResultStatus = resultStatus == "Passed" ? ColorStyle.Pass : resultStatus == "Failed"
-                            ? ColorStyle.Failure : resultStatus == "Warning"
-                    ? ColorStyle.Warning
-                    : ColorStyle.Output;
+                ColorStyle colorByResultStatus = ColorByResultStatus(resultStatus);
 
                 using (new ColorConsole(colorByResultStatus))
                     _outWriter.WriteLine("{0} => {1}", resultStatus.ToUpper(), label);
@@ -173,5 +170,26 @@ namespace NUnit.ConsoleRunner
         }
 
         #endregion
+
+        private static ColorStyle ColorByResultStatus(string resultStatus)
+        {
+            ColorStyle colorByResultStatus;
+            switch (resultStatus)
+            {
+                case "Passed":
+                    colorByResultStatus = ColorStyle.Pass;
+                    break;
+                case "Failed":
+                    colorByResultStatus = ColorStyle.Failure;
+                    break;
+                case "Warning":
+                    colorByResultStatus = ColorStyle.Warning;
+                    break;
+                default:
+                    colorByResultStatus = ColorStyle.Output;
+                    break;
+            }
+            return colorByResultStatus;
+        }
     }
 }
