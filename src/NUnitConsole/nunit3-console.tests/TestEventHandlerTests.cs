@@ -66,6 +66,11 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData("<start-suite/>", "On", ""),
             new TestCaseData("<start-suite/>", "Before", ""),
             new TestCaseData("<start-suite/>", "After", ""),
+            // Start Events "Before", "All" with name
+            new TestCaseData("<start-test fullname='SomeName'/>", "Before", "=> SomeName\r\n"),
+            new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "Before", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Off", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "On", ""),
