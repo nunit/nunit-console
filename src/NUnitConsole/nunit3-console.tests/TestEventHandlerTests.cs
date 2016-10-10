@@ -58,16 +58,16 @@ namespace NUnit.ConsoleRunner.Tests
         static TestCaseData[] EventData = new TestCaseData[]
         {
             // Start Events
-            new TestCaseData("<start-test/>", "Off", ""),
-            new TestCaseData("<start-test/>", "On", ""),
-            new TestCaseData("<start-test/>", "All", ""),
-            new TestCaseData("<start-suite/>", "Off", ""),
-            new TestCaseData("<start-suite/>", "On", ""),
-            new TestCaseData("<start-suite/>", "All", ""),
+            new TestCaseData("<start-test fullname='SomeName'/>", "Off", ""),
+            new TestCaseData("<start-test fullname='SomeName'/>", "On", ""),
+            new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "Off", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "On", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-case fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-case fullname='SomeName'/>", "All", "=> SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName'/>", "All", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "All", ""),
@@ -83,7 +83,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "All", 
-                "=> SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
                 "Off", 
@@ -95,7 +95,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
                 "All",
-                "=> SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\n"),
             // Output Events
             new TestCaseData(
                 "<test-output>OUTPUT</test-output>",
