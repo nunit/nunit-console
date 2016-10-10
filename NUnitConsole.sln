@@ -51,23 +51,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219
 		nuget\engine\nunit.nuget.addins = nuget\engine\nunit.nuget.addins
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "framework", "framework", "{BC87F477-1A7A-45D0-9AC1-9F7315264732}"
-	ProjectSection(SolutionItems) = preProject
-		nuget\framework\nunit.nuspec = nuget\framework\nunit.nuspec
-		nuget\framework\nunitCF.nuspec = nuget\framework\nunitCF.nuspec
-		nuget\framework\nunitSL.nuspec = nuget\framework\nunitSL.nuspec
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nunitlite", "nunitlite", "{140CDAD6-6E11-4A97-94F3-B23A14391117}"
-	ProjectSection(SolutionItems) = preProject
-		nuget\nunitlite\install.ps1 = nuget\nunitlite\install.ps1
-		nuget\nunitlite\nunitlite.nuspec = nuget\nunitlite\nunitlite.nuspec
-		nuget\nunitlite\nunitliteCF.nuspec = nuget\nunitlite\nunitliteCF.nuspec
-		nuget\nunitlite\nunitliteSL.nuspec = nuget\nunitlite\nunitliteSL.nuspec
-		nuget\nunitlite\Program.cs = nuget\nunitlite\Program.cs
-		nuget\nunitlite\Program.vb = nuget\nunitlite\Program.vb
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E}"
 	ProjectSection(SolutionItems) = preProject
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
@@ -129,8 +112,6 @@ Global
 		{B310A760-8AE1-41CA-81F8-03B12E2FCE30} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
 		{28B605B2-E2E9-417E-8369-49E263F1F31B} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{43A219A8-2995-4884-806F-FDB9CD25D403} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
-		{BC87F477-1A7A-45D0-9AC1-9F7315264732} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
-		{140CDAD6-6E11-4A97-94F3-B23A14391117} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 	EndGlobalSection

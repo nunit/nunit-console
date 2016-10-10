@@ -24,9 +24,7 @@
 using System;
 using System.IO;
 using System.Xml;
-using NUnit.Common;
 using NUnit.Engine;
-using NUnit.ConsoleRunner.Utilities;
 
 namespace NUnit.ConsoleRunner
 {    
@@ -79,21 +77,25 @@ namespace NUnit.ConsoleRunner
 
         private void TestStarted(XmlNode testResult)
         {
+            var testName = testResult.Attributes["fullname"].Value;
+
             if (_displayLabels == "BEFORE" || _displayLabels == "ALL")
-            {
-                var testName = testResult.GetAttribute("fullname");
                 WriteLabelLine(testName);
-            }
         }
 
         private void TestFinished(XmlNode testResult)
         {
-            var testName = testResult.GetAttribute("fullname");
+            var testName = testResult.Attributes["fullname"].Value;
             var status = testResult.GetAttribute("label") ?? testResult.GetAttribute("result");
             var outputNode = testResult.SelectSingleNode("output");
 
             if (_displayLabels == "AFTER")
-                WriteLabelLine(testName, status);
+            {
+                if (status == null)
+                    WriteLabelLine(testName);
+                else
+                    WriteLabelLine(testName, status);
+            }
 
             if (outputNode != null)
             {
@@ -193,6 +195,7 @@ namespace NUnit.ConsoleRunner
                     colorByResultStatus = ColorStyle.Pass;
                     break;
                 case "Failed":
+                case "Error":
                     colorByResultStatus = ColorStyle.Error;
                     break;
                 case "Ignore":

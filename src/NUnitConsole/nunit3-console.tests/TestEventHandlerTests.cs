@@ -58,24 +58,22 @@ namespace NUnit.ConsoleRunner.Tests
         static TestCaseData[] EventData = new TestCaseData[]
         {
             // Start Events
-            new TestCaseData("<start-test/>", "Off", ""),
-            new TestCaseData("<start-test/>", "On", ""),
-            new TestCaseData("<start-test/>", "Before", ""),
-            new TestCaseData("<start-test/>", "After", ""),
-            new TestCaseData("<start-suite/>", "Off", ""),
-            new TestCaseData("<start-suite/>", "On", ""),
-            new TestCaseData("<start-suite/>", "Before", ""),
-            new TestCaseData("<start-suite/>", "After", ""),
-            // Start Events "Before", "All" with name
+            new TestCaseData("<start-test fullname='SomeName'/>", "Off", ""),
+            new TestCaseData("<start-test fullname='SomeName'/>", "On", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "Before", "=> SomeName\r\n"),
+            new TestCaseData("<start-test fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "Off", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "On", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Before", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
             // Finish Events - No Output
-            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Off", ""),
-            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "On", ""),
-            //new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Before", "=> SomeName\r\nPASSED => SomeName\r\n"),
-            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "After", "PASSED => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName'/>", "Off", ""),
+            new TestCaseData("<test-case fullname='SomeName'/>", "On", ""),
+            new TestCaseData("<test-case fullname='SomeName'/>", "Before", ""),
+            new TestCaseData("<test-case fullname='SomeName'/>", "After", "=> SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName'/>", "All", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
             //new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", "=> SomeName\r\nPASSED => SomeName\r\n"),
@@ -103,6 +101,10 @@ namespace NUnit.ConsoleRunner.Tests
                 "After", 
                 "FAILED => SomeName\r\n"),
             new TestCaseData(
+                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
+                "All", 
+                "OUTPUT\r\n"),
+            new TestCaseData(
                 "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
                 "Off", 
                 "OUTPUT\r\n"),
@@ -114,6 +116,10 @@ namespace NUnit.ConsoleRunner.Tests
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
                 "After",
                 "=> SomeName\r\nOUTPUT\r\n"),
+            new TestCaseData(
+                "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
+                "All",
+                "OUTPUT\r\n"),
             // Output Events
             new TestCaseData(
                 "<test-output>OUTPUT</test-output>",
