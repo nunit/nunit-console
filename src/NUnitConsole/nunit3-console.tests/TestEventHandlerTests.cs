@@ -101,6 +101,18 @@ namespace NUnit.ConsoleRunner.Tests
                 "After", 
                 "FAILED => SomeName\r\n"),
             new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "FAILED => SomeName\r\nOUTPUT\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Skipped'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "SKIPPED => SomeName\r\nOUTPUT\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Inconclusive'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "INCONCLUSIVE => SomeName\r\nOUTPUT\r\n"),
+            new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "All", 
                 "OUTPUT\r\n"),
