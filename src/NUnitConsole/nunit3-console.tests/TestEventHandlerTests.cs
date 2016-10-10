@@ -76,7 +76,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData("<test-case fullname='SomeName'/>", "All", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
-            //new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", "=> SomeName\r\nPASSED => SomeName\r\n"),
+            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "After", ""),
 
             // Finish Events - With Output
@@ -96,8 +96,8 @@ namespace NUnit.ConsoleRunner.Tests
                 "<test-case fullname='SomeName' result='Passed' />", 
                 "After", 
                 "PASSED => SomeName\r\n"),
-            new TestCaseData
-                ("<test-case fullname='SomeName' result='Failed' />", 
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' />", 
                 "After", 
                 "FAILED => SomeName\r\n"),
             new TestCaseData(
