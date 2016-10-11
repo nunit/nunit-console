@@ -334,20 +334,6 @@ Task("PackageConsole")
         });
     });
 
-Task("PackageZip")
-    .IsDependentOn("CreateImage")
-    .Does(() =>
-    {
-        CreateDirectory(PACKAGE_DIR);
-
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-
-        var zipFiles =
-            GetFiles(currentImageDir + "*.*") +
-            GetFiles(currentImageDir + "bin/*.*");
-        Zip(currentImageDir, File(ZIP_PACKAGE), zipFiles);
-    });
-
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
 //////////////////////////////////////////////////////////////////////
@@ -472,8 +458,7 @@ Task("Test")
 Task("Package")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
-    .IsDependentOn("PackageConsole")
-    .IsDependentOn("PackageZip");
+    .IsDependentOn("PackageConsole");
 
 Task("Appveyor")
     .IsDependentOn("Build")

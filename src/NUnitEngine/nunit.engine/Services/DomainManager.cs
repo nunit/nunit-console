@@ -157,7 +157,7 @@ namespace NUnit.Engine.Services
 
                 if (!_unloadThread.Join(30000))
                 {
-                    string msg = "Unable to unload AppDomain, Unload thread timed out";
+                    string msg = "Unable to unload AppDomain, Unload thread timed out.";
 
                     log.Error(msg);
                     Kill(_unloadThread);

@@ -104,6 +104,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "All" },               new string[] { "JUNK" })]
         [TestCase("InternalTraceLevel", "trace",      new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
+        [TestCase("ConsoleEncoding",    "encoding",   new string[] { "utf-8", "ascii", "unicode" },      new string[0])]
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)
         {
             string[] prototypes = pattern.Split('|');
@@ -209,6 +210,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--trace")]
         [TestCase("--test-name-format")]
         [TestCase("--params")]
+        [TestCase("--encoding")]
         public void MissingValuesAreReported(string option)
         {
             ConsoleOptions options = new ConsoleOptions(option + "=");
