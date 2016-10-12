@@ -1,4 +1,4 @@
-﻿NUnit msi Installer 3.5.0 - November 12th, 2016
+﻿NUnit msi Installer 3.5.0 - October 12th, 2016
 
  * Framework is no longer installed, now solely distributed via NuGet.
 
