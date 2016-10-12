@@ -1,4 +1,4 @@
-﻿NUnit msi Installer 3.5.0 - Date TBC
+﻿NUnit msi Installer 3.5.0 - November 12th, 2016
 
  * Framework is no longer installed, now solely distributed via NuGet.
 
@@ -9,4 +9,4 @@ Components Installed:
  * NUnit.Extension.NUnitProjectLoader 3.4.1
  * NUnit.Extension.NUnitV2Driver 3.4.1
  * NUnit.Extension.NUnitV2ResultWriter 3.4.1
- * NUnit.Extension.TeamCityEventListener 1.0.1
+ * NUnit.Extension.TeamCityEventListener 1.0.2
