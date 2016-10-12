@@ -9,8 +9,8 @@ var configuration = Argument("configuration", "Release");
 // VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.5.0";
-var displayVersion = "3.5.0";
+var version = "3.6.0";
+var displayVersion = "3.6.0";
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGES
@@ -63,14 +63,14 @@ Task("FetchPackages")
 {
     foreach(var package in CONSOLE_PACKAGES)
     {
-        NuGetInstall(package, new NuGetInstallSettings { 
+        NuGetInstall(package, new NuGetInstallSettings {
 						OutputDirectory = RUNNER_PACKAGES_DIR
 					});
     }
 
     foreach(var package in EXTENSION_PACKAGES)
     {
-        NuGetInstall(package, new NuGetInstallSettings { 
+        NuGetInstall(package, new NuGetInstallSettings {
 						OutputDirectory = EXTENSION_PACKAGES_DIR
 					});
     }
