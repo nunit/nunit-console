@@ -23,19 +23,34 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace NUnit.Common
 {
+    using ConsoleRunner;
+
     /// <summary>
     /// ConsoleOptions encapsulates the option settings for
     /// the nunit3-console program.
     /// </summary>
     public class ConsoleOptions : CommandLineOptions
     {
+        private readonly IFileSystem _fileSystem;
+        private readonly IConverter<IEnumerable<string>, IEnumerable<string>> _argumentsFileParser;
+
         #region Constructors
 
-        internal ConsoleOptions(IDefaultOptionsProvider provider, params string[] args) : base(provider, args) { }
+        internal ConsoleOptions(
+            IDefaultOptionsProvider provider,
+            IFileSystem fileSystem,
+            IConverter<IEnumerable<string>, IEnumerable<string>> argumentsFileParser,
+            params string[] args)
+            : base(provider, args)
+        {
+            if (fileSystem == null) throw new ArgumentNullException("fileSystem");
+            if (argumentsFileParser == null) throw new ArgumentNullException("argumentsFileParser");
+            _fileSystem = fileSystem;
+            _argumentsFileParser = argumentsFileParser;
+        }
 
         public ConsoleOptions(params string[] args) : base(args) { }
 
@@ -67,9 +82,9 @@ namespace NUnit.Common
 
         public bool LoadUserProfile { get; private set; }
 
-        private int maxAgents = -1;
-        public int MaxAgents { get { return maxAgents; } }
-        public bool MaxAgentsSpecified { get { return maxAgents >= 0; } }
+        private int _maxAgents = -1;
+        public int MaxAgents { get { return _maxAgents; } }
+        public bool MaxAgentsSpecified { get { return _maxAgents >= 0; } }
 
         public bool DebugTests { get; private set; }
 
@@ -137,7 +152,7 @@ namespace NUnit.Common
                 v => LoadUserProfile = v != null);
 
             this.Add("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
-                v => maxAgents = RequiredInt(v, "--agents"));
+                v => _maxAgents = RequiredInt(v, "--agents"));
 
             this.Add("debug", "Launch debugger to debug tests.",
                 v => DebugTests = v != null);
@@ -155,5 +170,57 @@ namespace NUnit.Common
         }
 
         #endregion
+
+        public IEnumerable<string> Expand(IEnumerable<string> args)
+        {
+            if (args == null) throw new ArgumentNullException("args");
+
+            foreach (var arg in args)
+            {
+                if (arg.Length == 0 || arg[0] != '@')
+                {
+                    yield return arg;
+                    continue;
+                }
+
+                var fileName = arg.Substring(1, arg.Length - 1);
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    ErrorMessages.Add("The file name should not be empty.");
+                    continue;
+                }
+
+                if (!_fileSystem.FileExists(fileName))
+                {
+                    ErrorMessages.Add("The file \"" + fileName + "\" was not found.");
+                    continue;
+                }
+
+
+                using (var linesEnumerator = _argumentsFileParser.Convert(_fileSystem.ReadLines(fileName)).GetEnumerator())
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            if (!linesEnumerator.MoveNext())
+                            {
+                                break;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            ErrorMessages.Add("Error occurred while reading the file \"" + fileName + "\".");
+                            break;
+                        }
+
+                        if (!string.IsNullOrEmpty(linesEnumerator.Current))
+                        {
+                            yield return linesEnumerator.Current;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

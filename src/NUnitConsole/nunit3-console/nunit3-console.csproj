@@ -56,6 +56,7 @@
     <Compile Include="..\ConsoleVersion.cs">
       <Link>Properties\ConsoleVersion.cs</Link>
     </Compile>
+    <Compile Include="ArgumentsFileParser.cs" />
     <Compile Include="ColorConsole.cs" />
     <Compile Include="ColorConsoleWriter.cs" />
     <Compile Include="ColorStyle.cs" />
@@ -66,8 +67,11 @@
     <Compile Include="EnginePackageSettings.cs" />
     <Compile Include="ExtendedTextWrapper.cs" />
     <Compile Include="ExtendedTextWriter.cs" />
+    <Compile Include="FileSystem.cs" />
     <Compile Include="FrameworkPackageSettings.cs" />
+    <Compile Include="IConverter.cs" />
     <Compile Include="IDefaultOptionsProvider.cs" />
+    <Compile Include="IFileSystem.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="OutputSpecification.cs" />
     <Compile Include="Program.cs" />
