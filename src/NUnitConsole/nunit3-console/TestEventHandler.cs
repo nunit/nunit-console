@@ -91,12 +91,13 @@ namespace NUnit.ConsoleRunner
 
             if (_displayLabels == "AFTER")
             {
+                if (outputNode != null)
+                    WriteOutputLine(outputNode.InnerText);
                 if (status == null)
                     WriteLabelLine(testName);
                 else
                     WriteLabelLine(testName, status);
-            }
-
+            } else
             if (outputNode != null)
             {
                 if (_displayLabels == "ON")

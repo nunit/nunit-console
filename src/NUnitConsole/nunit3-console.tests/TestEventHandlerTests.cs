@@ -91,7 +91,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "After", 
-                "PASSED => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nPASSED => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Passed' />", 
                 "After", 
@@ -103,31 +103,35 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Failed'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "FAILED => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nFAILED => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "INVALID => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nINVALID => SomeName\r\n"),
+             new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nINVALID => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Failed' label='Error'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "ERROR => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nERROR => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Failed' label='Cancelled'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "CANCELLED => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nCANCELLED => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Skipped'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "SKIPPED => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nSKIPPED => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Skipped' label='Ignored'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "IGNORED => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nIGNORED => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Inconclusive'><output>OUTPUT</output></test-case>", 
                 "After", 
-                "INCONCLUSIVE => SomeName\r\nOUTPUT\r\n"),
+                "OUTPUT\r\nINCONCLUSIVE => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "All", 
