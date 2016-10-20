@@ -138,7 +138,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCaseSource("KNOWN_EXTENSIONS")]
         public void CanListExtensions(string typeName)
         {
-            foreach (ExtensionNode node in _serviceClass.Extensions)
+            foreach (IExtensionNode node in _serviceClass.Extensions)
                 if (node.TypeName == typeName)
                 {
                     Assert.True(node.Enabled);
@@ -162,7 +162,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void ExtensionMayBeDisabledByDefault()
         {
-            foreach (ExtensionNode node in _serviceInterface.Extensions)
+            foreach (IExtensionNode node in _serviceInterface.Extensions)
                 if (node.TypeName == "NUnit.Engine.Tests.DummyDisabledExtension")
                 {
                     Assert.False(node.Enabled, "Should be disabled by default");
