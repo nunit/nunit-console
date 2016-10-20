@@ -30,38 +30,40 @@ namespace NUnit.Engine.Drivers
     public class NotRunnableFrameworkDriver : IFrameworkDriver
     {
         private const string LOAD_RESULT_FORMAT =
-            "<test-suite type='Assembly' id='{0}' name='{1}' fullname='{2}' testcasecount='0' runstate='NotRunnable'>" +
+            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='NotRunnable'>" +
                 "<properties>" +
-                    "<property name='_SKIPREASON' value='{3}'/>" +
+                    "<property name='_SKIPREASON' value='{4}'/>" +
                 "</properties>" +
             "</test-suite>";
 
         private const string RUN_RESULT_FORMAT =
-            "<test-suite type='Assembly' id='{0}' name='{1}' fullname='{2}' testcasecount='0' runstate='NotRunnable' result='Failed' label='Invalid'>" +
+            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='NotRunnable' result='Failed' label='Invalid'>" +
                 "<properties>" +
-                    "<property name='_SKIPREASON' value='{3}'/>" +
+                    "<property name='_SKIPREASON' value='{4}'/>" +
                 "</properties>" +
                 "<reason>" +
-                    "<message>{3}</message>" +
+                    "<message>{4}</message>" +
                 "</reason>" +
             "</test-suite>";
 
         private string _name;
         private string _fullname;
         private string _message;
+        private string _type;
 
         public NotRunnableFrameworkDriver(string assemblyPath, string message)
         {
             _name = Escape(Path.GetFileName(assemblyPath));
             _fullname = Escape(Path.GetFullPath(assemblyPath));
             _message = Escape(message);
+            _type = new List<string> {".dll", ".exe"}.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
         }
 
         public string ID { get; set; }
 
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
-            return string.Format(LOAD_RESULT_FORMAT, TestID, _name, _fullname, _message);
+            return string.Format(LOAD_RESULT_FORMAT, _type, TestID, _name, _fullname, _message);
         }
 
         public int CountTestCases(string filter)
@@ -71,12 +73,12 @@ namespace NUnit.Engine.Drivers
 
         public string Run(ITestEventListener listener, string filter)
         {
-            return string.Format(RUN_RESULT_FORMAT, TestID, _name, _fullname, _message);
+            return string.Format(RUN_RESULT_FORMAT, _type, TestID, _name, _fullname, _message);
         }
 
         public string Explore(string filter)
         {
-            return string.Format(LOAD_RESULT_FORMAT, TestID, _name, _fullname, _message);
+            return string.Format(LOAD_RESULT_FORMAT, _type, TestID, _name, _fullname, _message);
         }
 
         public void StopRun(bool force)
