@@ -100,7 +100,6 @@
     <Compile Include="Services\ProjectServiceTests.cs" />
     <Compile Include="Services\ResultServiceTests.cs" />
     <Compile Include="Services\RecentFilesTests.cs" />
-    <Compile Include="Services\ResultWriters\SchemaValidator.cs" />
     <Compile Include="Services\ResultWriters\XmlOutputTest.cs" />
     <Compile Include="Services\ResultWriters\XmlTransformResultWriterTests.cs" />
     <Compile Include="Services\DefaultTestRunnerFactoryTests.cs" />
