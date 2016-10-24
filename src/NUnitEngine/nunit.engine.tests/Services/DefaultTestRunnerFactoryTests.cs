@@ -22,8 +22,8 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Reflection;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
 
@@ -89,6 +89,9 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("x.dll y.dll z.dll",     "Multiple", typeof(MultipleTestProcessRunner))]
         public void CorrectRunnerIsUsed(string files, string processModel, Type expectedType)
         {
+            if (files == "EngineTests.nunit")
+                files = Path.Combine(AssemblyDirectory, files);
+
             var package = new TestPackage(files.Split(new char[] { ' ' }));
             if (processModel != null)
                 package.AddSetting("ProcessModel", processModel);
@@ -109,6 +112,17 @@ namespace NUnit.Engine.Services.Tests
             var runner = _factory.MakeTestRunner(package);
 
             Assert.That(runner, Is.TypeOf(expectedType));
+        }
+
+        private static string AssemblyDirectory
+        {
+            get
+            {
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
+            }
         }
     }
 }
