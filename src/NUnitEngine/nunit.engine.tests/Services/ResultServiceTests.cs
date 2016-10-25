@@ -69,7 +69,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void CanGetWriterUser()
         {
-            string actual = CanGetWriter("user", new object[] { Path.Combine(AssemblyDirectory, "TextSummary.xslt") });
+            string actual = CanGetWriter("user", new object[] { Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt") });
             Assert.That(actual, Is.EqualTo("XmlTransformResultWriter"));
         }
 
@@ -87,17 +87,6 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(
                 () => _resultService.GetResultWriter("user", null),
                 Throws.TypeOf<ArgumentNullException>());
-        }
-
-        private static string AssemblyDirectory
-        {
-            get
-            {
-                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new UriBuilder(codeBase);
-                string path = Uri.UnescapeDataString(uri.Path);
-                return Path.GetDirectoryName(path);
-            }
         }
     }
 }

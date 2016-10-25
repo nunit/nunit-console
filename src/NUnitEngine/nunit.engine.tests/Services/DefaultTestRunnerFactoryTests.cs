@@ -90,7 +90,7 @@ namespace NUnit.Engine.Services.Tests
         public void CorrectRunnerIsUsed(string files, string processModel, Type expectedType)
         {
             if (files == "EngineTests.nunit")
-                files = Path.Combine(AssemblyDirectory, files);
+                files = Path.Combine(TestContext.CurrentContext.TestDirectory, files);
 
             var package = new TestPackage(files.Split(new char[] { ' ' }));
             if (processModel != null)
@@ -112,17 +112,6 @@ namespace NUnit.Engine.Services.Tests
             var runner = _factory.MakeTestRunner(package);
 
             Assert.That(runner, Is.TypeOf(expectedType));
-        }
-
-        private static string AssemblyDirectory
-        {
-            get
-            {
-                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new UriBuilder(codeBase);
-                string path = Uri.UnescapeDataString(uri.Path);
-                return Path.GetDirectoryName(path);
-            }
         }
     }
 }
