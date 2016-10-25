@@ -56,6 +56,7 @@ var ZIP_PACKAGE = PACKAGE_DIR + "NUnit-" + packageVersion + ".zip";
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
+    .Description("Deletes all files in the BIN directory")
     .Does(() =>
     {
         CleanDirectory(BIN_DIR);
@@ -67,6 +68,7 @@ Task("Clean")
 //////////////////////////////////////////////////////////////////////
 
 Task("InitializeBuild")
+    .Description("Initializes the build")
     .Does(() =>
     {
 		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
@@ -120,6 +122,7 @@ Task("InitializeBuild")
 //////////////////////////////////////////////////////////////////////
 
 Task("BuildEngine")
+    .Description("Builds the engine")
     .IsDependentOn("InitializeBuild")
     .Does(() =>
     {
@@ -138,6 +141,7 @@ Task("BuildEngine")
 //////////////////////////////////////////////////////////////////////
 
 Task("BuildConsole")
+    .Description("Builds the console runner")
     .IsDependentOn("InitializeBuild")
     .Does(() =>
     {
@@ -150,6 +154,7 @@ Task("BuildConsole")
 //////////////////////////////////////////////////////////////////////
 
 Task("BuildCppTestFiles")
+    .Description("Builds the C++ mock test assemblies")
     .IsDependentOn("InitializeBuild")
     .WithCriteria(IsRunningOnWindows)
     .Does(() =>
@@ -173,6 +178,7 @@ Task("BuildCppTestFiles")
 //////////////////////////////////////////////////////////////////////
 
 Task("CheckForError")
+    .Description("Checks for errors running the test suites")
     .Does(() => CheckForError(ref ErrorDetail));
 
 //////////////////////////////////////////////////////////////////////
@@ -180,6 +186,7 @@ Task("CheckForError")
 //////////////////////////////////////////////////////////////////////
 
 Task("TestEngine")
+    .Description("Tests the engine")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
@@ -192,6 +199,7 @@ Task("TestEngine")
 //////////////////////////////////////////////////////////////////////
 
 Task("TestConsole")
+    .Description("Tests the console runner")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
@@ -239,13 +247,15 @@ var BinFiles = new FilePath[]
 };
 
 Task("PackageSource")
-  .Does(() =>
+    .Description("Creates a ZIP file of the source code")
+    .Does(() =>
     {
         CreateDirectory(PACKAGE_DIR);
         RunGitCommand(string.Format("archive -o {0} HEAD", SRC_PACKAGE));
     });
 
 Task("CreateImage")
+    .Description("Copies all files into the image directory")
     .Does(() =>
     {
         var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
@@ -269,6 +279,7 @@ Task("CreateImage")
     });
 
 Task("PackageEngine")
+    .Description("Creates NuGet packages of the engine")
     .IsDependentOn("CreateImage")
     .Does(() =>
     {
@@ -302,6 +313,7 @@ Task("PackageEngine")
     });
 
 Task("PackageConsole")
+    .Description("Creates NuGet packages of the console runner")
     .IsDependentOn("CreateImage")
     .Does(() =>
     {
@@ -444,32 +456,39 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string arguments, strin
 //////////////////////////////////////////////////////////////////////
 
 Task("Build")
-  .IsDependentOn("BuildEngine")
-  .IsDependentOn("BuildConsole");
+    .Description("Builds the engine and console runner")
+    .IsDependentOn("BuildEngine")
+    .IsDependentOn("BuildConsole");
 
 Task("Rebuild")
+    .Description("Rebuilds the engine and console runner")
     .IsDependentOn("Clean")
     .IsDependentOn("Build");
 
 Task("Test")
+    .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestEngine")
     .IsDependentOn("TestConsole");
 
 Task("Package")
+    .Description("Packages the engine and console runner")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageConsole");
 
 Task("Appveyor")
+    .Description("Builds, tests and packages on AppVeyor")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Package");
 
 Task("Travis")
+    .Description("Builds and tests on Travis")
     .IsDependentOn("Build")
     .IsDependentOn("Test");
 
 Task("Default")
+    .Description("Builds the engine and console runner")
     .IsDependentOn("Build"); // Rebuild?
 
 //////////////////////////////////////////////////////////////////////
