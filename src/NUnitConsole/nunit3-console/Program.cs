@@ -128,6 +128,11 @@ namespace NUnit.ConsoleRunner
                     {
                         return new ConsoleRunner(engine, Options, OutWriter).Execute();
                     }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        OutWriter.WriteLine(ColorStyle.Error, ex.Message);
+                        return ConsoleRunner.INVALID_ARG;
+                    }
                     catch (TestSelectionParserException ex)
                     {
                         OutWriter.WriteLine(ColorStyle.Error, ex.Message);
