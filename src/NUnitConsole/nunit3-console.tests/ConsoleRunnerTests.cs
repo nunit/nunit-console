@@ -19,8 +19,9 @@ namespace NUnit.ConsoleRunner.Tests
             try
             {
                 var directorySecurity = new DirectorySecurity();
-                directorySecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().User, FileSystemRights.Write, AccessControlType.Deny));
-                directorySecurity.AddAccessRule(new FileSystemAccessRule(WindowsIdentity.GetCurrent().User, FileSystemRights.DeleteSubdirectoriesAndFiles, AccessControlType.Allow));
+                SecurityIdentifier everyone = new SecurityIdentifier(WellKnownSidType.WorldSid, null);
+                directorySecurity.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.Write, AccessControlType.Deny));
+                directorySecurity.AddAccessRule(new FileSystemAccessRule(everyone, FileSystemRights.DeleteSubdirectoriesAndFiles, AccessControlType.Allow));
                 Directory.SetAccessControl(tempDirPath, directorySecurity);
 
                 var consoleRunner = new ConsoleRunner(
