@@ -156,7 +156,7 @@ namespace NUnit.ConsoleRunner
             {
                 foreach (OutputSpecification spec in _options.ExploreOutputSpecifications)
                 {
-                    _resultService.GetResultWriter(spec.Format, new object[] {spec.Transform}).WriteResultFile(result, spec.OutputPath);
+                    _resultService.GetResultWriter(spec.Format, new object[] { spec.Transform }).WriteResultFile(result, spec.OutputPath);
                     _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
             }
@@ -169,7 +169,14 @@ namespace NUnit.ConsoleRunner
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
-                GetResultWriter(spec).CheckWritability(outputPath);
+                try
+                {
+                    GetResultWriter(spec).CheckWritability(outputPath);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    throw new UnauthorizedAccessException("Error: Unauthorized working directory",e);
+                }
             }
 
             // TODO: Incorporate this in EventCollector?
@@ -259,8 +266,8 @@ namespace NUnit.ConsoleRunner
                     var unixVariant = Marshal.PtrToStringAnsi(buf);
                     if (unixVariant.Equals("Darwin"))
                         unixVariant = "MacOSX";
-                    
-                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack); 
+
+                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack);
                 }
                 Marshal.FreeHGlobal(buf);
             }
@@ -344,7 +351,7 @@ namespace NUnit.ConsoleRunner
 
         private IResultWriter GetResultWriter(OutputSpecification spec)
         {
-            return _resultService.GetResultWriter(spec.Format, new object[] {spec.Transform});
+            return _resultService.GetResultWriter(spec.Format, new object[] { spec.Transform });
         }
 
         // This is public static for ease of testing
@@ -366,7 +373,7 @@ namespace NUnit.ConsoleRunner
 
             // Console runner always sets DisposeRunners
             //if (options.DisposeRunners)
-                package.AddSetting(EnginePackageSettings.DisposeRunners, true);
+            package.AddSetting(EnginePackageSettings.DisposeRunners, true);
 
             if (options.ShadowCopyFiles)
                 package.AddSetting(EnginePackageSettings.ShadowCopyFiles, true);
