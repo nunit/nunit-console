@@ -29,8 +29,8 @@ namespace NUnit.ConsoleRunner.Tests
     [TestFixture]
     public class ArgumentsFileParserTests
     {
-        [Test]
         [TestCase("--arg", "--arg")]
+        [TestCase("--ArG", "--ArG")]
         [TestCase("--arg1 --arg2", "--arg1\n--arg2")]
         [TestCase("--arg1\n--arg2", "--arg1\n--arg2")]
         [TestCase("", "")]
@@ -46,6 +46,15 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("\"--arg\"", "--arg")]
         [TestCase("\"--arg 1\"", "--arg 1")]
         [TestCase("\"--arg\"1\"", "--arg\n1")]
+        [TestCase("\"--arg abc\"", "--arg abc")]
+        [TestCase("\"--arg   abc\"", "--arg   abc")]
+        [TestCase("\" --arg   abc \"", " --arg   abc ")]
+        [TestCase("\"--arg=abc\"", "--arg=abc")]
+        [TestCase("\"--arg=aBc\"", "--arg=aBc")]
+        [TestCase("\"--arg = abc\"", "--arg = abc")]
+        [TestCase("\"--arg=abc,xyz\"", "--arg=abc,xyz")]
+        [TestCase("\"--arg=abc, xyz\"", "--arg=abc, xyz")]
+        [TestCase("\"@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz\"", "@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz")]
         public void ShouldParseArgumentsFromLines(string linesStr, string expectedArgsStr)
         {
             // Given
