@@ -59,6 +59,7 @@
     <Compile Include="ColorStyleTests.cs" />
     <Compile Include="CommandLineTests.cs" />
     <Compile Include="ConsoleOutputTests.cs" />
+    <Compile Include="ConsoleRunnerTests.cs" />
     <Compile Include="DefaultOptionsProviderTests.cs" />
     <Compile Include="ExtendedTextWrapperTests.cs" />
     <Compile Include="MakeTestPackageTests.cs" />
