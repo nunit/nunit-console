@@ -27,9 +27,9 @@ using System.Text.RegularExpressions;
 
 namespace NUnit.ConsoleRunner
 {
-    internal class ArgumentsFileParser: IConverter<IEnumerable<string>, IEnumerable<string>>
+    internal class ArgumentsFileParser : IConverter<IEnumerable<string>, IEnumerable<string>>
     {
-        private static readonly Regex ArgsRegex = new Regex("(\\\"(?<arg>.+?)\\\"|(?<arg>[^\\s\"]+))", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private static readonly Regex ArgsRegex = new Regex(@"\G(""((""""|[^""])+)""|(\S+)) *", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public IEnumerable<string> Convert(IEnumerable<string> src)
         {
@@ -44,9 +44,8 @@ namespace NUnit.ConsoleRunner
                         continue;
                     }
 
-                    yield return argMatch.Groups["arg"].Value;
+                    yield return Regex.Replace(argMatch.Groups[2].Success ? argMatch.Groups[2].Value : argMatch.Groups[4].Value, @"""""", @"""");
                 }
-                
             }
         }
     }

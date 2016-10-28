@@ -45,7 +45,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("\"--arg 1\" \"--arg 2\" arg3 \"arg 4\"\n\"--arg 1\" \"--arg 2\" arg3 \"arg 4\"", "--arg 1\n--arg 2\narg3\narg 4\n--arg 1\n--arg 2\narg3\narg 4")]
         [TestCase("\"--arg\"", "--arg")]
         [TestCase("\"--arg 1\"", "--arg 1")]
-        [TestCase("\"--arg\"1\"", "--arg\n1")]
         [TestCase("\"--arg abc\"", "--arg abc")]
         [TestCase("\"--arg   abc\"", "--arg   abc")]
         [TestCase("\" --arg   abc \"", " --arg   abc ")]
