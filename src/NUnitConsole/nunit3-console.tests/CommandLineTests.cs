@@ -39,7 +39,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
         [TestCase("--arg1 @file1.txt --arg2", "", "--arg1 --arg2", "The file \"file1.txt\" was not found.")]
-        [TestCase("--arg1 @ --arg2", "", "--arg1 --arg2", "The file name should not be empty.")]
+        [TestCase("--arg1 @ --arg2", "", "--arg1 --arg2", "You must include a file name after @.")]
         [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--fileArg1\n--fileArg2,file2.txt:--fileArg3", "--arg1 --fileArg1 --fileArg2 --arg2 --fileArg3", "")]
         [TestCase("--arg1 @file1.txt --arg2", "file1.txt:", "--arg1 --arg2", "")]
         [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n\n\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]

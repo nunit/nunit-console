@@ -186,7 +186,7 @@ namespace NUnit.Common
                 var fileName = arg.Substring(1, arg.Length - 1);
                 if (string.IsNullOrEmpty(fileName))
                 {
-                    ErrorMessages.Add("The file name should not be empty.");
+                    ErrorMessages.Add("You must include a file name after @.");
                     continue;
                 }
 
