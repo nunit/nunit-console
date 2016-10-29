@@ -37,7 +37,7 @@ namespace NUnit.ConsoleRunner
     public class Program
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
-        static ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider());
+        static ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem(), new ArgumentsFileParser());
         private static ExtendedTextWriter _outWriter;
 
         // This has to be lazy otherwise NoColor command line option is not applied correctly
@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner
         {
             try
             {
-                Options.Parse(args);
+                Options.Parse(Options.Expand(args));
             }
             catch (OptionException ex)
             {
