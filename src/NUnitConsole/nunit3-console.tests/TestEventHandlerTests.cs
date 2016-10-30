@@ -60,37 +60,93 @@ namespace NUnit.ConsoleRunner.Tests
             // Start Events
             new TestCaseData("<start-test fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "On", ""),
+            new TestCaseData("<start-test fullname='SomeName'/>", "Before", "=> SomeName\r\n"),
+            new TestCaseData("<start-test fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "On", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "Before", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-case fullname='SomeName'/>", "On", ""),
+            new TestCaseData("<test-case fullname='SomeName'/>", "Before", ""),
+            new TestCaseData("<test-case fullname='SomeName'/>", "After", "=> SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName'/>", "All", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-suite fullname='SomeName'/>", "All", ""),
+            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", ""),
+            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "After", ""),
+
             // Finish Events - With Output
             new TestCaseData(
-                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "Off",
                 "OUTPUT\r\n"),
             new TestCaseData(
-                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "On",
                 "=> SomeName\r\nOUTPUT\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
+                "After", 
+                "OUTPUT\r\nPASSED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Passed' />", 
+                "After", 
+                "PASSED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' />", 
+                "After", 
+                "FAILED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nFAILED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nINVALID => SomeName\r\n"),
+             new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nINVALID => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Error'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nERROR => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Cancelled'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nCANCELLED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Skipped'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nSKIPPED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Skipped' label='Ignored'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nIGNORED => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Inconclusive'><output>OUTPUT</output></test-case>", 
+                "After", 
+                "OUTPUT\r\nINCONCLUSIVE => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "All", 
                 "OUTPUT\r\n"),
             new TestCaseData(
-                "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
+                "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
                 "Off", 
                 "OUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
                 "On",
+                "=> SomeName\r\nOUTPUT\r\n"),
+            new TestCaseData(
+                "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
+                "After",
                 "=> SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
@@ -107,7 +163,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT\r\n"),
             new TestCaseData(
                 "<test-output>OUTPUT</test-output>",
-                "All",
+                "After",
                 "OUTPUT\r\n")
         };
 #pragma warning restore 414
