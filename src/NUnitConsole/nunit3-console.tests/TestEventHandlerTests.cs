@@ -54,6 +54,19 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(Output, Is.EqualTo(expected));
         }
 
+        [TestCaseSource("MultipleEventData")]
+        public void MultipleEvents(string[] reports, string labels, string expected)
+        {
+            var handler = new TestEventHandler(_writer, labels);
+
+            foreach (string report in reports)
+                handler.OnTestEvent(report);
+
+            if (Environment.NewLine != "\r\n")
+                expected = expected.Replace("\r\n", Environment.NewLine);
+            Assert.That(Output, Is.EqualTo(expected));
+        }
+
 #pragma warning disable 414
         static TestCaseData[] EventData = new TestCaseData[]
         {
@@ -165,6 +178,39 @@ namespace NUnit.ConsoleRunner.Tests
                 "<test-output>OUTPUT</test-output>",
                 "After",
                 "OUTPUT\r\n")
+        };
+
+        static string[] SingleTestEvents = new string[]
+        {
+            "<start-test fullname='TEST1'/>",
+            "<test-output fullname='TEST1'>Immediate output from TEST1</test-output>",
+            "<test-case fullname='TEST1' result='Passed'><output>Output\r\nfrom\r\nTEST1</output></test-case>"
+        };
+
+        static TestCaseData[] MultipleEventData = new TestCaseData[]
+        {
+            new TestCaseData(
+                SingleTestEvents,
+                "Off",
+                "Immediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
+            new TestCaseData(
+                SingleTestEvents,
+                "On",
+                "Immediate output from TEST1\r\n=> TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
+                // should be "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
+            new TestCaseData(
+                SingleTestEvents,
+                "All",
+                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
+            new TestCaseData(
+                SingleTestEvents,
+                "Before",
+                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
+            new TestCaseData(
+                SingleTestEvents,
+                "After",
+                "Immediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\nPASSED => TEST1\r\n")
+                // should be "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\nPASSED => TEST1\r\n")
         };
 #pragma warning restore 414
     }
