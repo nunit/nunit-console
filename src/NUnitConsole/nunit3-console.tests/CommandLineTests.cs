@@ -26,16 +26,40 @@ using System.IO;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Options;
+using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Tests
 {
-    using System.Collections.Generic;
-    using Framework;
-
     [TestFixture]
     public class CommandLineTests
     {
         #region General Tests
+
+        [Test]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "", "--arg1 --arg2", "The file \"file1.txt\" was not found.")]
+        [TestCase("--arg1 @ --arg2", "", "--arg1 --arg2", "You must include a file name after @.")]
+        [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--fileArg1\n--fileArg2,file2.txt:--fileArg3", "--arg1 --fileArg1 --fileArg2 --arg2 --fileArg3", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:", "--arg1 --arg2", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n\n\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
+        public void ArgumentsFromFilesTests(string args, string files, string expectedExpandedArgs, string expectedErrorMessages)
+        {
+            // Given
+            var fileSystem = new VirtualFileSystem();
+            fileSystem.SetupFiles(files);
+
+            var expectedErrors = expectedErrorMessages.Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+
+            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem, new SimpleArgumentsFileParser());
+
+            // When
+            var actualExpectedExpandedArgs = string.Join(" ", new List<string>(options.Expand(args.Split(' '))).ToArray());
+
+            // Then
+            Assert.AreEqual(expectedExpandedArgs, actualExpectedExpandedArgs);
+            Assert.AreEqual(expectedErrors, options.ErrorMessages);
+        }
 
         [Test]
         public void NoInputFiles()
@@ -522,7 +546,7 @@ namespace NUnit.ConsoleRunner.Tests
             ConsoleOptions options;
             if (defaultTeamcity.HasValue)
             {
-                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), args.ToArray());
+                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), new VirtualFileSystem(), new SimpleArgumentsFileParser(), args.ToArray());
             }
             else
             {
