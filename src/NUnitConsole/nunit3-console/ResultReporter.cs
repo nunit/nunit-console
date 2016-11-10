@@ -260,6 +260,47 @@ namespace NUnit.ConsoleRunner
 
         private void WriteSingleResult(XmlNode result, ColorStyle colorStyle)
         {
+            string status = GetStatus(result);
+
+            string reportID = (++_reportIndex).ToString();
+            string fullName = result.GetAttribute("fullname");
+            var assertions = result.SelectNodes("assertions/assertion");
+            int numAsserts = assertions.Count;
+
+            //if (numAsserts > 0)
+            //{
+            //    int assertionCounter = 0;
+            //    string assertID = reportID;
+            //    foreach (XmlNode assertion in assertions)
+            //    {
+            //        if (numAsserts > 1)
+            //            assertID = string.Format("{0}-{1}", reportID, ++assertionCounter);
+
+            //        WriteSingleResult(colorStyle, assertID, status, fullName,
+            //            GetTrimmedInnerText(assertion.SelectSingleNode("message")),
+            //            GetTrimmedInnerText(assertion.SelectSingleNode("stack-trace")));
+            //    }
+            //}
+            //else
+                WriteSingleResult(colorStyle, reportID, status, fullName, GetMessage(result), GetStackTrace(result));
+        }
+
+        private void WriteSingleResult(ColorStyle colorStyle, string reportID, string status, string fullName, string message, string stackTrace)
+        {
+            _writer.WriteLine(colorStyle,
+                string.Format("{0}) {1} : {2}", reportID, status, fullName));
+
+            if (!string.IsNullOrEmpty(message))
+                _writer.WriteLine(colorStyle, message);
+
+            if (!string.IsNullOrEmpty(stackTrace))
+                _writer.WriteLine(colorStyle, stackTrace);
+
+            _writer.WriteLine(); // Skip after each item
+        }
+
+        private static string GetStatus(XmlNode result)
+        {
             string status = result.GetAttribute("label");
             if (status == null)
                 status = result.GetAttribute("result");
@@ -271,38 +312,29 @@ namespace NUnit.ConsoleRunner
                     status = site + " " + status;
             }
 
-            string fullName = result.GetAttribute("fullname");
+            return status;
+        }
 
-            _writer.WriteLine(colorStyle,
-                string.Format("{0}) {1} : {2}", ++_reportIndex, status, fullName));
+        private static string GetMessage(XmlNode result)
+        {
+            return GetTrimmedInnerText(
+                result.SelectSingleNode("failure/message") ?? result.SelectSingleNode("reason/message"));
+        }
 
-            XmlNode failureNode = result.SelectSingleNode("failure");
-            if (failureNode != null)
-            {
-                XmlNode message = failureNode.SelectSingleNode("message");
-                XmlNode stacktrace = failureNode.SelectSingleNode("stack-trace");
+        private static string GetStackTrace(XmlNode result)
+        {
+            return GetTrimmedInnerText(result.SelectSingleNode("failure/stack-trace"));
 
-                // In order to control the format, we trim any line-end chars
-                // from end of the strings we write and supply them via calls
-                // to WriteLine(). Newlines within the strings are retained.
+        }
 
-                if (message != null)
-                    _writer.WriteLine(colorStyle, message.InnerText.TrimEnd(EOL_CHARS));
-
-                if (stacktrace != null)
-                    _writer.WriteLine(colorStyle, stacktrace.InnerText.TrimEnd(EOL_CHARS));
-            }
-
-            XmlNode reasonNode = result.SelectSingleNode("reason");
-            if (reasonNode != null)
-            {
-                XmlNode message = reasonNode.SelectSingleNode("message");
-
-                if (message != null)
-                    _writer.WriteLine(colorStyle, message.InnerText.TrimEnd(EOL_CHARS));
-            }
-
-            _writer.WriteLine(); // Skip after each item
+        private static string GetTrimmedInnerText(XmlNode node)
+        {
+            // In order to control the format, we trim any line-end chars
+            // from end of the strings we write and supply them via calls
+            // to WriteLine(). Newlines within the strings are retained.
+            return node != null
+                ? node.InnerText.TrimEnd(EOL_CHARS)
+                : null;
         }
 
         #endregion
