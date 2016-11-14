@@ -107,7 +107,6 @@ namespace NUnit.ConsoleRunner
         public void WriteResult(ExtendedTextWriter writer)
         {
             int numAsserts = Assertions.Count;
-            ColorStyle style = GetColorStyle();
 
             if (numAsserts > 0)
             {
