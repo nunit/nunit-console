@@ -196,8 +196,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 SingleTestEvents,
                 "On",
-                "Immediate output from TEST1\r\n=> TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
-                // should be "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
+                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
             new TestCaseData(
                 SingleTestEvents,
                 "All",
@@ -209,8 +208,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 SingleTestEvents,
                 "After",
-                "Immediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\nPASSED => TEST1\r\n")
-                // should be "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\nPASSED => TEST1\r\n")
+                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\nPASSED => TEST1\r\n")
         };
 #pragma warning restore 414
     }

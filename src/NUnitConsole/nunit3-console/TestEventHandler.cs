@@ -123,10 +123,10 @@ namespace NUnit.ConsoleRunner
 
         private void TestOutput(XmlNode outputNode)
         {
-            var testName = outputNode.GetAttribute("testname");
+            var testName = outputNode.GetAttribute("fullname");
             var stream = outputNode.GetAttribute("stream");
 
-            if (_displayLabels == "ON" && testName != null)
+            if ((_displayLabels == "ON" || _displayLabels == "AFTER") && testName != null)
                 WriteLabelLine(testName);
 
             WriteOutputLine(outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
@@ -146,15 +146,12 @@ namespace NUnit.ConsoleRunner
         }
         private void WriteLabelLine(string label, string status)
         {
-            if (label != _currentLabel)
-            {
-                ColorStyle colorByResultStatus = ColorByResultStatus(status);
+            ColorStyle colorByResultStatus = ColorByResultStatus(status);
 
-                using (new ColorConsole(colorByResultStatus))
-                    _outWriter.WriteLine("{0} => {1}", status.ToUpper(), label);
+            using (new ColorConsole(colorByResultStatus))
+                _outWriter.WriteLine("{0} => {1}", status.ToUpper(), label);
 
-                _currentLabel = label;
-            }
+            _currentLabel = label;
         }
 
         private void WriteOutputLine(string text)
