@@ -26,16 +26,40 @@ using System.IO;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Options;
+using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Tests
 {
-    using System.Collections.Generic;
-    using Framework;
-
     [TestFixture]
     public class CommandLineTests
     {
         #region General Tests
+
+        [Test]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "", "--arg1 --arg2", "The file \"file1.txt\" was not found.")]
+        [TestCase("--arg1 @ --arg2", "", "--arg1 --arg2", "You must include a file name after @.")]
+        [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--fileArg1\n--fileArg2,file2.txt:--fileArg3", "--arg1 --fileArg1 --fileArg2 --arg2 --fileArg3", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:", "--arg1 --arg2", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n\n\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
+        public void ArgumentsFromFilesTests(string args, string files, string expectedExpandedArgs, string expectedErrorMessages)
+        {
+            // Given
+            var fileSystem = new VirtualFileSystem();
+            fileSystem.SetupFiles(files);
+
+            var expectedErrors = expectedErrorMessages.Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+
+            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem, new SimpleArgumentsFileParser());
+
+            // When
+            var actualExpectedExpandedArgs = string.Join(" ", new List<string>(options.Expand(args.Split(' '))).ToArray());
+
+            // Then
+            Assert.AreEqual(expectedExpandedArgs, actualExpectedExpandedArgs);
+            Assert.AreEqual(expectedErrors, options.ErrorMessages);
+        }
 
         [Test]
         public void NoInputFiles()
@@ -101,7 +125,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("OutFile",            "output|out", new string[] { "output.txt" },                     new string[0])]
         [TestCase("ErrFile",            "err",        new string[] { "error.txt" },                      new string[0])]
         [TestCase("WorkDirectory",      "work",       new string[] { "results" },                        new string[0])]
-        [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "All" },               new string[] { "JUNK" })]
+        [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "Before", "After", "All" },   new string[] { "JUNK" })]
         [TestCase("InternalTraceLevel", "trace",      new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding",    "encoding",   new string[] { "utf-8", "ascii", "unicode" },      new string[0])]
@@ -141,7 +165,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
-        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "All" })]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
@@ -522,7 +546,7 @@ namespace NUnit.ConsoleRunner.Tests
             ConsoleOptions options;
             if (defaultTeamcity.HasValue)
             {
-                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), args.ToArray());
+                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), new VirtualFileSystem(), new SimpleArgumentsFileParser(), args.ToArray());
             }
             else
             {

@@ -15,7 +15,8 @@ build/
 [Bb]in/
 [Oo]bj/
 .vs/
-tools/Cake
+tools/
+!tools/packages.config
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
@@ -179,3 +180,4 @@ MockAssemblyResult.xml
 PortabilityAnalysis*.html
 tools
 !tools/packages.config
+/issue_16.cmd

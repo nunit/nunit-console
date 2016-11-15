@@ -169,7 +169,17 @@ namespace NUnit.ConsoleRunner
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
-                GetResultWriter(spec).CheckWritability(outputPath);
+                try
+                {
+                    GetResultWriter(spec).CheckWritability(outputPath);
+                }
+                catch (SystemException ex)
+                {
+                    throw new NUnitEngineException(
+                        String.Format(
+                            "The path specified in --result {0} could not be written to",
+                            spec.OutputPath), ex);
+                }
             }
 
             // TODO: Incorporate this in EventCollector?

@@ -1,5 +1,5 @@
-// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+﻿// ***********************************************************************
+// Copyright (c) 2015 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,11 +21,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System.Reflection;
+using System.Collections.Generic;
 
-//
-// Versioning for the NUnit Engine assemblies, with the exception
-// of nunit.engine.api, which uses a separate version file.
-//
-[assembly: AssemblyVersion("3.6.0.0")]
-[assembly: AssemblyFileVersion("3.6.0.0")]
+namespace NUnit.Common
+{
+    public interface IFileSystem
+    {
+        bool FileExists(string fileName);
+
+        IEnumerable<string> ReadLines(string fileName);
+    }
+}
