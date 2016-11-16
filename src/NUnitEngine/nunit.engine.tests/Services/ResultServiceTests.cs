@@ -22,14 +22,12 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Reflection;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
 {
-    using ResultWriters;
-
     public class ResultServiceTests
     {
         private ResultService _resultService;
@@ -59,13 +57,20 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]
         //[TestCase("nunit2", null, ExpectedResult = "NUnit2XmlResultWriter")]
         [TestCase("cases", null, ExpectedResult = "TestCaseResultWriter")]
-        [TestCase("user", new object[] { "TextSummary.xslt" }, ExpectedResult = "XmlTransformResultWriter")]
+        //[TestCase("user", new object[] { "TextSummary.xslt" }, ExpectedResult = "XmlTransformResultWriter")]
         public string CanGetWriter(string format, object[] args)
         {
             var writer = _resultService.GetResultWriter(format, args);
 
             Assert.NotNull(writer);
             return writer.GetType().Name;
+        }
+
+        [Test]
+        public void CanGetWriterUser()
+        {
+            string actual = CanGetWriter("user", new object[] { Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt") });
+            Assert.That(actual, Is.EqualTo("XmlTransformResultWriter"));
         }
 
         [Test]
