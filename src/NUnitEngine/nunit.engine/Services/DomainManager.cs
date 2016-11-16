@@ -57,7 +57,13 @@ namespace NUnit.Engine.Services
         {
             AppDomainSetup setup = CreateAppDomainSetup(package);
 
-            string domainName = "test-domain-" + package.Name;
+            string hashCode = string.Empty;
+            if (package.Name != null)
+            {
+                hashCode = package.Name.GetHashCode().ToString("x") + "-";
+            }
+
+            string domainName = "domain-" + hashCode + package.Name;
             // Setup the Evidence
             Evidence evidence = new Evidence(AppDomain.CurrentDomain.Evidence);
             if (evidence.Count == 0)
