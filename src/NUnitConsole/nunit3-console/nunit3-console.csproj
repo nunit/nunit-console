@@ -63,6 +63,7 @@
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="ConsoleOptions.cs" />
     <Compile Include="ConsoleRunner.cs" />
+    <Compile Include="ConsoleTestResult.cs" />
     <Compile Include="DefaultOptionsProvider.cs" />
     <Compile Include="EnginePackageSettings.cs" />
     <Compile Include="ExtendedTextWrapper.cs" />

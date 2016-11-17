@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014-2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 using NUnit.Common;
@@ -32,40 +33,38 @@ namespace NUnit.ConsoleRunner
 
     public class ResultReporter
     {
-        private ExtendedTextWriter _writer;
-        private XmlNode _result;
-        private string _overallResult;
-        private ConsoleOptions _options;
-
-        private int _reportIndex = 0;
-
-        public ResultReporter(XmlNode result, ExtendedTextWriter writer, ConsoleOptions options)
+        public ResultReporter(XmlNode resultNode, ExtendedTextWriter writer, ConsoleOptions options)
         {
-            _result = result;
-            _writer = writer;
+            ResultNode = resultNode;
+            Writer = writer;
+            Options = options;
 
-            _overallResult = result.GetAttribute("result");
-            if (_overallResult == "Skipped")
-                _overallResult = "Warning";
+            OverallResult = resultNode.GetAttribute("result");
+            if (OverallResult == "Skipped")
+                OverallResult = "Warning";
 
-            _options = options;
-
-            Summary = new ResultSummary(result);
+            Summary = new ResultSummary(resultNode);
         }
 
         public ResultSummary Summary { get; private set; }
+
+        private int ReportIndex { get; set; }
+        private XmlNode ResultNode { get; set; }
+        private ExtendedTextWriter Writer { get; set; }
+        private ConsoleOptions Options { get; set; }
+        private string OverallResult { get; set; }
 
         /// <summary>
         /// Reports the results to the console
         /// </summary>
         public void ReportResults()
         {
-            _writer.WriteLine();
+            Writer.WriteLine();
 
             if (Summary.ExplicitCount + Summary.SkipCount + Summary.IgnoreCount > 0)
                 WriteNotRunReport();
 
-            if (_overallResult == "Failed")
+            if (OverallResult == "Failed")
                 WriteErrorsAndFailuresReport();
 
             WriteRunSettingsReport();
@@ -77,71 +76,71 @@ namespace NUnit.ConsoleRunner
 
         public void WriteRunSettingsReport()
         {
-            var firstSuite = _result.SelectSingleNode("test-suite");
+            var firstSuite = ResultNode.SelectSingleNode("test-suite");
             if (firstSuite != null)
             {
                 var settings = firstSuite.SelectNodes("settings/setting");
 
                 if (settings.Count > 0)
                 {
-                    _writer.WriteLine(ColorStyle.SectionHeader, "Run Settings");
+                    Writer.WriteLine(ColorStyle.SectionHeader, "Run Settings");
 
                     foreach (XmlNode node in settings)
                     {
                         string name = node.GetAttribute("name");
                         string val = node.GetAttribute("value");
                         string label = string.Format("    {0}: ", name);
-                        _writer.WriteLabelLine(label, val);
+                        Writer.WriteLabelLine(label, val);
                     }
 
-                    _writer.WriteLine();
+                    Writer.WriteLine();
                 }
             }
         }
 
         public void WriteSummaryReport()
         {
-            ColorStyle overall = _overallResult == "Passed"
+            ColorStyle overall = OverallResult == "Passed"
                 ? ColorStyle.Pass
-                : _overallResult == "Failed" 
+                : OverallResult == "Failed" 
                     ? ColorStyle.Failure
-                    : _overallResult == "Warning"
+                    : OverallResult == "Warning"
                         ? ColorStyle.Warning
                         : ColorStyle.Output;
             
-            _writer.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
-            _writer.WriteLabelLine("  Overall result: ", _overallResult, overall);
+            Writer.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
+            Writer.WriteLabelLine("  Overall result: ", OverallResult, overall);
 
             WriteSummaryCount("  Test Count: ", Summary.TestCount);
             WriteSummaryCount(", Passed: ", Summary.PassCount);
             WriteSummaryCount(", Failed: ", Summary.FailedCount, ColorStyle.Failure);
             WriteSummaryCount(", Inconclusive: ", Summary.InconclusiveCount);
             WriteSummaryCount(", Skipped: ", Summary.TotalSkipCount);
-            _writer.WriteLine();
+            Writer.WriteLine();
 
             if (Summary.FailedCount > 0)
             {
                 WriteSummaryCount("    Failed Tests - Failures: ", Summary.FailureCount);
                 WriteSummaryCount(", Errors: ", Summary.ErrorCount, ColorStyle.Error);
                 WriteSummaryCount(", Invalid: ", Summary.InvalidCount);
-                _writer.WriteLine();
+                Writer.WriteLine();
             }
             if (Summary.TotalSkipCount > 0)
             {
                 WriteSummaryCount("    Skipped Tests - Ignored: ", Summary.IgnoreCount);
                 WriteSummaryCount(", Explicit: ", Summary.ExplicitCount);
                 WriteSummaryCount(", Other: ", Summary.SkipCount);
-                _writer.WriteLine();
+                Writer.WriteLine();
             }
 
-            var duration = _result.GetAttribute("duration", 0.0);
-            var startTime = _result.GetAttribute("start-time", DateTime.MinValue);
-            var endTime = _result.GetAttribute("end-time", DateTime.MaxValue);
+            var duration = ResultNode.GetAttribute("duration", 0.0);
+            var startTime = ResultNode.GetAttribute("start-time", DateTime.MinValue);
+            var endTime = ResultNode.GetAttribute("end-time", DateTime.MaxValue);
 
-            _writer.WriteLabelLine("  Start time: ", startTime.ToString("u"));
-            _writer.WriteLabelLine("    End time: ", endTime.ToString("u"));
-            _writer.WriteLabelLine("    Duration: ", string.Format(NumberFormatInfo.InvariantInfo, "{0:0.000} seconds", duration));
-            _writer.WriteLine();
+            Writer.WriteLabelLine("  Start time: ", startTime.ToString("u"));
+            Writer.WriteLabelLine("    End time: ", endTime.ToString("u"));
+            Writer.WriteLabelLine("    Duration: ", string.Format(NumberFormatInfo.InvariantInfo, "{0:0.000} seconds", duration));
+            Writer.WriteLine();
         }
 
         #endregion
@@ -150,51 +149,52 @@ namespace NUnit.ConsoleRunner
 
         public void WriteErrorsAndFailuresReport()
         {
-            _reportIndex = 0;
-            _writer.WriteLine(ColorStyle.SectionHeader, "Errors and Failures");
-            _writer.WriteLine();
-            WriteErrorsAndFailures(_result);
+            ReportIndex = 0;
+            Writer.WriteLine(ColorStyle.SectionHeader, "Errors and Failures");
+            Writer.WriteLine();
 
-            if (_options.StopOnError)
+            WriteErrorsAndFailures(ResultNode);
+
+            if (Options.StopOnError)
             {
-                _writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
-                _writer.WriteLine();
+                Writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
+                Writer.WriteLine();
             }
         }
 
-        private void WriteErrorsAndFailures(XmlNode result)
+        private void WriteErrorsAndFailures(XmlNode resultNode)
         {
-            string resultState = result.GetAttribute("result");
+            string resultState = resultNode.GetAttribute("result");
 
-            switch (result.Name)
+            switch (resultNode.Name)
             {
                 case "test-case":
                     if (resultState == "Failed")
-                        WriteSingleResult(result, ColorStyle.Failure);
+                        new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                     return;
 
                 case "test-run":
-                    foreach (XmlNode childResult in result.ChildNodes)
+                    foreach (XmlNode childResult in resultNode.ChildNodes)
                         WriteErrorsAndFailures(childResult);
                     break;
 
                 case "test-suite":
                     if (resultState == "Failed")
                     {
-                        if (result.GetAttribute("type") == "Theory")
+                        if (resultNode.GetAttribute("type") == "Theory")
                         {
-                            WriteSingleResult(result, ColorStyle.Failure);
+                            new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                         }
                         else
                         {
-                            var site = result.GetAttribute("site");
+                            var site = resultNode.GetAttribute("site");
                             if (site != "Parent" && site != "Child")
-                                WriteSingleResult(result, ColorStyle.Failure);
+                                new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                             if (site == "SetUp") return;
                         }
                     }
                     
-                    foreach (XmlNode childResult in result.ChildNodes)
+                    foreach (XmlNode childResult in resultNode.ChildNodes)
                         WriteErrorsAndFailures(childResult);
 
                     break;
@@ -207,35 +207,27 @@ namespace NUnit.ConsoleRunner
 
         public void WriteNotRunReport()
         {
-            _reportIndex = 0;
-            _writer.WriteLine(ColorStyle.SectionHeader, "Tests Not Run");
-            _writer.WriteLine();
-            WriteNotRunResults(_result);
+            ReportIndex = 0;
+            Writer.WriteLine(ColorStyle.SectionHeader, "Tests Not Run");
+            Writer.WriteLine();
+            WriteNotRunResults(ResultNode);
         }
 
-        private void WriteNotRunResults(XmlNode result)
+        private void WriteNotRunResults(XmlNode resultNode)
         {
-            switch (result.Name)
+            switch (resultNode.Name)
             {
                 case "test-case":
-                    string status = result.GetAttribute("result");
+                    string status = resultNode.GetAttribute("result");
 
                     if (status == "Skipped")
-                    {
-                        string label = result.GetAttribute("label");
-
-                        var colorStyle = label == "Ignored" 
-                            ? ColorStyle.Warning 
-                            : ColorStyle.Output;
-
-                        WriteSingleResult(result, colorStyle);
-                    }
+                        new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
 
                     break;
 
                 case "test-suite":
                 case "test-run":
-                    foreach (XmlNode childResult in result.ChildNodes)
+                    foreach (XmlNode childResult in resultNode.ChildNodes)
                         WriteNotRunResults(childResult);
 
                     break;
@@ -248,61 +240,12 @@ namespace NUnit.ConsoleRunner
 
         private void WriteSummaryCount(string label, int count)
         {
-            _writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture));
+            Writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture));
         }
 
         private void WriteSummaryCount(string label, int count, ColorStyle color)
         {
-            _writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture), count > 0 ? color : ColorStyle.Value);
-        }
-
-        private static readonly char[] EOL_CHARS = new char[] { '\r', '\n' };
-
-        private void WriteSingleResult(XmlNode result, ColorStyle colorStyle)
-        {
-            string status = result.GetAttribute("label");
-            if (status == null)
-                status = result.GetAttribute("result");
-
-            if (status == "Failed" || status == "Error")
-            {
-                var site = result.GetAttribute("site");
-                if (site == "SetUp" || site == "TearDown")
-                    status = site + " " + status;
-            }
-
-            string fullName = result.GetAttribute("fullname");
-
-            _writer.WriteLine(colorStyle,
-                string.Format("{0}) {1} : {2}", ++_reportIndex, status, fullName));
-
-            XmlNode failureNode = result.SelectSingleNode("failure");
-            if (failureNode != null)
-            {
-                XmlNode message = failureNode.SelectSingleNode("message");
-                XmlNode stacktrace = failureNode.SelectSingleNode("stack-trace");
-
-                // In order to control the format, we trim any line-end chars
-                // from end of the strings we write and supply them via calls
-                // to WriteLine(). Newlines within the strings are retained.
-
-                if (message != null)
-                    _writer.WriteLine(colorStyle, message.InnerText.TrimEnd(EOL_CHARS));
-
-                if (stacktrace != null)
-                    _writer.WriteLine(colorStyle, stacktrace.InnerText.TrimEnd(EOL_CHARS));
-            }
-
-            XmlNode reasonNode = result.SelectSingleNode("reason");
-            if (reasonNode != null)
-            {
-                XmlNode message = reasonNode.SelectSingleNode("message");
-
-                if (message != null)
-                    _writer.WriteLine(colorStyle, message.InnerText.TrimEnd(EOL_CHARS));
-            }
-
-            _writer.WriteLine(); // Skip after each item
+            Writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture), count > 0 ? color : ColorStyle.Value);
         }
 
         #endregion
