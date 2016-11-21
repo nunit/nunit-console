@@ -21,7 +21,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.Collections.Generic;
+using System.Web.UI;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
@@ -91,14 +93,11 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         protected override TestEngineResult LoadPackage()
         {
-            var results = new List<TestEngineResult>();
-
             var packages = new List<TestPackage>(TestPackage.SubPackages);
             if (packages.Count == 0)
                 packages.Add(TestPackage);
 
-            foreach (var runner in Runners)
-                results.Add(runner.Load());
+            List<TestEngineResult> results = RunInParallel(runner => new TestLoadTask(runner));
 
             return ResultHelper.Merge(results);
         }
@@ -152,21 +151,7 @@ namespace NUnit.Engine.Runners
             }
             else
             {
-                var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
-                var tasks = new List<TestExecutionTask>();
-
-                foreach (ITestEngineRunner runner in Runners)
-                {
-                    var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
-                    tasks.Add(task);
-                    workerPool.Enqueue(task);
-                }
-
-                workerPool.Start();
-                workerPool.WaitAll();
-
-                foreach (var task in tasks)
-                    results.Add(task.Result());
+                results = RunInParallel(runner => new TestExecutionTask(runner, listener, filter, disposeRunners));
             }
 
             if (disposeRunners) Runners.Clear();
@@ -199,6 +184,31 @@ namespace NUnit.Engine.Runners
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {
             return TestRunnerFactory.MakeTestRunner(package);
+        }
+
+        private delegate ITestExecutionTask TaskFactory(ITestEngineRunner runner);
+        
+        private List<TestEngineResult> RunInParallel(TaskFactory taskFactory) 
+        {
+            var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
+            var tasks = new List<ITestExecutionTask>();
+
+            foreach (ITestEngineRunner runner in Runners)
+            {
+                var task = taskFactory(runner);
+                tasks.Add(task);
+                workerPool.Enqueue(task);
+            }
+
+            workerPool.Start();
+            workerPool.WaitAll();
+
+            var results = new List<TestEngineResult>();
+
+            foreach(ITestExecutionTask task in tasks)
+                results.Add(task.Result());
+
+            return results;
         }
     }
 }
