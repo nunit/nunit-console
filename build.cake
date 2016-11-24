@@ -47,10 +47,6 @@ var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
 
-// Packages
-var SRC_PACKAGE = PACKAGE_DIR + "NUnit-" + version + modifier + "-src.zip";
-var ZIP_PACKAGE = PACKAGE_DIR + "NUnit-" + packageVersion + ".zip";
-
 //////////////////////////////////////////////////////////////////////
 // CLEAN
 //////////////////////////////////////////////////////////////////////
@@ -245,14 +241,6 @@ var BinFiles = new FilePath[]
     "TestListWithEmptyLine.tst",
     "TextSummary.xslt",
 };
-
-Task("PackageSource")
-    .Description("Creates a ZIP file of the source code")
-    .Does(() =>
-    {
-        CreateDirectory(PACKAGE_DIR);
-        RunGitCommand(string.Format("archive -o {0} HEAD", SRC_PACKAGE));
-    });
 
 Task("CreateImage")
     .Description("Copies all files into the image directory")
