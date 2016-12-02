@@ -125,7 +125,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("OutFile",            "output|out", new string[] { "output.txt" },                     new string[0])]
         [TestCase("ErrFile",            "err",        new string[] { "error.txt" },                      new string[0])]
         [TestCase("WorkDirectory",      "work",       new string[] { "results" },                        new string[0])]
-        [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "All" },               new string[] { "JUNK" })]
+        [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "Before", "After", "All" },   new string[] { "JUNK" })]
         [TestCase("InternalTraceLevel", "trace",      new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding",    "encoding",   new string[] { "utf-8", "ascii", "unicode" },      new string[0])]
@@ -165,7 +165,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
-        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "All" })]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
