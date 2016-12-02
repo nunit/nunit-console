@@ -184,7 +184,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             "<start-test fullname='TEST1'/>",
             "<test-output fullname='TEST1'>Immediate output from TEST1</test-output>",
-            "<test-case fullname='TEST1' result='Passed'><output>Output\r\nfrom\r\nTEST1</output></test-case>"
+			string.Format("<test-case fullname='TEST1' result='Passed'><output>Output{0}from{0}TEST1</output></test-case>", Environment.NewLine)
         };
 
         static TestCaseData[] MultipleEventData = new TestCaseData[]
