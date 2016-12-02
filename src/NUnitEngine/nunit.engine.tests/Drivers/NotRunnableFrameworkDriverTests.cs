@@ -21,81 +21,79 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Web.UI;
 using System.Xml;
-using NUnit.Engine.Internal;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using NUnit.Engine.Extensibility;
-using NUnit.Tests.Assemblies;
 
 namespace NUnit.Engine.Drivers.Tests
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
     public class NotRunnableFrameworkDriverTests
     {
-        private const string BAD_FILE = "junk.dll";
         private const string REASON = "Assembly could not be found";
 
-        private IFrameworkDriver _driver;
-
-        [SetUp]
-        public void CreateDriver()
+        [TestCase("junk.dll", "Assembly")]
+        [TestCase("junk.exe", "Assembly")]
+        [TestCase("junk.cfg", "Unknown")]
+        public void Load_ReturnsNonRunnableSuite(string badFile, string expectedType)
         {
-            _driver = new NotRunnableFrameworkDriver( BAD_FILE, REASON);
-            _driver.ID = "99";
-        }
-
-        [Test]
-        public void Load_ReturnsNonRunnableSuite()
-        {
-            var result = XmlHelper.CreateXmlNode(_driver.Load(BAD_FILE, new Dictionary<string, object>()));
+            IFrameworkDriver driver = CreateDriver(badFile);
+            var result = XmlHelper.CreateXmlNode(driver.Load(badFile, new Dictionary<string, object>()));
 
             Assert.That(result.Name, Is.EqualTo("test-suite"));
-            Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
+            Assert.That(result.GetAttribute("type"), Is.EqualTo(expectedType));
             Assert.That(result.GetAttribute("id"), Is.EqualTo("99-1"));
-            Assert.That(result.GetAttribute("name"), Is.EqualTo(BAD_FILE));
-            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(BAD_FILE)));
+            Assert.That(result.GetAttribute("name"), Is.EqualTo(badFile));
+            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(badFile)));
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("NotRunnable"));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
             Assert.That(GetSkipReason(result), Is.EqualTo(REASON));
             Assert.That(result.SelectNodes("test-suite").Count, Is.EqualTo(0), "Load result should not have child tests");
         }
 
-        [Test]
-        public void Explore_ReturnsNonRunnableSuite()
+        [TestCase("junk.dll", "Assembly")]
+        [TestCase("junk.exe", "Assembly")]
+        [TestCase("junk.cfg", "Unknown")]
+        public void Explore_ReturnsNonRunnableSuite(string badFile, string expectedType)
         {
-            var result = XmlHelper.CreateXmlNode(_driver.Explore(TestFilter.Empty.Text));
+            IFrameworkDriver driver = CreateDriver(badFile);
+            var result = XmlHelper.CreateXmlNode(driver.Explore(TestFilter.Empty.Text));
 
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("id"), Is.EqualTo("99-1"));
-            Assert.That(result.GetAttribute("name"), Is.EqualTo(BAD_FILE));
-            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(BAD_FILE)));
-            Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
+            Assert.That(result.GetAttribute("name"), Is.EqualTo(badFile));
+            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(badFile)));
+            Assert.That(result.GetAttribute("type"), Is.EqualTo(expectedType));
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("NotRunnable"));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
             Assert.That(GetSkipReason(result), Is.EqualTo(REASON));
             Assert.That(result.SelectNodes("test-suite").Count, Is.EqualTo(0), "Result should not have child tests");
         }
 
-        [Test]
-        public void CountTestCases_ReturnsZero()
+        [TestCase("junk.dll")]
+        [TestCase("junk.exe")]
+        [TestCase("junk.cfg")]
+        public void CountTestCases_ReturnsZero(string badFile)
         {
-            Assert.That(_driver.CountTestCases(TestFilter.Empty.Text), Is.EqualTo(0));
+            IFrameworkDriver driver = CreateDriver(badFile);
+            Assert.That(driver.CountTestCases(TestFilter.Empty.Text), Is.EqualTo(0));
         }
 
-        [Test]
-        public void Run_ReturnsNonRunnableSuite()
+        [TestCase("junk.dll", "Assembly")]
+        [TestCase("junk.exe", "Assembly")]
+        [TestCase("junk.cfg", "Unknown")]
+        public void Run_ReturnsNonRunnableSuite(string badFile, string expectedType)
         {
-            var result = XmlHelper.CreateXmlNode(_driver.Run(new NullListener(), TestFilter.Empty.Text));
+            IFrameworkDriver driver = CreateDriver(badFile);
+            var result = XmlHelper.CreateXmlNode(driver.Run(new NullListener(), TestFilter.Empty.Text));
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("id"), Is.EqualTo("99-1"));
-            Assert.That(result.GetAttribute("name"), Is.EqualTo(BAD_FILE));
-            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(BAD_FILE)));
-            Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
+            Assert.That(result.GetAttribute("name"), Is.EqualTo(badFile));
+            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(badFile)));
+            Assert.That(result.GetAttribute("type"), Is.EqualTo(expectedType));
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("NotRunnable"));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
             Assert.That(GetSkipReason(result), Is.EqualTo(REASON));
@@ -106,6 +104,12 @@ namespace NUnit.Engine.Drivers.Tests
         }
 
         #region Helper Methods
+        private IFrameworkDriver CreateDriver(string filePath)
+        {
+            IFrameworkDriver driver = new NotRunnableFrameworkDriver(filePath, REASON);
+            driver.ID = "99";
+            return driver;
+        }
         private static string GetSkipReason(XmlNode result)
         {
             var propNode = result.SelectSingleNode(string.Format("properties/property[@name='{0}']", PropertyNames.SkipReason));
@@ -114,7 +118,7 @@ namespace NUnit.Engine.Drivers.Tests
         #endregion
 
         #region Nested NullListener Class
-        public class NullListener : ITestEventListener
+        private class NullListener : ITestEventListener
         {
             public void OnTestEvent(string testEvent)
             {
