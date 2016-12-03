@@ -348,8 +348,8 @@ namespace NUnit.Common
             this.Add("noresult", "Don't save any test results.",
                 v => noresult = v != null);
 
-            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, Before, After, All",
-                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "Before", "After", "All"));
+            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, All",
+                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "All"));
 
             this.Add("test-name-format=", "Non-standard naming pattern to use in generating test names.",
                 v => DefaultTestNamePattern = RequiredValue(v, "--test-name-format"));

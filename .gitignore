@@ -180,4 +180,3 @@ MockAssemblyResult.xml
 PortabilityAnalysis*.html
 tools
 !tools/packages.config
-/issue_16.cmd
