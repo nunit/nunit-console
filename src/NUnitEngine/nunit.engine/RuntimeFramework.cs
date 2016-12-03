@@ -36,7 +36,27 @@ namespace NUnit.Engine
     /// </summary>
     [Serializable]
     public sealed class RuntimeFramework : IRuntimeFramework
-    {
+    { 
+        // TODO: RuntimeFramework was originally created for use in
+        // a single-threaded environment. The introduction of parallel
+        // execution and especially parallel loading of tests has
+        // exposed some weaknesses.
+        //
+        // Ideally, we should remove all knowledge of the environment
+        // from RuntimeFramework. An instance of RuntimeFramework does
+        // not need to know, for example, if it is available on the 
+        // current system. In the present architecture, that's really
+        // the job of the RuntimeFrameworkService. Other functions
+        // may actually belong in TestAgency.
+        //
+        // All the static properties of RuntimeFrameowork need to be
+        // examined for thread-safety, particularly CurrentFramework
+        // and AvailableFrameworks. The latter caused a problem with
+        // parallel loading, which has been fixed for now through a
+        // hack added to RuntimeFrameworkService. We may be able to
+        // move all this functionality to services, eliminating the
+        // use of public static properties here.
+
         #region Static Fields
 
         /// <summary>

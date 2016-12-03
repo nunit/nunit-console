@@ -54,7 +54,7 @@ namespace NUnit.Engine.Runners
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
             _extensionService = _services.GetService<ExtensionService>();
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
-            LoadPackage();
+            //LoadPackage();
         }
 
         #region Properties
