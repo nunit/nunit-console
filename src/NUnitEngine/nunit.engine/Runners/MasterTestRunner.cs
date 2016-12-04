@@ -50,11 +50,13 @@ namespace NUnit.Engine.Runners
             _services = services;
             TestPackage = package;
 
+            // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
             _extensionService = _services.GetService<ExtensionService>();
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
-            //LoadPackage();
+
+            InitializePackage();
         }
 
         #region Properties
@@ -204,10 +206,10 @@ namespace NUnit.Engine.Runners
         #region Helper Methods
 
         /// <summary>
-        /// Load a TestPackage for possible execution,
-        /// saving the result in the LoadResult property.
+        /// Check the package settings, expand projects and
+        /// determine what runtimes may be needed.
         /// </summary>
-        private void LoadPackage()
+        private void InitializePackage()
         {
             // Last chance to catch invalid settings in package,
             // in case the client runner missed them.
@@ -230,8 +232,6 @@ namespace NUnit.Engine.Runners
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
             }
-
-            LoadResult = _engineRunner.Load().Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
         }
 
         private TestEngineResult PrepareResult(TestEngineResult result)
