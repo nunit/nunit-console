@@ -54,112 +54,43 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(Output, Is.EqualTo(expected));
         }
 
-        [TestCaseSource("MultipleEventData")]
-        public void MultipleEvents(string[] reports, string labels, string expected)
-        {
-            var handler = new TestEventHandler(_writer, labels);
-
-            foreach (string report in reports)
-                handler.OnTestEvent(report);
-
-            if (Environment.NewLine != "\r\n")
-                expected = expected.Replace("\r\n", Environment.NewLine);
-            Assert.That(Output, Is.EqualTo(expected));
-        }
-
 #pragma warning disable 414
         static TestCaseData[] EventData = new TestCaseData[]
         {
             // Start Events
             new TestCaseData("<start-test fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<start-test fullname='SomeName'/>", "Before", "=> SomeName\r\n"),
-            new TestCaseData("<start-test fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<start-suite fullname='SomeName'/>", "Before", ""),
-            new TestCaseData("<start-suite fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-case fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-case fullname='SomeName'/>", "Before", ""),
-            new TestCaseData("<test-case fullname='SomeName'/>", "After", "=> SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName'/>", "All", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", ""),
-            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "After", ""),
-
+            new TestCaseData("<test-suite fullname='SomeName'/>", "All", ""),
             // Finish Events - With Output
             new TestCaseData(
-                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "Off",
                 "OUTPUT\r\n"),
             new TestCaseData(
-                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
+                "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "On",
                 "=> SomeName\r\nOUTPUT\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
-                "After", 
-                "OUTPUT\r\nPASSED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Passed' />", 
-                "After", 
-                "PASSED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Failed' />", 
-                "After", 
-                "FAILED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Failed'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nFAILED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nINVALID => SomeName\r\n"),
-             new TestCaseData(
-                "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nINVALID => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Failed' label='Error'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nERROR => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Failed' label='Cancelled'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nCANCELLED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Skipped'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nSKIPPED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Skipped' label='Ignored'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nIGNORED => SomeName\r\n"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Inconclusive'><output>OUTPUT</output></test-case>", 
-                "After", 
-                "OUTPUT\r\nINCONCLUSIVE => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName'><output>OUTPUT</output></test-case>",
                 "All", 
                 "OUTPUT\r\n"),
             new TestCaseData(
-                "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
+                "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
                 "Off", 
                 "OUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
                 "On",
-                "=> SomeName\r\nOUTPUT\r\n"),
-            new TestCaseData(
-                "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
-                "After",
                 "=> SomeName\r\nOUTPUT\r\n"),
             new TestCaseData(
                 "<test-suite fullname='SomeName'><output>OUTPUT</output></test-suite>",
@@ -176,39 +107,8 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT\r\n"),
             new TestCaseData(
                 "<test-output>OUTPUT</test-output>",
-                "After",
-                "OUTPUT\r\n")
-        };
-
-        static string[] SingleTestEvents = new string[]
-        {
-            "<start-test fullname='TEST1'/>",
-            "<test-output fullname='TEST1'>Immediate output from TEST1</test-output>",
-			string.Format("<test-case fullname='TEST1' result='Passed'><output>Output{0}from{0}TEST1</output></test-case>", Environment.NewLine)
-        };
-
-        static TestCaseData[] MultipleEventData = new TestCaseData[]
-        {
-            new TestCaseData(
-                SingleTestEvents,
-                "Off",
-                "Immediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
-            new TestCaseData(
-                SingleTestEvents,
-                "On",
-                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
-            new TestCaseData(
-                SingleTestEvents,
                 "All",
-                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
-            new TestCaseData(
-                SingleTestEvents,
-                "Before",
-                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\n"),
-            new TestCaseData(
-                SingleTestEvents,
-                "After",
-                "=> TEST1\r\nImmediate output from TEST1\r\nOutput\r\nfrom\r\nTEST1\r\nPASSED => TEST1\r\n")
+                "OUTPUT\r\n")
         };
 #pragma warning restore 414
     }
