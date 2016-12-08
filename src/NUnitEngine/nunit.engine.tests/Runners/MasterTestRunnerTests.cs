@@ -34,7 +34,7 @@ namespace NUnit.Engine.Runners.Tests
         private TestPackage _package;
         private ServiceContext _services;
         private MasterTestRunner _runner;
-        private List<string> _events;
+        private List<XmlNode> _events;
 
         [SetUp]
         public void Initialize()
@@ -54,7 +54,7 @@ namespace NUnit.Engine.Runners.Tests
 
             _runner = new MasterTestRunner(_services, _package);
 
-            _events = new List<string>();
+            _events = new List<XmlNode>();
         }
 
         [TearDown]
@@ -101,6 +101,7 @@ namespace NUnit.Engine.Runners.Tests
         [Test]
         public void Run()
         {
+            _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
             var result = _runner.Run(this, TestFilter.Empty);
             CheckTestRunResult(result);
         }
@@ -108,6 +109,7 @@ namespace NUnit.Engine.Runners.Tests
         [Test]
         public void RunAsync()
         {
+            _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
             var testRun = _runner.RunAsync(this, TestFilter.Empty);
             testRun.Wait(-1);
             CheckTestRunResult(testRun.Result);
@@ -132,16 +134,17 @@ namespace NUnit.Engine.Runners.Tests
             Assert.That(suite.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
             Assert.That(suite.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
 
-            Assert.That(_events[0], Does.StartWith("<start-run"));
-            Assert.That(_events[1], Does.StartWith("<start-suite"));
-            Assert.That(_events[_events.Count - 2], Does.StartWith("<test-suite"));
-            Assert.That(_events[_events.Count - 1], Does.StartWith("<test-run"));
-            Assert.That(_events.Count(s => s.StartsWith("<test-case")), Is.EqualTo(MockAssembly.Tests));
+            Assert.That(_events[0].Name, Is.EqualTo("start-run"));
+            Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(MockAssembly.Tests), "Start-run count value");
+            Assert.That(_events[1].Name, Is.EqualTo("start-suite"));
+            Assert.That(_events[_events.Count - 2].Name, Is.EqualTo("test-suite"));
+            Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"));
+            Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(MockAssembly.Tests));
         }
 
         void ITestEventListener.OnTestEvent(string report)
         {
-            _events.Add(report);
+            _events.Add(XmlHelper.CreateXmlNode(report));
         }
     }
 }
