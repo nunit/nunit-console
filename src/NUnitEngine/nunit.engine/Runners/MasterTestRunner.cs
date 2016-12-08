@@ -29,6 +29,7 @@ using System.Reflection;
 using System.Xml;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
+using System.ComponentModel;
 
 namespace NUnit.Engine.Runners
 {
@@ -153,7 +154,7 @@ namespace NUnit.Engine.Runners
         /// <returns></returns>
         public ITestRun RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            return _engineRunner.RunAsync(listener, filter);
+            return RunTestsAsync(listener, filter);
         }
 
         /// <summary>
@@ -372,6 +373,24 @@ namespace NUnit.Engine.Runners
             eventDispatcher.OnTestEvent(result.Xml.OuterXml);
 
             return result;
+        }
+
+        private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
+        {
+            var testRun = new AsyncTestEngineResult();
+
+            using (var worker = new BackgroundWorker())
+            {
+                worker.DoWork += (s, ea) =>
+                {
+                    var result = RunTests(listener, filter);
+                    testRun.SetResult(result);
+                };
+
+                worker.RunWorkerAsync();
+            }
+
+            return testRun;
         }
 
         private static void InsertCommandLineElement(XmlNode resultNode)

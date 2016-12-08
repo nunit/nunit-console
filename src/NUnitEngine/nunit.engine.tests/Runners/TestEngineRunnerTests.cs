@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using NUnit.Engine.Internal;
 using NUnit.Framework;
@@ -42,7 +43,7 @@ namespace NUnit.Engine.Runners.Tests
     {
         protected TestPackage _package;
         protected ServiceContext _services;
-        protected TRunner _runner; 
+        protected TRunner _runner;
 
         // Number of copies of mock-assembly to use in package
         protected int _numAssemblies;

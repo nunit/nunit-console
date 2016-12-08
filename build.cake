@@ -391,6 +391,7 @@ void BuildProject(string projectPath, string configuration, MSBuildPlatform buil
             .SetMSBuildPlatform(buildPlatform)
             .SetVerbosity(Verbosity.Minimal)
             .SetNodeReuse(false)
+			.SetPlatformTarget(PlatformTarget.MSIL)
         );
     }
     else
