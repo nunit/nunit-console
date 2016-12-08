@@ -194,6 +194,7 @@ namespace NUnit.Engine.Services
 
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
             Guid agentId = Guid.NewGuid();
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
