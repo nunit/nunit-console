@@ -174,8 +174,10 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            return PrepareResult(_engineRunner.Explore(filter))
-                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName).Xml;
+            LoadResult = PrepareResult(_engineRunner.Explore(filter))
+                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+
+            return LoadResult.Xml;
         }
 
         #endregion
