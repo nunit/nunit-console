@@ -79,6 +79,7 @@
     <Compile Include="Internal\ServerUtilityTests.cs" />
     <Compile Include="Internal\SettingsGroupTests.cs" />
     <Compile Include="ResultHelperTests.cs" />
+    <Compile Include="Runners\MasterTestRunnerTests.cs" />
     <Compile Include="Runners\MultipleTestProcessRunnerTests.cs" />
     <Compile Include="Runners\TestEngineRunnerTests.cs" />
     <Compile Include="Runners\ParallelTaskWorkerPoolTests.cs" />
