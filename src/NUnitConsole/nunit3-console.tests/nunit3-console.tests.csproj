@@ -39,11 +39,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NUnit.3.6.0-ci-03472-pr-1920\lib\net20\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\packages\NUnit.3.6.0-dev-03477\lib\net20\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NUnit.System.Linq, Version=0.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NUnit.3.6.0-ci-03472-pr-1920\lib\net20\NUnit.System.Linq.dll</HintPath>
+      <HintPath>..\..\..\packages\NUnit.3.6.0-dev-03477\lib\net20\NUnit.System.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
