@@ -81,6 +81,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DebugTests", "debug")]
         [TestCase("PauseBeforeRun", "pause")]
         [TestCase("LoadUserProfile", "loaduserprofile")]
+        [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
 #endif

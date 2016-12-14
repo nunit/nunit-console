@@ -384,6 +384,9 @@ namespace NUnit.ConsoleRunner
             if (options.LoadUserProfile)
                 package.AddSetting(EnginePackageSettings.LoadUserProfile, true);
 
+            if (options.SkipNonTestAssemblies)
+                package.AddSetting(EnginePackageSettings.SkipNonTestAssemblies, true);
+
             if (options.DefaultTimeout >= 0)
                 package.AddSetting(FrameworkPackageSettings.DefaultTimeout, options.DefaultTimeout);
 

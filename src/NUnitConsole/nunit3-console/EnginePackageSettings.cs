@@ -129,6 +129,11 @@ namespace NUnit
         public const string LoadUserProfile = "LoadUserProfile";
 
         /// <summary>
+        /// Bool flag indicating that non-test assemblies should be skipped without error.
+        /// </summary>
+        public const string SkipNonTestAssemblies = "SkipNonTestAssemblies";
+
+        /// <summary>
         /// Flag (bool) indicating whether to pause execution of tests to allow
         /// the user to attache a debugger.
         /// </summary>

@@ -106,7 +106,7 @@ namespace NUnit.Engine.Drivers.Tests
         #region Helper Methods
         private IFrameworkDriver CreateDriver(string filePath)
         {
-            IFrameworkDriver driver = new NotRunnableFrameworkDriver(filePath, REASON);
+            IFrameworkDriver driver = new InvalidAssemblyFrameworkDriver(filePath, REASON);
             driver.ID = "99";
             return driver;
         }

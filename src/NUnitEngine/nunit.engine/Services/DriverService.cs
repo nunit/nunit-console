@@ -48,26 +48,36 @@ namespace NUnit.Engine.Services
         /// <param name="domain">The AppDomain to use for the tests</param>
         /// <param name="assemblyPath">The full path to the test assembly</param>
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
+        /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
-        public IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework)
+        public IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies)
         {
             if (!File.Exists(assemblyPath))
-                return new NotRunnableFrameworkDriver(assemblyPath, "File not found: " + assemblyPath);
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, "File not found: " + assemblyPath);
 
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
-                return new NotRunnableFrameworkDriver(assemblyPath, "File type is not supported");
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, "File type is not supported");
 
             if (targetFramework != null)
             {
                 var platform = targetFramework.Split(new char[] { ',' })[0];
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETCompactFramework")
-                    return new NotRunnableFrameworkDriver(assemblyPath, platform + " test assemblies are not yet supported by the engine");
+                    return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not yet supported by the engine");
             }
 
             try
             {
+                var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath);
+
+                if (skipNonTestAssemblies)
+                {
+                    foreach (var attr in assemblyDef.CustomAttributes)
+                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssembly")
+                            return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                }
+
                 var references = new List<AssemblyName>();
-                foreach (var cecilRef in AssemblyDefinition.ReadAssembly(assemblyPath).MainModule.AssemblyReferences)
+                foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
                     references.Add(new AssemblyName(cecilRef.FullName));
 
                 foreach (var factory in _factories)
@@ -81,10 +91,13 @@ namespace NUnit.Engine.Services
             }
             catch (BadImageFormatException ex)
             {
-                return new NotRunnableFrameworkDriver(assemblyPath, ex.Message);
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, ex.Message);
             }
 
-            return new NotRunnableFrameworkDriver(assemblyPath, string.Format("No suitable tests found in '{0}'.\n" +
+            if (skipNonTestAssemblies)
+                return new SkippedAssemblyFrameworkDriver(assemblyPath);
+            else
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, string.Format("No suitable tests found in '{0}'.\n" +
                                                                               "Either assembly contains no tests or proper test driver has not been found.", assemblyPath));
         }
 

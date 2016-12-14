@@ -53,14 +53,15 @@ namespace NUnit.Engine.Services.Tests
 
 
         [TestCase("mock-assembly.dll", typeof(NUnit3FrameworkDriver))]
-        [TestCase("mock-assembly.pdb", typeof(NotRunnableFrameworkDriver))]
-        [TestCase("junk.dll", typeof(NotRunnableFrameworkDriver))]
+        [TestCase("mock-assembly.pdb", typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("junk.dll", typeof(InvalidAssemblyFrameworkDriver))]
         public void CorrectDriverIsUsed(string fileName, Type expectedType)
         {
             var driver = _driverService.GetDriver(
                 AppDomain.CurrentDomain,
                 Path.Combine(TestContext.CurrentContext.TestDirectory, fileName),
-                null);
+                null,
+                false);
 
             Assert.That(driver, Is.InstanceOf(expectedType));
         }

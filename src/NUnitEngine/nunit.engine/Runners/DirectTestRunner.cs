@@ -104,9 +104,10 @@ namespace NUnit.Engine.Runners
                     _assemblyResolver.AddPathFromFile(testFile);
                 }
 
-                var targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
-
-                IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework);
+                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
+                bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
+                
+                IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
                 driver.ID = TestPackage.ID;
                 result.Add(driver.Load(testFile, subPackage.Settings));
                 _drivers.Add(driver);
