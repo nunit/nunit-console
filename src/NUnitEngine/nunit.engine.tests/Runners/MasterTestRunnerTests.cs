@@ -120,8 +120,8 @@ namespace NUnit.Engine.Runners.Tests
             Assert.That(result.Name, Is.EqualTo("test-run"));
             Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Success));
-            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.ErrorsAndFailures));
+            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed));
+            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
             Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
             Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
 
@@ -129,8 +129,8 @@ namespace NUnit.Engine.Runners.Tests
             Assert.NotNull("No suite found");
             Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Success));
-            Assert.That(suite.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.ErrorsAndFailures));
+            Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed));
+            Assert.That(suite.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
             Assert.That(suite.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
             Assert.That(suite.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
 

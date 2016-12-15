@@ -74,7 +74,7 @@ namespace NUnit.ConsoleRunner.Tests
             var reportSequence = new[]
             {
                 "Tests Not Run",
-                "Errors and Failures",
+                "Errors, Failures and Warnings",
                 "Test Run Summary"
             };
 
@@ -95,7 +95,7 @@ namespace NUnit.ConsoleRunner.Tests
             var expected = new [] {
                 "Test Run Summary",
                 "  Overall result: Failed",
-                "  Test Count: 28, Passed: 15, Failed: 5, Inconclusive: 1, Skipped: 7",
+                "  Test Count: 29, Passed: 15, Failed: 5, Warnings: 1, Inconclusive: 1, Skipped: 7",
                 "    Failed Tests - Failures: 1, Errors: 1, Invalid: 3",
                 "    Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
                 "  Start time: 2015-10-19 02:12:28Z",
@@ -114,7 +114,7 @@ namespace NUnit.ConsoleRunner.Tests
             var nl = Environment.NewLine;
 
             var expected = new[] {
-                "Errors and Failures",
+                "Errors, Failures and Warnings",
                 "1) Failed : NUnit.Tests.Assemblies.MockTestFixture.FailingTest" + nl +
                 "Intentional failure",
                 "2) Invalid : NUnit.Tests.Assemblies.MockTestFixture.NonPublicTest" + nl +
@@ -123,11 +123,13 @@ namespace NUnit.ConsoleRunner.Tests
                 "No arguments were provided",
                 "4) Error : NUnit.Tests.Assemblies.MockTestFixture.TestWithException" + nl +
                 "System.Exception : Intentional Exception",
-                "5) Invalid : NUnit.Tests.BadFixture" + nl +
+                "5) Warning : NUnit.Tests.Assemblies.MockTestFixture.WarningTest" + nl +
+                "Warning Message",
+                "6) Invalid : NUnit.Tests.BadFixture" + nl +
                 "No suitable constructor was found"
         };
-
-            var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsAndFailuresReport);
+            
+            var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsFailuresAndWarningsReport);
 
             foreach (var ex in expected)
             {
