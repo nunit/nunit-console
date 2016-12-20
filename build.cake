@@ -378,17 +378,12 @@ void CheckForError(ref List<string> errorDetail)
 
 void BuildProject(string projectPath, string configuration)
 {
-    BuildProject(projectPath, configuration, MSBuildPlatform.Automatic);
-}
-
-void BuildProject(string projectPath, string configuration, MSBuildPlatform buildPlatform)
-{
     if(IsRunningOnWindows())
     {
         // Use MSBuild
         MSBuild(projectPath, new MSBuildSettings()
             .SetConfiguration(configuration)
-            .SetMSBuildPlatform(buildPlatform)
+            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
             .SetVerbosity(Verbosity.Minimal)
             .SetNodeReuse(false)
 			.SetPlatformTarget(PlatformTarget.MSIL)
@@ -396,6 +391,7 @@ void BuildProject(string projectPath, string configuration, MSBuildPlatform buil
     }
     else
     {
+        Information(string.Format("Building {0}...", projectPath));
         // Use XBuild
         XBuild(projectPath, new XBuildSettings()
             .WithTarget("Build")
