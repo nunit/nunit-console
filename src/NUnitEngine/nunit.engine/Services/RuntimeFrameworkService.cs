@@ -96,7 +96,10 @@ namespace NUnit.Engine.Services
         /// <returns>A string representing the selected RuntimeFramework</returns>
         public string SelectRuntimeFramework(TestPackage package)
         {
-            // Start by examining the provided settings
+            // Evaluate package target framework
+            ApplyImageData(package);
+
+            // Examine the provided settings
             RuntimeFramework currentFramework = RuntimeFramework.CurrentFramework;
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             RuntimeFramework requestedFramework = frameworkSetting.Length > 0
@@ -115,13 +118,10 @@ namespace NUnit.Engine.Services
             if (targetRuntime == RuntimeType.Any)
                 targetRuntime = currentFramework.Runtime;
 
-            // Examine the package 
-            ApplyImageData(package);
+            if (targetVersion == RuntimeFramework.DefaultVersion)
+                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, currentFramework.FrameworkVersion);
 
-            // Modify settings if necessary
-            targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, targetVersion);
-            RuntimeFramework checkFramework = new RuntimeFramework(targetRuntime, targetVersion);
-            if (!checkFramework.IsAvailable)
+            if (!new RuntimeFramework(targetRuntime, targetVersion).IsAvailable)
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
                 if (targetVersion < currentFramework.FrameworkVersion)
