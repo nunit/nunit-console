@@ -12,7 +12,7 @@
     <SuppressIces>ICE61</SuppressIces>
     <ProjectGuid>809C00DC-3FD3-45BF-BC0E-E284F314D306</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>NUnit.$(Version)</OutputName>
+    <OutputName>NUnit.Console-$(Version)</OutputName>
     <OutputType>Package</OutputType>
     <DefineSolutionProperties>false</DefineSolutionProperties>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>

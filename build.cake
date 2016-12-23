@@ -42,7 +42,7 @@ var EXTENSION_PACKAGES_DIR = ROOT_DIR + "extension-packages/";
 var DISTRIBUTION_DIR = ROOT_DIR + "distribution/";
 var IMAGE_DIR = ROOT_DIR + "image/";
 var IMAGE_ADDINS_DIR = IMAGE_DIR + "addins/";
-var ZIP_FILE = string.Format("{0}NUnit.{1}.zip", DISTRIBUTION_DIR, version);
+var ZIP_FILE = string.Format("{0}NUnit.Console-{1}.zip", DISTRIBUTION_DIR, version);
 
 //////////////////////////////////////////////////////////////////////
 // TASK
