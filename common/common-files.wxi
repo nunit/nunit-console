@@ -2,8 +2,8 @@
 <Include>
     <Fragment>
         <ComponentGroup Id="NUNIT.COMMON" Directory="INSTALLDIR">
-            <Component Id="CHANGES.txt" Location="local" Guid="1FC58664-BC75-4EB5-B67C-B439B1870C63">
-                <File Id="CHANGES.txt" Source="$(var.InstallImage)\CHANGES.txt" />
+            <Component Id="COMPONENTS.txt" Location="local" Guid="DD64E89E-8ADC-42F7-8F53-6594A97C291C">
+                <File Id="COMPONENTS.txt" Source="$(var.InstallImage)\COMPONENTS.txt" />
             </Component>
             <Component Id="LICENSE.txt" Location="local" Guid="310C1DF5-BF3B-4758-B1BC-8B40D3F75E62">
                 <File Id="LICENSE.txt" Source="$(var.InstallImage)\LICENSE.txt" />

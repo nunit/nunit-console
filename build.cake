@@ -1,3 +1,7 @@
+#addin "Cake.ExtendedNuGet"
+#addin "nuget:?package=NuGet.Core&version=2.8.6"
+#addin "Cake.FileHelpers"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -43,6 +47,7 @@ var DISTRIBUTION_DIR = ROOT_DIR + "distribution/";
 var IMAGE_DIR = ROOT_DIR + "image/";
 var IMAGE_ADDINS_DIR = IMAGE_DIR + "addins/";
 var ZIP_FILE = string.Format("{0}NUnit.Console-{1}.zip", DISTRIBUTION_DIR, version);
+var COMPONENTS_FILE_PATH = IMAGE_DIR + "COMPONENTS.txt";
 
 //////////////////////////////////////////////////////////////////////
 // TASK
@@ -90,7 +95,29 @@ Task("CreateImage")
 		CopyPackageContents(packageDir, IMAGE_ADDINS_DIR);
 });
 
+Task("WriteComponentsFile")
+.IsDependentOn("Clean")
+.IsDependentOn("FetchPackages")
+.Does(context =>
+{
+    List<string> lines = new List<string> { "This package contains the following components:", "" };
+	
+	var packageDirs = new [] { RUNNER_PACKAGES_DIR, EXTENSION_PACKAGES_DIR };
+	
+	foreach (var packageDir in packageDirs)
+	{
+		foreach(var nupkgPath in GetFiles(packageDir + "*/*.nupkg"))
+		{
+			var nupkg = new ZipPackage(nupkgPath.MakeAbsolute(context.Environment).FullPath);
+			lines.Add(string.Format("{0} - {1}{2}{3}{2}", nupkg.Id, nupkg.Version, Environment.NewLine, nupkg.Summary));
+		}
+	}
+
+	FileWriteLines(COMPONENTS_FILE_PATH, lines.ToArray());
+});
+
 Task("PackageMsi")
+.IsDependentOn("WriteComponentsFile")
 .IsDependentOn("CreateImage")
 .Does(() =>
 {
@@ -107,6 +134,7 @@ Task("PackageMsi")
 });
 
 Task("PackageZip")
+.IsDependentOn("WriteComponentsFile")
 .IsDependentOn("CreateImage")
 .Does(() =>
 {

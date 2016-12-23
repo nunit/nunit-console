@@ -13,11 +13,14 @@ $TOOLS_DIR = Join-Path $PSScriptRoot "tools"
 $NUGET_EXE = Join-Path $TOOLS_DIR "nuget.exe"
 $CAKE_EXE = Join-Path $TOOLS_DIR "Cake/Cake.exe"
 
+# Experimental currently required due to https://github.com/Redth/Cake.ExtendedNuGet/issues/7
+$UseExperimental = "-experimental"
+
 # Should we use experimental build of Roslyn?
-$UseExperimental = "";
-if($Experimental.IsPresent) {
-    $UseExperimental = "-experimental"
-}
+#$UseExperimental = "";
+#if($Experimental.IsPresent) {
+#    $UseExperimental = "-experimental"
+#}
 
 # Is this a dry run?
 $UseDryRun = "";
