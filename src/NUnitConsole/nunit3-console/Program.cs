@@ -79,17 +79,6 @@ namespace NUnit.ConsoleRunner
                 }
             }
 
-            //ColorConsole.Enabled = !Options.NoColor;
-
-            // Create SettingsService early so we know the trace level right at the start
-            //SettingsService settingsService = new SettingsService();
-            //InternalTraceLevel level = (InternalTraceLevel)settingsService.GetSetting("Options.InternalTraceLevel", InternalTraceLevel.Default);
-            //if (options.trace != InternalTraceLevel.Default)
-            //    level = options.trace;
-
-            //InternalTrace.Initialize("nunit3-console_%p.log", level);
-            
-            //log.Info("NUnit3-console.exe starting");
             try
             {
                 if (Options.ShowVersion || !Options.NoHeader)

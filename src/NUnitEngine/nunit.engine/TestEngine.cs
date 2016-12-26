@@ -84,18 +84,13 @@ namespace NUnit.Engine
         /// </summary>
         public void Initialize()
         {
-            SettingsService settingsService = new SettingsService(true);
-
-            if(InternalTraceLevel == InternalTraceLevel.Default)
-                InternalTraceLevel = settingsService.GetSetting("Options.InternalTraceLevel", InternalTraceLevel.Off);
-
             if(InternalTraceLevel != InternalTraceLevel.Off && !InternalTrace.Initialized)
             {
                 var logName = string.Format("InternalTrace.{0}.log", Process.GetCurrentProcess().Id);
                 InternalTrace.Initialize(Path.Combine(WorkDirectory, logName), InternalTraceLevel);
             }
 
-            Services.Add(settingsService);
+            Services.Add(new SettingsService(true));
             Services.Add(new DomainManager());
             Services.Add(new ExtensionService());
             Services.Add(new DriverService());
