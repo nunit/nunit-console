@@ -34,35 +34,17 @@ namespace NUnit.Engine.Services
         private IList<string> _fileEntries = new List<string>();
         private ISettings _userSettings;
 
-        private const int MinSize = 0;
-        private const int MaxSize = 24;
-        private const int DefaultSize = 5;
+        private const int MAX_FILES = 24;
 
         #region Properties
 
         public int MaxFiles
         {
-            get 
-            { 
-                int size = _userSettings.GetSetting("Gui.RecentProjects.MaxFiles", DefaultSize );
-                
-                if ( size < MinSize ) size = MinSize;
-                if ( size > MaxSize ) size = MaxSize;
-                
-                return size;
-            }
-            set 
-            { 
-                int oldSize = MaxFiles;
-                int newSize = value;
-                
-                if ( newSize < MinSize ) newSize = MinSize;
-                if ( newSize > MaxSize ) newSize = MaxSize;
-
-                _userSettings.SaveSetting( "Gui.RecentProjects.MaxFiles", newSize );
-                if ( newSize < oldSize ) SaveEntriesToSettings();
-            }
+            get { return MAX_FILES; }
+            set { /* Noop in this implementation */ }
+            // NOTE: we retain the setter to avoid changing the interface
         }
+
         #endregion
 
         #region Public Methods
@@ -79,8 +61,8 @@ namespace NUnit.Engine.Services
             _fileEntries.Remove(filePath);
 
             _fileEntries.Insert( 0, filePath );
-            if( _fileEntries.Count > MaxFiles )
-                _fileEntries.RemoveAt( MaxFiles );
+            if( _fileEntries.Count > MAX_FILES )
+                _fileEntries.RemoveAt( MAX_FILES );
         }
         #endregion
 
@@ -96,9 +78,9 @@ namespace NUnit.Engine.Services
 
         private void AddEntriesForPrefix(string prefix)
         {
-            for (int index = 1; index < MaxFiles; index++)
+            for (int index = 1; index < MAX_FILES; index++)
             {
-                if (_fileEntries.Count >= MaxFiles) break;
+                if (_fileEntries.Count >= MAX_FILES) break;
 
                 string fileSpec = _userSettings.GetSetting(GetRecentFileKey(prefix, index)) as string;
                 if (fileSpec != null) _fileEntries.Add(fileSpec);
@@ -109,10 +91,10 @@ namespace NUnit.Engine.Services
         {
             string prefix = "Gui.RecentProjects";
 
-            while( _fileEntries.Count > MaxFiles )
+            while( _fileEntries.Count > MAX_FILES )
                 _fileEntries.RemoveAt( _fileEntries.Count - 1 );
 
-            for( int index = 0; index < MaxSize; index++ ) 
+            for( int index = 0; index < MAX_FILES; index++ ) 
             {
                 string keyName = GetRecentFileKey( prefix, index + 1 );
                 if ( index < _fileEntries.Count )
