@@ -46,8 +46,6 @@ namespace NUnit.Engine.Services
         private static readonly PropertyInfo TargetFrameworkNameProperty =
             typeof(AppDomainSetup).GetProperty("TargetFrameworkName", BindingFlags.Public | BindingFlags.Instance);
 
-        private ISettings _settingsService;
-
         #region Create and Unload Domains
         /// <summary>
         /// Construct an application domain for running a test package
@@ -369,27 +367,6 @@ namespace NUnit.Engine.Services
 
             if ((thread.ThreadState & System.Threading.ThreadState.WaitSleepJoin) != 0)
                 thread.Interrupt();
-        }
-
-        #endregion
-
-        #region Service Overrides
-
-        public override void StartService() 
-        {
-            try
-            {
-                // DomainManager has a soft dependency on the SettingsService.
-                // If it's not available, default values are used.
-                _settingsService = ServiceContext.GetService<ISettings>();
-
-                Status = ServiceStatus.Started;
-            }
-            catch
-            {
-                Status = ServiceStatus.Error;
-                throw;
-            }
         }
 
         #endregion
