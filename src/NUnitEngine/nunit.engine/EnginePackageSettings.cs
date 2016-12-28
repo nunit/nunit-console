@@ -141,6 +141,12 @@ namespace NUnit
         /// </summary>
         public const string InternalTraceLevel = "InternalTraceLevel";
 
+        /// <summary>
+        /// The PrincipalPolicy to set on the test AppDomain. Values are:
+        /// "UnauthenticatedPrincipal", "NoPrincipal" and "WindowsPrincipal".
+        /// </summary>
+        public const string PrincipalPolicy = "PrincipalPolicy";
+
         #endregion
     }
 }

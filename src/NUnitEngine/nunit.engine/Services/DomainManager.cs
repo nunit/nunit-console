@@ -76,17 +76,18 @@ namespace NUnit.Engine.Services
                 Hash hash = new Hash(assembly);
                 evidence.AddHost(hash);
             }
-
+            
             log.Info("Creating AppDomain " + domainName);
 
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
 
-            // Set PrincipalPolicy for the domain if called for in the settings
-            if (_settingsService != null && _settingsService.GetSetting("Options.TestLoader.SetPrincipalPolicy", false))
+            // Set PrincipalPolicy for the domain if called for in the package settings
+            if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
             {
-                runnerDomain.SetPrincipalPolicy(_settingsService.GetSetting(
-                    "Options.TestLoader.PrincipalPolicy", 
-                    PrincipalPolicy.UnauthenticatedPrincipal));
+                PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy),
+                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPricipal"));
+
+                runnerDomain.SetPrincipalPolicy(policy);
             }
 
             return runnerDomain;
