@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services
                 if (skipNonTestAssemblies)
                 {
                     foreach (var attr in assemblyDef.CustomAttributes)
-                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssembly")
+                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
                             return new SkippedAssemblyFrameworkDriver(assemblyPath);
                 }
 
