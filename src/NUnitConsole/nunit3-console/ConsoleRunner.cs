@@ -420,6 +420,9 @@ namespace NUnit.ConsoleRunner
             if (options.PauseBeforeRun)
                 package.AddSetting(FrameworkPackageSettings.PauseBeforeRun, true);
 
+            if (options.PrincipalPolicy != null)
+                package.AddSetting(EnginePackageSettings.PrincipalPolicy, options.PrincipalPolicy);
+
 #if DEBUG
             if (options.DebugAgent)
                 package.AddSetting(EnginePackageSettings.DebugAgent, true);

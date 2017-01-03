@@ -49,7 +49,7 @@ namespace NUnit.ConsoleRunner.Tests
             var fileSystem = new VirtualFileSystem();
             fileSystem.SetupFiles(files);
 
-            var expectedErrors = expectedErrorMessages.Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+            var expectedErrors = expectedErrorMessages.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem, new SimpleArgumentsFileParser());
 
@@ -117,18 +117,19 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
-        [TestCase("WhereClause",        "where",      new string[] { "cat==Fast" },                      new string[0])]
-        [TestCase("ActiveConfig",       "config",     new string[] { "Debug" },                          new string[0])]
-        [TestCase("ProcessModel",       "process",    new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
-        [TestCase("DomainUsage",        "domain",     new string[] { "None", "Single", "Multiple" },     new string[] { "JUNK" })]
-        [TestCase("Framework",          "framework",  new string[] { "net-4.0" },                        new string[0])]
-        [TestCase("OutFile",            "output|out", new string[] { "output.txt" },                     new string[0])]
-        [TestCase("ErrFile",            "err",        new string[] { "error.txt" },                      new string[0])]
-        [TestCase("WorkDirectory",      "work",       new string[] { "results" },                        new string[0])]
-        [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "All" },               new string[] { "JUNK" })]
-        [TestCase("InternalTraceLevel", "trace",      new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
+        [TestCase("WhereClause", "where", new string[] { "cat==Fast" }, new string[0])]
+        [TestCase("ActiveConfig", "config", new string[] { "Debug" }, new string[0])]
+        [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
+        [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
+        [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
+        [TestCase("OutFile", "output|out", new string[] { "output.txt" }, new string[0])]
+        [TestCase("ErrFile", "err", new string[] { "error.txt" }, new string[0])]
+        [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "All" }, new string[] { "JUNK" })]
+        [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
-        [TestCase("ConsoleEncoding",    "encoding",   new string[] { "utf-8", "ascii", "unicode" },      new string[0])]
+        [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
+        [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)
         {
             string[] prototypes = pattern.Split('|');

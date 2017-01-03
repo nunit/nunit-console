@@ -46,8 +46,6 @@ namespace NUnit.Engine.Services
         private static readonly PropertyInfo TargetFrameworkNameProperty =
             typeof(AppDomainSetup).GetProperty("TargetFrameworkName", BindingFlags.Public | BindingFlags.Instance);
 
-        private ISettings _settingsService;
-
         #region Create and Unload Domains
         /// <summary>
         /// Construct an application domain for running a test package
@@ -76,17 +74,18 @@ namespace NUnit.Engine.Services
                 Hash hash = new Hash(assembly);
                 evidence.AddHost(hash);
             }
-
+            
             log.Info("Creating AppDomain " + domainName);
 
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
 
-            // Set PrincipalPolicy for the domain if called for in the settings
-            if (_settingsService != null && _settingsService.GetSetting("Options.TestLoader.SetPrincipalPolicy", false))
+            // Set PrincipalPolicy for the domain if called for in the package settings
+            if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
             {
-                runnerDomain.SetPrincipalPolicy(_settingsService.GetSetting(
-                    "Options.TestLoader.PrincipalPolicy", 
-                    PrincipalPolicy.UnauthenticatedPrincipal));
+                PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy),
+                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPricipal"));
+
+                runnerDomain.SetPrincipalPolicy(policy);
             }
 
             return runnerDomain;
@@ -368,27 +367,6 @@ namespace NUnit.Engine.Services
 
             if ((thread.ThreadState & System.Threading.ThreadState.WaitSleepJoin) != 0)
                 thread.Interrupt();
-        }
-
-        #endregion
-
-        #region Service Overrides
-
-        public override void StartService() 
-        {
-            try
-            {
-                // DomainManager has a soft dependency on the SettingsService.
-                // If it's not available, default values are used.
-                _settingsService = ServiceContext.GetService<ISettings>();
-
-                Status = ServiceStatus.Started;
-            }
-            catch
-            {
-                Status = ServiceStatus.Error;
-                throw;
-            }
         }
 
         #endregion
