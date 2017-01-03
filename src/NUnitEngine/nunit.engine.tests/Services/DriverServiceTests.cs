@@ -52,16 +52,23 @@ namespace NUnit.Engine.Services.Tests
         }
 
 
-        [TestCase("mock-assembly.dll", typeof(NUnit3FrameworkDriver))]
-        [TestCase("mock-assembly.pdb", typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("junk.dll", typeof(InvalidAssemblyFrameworkDriver))]
-        public void CorrectDriverIsUsed(string fileName, Type expectedType)
+        [TestCase("mock-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
+        [TestCase("mock-assembly.dll", true, typeof(NUnit3FrameworkDriver))]
+        [TestCase("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("nunit.engine.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("nunit.engine.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
+        [TestCase("notest-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
+        [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
+        public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
             var driver = _driverService.GetDriver(
                 AppDomain.CurrentDomain,
                 Path.Combine(TestContext.CurrentContext.TestDirectory, fileName),
                 null,
-                false);
+                skipNonTestAssemblies);
 
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
