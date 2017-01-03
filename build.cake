@@ -130,6 +130,7 @@ Task("BuildEngine")
 
         // Engine tests
         BuildProject("./src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj", configuration);
+        BuildProject("./src/NUnitEngine/notest-assembly/notest-assembly.csproj", configuration);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -220,6 +221,7 @@ var BinFiles = new FilePath[]
     "ConsoleTests.nunit",
     "EngineTests.nunit",
     "mock-assembly.dll",
+	"notest-assembly.dll",
     "Mono.Cecil.dll",
     "nunit-agent-x86.exe",
     "nunit-agent-x86.exe.config",
