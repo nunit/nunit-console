@@ -96,6 +96,8 @@ namespace NUnit.Common
 
         public bool PauseBeforeRun { get; private set; }
 
+        public string PrincipalPolicy { get; private set; }
+
         #endregion
 
         #region Overrides
@@ -167,6 +169,9 @@ namespace NUnit.Common
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
+
+            this.Add("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
+                v => PrincipalPolicy = RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
 
 #if DEBUG
             this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",

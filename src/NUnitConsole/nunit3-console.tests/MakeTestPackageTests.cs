@@ -75,6 +75,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--pause", "PauseBeforeRun", true)]
         [TestCase("--params:X=5;Y=7", "TestParameters", "X=5;Y=7")]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
+        [TestCase("--set-principal-policy:UnauthenticatedPrincipal", "PrincipalPolicy", "UnauthenticatedPrincipal")]
 #if DEBUG
         [TestCase("--debug-agent", "DebugAgent", true)]
 #endif

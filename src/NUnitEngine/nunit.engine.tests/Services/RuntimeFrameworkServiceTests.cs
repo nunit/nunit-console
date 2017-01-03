@@ -74,5 +74,20 @@ namespace NUnit.Engine.Services.Tests
             foreach (var framework in available)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
         }
+
+        [TestCase("mono", 4, 5, "net-4.5")]
+        [TestCase("net", 4, 0, "net-4.5")]
+        [TestCase("net", 4, 5, "net-4.5")]
+
+        public void EngineOptionPreferredOverImageTarget(string framework, int majorVersion, int minorVersion, string requested)
+        {
+            var package = new TestPackage("test");
+            package.AddSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, framework);
+            package.AddSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(majorVersion, minorVersion));
+            package.AddSetting(EnginePackageSettings.RuntimeFramework, requested);
+
+            _runtimeService.SelectRuntimeFramework(package);
+            Assert.That(package.GetSetting<string>(EnginePackageSettings.RuntimeFramework, null), Is.EqualTo(requested));
+        }
     }
 }

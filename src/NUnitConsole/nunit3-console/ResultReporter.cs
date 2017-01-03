@@ -65,7 +65,7 @@ namespace NUnit.ConsoleRunner
                 WriteNotRunReport();
 
             if (OverallResult == "Failed")
-                WriteErrorsAndFailuresReport();
+                WriteErrorsFailuresAndWarningsReport();
 
             WriteRunSettingsReport();
 
@@ -114,6 +114,7 @@ namespace NUnit.ConsoleRunner
             WriteSummaryCount("  Test Count: ", Summary.TestCount);
             WriteSummaryCount(", Passed: ", Summary.PassCount);
             WriteSummaryCount(", Failed: ", Summary.FailedCount, ColorStyle.Failure);
+            WriteSummaryCount(", Warnings: ", Summary.WarningCount, ColorStyle.Warning);
             WriteSummaryCount(", Inconclusive: ", Summary.InconclusiveCount);
             WriteSummaryCount(", Skipped: ", Summary.TotalSkipCount);
             Writer.WriteLine();
@@ -145,15 +146,15 @@ namespace NUnit.ConsoleRunner
 
         #endregion
 
-        #region Errors and Failures Report
+        #region Errors, Failures and Warnings Report
 
-        public void WriteErrorsAndFailuresReport()
+        public void WriteErrorsFailuresAndWarningsReport()
         {
             ReportIndex = 0;
-            Writer.WriteLine(ColorStyle.SectionHeader, "Errors and Failures");
+            Writer.WriteLine(ColorStyle.SectionHeader, "Errors, Failures and Warnings");
             Writer.WriteLine();
 
-            WriteErrorsAndFailures(ResultNode);
+            WriteErrorsFailuresAndWarnings(ResultNode);
 
             if (Options.StopOnError)
             {
@@ -162,24 +163,24 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        private void WriteErrorsAndFailures(XmlNode resultNode)
+        private void WriteErrorsFailuresAndWarnings(XmlNode resultNode)
         {
             string resultState = resultNode.GetAttribute("result");
 
             switch (resultNode.Name)
             {
                 case "test-case":
-                    if (resultState == "Failed")
+                    if (resultState == "Failed" || resultState == "Warning")
                         new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                     return;
 
                 case "test-run":
                     foreach (XmlNode childResult in resultNode.ChildNodes)
-                        WriteErrorsAndFailures(childResult);
+                        WriteErrorsFailuresAndWarnings(childResult);
                     break;
 
                 case "test-suite":
-                    if (resultState == "Failed")
+                    if (resultState == "Failed" || resultState == "Warning")
                     {
                         if (resultNode.GetAttribute("type") == "Theory")
                         {
@@ -195,7 +196,7 @@ namespace NUnit.ConsoleRunner
                     }
                     
                     foreach (XmlNode childResult in resultNode.ChildNodes)
-                        WriteErrorsAndFailures(childResult);
+                        WriteErrorsFailuresAndWarnings(childResult);
 
                     break;
             }

@@ -149,7 +149,7 @@ namespace NUnit.ConsoleRunner
         {
             return Result == "Failed"
                 ? ColorStyle.Failure
-                : Status == "Ignored"
+                : Result == "Warning" || Status == "Ignored"
                     ? ColorStyle.Warning
                     : ColorStyle.Output;
         }
