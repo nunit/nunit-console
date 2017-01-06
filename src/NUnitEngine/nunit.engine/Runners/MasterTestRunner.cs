@@ -229,8 +229,9 @@ namespace NUnit.Engine.Runners
             // be used to determine how to run the assembly.
             _runtimeService.SelectRuntimeFramework(TestPackage);
 
-            if (IntPtr.Size == 8 &&
-                TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "") == "InProcess" &&
+            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
+
+            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single")  &&
                 TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false))
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
@@ -298,8 +299,8 @@ namespace NUnit.Engine.Runners
                     throw new NUnitEngineException(string.Format("The requested framework {0} is unknown or not available.", frameworkSetting));
 
                 // If running in process, check requested framework is compatible
-                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default");
-                if (processModel.ToLower() == "single")
+                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
+                if (processModel == "single" || processModel == "inprocess")
                 {
                     var currentFramework = RuntimeFramework.CurrentFramework;
                     var requestedFramework = RuntimeFramework.Parse(frameworkSetting);
