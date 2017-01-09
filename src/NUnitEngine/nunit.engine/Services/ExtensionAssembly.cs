@@ -85,7 +85,7 @@ namespace NUnit.Engine.Services
         {
 #if DEBUG
             if (!IsDuplicateOf(other))
-                throw new NUnitEngineException("IsBetterVersonOf should only be called on duplicate assemblies");
+                throw new NUnitEngineException("IsBetterVersionOf should only be called on duplicate assemblies");
 #endif
 
             var version = AssemblyName.Version;
