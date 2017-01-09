@@ -83,7 +83,7 @@ namespace NUnit.Engine.Services
             if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
             {
                 PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy),
-                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPricipal"));
+                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPrincipal"));
 
                 runnerDomain.SetPrincipalPolicy(policy);
             }
