@@ -48,7 +48,7 @@ namespace NUnit.Engine.Runners
 
         public void Enqueue(ITestExecutionTask task)
         {
-            Guard.OperationValid(!_isRunning, "Can only engueue tasks before starting the queue");
+            Guard.OperationValid(!_isRunning, "Can only enqueue tasks before starting the queue");
 
             _tasks.Enqueue(task);
         }

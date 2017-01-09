@@ -49,7 +49,7 @@ namespace NUnit.Engine
         // the job of the RuntimeFrameworkService. Other functions
         // may actually belong in TestAgency.
         //
-        // All the static properties of RuntimeFrameowork need to be
+        // All the static properties of RuntimeFramework need to be
         // examined for thread-safety, particularly CurrentFramework
         // and AvailableFrameworks. The latter caused a problem with
         // parallel loading, which has been fixed for now through a
@@ -377,7 +377,7 @@ namespace NUnit.Engine
         public Version ClrVersion { get; private set; }
 
         /// <summary>
-        /// The Profile for this framwork, where relevant.
+        /// The Profile for this framework, where relevant.
         /// May be null and will have different sets of 
         /// values for each Runtime.
         /// </summary>

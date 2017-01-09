@@ -111,7 +111,7 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// Reload the currently loaded test jpackage.
+        /// Reload the currently loaded test package.
         /// </summary>
         /// <returns>An XmlNode representing the loaded package</returns>
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>

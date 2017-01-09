@@ -158,7 +158,7 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void CanRegognizeInProcessOption()
+        public void CanRecognizeInProcessOption()
         {
             ConsoleOptions options = new ConsoleOptions("--inprocess");
             Assert.True(options.Validate(), "Should be valid: --inprocess");
@@ -536,7 +536,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase(false, false, false)]
         [TestCase(true, true, true)]
         [TestCase(false, true, true)]
-        public void ShouldSetTeamCityFlagAccordingToArgsAndDefauls(bool hasTeamcityInCmd, bool? defaultTeamcity, bool expectedTeamCity)
+        public void ShouldSetTeamCityFlagAccordingToArgsAndDefaults(bool hasTeamcityInCmd, bool? defaultTeamcity, bool expectedTeamCity)
         {
             // Given
             List<string> args = new List<string> { "tests.dll" };

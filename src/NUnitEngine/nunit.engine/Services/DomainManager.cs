@@ -83,7 +83,7 @@ namespace NUnit.Engine.Services
             if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
             {
                 PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy),
-                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPricipal"));
+                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPrincipal"));
 
                 runnerDomain.SetPrincipalPolicy(policy);
             }
@@ -245,7 +245,7 @@ namespace NUnit.Engine.Services
         
             // The ProjectService adds any project config to the settings.
             // So, at this point, we only want to handle assemblies or an
-            // anonymous package created from the comnand-line.
+            // anonymous package created from the command-line.
             string fullName = package.FullName;
             if (IsExecutable(fullName))
                 return fullName + ".config";

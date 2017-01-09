@@ -34,7 +34,7 @@ namespace NUnit.Engine.Services
         static Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
         // HACK: This line forces RuntimeFramework to initialize the static property
-        // AvailableFrameworks before it is accessed by mulitiple threads. See comment
+        // AvailableFrameworks before it is accessed by multiple threads. See comment
         // on RuntimeFramework class for a more detailled explanation.
         static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
 
