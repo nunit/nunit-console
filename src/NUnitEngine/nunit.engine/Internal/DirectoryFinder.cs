@@ -40,7 +40,7 @@ namespace NUnit.Engine.Internal
         /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
         /// Each path component may have wildcard characters and a component
-        /// of "**" may be used to represent all directories, recusively.
+        /// of "**" may be used to represent all directories, recursively.
         /// </summary>
         /// <param name="baseDir">A DirectoryInfo from which the matching starts</param>
         /// <param name="pattern">The pattern to match</param>
@@ -94,7 +94,7 @@ namespace NUnit.Engine.Internal
             if (lastSep < 0) // Simple file name entry, no path
                 return baseDir.GetFiles(pattern);
 
-            // Othersise split pattern into two parts around last separator
+            // Otherwise split pattern into two parts around last separator
             var pattern1 = pattern.Substring(0, lastSep);
             var pattern2 = pattern.Substring(lastSep + 1);
 

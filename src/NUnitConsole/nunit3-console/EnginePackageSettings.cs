@@ -86,7 +86,7 @@ namespace NUnit
         public const string PrivateBinPath = "PrivateBinPath";
 
         /// <summary>
-        /// The maximum number of test agents permitted to run simultneously. 
+        /// The maximum number of test agents permitted to run simultaneously. 
         /// Ignored if the ProcessModel is not set or defaulted to Multiple.
         /// </summary>
         public const string MaxAgents = "MaxAgents";
