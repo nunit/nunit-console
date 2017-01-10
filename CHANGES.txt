@@ -1,4 +1,4 @@
-﻿NUnit 3.6 - January 13, 2017
+﻿NUnit 3.6 - January 11, 2017
 
 Console Runner
 
