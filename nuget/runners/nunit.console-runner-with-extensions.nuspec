@@ -26,7 +26,7 @@
     <releaseNotes>This release uses the latest version of the TeamCityEventListener extension.</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2016 Charlie Poole</copyright>
+    <copyright>Copyright (c) 2017 Charlie Poole</copyright>
     <dependencies>
       <group>
         <dependency id="NUnit.ConsoleRunner" version="$version$" />
