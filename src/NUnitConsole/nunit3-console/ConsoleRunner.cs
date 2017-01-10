@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using NUnit.Common;
@@ -29,6 +30,7 @@ using NUnit.ConsoleRunner.Utilities;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace NUnit.ConsoleRunner
 {
@@ -438,10 +440,30 @@ namespace NUnit.ConsoleRunner
             if (options.DefaultTestNamePattern != null)
                 package.AddSetting(FrameworkPackageSettings.DefaultTestNamePattern, options.DefaultTestNamePattern);
 
-            if (options.TestParameters != null)
-                package.AddSetting(FrameworkPackageSettings.TestParameters, options.TestParameters);
+            if (options.TestParameters.Count != 0)
+                AddTestParametersSetting(package, options.TestParameters);
 
             return package;
+        }
+
+        /// <summary>
+        /// Sets test parameters, handling backwards compatibility.
+        /// </summary>
+        private static void AddTestParametersSetting(TestPackage testPackage, IDictionary<string, string> testParameters)
+        {
+            testPackage.AddSetting(FrameworkPackageSettings.TestParametersDictionary, testParameters);
+
+            if (testParameters.Count != 0)
+            {
+                // This cannot be changed without breaking backwards compatibility with old frameworks.
+                // Reserializes the way old frameworks understand, even if this runner's parsing is changed.
+
+                var oldFrameworkSerializedParameters = new StringBuilder();
+                foreach (var parameter in testParameters)
+                    oldFrameworkSerializedParameters.Append(parameter.Key).Append('=').Append(parameter.Value).Append(';');
+
+                testPackage.AddSetting(FrameworkPackageSettings.TestParameters, oldFrameworkSerializedParameters.ToString(0, oldFrameworkSerializedParameters.Length - 1));
+            }
         }
 
         private TestFilter CreateTestFilter(ConsoleOptions options)
