@@ -29,7 +29,7 @@
     <copyright>Copyright (c) 2017 Charlie Poole</copyright>
     <dependencies>
       <group>
-          <dependency id="NUnit.ConsoleRunner" version="3.5.0" />
+          <dependency id="NUnit.ConsoleRunner" version="$version$" />
           <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.5.0" />
           <dependency id="NUnit.Extension.VSProjectLoader" version="3.5.0" />
           <dependency id="NUnit.Extension.NUnitV2ResultWriter" version="3.5.0" />
