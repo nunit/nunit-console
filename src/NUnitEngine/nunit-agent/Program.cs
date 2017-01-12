@@ -41,7 +41,9 @@ namespace NUnit.Agent
 
         static Guid AgentId;
         static string AgencyUrl;
+        static Process AgencyProcess;
         static ITestAgency Agency;
+        static RemoteTestAgent Agent;
 
         /// <summary>
         /// Channel used for communications with the agency
@@ -65,7 +67,7 @@ namespace NUnit.Agent
             for (int i = 2; i < args.Length; i++)
             {
                 string arg = args[i];
-                
+
                 // NOTE: we can test these strings exactly since
                 // they originate from the engine itself.
                 if (arg == "--debug-agent")
@@ -76,6 +78,11 @@ namespace NUnit.Agent
                 else if (arg.StartsWith("--trace:"))
                 {
                     traceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), arg.Substring(8));
+                }
+                else if (arg.StartsWith("--pid="))
+                {
+                    int agencyProcessId = int.Parse(arg.Substring(6));
+                    AgencyProcess = Process.GetProcessById(agencyProcessId);
                 }
             }
 
@@ -141,16 +148,12 @@ namespace NUnit.Agent
             if (Channel != null)
             {
                 log.Info("Starting RemoteTestAgent");
-                RemoteTestAgent agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
+                Agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
 
                 try
                 {
-                    if (agent.Start())
-                    {
-                        log.Debug("Waiting for stopSignal");
-                        agent.WaitForStop();
-                        log.Debug("Stop signal received");
-                    }
+                    if (Agent.Start())
+                        WaitForStop();
                     else
                         log.Error("Failed to start RemoteTestAgent");
                 }
@@ -173,6 +176,22 @@ namespace NUnit.Agent
             log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);
 
             return 0;
+        }
+
+        private static void WaitForStop()
+        {
+            log.Debug("Waiting for stopSignal");
+
+            while (!Agent.WaitForStop(500))
+            {
+                if (AgencyProcess.HasExited)
+                {
+                    log.Error("Parent process has been terminated.");
+                    Environment.Exit(-1);
+                }
+            }
+
+            log.Debug("Stop signal received");
         }
     }
 }

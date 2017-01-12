@@ -167,10 +167,10 @@ namespace NUnit.Engine.Services
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
-
+            
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
-            string agentArgs = string.Empty;
+            string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
             if (debugAgent)
                 agentArgs += " --debug-agent";
             if (traceLevel != "Off")
