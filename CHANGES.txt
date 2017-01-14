@@ -1,4 +1,4 @@
-﻿NUnit 3.6 - January 11, 2017
+﻿NUnit 3.6 - January 14, 2017
 
 Console Runner
 
@@ -7,6 +7,11 @@ Console Runner
    the NUnit.Framework.NonTestAssemblyAttribute.
  * Messages from the new Multiple Assert blocks will be displayed individually
  * Warnings from the new Warn.If, Warn.Unless and Assert.Warn are now displayed
+
+Engine
+
+ * NUnit agents now monitor the running engine process and will terminate themselves
+   if the parent runner process is killed or dies
 
 Issues Resolved
 
@@ -23,6 +28,7 @@ Issues Resolved
  * 110 Writability check could give a friendlier message.
  * 113 Add task descriptions to Build.cake
  * 127 Modify console runner to display multiple assert information
+ * 128 Terminate agent if main process has terminated
  * 133 NUnit downloadable packages zip file naming is confusing and non-intuitive
  * 136 Handle early termination of multiple assert block
  * 138 Report Warnings in console runner
