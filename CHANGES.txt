@@ -1,4 +1,45 @@
-﻿NUnit 3.5 - October 11, 2016
+﻿NUnit 3.6 - January 14, 2017
+
+Console Runner
+
+ * Added command line option --skipnontestassemblies to skip assemblies that do
+   not contain tests without raising an error and to skip assemblies that contain
+   the NUnit.Framework.NonTestAssemblyAttribute.
+ * Messages from the new Multiple Assert blocks will be displayed individually
+ * Warnings from the new Warn.If, Warn.Unless and Assert.Warn are now displayed
+
+Engine
+
+ * NUnit agents now monitor the running engine process and will terminate themselves
+   if the parent runner process is killed or dies
+
+Issues Resolved
+
+ * 16 NUnit Engine Tests fail if not run from test directory
+ * 18 Invalid file type is shown in XML as type="Assembly"
+ * 23 In nunit3-console you cannot pass parameters containing ';' because they always get split
+ * 37 NUnit 3 console should produce xml events for ITestEventListener which contain
+      unique id in the scope of all test agents for NUnit 2 tests
+ * 58 System.Configuration.ConfigurationErrorsException thrown in multiple domain mode.
+ * 62 NUnit3 Fails on DLL with no Tests, Unlike NUnit2
+ * 100 Class NUnit.Engine.Services.ResultWriters.Tests.SchemaValidator is never used
+ * 101 Method NUnit.Options.OptionSet.Unprocessed always returns "false"
+ * 104 Type of variable enumerated in 'foreach' is not guaranteed to be castable
+ * 110 Writability check could give a friendlier message.
+ * 113 Add task descriptions to Build.cake
+ * 127 Modify console runner to display multiple assert information
+ * 128 Terminate agent if main process has terminated
+ * 133 NUnit downloadable packages zip file naming is confusing and non-intuitive
+ * 136 Handle early termination of multiple assert block
+ * 138 Report Warnings in console runner
+ * 145 MasterTestRunner.RunAsync no longer provides start-run and test-run events
+ * 151 Unexpected behaviour from --framework flag
+ * 153 Remove some settings used by the engine
+ * 156 Use high-quality icon for nuspecs
+ * 157 Fix Detection of invalid framework when --inprocess
+ * 159 Update extension versions in the NuSpec Files
+
+NUnit 3.5 - October 11, 2016
 
 This is the first version of NUnit where the framework will be released separately from the
 console runner, engine and other extensions. From this point forward, the NUnit console and engine will be
