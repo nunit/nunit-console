@@ -105,9 +105,9 @@ namespace NUnit.Engine.Agents
             stopSignal.Set();
         }
 
-        public void WaitForStop()
+        public bool WaitForStop(int timeout)
         {
-            stopSignal.WaitOne();
+            return stopSignal.WaitOne(timeout);
         }
 
         #endregion
