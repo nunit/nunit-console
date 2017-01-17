@@ -22,11 +22,12 @@
 // ***********************************************************************
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
-using System.Runtime.Serialization;
 
 namespace NUnit.Engine.Drivers
 {
@@ -120,7 +121,20 @@ namespace NUnit.Engine.Drivers
             CallbackHandler handler = new RunTestsCallbackHandler(listener);
 
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
-            CreateObject(RUN_ACTION, _frameworkController, filter, handler);
+
+            try
+            {
+                CreateObject(RUN_ACTION, _frameworkController, filter, handler);
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    throw new NUnitEngineException(ex.InnerException.Message);
+                }
+
+                throw;
+            }
 
             return handler.Result;
         }
