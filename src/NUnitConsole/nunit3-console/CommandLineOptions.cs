@@ -116,8 +116,6 @@ namespace NUnit.Common
 
         public bool NoColor { get; private set; }
 
-        public bool Verbose { get; private set; }
-
         public bool TeamCity { get; private set; }
 
         public string OutFile { get; private set; }
@@ -366,9 +364,6 @@ namespace NUnit.Common
 
             this.Add("nocolor|noc", "Displays console output without color.",
                 v => NoColor = v != null);
-
-            this.Add("verbose|v", "Display additional information as the test runs.",
-                v => Verbose = v != null);
 
             this.Add("help|h", "Display this message and exit.",
                 v => ShowHelp = v != null);
