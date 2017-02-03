@@ -52,6 +52,11 @@ namespace NUnit.Engine
         void Stop();
 
         /// <summary>
+        /// Pings the agent to check that it is still alive.
+        /// </summary>
+        void Ping();
+
+        /// <summary>
         ///  Creates a test runner
         /// </summary>
         ITestEngineRunner CreateRunner(TestPackage package);

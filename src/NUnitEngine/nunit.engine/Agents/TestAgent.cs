@@ -102,6 +102,11 @@ namespace NUnit.Engine.Agents
         public abstract void Stop();
 
         /// <summary>
+        /// Pings the agent to check that it is still alive.
+        /// </summary>
+        public abstract void Ping();
+
+        /// <summary>
         ///  Creates a test runner
         /// </summary>
         public abstract ITestEngineRunner CreateRunner(TestPackage package);

@@ -105,6 +105,11 @@ namespace NUnit.Engine.Agents
             stopSignal.Set();
         }
 
+        public override void Ping()
+        {
+            log.Info("Ping");
+        }
+
         public bool WaitForStop(int timeout)
         {
             return stopSignal.WaitOne(timeout);

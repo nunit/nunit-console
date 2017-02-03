@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Net.Sockets;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
@@ -240,9 +241,38 @@ namespace NUnit.Engine.Runners
                 {
                     try
                     {
+                        log.Debug("Pinging remote agent");
+
+                        // Ping the agent to check that it is still alive.
+                        _agent.Ping();
+                    }
+                    catch (Exception e)
+                    {
+                        string stopError = string.Format("Failed to ping the remote agent. {0}", e.Message);
+                        log.Error(stopError);
+                        _agent = null;
+
+                        // Stop error with no unload error, just rethrow
+                        if (unloadError == null)
+                            throw;
+
+                        // Both kinds of errors, throw exception with combined message
+                        throw new NUnitEngineException(unloadError + Environment.NewLine + stopError);
+                    }
+
+                    try
+                    {
                         log.Debug("Stopping remote agent");
                         _agent.Stop();
                         _agent = null;
+                    }
+                    catch (SocketException)
+                    {
+                        // Sometimes the TCP Channel Proxy to the Agent throws a 
+                        // SocketException (0x80004005) when calling 'Stop', although 
+                        // the Agent receives the stop signal and terminates successfully. 
+                        // We assume that the Agent is still present and responding because 
+                        // we called 'Ping' and that therefore the Socket Exception can be ignored.
                     }
                     catch (Exception e)
                     {
