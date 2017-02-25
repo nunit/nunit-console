@@ -408,60 +408,32 @@ namespace NUnit.Engine.Services
         #region Nested Class - AgentDataBase
         /// <summary>
         ///  A simple class that tracks data about this
-        ///  agencies active and available agents
+        ///  agencies active and available agents.
+        ///  This class is required to be multi-thread safe.
         /// </summary>
         private class AgentDataBase
         {
-            private Dictionary<Guid, AgentRecord> agentData = new Dictionary<Guid, AgentRecord>();
+            private readonly Dictionary<Guid, AgentRecord> _agentData = new Dictionary<Guid, AgentRecord>();
+            private readonly object _lock = new object();
 
             public AgentRecord this[Guid id]
             {
-                get { return agentData[id]; }
-                set
-                {
-                    if ( value == null )
-                        agentData.Remove( id );
-                    else
-                        agentData[id] = value;
-                }
-            }
-
-            public AgentRecord this[ITestAgent agent]
-            {
                 get
                 {
-                    foreach( KeyValuePair<Guid, AgentRecord> entry in agentData)
+                    lock (_lock)
                     {
-                        AgentRecord r = entry.Value;
-                        if ( r.Agent == agent )
-                            return r;
+                        return _agentData[id];
                     }
-
-                    return null;
                 }
             }
 
-            public void Add( AgentRecord r )
+            public void Add(AgentRecord r)
             {
-                agentData[r.Id] = r;
+                lock (_lock)
+                {
+                    _agentData[r.Id] = r;
+                }
             }
-
-            public void Remove(Guid agentId)
-            {
-                agentData.Remove(agentId);
-            }
-
-            public void Clear()
-            {
-                agentData.Clear();
-            }
-
-            //#region IEnumerable Members
-            //public IEnumerator<KeyValuePair<Guid,AgentRecord>> GetEnumerator()
-            //{
-            //    return agentData.GetEnumerator();
-            //}
-            //#endregion
         }
 
         #endregion
