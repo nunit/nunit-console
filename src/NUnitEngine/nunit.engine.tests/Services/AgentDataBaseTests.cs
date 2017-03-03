@@ -44,13 +44,16 @@ namespace NUnit.Engine.Services.Tests
             _generatedGuids = new List<Guid>();
         }
 
-        [TestCaseSource(COUNTS)]
-        public void AddData(int count)
+        [Test]
+        public void AddData()
         {
-            AddRecords(count);
+            AddRecords(5);
 
-            Assert.That(_generatedGuids.Count, Is.EqualTo(count));
-            Assert.That(_data.GetGuids(), Is.EqualTo(_generatedGuids));
+            Assert.That(_generatedGuids.Count, Is.EqualTo(5));
+            Assert.That(_data.Count, Is.EqualTo(5));
+
+            var snap = _data.TakeSnapshot();
+            Assert.That(snap.Guids, Is.EqualTo(_generatedGuids));
         }
 
         [TestCaseSource(COUNTS)]
@@ -60,13 +63,16 @@ namespace NUnit.Engine.Services.Tests
             RunInParallel((g) => AddRecord((Guid)g));
 
             Assert.That(_generatedGuids.Count, Is.EqualTo(count));
-            Assert.That(_data.GetGuids(), Is.EqualTo(_generatedGuids));
+            Assert.That(_data.Count, Is.EqualTo(count));
+
+            var snap = _data.TakeSnapshot();
+            Assert.That(snap.Guids, Is.EqualTo(_generatedGuids));
         }
 
-        [TestCaseSource(COUNTS)]
-        public void ReadData(int count)
+        [Test]
+        public void ReadData()
         {
-            AddRecords(count);
+            AddRecords(5);
 
             foreach (var guid in _generatedGuids)
             {
@@ -88,6 +94,41 @@ namespace NUnit.Engine.Services.Tests
                 Assert.NotNull(r);
                 Assert.That(r.Id, Is.EqualTo(guid));
             });
+        }
+
+        [Test]
+        public void RemoveData()
+        {
+            AddRecords(5);
+
+            foreach (var guid in _generatedGuids)
+                _data.Remove(guid);
+
+            Assert.That(_data.Count, Is.EqualTo(0));
+        }
+
+        [TestCaseSource(COUNTS)]
+        public void RemoveData_Parallel(int count)
+        {
+            AddRecords(count);
+
+            RunInParallel((g) =>
+            {
+                var guid = (Guid)g;
+                _data.Remove(guid);
+            });
+
+            Assert.That(_data.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ClearData()
+        {
+            AddRecords(5);
+
+            _data.Clear();
+
+            Assert.That(_data.Count, Is.EqualTo(0));
         }
 
         private void GenerateGuids(int count)

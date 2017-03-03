@@ -65,23 +65,25 @@ namespace NUnit.Engine.Services
             }
         }
 
-        //public AgentRecord this[ITestAgent agent]
-        //{
-        //    get
-        //    {
-        //        lock (_lock)
-        //        {
-        //            foreach (var entry in _agentData)
-        //            {
-        //                AgentRecord r = entry.Value;
-        //                if (r.Agent == agent)
-        //                    return r;
-        //            }
-        //        }
+        public int Count
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    return _agentData.Count;
+                }
+            }
+        }
 
-        //        return null;
-        //    }
-        //}
+        // Take a snapshot of the database - used primarily in testing.
+        public Snapshot TakeSnapshot()
+        {
+            lock (_lock)
+            {
+                return new Snapshot(_agentData.Values);
+            }
+        }
 
         public void Add(AgentRecord r)
         {
@@ -91,6 +93,12 @@ namespace NUnit.Engine.Services
             }
         }
 
+        #region Methods not currently used
+
+        // These methods are not currently used, but are  being
+        // maintained (and tested) for now since TestAgency is 
+        // undergoing some changes and may need them again.
+
         public void Remove(Guid agentId)
         {
             lock (_lock)
@@ -99,26 +107,36 @@ namespace NUnit.Engine.Services
             }
         }
 
-        //public void Clear()
-        //{
-        //    lock (_lock)
-        //    {
-        //        _agentData.Clear();
-        //    }
-        //}
-
-        // Method used for testing - returns a snapshot of
-        // the guids currently in the database.
-        public ICollection<Guid> GetGuids()
+        public void Clear()
         {
-#if LOCKING
             lock (_lock)
             {
-                return new List<Guid>(_agentData.Keys);
+                _agentData.Clear();
             }
-#else
-            return new List<Guid>(_agentData.Keys);
-#endif
         }
+
+        #endregion
+
+        #region Nested Snapshot Class used in Testing
+
+        public class Snapshot
+        {
+            public Snapshot(IEnumerable<AgentRecord> data)
+            {
+                Guids = new List<Guid>();
+                Records = new List<AgentRecord>();
+
+                foreach(var record in data)
+                {
+                    Guids.Add(record.Id);
+                    Records.Add(record);
+                }
+            }
+
+            public ICollection<Guid> Guids { get; private set; }
+            public ICollection<AgentRecord> Records { get; private set; }
+        }
+
+        #endregion
     }
 }

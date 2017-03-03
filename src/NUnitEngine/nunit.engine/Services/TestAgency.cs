@@ -103,17 +103,6 @@ namespace NUnit.Engine.Services
             r.Agent = agent;
         }
 
-        public void ReportStatus( Guid agentId, AgentStatus status )
-        {
-            AgentRecord r = _agentData[agentId];
-
-            if ( r == null )
-                throw new ArgumentException(
-                    string.Format("Agent {0} is not in the agency database", agentId),
-                    "agentId" );
-
-            r.Status = status;
-        }
         #endregion
 
         #region Public Methods - Called by Clients
@@ -214,7 +203,6 @@ namespace NUnit.Engine.Services
                     break;
             }
             
-            //p.Exited += new EventHandler(OnProcessExit);
             p.Start();
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
