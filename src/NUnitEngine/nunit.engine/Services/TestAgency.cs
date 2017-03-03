@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011-2016 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -381,58 +381,6 @@ namespace NUnit.Engine.Services
             {
                 Status = ServiceStatus.Error;
                 throw;
-            }
-        }
-
-        #endregion
-
-        #region Nested Class - AgentRecord
-        private class AgentRecord
-        {
-            public Guid Id;
-            public Process Process;
-            public ITestAgent Agent;
-            public AgentStatus Status;
-
-            public AgentRecord( Guid id, Process p, ITestAgent a, AgentStatus s )
-            {
-                this.Id = id;
-                this.Process = p;
-                this.Agent = a;
-                this.Status = s;
-            }
-
-        }
-        #endregion
-
-        #region Nested Class - AgentDataBase
-        /// <summary>
-        ///  A simple class that tracks data about this
-        ///  agencies active and available agents.
-        ///  This class is required to be multi-thread safe.
-        /// </summary>
-        private class AgentDataBase
-        {
-            private readonly Dictionary<Guid, AgentRecord> _agentData = new Dictionary<Guid, AgentRecord>();
-            private readonly object _lock = new object();
-
-            public AgentRecord this[Guid id]
-            {
-                get
-                {
-                    lock (_lock)
-                    {
-                        return _agentData[id];
-                    }
-                }
-            }
-
-            public void Add(AgentRecord r)
-            {
-                lock (_lock)
-                {
-                    _agentData[r.Id] = r;
-                }
             }
         }
 
