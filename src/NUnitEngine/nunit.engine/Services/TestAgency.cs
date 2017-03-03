@@ -121,9 +121,6 @@ namespace NUnit.Engine.Services
         public ITestAgent GetAgent(TestPackage package, int waitTime)
         {
             // TODO: Decide if we should reuse agents
-            //AgentRecord r = FindAvailableRemoteAgent(type);
-            //if ( r == null )
-            //    r = CreateRemoteAgent(type, framework, waitTime);
             return CreateRemoteAgent(package, waitTime);
         }
 
@@ -139,16 +136,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        //public void DestroyAgent( ITestAgent agent )
-        //{
-        //    AgentRecord r = agentData[agent.Id];
-        //    if ( r != null )
-        //    {
-        //        if( !r.Process.HasExited )
-        //            r.Agent.Stop();
-        //        agentData[r.Id] = null;
-        //    }
-        //}
         #endregion
 
         #region Helper Methods
@@ -183,7 +170,7 @@ namespace NUnit.Engine.Services
                     string.Format("The {0} framework is not available", targetRuntime),
                     "framework");
 
-            string agentExePath = GetTestAgentExePath(targetRuntime.ClrVersion, useX86Agent);
+            string agentExePath = GetTestAgentExePath(useX86Agent);
 
             if (agentExePath == null)
                 throw new ArgumentException(
@@ -236,26 +223,6 @@ namespace NUnit.Engine.Services
             return agentId;
         }
 
-        //private void OnProcessExit(object sender, EventArgs e)
-        //{
-        //    Process p = sender as Process;
-        //    if (p != null)
-        //        agentData.Remove(p.Id);
-        //}
-
-        //private AgentRecord FindAvailableAgent()
-        //{
-        //    foreach( AgentRecord r in agentData )
-        //        if ( r.Status == AgentStatus.Ready)
-        //        {
-        //            log.Debug( "Reusing agent {0}", r.Id );
-        //            r.Status = AgentStatus.Busy;
-        //            return r;
-        //        }
-
-        //    return null;
-        //}
-
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
             Guid agentId = LaunchAgentProcess(package);
@@ -280,69 +247,12 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        /// <summary>
-        /// Return the NUnit Bin Directory for a particular
-        /// runtime version, or null if it's not installed.
-        /// For normal installations, there are only 1.1 and
-        /// 2.0 directories. However, this method accommodates
-        /// 3.5 and 4.0 directories for the benefit of NUnit
-        /// developers using those runtimes.
-        /// </summary>
-        private static string GetNUnitBinDirectory(Version v)
-        {
-            // Get current bin directory
-            string dir = NUnitConfiguration.EngineDirectory;
-
-            // Return current directory if current and requested
-            // versions are both >= 2 or both 1
-            if ((Environment.Version.Major >= 2) == (v.Major >= 2))
-                return dir;
-
-            // Check whether special support for version 1 is installed
-            if (v.Major == 1)
-            {
-                string altDir = Path.Combine(dir, "net-1.1");
-                if (Directory.Exists(altDir))
-                    return altDir;
-
-                // The following is only applicable to the dev environment,
-                // which uses parallel build directories. We try to substitute
-                // one version number for another in the path.
-                string[] search = new string[] { "2.0", "3.0", "3.5", "4.0" };
-                string[] replace = v.Minor == 0
-                    ? new string[] { "1.0", "1.1" }
-                    : new string[] { "1.1", "1.0" };
-
-                // Look for current value in path so it can be replaced
-                string current = null;
-                foreach (string s in search)
-                    if (dir.IndexOf(s) >= 0)
-                    {
-                        current = s;
-                        break;
-                    }
-
-                // Try the substitution
-                if (current != null)
-                {
-                    foreach (string target in replace)
-                    {
-                        altDir = dir.Replace(current, target);
-                        if (Directory.Exists(altDir))
-                            return altDir;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static string GetTestAgentExePath(Version v, bool requires32Bit)
+        private static string GetTestAgentExePath(bool requires32Bit)
         {
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
 
-            string agentName = v.Major > 1 && requires32Bit
+            string agentName = requires32Bit
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 

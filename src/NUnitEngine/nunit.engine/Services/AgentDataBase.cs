@@ -91,13 +91,13 @@ namespace NUnit.Engine.Services
             }
         }
 
-        //public void Remove(Guid agentId)
-        //{
-        //    lock (_lock)
-        //    {
-        //        _agentData.Remove(agentId);
-        //    }
-        //}
+        public void Remove(Guid agentId)
+        {
+            lock (_lock)
+            {
+                _agentData.Remove(agentId);
+            }
+        }
 
         //public void Clear()
         //{
