@@ -30,7 +30,9 @@ namespace NUnit.Engine.Services.Tests
 {
     public class AgentDataBaseTests
     {
+#pragma warning disable 414
         private static int[] Counts = new int[] { 1, 3, 10 };
+#pragma warning restore 414
 
         const string COUNTS = nameof(Counts);
 
