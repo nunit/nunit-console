@@ -62,8 +62,12 @@ namespace NUnit.ConsoleRunner.Tests
             foreach (string report in reports)
                 handler.OnTestEvent(report);
 
-            if (Environment.NewLine != "\r\n")
-                expected = expected.Replace("\r\n", Environment.NewLine);
+            // Make sure all newlines are the same
+            expected = expected.Replace("\r\n", "\n");
+
+            // Replace with current newline before comparing
+            expected = expected.Replace("\n", Environment.NewLine);
+
             Assert.That(Output, Is.EqualTo(expected));
         }
 
