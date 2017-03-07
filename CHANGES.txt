@@ -1,4 +1,15 @@
-﻿NUnit 3.6 - January 14, 2017
+﻿NUnit 3.6.1 - March 6, 2017
+
+Engine
+
+ * This hotfix release addresses a race condition in the Engine that caused
+   tests to intermittently fail.
+
+Issues Resolved
+
+ * 168 Intermittent errors while running tests after updating to 3.6
+
+NUnit 3.6 - January 14, 2017
 
 Console Runner
 
