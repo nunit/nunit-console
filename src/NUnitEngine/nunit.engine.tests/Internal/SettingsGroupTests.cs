@@ -22,6 +22,8 @@
 // ***********************************************************************
 
 using System;
+using System.ComponentModel;
+using System.Drawing;
 using NUnit.Framework;
 using Microsoft.Win32;
 
@@ -96,6 +98,20 @@ namespace NUnit.Engine.Internal.Tests
         {
             settings.SaveSetting( "X", "1y25" );
             Assert.AreEqual( 42, settings.GetSetting( "X", 42 ) );
+        }
+
+        [Test]
+        [SetCulture("da-DK")]
+        public void SaveAndGetSettingShouldReturnTheOriginalValue()
+        {
+            var settingName = "MySetting";
+            var settingValue = new Point(10, 20);
+            var typeConverter = TypeDescriptor.GetConverter(settingValue);
+            var settingsValue = typeConverter.ConvertToInvariantString(settingValue);
+
+            settings.SaveSetting(settingName, settingsValue);
+            var point = settings.GetSetting(settingName, new Point(30, 40));
+            Assert.That(point, Is.EqualTo(settingValue));
         }
     }
 }
