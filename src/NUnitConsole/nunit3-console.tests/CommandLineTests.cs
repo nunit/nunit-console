@@ -43,6 +43,8 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--fileArg1\n--fileArg2,file2.txt:--fileArg3", "--arg1 --fileArg1 --fileArg2 --arg2 --fileArg3", "")]
         [TestCase("--arg1 @file1.txt --arg2", "file1.txt:", "--arg1 --arg2", "")]
         [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n\n\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\nThis is a COMMENT\n--fileArg2", "--arg1 --fileArg1 This is a COMMENT --fileArg2 --arg2", "")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n#This is a COMMENT\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
         public void ArgumentsFromFilesTests(string args, string files, string expectedExpandedArgs, string expectedErrorMessages)
         {
             // Given
