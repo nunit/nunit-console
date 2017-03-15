@@ -73,6 +73,7 @@
     <Compile Include="..\EngineVersion.cs">
       <Link>Properties\EngineVersion.cs</Link>
     </Compile>
+    <Compile Include="Agents\RemoteTestAgentTests.cs" />
     <Compile Include="Api\ServiceLocatorTests.cs" />
     <Compile Include="Api\TestFilterTests.cs" />
     <Compile Include="Api\TestPackageTests.cs" />

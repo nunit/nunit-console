@@ -103,6 +103,11 @@ namespace NUnit.Engine.Services
             r.Agent = agent;
         }
 
+        public void Unregister(Guid agentId)
+        {
+            _agentData.Remove(agentId);
+        }
+
         #endregion
 
         #region Public Methods - Called by Clients

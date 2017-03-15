@@ -44,6 +44,7 @@ namespace NUnit.Engine.Agents
         private TestPackage _package;
 
         private ManualResetEvent stopSignal = new ManualResetEvent(false);
+        private bool _stopped = false;
         
         #endregion
 
@@ -95,14 +96,25 @@ namespace NUnit.Engine.Agents
 
         public override void Stop()
         {
-            log.Info("Stopping");
-            // This causes an error in the client because the agent 
-            // database is not thread-safe.
-            //if (agency != null)
-            //    agency.ReportStatus(this.ProcessId, AgentStatus.Stopping);
+            if (_stopped)
+            {
+                return;
+            }
 
+            log.Info("Stopping");
+
+            try
+            {
+                this.Agency.Unregister(this.Id);
+                log.Debug("Unregistered with TestAgency");
+            }
+            catch (Exception ex)
+            {
+                log.Error("RemoteTestAgent: Failed to unregister with TestAgency", ex);
+            }
 
             stopSignal.Set();
+            _stopped = true;
         }
 
         public bool WaitForStop(int timeout)
