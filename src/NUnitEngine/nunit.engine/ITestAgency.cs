@@ -21,6 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
+
 namespace NUnit.Engine
 {
     /// <summary>
@@ -34,5 +36,11 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="agent"></param>
         void Register(ITestAgent agent);
+
+        /// <summary>
+        /// Unregisters an agent with an agency
+        /// </summary>
+        /// <param name="agentId"></param>
+        void Unregister(Guid agentId);
     }
 }
