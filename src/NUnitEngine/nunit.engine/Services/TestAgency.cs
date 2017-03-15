@@ -52,11 +52,11 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class TestAgency : ServerBase, ITestAgency, IService
     {
-        static Logger log = InternalTrace.GetLogger(typeof(TestAgency));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
         #region Private Fields
 
-        private AgentDataBase _agentData = new AgentDataBase();
+        private readonly AgentDataBase _agentData = new AgentDataBase();
 
         #endregion
 

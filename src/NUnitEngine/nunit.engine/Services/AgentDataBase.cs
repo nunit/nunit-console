@@ -29,8 +29,8 @@ namespace NUnit.Engine.Services
 {
     internal class AgentRecord
     {
-        public Guid Id;
-        public Process Process;
+        public readonly Guid Id;
+        public readonly Process Process;
         public ITestAgent Agent;
         public AgentStatus Status;
 
