@@ -35,9 +35,9 @@ namespace NUnit.Engine.Agents
     {
         #region Private Fields
 
-        private ITestAgency agency;
-        private Guid agentId;
-        private IServiceLocator services;
+        private readonly ITestAgency agency;
+        private readonly Guid agentId;
+        private readonly IServiceLocator services;
 
         #endregion
 

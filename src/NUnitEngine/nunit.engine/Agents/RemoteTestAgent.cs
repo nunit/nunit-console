@@ -36,14 +36,14 @@ namespace NUnit.Engine.Agents
     /// </summary>
     public class RemoteTestAgent : TestAgent, ITestEngineRunner
     {
-        static Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
 
         #region Fields
 
         private ITestEngineRunner _runner;
         private TestPackage _package;
 
-        private ManualResetEvent stopSignal = new ManualResetEvent(false);
+        private readonly ManualResetEvent stopSignal = new ManualResetEvent(false);
         
         #endregion
 
