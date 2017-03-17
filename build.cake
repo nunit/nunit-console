@@ -339,12 +339,12 @@ Task("PackageConsole")
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
 //////////////////////////////////////////////////////////////////////
-Setup(() =>
+Setup(context =>
 {
     // Executed BEFORE the first task.
 });
 
-Teardown(() =>
+Teardown(context =>
 {
     // Executed AFTER the last task.
     CheckForError(ref ErrorDetail);
