@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v2.0": {},
+    ".NETFramework,Version=v2.0/win": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "": [],
+    ".NETFramework,Version=v2.0": []
+  },
+  "packageFolders": {
+    "C:\\Users\\Rob Prouse\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "restore": {
+      "projectUniqueName": "C:\\src\\nunit\\nunit-console\\src\\NUnitEngine\\mock-assembly\\mock-assembly.csproj",
+      "projectName": "mock-assembly",
+      "projectPath": "C:\\src\\nunit\\nunit-console\\src\\NUnitEngine\\mock-assembly\\mock-assembly.csproj",
+      "projectJsonPath": "C:\\src\\nunit\\nunit-console\\src\\NUnitEngine\\mock-assembly\\mock-assembly.project.json",
+      "projectStyle": "ProjectJson"
+    },
+    "frameworks": {
+      "net20": {}
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      }
+    }
+  }
+}
