@@ -24,8 +24,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -96,15 +94,17 @@ namespace NUnit.Engine.Internal
 
         public void SaveSettings()
         {
-            if (_writeable && _settings.Keys.Count > 0)
-            {
-                try
-                {
-                    string dirPath = Path.GetDirectoryName(_settingsFile);
-                    if (!Directory.Exists(dirPath))
-                        Directory.CreateDirectory(dirPath);
+            if (!_writeable || _settings.Keys.Count <= 0)
+                return;
 
-                    XmlTextWriter writer = new XmlTextWriter(_settingsFile, System.Text.Encoding.UTF8);
+            try
+            {
+                string dirPath = Path.GetDirectoryName(_settingsFile);
+                if (!Directory.Exists(dirPath))
+                    Directory.CreateDirectory(dirPath);
+
+                using (var writer = new XmlTextWriter(_settingsFile, System.Text.Encoding.UTF8))
+                {
                     writer.Formatting = Formatting.Indented;
 
                     writer.WriteProcessingInstruction("xml", "version=\"1.0\"");
@@ -131,11 +131,12 @@ namespace NUnit.Engine.Internal
                     writer.WriteEndElement();
                     writer.Close();
                 }
-                catch (Exception)
-                {
-                    // So we won't try this again
-                    _writeable = false;
-                }
+            }
+            catch (Exception)
+            {
+                // So we won't try this again
+                _writeable = false;
+                throw;
             }
         }
 

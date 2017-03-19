@@ -22,8 +22,6 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
@@ -66,6 +64,15 @@ namespace NUnit.Engine.Services.Tests
             ((FakeSettingsService)_settingsService).FailToStart = true;
             Assert.That(() => _serviceManager.StartServices(), 
                 Throws.InstanceOf<InvalidOperationException>().And.Message.Contains("FakeSettingsService"));
+        }
+
+        [Test]
+        public void TerminationFailure()
+        {
+            ((FakeSettingsService)_settingsService).FailedToStop = true;
+            _settingsService.StartService();
+
+            Assert.DoesNotThrow(() => _serviceManager.StopServices());
         }
 
         [Test]
