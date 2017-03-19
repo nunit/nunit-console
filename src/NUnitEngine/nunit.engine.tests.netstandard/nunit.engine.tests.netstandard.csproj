@@ -1,77 +1,40 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{315eeb16-5481-4fd9-9ab1-01c91d83eb22}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <AssemblyName>nunit.engine.tests.netstandard</AssemblyName>
-    <DefaultLanguage>en-US</DefaultLanguage>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
-    <IntermediateOutputPath>obj\$(Configuration)\netstandard\</IntermediateOutputPath>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-    <LangVersion>6</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\bin\Release\netstandard\</OutputPath>
-    <DefineConstants>TRACE;NETSTANDARD1_3</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD1_3</DefineConstants>
-    <OutputPath>..\..\..\bin\Debug\netstandard\</OutputPath>
-    <DebugType>full</DebugType>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
-    <DebugSymbols>true</DebugSymbols>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <Authors>Charlie Poole</Authors>
+    <Company>NUnit Software</Company>
+    <Product>NUnit 3.0</Product>
+    <Description>Tests of the NUnit .NET Standard Engine</Description>
+    <Version>3.7.0</Version>
+    <Copyright>Copyright (C) 2017 Charlie Poole</Copyright>
   </PropertyGroup>
+
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <Compile Include="..\nunit.engine.tests\Api\TestFilterTests.cs" Link="API\TestFilterTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Api\TestPackageTests.cs" Link="API\TestPackageTests.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="..\..\nunit.snk">
-      <Link>nunit.snk</Link>
-    </None>
-    <None Include="nunit.engine.tests.netstandard.project.json" />
+    <None Include="..\..\nunit.snk" Link="nunit.snk" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\nunit.engine.netstandard\nunit.engine.netstandard.csproj">
-      <Project>{1FC89619-05EE-410D-A4DF-8561A6485EC6}</Project>
-      <Name>nunit.engine.netstandard</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\mock-assembly\mock-assembly.netstandard.csproj">
-      <Project>{1059D07B-68E7-40E5-BCCD-00E780D6536E}</Project>
-      <Name>mock-assembly-netstandard</Name>
-    </ProjectReference>
+    <PackageReference Include="NUnit" Version="3.6.1" />
+    <PackageReference Include="NUnitLite" Version="3.6.1" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <NuGetTargetMoniker>.NETStandard,Version=v1.3</NuGetTargetMoniker>
-  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\mock-assembly\mock-assembly.netstandard.csproj" />
+    <ProjectReference Include="..\nunit.engine.netstandard\nunit.engine.netstandard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="API\" />
+  </ItemGroup>
+
 </Project>
