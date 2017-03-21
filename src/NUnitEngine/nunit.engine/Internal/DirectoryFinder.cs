@@ -28,8 +28,6 @@ using System.Text;
 
 namespace NUnit.Engine.Internal
 {
-    #region Public Methods
-
     /// <summary>
     /// DirectoryFinder is a utility class used for extended wildcard
     /// selection of directories and files. It's less than a full-fledged
@@ -37,6 +35,8 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class DirectoryFinder
     {
+        #region Public Methods
+
         /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
         /// Each path component may have wildcard characters and a component

@@ -52,7 +52,7 @@ namespace NUnit.Engine.Drivers
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
 
-            return new NUnitNetStandardDriver(reference);
+            return new NUnitNetStandardDriver();
         }
     }
 }

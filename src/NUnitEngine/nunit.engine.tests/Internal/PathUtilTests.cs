@@ -86,7 +86,8 @@ namespace NUnit.Engine.Internal.Tests
 				PathUtils.Canonicalize( @"folder1\folder2\..\..\..\file.tmp" ) );
 		}
 
-		[Test]
+#if !NETCOREAPP1_1
+        [Test]
 		[Platform(Exclude="Linux,UNIX,MacOSX")]
         public void RelativePath()
 		{
@@ -121,8 +122,9 @@ namespace NUnit.Engine.Internal.Tests
             Assert.AreEqual(@"..\Folder2\folder3", PathUtils.RelativePath(
                 @"c:\folder1", @"C:\Folder2\folder3"));
         }
+#endif
 
-		[Test]
+        [Test]
 		public void SamePathOrUnder()
 		{
 			Assert.SamePathOrUnder( @"C:\folder1\folder2\folder3", @"c:\folder1\.\folder2\junk\..\folder3" );

@@ -39,6 +39,8 @@ namespace NUnit.Engine.Drivers
     {
         const string LOAD_MESSAGE = "Method called without calling Load first";
         const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
+        const string FAILED_TO_LOAD_TEST_ASSEMBLY = "Failed to load the test assembly {0}";
+        const string FAILED_TO_LOAD_NUNIT = "Failed to load the NUnit Framework in the test assembly";
 
         static readonly string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
         static readonly string LOAD_METHOD = "LoadTests";
@@ -54,11 +56,6 @@ namespace NUnit.Engine.Drivers
         Assembly _frameworkAssembly;
         object _frameworkController;
         Type _frameworkControllerType;
-
-        public NUnitNetStandardDriver(AssemblyName nunit)
-        {
-            _frameworkAssembly = Assembly.Load(nunit);
-        }
 
         /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
@@ -79,6 +76,18 @@ namespace NUnit.Engine.Drivers
 
             var assemblyRef = AssemblyDefinition.ReadAssembly(testAssembly);
             _testAssembly = Assembly.Load(new AssemblyName(assemblyRef.FullName));
+            if(_testAssembly == null)
+                throw new NUnitEngineException(string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyRef.FullName));
+
+            var nunitRef = assemblyRef.MainModule.AssemblyReferences.Where(reference => reference.Name == "nunit.framework").FirstOrDefault();
+            if (nunitRef == null)
+                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
+
+            var nunit = Assembly.Load(new AssemblyName(nunitRef.FullName));
+            if (nunit == null)
+                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
+
+            _frameworkAssembly = nunit;
 
             _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
             if (_frameworkController == null)

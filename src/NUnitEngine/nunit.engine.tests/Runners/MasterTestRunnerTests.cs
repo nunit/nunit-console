@@ -32,13 +32,18 @@ namespace NUnit.Engine.Runners.Tests
     public class MasterTestRunnerTests : ITestEventListener
     {
         private TestPackage _package;
+#if !NETCOREAPP1_1
         private ServiceContext _services;
+#endif
         private MasterTestRunner _runner;
         private List<XmlNode> _events;
 
         [SetUp]
         public void Initialize()
         {
+            _package = new TestPackage("mock-assembly.dll");
+
+#if !NETCOREAPP1_1
             // Add all services needed
             _services = new ServiceContext();
             _services.Add(new Services.DomainManager());
@@ -50,10 +55,10 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
             _services.ServiceManager.StartServices();
 
-            _package = new TestPackage("mock-assembly.dll");
-
             _runner = new MasterTestRunner(_services, _package);
-
+#else
+            _runner = new MasterTestRunner(_package);
+#endif
             _events = new List<XmlNode>();
         }
 
@@ -63,8 +68,10 @@ namespace NUnit.Engine.Runners.Tests
             if (_runner != null)
                 _runner.Dispose();
 
+#if !NETCOREAPP1_1
             if (_services != null)
                 _services.ServiceManager.Dispose();
+#endif
         }
 
         [Test]
@@ -106,6 +113,7 @@ namespace NUnit.Engine.Runners.Tests
             CheckTestRunResult(result);
         }
 
+#if !NETCOREAPP1_1
         [Test]
         public void RunAsync()
         {
@@ -114,6 +122,7 @@ namespace NUnit.Engine.Runners.Tests
             testRun.Wait(-1);
             CheckTestRunResult(testRun.Result);
         }
+#endif
 
         private void CheckTestRunResult(XmlNode result)
         {

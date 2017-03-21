@@ -17,6 +17,12 @@
   <ItemGroup>
     <Compile Include="..\nunit.engine.tests\Api\TestFilterTests.cs" Link="API\TestFilterTests.cs" />
     <Compile Include="..\nunit.engine.tests\Api\TestPackageTests.cs" Link="API\TestPackageTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Drivers\NotRunnableFrameworkDriverTests.cs" Link="Drivers\NotRunnableFrameworkDriverTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Internal\DirectoryFinderTests.cs" Link="Internal\DirectoryFinderTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Internal\PathUtilTests.cs" Link="Internal\PathUtilTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Internal\SettingsGroupTests.cs" Link="Internal\SettingsGroupTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Runners\MasterTestRunnerTests.cs" Link="Runners\MasterTestRunnerTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Runners\ParallelTaskWorkerPoolTests.cs" Link="Runners\ParallelTaskWorkerPoolTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +41,8 @@
 
   <ItemGroup>
     <Folder Include="API\" />
-    <Folder Include="Internal\Logging\" />
+    <Folder Include="Internal\" />
+    <Folder Include="Runners\" />
     <Folder Include="Services\" />
   </ItemGroup>
 
