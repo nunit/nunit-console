@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Xml;
 
 namespace NUnit.Engine.Extensibility
@@ -39,7 +40,7 @@ namespace NUnit.Engine.Extensibility
         /// used to ensure that test ids are unique across drivers.
         /// </summary>
         string ID { get; set; }
-
+        
         /// <summary>
         /// Loads the tests in an assembly.
         /// </summary>

@@ -63,9 +63,15 @@ namespace NUnit.Engine.Runners
             }
         }
 
+#if NETSTANDARD1_3
+        public AggregatingTestRunner(TestPackage package) : base(package)
+        {
+        }
+#else
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
         }
+#endif
 
         #region AbstractTestRunner Overrides
 

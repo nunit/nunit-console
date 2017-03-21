@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2014 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,42 +22,37 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.Reflection;
+using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Runners
+namespace NUnit.Engine.Drivers
 {
-    /// <summary>
-    /// TestEventDispatcher is used to send test events to a number of listeners
-    /// </summary>
-    public class TestEventDispatcher :
-#if !NETSTANDARD1_3
-        MarshalByRefObject, 
-#endif
-        ITestEventListener
+    public class NUnitNetStandardDriverFactory
     {
-        private object _eventLock = new object();
+        private const string NUNIT_FRAMEWORK = "nunit.framework";
 
-        public TestEventDispatcher()
+        /// <summary>
+        /// Gets a flag indicating whether a given assembly name and version
+        /// represent a test framework supported by this factory.
+        /// </summary>
+        /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
+        public bool IsSupportedTestFramework(AssemblyName reference)
         {
-            Listeners = new List<ITestEventListener>();
+            return reference.Name == NUNIT_FRAMEWORK && reference.Version.Major == 3;
         }
 
-        public IList<ITestEventListener>Listeners { get; private set; }
-
-        public void OnTestEvent(string report)
+        /// <summary>
+        /// Gets a driver for a given test assembly and a framework
+        /// which the assembly is already known to reference.
+        /// </summary>
+        /// <param name="domain">The domain in which the assembly will be loaded</param>
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        /// <returns></returns>
+        public IFrameworkDriver GetDriver(AssemblyName reference)
         {
-            lock (_eventLock)
-            {
-                foreach (var listener in Listeners)
-                    listener.OnTestEvent(report);
-            }
-        }
+            Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
 
-#if !NETSTANDARD1_3
-        public override object InitializeLifetimeService()
-        {
-            return null;
+            return new NUnitNetStandardDriver(reference);
         }
-#endif
     }
 }
