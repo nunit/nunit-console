@@ -134,7 +134,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode giving the result of the test execution</returns>
         public XmlNode Run(ITestEventListener listener, TestFilter filter)
         {
-            return PrepareResult(RunTests(listener, filter)).Xml;
+            return RunTests(listener, filter).Xml;
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            LoadResult = PrepareResult(_engineRunner.Explore(filter))
+            LoadResult = _engineRunner.Explore(filter)
                 .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
 
             return LoadResult.Xml;
@@ -207,13 +207,6 @@ namespace NUnit.Engine.Runners
         private void ValidatePackageSettings()
         {
             // TODO: Any package settings to validate?
-        }
-
-        private TestEngineResult PrepareResult(TestEngineResult result)
-        {
-            if (result == null) throw new ArgumentNullException("result");
-
-            return result.MakePackageResult(TestPackage.Name, TestPackage.FullName);
         }
 
         private void EnsurePackagesAreExpanded(TestPackage package)

@@ -40,8 +40,6 @@ namespace NUnit.Engine.Runners
 
         public DirectTestRunner(TestPackage package) : base(package)
         {
-            // Currently only one driver
-            _drivers.Add(new NUnitNetStandardDriver());
         }
 
         #region AbstractTestRunner Overrides

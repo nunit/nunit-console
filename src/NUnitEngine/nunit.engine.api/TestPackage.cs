@@ -51,7 +51,14 @@ namespace NUnit.Engine
 
             if (filePath != null)
             {
+#if NETSTANDARD1_3
+                if (!Path.IsPathRooted(filePath))
+                    throw new NUnitEngineException("Paths to test assemblies must not be relative in .NET Standard");
+
+                FullName = filePath;
+#else
                 FullName = Path.GetFullPath(filePath);
+#endif
                 Settings = new Dictionary<string,object>();
                 SubPackages = new List<TestPackage>();
             }
