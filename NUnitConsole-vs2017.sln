@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}"
 	ProjectSection(SolutionItems) = preProject
@@ -62,6 +62,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mock-assembly", "src\NUnitE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "notest-assembly", "src\NUnitEngine\notest-assembly\notest-assembly.csproj", "{B1D90742-39BD-429C-8E87-C5CD2991DF27}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "netstandard", "netstandard", "{B7F79C96-34D2-45F2-990B-599A9BE4DFAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit.engine.tests.netstandard", "src\NUnitEngine\nunit.engine.tests.netstandard\nunit.engine.tests.netstandard.csproj", "{BC22F0E4-0862-4F82-A912-C9A447FECBAD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly.netstandard", "src\NUnitEngine\mock-assembly\mock-assembly.netstandard.csproj", "{BC6C8155-2024-4F58-A006-18A15EA22A5C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.netstandard", "src\NUnitEngine\nunit.engine.netstandard\nunit.engine.netstandard.csproj", "{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +112,18 @@ Global
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC22F0E4-0862-4F82-A912-C9A447FECBAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC22F0E4-0862-4F82-A912-C9A447FECBAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC22F0E4-0862-4F82-A912-C9A447FECBAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC22F0E4-0862-4F82-A912-C9A447FECBAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC6C8155-2024-4F58-A006-18A15EA22A5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC6C8155-2024-4F58-A006-18A15EA22A5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC6C8155-2024-4F58-A006-18A15EA22A5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC6C8155-2024-4F58-A006-18A15EA22A5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +141,10 @@ Global
 		{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{B7F79C96-34D2-45F2-990B-599A9BE4DFAA} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{BC22F0E4-0862-4F82-A912-C9A447FECBAD} = {B7F79C96-34D2-45F2-990B-599A9BE4DFAA}
+		{BC6C8155-2024-4F58-A006-18A15EA22A5C} = {B7F79C96-34D2-45F2-990B-599A9BE4DFAA}
+		{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D} = {B7F79C96-34D2-45F2-990B-599A9BE4DFAA}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = src\NUnitFramework\tests\nunitlite.tests-2.0.csproj
