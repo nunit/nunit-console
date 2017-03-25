@@ -35,14 +35,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\nunit.engine.netstandard\nunit.engine.netstandard.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="API\" />
     <Folder Include="Internal\" />
     <Folder Include="Runners\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\mock-assembly\mock-assembly.netstandard.csproj" />
+    <ProjectReference Include="..\nunit.engine.netstandard\nunit.engine.netstandard.csproj" />
   </ItemGroup>
 
 </Project>

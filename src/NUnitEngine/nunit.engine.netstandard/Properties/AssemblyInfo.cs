@@ -1,14 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("NUnit .NET Standard Engine")]
-[assembly: AssemblyDescription("Provides a common interface for loading, exploring and running NUnit tests")]
-[assembly: AssemblyCulture("")]
-[assembly: ComVisible(false)]
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("nunit.engine.tests.netstandard, PublicKey="+
     "002400000480000094000000060200000024000052534131000400000100010031eea370b1984b" +
