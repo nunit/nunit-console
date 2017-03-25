@@ -99,7 +99,7 @@ namespace NUnit.Tests
 
             public const int Inconclusive = MockTestFixture.Inconclusive;
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             public static readonly string AssemblyPath = AssemblyHelper.GetAssemblyPath(typeof(MockAssembly).Assembly);
 #endif
         }

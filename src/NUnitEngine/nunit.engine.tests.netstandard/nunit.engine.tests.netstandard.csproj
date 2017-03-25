@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\mock-assembly\mock-assembly.netstandard.csproj" />
     <ProjectReference Include="..\nunit.engine.netstandard\nunit.engine.netstandard.csproj" />
   </ItemGroup>
 

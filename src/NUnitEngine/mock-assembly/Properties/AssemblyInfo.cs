@@ -26,6 +26,8 @@ using System.Reflection;
 // Information about this assembly is defined by the following attributes. 
 // Change them to the _values specific to your project.
 
+#if !NETSTANDARD1_6
 [assembly: AssemblyTitle("mock-assembly")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCulture("")]
+#endif
