@@ -88,9 +88,6 @@
     <Compile Include="..\nunit.engine\Runners\ITestExecutionTask.cs">
       <Link>Runners\ITestExecutionTask.cs</Link>
     </Compile>
-    <Compile Include="..\nunit.engine\Runners\ParallelTaskWorkerPool.cs">
-      <Link>Runners\ParallelTaskWorkerPool.cs</Link>
-    </Compile>
     <Compile Include="..\nunit.engine\Runners\TestEventDispatcher.cs">
       <Link>Runners\TestEventDispatcher.cs</Link>
     </Compile>

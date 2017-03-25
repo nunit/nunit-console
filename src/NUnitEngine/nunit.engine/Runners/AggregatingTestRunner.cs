@@ -148,37 +148,52 @@ namespace NUnit.Engine.Runners
 
             bool disposeRunners = TestPackage.GetSetting(EnginePackageSettings.DisposeRunners, false);
 
+#if NETSTANDARD1_3
+            RunTestsSequentially(listener, filter, results, disposeRunners);
+#else
             if (LevelOfParallelism <= 1)
             {
-                foreach (ITestEngineRunner runner in Runners)
-                {
-                    results.Add(runner.Run(listener, filter));
-                    if (disposeRunners) runner.Dispose();
-                }
+                RunTestsSequentially(listener, filter, results, disposeRunners);
             }
             else
             {
-                var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
-                var tasks = new List<TestExecutionTask>();
-
-                foreach (ITestEngineRunner runner in Runners)
-                {
-                    var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
-                    tasks.Add(task);
-                    workerPool.Enqueue(task);
-                }
-
-                workerPool.Start();
-                workerPool.WaitAll();
-
-                foreach (var task in tasks)
-                    results.Add(task.Result());
+                RunTestsInParallel(listener, filter, results, disposeRunners);
             }
-
+#endif
             if (disposeRunners) Runners.Clear();
 
             return ResultHelper.Merge(results);
         }
+
+        private void RunTestsSequentially(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
+        {
+            foreach (ITestEngineRunner runner in Runners)
+            {
+                results.Add(runner.Run(listener, filter));
+                if (disposeRunners) runner.Dispose();
+            }
+        }
+
+#if !NETSTANDARD1_3
+        private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
+        {
+            var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
+            var tasks = new List<TestExecutionTask>();
+
+            foreach (ITestEngineRunner runner in Runners)
+            {
+                var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
+                tasks.Add(task);
+                workerPool.Enqueue(task);
+            }
+
+            workerPool.Start();
+            workerPool.WaitAll();
+
+            foreach (var task in tasks)
+                results.Add(task.Result());
+        }
+#endif
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
@@ -200,7 +215,7 @@ namespace NUnit.Engine.Runners
             Runners.Clear();
         }
 
-        #endregion
+#endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {
