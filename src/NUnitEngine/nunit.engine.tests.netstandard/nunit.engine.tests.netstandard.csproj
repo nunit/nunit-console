@@ -21,6 +21,7 @@
     <Compile Include="..\nunit.engine.tests\Internal\PathUtilTests.cs" Link="Internal\PathUtilTests.cs" />
     <Compile Include="..\nunit.engine.tests\Internal\SettingsGroupTests.cs" Link="Internal\SettingsGroupTests.cs" />
     <Compile Include="..\nunit.engine.tests\Runners\MasterTestRunnerTests.cs" Link="Runners\MasterTestRunnerTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Services\ResultServiceTests.cs" Link="Services\ResultServiceTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,8 +35,8 @@
 
   <ItemGroup>
     <Folder Include="Internal\" />
-    <Folder Include="Runners\" />
     <Folder Include="Services\" />
+    <Folder Include="Runners\" />
   </ItemGroup>
 
   <ItemGroup>

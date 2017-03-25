@@ -28,9 +28,11 @@
     <Compile Include="..\nunit.engine.api\Extensibility\IFrameworkDriver.cs">
       <Link>Extensibility\IFrameworkDriver.cs</Link>
     </Compile>
+    <Compile Include="..\nunit.engine.api\Extensibility\IResultWriter.cs" Link="Extensibility\IResultWriter.cs" />
     <Compile Include="..\nunit.engine.api\ILogger.cs">
       <Link>ILogger.cs</Link>
     </Compile>
+    <Compile Include="..\nunit.engine.api\IResultService.cs" Link="IResultService.cs" />
     <Compile Include="..\nunit.engine.api\ISettings.cs">
       <Link>ISettings.cs</Link>
     </Compile>
@@ -94,6 +96,9 @@
     <Compile Include="..\nunit.engine\Runners\TestExecutionTask.cs">
       <Link>Runners\TestExecutionTask.cs</Link>
     </Compile>
+    <Compile Include="..\nunit.engine\Services\ResultService.cs" Link="Services\ResultService.cs" />
+    <Compile Include="..\nunit.engine\Services\ResultWriters\NUnit3XmlResultWriter.cs" Link="Services\ResultWriters\NUnit3XmlResultWriter.cs" />
+    <Compile Include="..\nunit.engine\Services\ResultWriters\TestCaseResultWriter.cs" Link="Services\ResultWriters\TestCaseResultWriter.cs" />
     <Compile Include="..\nunit.engine\TestEngineResult.cs">
       <Link>TestEngineResult.cs</Link>
     </Compile>
@@ -150,5 +155,8 @@
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
     <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\ResultWriters\" />
   </ItemGroup>
 </Project>
