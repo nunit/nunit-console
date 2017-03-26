@@ -36,6 +36,7 @@
     <Compile Include="..\nunit.engine.api\ISettings.cs">
       <Link>ISettings.cs</Link>
     </Compile>
+    <Compile Include="..\nunit.engine.api\TestSelectionParserException.cs" Link="TestSelectionParserException.cs" />
     <Compile Include="..\nunit.engine\Drivers\NotRunnableFrameworkDriver.cs">
       <Link>Drivers\NotRunnableFrameworkDriver.cs</Link>
     </Compile>
@@ -99,6 +100,10 @@
     <Compile Include="..\nunit.engine\Services\ResultService.cs" Link="Services\ResultService.cs" />
     <Compile Include="..\nunit.engine\Services\ResultWriters\NUnit3XmlResultWriter.cs" Link="Services\ResultWriters\NUnit3XmlResultWriter.cs" />
     <Compile Include="..\nunit.engine\Services\ResultWriters\TestCaseResultWriter.cs" Link="Services\ResultWriters\TestCaseResultWriter.cs" />
+    <Compile Include="..\nunit.engine\Services\TestFilterBuilder.cs" Link="Services\TestFilterBuilder.cs" />
+    <Compile Include="..\nunit.engine\Services\TestFilterService.cs" Link="Services\TestFilterService.cs" />
+    <Compile Include="..\nunit.engine\Services\TestSelectionParser.cs" Link="Services\TestSelectionParser.cs" />
+    <Compile Include="..\nunit.engine\Services\Tokenizer.cs" Link="Services\Tokenizer.cs" />
     <Compile Include="..\nunit.engine\TestEngineResult.cs">
       <Link>TestEngineResult.cs</Link>
     </Compile>

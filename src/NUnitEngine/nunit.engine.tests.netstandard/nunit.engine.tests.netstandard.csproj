@@ -22,6 +22,10 @@
     <Compile Include="..\nunit.engine.tests\Internal\SettingsGroupTests.cs" Link="Internal\SettingsGroupTests.cs" />
     <Compile Include="..\nunit.engine.tests\Runners\MasterTestRunnerTests.cs" Link="Runners\MasterTestRunnerTests.cs" />
     <Compile Include="..\nunit.engine.tests\Services\ResultServiceTests.cs" Link="Services\ResultServiceTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Services\TestFilterBuilderTests.cs" Link="Services\TestFilterBuilderTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Services\TestFilteringTests.cs" Link="Services\TestFilteringTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Services\TestSelectionParserTests.cs" Link="Services\TestSelectionParserTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Services\TokenizerTests.cs" Link="Services\TokenizerTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
