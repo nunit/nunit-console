@@ -224,7 +224,7 @@ namespace NUnit.Common
                             break;
                         }
 
-                        if (!string.IsNullOrEmpty(linesEnumerator.Current))
+                        if (!string.IsNullOrEmpty(linesEnumerator.Current) && linesEnumerator.Current[0] != '#')
                         {
                             yield return linesEnumerator.Current;
                         }
