@@ -36,13 +36,20 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class TestEventHandler : MarshalByRefObject, ITestEventListener
     {
-        private readonly string _displayLabels;
         private readonly TextWriter _outWriter;
 
-        public TestEventHandler(TextWriter outWriter, string displayLabels)
+        private readonly bool _displayBeforeTest;
+        private readonly bool _displayAfterTest;
+        private readonly bool _displayBeforeOutput;
+
+        public TestEventHandler(TextWriter outWriter, string labelsOption)
         {
-            _displayLabels = displayLabels.ToUpperInvariant();
             _outWriter = outWriter;
+
+            labelsOption = labelsOption.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+            _displayBeforeTest = labelsOption == "ALL" || labelsOption == "BEFORE";
+            _displayAfterTest = labelsOption == "AFTER";
+            _displayBeforeOutput = _displayBeforeTest || _displayAfterTest || labelsOption == "ON";
         }
 
         #region ITestEventHandler Members
@@ -81,22 +88,26 @@ namespace NUnit.ConsoleRunner
         {
             var testName = testResult.Attributes["fullname"].Value;
 
-            if (_displayLabels == "ALL")
+            if (_displayBeforeTest)
                 WriteLabelLine(testName);
         }
 
         private void TestFinished(XmlNode testResult)
         {
             var testName = testResult.Attributes["fullname"].Value;
+            var status = testResult.GetAttribute("label") ?? testResult.GetAttribute("result");
             var outputNode = testResult.SelectSingleNode("output");
 
             if (outputNode != null)
             {
-                if (_displayLabels == "ON")
+                if (_displayBeforeOutput)
                     WriteLabelLine(testName);
 
                 WriteOutputLine(outputNode.InnerText);
             }
+
+            if (_displayAfterTest)
+                WriteLabelLineAfterTest(testName, status);
         }
 
         private void SuiteFinished(XmlNode testResult)
@@ -106,7 +117,7 @@ namespace NUnit.ConsoleRunner
 
             if (outputNode != null)
             {
-                if (_displayLabels == "ON")
+                if (_displayBeforeOutput)
                     WriteLabelLine(suiteName);
 
                 WriteOutputLine(outputNode.InnerText);
@@ -118,7 +129,7 @@ namespace NUnit.ConsoleRunner
             var testName = outputNode.GetAttribute("testname");
             var stream = outputNode.GetAttribute("stream");
 
-            if (_displayLabels == "ON" && testName != null)
+            if (_displayBeforeOutput && testName != null)
                 WriteLabelLine(testName);
 
             WriteOutputLine(outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
@@ -137,6 +148,18 @@ namespace NUnit.ConsoleRunner
             }
         }
 
+        private void WriteLabelLineAfterTest(string label, string status)
+        {
+            if (status != null)
+                using (new ColorConsole(GetColorForResultStatus(status)))
+                    _outWriter.Write("{0} ", status);
+
+            using (new ColorConsole(ColorStyle.SectionHeader))
+                _outWriter.WriteLine("=> {0}", label);
+
+            _currentLabel = label;
+        }
+
         private void WriteOutputLine(string text)
         {
             WriteOutputLine(text, ColorStyle.Output);
@@ -153,6 +176,26 @@ namespace NUnit.ConsoleRunner
                 {
                     _outWriter.WriteLine();
                 }
+            }
+        }
+
+        private static ColorStyle GetColorForResultStatus(string status)
+        {
+            switch (status)
+            {
+                case "Passed":
+                    return ColorStyle.Pass;
+                case "Failed":
+                    return ColorStyle.Failure;
+                case "Error":
+                case "Invalid":
+                case "Cancelled":
+                    return ColorStyle.Error;
+                case "Warning":
+                case "Ignored":
+                    return ColorStyle.Warning;
+                default:
+                    return ColorStyle.Output;
             }
         }
 
