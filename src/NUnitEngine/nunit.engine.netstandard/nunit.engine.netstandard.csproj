@@ -4,6 +4,7 @@
     <RootNamespace>NUnit.Engine</RootNamespace>
     <AssemblyName>nunit.engine.netstandard</AssemblyName>
     <IntermediateOutputPath>obj\$(Configuration)\netstandard\</IntermediateOutputPath>
+    <PackageVersion Condition=" '$(PackageVersion)' == '' ">3.7.0-dev</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -13,7 +14,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Company>NUnit Software</Company>
     <Authors>Charlie Poole</Authors>
-    <Version>3.7.0-alpha1</Version>
+    <Version>$(PackageVersion)</Version>
     <Product>NUnit 3.0</Product>
     <Copyright>Copyright (C) 2017 Charlie Poole</Copyright>
     <Description>Provides a common interface for loading, exploring and running NUnit tests using .NET Standard</Description>
