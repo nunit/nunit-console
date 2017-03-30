@@ -12,12 +12,16 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Company>NUnit Software</Company>
-    <Authors>Charlie Poole</Authors>
-    <Version>$(PackageVersion)</Version>
-    <Product>NUnit 3.0</Product>
-    <Copyright>Copyright (C) 2017 Charlie Poole</Copyright>
-    <Description>Provides a common interface for loading, exploring and running NUnit tests using .NET Standard</Description>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>    
+    <Version>$(PackageVersion)</Version>    
     <PackageLicenseUrl>http://nunit.org/nuget/nunit3-license.txt</PackageLicenseUrl>
     <PackageProjectUrl>http://nunit.org</PackageProjectUrl>
     <PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</PackageIconUrl>
@@ -26,6 +30,8 @@
     <PackageTags>nunit test testing tdd engine</PackageTags>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
     <Compile Include="..\nunit.engine.api\Extensibility\IFrameworkDriver.cs">
       <Link>Extensibility\IFrameworkDriver.cs</Link>
     </Compile>
@@ -83,6 +89,7 @@
     <Compile Include="..\nunit.engine\ITestRunnerFactory.cs">
       <Link>ITestRunnerFactory.cs</Link>
     </Compile>
+    <Compile Include="..\nunit.engine\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\nunit.engine\Runners\AbstractTestRunner.cs">
       <Link>Runners\AbstractTestRunner.cs</Link>
     </Compile>

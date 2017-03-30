@@ -6,20 +6,27 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
-    <Authors>Charlie Poole</Authors>
-    <Company>NUnit Software</Company>
-    <Product>NUnit 3.0</Product>
-    <Description>Tests of the NUnit .NET Standard Engine</Description>
-    <Version>3.7.0</Version>
-    <Copyright>Copyright (C) 2017 Charlie Poole</Copyright>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <Version>$(PackageVersion)</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
     <Compile Include="..\nunit.engine.tests\Api\TestFilterTests.cs" Link="API\TestFilterTests.cs" />
     <Compile Include="..\nunit.engine.tests\Drivers\NotRunnableFrameworkDriverTests.cs" Link="Drivers\NotRunnableFrameworkDriverTests.cs" />
     <Compile Include="..\nunit.engine.tests\Internal\DirectoryFinderTests.cs" Link="Internal\DirectoryFinderTests.cs" />
     <Compile Include="..\nunit.engine.tests\Internal\PathUtilTests.cs" Link="Internal\PathUtilTests.cs" />
     <Compile Include="..\nunit.engine.tests\Internal\SettingsGroupTests.cs" Link="Internal\SettingsGroupTests.cs" />
+    <Compile Include="..\nunit.engine.tests\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\nunit.engine.tests\Runners\MasterTestRunnerTests.cs" Link="Runners\MasterTestRunnerTests.cs" />
     <Compile Include="..\nunit.engine.tests\Services\ResultServiceTests.cs" Link="Services\ResultServiceTests.cs" />
     <Compile Include="..\nunit.engine.tests\Services\TestFilterBuilderTests.cs" Link="Services\TestFilterBuilderTests.cs" />
