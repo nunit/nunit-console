@@ -418,7 +418,12 @@ Task("PackageNetStandardEngine")
     {
         if(IsDotNetCoreInstalled)
         {
-            CopyFile("src/NUnitEngine/nunit.engine.netstandard/bin/"+configuration+"/nunit.engine.netstandard."+packageVersion+".nupkg", PACKAGE_DIR);
+            var nuget = "nunit.engine.netstandard." + packageVersion + ".nupkg";
+            var src   = "src/NUnitEngine/nunit.engine.netstandard/bin/" + configuration + "/" + nuget;
+            var dest  = PACKAGE_DIR + nuget;
+
+            CreateDirectory(PACKAGE_DIR);
+            CopyFile(src, dest);
         }
     });
 
