@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace nunit.engine.tests.netstandard
+namespace NUnit.Engine.Tests
 {
     class Program
     {
