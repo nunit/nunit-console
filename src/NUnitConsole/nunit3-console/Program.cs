@@ -243,7 +243,7 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      If --explore is used without any specification following, a list of");
                 OutWriter.WriteLine("      test cases is output to the writer.");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      If none of the options {--result, --explore, --noxml} is used,");
+                OutWriter.WriteLine("      If none of the options {--result, --explore, --noresult} is used,");
                 OutWriter.WriteLine("      NUnit saves the results to TestResult.xml in nunit3 format");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      Any transforms provided must handle input in the native nunit3 format.");
