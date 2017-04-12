@@ -105,6 +105,22 @@ namespace NUnit.Engine.Drivers.Tests
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
         }
+
+        [TestCase("<filter><cat>MockCategory</cat></filter>")]
+        [TestCase("<filter><cat>FixtureCategory</cat></filter>")]
+        [TestCase("<filter><or><cat>MockCategory</cat><cat>FixtureCategory</cat></or></filter>")]
+        [TestCase("<filter><and><cat>MockCategory</cat><cat>FixtureCategory</cat></and></filter>")]
+        [TestCase("<filter><not><cat>MockCategory</cat></not></filter>")]
+        [TestCase("<filter><and><not><cat>MockCategory</cat></not><not><cat>FixtureCategory</cat></not></and></filter>")]
+        public void Explore_WithCatagoryFilter_ReturnsFilteredSuite(string categoryFilter)
+        {
+            _driver.Load(_mockAssemblyPath, _settings);
+            var result = XmlHelper.CreateXmlNode(_driver.Explore(categoryFilter));
+
+            var testCaseCount = result.SelectNodes("//test-case").Count;
+
+            Assert.That(_driver.CountTestCases(categoryFilter), Is.EqualTo(testCaseCount), "Explore did not return expected test count");
+        }
         #endregion
 
         #region CountTests
