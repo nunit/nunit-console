@@ -87,11 +87,17 @@ Task("InitializeBuild")
     .Description("Initializes the build")
     .Does(() =>
     {
+        // Nuget on some Travis boxes is not able to restore the solution
+        var settings = new NuGetRestoreSettings { Source = PACKAGE_SOURCE };
+        var nuget4 = PROJECT_DIR + "tools/nuget.exe";
+        if(System.IO.File.Exists(nuget4))
+        {
+            Information("Using Nuget.exe from tools directory");
+            settings.ToolPath = nuget4;
+        }
+
         Information("Restoring NuGet packages");
-		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
-		{
-			Source = PACKAGE_SOURCE
-		});
+		NuGetRestore(SOLUTION_FILE, settings);
 
         if(IsDotNetCoreInstalled && !TravisCI.IsRunningOnTravisCI)
         {
