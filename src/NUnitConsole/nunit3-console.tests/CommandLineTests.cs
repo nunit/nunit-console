@@ -103,6 +103,9 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("testfile.dll @file1.txt --arg2",
             "file1.txt:--where\n    \"test == somelongname or\ntest == /another long name/ or\ncat == SomeCategory\"",
             "testfile.dll", "--where", "test == somelongname or test == /another long name/ or cat == SomeCategory", "--arg2")]
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where\n    \"test == somelongname ||\ntest == /another long name/ ||\ncat == SomeCategory\"",
+            "testfile.dll", "--where", "test == somelongname || test == /another long name/ || cat == SomeCategory", "--arg2")]
         public void GetArgsFromFiles(string commandline, string files, params string[] expectedArgs)
         {
             // Given
