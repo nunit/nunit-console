@@ -94,7 +94,7 @@ Task("InitializeBuild")
             Verbosity = NuGetVerbosity.Detailed
         });
 
-        if(IsDotNetCoreInstalled && !TravisCI.IsRunningOnTravisCI)
+        if(IsDotNetCoreInstalled && IsRunningOnWindows())
         {
             Information("Restoring .NET Core packages");
             DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
@@ -168,7 +168,7 @@ Task("BuildEngine")
 Task("BuildNetStandardEngine")
     .Description("Builds the .NET Standard engine")
     .IsDependentOn("InitializeBuild")
-    .WithCriteria(!TravisCI.IsRunningOnTravisCI)
+    .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
         if(IsDotNetCoreInstalled)
@@ -265,7 +265,7 @@ Task("TestConsole")
 Task("TestNetStandardEngine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("BuildNetStandardEngine")
-    .WithCriteria(!TravisCI.IsRunningOnTravisCI)
+    .WithCriteria(IsRunningOnWindows())
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
@@ -417,7 +417,7 @@ Task("PackageConsole")
 
 Task("PackageNetStandardEngine")
     .Description("Copies the .NET Standard Engine nuget package in the packages directory")
-    .WithCriteria(!TravisCI.IsRunningOnTravisCI)
+    .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
         if(IsDotNetCoreInstalled)
