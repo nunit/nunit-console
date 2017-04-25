@@ -249,7 +249,7 @@ namespace NUnit.Common
 
             foreach (var line in _fileSystem.ReadLines(filename))
             {
-                if (!string.IsNullOrEmpty(line) && line[0] != '#')
+                if (!string.IsNullOrEmpty(line) && line[0] != '#' && line.Trim().Length > 0)
                 {
                     if (sb.Length > 0)
                         sb.Append(' ');
