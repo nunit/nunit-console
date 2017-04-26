@@ -131,6 +131,7 @@ namespace NUnit.Engine.Runners.Tests
         private class NoOpTask : ITestExecutionTask
         {
             public void Execute() { }
+            public TestEngineResult Result() { return null; }
         }
 
         private enum BusyTaskState
@@ -162,6 +163,8 @@ namespace NUnit.Engine.Runners.Tests
             {
                 _semaphore.Release(1);
             }
+
+            public TestEngineResult Result() { return null; }
         }
     }
 }

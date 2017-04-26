@@ -21,16 +21,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace NUnit.Engine.Runners
 {
-    public interface ITestExecutionTask
+    public class TestLoadTask : ITestExecutionTask
     {
-        void Execute();
+        private volatile TestEngineResult _result;
+        private readonly ITestEngineRunner _runner;
 
-        TestEngineResult Result();
+        public TestLoadTask(ITestEngineRunner runner)
+        {
+            _runner = runner;
+        }
+
+        public void Execute()
+        {
+            _result = _runner.Load();
+        }
+
+        public TestEngineResult Result()
+        {
+            return _result;
+        }
     }
 }
