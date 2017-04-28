@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -78,11 +78,11 @@ namespace NUnit.Engine.Internal.Tests
 				PathUtils.Canonicalize( @"C:\folder1\.\folder2\..\file.tmp" ) );
 			Assert.AreEqual( @"folder1\file.tmp",
 				PathUtils.Canonicalize( @"folder1\.\folder2\..\file.tmp" ) );
-			Assert.AreEqual( @"folder1\file.tmp", 
+			Assert.AreEqual( @"folder1\file.tmp",
 				PathUtils.Canonicalize( @"folder1\folder2\.\..\file.tmp" ) );
-			Assert.AreEqual( @"file.tmp", 
+			Assert.AreEqual( @"file.tmp",
 				PathUtils.Canonicalize( @"folder1\folder2\..\.\..\file.tmp" ) );
-			Assert.AreEqual( @"file.tmp", 
+			Assert.AreEqual( @"file.tmp",
 				PathUtils.Canonicalize( @"folder1\folder2\..\..\..\file.tmp" ) );
 		}
 
@@ -91,7 +91,7 @@ namespace NUnit.Engine.Internal.Tests
 		[Platform(Exclude="Linux,UNIX,MacOSX")]
         public void RelativePath()
 		{
-			Assert.AreEqual( @"folder2\folder3", PathUtils.RelativePath( 
+			Assert.AreEqual( @"folder2\folder3", PathUtils.RelativePath(
 				@"c:\folder1", @"c:\folder1\folder2\folder3" ) );
 			Assert.AreEqual( @"..\folder2\folder3", PathUtils.RelativePath(
 				@"c:\folder1", @"c:\folder2\folder3" ) );
@@ -111,11 +111,11 @@ namespace NUnit.Engine.Internal.Tests
             // First filePath consisting just of a root:
             Assert.AreEqual(@"folder1\folder2", PathUtils.RelativePath(
                 @"C:\", @"C:\folder1\folder2"));
-            
+
             // Trailing directory separator in first filePath shall be ignored:
             Assert.AreEqual(@"folder2\folder3", PathUtils.RelativePath(
                 @"c:\folder1\", @"c:\folder1\folder2\folder3"));
-            
+
             // Case-insensitive behavior, preserving 2nd filePath directories in result:
             Assert.AreEqual(@"Folder2\Folder3", PathUtils.RelativePath(
                 @"C:\folder1", @"c:\folder1\Folder2\Folder3"));
@@ -164,24 +164,24 @@ namespace NUnit.Engine.Internal.Tests
 				PathUtils.Canonicalize( "/folder1/./folder2/../file.tmp" ) );
 			Assert.AreEqual( "folder1/file.tmp",
 				PathUtils.Canonicalize( "folder1/./folder2/../file.tmp" ) );
-			Assert.AreEqual( "folder1/file.tmp", 
+			Assert.AreEqual( "folder1/file.tmp",
 				PathUtils.Canonicalize( "folder1/folder2/./../file.tmp" ) );
-			Assert.AreEqual( "file.tmp", 
+			Assert.AreEqual( "file.tmp",
 				PathUtils.Canonicalize( "folder1/folder2/.././../file.tmp" ) );
-			Assert.AreEqual( "file.tmp", 
+			Assert.AreEqual( "file.tmp",
 				PathUtils.Canonicalize( "folder1/folder2/../../../file.tmp" ) );
 		}
 
 		[Test]
 		public void RelativePath()
 		{
-			Assert.AreEqual( "folder2/folder3", 
+			Assert.AreEqual( "folder2/folder3",
 				PathUtils.RelativePath(	"/folder1", "/folder1/folder2/folder3" ) );
-			Assert.AreEqual( "../folder2/folder3", 
+			Assert.AreEqual( "../folder2/folder3",
 				PathUtils.RelativePath( "/folder1", "/folder2/folder3" ) );
-			Assert.AreEqual( "bin/debug", 
+			Assert.AreEqual( "bin/debug",
 				PathUtils.RelativePath( "/folder1", "bin/debug" ) );
-			Assert.AreEqual( "../other/folder", 
+			Assert.AreEqual( "../other/folder",
 				PathUtils.RelativePath( "/folder", "/other/folder" ) );
 			Assert.AreEqual( "../../d",
 				PathUtils.RelativePath( "/a/b/c", "/a/d" ) );
@@ -189,15 +189,15 @@ namespace NUnit.Engine.Internal.Tests
                 PathUtils.RelativePath("/a/b", "/a/b"));
             Assert.AreEqual(string.Empty,
                 PathUtils.RelativePath("/", "/"));
-            
+
             // First filePath consisting just of a root:
             Assert.AreEqual("folder1/folder2", PathUtils.RelativePath(
                 "/", "/folder1/folder2"));
-            
+
             // Trailing directory separator in first filePath shall be ignored:
             Assert.AreEqual("folder2/folder3", PathUtils.RelativePath(
                 "/folder1/", "/folder1/folder2/folder3"));
-            
+
             // Case-sensitive behavior:
             Assert.AreEqual("../Folder1/Folder2/folder3",
                 PathUtils.RelativePath("/folder1", "/Folder1/Folder2/folder3"),

@@ -3,7 +3,6 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <AssemblyName>nunit.engine.netstandard</AssemblyName>
-    <IntermediateOutputPath>obj\$(Configuration)\netstandard\</IntermediateOutputPath>
     <PackageVersion Condition=" '$(PackageVersion)' == '' ">3.7.0-dev</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -12,16 +11,8 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>    
-    <Version>$(PackageVersion)</Version>    
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Version>$(PackageVersion)</Version>
     <PackageLicenseUrl>http://nunit.org/nuget/nunit3-license.txt</PackageLicenseUrl>
     <PackageProjectUrl>http://nunit.org</PackageProjectUrl>
     <PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</PackageIconUrl>
