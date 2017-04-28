@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,40 +21,36 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using NUnit.Engine.Internal;
 using System;
-using System.Xml;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace NUnit.Engine
 {
     /// <summary>
-    /// ITestEngine represents an instance of the test engine.
-    /// Clients wanting to discover, explore or run tests start
-    /// require an instance of the engine, which is generally 
-    /// acquired from the TestEngineActivator class.
+    /// The TestEngine provides services that allow a client
+    /// program to interact with NUnit in order to explore,
+    /// load and run tests.
     /// </summary>
-    public interface ITestEngine : IDisposable
+    public class TestEngine : ITestEngine
     {
-#if !NETSTANDARD1_3
-        /// <summary>
-        /// Gets the IServiceLocator interface, which gives access to
-        /// certain services provided by the engine.
-        /// </summary>
-        IServiceLocator Services { get; }
-#endif
+        public TestEngine()
+        {
+            WorkDirectory = Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "Home");
+            InternalTraceLevel = InternalTraceLevel.Default;
+        }
 
-        /// <summary>
-        /// Gets and sets the directory path used by the engine for saving files.
-        /// Some services may ignore changes to this path made after initialization.
-        /// The default value is the current directory.
-        /// </summary>
-        string WorkDirectory { get; set;  }
+        #region Public Properties
 
-        /// <summary>
-        /// Gets and sets the InternalTraceLevel used by the engine. Changing this
-        /// setting after initialization will have no effect. The default value
-        /// is the value saved in the NUnit settings.
-        /// </summary>
-        InternalTraceLevel InternalTraceLevel { get; set; }
+        public string WorkDirectory { get; set; }
+
+        public InternalTraceLevel InternalTraceLevel { get; set; }
+
+        #endregion
+
+        #region ITestEngine Members
 
         /// <summary>
         /// Initialize the engine. This includes initializing mono addins,
@@ -67,14 +63,46 @@ namespace NUnit.Engine
         /// that link directly to nunit.engine usually do so
         /// in order to perform custom initialization.
         /// </summary>
-        void Initialize();
+        public void Initialize()
+        {
+            if (InternalTraceLevel != InternalTraceLevel.Off && !InternalTrace.Initialized)
+            {
+                var logName = string.Format("InternalTrace.{0}.log", Process.GetCurrentProcess().Id);
+                InternalTrace.Initialize(Path.Combine(WorkDirectory, logName), InternalTraceLevel);
+            }
+        }
 
         /// <summary>
-        /// Returns a test runner instance for use by clients in discovering,
-        /// exploring and executing tests.
+        /// Returns a test runner for use by clients that need to load the
+        /// tests once and run them multiple times. If necessary, the
+        /// services are initialized first.
         /// </summary>
-        /// <param name="package">The TestPackage for which the runner is intended.</param>
         /// <returns>An ITestRunner.</returns>
-        ITestRunner GetRunner(TestPackage package);
+        public ITestRunner GetRunner(TestPackage package)
+        {
+            return new Runners.MasterTestRunner(package);
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        private bool _disposed = false;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                _disposed = true;
+            }
+        }
+
+        #endregion
     }
 }

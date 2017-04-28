@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <RootNamespace>NUnit.Tests</RootNamespace>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>mock-assembly</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Version>$(PackageVersion)</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\nunit.snk">
+      <Link>nunit.snk</Link>
+    </None>
+  </ItemGroup>
+</Project>

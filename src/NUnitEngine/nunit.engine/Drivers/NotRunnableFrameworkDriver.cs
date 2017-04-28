@@ -24,6 +24,7 @@
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Extensibility;
+using System.Reflection;
 
 namespace NUnit.Engine.Drivers
 {
@@ -65,6 +66,7 @@ namespace NUnit.Engine.Drivers
 
         public string ID { get; set; }
 
+        
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
             return GetLoadResult();

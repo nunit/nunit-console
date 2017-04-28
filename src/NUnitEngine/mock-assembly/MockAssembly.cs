@@ -99,7 +99,9 @@ namespace NUnit.Tests
 
             public const int Inconclusive = MockTestFixture.Inconclusive;
 
+#if !NETSTANDARD1_6
             public static readonly string AssemblyPath = AssemblyHelper.GetAssemblyPath(typeof(MockAssembly).Assembly);
+#endif
         }
 
         [TestFixture(Description="Fake Test Fixture")]
