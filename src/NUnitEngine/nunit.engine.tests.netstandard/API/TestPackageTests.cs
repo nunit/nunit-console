@@ -43,7 +43,7 @@ namespace NUnit.Engine.Api.Tests
         }
 
         [Test]
-        public void AssemblyPathIsUsedAsFilePath()
+        public void AssemblyPathIsUsedAsFullName()
         {
             Assert.AreEqual(@"c:\test.dll", package.FullName);
         }
