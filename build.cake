@@ -16,7 +16,7 @@ var ErrorDetail = new List<string>();
 //////////////////////////////////////////////////////////////////////
 
 var version = "3.7.0";
-var modifier = "-alpha1";
+var modifier = "";
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
@@ -56,6 +56,37 @@ bool IsDotNetCoreInstalled = false;
 //////////////////////////////////////////////////////////////////////
 Setup(context =>
 {
+    if (BuildSystem.IsRunningOnAppVeyor)
+    {
+        var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
+        var branch = AppVeyor.Environment.Repository.Branch;
+        var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
+
+        if (branch == "master" && !isPullRequest)
+        {
+            packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+        }
+        else
+        {
+            var suffix = "-ci-" + buildNumber + dbgSuffix;
+
+            if (isPullRequest)
+                suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
+            else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+                suffix += "-pre-" + buildNumber;
+            else
+                suffix += "-" + branch;
+
+            // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
+            if (suffix.Length > 21)
+                suffix = suffix.Substring(0, 21);
+
+            packageVersion = version + suffix;
+        }
+
+        AppVeyor.UpdateBuildVersion(packageVersion);
+    }
+
     // Executed BEFORE the first task.
     Information("Building version {0} of NUnit.", packageVersion);
     IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
@@ -99,46 +130,6 @@ Task("InitializeBuild")
             Information("Restoring .NET Core packages");
             DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
         }
-
-		if (BuildSystem.IsRunningOnAppVeyor)
-		{
-			var tag = AppVeyor.Environment.Repository.Tag;
-
-			if (tag.IsTag)
-			{
-				packageVersion = tag.Name;
-			}
-			else
-			{
-				var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
-				var branch = AppVeyor.Environment.Repository.Branch;
-				var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
-
-				if (branch == "master" && !isPullRequest)
-				{
-					packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
-				}
-				else
-				{
-				    var suffix = "-ci-" + buildNumber + dbgSuffix;
-
-					if (isPullRequest)
-						suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
-					else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-						suffix += "-pre-" + buildNumber;
-					else
-						suffix += "-" + branch;
-
-					// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-					if (suffix.Length > 21)
-						suffix = suffix.Substring(0, 21);
-
-					packageVersion = version + suffix;
-				}
-			}
-
-			AppVeyor.UpdateBuildVersion(packageVersion);
-		}
 	});
 
 //////////////////////////////////////////////////////////////////////
