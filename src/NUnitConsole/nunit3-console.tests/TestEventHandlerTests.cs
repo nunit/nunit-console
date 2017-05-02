@@ -213,6 +213,12 @@ namespace NUnit.ConsoleRunner.Tests
             string.Format("<test-case fullname='TEST1' result='Passed'><output>Output{0}from{0}TEST1</output></test-case>", Environment.NewLine)
         };
 
+        static string[] SingleTest_SuiteFinish = new string[]
+        {
+            "<test-output testname='TEST1'>Immediate output from TEST1</test-output>",
+            string.Format("<test-suite fullname='TEST1' result='Passed'><output>Output from Suite TEST1</output></test-suite>")
+        };
+
         static string[] TwoTests_SequentialExecution = new string[]
         {
             "<start-test fullname='TEST1'/>",
@@ -305,6 +311,35 @@ from
 TEST1
 Passed => TEST1
 "),
+            new TestCaseData(
+                SingleTest_SuiteFinish,
+                "Off",
+@"Immediate output from TEST1
+Output from Suite TEST1"),
+            new TestCaseData(
+                SingleTest_SuiteFinish,
+                "On",
+@"=> TEST1
+Immediate output from TEST1
+Output from Suite TEST1"),
+            new TestCaseData(
+                SingleTest_SuiteFinish,
+                "All",
+@"=> TEST1
+Immediate output from TEST1
+Output from Suite TEST1"),
+            new TestCaseData(
+                SingleTest_SuiteFinish,
+                "Before",
+@"=> TEST1
+Immediate output from TEST1
+Output from Suite TEST1"),
+            new TestCaseData(
+                SingleTest_SuiteFinish,
+                "After",
+@"=> TEST1
+Immediate output from TEST1
+Output from Suite TEST1"),
             new TestCaseData(
                 TwoTests_SequentialExecution,
                 "Off",
