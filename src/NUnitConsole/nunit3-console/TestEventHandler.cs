@@ -42,6 +42,9 @@ namespace NUnit.ConsoleRunner
         private readonly bool _displayAfterTest;
         private readonly bool _displayBeforeOutput;
 
+        private string _lastTestOutput;
+        private bool _wantNewLine = false;
+
         public TestEventHandler(TextWriter outWriter, string labelsOption)
         {
             _outWriter = outWriter;
@@ -103,7 +106,8 @@ namespace NUnit.ConsoleRunner
                 if (_displayBeforeOutput)
                     WriteLabelLine(testName);
 
-                WriteOutputLine(outputNode.InnerText);
+                FlushNewLineIfNeeded();
+                WriteOutputLine(testName, outputNode.InnerText);
             }
 
             if (_displayAfterTest)
@@ -120,7 +124,8 @@ namespace NUnit.ConsoleRunner
                 if (_displayBeforeOutput)
                     WriteLabelLine(suiteName);
 
-                WriteOutputLine(outputNode.InnerText);
+                FlushNewLineIfNeeded();
+                WriteOutputLine(suiteName, outputNode.InnerText);
             }
         }
 
@@ -132,7 +137,7 @@ namespace NUnit.ConsoleRunner
             if (_displayBeforeOutput && testName != null)
                 WriteLabelLine(testName);
 
-            WriteOutputLine(outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
+            WriteOutputLine(testName, outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
         }
 
         private string _currentLabel;
@@ -141,6 +146,9 @@ namespace NUnit.ConsoleRunner
         {
             if (label != _currentLabel)
             {
+                FlushNewLineIfNeeded();
+                _lastTestOutput = label;
+
                 using (new ColorConsole(ColorStyle.SectionHeader))
                     _outWriter.WriteLine("=> {0}", label);
 
@@ -150,6 +158,9 @@ namespace NUnit.ConsoleRunner
 
         private void WriteLabelLineAfterTest(string label, string status)
         {
+            FlushNewLineIfNeeded();
+            _lastTestOutput = label;
+
             if (status != null)
                 using (new ColorConsole(GetColorForResultStatus(status)))
                     _outWriter.Write("{0} ", status);
@@ -160,22 +171,37 @@ namespace NUnit.ConsoleRunner
             _currentLabel = label;
         }
 
-        private void WriteOutputLine(string text)
+        private void WriteOutputLine(string testName, string text)
         {
-            WriteOutputLine(text, ColorStyle.Output);
+            WriteOutputLine(testName, text, ColorStyle.Output);
         }
 
-        private void WriteOutputLine(string text, ColorStyle color)
+        private void WriteOutputLine(string testName, string text, ColorStyle color)
         {
             using (new ColorConsole(color))
             {
+                if (_lastTestOutput != testName)
+                {
+                    FlushNewLineIfNeeded();
+                    _lastTestOutput = testName;
+                }
+
                 _outWriter.Write(text);
 
-                // Some labels were being shown on the same line as the previous output
+                // If the text we just wrote did not have a new line, flag that we should eventually emit one.
                 if (!text.EndsWith("\n"))
                 {
-                    _outWriter.WriteLine();
+                    _wantNewLine = true;
                 }
+            }
+        }
+
+        private void FlushNewLineIfNeeded()
+        {
+            if (_wantNewLine)
+            {
+                _outWriter.WriteLine();
+                _wantNewLine = false;
             }
         }
 
