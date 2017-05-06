@@ -121,20 +121,7 @@ namespace NUnit.Engine.Drivers
             CallbackHandler handler = new RunTestsCallbackHandler(listener);
 
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
-
-            try
-            {
-                CreateObject(RUN_ACTION, _frameworkController, filter, handler);
-            }
-            catch (TargetInvocationException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    throw new NUnitEngineException(ex.InnerException.Message);
-                }
-
-                throw;
-            }
+            CreateObject(RUN_ACTION, _frameworkController, filter, handler);
 
             return handler.Result;
         }
@@ -175,13 +162,20 @@ namespace NUnit.Engine.Drivers
 
         private object CreateObject(string typeName, params object[] args)
         {
-            return _testDomain.CreateInstanceAndUnwrap(
-                NUNIT_FRAMEWORK, typeName, false, 0,
+            try
+            {
+                return _testDomain.CreateInstanceAndUnwrap(
+                    NUNIT_FRAMEWORK, typeName, false, 0,
 #if !NET_4_0
-                null, args, null, null, null );
+                    null, args, null, null, null);
 #else
                 null, args, null, null );
 #endif
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new NUnitEngineException("The NUnit 3.0 driver encountered an error while executing reflected code.", ex.InnerException);
+            }
         }
 
         #endregion

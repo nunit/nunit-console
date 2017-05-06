@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
 using NUnit.Tests.Assemblies;
-using NUnit.Engine.Internal.Tests;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -147,8 +146,6 @@ namespace NUnit.Engine.Drivers.Tests
         public void RunTestsAction_WithoutLoad_ThrowsInvalidOperationException()
         {
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), TestFilter.Empty.Text));
-            if (ex is TargetInvocationException)
-                ex = ex.InnerException;
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
         }
@@ -160,8 +157,6 @@ namespace NUnit.Engine.Drivers.Tests
 
             var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
-            if (ex is TargetInvocationException)
-                ex = ex.InnerException;
             Assert.That(ex, Is.TypeOf<NUnitEngineException>());
         }
         #endregion
