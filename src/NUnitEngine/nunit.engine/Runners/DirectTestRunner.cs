@@ -78,10 +78,8 @@ namespace NUnit.Engine.Runners
                 {
                     driverResult = driver.Explore(filter.Text);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is NUnitEngineException))
                 {
-                    if (ex is NUnitEngineException)
-                        throw;
                     throw new NUnitEngineException("An exception occurred in the driver while exploring tests.", ex);
                 }
 
@@ -137,11 +135,9 @@ namespace NUnit.Engine.Runners
             {
                 return driver.Load(testFile, subPackage.Settings);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is NUnitEngineException))
             {
-                if (ex is NUnitEngineException)
-                    throw;
-                throw new NUnitEngineException("An exception occurred in the driver while loading itself.", ex);
+                throw new NUnitEngineException("An exception occurred in the driver while loading tests.", ex);
             }
         }
 
@@ -163,10 +159,8 @@ namespace NUnit.Engine.Runners
                 {
                     count += driver.CountTestCases(filter.Text);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is NUnitEngineException))
                 {
-                    if (ex is NUnitEngineException)
-                        throw;
                     throw new NUnitEngineException("An exception occurred in the driver while counting test cases.", ex);
                 }
             }
@@ -197,10 +191,8 @@ namespace NUnit.Engine.Runners
                 {
                     driverResult = driver.Run(listener, filter.Text);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is NUnitEngineException))
                 {
-                    if (ex is NUnitEngineException)
-                        throw;
                     throw new NUnitEngineException("An exception occurred in the driver while running tests.", ex);
                 }
 
@@ -227,17 +219,16 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
+            EnsurePackageIsLoaded();
+
             foreach (IFrameworkDriver driver in _drivers)
             {
                 try
                 {
                     driver.StopRun(force);
-
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!(ex is NUnitEngineException))
                 {
-                    if (ex is NUnitEngineException)
-                        throw;
                     throw new NUnitEngineException("An exception occurred in the driver while stopping the run.", ex);
                 }
             }
