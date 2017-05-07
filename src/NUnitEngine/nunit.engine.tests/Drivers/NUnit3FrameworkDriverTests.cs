@@ -23,10 +23,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Web.UI;
+using System.Reflection;
 using System.Xml;
 using NUnit.Tests.Assemblies;
-using NUnit.Engine.Internal;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -36,8 +35,6 @@ namespace NUnit.Engine.Drivers.Tests
     public class NUnit3FrameworkDriverTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
-        private const string MISSING_FILE = "junk.dll";
-        private const string NUNIT_FRAMEWORK = "nunit.framework";
         private const string LOAD_MESSAGE = "Method called without calling Load first";
 
         private IDictionary<string, object> _settings = new Dictionary<string, object>();
@@ -149,10 +146,18 @@ namespace NUnit.Engine.Drivers.Tests
         public void RunTestsAction_WithoutLoad_ThrowsInvalidOperationException()
         {
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), TestFilter.Empty.Text));
-            if (ex is System.Reflection.TargetInvocationException)
-                ex = ex.InnerException;
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
+        }
+
+        [Test]
+        public void RunTestsAction_WithInvalidFilterElement_ThrowsNUnitEngineException()
+        {
+            _driver.Load(_mockAssemblyPath, _settings);
+
+            var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
+            var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
+            Assert.That(ex, Is.TypeOf<NUnitEngineException>());
         }
         #endregion
 
