@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.tests.netstandard", "src\NUnitEngine\nunit.engine.tests.netstandard\nunit.engine.tests.netstandard.csproj", "{BC22F0E4-0862-4F82-A912-C9A447FECBAD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly.netstandard", "src\NUnitEngine\mock-assembly\mock-assembly.netstandard.csproj", "{BC6C8155-2024-4F58-A006-18A15EA22A5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly.netstandard", "src\NUnitEngine\mock-assembly.netstandard\mock-assembly.netstandard.csproj", "{BC6C8155-2024-4F58-A006-18A15EA22A5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.netstandard", "src\NUnitEngine\nunit.engine.netstandard\nunit.engine.netstandard.csproj", "{C26FFC46-60CE-4CBA-87BD-8E9B972C0E0D}"
 EndProject
