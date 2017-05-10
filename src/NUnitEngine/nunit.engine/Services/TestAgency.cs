@@ -143,7 +143,7 @@ namespace NUnit.Engine.Services
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
-            
+
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
             string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
@@ -161,10 +161,9 @@ namespace NUnit.Engine.Services
 
             string agentExePath = GetTestAgentExePath(useX86Agent);
 
-            if (agentExePath == null)
-                throw new ArgumentException(
-                    string.Format("NUnit components for version {0} of the CLR are not installed",
-                    targetRuntime.ClrVersion.ToString()), "targetRuntime");
+            if (!File.Exists(agentExePath))
+                throw new FileNotFoundException(
+                    $"{Path.GetFileName(agentExePath)} for version {targetRuntime.ClrVersion.ToString()} of the CLR could not be found.", agentExePath);
 
             log.Debug("Using nunit-agent at " + agentExePath);
 
@@ -244,8 +243,7 @@ namespace NUnit.Engine.Services
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 
-            string agentExePath = Path.Combine(engineDir, agentName);
-            return File.Exists(agentExePath) ? agentExePath : null;
+            return Path.Combine(engineDir, agentName);
         }
 
         #endregion
