@@ -163,7 +163,7 @@ namespace NUnit.Engine.Services
 
             if (!File.Exists(agentExePath))
                 throw new FileNotFoundException(
-                    $"{Path.GetFileName(agentExePath)} for version {targetRuntime.ClrVersion.ToString()} of the CLR could not be found.", agentExePath);
+                    $"{Path.GetFileName(agentExePath)} could not be found.", agentExePath);
 
             log.Debug("Using nunit-agent at " + agentExePath);
 
