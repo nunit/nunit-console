@@ -33,7 +33,7 @@ namespace NUnit.Engine.Services
 
     /// <summary>
     /// NUnit3XmlResultWriter is responsible for writing the results
-    /// of a test to a file in NUnit 3.0 format.
+    /// of a test to a file in NUnit 3 format.
     /// </summary>
     public class NUnit3XmlResultWriter : IResultWriter
     {
