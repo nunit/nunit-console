@@ -35,7 +35,7 @@ namespace NUnit.Engine.Internal
     /// A collection of utility methods used to create, retrieve
     /// and release <see cref="TcpChannel"/>s.
     /// </summary>
-    public static class ServerUtilities
+    public static partial class ServerUtilities
     {
         private static readonly Logger Log = InternalTrace.GetLogger(typeof(ServerUtilities));
 
@@ -45,8 +45,9 @@ namespace NUnit.Engine.Internal
         /// <param name="name">The name of the channel to create.</param>
         /// <param name="port">The port number of the channel to create.</param>
         /// <param name="limit">The rate limit of the channel to create.</param>
+        /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>A <see cref="TcpChannel"/> configured with the given name and port.</returns>
-        private static TcpChannel CreateTcpChannel(string name, int port, int limit)
+        private static TcpChannel CreateTcpChannel(string name, int port, int limit, CurrentMessageCounter currentMessageCounter = null)
         {
             var props = new Dictionary<string, object>
             {
@@ -63,16 +64,22 @@ namespace NUnit.Engine.Internal
 
             var clientProvider = new BinaryClientFormatterSinkProvider();
 
-            return new TcpChannel(props, clientProvider, serverProvider);
+            return new TcpChannel(
+                props,
+                clientProvider,
+                currentMessageCounter != null
+                    ? new ObservableServerChannelSinkProvider(currentMessageCounter) { Next = serverProvider }
+                    : (IServerChannelSinkProvider)serverProvider);
         }
 
         /// <summary>
         /// Get a default channel. If one does not exist, then one is created and registered.
         /// </summary>
+        /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
-        public static TcpChannel GetTcpChannel()
+        public static TcpChannel GetTcpChannel(CurrentMessageCounter currentMessageCounter = null)
         {
-            return GetTcpChannel("", 0, 2);
+            return GetTcpChannel("", 0, 2, currentMessageCounter);
         }
 
         /// <summary>
@@ -82,10 +89,11 @@ namespace NUnit.Engine.Internal
         /// </summary>
         /// <param name="name">The name of the channel.</param>
         /// <param name="port">The port to use if the channel must be created.</param>
+        /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
-        public static TcpChannel GetTcpChannel(string name, int port)
+        public static TcpChannel GetTcpChannel(string name, int port, CurrentMessageCounter currentMessageCounter = null)
         {
-            return GetTcpChannel(name, port, 2);
+            return GetTcpChannel(name, port, 2, currentMessageCounter);
         }
 
         /// <summary>
@@ -96,8 +104,9 @@ namespace NUnit.Engine.Internal
         /// <param name="name">The name of the channel</param>
         /// <param name="port">The port to use if the channel must be created.</param>
         /// <param name="limit">The client connection limit or negative for the default.</param>
+        /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
-        public static TcpChannel GetTcpChannel(string name, int port, int limit)
+        public static TcpChannel GetTcpChannel(string name, int port, int limit, CurrentMessageCounter currentMessageCounter = null)
         {
             var existingChannel = ChannelServices.GetChannel(name) as TcpChannel;
             if (existingChannel != null) return existingChannel;
@@ -107,7 +116,7 @@ namespace NUnit.Engine.Internal
             for (var retries = 0; retries < 10; retries++)
                 try
                 {
-                    var newChannel = CreateTcpChannel(name, port, limit);
+                    var newChannel = CreateTcpChannel(name, port, limit, currentMessageCounter);
                     ChannelServices.RegisterChannel(newChannel, false);
                     return newChannel;
                 }
