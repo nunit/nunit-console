@@ -17,6 +17,7 @@
     <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
     <Compile Include="..\mock-assembly\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\mock-assembly\MockAssembly.cs" Link="MockAssembly.cs" />
+    <Compile Include="..\mock-assembly\AccessesCurrentTestContextDuringDiscovery.cs" Link="AccessesCurrentTestContextDuringDiscovery.cs" />
   </ItemGroup>
 
   <ItemGroup>
