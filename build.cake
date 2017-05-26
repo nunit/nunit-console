@@ -32,6 +32,8 @@ var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
 
 var SOLUTION_FILE = "NUnitConsole.sln";
+var DOTNETCORE_SOLUTION_FILE = "NUnit.Engine.NetStandard.sln";
+var DOTNETCORE_TEST_ASSEMBLY = "src/NUnitEngine/nunit.engine.tests.netstandard/bin/" + configuration + "/netcoreapp1.1/nunit.engine.tests.netstandard.dll";
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]
@@ -46,6 +48,55 @@ var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
+
+bool IsDotNetCoreInstalled = false;
+
+//////////////////////////////////////////////////////////////////////
+// SETUP AND TEARDOWN TASKS
+//////////////////////////////////////////////////////////////////////
+Setup(context =>
+{
+    if (BuildSystem.IsRunningOnAppVeyor)
+    {
+        var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
+        var branch = AppVeyor.Environment.Repository.Branch;
+        var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
+
+        if (branch == "master" && !isPullRequest)
+        {
+            packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+        }
+        else
+        {
+            var suffix = "-ci-" + buildNumber + dbgSuffix;
+
+            if (isPullRequest)
+                suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
+            else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+                suffix += "-pre-" + buildNumber;
+            else
+                suffix += "-" + branch;
+
+            // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
+            if (suffix.Length > 21)
+                suffix = suffix.Substring(0, 21);
+
+            packageVersion = version + suffix;
+        }
+
+        AppVeyor.UpdateBuildVersion(packageVersion);
+    }
+
+    // Executed BEFORE the first task.
+    Information("Building version {0} of NUnit.", packageVersion);
+    IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
+});
+
+Teardown(context =>
+{
+    // Executed AFTER the last task.
+    CheckForError(ref ErrorDetail);
+});
 
 //////////////////////////////////////////////////////////////////////
 // CLEAN
@@ -67,50 +118,18 @@ Task("InitializeBuild")
     .Description("Initializes the build")
     .Does(() =>
     {
-		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
-		{
-			Source = PACKAGE_SOURCE
-		});
+        Information("Restoring NuGet packages");
+		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings
+        {
+            Source = PACKAGE_SOURCE,
+            Verbosity = NuGetVerbosity.Detailed
+        });
 
-		if (BuildSystem.IsRunningOnAppVeyor)
-		{
-			var tag = AppVeyor.Environment.Repository.Tag;
-
-			if (tag.IsTag)
-			{
-				packageVersion = tag.Name;
-			}
-			else
-			{
-				var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
-				var branch = AppVeyor.Environment.Repository.Branch;
-				var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
-
-				if (branch == "master" && !isPullRequest)
-				{
-					packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
-				}
-				else
-				{
-				    var suffix = "-ci-" + buildNumber + dbgSuffix;
-
-					if (isPullRequest)
-						suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
-					else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-						suffix += "-pre-" + buildNumber;
-					else
-						suffix += "-" + branch;
-
-					// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-					if (suffix.Length > 21)
-						suffix = suffix.Substring(0, 21);
-
-					packageVersion = version + suffix;
-				}
-			}
-
-			AppVeyor.UpdateBuildVersion(packageVersion);
-		}
+        if(IsDotNetCoreInstalled && IsRunningOnWindows())
+        {
+            Information("Restoring .NET Core packages");
+            DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
+        }
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -131,6 +150,32 @@ Task("BuildEngine")
         // Engine tests
         BuildProject("./src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj", configuration);
         BuildProject("./src/NUnitEngine/notest-assembly/notest-assembly.csproj", configuration);
+    });
+
+//////////////////////////////////////////////////////////////////////
+// BUILD NETSTANDARD ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("BuildNetStandardEngine")
+    .Description("Builds the .NET Standard engine")
+    .IsDependentOn("InitializeBuild")
+    .WithCriteria(IsRunningOnWindows())
+    .Does(() =>
+    {
+        if(IsDotNetCoreInstalled)
+        {
+            var settings = new DotNetCoreBuildSettings
+            {
+                Configuration = configuration,
+                EnvironmentVariables = new Dictionary<string, string>()
+            };
+            settings.EnvironmentVariables.Add("PackageVersion", packageVersion);
+            DotNetCoreBuild(DOTNETCORE_SOLUTION_FILE, settings);
+        }
+        else
+        {
+            Warning("Skipping .NET Standard build because .NET Core is not installed");
+        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -202,6 +247,27 @@ Task("TestConsole")
     .Does(() =>
     {
         RunTest(NUNIT3_CONSOLE, BIN_DIR, CONSOLE_TESTS, "TestConsole", ref ErrorDetail);
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETSTANDARD ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetStandardEngine")
+    .Description("Tests the .NET Standard Engine")
+    .IsDependentOn("BuildNetStandardEngine")
+    .WithCriteria(IsRunningOnWindows())
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        if(IsDotNetCoreInstalled)
+        {
+            DotNetCoreExecute(DOTNETCORE_TEST_ASSEMBLY);
+        }
+        else
+        {
+            Warning("Skipping .NET Standard tests because .NET Core is not installed");
+        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -337,22 +403,46 @@ Task("PackageConsole")
     });
 
 //////////////////////////////////////////////////////////////////////
-// SETUP AND TEARDOWN TASKS
+// PACKAGE NETSTANDARD ENGINE
 //////////////////////////////////////////////////////////////////////
-Setup(context =>
-{
-    // Executed BEFORE the first task.
-});
 
-Teardown(context =>
-{
-    // Executed AFTER the last task.
-    CheckForError(ref ErrorDetail);
-});
+Task("PackageNetStandardEngine")
+    .Description("Copies the .NET Standard Engine nuget package in the packages directory")
+    .WithCriteria(IsRunningOnWindows())
+    .Does(() =>
+    {
+        if(IsDotNetCoreInstalled)
+        {
+            var nuget = "nunit.engine.netstandard." + packageVersion + ".nupkg";
+            var src   = "src/NUnitEngine/nunit.engine.netstandard/bin/" + configuration + "/" + nuget;
+            var dest  = PACKAGE_DIR + nuget;
+
+            CreateDirectory(PACKAGE_DIR);
+            CopyFile(src, dest);
+        }
+    });
 
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
+
+bool CheckIfDotNetCoreInstalled()
+{
+    try
+    {
+        Information("Checking if .NET Core SDK is installed");
+        StartProcess("dotnet", new ProcessSettings
+        {
+            Arguments = "--version"
+        });
+    }
+    catch(Exception)
+    {
+        Warning(".NET Core SDK is not installed. It can be installed from https://www.microsoft.com/net/core");
+        return false;
+    }
+    return true;
+}
 
 void RunGitCommand(string arguments)
 {
@@ -445,7 +535,8 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string arguments, strin
 Task("Build")
     .Description("Builds the engine and console runner")
     .IsDependentOn("BuildEngine")
-    .IsDependentOn("BuildConsole");
+    .IsDependentOn("BuildConsole")
+    .IsDependentOn("BuildNetStandardEngine");
 
 Task("Rebuild")
     .Description("Rebuilds the engine and console runner")
@@ -455,13 +546,15 @@ Task("Rebuild")
 Task("Test")
     .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestEngine")
-    .IsDependentOn("TestConsole");
+    .IsDependentOn("TestConsole")
+    .IsDependentOn("TestNetStandardEngine");
 
 Task("Package")
     .Description("Packages the engine and console runner")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
-    .IsDependentOn("PackageConsole");
+    .IsDependentOn("PackageConsole")
+    .IsDependentOn("PackageNetStandardEngine");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

@@ -23,9 +23,10 @@
 
 using System;
 using System.ComponentModel;
-using System.Drawing;
 using NUnit.Framework;
-using Microsoft.Win32;
+#if !NETCOREAPP1_1
+using System.Drawing;
+#endif
 
 namespace NUnit.Engine.Internal.Tests
 {
@@ -100,6 +101,7 @@ namespace NUnit.Engine.Internal.Tests
             Assert.AreEqual( 42, settings.GetSetting( "X", 42 ) );
         }
 
+#if !NETCOREAPP1_1
         [Test]
         [SetCulture("da-DK")]
         public void SaveAndGetSettingShouldReturnTheOriginalValue()
@@ -113,5 +115,6 @@ namespace NUnit.Engine.Internal.Tests
             var point = settings.GetSetting(settingName, new Point(30, 40));
             Assert.That(point, Is.EqualTo(settingValue));
         }
+#endif
     }
 }

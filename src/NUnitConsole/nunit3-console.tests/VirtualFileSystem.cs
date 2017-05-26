@@ -59,7 +59,8 @@ namespace NUnit.ConsoleRunner.Tests
             foreach (var file in files.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var fileParts = file.Split(':');
-                SetupFile(fileParts[0], fileParts[1].Split(new[] { '\n' }, StringSplitOptions.None));
+                var lines = fileParts[1].Replace("\r\n", "\n").Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                SetupFile(fileParts[0], lines);
             }
         }
     }

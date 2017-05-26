@@ -35,13 +35,21 @@ namespace NUnit.Engine.Services.Tests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
 
+#if NETCOREAPP1_1
+        private NUnitNetStandardDriver _driver;
+#else
         private NUnit3FrameworkDriver _driver;
+#endif
 
         [SetUp]
         public void LoadAssembly()
         {
             var mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
+#if NETCOREAPP1_1
+            _driver = new NUnitNetStandardDriver();
+#else
             _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain);
+#endif
             _driver.Load(mockAssemblyPath, new Dictionary<string, object>());
         }
 

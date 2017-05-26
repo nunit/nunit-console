@@ -56,7 +56,8 @@ namespace NUnit.Tests
                         + BadFixture.Tests
                         + FixtureWithTestCases.Tests
                         + ParameterizedFixture.Tests
-                        + GenericFixtureConstants.Tests;
+                        + GenericFixtureConstants.Tests
+                        + AccessesCurrentTestContextDuringDiscovery.Tests;
 
             public const int Suites = MockTestFixture.Suites
                         + Singletons.OneTestCase.Suites
@@ -67,6 +68,7 @@ namespace NUnit.Tests
                         + FixtureWithTestCases.Suites
                         + ParameterizedFixture.Suites
                         + GenericFixtureConstants.Suites
+                        + AccessesCurrentTestContextDuringDiscovery.Suites
                         + NamespaceSuites;
 
             public const int TestStartedEvents = Tests - IgnoredFixture.Tests - BadFixture.Tests - ExplicitFixture.Tests;
@@ -84,7 +86,8 @@ namespace NUnit.Tests
                         + TestAssembly.MockTestFixture.Tests
                         + FixtureWithTestCases.Tests
                         + ParameterizedFixture.Tests
-                        + GenericFixtureConstants.Tests;
+                        + GenericFixtureConstants.Tests
+                        + AccessesCurrentTestContextDuringDiscovery.Tests;
 
             public const int Skipped_Ignored = MockTestFixture.Skipped_Ignored + IgnoredFixture.Tests;
             public const int Skipped_Explicit = MockTestFixture.Skipped_Explicit + ExplicitFixture.Tests;
@@ -99,7 +102,9 @@ namespace NUnit.Tests
 
             public const int Inconclusive = MockTestFixture.Inconclusive;
 
+#if !NETSTANDARD1_6
             public static readonly string AssemblyPath = AssemblyHelper.GetAssemblyPath(typeof(MockAssembly).Assembly);
+#endif
         }
 
         [TestFixture(Description="Fake Test Fixture")]

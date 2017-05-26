@@ -22,11 +22,12 @@
 // ***********************************************************************
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
-using System.Runtime.Serialization;
 
 namespace NUnit.Engine.Drivers
 {
@@ -80,7 +81,7 @@ namespace NUnit.Engine.Drivers
             }
             catch (SerializationException ex)
             {
-                throw new NUnitEngineException("The NUnit 3.0 driver cannot support this test assembly. Use a platform specific runner.", ex);
+                throw new NUnitEngineException("The NUnit 3 driver cannot support this test assembly. Use a platform specific runner.", ex);
             }
 
             CallbackHandler handler = new CallbackHandler();
@@ -161,13 +162,20 @@ namespace NUnit.Engine.Drivers
 
         private object CreateObject(string typeName, params object[] args)
         {
-            return _testDomain.CreateInstanceAndUnwrap(
-                NUNIT_FRAMEWORK, typeName, false, 0,
+            try
+            {
+                return _testDomain.CreateInstanceAndUnwrap(
+                    NUNIT_FRAMEWORK, typeName, false, 0,
 #if !NET_4_0
-                null, args, null, null, null );
+                    null, args, null, null, null);
 #else
                 null, args, null, null );
 #endif
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new NUnitEngineException("The NUnit 3 driver encountered an error while executing reflected code.", ex.InnerException);
+            }
         }
 
         #endregion

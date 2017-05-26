@@ -47,12 +47,16 @@ namespace NUnit.Engine
     /// for combining multiple TestEngineResults into one.
     /// 
     /// </summary>
+ #if !NETSTANDARD1_3
     [Serializable]
+#endif
     public class TestEngineResult
     {
         private List<string> _xmlText = new List<string>();
 
+#if !NETSTANDARD1_3
         [NonSerialized]
+#endif
         private List<XmlNode> _xmlNodes = new List<XmlNode>();
 
         #region Constructors

@@ -27,7 +27,7 @@ using System.Reflection;
 // Common Information for the NUnit assemblies
 //
 [assembly: AssemblyCompany("NUnit Software")]
-[assembly: AssemblyProduct("NUnit 3.0")]
+[assembly: AssemblyProduct("NUnit 3")]
 [assembly: AssemblyCopyright("Copyright (C) 2017 Charlie Poole")]
 [assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
 
@@ -42,16 +42,10 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 4.0 Debug")]
 #elif NET_2_0
 [assembly: AssemblyConfiguration(".NET 2.0 Debug")]
-#elif SL_5_0
-[assembly: AssemblyConfiguration("Silverlight 5.0 Debug")]
-#elif SL_4_0
-[assembly: AssemblyConfiguration("Silverlight 4.0 Debug")]
-#elif SL_3_0
-[assembly: AssemblyConfiguration("Silverlight 3.0 Debug")]
-#elif NETCF_3_5
-[assembly: AssemblyConfiguration("Compact Framework 3.5 Debug")]
 #elif PORTABLE
 [assembly: AssemblyConfiguration("Portable Debug")]
+#elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
+[assembly: AssemblyConfiguration(".NET Standard Debug")]
 #else
 [assembly: AssemblyConfiguration("Debug")]
 #endif
@@ -62,16 +56,10 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 4.0")]
 #elif NET_2_0
 [assembly: AssemblyConfiguration(".NET 2.0")]
-#elif SL_5_0
-[assembly: AssemblyConfiguration("Silverlight 5.0")]
-#elif SL_4_0
-[assembly: AssemblyConfiguration("Silverlight 4.0")]
-#elif SL_3_0
-[assembly: AssemblyConfiguration("Silverlight 3.0")]
-#elif NETCF_3_5
-[assembly: AssemblyConfiguration("Compact Framework 3.5")]
 #elif PORTABLE
 [assembly: AssemblyConfiguration("Portable")]
+#elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
+[assembly: AssemblyConfiguration(".NET Standard")]
 #else
 [assembly: AssemblyConfiguration("")]
 #endif

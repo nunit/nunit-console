@@ -36,13 +36,23 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class TestEventHandler : MarshalByRefObject, ITestEventListener
     {
-        private readonly string _displayLabels;
         private readonly TextWriter _outWriter;
 
-        public TestEventHandler(TextWriter outWriter, string displayLabels)
+        private readonly bool _displayBeforeTest;
+        private readonly bool _displayAfterTest;
+        private readonly bool _displayBeforeOutput;
+
+        private string _lastTestOutput;
+        private bool _wantNewLine = false;
+
+        public TestEventHandler(TextWriter outWriter, string labelsOption)
         {
-            _displayLabels = displayLabels.ToUpperInvariant();
             _outWriter = outWriter;
+
+            labelsOption = labelsOption.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+            _displayBeforeTest = labelsOption == "ALL" || labelsOption == "BEFORE";
+            _displayAfterTest = labelsOption == "AFTER";
+            _displayBeforeOutput = _displayBeforeTest || _displayAfterTest || labelsOption == "ON";
         }
 
         #region ITestEventHandler Members
@@ -81,22 +91,27 @@ namespace NUnit.ConsoleRunner
         {
             var testName = testResult.Attributes["fullname"].Value;
 
-            if (_displayLabels == "ALL")
+            if (_displayBeforeTest)
                 WriteLabelLine(testName);
         }
 
         private void TestFinished(XmlNode testResult)
         {
             var testName = testResult.Attributes["fullname"].Value;
+            var status = testResult.GetAttribute("label") ?? testResult.GetAttribute("result");
             var outputNode = testResult.SelectSingleNode("output");
 
             if (outputNode != null)
             {
-                if (_displayLabels == "ON")
+                if (_displayBeforeOutput)
                     WriteLabelLine(testName);
 
-                WriteOutputLine(outputNode.InnerText);
+                FlushNewLineIfNeeded();
+                WriteOutputLine(testName, outputNode.InnerText);
             }
+
+            if (_displayAfterTest)
+                WriteLabelLineAfterTest(testName, status);
         }
 
         private void SuiteFinished(XmlNode testResult)
@@ -106,10 +121,11 @@ namespace NUnit.ConsoleRunner
 
             if (outputNode != null)
             {
-                if (_displayLabels == "ON")
+                if (_displayBeforeOutput)
                     WriteLabelLine(suiteName);
 
-                WriteOutputLine(outputNode.InnerText);
+                FlushNewLineIfNeeded();
+                WriteOutputLine(suiteName, outputNode.InnerText);
             }
         }
 
@@ -118,10 +134,10 @@ namespace NUnit.ConsoleRunner
             var testName = outputNode.GetAttribute("testname");
             var stream = outputNode.GetAttribute("stream");
 
-            if (_displayLabels == "ON" && testName != null)
+            if (_displayBeforeOutput && testName != null)
                 WriteLabelLine(testName);
 
-            WriteOutputLine(outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
+            WriteOutputLine(testName, outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
         }
 
         private string _currentLabel;
@@ -130,6 +146,9 @@ namespace NUnit.ConsoleRunner
         {
             if (label != _currentLabel)
             {
+                FlushNewLineIfNeeded();
+                _lastTestOutput = label;
+
                 using (new ColorConsole(ColorStyle.SectionHeader))
                     _outWriter.WriteLine("=> {0}", label);
 
@@ -137,22 +156,72 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        private void WriteOutputLine(string text)
+        private void WriteLabelLineAfterTest(string label, string status)
         {
-            WriteOutputLine(text, ColorStyle.Output);
+            FlushNewLineIfNeeded();
+            _lastTestOutput = label;
+
+            if (status != null)
+                using (new ColorConsole(GetColorForResultStatus(status)))
+                    _outWriter.Write("{0} ", status);
+
+            using (new ColorConsole(ColorStyle.SectionHeader))
+                _outWriter.WriteLine("=> {0}", label);
+
+            _currentLabel = label;
         }
 
-        private void WriteOutputLine(string text, ColorStyle color)
+        private void WriteOutputLine(string testName, string text)
+        {
+            WriteOutputLine(testName, text, ColorStyle.Output);
+        }
+
+        private void WriteOutputLine(string testName, string text, ColorStyle color)
         {
             using (new ColorConsole(color))
             {
+                if (_lastTestOutput != testName)
+                {
+                    FlushNewLineIfNeeded();
+                    _lastTestOutput = testName;
+                }
+
                 _outWriter.Write(text);
 
-                // Some labels were being shown on the same line as the previous output
+                // If the text we just wrote did not have a new line, flag that we should eventually emit one.
                 if (!text.EndsWith("\n"))
                 {
-                    _outWriter.WriteLine();
+                    _wantNewLine = true;
                 }
+            }
+        }
+
+        private void FlushNewLineIfNeeded()
+        {
+            if (_wantNewLine)
+            {
+                _outWriter.WriteLine();
+                _wantNewLine = false;
+            }
+        }
+
+        private static ColorStyle GetColorForResultStatus(string status)
+        {
+            switch (status)
+            {
+                case "Passed":
+                    return ColorStyle.Pass;
+                case "Failed":
+                    return ColorStyle.Failure;
+                case "Error":
+                case "Invalid":
+                case "Cancelled":
+                    return ColorStyle.Error;
+                case "Warning":
+                case "Ignored":
+                    return ColorStyle.Warning;
+                default:
+                    return ColorStyle.Output;
             }
         }
 

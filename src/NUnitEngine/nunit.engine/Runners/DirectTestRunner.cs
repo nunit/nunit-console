@@ -71,7 +71,20 @@ namespace NUnit.Engine.Runners
             var result = new TestEngineResult();
 
             foreach (IFrameworkDriver driver in _drivers)
-                result.Add(driver.Explore(filter.Text));
+            {
+                string driverResult;
+
+                try
+                {
+                    driverResult = driver.Explore(filter.Text);
+                }
+                catch (Exception ex) when (!(ex is NUnitEngineException))
+                {
+                    throw new NUnitEngineException("An exception occurred in the driver while exploring tests.", ex);
+                }
+
+                result.Add(driverResult);
+            }
 
             return result;
         }
@@ -109,11 +122,23 @@ namespace NUnit.Engine.Runners
                 
                 IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
                 driver.ID = TestPackage.ID;
-                result.Add(driver.Load(testFile, subPackage.Settings));
+                result.Add(LoadDriver(driver, testFile, subPackage));
                 _drivers.Add(driver);
             }
 
             return result;
+        }
+
+        private static string LoadDriver(IFrameworkDriver driver, string testFile, TestPackage subPackage)
+        {
+            try
+            {
+                return driver.Load(testFile, subPackage.Settings);
+            }
+            catch (Exception ex) when (!(ex is NUnitEngineException))
+            {
+                throw new NUnitEngineException("An exception occurred in the driver while loading tests.", ex);
+            }
         }
 
         /// <summary>
@@ -129,7 +154,16 @@ namespace NUnit.Engine.Runners
             int count = 0;
 
             foreach (IFrameworkDriver driver in _drivers)
-                count += driver.CountTestCases(filter.Text);
+            {
+                try
+                {
+                    count += driver.CountTestCases(filter.Text);
+                }
+                catch (Exception ex) when (!(ex is NUnitEngineException))
+                {
+                    throw new NUnitEngineException("An exception occurred in the driver while counting test cases.", ex);
+                }
+            }
 
             return count;
         }
@@ -151,7 +185,18 @@ namespace NUnit.Engine.Runners
 
             foreach (IFrameworkDriver driver in _drivers)
             {
-                result.Add(driver.Run(listener, filter.Text));
+                string driverResult;
+
+                try
+                {
+                    driverResult = driver.Run(listener, filter.Text);
+                }
+                catch (Exception ex) when (!(ex is NUnitEngineException))
+                {
+                    throw new NUnitEngineException("An exception occurred in the driver while running tests.", ex);
+                }
+
+                result.Add(driverResult);
             }
 
             if (_assemblyResolver != null)
@@ -174,8 +219,19 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
-            foreach(var driver in _drivers)
-                driver.StopRun(force);
+            EnsurePackageIsLoaded();
+
+            foreach (IFrameworkDriver driver in _drivers)
+            {
+                try
+                {
+                    driver.StopRun(force);
+                }
+                catch (Exception ex) when (!(ex is NUnitEngineException))
+                {
+                    throw new NUnitEngineException("An exception occurred in the driver while stopping the run.", ex);
+                }
+            }
         }
 
         #endregion

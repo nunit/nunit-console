@@ -37,7 +37,7 @@ namespace NUnit.ConsoleRunner
     public class Program
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
-        static ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem(), new ArgumentsFileParser());
+        static ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem());
         private static ExtendedTextWriter _outWriter;
 
         // This has to be lazy otherwise NoColor command line option is not applied correctly
@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner
         {
             try
             {
-                Options.Parse(Options.Expand(args));
+                Options.Parse(Options.PreParse(args));
             }
             catch (OptionException ex)
             {
@@ -234,16 +234,16 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("          --OPTION:filename;transform=xsltfile");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      The --result option may use any of the following formats:");
-                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3.0");
+                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3");
                 OutWriter.WriteLine("          nunit2 - legacy XML format used by earlier releases of NUnit");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      The --explore option may use any of the following formats:");
-                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3.0");
+                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3");
                 OutWriter.WriteLine("          cases  - a text file listing the full names of all test cases.");
                 OutWriter.WriteLine("      If --explore is used without any specification following, a list of");
                 OutWriter.WriteLine("      test cases is output to the writer.");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      If none of the options {--result, --explore, --noxml} is used,");
+                OutWriter.WriteLine("      If none of the options {--result, --explore, --noresult} is used,");
                 OutWriter.WriteLine("      NUnit saves the results to TestResult.xml in nunit3 format");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      Any transforms provided must handle input in the native nunit3 format.");

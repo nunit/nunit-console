@@ -26,6 +26,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Xml;
+#if NETSTANDARD1_3
+using System.Xml.Linq;
+#endif
 
 namespace NUnit.Engine.Internal
 {
@@ -69,18 +72,21 @@ namespace NUnit.Engine.Internal
             try
             {
                 XmlDocument doc = new XmlDocument();
-                doc.Load(_settingsFile);
+                using (var stream = new FileStream(_settingsFile, FileMode.Open, FileAccess.Read))
+                {
+                    doc.Load(stream);
+                }
 
                 foreach (XmlElement element in doc.DocumentElement["Settings"].ChildNodes)
                 {
                     if (element.Name != "Setting")
-                        throw new ApplicationException("Unknown element in settings file: " + element.Name);
+                        throw new Exception("Unknown element in settings file: " + element.Name);
 
                     if (!element.HasAttribute("name"))
-                        throw new ApplicationException("Setting must have 'name' attribute");
+                        throw new Exception("Setting must have 'name' attribute");
 
                     if (!element.HasAttribute("value"))
-                        throw new ApplicationException("Setting must have 'value' attribute");
+                        throw new Exception("Setting must have 'value' attribute");
 
                     SaveSetting(element.GetAttribute("name"), element.GetAttribute("value"));
                 }
@@ -103,6 +109,29 @@ namespace NUnit.Engine.Internal
                 if (!Directory.Exists(dirPath))
                     Directory.CreateDirectory(dirPath);
 
+#if NETSTANDARD1_3
+                var settings = new XElement("Settings");
+
+                List<string> keys = new List<string>(_settings.Keys);
+                keys.Sort();
+
+                foreach (string name in keys)
+                {
+                    object val = GetSetting(name);
+                    if (val != null)
+                    {
+                        settings.Add(new XElement("Setting",
+                                                    new XAttribute("name", name),
+                                                    new XAttribute("value", TypeDescriptor.GetConverter(val.GetType()).ConvertToInvariantString(val))
+                                                    ));
+                    }
+                }
+                var doc = new XDocument(new XElement("NUnitSettings", settings));
+                using (var file = new FileStream(_settingsFile, FileMode.Create, FileAccess.Write))
+                {
+                    doc.Save(file);
+                }
+#else
                 using (var writer = new XmlTextWriter(_settingsFile, System.Text.Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
@@ -131,6 +160,7 @@ namespace NUnit.Engine.Internal
                     writer.WriteEndElement();
                     writer.Close();
                 }
+#endif
             }
             catch (Exception)
             {

@@ -32,6 +32,19 @@ namespace NUnit.Engine.Services.Tests
     {
         private ResultService _resultService;
 
+#if NETCOREAPP1_1
+        [SetUp]
+        public void CreateService()
+        {
+            _resultService = new ResultService();
+        }
+
+        [Test]
+        public void AvailableFormats()
+        {
+            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases" }));
+        }
+#else
         [SetUp]
         public void CreateService()
         {
@@ -53,6 +66,7 @@ namespace NUnit.Engine.Services.Tests
         {
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
         }
+#endif
 
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]
         //[TestCase("nunit2", null, ExpectedResult = "NUnit2XmlResultWriter")]
@@ -66,6 +80,7 @@ namespace NUnit.Engine.Services.Tests
             return writer.GetType().Name;
         }
 
+#if !NETCOREAPP1_1
         [Test]
         public void CanGetWriterUser()
         {
@@ -88,5 +103,6 @@ namespace NUnit.Engine.Services.Tests
                 () => _resultService.GetResultWriter("user", null),
                 Throws.TypeOf<ArgumentNullException>());
         }
+#endif
     }
 }
