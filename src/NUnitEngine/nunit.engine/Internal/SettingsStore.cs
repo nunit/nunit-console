@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Xml;
 #if NETSTANDARD1_3
 using System.Xml.Linq;
@@ -132,7 +133,8 @@ namespace NUnit.Engine.Internal
                     doc.Save(file);
                 }
 #else
-                using (var writer = new XmlTextWriter(_settingsFile, System.Text.Encoding.UTF8))
+                var stream = new MemoryStream();
+                using (var writer = new XmlTextWriter(stream, Encoding.UTF8))
                 {
                     writer.Formatting = Formatting.Indented;
 
@@ -158,7 +160,12 @@ namespace NUnit.Engine.Internal
 
                     writer.WriteEndElement();
                     writer.WriteEndElement();
-                    writer.Close();
+                    writer.Flush();
+
+                    var reader = new StreamReader(stream, Encoding.UTF8, true);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var contents = reader.ReadToEnd();
+                    File.WriteAllText(_settingsFile, contents, Encoding.UTF8);
                 }
 #endif
             }

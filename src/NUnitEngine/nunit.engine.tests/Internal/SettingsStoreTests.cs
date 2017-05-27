@@ -31,12 +31,13 @@ namespace NUnit.Engine.Internal.Tests
     [TestFixture]
     public class SettingsStoreTests
     {
-        private readonly string settingsFile = Path.Combine(Path.GetTempPath(), "Nunit_SettingsStoreTests.xml");
+        private string settingsFile;
         private SettingsStore settings;
 
         [SetUp]
         public void SetUp()
         {
+            settingsFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             settings = new SettingsStore(settingsFile, true);
         }
 
@@ -47,6 +48,7 @@ namespace NUnit.Engine.Internal.Tests
             XmlTypeCode settingValue = (XmlTypeCode)wrongValue;
             settings.SaveSetting("setting", settingValue);
             Assert.Throws<ArgumentException>(() => settings.SaveSettings());
+            Assert.That(File.Exists(settingsFile), Is.False);
         }
 
         [Test]
@@ -62,6 +64,34 @@ namespace NUnit.Engine.Internal.Tests
             settings.SaveSettings();
             settings.LoadSettings();
 
+            var actualXmlTypeCodeValue = settings.GetSetting(xmlTypeCodeSettingName, XmlTypeCode.Comment);
+            var actualDateValue = settings.GetSetting(dateSettingName, DateTime.MinValue);
+            Assert.That(actualXmlTypeCodeValue, Is.EqualTo(xmlTypeCodeSettingValue));
+            Assert.That(actualDateValue, Is.EqualTo(dateSettingValue));
+        }
+
+        [Test]
+        public void SaveSettingsDoesNotOverwriteExistingFileWhenFailing()
+        {
+            const string xmlTypeCodeSettingName = "setting";
+            const string dateSettingName = "date";
+            var xmlTypeCodeSettingValue = XmlTypeCode.ProcessingInstruction;
+            var dateSettingValue = new DateTime();
+
+            // Save initial version of the settings file
+            settings.SaveSetting(xmlTypeCodeSettingName, xmlTypeCodeSettingValue);
+            settings.SaveSetting(dateSettingName, dateSettingValue);
+            settings.SaveSettings();
+
+            // Try to save setting that fails
+            settings.LoadSettings();
+            var wrongValue = -1;
+            var settingValue = (XmlTypeCode)wrongValue;
+            settings.SaveSetting("setting", settingValue);
+            Assert.Throws<ArgumentException>(() => settings.SaveSettings());
+
+            // Assert that the initial version is not overwritten
+            settings.LoadSettings();
             var actualXmlTypeCodeValue = settings.GetSetting(xmlTypeCodeSettingName, XmlTypeCode.Comment);
             var actualDateValue = settings.GetSetting(dateSettingName, DateTime.MinValue);
             Assert.That(actualXmlTypeCodeValue, Is.EqualTo(xmlTypeCodeSettingValue));
