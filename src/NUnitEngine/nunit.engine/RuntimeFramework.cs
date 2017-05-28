@@ -27,6 +27,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
+using NUnit.Engine.Services;
 using NUnit.Engine.Services.FrameworkUtilities;
 
 namespace NUnit.Engine
@@ -66,7 +67,6 @@ namespace NUnit.Engine
         /// </summary>
         public static readonly Version DefaultVersion = new Version(0, 0);
 
-        private static RuntimeFramework _currentFramework = CurrentFrameworkLocator.GetCurrentFramework();
         private static List<RuntimeFramework> _availableFrameworks;
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
@@ -481,7 +481,7 @@ namespace NUnit.Engine
 
         private static void FindDefaultMonoFramework()
         {
-            if (_currentFramework.Runtime == RuntimeType.Mono)
+            if (RuntimeFrameworkService.CurrentFramework.Runtime == RuntimeType.Mono)
                 UseCurrentMonoFramework();
             else
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -490,14 +490,16 @@ namespace NUnit.Engine
 
         private static void UseCurrentMonoFramework()
         {
-            Debug.Assert(_currentFramework.Runtime == RuntimeType.Mono && MonoPrefix != null && MonoVersion != null);
+            var currentFramework = RuntimeFrameworkService.CurrentFramework;
+
+            Debug.Assert(currentFramework.Runtime == RuntimeType.Mono && MonoPrefix != null && MonoVersion != null);
 
             // Multiple profiles are no longer supported with Mono 4.0
             if (MonoVersion.Major < 4 && FindAllMonoProfiles() > 0)
                 return;
 
             // If Mono 4.0+ or no profiles found, just use current runtime
-            _availableFrameworks.Add(_currentFramework);
+            _availableFrameworks.Add(currentFramework);
         }
 
         private static void FindBestMonoFrameworkOnWindows()
@@ -600,9 +602,5 @@ namespace NUnit.Engine
         }
 
         #endregion
-
-
-
-
     }
 }
