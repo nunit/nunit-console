@@ -36,14 +36,12 @@ namespace NUnit.Engine.Services
 
         private static readonly Version AnyVersion = new Version(0, 0);
 
-        // HACK: This line forces RuntimeFramework to initialize the static property
-        // AvailableFrameworks before it is accessed by multiple threads. See comment
-        // on RuntimeFramework class for a more detailled explanation.
-        static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
+        static readonly RuntimeFramework[] _availableRuntimes;
 
         static RuntimeFrameworkService()
         {
             CurrentFramework = CurrentFrameworkLocator.GetCurrentFramework();
+            _availableRuntimes = RuntimeFramework.AvailableFrameworks;
         }
 
         #region Instance Properties
