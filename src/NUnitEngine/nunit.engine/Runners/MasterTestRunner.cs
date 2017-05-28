@@ -302,7 +302,7 @@ namespace NUnit.Engine.Runners
                 var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
                 if (processModel == "single" || processModel == "inprocess")
                 {
-                    var currentFramework = RuntimeFramework.CurrentFramework;
+                    var currentFramework = RuntimeFrameworkService.CurrentFramework;
                     var requestedFramework = RuntimeFramework.Parse(frameworkSetting);
                     if (!currentFramework.Supports(requestedFramework))
                         throw new NUnitEngineException(string.Format(

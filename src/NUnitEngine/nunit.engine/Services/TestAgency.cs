@@ -130,13 +130,13 @@ namespace NUnit.Engine.Services
         #region Helper Methods
         private Guid LaunchAgentProcess(TestPackage package)
         {
-            RuntimeFramework targetRuntime = RuntimeFramework.CurrentFramework;
+            RuntimeFramework targetRuntime = RuntimeFrameworkService.CurrentFramework;
             string runtimeSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             if (runtimeSetting != "")
                 targetRuntime = RuntimeFramework.Parse(runtimeSetting);
 
             if (targetRuntime.Runtime == RuntimeType.Any)
-                targetRuntime = new RuntimeFramework(RuntimeFramework.CurrentFramework.Runtime, targetRuntime.ClrVersion);
+                targetRuntime = new RuntimeFramework(RuntimeFrameworkService.CurrentFramework.Runtime, targetRuntime.ClrVersion);
 
             bool useX86Agent = package.GetSetting(EnginePackageSettings.RunAsX86, false);
             bool debugTests = package.GetSetting(EnginePackageSettings.DebugTests, false);

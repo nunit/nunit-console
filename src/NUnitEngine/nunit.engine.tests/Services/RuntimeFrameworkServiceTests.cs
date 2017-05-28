@@ -32,6 +32,13 @@ namespace NUnit.Engine.Services.Tests
     {
         private RuntimeFrameworkService _runtimeService;
 
+        static readonly RuntimeType CurrentRuntime =
+            Type.GetType("Mono.Runtime", false) != null
+                ? RuntimeType.Mono
+                : Environment.OSVersion.Platform == PlatformID.WinCE
+                    ? RuntimeType.NetCF
+                    : RuntimeType.Net;
+
         [SetUp]
         public void CreateServiceContext()
         {
@@ -88,6 +95,29 @@ namespace NUnit.Engine.Services.Tests
 
             _runtimeService.SelectRuntimeFramework(package);
             Assert.That(package.GetSetting<string>(EnginePackageSettings.RuntimeFramework, null), Is.EqualTo(requested));
+        }
+
+        [Test]
+        public void CanGetCurrentFramework()
+        {
+            RuntimeFramework framework = RuntimeFrameworkService.CurrentFramework;
+
+            Assert.That(framework.Runtime, Is.EqualTo(CurrentRuntime));
+            Assert.That(framework.ClrVersion, Is.EqualTo(Environment.Version));
+        }
+
+        [Test]
+        public void CurrentFrameworkHasBuildSpecified()
+        {
+            Assert.That(RuntimeFrameworkService.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
+        }
+
+        [Test]
+        public void CurrentFrameworkMustBeAvailable()
+        {
+            var current = RuntimeFrameworkService.CurrentFramework;
+            Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
+            Assert.That(current.IsAvailable, "{0} not available", current);
         }
     }
 }

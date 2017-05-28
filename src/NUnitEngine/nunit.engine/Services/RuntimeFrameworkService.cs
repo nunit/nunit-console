@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using Mono.Cecil;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Services.FrameworkUtilities;
 
 namespace NUnit.Engine.Services
 {
@@ -40,6 +41,11 @@ namespace NUnit.Engine.Services
         // on RuntimeFramework class for a more detailled explanation.
         static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
 
+        static RuntimeFrameworkService()
+        {
+            CurrentFramework = CurrentFrameworkLocator.GetCurrentFramework();
+        }
+
         #region Instance Properties
 
         /// <summary>
@@ -49,6 +55,11 @@ namespace NUnit.Engine.Services
         {
             get { return _availableRuntimes; }
         }
+
+        /// <summary>
+        /// Returns the framework that is currently in use.
+        /// </summary>
+        public static RuntimeFramework CurrentFramework { get; }
 
         #endregion
 
@@ -84,13 +95,12 @@ namespace NUnit.Engine.Services
             ApplyImageData(package);
 
             // Examine the provided settings
-            RuntimeFramework currentFramework = RuntimeFramework.CurrentFramework;
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             RuntimeFramework requestedFramework = frameworkSetting.Length > 0
                 ? RuntimeFramework.Parse(frameworkSetting)
                 : new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
 
-            log.Debug("Current framework is {0}", currentFramework);
+            log.Debug("Current framework is {0}", CurrentFramework);
             if (requestedFramework == null)
                 log.Debug("No specific framework requested");
             else
@@ -100,16 +110,16 @@ namespace NUnit.Engine.Services
             Version targetVersion = requestedFramework.FrameworkVersion;
 
             if (targetRuntime == RuntimeType.Any)
-                targetRuntime = currentFramework.Runtime;
+                targetRuntime = CurrentFramework.Runtime;
 
             if (targetVersion == RuntimeFramework.DefaultVersion)
-                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, currentFramework.FrameworkVersion);
+                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, CurrentFramework.FrameworkVersion);
 
             if (!new RuntimeFramework(targetRuntime, targetVersion).IsAvailable)
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
-                if (targetVersion < currentFramework.FrameworkVersion)
-                    targetVersion = currentFramework.FrameworkVersion;
+                if (targetVersion < CurrentFramework.FrameworkVersion)
+                    targetVersion = CurrentFramework.FrameworkVersion;
             }
 
             RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);

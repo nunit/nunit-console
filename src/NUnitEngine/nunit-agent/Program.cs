@@ -86,7 +86,7 @@ namespace NUnit.Agent
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
                 Environment.Version,
-                RuntimeFramework.CurrentFramework.DisplayName);
+                RuntimeFrameworkService.CurrentFramework.DisplayName);
 
             // Restore the COMPLUS_Version env variable if it's been overridden by TestAgency::LaunchAgentProcess
             try
