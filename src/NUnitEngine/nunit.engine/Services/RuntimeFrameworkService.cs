@@ -33,10 +33,14 @@ namespace NUnit.Engine.Services
     {
         static Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
+        private static readonly Version AnyVersion = new Version(0, 0);
+
         // HACK: This line forces RuntimeFramework to initialize the static property
         // AvailableFrameworks before it is accessed by multiple threads. See comment
         // on RuntimeFramework class for a more detailled explanation.
         static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
+
+        #region Instance Properties
 
         /// <summary>
         /// Gets a list of available runtimes.
@@ -45,6 +49,10 @@ namespace NUnit.Engine.Services
         {
             get { return _availableRuntimes; }
         }
+
+        #endregion
+
+        #region Public methods
 
         /// <summary>
         /// Returns true if the runtime framework represented by
@@ -60,30 +68,6 @@ namespace NUnit.Engine.Services
                     return true;
 
             return false;
-        }
-
-        private static readonly Version AnyVersion = new Version(0, 0);
-
-        private static bool FrameworksMatch(RuntimeFramework f1, RuntimeFramework f2)
-        {
-            var rt1 = f1.Runtime;
-            var rt2 = f2.Runtime;
-
-            if (rt1 != RuntimeType.Any && rt2 != RuntimeType.Any && rt1 != rt2)
-                return false;
-
-            var v1 = f1.ClrVersion;
-            var v2 = f2.ClrVersion;
-
-            if (v1 == AnyVersion || v2 == AnyVersion)
-                return true;
-
-            return v1.Major == v2.Major &&
-                   v1.Minor == v2.Minor &&
-                   (v1.Build < 0 || v2.Build < 0 || v1.Build == v2.Build) &&
-                   (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision) &&
-                   f1.FrameworkVersion.Major == f2.FrameworkVersion.Major &&
-                   f1.FrameworkVersion.Minor == f2.FrameworkVersion.Minor;
         }
 
         /// <summary>
@@ -135,6 +119,8 @@ namespace NUnit.Engine.Services
 
             return targetFramework.ToString();
         }
+
+        #endregion
 
         #region Helper Methods
 
@@ -242,6 +228,28 @@ namespace NUnit.Engine.Services
                 package.Settings[EnginePackageSettings.RunAsX86] = true;
 
             package.Settings[InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver] = requiresAssemblyResolver;
+        }
+
+        private static bool FrameworksMatch(RuntimeFramework f1, RuntimeFramework f2)
+        {
+            var rt1 = f1.Runtime;
+            var rt2 = f2.Runtime;
+
+            if (rt1 != RuntimeType.Any && rt2 != RuntimeType.Any && rt1 != rt2)
+                return false;
+
+            var v1 = f1.ClrVersion;
+            var v2 = f2.ClrVersion;
+
+            if (v1 == AnyVersion || v2 == AnyVersion)
+                return true;
+
+            return v1.Major == v2.Major &&
+                   v1.Minor == v2.Minor &&
+                   (v1.Build < 0 || v2.Build < 0 || v1.Build == v2.Build) &&
+                   (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision) &&
+                   f1.FrameworkVersion.Major == f2.FrameworkVersion.Major &&
+                   f1.FrameworkVersion.Minor == f2.FrameworkVersion.Minor;
         }
 
         #endregion

@@ -121,6 +121,7 @@
     <Compile Include="Services\AgentDataBase.cs" />
     <Compile Include="Services\ExtensionAssembly.cs" />
     <Compile Include="Services\ExtensionService.cs" />
+    <Compile Include="Services\FrameworkUtilities\DotNetFrameworkLocator.cs" />
     <Compile Include="Services\ResultWriters\NUnit3XmlResultWriter.cs" />
     <Compile Include="Services\ResultWriters\TestCaseResultWriter.cs" />
     <Compile Include="Services\ResultWriters\XmlTransformResultWriter.cs" />
