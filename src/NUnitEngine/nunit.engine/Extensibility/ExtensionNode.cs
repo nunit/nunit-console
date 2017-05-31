@@ -131,7 +131,11 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         public object CreateExtensionObject(params object[] args)
         {
-            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null, null);
+            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null
+#if NET_2_0
+               , null
+#endif
+              );
         }
 
         public void AddProperty(string name, string val)

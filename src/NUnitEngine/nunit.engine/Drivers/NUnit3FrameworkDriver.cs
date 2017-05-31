@@ -165,12 +165,11 @@ namespace NUnit.Engine.Drivers
             try
             {
                 return _testDomain.CreateInstanceAndUnwrap(
-                    NUNIT_FRAMEWORK, typeName, false, 0,
-#if !NET_4_0
-                    null, args, null, null, null);
-#else
-                null, args, null, null );
+                    NUNIT_FRAMEWORK, typeName, false, 0, null, args, null, null
+#if NET_2_0
+                    , null
 #endif
+					);
             }
             catch (TargetInvocationException ex)
             {
