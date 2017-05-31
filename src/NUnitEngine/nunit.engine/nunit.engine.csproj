@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">
+    <DefineConstants>$(DefineConstants);NET_2_0</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
