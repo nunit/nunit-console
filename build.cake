@@ -1,3 +1,10 @@
+// Load the extensions to create the chocolatey package
+#tool "NUnit.Extension.VSProjectLoader"
+#tool "NUnit.Extension.NUnitProjectLoader"
+#tool "NUnit.Extension.NUnitV2ResultWriter"
+#tool "NUnit.Extension.NUnitV2Driver"
+#tool "NUnit.Extension.TeamCityEventListener"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -402,6 +409,37 @@ Task("PackageConsole")
         });
     });
 
+Task("PackageChocolatey")
+	.Description("Creates chocolate packages of the console runner")
+    .IsDependentOn("CreateImage")
+	.Does(() =>
+	{
+		var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+		
+		EnsureDirectoryExists(PACKAGE_DIR);
+		
+		// Since cake does not yet support a working directory and separate output directory for chocolatey, the following copying and hacks are needed.
+		EnsureDirectoryExists(currentImageDir + "addins");
+		CopyFileToDirectory("choco/nunit-console.portable.nuspec", currentImageDir);
+		CopyFileToDirectory("tools/NUnit.Extension.NUnitProjectLoader/tools/nunit-project-loader.dll", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.NUnitV2Driver/tools/nunit.v2.driver.dll", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.NUnitV2Driver/tools/nunit.core.dll", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.NUnitV2Driver/tools/nunit.core.interfaces.dll", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.NUnitV2Driver/tools/nunit.v2.driver.addins", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.NUnitV2ResultWriter/tools/nunit-v2-result-writer.dll", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.TeamCityEventListener/tools/teamcity-event-listener.dll", currentImageDir + "addins");
+		CopyFileToDirectory("tools/NUnit.Extension.VSProjectLoader/tools/vs-project-loader.dll", currentImageDir + "addins");
+		Context.Environment.WorkingDirectory = currentImageDir;
+		
+		ChocolateyPack("nunit-console.portable.nuspec", 
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
+				//WorkingDirectory = currentImageDir,
+				OutputDirectory = PACKAGE_DIR
+			});
+	}); 
+
 //////////////////////////////////////////////////////////////////////
 // PACKAGE NETSTANDARD ENGINE
 //////////////////////////////////////////////////////////////////////
@@ -554,7 +592,8 @@ Task("Package")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageConsole")
-    .IsDependentOn("PackageNetStandardEngine");
+    .IsDependentOn("PackageNetStandardEngine")
+	.IsDependentOn("PackageChocolatey");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

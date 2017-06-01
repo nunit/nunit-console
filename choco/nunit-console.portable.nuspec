@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>nunit-console.portable</id>
+    <version>3.6.1</version>
+    <title>NUnit Console Runner Version 3 (No Extensions, Portable)</title>
+    <summary>Console runner for the NUnit 3 unit-testing framework, without any extensions.</summary>
+    <description>
+      This package includes the nunit3-console runner and test engine for version 3 of the NUnit unit-testing framework.
+    </description>
+    <projectUrl>http://nunit.org</projectUrl>
+    <projectSourceUrl>https://github.com/nunit/nunit-console</projectSourceUrl>
+    <docsUrl>https://github.com/nunit/docs/wiki/Console-Command-Line</docsUrl>
+    <bugTrackerUrl>https://github.com/nunit/nunit-console/issues</bugTrackerUrl>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <packageSourceUrl>https://github.com/nunit/nunit-console</packageSourceUrl>
+	<releaseNotes>https://raw.githubusercontent.com/nunit/nunit-console/master/CHANGES.txt</releaseNotes>
+	<mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
+    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <authors>nunit</authors>
+    <owners>nunit</owners>
+	<language>en-US</language>
+    <tags>nunit console runner test testing tdd</tags>
+    <copyright>Copyright (c) 2017 nunit</copyright>
+  </metadata>
+  <files>
+    <file src="LICENSE.txt" />
+    <file src="NOTICES.txt" />
+    <file src="CHANGES.txt" />
+    <file src="bin\nunit-agent.exe" target="tools" />
+    <file src="bin\nunit-agent.exe.config" target="tools" />
+    <file src="bin\nunit-agent-x86.exe" target="tools" />
+    <file src="bin\nunit-agent-x86.exe.config" target="tools" />
+    <file src="bin\nunit3-console.exe" target="tools" />
+    <file src="bin\nunit3-console.exe.config" target="tools" />
+    <file src="bin\nunit.engine.api.dll" target="tools" />
+    <file src="bin\nunit.engine.api.xml" target="tools" />
+    <file src="bin\nunit.engine.dll" target="tools" />
+    <file src="bin\Mono.Cecil.dll" target="tools" />
+    <file src="..\..\nuget\engine\nunit.nuget.addins" target="tools"/>
+	<file src="addins\nunit-project-loader.dll" target="tools\addins" />
+	<file src="addins\nunit.v2.driver.dll" target="tools\addins" />
+	<file src="addins\nunit.core.dll" target="tools\addins" />
+	<file src="addins\nunit.core.interfaces.dll" target="tools\addins" />
+	<file src="addins\nunit.v2.driver.addins" target="tools\addins" />
+	<file src="addins\nunit-v2-result-writer.dll" target="tools\addins" />
+	<file src="addins\teamcity-event-listener.dll" target="tools\addins" />
+	<file src="addins\vs-project-loader.dll" target="tools\addins" />
+  </files>
+</package>
