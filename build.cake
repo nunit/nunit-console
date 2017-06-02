@@ -1,6 +1,7 @@
-#addin "Cake.ExtendedNuGet"
-#addin "nuget:?package=NuGet.Core&version=2.8.6"
+#addin "nuget:?package=Cake.ExtendedNuGet&version=1.0.0.22"
+#addin "nuget:?package=NuGet.Core&version=2.12.0"
 #addin "Cake.FileHelpers"
+
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -13,8 +14,8 @@ var configuration = Argument("configuration", "Release");
 // VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.6.0";
-var displayVersion = "3.6.0";
+var version = "3.6.1";
+var displayVersion = "3.6.1";
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGES
@@ -101,9 +102,9 @@ Task("WriteComponentsFile")
 .Does(context =>
 {
     List<string> lines = new List<string> { "This package contains the following components:", "" };
-	
+
 	var packageDirs = new [] { RUNNER_PACKAGES_DIR, EXTENSION_PACKAGES_DIR };
-	
+
 	foreach (var packageDir in packageDirs)
 	{
 		foreach(var nupkgPath in GetFiles(packageDir + "*/*.nupkg"))
