@@ -415,25 +415,29 @@ Task("PackageChocolatey")
 		
 		// Note: Since cake does not yet support a working directory and separate output directory for chocolatey, the following copying and hacks are needed.
 		
-		// List with the addins (addin name, primary dll, additional files)
-		var addins = new Tuple<string, string, string[]>[] {
-			new Tuple<string, string, string[]>(
+		// List with the addins (addin name, version, primary dll, additional files)
+		var addins = new Tuple<string, string, string, string[]>[] {
+			new Tuple<string, string, string, string[]>(
 				"NUnit.Extension.VSProjectLoader",
+				"3.5.0",
 				"vs-project-loader.dll",
 				null
 			),
-			new Tuple<string, string, string[]>(
+			new Tuple<string, string, string, string[]>(
 				"NUnit.Extension.NUnitProjectLoader",
+				"3.5.0",
 				"nunit-project-loader.dll",
 				null
 			),
-			new Tuple<string, string, string[]>(
+			new Tuple<string, string, string, string[]>(
 				"NUnit.Extension.NUnitV2ResultWriter",
+				"3.5.0",
 				"nunit-v2-result-writer.dll",
 				null
 			),
-			new Tuple<string, string, string[]>(
+			new Tuple<string, string, string, string[]>(
 				"NUnit.Extension.NUnitV2Driver",
+				"3.6.0",
 				"nunit.v2.driver.dll",
 				new [] {
 					"nunit.core.dll",
@@ -441,8 +445,9 @@ Task("PackageChocolatey")
 					"nunit.v2.driver.addins"
 				}
 			),
-			new Tuple<string, string, string[]>(
+			new Tuple<string, string, string, string[]>(
 				"NUnit.Extension.TeamCityEventListener",
+				"1.0.2",
 				"teamcity-event-listener.dll",
 				null
 			)
@@ -454,22 +459,24 @@ Task("PackageChocolatey")
 		var addinsDir = System.IO.Path.Combine(currentImageDir, "addins");
 		EnsureDirectoryExists(addinsDir);
 		foreach (var addin in addins) {
+			// Set the version
+			nugetInstallSettings.Version = addin.Item2;
 			// Install the extension
 			NuGetInstall(addin.Item1, nugetInstallSettings);
 			var addinToolsPath = System.IO.Path.Combine(toolsDir, addin.Item1, "tools");
 			// Copy primary dll
-			var primaryDllPath = System.IO.Path.Combine(addinToolsPath, addin.Item2);
+			var primaryDllPath = System.IO.Path.Combine(addinToolsPath, addin.Item3);
 			CopyFileToDirectory(primaryDllPath, addinsDir);
 			// Copy additional files
-			if (addin.Item3 != null) {
-				foreach (var additionalItem in addin.Item3) {
+			if (addin.Item4 != null) {
+				foreach (var additionalItem in addin.Item4) {
 					var additionalItemPath = System.IO.Path.Combine(addinToolsPath, additionalItem);
 					CopyFileToDirectory(additionalItemPath, addinsDir);
 				}
 			}
 			// Write the primary dll to the addins file
 			FileAppendLines(System.IO.Path.Combine(currentImageDir, "nunit.engine.addins"), new[] {
-				System.IO.Path.Combine("addins", addin.Item2)
+				System.IO.Path.Combine("addins", addin.Item3)
 			});
 		}	
 				

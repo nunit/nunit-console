@@ -19,11 +19,11 @@
 	<mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
     <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <authors>nunit</authors>
-    <owners>nunit</owners>
+    <authors>Charlie Poole</authors>
+    <owners>Charlie Poole</owners>
 	<language>en-US</language>
     <tags>nunit console runner test testing tdd</tags>
-    <copyright>Copyright (c) 2017 nunit</copyright>
+    <copyright>Copyright (c) 2017 Charlie Poole</copyright>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
