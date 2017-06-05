@@ -62,6 +62,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mock-assembly", "src\NUnitE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "notest-assembly", "src\NUnitEngine\notest-assembly\notest-assembly.csproj", "{B1D90742-39BD-429C-8E87-C5CD2991DF27}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA-A337-41D3-898D-C6A98278E6AD}"
+	ProjectSection(SolutionItems) = preProject
+		choco\nunit-console.nuspec = choco\nunit-console.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +126,7 @@ Global
 		{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{4FDF7BFA-A337-41D3-898D-C6A98278E6AD} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = src\NUnitFramework\tests\nunitlite.tests-2.0.csproj
