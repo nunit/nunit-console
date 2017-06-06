@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NUnit.Console</id>
-    <title>NUnit Console Runner Version 3 Plus Extensions</title>
+    <title>NUnit 3 Console Runner Plus Extensions</title>
     <version>$version$</version>
     <authors>Charlie Poole</authors>
     <owners>Charlie Poole</owners>

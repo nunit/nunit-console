@@ -479,17 +479,24 @@ Task("PackageChocolatey")
 			});
 		}	
 				
-		// Copy the nuspec file
-		CopyFileToDirectory("choco/nunit-console.nuspec", currentImageDir);
+		// Copy the nuspec files
+		CopyFileToDirectory("choco/nunit-console-runner.nuspec", currentImageDir);
+		CopyFileToDirectory("choco/nunit-console-with-extensions.nuspec", currentImageDir);
 		
 		// Set the working directory
 		Context.Environment.WorkingDirectory = currentImageDir;
 		
-		ChocolateyPack("nunit-console.nuspec", 
+		ChocolateyPack("nunit-console-runner.nuspec", 
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
-				//WorkingDirectory = currentImageDir,
+				OutputDirectory = PACKAGE_DIR
+			});
+		
+		ChocolateyPack("nunit-console-with-extensions.nuspec", 
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
 				OutputDirectory = PACKAGE_DIR
 			});
 	}); 

@@ -64,7 +64,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "notest-assembly", "src\NUni
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA-A337-41D3-898D-C6A98278E6AD}"
 	ProjectSection(SolutionItems) = preProject
-		choco\nunit-console.nuspec = choco\nunit-console.nuspec
+		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
+		choco\nunit-console-with-extensions.nuspec = choco\nunit-console-with-extensions.nuspec
 	EndProjectSection
 EndProject
 Global
