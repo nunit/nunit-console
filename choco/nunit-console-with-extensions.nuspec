@@ -40,8 +40,10 @@
     <file src="CHANGES.txt" />
     <file src="bin\nunit-agent.exe" target="tools" />
     <file src="bin\nunit-agent.exe.config" target="tools" />
+    <file src="bin\nunit-agent.exe.ignore" target="tools" />
     <file src="bin\nunit-agent-x86.exe" target="tools" />
     <file src="bin\nunit-agent-x86.exe.config" target="tools" />
+    <file src="bin\nunit-agent-x86.exe.ignore" target="tools" />
     <file src="bin\nunit3-console.exe" target="tools" />
     <file src="bin\nunit3-console.exe.config" target="tools" />
     <file src="bin\nunit.engine.api.dll" target="tools" />

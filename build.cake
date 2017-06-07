@@ -482,7 +482,9 @@ Task("PackageChocolatey")
 		// Copy the nuspec files
 		CopyFileToDirectory("choco/nunit-console-runner.nuspec", currentImageDir);
 		CopyFileToDirectory("choco/nunit-console-with-extensions.nuspec", currentImageDir);
-		
+		CopyFileToDirectory("choco/nunit-agent.exe.ignore", currentImageDir + "bin/");
+		CopyFileToDirectory("choco/nunit-agent-x86.exe.ignore", currentImageDir + "bin");
+				
 		// Set the working directory
 		Context.Environment.WorkingDirectory = currentImageDir;
 		
