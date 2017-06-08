@@ -1,3 +1,5 @@
+#addin "Cake.FileHelpers"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -402,6 +404,97 @@ Task("PackageConsole")
         });
     });
 
+Task("PackageChocolatey")
+	.Description("Creates chocolate packages of the console runner")
+    .IsDependentOn("CreateImage")
+	.Does(() =>
+	{
+		var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+		
+		EnsureDirectoryExists(PACKAGE_DIR);
+		
+		// Note: Since cake does not yet support a working directory and separate output directory for chocolatey, the following copying and hacks are needed.
+		
+		// List with the addins (addin name, version, primary dll, additional files)
+		var addins = new Tuple<string, string, string, string[]>[] {
+			new Tuple<string, string, string, string[]>(
+				"NUnit.Extension.VSProjectLoader",
+				"3.5.0",
+				"vs-project-loader.dll",
+				null
+			),
+			new Tuple<string, string, string, string[]>(
+				"NUnit.Extension.NUnitProjectLoader",
+				"3.5.0",
+				"nunit-project-loader.dll",
+				null
+			),
+			new Tuple<string, string, string, string[]>(
+				"NUnit.Extension.NUnitV2ResultWriter",
+				"3.5.0",
+				"nunit-v2-result-writer.dll",
+				null
+			),
+			new Tuple<string, string, string, string[]>(
+				"NUnit.Extension.NUnitV2Driver",
+				"3.6.0",
+				"nunit.v2.driver.dll",
+				new [] {
+					"nunit.core.dll",
+					"nunit.core.interfaces.dll",
+					"nunit.v2.driver.addins"
+				}
+			),
+			new Tuple<string, string, string, string[]>(
+				"NUnit.Extension.TeamCityEventListener",
+				"1.0.2",
+				"teamcity-event-listener.dll",
+				null
+			)
+		};
+		
+		// Install and copy the addin files
+		var toolsDir = "tools";
+		var nugetInstallSettings = new NuGetInstallSettings { OutputDirectory = toolsDir, ExcludeVersion = true };
+		var addinsDir = System.IO.Path.Combine(currentImageDir, "addins");
+		EnsureDirectoryExists(addinsDir);
+		foreach (var addin in addins) {
+			// Set the version
+			nugetInstallSettings.Version = addin.Item2;
+			// Install the extension
+			NuGetInstall(addin.Item1, nugetInstallSettings);
+			var addinToolsPath = System.IO.Path.Combine(toolsDir, addin.Item1, "tools");
+			// Copy primary dll
+			var primaryDllPath = System.IO.Path.Combine(addinToolsPath, addin.Item3);
+			CopyFileToDirectory(primaryDllPath, addinsDir);
+			// Copy additional files
+			if (addin.Item4 != null) {
+				foreach (var additionalItem in addin.Item4) {
+					var additionalItemPath = System.IO.Path.Combine(addinToolsPath, additionalItem);
+					CopyFileToDirectory(additionalItemPath, addinsDir);
+				}
+			}
+			// Write the primary dll to the addins file
+			FileAppendLines(System.IO.Path.Combine(currentImageDir, "nunit.engine.addins"), new[] {
+				System.IO.Path.Combine("addins", addin.Item3)
+			});
+		}	
+				
+		// Copy the nuspec file
+		CopyFileToDirectory("choco/nunit-console.nuspec", currentImageDir);
+		
+		// Set the working directory
+		Context.Environment.WorkingDirectory = currentImageDir;
+		
+		ChocolateyPack("nunit-console.nuspec", 
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
+				//WorkingDirectory = currentImageDir,
+				OutputDirectory = PACKAGE_DIR
+			});
+	}); 
+
 //////////////////////////////////////////////////////////////////////
 // PACKAGE NETSTANDARD ENGINE
 //////////////////////////////////////////////////////////////////////
@@ -554,7 +647,8 @@ Task("Package")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageConsole")
-    .IsDependentOn("PackageNetStandardEngine");
+    .IsDependentOn("PackageNetStandardEngine")
+	.IsDependentOn("PackageChocolatey");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")
