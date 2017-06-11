@@ -492,14 +492,52 @@ Task("PackageChocolatey")
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
-				OutputDirectory = PACKAGE_DIR
+				OutputDirectory = PACKAGE_DIR,
+				Files = new []
+				{
+					new ChocolateyNuSpecContent { Source = "LICENSE.txt" },
+					new ChocolateyNuSpecContent { Source = "NOTICES.txt" },
+					new ChocolateyNuSpecContent { Source = "CHANGES.txt" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.config", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.ignore", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.config", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.ignore", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe.config", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.dll", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.xml", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.dll", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/Mono.Cecil.dll", Target="tools" }
+				}
 			});
 		
 		ChocolateyPack("nunit-console-with-extensions.nuspec", 
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
-				OutputDirectory = PACKAGE_DIR
+				OutputDirectory = PACKAGE_DIR,
+				Files = new []
+				{
+					new ChocolateyNuSpecContent { Source = "LICENSE.txt" },
+					new ChocolateyNuSpecContent { Source = "NOTICES.txt" },
+					new ChocolateyNuSpecContent { Source = "CHANGES.txt" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.config", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.ignore", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.config", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.ignore", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe.config", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.dll", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.xml", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.dll", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "bin/Mono.Cecil.dll", Target="tools" },
+					new ChocolateyNuSpecContent { Source = "nunit.engine.addins", Target="tools" },	
+					new ChocolateyNuSpecContent { Source = "addins/**/*.*", Target="tools" }	
+				}
 			});
 	}); 
 
