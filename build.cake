@@ -405,17 +405,20 @@ Task("PackageConsole")
         });
     });
 
+// Unlike other tasks, this one does not depend on creation of the
+// image directory. I think this is the direction we want to go 
+// for all the different packages, but it's for a separate change.
 Task("PackageChocolatey")
 	.Description("Creates chocolatey packages of the console runner")
 	.Does(() =>
 	{
+	    // Using image dir just as a place to hold this one file for now
 		var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
 		
 		EnsureDirectoryExists(PACKAGE_DIR);
 		
-		// Note: Since cake does not yet support a working directory and separate output directory for chocolatey, the following copying and hacks are needed.
-		
 		// List with the extensions (name, version, primary dll) we are installing
+		// We need this to download the extensions and to produce the addins file
 		var extensions = new Tuple<string, string, string>[] {
 			new Tuple<string, string, string>(
 				"NUnit.Extension.VSProjectLoader",
@@ -480,6 +483,8 @@ Task("PackageChocolatey")
 			new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
 		};
 
+		// Used for the creation of the package. Duplicates what is in the extensions
+		// structure, unfortunately. Should be changed.
 		var extensionContent = new []
 		{
 			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.addins", Target="tools" },	
