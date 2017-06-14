@@ -31,6 +31,7 @@ var packageVersion = version + modifier + dbgSuffix;
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = PROJECT_DIR + "package/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
 
 var SOLUTION_FILE = "NUnitConsole.sln";
@@ -405,8 +406,7 @@ Task("PackageConsole")
     });
 
 Task("PackageChocolatey")
-	.Description("Creates chocolate packages of the console runner")
-    .IsDependentOn("CreateImage")
+	.Description("Creates chocolatey packages of the console runner")
 	.Does(() =>
 	{
 		var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
@@ -415,129 +415,100 @@ Task("PackageChocolatey")
 		
 		// Note: Since cake does not yet support a working directory and separate output directory for chocolatey, the following copying and hacks are needed.
 		
-		// List with the addins (addin name, version, primary dll, additional files)
-		var addins = new Tuple<string, string, string, string[]>[] {
-			new Tuple<string, string, string, string[]>(
+		// List with the extensions (name, version, primary dll) we are installing
+		var extensions = new Tuple<string, string, string>[] {
+			new Tuple<string, string, string>(
 				"NUnit.Extension.VSProjectLoader",
 				"3.5.0",
-				"vs-project-loader.dll",
-				null
+				"vs-project-loader.dll"
 			),
-			new Tuple<string, string, string, string[]>(
+			new Tuple<string, string, string>(
 				"NUnit.Extension.NUnitProjectLoader",
 				"3.5.0",
-				"nunit-project-loader.dll",
-				null
+				"nunit-project-loader.dll"
 			),
-			new Tuple<string, string, string, string[]>(
+			new Tuple<string, string, string>(
 				"NUnit.Extension.NUnitV2ResultWriter",
 				"3.5.0",
-				"nunit-v2-result-writer.dll",
-				null
+				"nunit-v2-result-writer.dll"
 			),
-			new Tuple<string, string, string, string[]>(
+			new Tuple<string, string, string>(
 				"NUnit.Extension.NUnitV2Driver",
 				"3.6.0",
-				"nunit.v2.driver.dll",
-				new [] {
-					"nunit.core.dll",
-					"nunit.core.interfaces.dll"
-				}
+				"nunit.v2.driver.dll"
 			),
-			new Tuple<string, string, string, string[]>(
+			new Tuple<string, string, string>(
 				"NUnit.Extension.TeamCityEventListener",
 				"1.0.2",
-				"teamcity-event-listener.dll",
-				null
+				"teamcity-event-listener.dll"
 			)
 		};
 		
-		// Install and copy the addin files
-		var toolsDir = "tools";
-		var nugetInstallSettings = new NuGetInstallSettings { OutputDirectory = toolsDir, ExcludeVersion = true };
-		var addinsDir = System.IO.Path.Combine(currentImageDir, "addins");
-		EnsureDirectoryExists(addinsDir);
-		foreach (var addin in addins) {
-			// Set the version
-			nugetInstallSettings.Version = addin.Item2;
-			// Install the extension
-			NuGetInstall(addin.Item1, nugetInstallSettings);
-			var addinToolsPath = System.IO.Path.Combine(toolsDir, addin.Item1, "tools");
-			// Copy primary dll
-			var primaryDllPath = System.IO.Path.Combine(addinToolsPath, addin.Item3);
-			CopyFileToDirectory(primaryDllPath, addinsDir);
-			// Copy additional files
-			if (addin.Item4 != null) {
-				foreach (var additionalItem in addin.Item4) {
-					var additionalItemPath = System.IO.Path.Combine(addinToolsPath, additionalItem);
-					CopyFileToDirectory(additionalItemPath, addinsDir);
-				}
-			}
+		// Install the extension files we are including
+		foreach (var extension in extensions)
+		{
+			NuGetInstall(extension.Item1,
+				new NuGetInstallSettings 
+				{ 
+				    OutputDirectory = TOOLS_DIR,
+					Version = extension.Item2,
+					ExcludeVersion = true 
+				});
+
 			// Write the primary dll to the addins file
 			FileAppendLines(System.IO.Path.Combine(currentImageDir, "nunit.engine.addins"), new[] {
-				System.IO.Path.Combine("addins", addin.Item3)
+				System.IO.Path.Combine("addins", extension.Item3)
 			});
-		}	
-				
-		// Copy the nuspec files
-		CopyFileToDirectory("choco/nunit-console-runner.nuspec", currentImageDir);
-		CopyFileToDirectory("choco/nunit-console-with-extensions.nuspec", currentImageDir);
-		CopyFileToDirectory("choco/nunit-agent.exe.ignore", currentImageDir + "bin/");
-		CopyFileToDirectory("choco/nunit-agent-x86.exe.ignore", currentImageDir + "bin");
-				
-		// Set the working directory
-		Context.Environment.WorkingDirectory = currentImageDir;
+		}
 		
-		ChocolateyPack("nunit-console-runner.nuspec", 
+		var basicContent = new []
+		{
+			new ChocolateyNuSpecContent { Source = "../LICENSE.txt" },
+			new ChocolateyNuSpecContent { Source = "../NOTICES.txt" },
+			new ChocolateyNuSpecContent { Source = "../CHANGES.txt" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe.config", Target="tools" },
+			new ChocolateyNuSpecContent { Source = "nunit-agent.exe.ignore", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
+			new ChocolateyNuSpecContent { Source = "nunit-agent-x86.exe.ignore", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe.config", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.dll", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.xml", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.dll", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
+		};
+
+		var extensionContent = new []
+		{
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.addins", Target="tools" },	
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.VSProjectLoader/tools/vs-project-loader.dll", Target="tools/addins" },	
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitProjectLoader/tools/nunit-project-loader.dll", Target="tools/addins" },	
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2ResultWriter/tools/nunit-v2-result-writer.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2Driver/tools/nunit.v2.driver.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2Driver/tools/nunit.core.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2Driver/tools/nunit.core.interfaces.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.TeamCityEventListener/tools/teamcity-event-listener.dll", Target="tools/addins" }
+		};
+							
+		ChocolateyPack("choco/nunit-console-runner.nuspec", 
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
 				OutputDirectory = PACKAGE_DIR,
-				Files = new []
-				{
-					new ChocolateyNuSpecContent { Source = "LICENSE.txt" },
-					new ChocolateyNuSpecContent { Source = "NOTICES.txt" },
-					new ChocolateyNuSpecContent { Source = "CHANGES.txt" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.config", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.ignore", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.config", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.ignore", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe.config", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.dll", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.xml", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.dll", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/Mono.Cecil.dll", Target="tools" }
-				}
+				Files = basicContent
 			});
 		
-		ChocolateyPack("nunit-console-with-extensions.nuspec", 
+		var fullContent = new List<ChocolateyNuSpecContent>( basicContent );
+		fullContent.AddRange(extensionContent);
+
+		ChocolateyPack("choco/nunit-console-with-extensions.nuspec", 
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
 				OutputDirectory = PACKAGE_DIR,
-				Files = new []
-				{
-					new ChocolateyNuSpecContent { Source = "LICENSE.txt" },
-					new ChocolateyNuSpecContent { Source = "NOTICES.txt" },
-					new ChocolateyNuSpecContent { Source = "CHANGES.txt" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.config", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent.exe.ignore", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.config", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit-agent-x86.exe.ignore", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit3-console.exe.config", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.dll", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.api.xml", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/nunit.engine.dll", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "bin/Mono.Cecil.dll", Target="tools" },
-					new ChocolateyNuSpecContent { Source = "nunit.engine.addins", Target="tools" },	
-					new ChocolateyNuSpecContent { Source = "addins/**/*.*", Target="tools" }	
-				}
+				Files = fullContent
 			});
 	}); 
 
