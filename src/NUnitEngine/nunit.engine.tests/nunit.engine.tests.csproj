@@ -79,8 +79,17 @@
     <Compile Include="Drivers\NUnit3FrameworkDriverTests.cs" />
     <Compile Include="DummyExtensions.cs" />
     <Compile Include="HangingAppDomainFixture.cs" />
+    <Compile Include="Helpers\ProcessUtils.cs" />
+    <Compile Include="Helpers\ShadowCopyUtils.cs" />
+    <Compile Include="Integration\DirectoryWithNeededAssemblies.cs" />
+    <Compile Include="Integration\IntegrationTests.cs" />
+    <Compile Include="Integration\MockAssemblyInDirectoryWithFramework.cs" />
+    <Compile Include="Integration\RemoteAgentTests.cs" />
+    <Compile Include="Helpers\StackEnumerator.cs" />
+    <Compile Include="Integration\RunnerInDirectoryWithoutFramework.cs" />
     <Compile Include="Internal\AssemblyHelperTests.cs" />
     <Compile Include="Internal\DirectoryFinderTests.cs" />
+    <Compile Include="Internal\SettingsStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Drivers\NotRunnableFrameworkDriverTests.cs" />
     <Compile Include="Internal\PathUtilTests.cs" />

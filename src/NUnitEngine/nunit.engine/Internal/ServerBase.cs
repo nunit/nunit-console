@@ -24,7 +24,6 @@
 using System;
 using System.Threading;
 using System.Runtime.Remoting;
-using System.Runtime.Remoting.Services;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
@@ -39,6 +38,7 @@ namespace NUnit.Engine.Internal
         protected int port;
 
         private TcpChannel channel;
+        private CurrentMessageCounter currentMessageCounter;
         private bool isMarshalled;
 
         private object theLock = new object();
@@ -47,11 +47,6 @@ namespace NUnit.Engine.Internal
         {
         }
 
-        /// <summary>
-        /// Constructor used to provide
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="port"></param>
         protected ServerBase(string uri, int port)
         {
             this.uri = uri;
@@ -69,7 +64,8 @@ namespace NUnit.Engine.Internal
             {
                 lock (theLock)
                 {
-                    this.channel = ServerUtilities.GetTcpChannel(uri + "Channel", port, 100);
+                    this.currentMessageCounter = new CurrentMessageCounter();
+                    this.channel = ServerUtilities.GetTcpChannel(uri + "Channel", port, 100, currentMessageCounter);
 
                     RemotingServices.Marshal(this, uri);
                     this.isMarshalled = true;
@@ -90,6 +86,8 @@ namespace NUnit.Engine.Internal
         [System.Runtime.Remoting.Messaging.OneWay]
         public virtual void Stop()
         {
+            currentMessageCounter.WaitForAllCurrentMessages();
+
             lock( theLock )
             {
                 if ( this.isMarshalled )

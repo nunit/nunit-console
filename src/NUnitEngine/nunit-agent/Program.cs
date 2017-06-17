@@ -22,8 +22,6 @@
 // ***********************************************************************
 
 using System;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
 using System.Diagnostics;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
@@ -44,12 +42,6 @@ namespace NUnit.Agent
         static Process AgencyProcess;
         static ITestAgency Agency;
         static RemoteTestAgent Agent;
-
-        /// <summary>
-        /// Channel used for communications with the agency
-        /// and with clients
-        /// </summary>
-        static TcpChannel Channel;
 
         private const string LOG_FILE_FORMAT = "nunit-agent_{0}.log";
 
@@ -133,7 +125,8 @@ namespace NUnit.Agent
             log.Info("Initializing Services");
             engine.Initialize();
 
-            Channel = ServerUtilities.GetTcpChannel();
+            // Owns the channel used for communications with the agency and with clients
+            var testAgencyServer = engine.Services.GetService<TestAgency>();
 
             log.Info("Connecting to TestAgency at {0}", AgencyUrl);
             try
@@ -145,32 +138,29 @@ namespace NUnit.Agent
                 log.Error("Unable to connect", ex);
             }
 
-            if (Channel != null)
+            log.Info("Starting RemoteTestAgent");
+            Agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
+
+            try
             {
-                log.Info("Starting RemoteTestAgent");
-                Agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
+                if (Agent.Start())
+                    WaitForStop();
+                else
+                    log.Error("Failed to start RemoteTestAgent");
+            }
+            catch (Exception ex)
+            {
+                log.Error("Exception in RemoteTestAgent", ex);
+            }
 
-                try
-                {
-                    if (Agent.Start())
-                        WaitForStop();
-                    else
-                        log.Error("Failed to start RemoteTestAgent");
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Exception in RemoteTestAgent", ex);
-                }
-
-                //log.Info("Unregistering Channel");
-                try
-                {
-                    ChannelServices.UnregisterChannel(Channel);
-                }
-                catch (Exception ex)
-                {
-                    log.Error("ChannelServices.UnregisterChannel threw an exception", ex);
-                }
+            try
+            {
+                // Unregister the channel
+                testAgencyServer.Stop();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Exception in TestAgency.Stop", ex);
             }
 
             log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);

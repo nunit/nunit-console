@@ -81,7 +81,7 @@ namespace NUnit.Engine.Drivers
             }
             catch (SerializationException ex)
             {
-                throw new NUnitEngineException("The NUnit 3.0 driver cannot support this test assembly. Use a platform specific runner.", ex);
+                throw new NUnitEngineException("The NUnit 3 driver cannot support this test assembly. Use a platform specific runner.", ex);
             }
 
             CallbackHandler handler = new CallbackHandler();
@@ -174,7 +174,7 @@ namespace NUnit.Engine.Drivers
             }
             catch (TargetInvocationException ex)
             {
-                throw new NUnitEngineException("The NUnit 3.0 driver encountered an error while executing reflected code.", ex.InnerException);
+                throw new NUnitEngineException("The NUnit 3 driver encountered an error while executing reflected code.", ex.InnerException);
             }
         }
 

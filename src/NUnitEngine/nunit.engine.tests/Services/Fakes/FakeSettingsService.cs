@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services.Tests.Fakes
@@ -45,8 +46,12 @@ namespace NUnit.Engine.Services.Tests.Fakes
         void IService.StopService()
         {
             _status = ServiceStatus.Stopped;
+            if (FailedToStop)
+                throw new ArgumentException(nameof(FailedToStop));
         }
 
         public bool FailToStart { get; set; }
+
+        public bool FailedToStop { get; set; }
     }
 }

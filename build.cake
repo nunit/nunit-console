@@ -1,3 +1,5 @@
+#addin "Cake.FileHelpers"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -29,6 +31,7 @@ var packageVersion = version + modifier + dbgSuffix;
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = PROJECT_DIR + "package/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
 
 var SOLUTION_FILE = "NUnitConsole.sln";
@@ -402,6 +405,118 @@ Task("PackageConsole")
         });
     });
 
+// Unlike other tasks, this one does not depend on creation of the
+// image directory. I think this is the direction we want to go 
+// for all the different packages, but it's for a separate change.
+Task("PackageChocolatey")
+	.Description("Creates chocolatey packages of the console runner")
+	.Does(() =>
+	{
+	    // Using image dir just as a place to hold this one file for now
+		var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+		
+		EnsureDirectoryExists(PACKAGE_DIR);
+		
+		// List with the extensions (name, version, primary dll) we are installing
+		// We need this to download the extensions and to produce the addins file
+		var extensions = new Tuple<string, string, string>[] {
+			new Tuple<string, string, string>(
+				"NUnit.Extension.VSProjectLoader",
+				"3.5.0",
+				"vs-project-loader.dll"
+			),
+			new Tuple<string, string, string>(
+				"NUnit.Extension.NUnitProjectLoader",
+				"3.5.0",
+				"nunit-project-loader.dll"
+			),
+			new Tuple<string, string, string>(
+				"NUnit.Extension.NUnitV2ResultWriter",
+				"3.5.0",
+				"nunit-v2-result-writer.dll"
+			),
+			new Tuple<string, string, string>(
+				"NUnit.Extension.NUnitV2Driver",
+				"3.6.0",
+				"nunit.v2.driver.dll"
+			),
+			new Tuple<string, string, string>(
+				"NUnit.Extension.TeamCityEventListener",
+				"1.0.2",
+				"teamcity-event-listener.dll"
+			)
+		};
+		
+		// Install the extension files we are including
+		foreach (var extension in extensions)
+		{
+			NuGetInstall(extension.Item1,
+				new NuGetInstallSettings 
+				{ 
+				    OutputDirectory = TOOLS_DIR,
+					Version = extension.Item2,
+					ExcludeVersion = true 
+				});
+
+			// Write the primary dll to the addins file
+			FileAppendLines(System.IO.Path.Combine(currentImageDir, "nunit.engine.addins"), new[] {
+				System.IO.Path.Combine("addins", extension.Item3)
+			});
+		}
+		
+		var basicContent = new []
+		{
+			new ChocolateyNuSpecContent { Source = "../LICENSE.txt" },
+			new ChocolateyNuSpecContent { Source = "../NOTICES.txt" },
+			new ChocolateyNuSpecContent { Source = "../CHANGES.txt" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe.config", Target="tools" },
+			new ChocolateyNuSpecContent { Source = "nunit-agent.exe.ignore", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
+			new ChocolateyNuSpecContent { Source = "nunit-agent-x86.exe.ignore", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe.config", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.dll", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.xml", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.dll", Target="tools" },
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
+		};
+
+		// Used for the creation of the package. Duplicates what is in the extensions
+		// structure, unfortunately. Should be changed.
+		var extensionContent = new []
+		{
+			new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.addins", Target="tools" },	
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.VSProjectLoader/tools/vs-project-loader.dll", Target="tools/addins" },	
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitProjectLoader/tools/nunit-project-loader.dll", Target="tools/addins" },	
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2ResultWriter/tools/nunit-v2-result-writer.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2Driver/tools/nunit.v2.driver.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2Driver/tools/nunit.core.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.NUnitV2Driver/tools/nunit.core.interfaces.dll", Target="tools/addins" },
+			new ChocolateyNuSpecContent { Source = TOOLS_DIR + "NUnit.Extension.TeamCityEventListener/tools/teamcity-event-listener.dll", Target="tools/addins" }
+		};
+							
+		ChocolateyPack("choco/nunit-console-runner.nuspec", 
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
+				OutputDirectory = PACKAGE_DIR,
+				Files = basicContent
+			});
+		
+		var fullContent = new List<ChocolateyNuSpecContent>( basicContent );
+		fullContent.AddRange(extensionContent);
+
+		ChocolateyPack("choco/nunit-console-with-extensions.nuspec", 
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
+				OutputDirectory = PACKAGE_DIR,
+				Files = fullContent
+			});
+	}); 
+
 //////////////////////////////////////////////////////////////////////
 // PACKAGE NETSTANDARD ENGINE
 //////////////////////////////////////////////////////////////////////
@@ -554,7 +669,8 @@ Task("Package")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageConsole")
-    .IsDependentOn("PackageNetStandardEngine");
+    .IsDependentOn("PackageNetStandardEngine")
+	.IsDependentOn("PackageChocolatey");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

@@ -24,8 +24,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Xml;
 #if NETSTANDARD1_3
 using System.Xml.Linq;
@@ -101,38 +101,41 @@ namespace NUnit.Engine.Internal
 
         public void SaveSettings()
         {
-            if (_writeable && _settings.Keys.Count > 0)
+            if (!_writeable || _settings.Keys.Count <= 0)
+                return;
+
+            try
             {
-                try
-                {
-                    string dirPath = Path.GetDirectoryName(_settingsFile);
-                    if (!Directory.Exists(dirPath))
-                        Directory.CreateDirectory(dirPath);
+                string dirPath = Path.GetDirectoryName(_settingsFile);
+                if (!Directory.Exists(dirPath))
+                    Directory.CreateDirectory(dirPath);
 
 #if NETSTANDARD1_3
-                    var settings = new XElement("Settings");
+                var settings = new XElement("Settings");
 
-                    List<string> keys = new List<string>(_settings.Keys);
-                    keys.Sort();
+                List<string> keys = new List<string>(_settings.Keys);
+                keys.Sort();
 
-                    foreach (string name in keys)
+                foreach (string name in keys)
+                {
+                    object val = GetSetting(name);
+                    if (val != null)
                     {
-                        object val = GetSetting(name);
-                        if (val != null)
-                        {
-                            settings.Add(new XElement("Setting",
-                                                        new XAttribute("name", name),
-                                                        new XAttribute("value", TypeDescriptor.GetConverter(val.GetType()).ConvertToInvariantString(val))
-                                                      ));
-                        }
+                        settings.Add(new XElement("Setting",
+                                                    new XAttribute("name", name),
+                                                    new XAttribute("value", TypeDescriptor.GetConverter(val.GetType()).ConvertToInvariantString(val))
+                                                    ));
                     }
-                    var doc = new XDocument(new XElement("NUnitSettings", settings));
-                    using (var file = new FileStream(_settingsFile, FileMode.Create, FileAccess.Write))
-                    {
-                        doc.Save(file);
-                    }
+                }
+                var doc = new XDocument(new XElement("NUnitSettings", settings));
+                using (var file = new FileStream(_settingsFile, FileMode.Create, FileAccess.Write))
+                {
+                    doc.Save(file);
+                }
 #else
-                    XmlTextWriter writer = new XmlTextWriter(_settingsFile, System.Text.Encoding.UTF8);
+                var stream = new MemoryStream();
+                using (var writer = new XmlTextWriter(stream, Encoding.UTF8))
+                {
                     writer.Formatting = Formatting.Indented;
 
                     writer.WriteProcessingInstruction("xml", "version=\"1.0\"");
@@ -157,14 +160,20 @@ namespace NUnit.Engine.Internal
 
                     writer.WriteEndElement();
                     writer.WriteEndElement();
-                    writer.Close();
+                    writer.Flush();
+
+                    var reader = new StreamReader(stream, Encoding.UTF8, true);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var contents = reader.ReadToEnd();
+                    File.WriteAllText(_settingsFile, contents, Encoding.UTF8);
+                }
 #endif
-                }
-                catch (Exception)
-                {
-                    // So we won't try this again
-                    _writeable = false;
-                }
+            }
+            catch (Exception)
+            {
+                // So we won't try this again
+                _writeable = false;
+                throw;
             }
         }
 
