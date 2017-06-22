@@ -4,8 +4,8 @@
     <id>NUnit.Console</id>
     <title>NUnit 3 Console Runner Plus Extensions</title>
     <version>$version$</version>
-    <authors>Charlie Poole</authors>
-    <owners>Charlie Poole</owners>
+    <authors>Charlie Poole, Rob Prouse</authors>
+    <owners>Charlie Poole, Rob Prouse</owners>
     <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
     <projectUrl>http://nunit.org</projectUrl>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
@@ -26,7 +26,7 @@
     <releaseNotes>This release uses the latest version of the TeamCityEventListener extension.</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2017 Charlie Poole</copyright>
+    <copyright>Copyright (c) 2017 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group>
           <dependency id="NUnit.ConsoleRunner" version="$version$" />
