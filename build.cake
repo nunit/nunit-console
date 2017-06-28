@@ -60,6 +60,7 @@ Task("Clean")
     CleanDirectory(RUNNER_PACKAGES_DIR);
     CleanDirectory(EXTENSION_PACKAGES_DIR);
     CleanDirectory(IMAGE_DIR);
+    CleanDirectory(IMAGE_ADDINS_DIR);
     CleanDirectory(DISTRIBUTION_DIR);
 });
 
@@ -163,8 +164,8 @@ public string[] GetAllDirectories(string dirPath)
 
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
-    var tools = packageDir + "/tools";
-	CopyDirectory(tools, outDir);
+    var files = GetFiles(packageDir + "/tools/*");
+    CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
 }
 
 //////////////////////////////////////////////////////////////////////
