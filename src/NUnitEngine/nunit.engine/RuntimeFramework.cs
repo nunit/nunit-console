@@ -485,7 +485,7 @@ namespace NUnit.Engine
             var currentFramework = CurrentFrameworkLocator.GetCurrentFramework();
 
             if (currentFramework.Runtime == RuntimeType.Mono)
-                UseCurrentMonoFramework(cu);
+                UseCurrentMonoFramework(currentFramework);
             else
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 FindBestMonoFrameworkOnWindows();
