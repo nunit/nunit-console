@@ -479,7 +479,7 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="target">The RuntimeFramework to be matched.</param>
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
-        public bool Supports(RuntimeFramework target)
+        public bool Supports(IRuntimeFramework target)
         {
             if (this.Runtime != RuntimeType.Any
                 && target.Runtime != RuntimeType.Any

@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -70,7 +71,7 @@ namespace NUnit.Engine.Services.Tests
         public void AvailableFrameworks()
         {
             var available = _runtimeService.AvailableRuntimes;
-            Assert.That(available.Count, Is.GreaterThan(0));
+            Assert.That(available.Count(), Is.GreaterThan(0));
             foreach (var framework in available)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
         }
