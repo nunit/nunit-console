@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2007 Charlie Poole, Rob Prouse
+// Copyright (c) 2007 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -67,7 +67,7 @@ namespace NUnit.Engine
         /// </summary>
         public static readonly Version DefaultVersion = new Version(0, 0);
 
-        private static List<RuntimeFramework> _availableFrameworks;
+        private static List<IRuntimeFramework> _availableFrameworks;
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
@@ -180,7 +180,7 @@ namespace NUnit.Engine
         /// Gets an array of all available frameworks
         /// </summary>
         // TODO: Special handling for netcf
-        public static RuntimeFramework[] AvailableFrameworks
+        public static IRuntimeFramework[] AvailableFrameworks
         {
             get
             {
@@ -349,9 +349,9 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public static RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
+        public static IRuntimeFramework GetBestAvailableFramework(IRuntimeFramework target)
         {
-            RuntimeFramework result = target;
+            IRuntimeFramework result = target;
 
             foreach (RuntimeFramework framework in AvailableFrameworks)
                 if (framework.Supports(target))
@@ -382,7 +382,7 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="target">The RuntimeFramework to be matched.</param>
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
-        public bool Supports(RuntimeFramework target)
+        public bool Supports(IRuntimeFramework target)
         {
             if (this.Runtime != RuntimeType.Any
                 && target.Runtime != RuntimeType.Any
@@ -467,7 +467,7 @@ namespace NUnit.Engine
 
         private static void FindAvailableFrameworks()
         {
-            _availableFrameworks = new List<RuntimeFramework>();
+            _availableFrameworks = new List<IRuntimeFramework>();
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 _availableFrameworks.AddRange(DotNetFrameworkLocator.FindAvailableDotNetFrameworks());
@@ -481,17 +481,18 @@ namespace NUnit.Engine
 
         private static void FindDefaultMonoFramework()
         {
-            if (RuntimeFrameworkService.CurrentFramework.Runtime == RuntimeType.Mono)
-                UseCurrentMonoFramework();
+            //TODO: This is a temporary hack until #173 moves this functionality to RuntimeFrameworkService
+            var currentFramework = CurrentFrameworkLocator.GetCurrentFramework();
+
+            if (currentFramework.Runtime == RuntimeType.Mono)
+                UseCurrentMonoFramework(cu);
             else
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 FindBestMonoFrameworkOnWindows();
         }
 
-        private static void UseCurrentMonoFramework()
+        private static void UseCurrentMonoFramework(IRuntimeFramework currentFramework)
         {
-            var currentFramework = RuntimeFrameworkService.CurrentFramework;
-
             Debug.Assert(currentFramework.Runtime == RuntimeType.Mono && MonoPrefix != null && MonoVersion != null);
 
             // Multiple profiles are no longer supported with Mono 4.0

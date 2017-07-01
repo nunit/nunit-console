@@ -98,7 +98,7 @@ namespace NUnit.Engine
             Services.Add(new ProjectService());
             Services.Add(new RuntimeFrameworkService());
             Services.Add(new DefaultTestRunnerFactory());
-            Services.Add(new TestAgency());
+            Services.Add(new TestAgency(Services));
             Services.Add(new ResultService());
             Services.Add(new TestFilterService());
 

@@ -34,7 +34,6 @@ namespace NUnit.Engine.Tests
         [Test]
         public void AvailableFrameworksList()
         {
-            RuntimeFramework[] available = RuntimeFramework.AvailableFrameworks;
             Assert.That(RuntimeFramework.AvailableFrameworks.Length, Is.GreaterThan(0) );
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
@@ -44,7 +43,7 @@ namespace NUnit.Engine.Tests
         public void AvailableFrameworksList_IncludesCurrentFramework()
         {
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                if (RuntimeFrameworkService.CurrentFramework.Supports(framework))
+                if (new RuntimeFrameworkService().CurrentFramework.Supports(framework))
                     return;
 
             Assert.Fail("CurrentFramework not listed as available");
@@ -91,8 +90,8 @@ namespace NUnit.Engine.Tests
         public void CanDisplayFrameworkAsString(FrameworkData data)
         {
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.frameworkVersion);
-            Assert.AreEqual(data.representation, framework.ToString());
-            Assert.AreEqual(data.displayName, framework.DisplayName);
+            Assert.AreEqual(data.representation, framework.ToString(), "Test RuntimeFramework ToString()");
+            Assert.AreEqual(data.displayName, framework.DisplayName, "Test RuntimeFramework DisplayName");
         }
 
         [TestCaseSource("matchData")]

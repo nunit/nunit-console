@@ -84,9 +84,6 @@ namespace NUnit.Agent
             InternalTrace.Initialize(logname, traceLevel);
 
             log.Info("Agent process {0} starting", pid);
-            log.Info("Running under version {0}, {1}",
-                Environment.Version,
-                RuntimeFrameworkService.CurrentFramework.DisplayName);
 
             // Restore the COMPLUS_Version env variable if it's been overridden by TestAgency::LaunchAgentProcess
             try
@@ -124,6 +121,11 @@ namespace NUnit.Agent
             // Initialize Services
             log.Info("Initializing Services");
             engine.Initialize();
+
+            var frameworkService = engine.Services.GetService<IRuntimeFrameworkService>();
+            log.Info("Running under version {0}, {1}",
+                Environment.Version,
+                frameworkService.CurrentFramework.DisplayName);
 
             // Owns the channel used for communications with the agency and with clients
             var testAgencyServer = engine.Services.GetService<TestAgency>();

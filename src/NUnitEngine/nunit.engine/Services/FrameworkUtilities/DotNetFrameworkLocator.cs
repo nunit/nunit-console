@@ -29,9 +29,9 @@ namespace NUnit.Engine.Services.FrameworkUtilities
 {
     internal static class DotNetFrameworkLocator
     {
-        internal static ICollection<RuntimeFramework> FindAvailableDotNetFrameworks()
+        internal static ICollection<IRuntimeFramework> FindAvailableDotNetFrameworks()
         {
-            var availableFrameworks = new List<RuntimeFramework>();
+            var availableFrameworks = new List<IRuntimeFramework>();
 
             // Handle Version 1.0, using a different registry key
             availableFrameworks.AddRange(FindExtremelyOldDotNetFrameworkVersions());
@@ -62,7 +62,7 @@ namespace NUnit.Engine.Services.FrameworkUtilities
             return availableFrameworks;
         }
 
-        private static IEnumerable<RuntimeFramework> FindExtremelyOldDotNetFrameworkVersions()
+        private static IEnumerable<IRuntimeFramework> FindExtremelyOldDotNetFrameworkVersions()
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\.NETFramework\policy\v1.0");
             if (key == null) yield break;
@@ -74,7 +74,7 @@ namespace NUnit.Engine.Services.FrameworkUtilities
         // Note: this method cannot be generalized past V4, because (a) it has
         // specific code for detecting .NET 4.5 and (b) we don't know what
         // Microsoft will do in the future
-        private static IEnumerable<RuntimeFramework> FindDotNetFourFrameworkVersions(RegistryKey versionKey)
+        private static IEnumerable<IRuntimeFramework> FindDotNetFourFrameworkVersions(RegistryKey versionKey)
         {
             foreach (string profile in new[] { "Full", "Client" })
             {

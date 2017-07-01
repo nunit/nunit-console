@@ -52,6 +52,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class TestAgency : ServerBase, ITestAgency, IService
     {
+        private readonly IServiceLocator _serviceLocator;
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
         #region Private Fields
@@ -61,9 +62,12 @@ namespace NUnit.Engine.Services
         #endregion
 
         #region Constructors
-        public TestAgency() : this( "TestAgency", 0 ) { }
+        public TestAgency(IServiceLocator serviceLocator) : this("TestAgency", 0, serviceLocator) { }
 
-        public TestAgency( string uri, int port ) : base( uri, port ) { }
+        public TestAgency(string uri, int port, IServiceLocator serviceLocator) : base( uri, port )
+        {
+            _serviceLocator = serviceLocator;
+        }
         #endregion
 
         #region ServerBase Overrides
@@ -130,13 +134,15 @@ namespace NUnit.Engine.Services
         #region Helper Methods
         private Guid LaunchAgentProcess(TestPackage package)
         {
-            RuntimeFramework targetRuntime = RuntimeFrameworkService.CurrentFramework;
+            var frameworkService = _serviceLocator.GetService<IRuntimeFrameworkService>();
+
+            IRuntimeFramework targetRuntime = frameworkService.CurrentFramework;
             string runtimeSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             if (runtimeSetting != "")
                 targetRuntime = RuntimeFramework.Parse(runtimeSetting);
 
             if (targetRuntime.Runtime == RuntimeType.Any)
-                targetRuntime = new RuntimeFramework(RuntimeFrameworkService.CurrentFramework.Runtime, targetRuntime.ClrVersion);
+                targetRuntime = new RuntimeFramework(frameworkService.CurrentFramework.Runtime, targetRuntime.ClrVersion);
 
             bool useX86Agent = package.GetSetting(EnginePackageSettings.RunAsX86, false);
             bool debugTests = package.GetSetting(EnginePackageSettings.DebugTests, false);

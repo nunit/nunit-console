@@ -100,7 +100,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void CanGetCurrentFramework()
         {
-            RuntimeFramework framework = RuntimeFrameworkService.CurrentFramework;
+            IRuntimeFramework framework = _runtimeService.CurrentFramework;
 
             Assert.That(framework.Runtime, Is.EqualTo(CurrentRuntime));
             Assert.That(framework.ClrVersion, Is.EqualTo(Environment.Version));
@@ -109,13 +109,13 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void CurrentFrameworkHasBuildSpecified()
         {
-            Assert.That(RuntimeFrameworkService.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
+            Assert.That(_runtimeService.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
         }
 
         [Test]
         public void CurrentFrameworkMustBeAvailable()
         {
-            var current = RuntimeFrameworkService.CurrentFramework;
+            var current = _runtimeService.CurrentFramework;
             Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
             Assert.That(current.IsAvailable, "{0} not available", current);
         }

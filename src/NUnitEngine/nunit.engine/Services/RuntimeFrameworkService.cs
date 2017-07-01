@@ -36,9 +36,9 @@ namespace NUnit.Engine.Services
 
         private static readonly Version AnyVersion = new Version(0, 0);
 
-        static readonly RuntimeFramework[] _availableRuntimes;
+        private readonly IRuntimeFramework[] _availableRuntimes;
 
-        static RuntimeFrameworkService()
+        public RuntimeFrameworkService()
         {
             CurrentFramework = CurrentFrameworkLocator.GetCurrentFramework();
             _availableRuntimes = RuntimeFramework.AvailableFrameworks;
@@ -57,7 +57,7 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Returns the framework that is currently in use.
         /// </summary>
-        public static RuntimeFramework CurrentFramework { get; }
+        public IRuntimeFramework CurrentFramework { get; }
 
         #endregion
 
@@ -238,7 +238,7 @@ namespace NUnit.Engine.Services
             package.Settings[InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver] = requiresAssemblyResolver;
         }
 
-        private static bool FrameworksMatch(RuntimeFramework f1, RuntimeFramework f2)
+        private static bool FrameworksMatch(IRuntimeFramework f1, IRuntimeFramework f2)
         {
             var rt1 = f1.Runtime;
             var rt2 = f2.Runtime;

@@ -38,5 +38,7 @@ namespace NUnit.Engine.Services.Tests.Fakes
         {
             throw new NotImplementedException();
         }
+
+        public IRuntimeFramework CurrentFramework { get; }
     }
 }
