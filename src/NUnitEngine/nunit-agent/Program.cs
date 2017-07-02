@@ -125,8 +125,8 @@ namespace NUnit.Agent
             log.Info("Initializing Services");
             engine.Initialize();
 
-            // Owns the channel used for communications with the agency and with clients
-            var testAgencyServer = engine.Services.GetService<TestAgency>();
+            // Make sure we can communicate with the agency
+            ServerUtilities.GetTcpChannel("", 0, 2);
 
             log.Info("Connecting to TestAgency at {0}", AgencyUrl);
             try
@@ -151,16 +151,6 @@ namespace NUnit.Agent
             catch (Exception ex)
             {
                 log.Error("Exception in RemoteTestAgent", ex);
-            }
-
-            try
-            {
-                // Unregister the channel
-                testAgencyServer.Stop();
-            }
-            catch (Exception ex)
-            {
-                log.Error("Exception in TestAgency.Stop", ex);
             }
 
             log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);
