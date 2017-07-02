@@ -40,6 +40,8 @@ namespace NUnit.Engine.Services
 
         public bool ServicesInitialized { get; private set; }
 
+        public int ServiceCount { get { return _services.Count; } }
+
         #region Public Methods
 
         public IService GetService( Type serviceType )
