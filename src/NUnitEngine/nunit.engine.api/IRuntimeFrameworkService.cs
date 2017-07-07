@@ -49,5 +49,10 @@ namespace NUnit.Engine
         /// <param name="package">A TestPackage</param>
         /// <returns>The selected RuntimeFramework</returns>
         string SelectRuntimeFramework(TestPackage package);
+
+        /// <summary>
+        /// Returns the framework that is currently in use.
+        /// </summary>
+        IRuntimeFramework CurrentFramework { get; }
     }
 }

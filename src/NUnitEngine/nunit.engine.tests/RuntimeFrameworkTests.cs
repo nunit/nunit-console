@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Engine.Services;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests
@@ -30,40 +31,9 @@ namespace NUnit.Engine.Tests
     [TestFixture]
     public class RuntimeFrameworkTests
     {
-        static RuntimeType currentRuntime =
-            Type.GetType("Mono.Runtime", false) != null
-                ? RuntimeType.Mono
-                : Environment.OSVersion.Platform == PlatformID.WinCE
-                    ? RuntimeType.NetCF
-                    : RuntimeType.Net;
-
-        [Test]
-        public void CanGetCurrentFramework()
-        {
-            RuntimeFramework framework = RuntimeFramework.CurrentFramework;
-
-            Assert.That(framework.Runtime, Is.EqualTo(currentRuntime));
-            Assert.That(framework.ClrVersion, Is.EqualTo(Environment.Version));
-        }
-
-        [Test]
-        public void CurrentFrameworkHasBuildSpecified()
-        {
-            Assert.That(RuntimeFramework.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
-        }
-
-        [Test]
-        public void CurrentFrameworkMustBeAvailable()
-        {
-            var current = RuntimeFramework.CurrentFramework;
-            Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
-            Assert.That(current.IsAvailable, "{0} not available", current);
-        }
-
         [Test]
         public void AvailableFrameworksList()
         {
-            RuntimeFramework[] available = RuntimeFramework.AvailableFrameworks;
             Assert.That(RuntimeFramework.AvailableFrameworks.Length, Is.GreaterThan(0) );
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
@@ -73,7 +43,7 @@ namespace NUnit.Engine.Tests
         public void AvailableFrameworksList_IncludesCurrentFramework()
         {
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                if (RuntimeFramework.CurrentFramework.Supports(framework))
+                if (new RuntimeFrameworkService().CurrentFramework.Supports(framework))
                     return;
 
             Assert.Fail("CurrentFramework not listed as available");
@@ -120,8 +90,8 @@ namespace NUnit.Engine.Tests
         public void CanDisplayFrameworkAsString(FrameworkData data)
         {
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.frameworkVersion);
-            Assert.AreEqual(data.representation, framework.ToString());
-            Assert.AreEqual(data.displayName, framework.DisplayName);
+            Assert.AreEqual(data.representation, framework.ToString(), "Test RuntimeFramework ToString()");
+            Assert.AreEqual(data.displayName, framework.DisplayName, "Test RuntimeFramework DisplayName");
         }
 
         [TestCaseSource("matchData")]

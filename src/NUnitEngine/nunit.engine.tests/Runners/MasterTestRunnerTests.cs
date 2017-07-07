@@ -54,7 +54,7 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(new Services.ProjectService());
             _services.Add(new Services.DefaultTestRunnerFactory());
             _services.Add(new Services.RuntimeFrameworkService());
-            _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
+            _services.Add(new Services.TestAgency("ProcessRunnerTests", 0, _services));
             _services.ServiceManager.StartServices();
 
             _runner = new MasterTestRunner(_services, _package);

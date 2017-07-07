@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole, Rob Prouse
+// Copyright (c) 2017 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -33,7 +33,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the inique Id for this runtime, such as "net-4.5"
         /// </summary>
-        string Id { get;  }
+        string Id { get; }
 
         /// <summary>
         /// Gets the display name of the framework, such as ".NET 4.5"
@@ -57,5 +57,34 @@ namespace NUnit.Engine
         /// values are Full and Client.
         /// </summary>
         string Profile { get; }
+
+        /// <summary>
+        /// The type of this runtime framework
+        /// </summary>
+        RuntimeType Runtime { get;  }
+
+        /// <summary>
+        /// Returns true if the current framework matches the
+        /// one supplied as an argument. Two frameworks match
+        /// if their runtime types are the same or either one
+        /// is RuntimeType.Any and all specified version components
+        /// are equal. Negative (i.e. unspecified) version
+        /// components are ignored.
+        /// </summary>
+        /// <param name="target">The IRuntimeFramework to be matched.</param>
+        /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
+        bool Supports(IRuntimeFramework target);
+
+        /// <summary>
+        /// Return true if any CLR version may be used in
+        /// matching this IRuntimeFramework object.
+        /// </summary>
+        bool AllowAnyVersion { get; }
+
+        /// <summary>
+        /// Returns true if the current IRuntimeFramework is available.
+        /// </summary>
+        /// <returns><c>true</c> if available, otherwise <c>false</c></returns>
+        bool IsAvailable { get; }
     }
 }
