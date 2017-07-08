@@ -21,19 +21,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-using System.Collections;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Internal.Tests
 {
-	/// <summary>
-	/// Summary description for RemotingUtilitiesTests.
-	/// </summary>
 	[TestFixture]
-	public class ServerUtilityTests
+	public class TcpChannelUtilsTests
 	{
 		TcpChannel channel1;
 		TcpChannel channel2;
@@ -41,16 +36,16 @@ namespace NUnit.Engine.Internal.Tests
 		[TearDown]
 		public void ReleaseChannels()
 		{
-			ServerUtilities.SafeReleaseChannel( channel1 );
-			ServerUtilities.SafeReleaseChannel( channel2 );
+			TcpChannelUtils.SafeReleaseChannel( channel1 );
+			TcpChannelUtils.SafeReleaseChannel( channel2 );
 		}
 
 		[Test]
 		public void CanGetTcpChannelOnSpecifiedPort()
 		{
-			channel1 = ServerUtilities.GetTcpChannel( "test", 1234 );
+			channel1 = TcpChannelUtils.GetTcpChannel( "test", 1234 );
 			Assert.AreEqual( "test", channel1.ChannelName );
-			channel2 = ServerUtilities.GetTcpChannel( "test", 4321 );
+			channel2 = TcpChannelUtils.GetTcpChannel( "test", 4321 );
 			Assert.AreEqual( "test", channel2.ChannelName );
 			Assert.AreEqual( channel1, channel2 );
 			Assert.AreSame( channel1, channel2 );
@@ -61,9 +56,9 @@ namespace NUnit.Engine.Internal.Tests
 		[Test]
 		public void CanGetTcpChannelOnUnspecifiedPort()
 		{
-			channel1 = ServerUtilities.GetTcpChannel( "test", 0 );
+			channel1 = TcpChannelUtils.GetTcpChannel( "test", 0 );
 			Assert.AreEqual( "test", channel1.ChannelName );
-			channel2 = ServerUtilities.GetTcpChannel( "test", 0 );
+			channel2 = TcpChannelUtils.GetTcpChannel( "test", 0 );
 			Assert.AreEqual( "test", channel2.ChannelName );
 			Assert.AreEqual( channel1, channel2 );
 			Assert.AreSame( channel1, channel2 );

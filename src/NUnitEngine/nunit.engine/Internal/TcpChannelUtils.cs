@@ -35,9 +35,9 @@ namespace NUnit.Engine.Internal
     /// A collection of utility methods used to create, retrieve
     /// and release <see cref="TcpChannel"/>s.
     /// </summary>
-    public static partial class ServerUtilities
+    public static partial class TcpChannelUtils
     {
-        private static readonly Logger Log = InternalTrace.GetLogger(typeof(ServerUtilities));
+        private static readonly Logger Log = InternalTrace.GetLogger(typeof(TcpChannelUtils));
 
         /// <summary>
         /// Create a <see cref="TcpChannel"/> with a given name on a given port.

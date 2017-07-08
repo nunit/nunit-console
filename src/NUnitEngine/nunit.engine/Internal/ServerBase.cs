@@ -63,7 +63,7 @@ namespace NUnit.Engine.Internal
             {
                 lock (theLock)
                 {
-                    this.channel = ServerUtilities.GetTcpChannel(uri + "Channel", port, 100);
+                    this.channel = TcpChannelUtils.GetTcpChannel(uri + "Channel", port, 100);
 
                     RemotingServices.Marshal(this, uri);
                     this.isMarshalled = true;

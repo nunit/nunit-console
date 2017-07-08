@@ -6,7 +6,7 @@ using System.Runtime.Remoting.Messaging;
 
 namespace NUnit.Engine.Internal
 {
-    partial class ServerUtilities
+    partial class TcpChannelUtils
     {
         private sealed class ObservableServerChannelSinkProvider : IServerChannelSinkProvider
         {

@@ -92,7 +92,7 @@ namespace NUnit.Engine.Agents
             log.Info("Agent starting");
 
             // Open the TCP channel so we can activate an ITestAgency instance from _agencyUrl
-            _channel = ServerUtilities.GetTcpChannel(_currentMessageCounter);
+            _channel = TcpChannelUtils.GetTcpChannel(_currentMessageCounter);
 
             log.Info("Connecting to TestAgency at {0}", _agencyUrl);
             try
