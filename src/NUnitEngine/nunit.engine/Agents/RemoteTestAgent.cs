@@ -22,6 +22,8 @@
 // ***********************************************************************
 
 using System;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
 using NUnit.Engine.Internal;
 
@@ -40,11 +42,16 @@ namespace NUnit.Engine.Agents
 
         #region Fields
 
+        private readonly string _agencyUrl;
+
         private ITestEngineRunner _runner;
         private TestPackage _package;
 
         private readonly ManualResetEvent stopSignal = new ManualResetEvent(false);
-        
+        private readonly CurrentMessageCounter _currentMessageCounter = new CurrentMessageCounter();
+        private TcpChannel _channel;
+        private ITestAgency _agency;
+
         #endregion
 
         #region Constructor
@@ -52,18 +59,23 @@ namespace NUnit.Engine.Agents
         /// <summary>
         /// Construct a RemoteTestAgent
         /// </summary>
-        public RemoteTestAgent( Guid agentId, ITestAgency agency, IServiceLocator services )
-            : base(agentId, agency, services) 
+        public RemoteTestAgent(Guid agentId, string agencyUrl, IServiceLocator services)
+            : base(agentId, services)
         {
+            _agencyUrl = agencyUrl;
         }
 
         #endregion
 
         #region Properties
+
+        public override ITestAgency Agency => _agency;
+
         public int ProcessId
         {
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }
         }
+
         #endregion
 
         #region Public Methods
@@ -79,14 +91,28 @@ namespace NUnit.Engine.Agents
         {
             log.Info("Agent starting");
 
+            // Open the TCP channel so we can activate an ITestAgency instance from _agencyUrl
+            _channel = ServerUtilities.GetTcpChannel(_currentMessageCounter);
+
+            log.Info("Connecting to TestAgency at {0}", _agencyUrl);
             try
             {
-                this.Agency.Register( this );
-                log.Debug( "Registered with TestAgency" );
+                // Direct cast, not safe cast. If the cast fails we need a clear InvalidCastException message, not a null _agency.
+                _agency = (ITestAgency)Activator.GetObject(typeof(ITestAgency), _agencyUrl);
             }
-            catch( Exception ex )
+            catch (Exception ex)
             {
-                log.Error( "RemoteTestAgent: Failed to register with TestAgency", ex );
+                log.Error("Unable to connect", ex);
+            }
+
+            try
+            {
+                _agency.Register(this);
+                log.Debug("Registered with TestAgency");
+            }
+            catch (Exception ex)
+            {
+                log.Error("RemoteTestAgent: Failed to register with TestAgency", ex);
                 return false;
             }
 
@@ -101,8 +127,20 @@ namespace NUnit.Engine.Agents
             //if (agency != null)
             //    agency.ReportStatus(this.ProcessId, AgentStatus.Stopping);
 
+            // Do this on a different thread since we need to wait until all messages are through,
+            // including the message which is waiting for this method to return so it can report back.
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                // Wait till all messages are finished
+                _currentMessageCounter.WaitForAllCurrentMessages();
 
-            stopSignal.Set();
+                // Shut down nicely
+                _channel.StopListening(null);
+                ChannelServices.UnregisterChannel(_channel);
+
+                // Signal to other threads that it's okay to exit the process or start a new channel, etc.
+                stopSignal.Set();
+            });
         }
 
         public bool WaitForStop(int timeout)

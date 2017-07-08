@@ -30,9 +30,6 @@ using NUnit.Engine.Services;
 
 namespace NUnit.Agent
 {
-    /// <summary>
-    /// Summary description for Program.
-    /// </summary>
     public class NUnitTestAgent
     {
         static Logger log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
@@ -40,7 +37,6 @@ namespace NUnit.Agent
         static Guid AgentId;
         static string AgencyUrl;
         static Process AgencyProcess;
-        static ITestAgency Agency;
         static RemoteTestAgent Agent;
 
         private const string LOG_FILE_FORMAT = "nunit-agent_{0}.log";
@@ -125,21 +121,8 @@ namespace NUnit.Agent
             log.Info("Initializing Services");
             engine.Initialize();
 
-            // Make sure we can communicate with the agency
-            ServerUtilities.GetTcpChannel("", 0, 2);
-
-            log.Info("Connecting to TestAgency at {0}", AgencyUrl);
-            try
-            {
-                Agency = Activator.GetObject(typeof(ITestAgency), AgencyUrl) as ITestAgency;
-            }
-            catch (Exception ex)
-            {
-                log.Error("Unable to connect", ex);
-            }
-
             log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
+            Agent = new RemoteTestAgent(AgentId, AgencyUrl, engine.Services);
 
             try
             {
