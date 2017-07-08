@@ -69,8 +69,6 @@ namespace NUnit.Engine.Agents
 
         #region Properties
 
-        public override ITestAgency Agency => _agency;
-
         public int ProcessId
         {
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }

@@ -70,13 +70,6 @@ namespace NUnit.Engine.Agents
         #region ITestAgent members
 
         /// <summary>
-        /// Gets a reference to the TestAgency with which this agent 
-        /// is associated. Returns null if the agent is not 
-        /// connected to an agency.
-        /// </summary>
-        public abstract ITestAgency Agency { get; }
-
-        /// <summary>
         /// Gets a Guid that uniquely identifies this agent.
         /// </summary>
         public Guid Id

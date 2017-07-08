@@ -31,11 +31,6 @@ namespace NUnit.Engine
     public interface ITestAgent
     {
         /// <summary>
-        /// Gets the agency with which this agent is associated.
-        /// </summary>
-        ITestAgency Agency { get; }
-
-        /// <summary>
         /// Gets a Guid that uniquely identifies this agent.
         /// </summary>
         Guid Id { get; }
