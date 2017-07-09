@@ -171,9 +171,21 @@ namespace NUnit.ConsoleRunner
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
+
+                IResultWriter resultWriter;
+
                 try
                 {
-                    GetResultWriter(spec).CheckWritability(outputPath);
+                    resultWriter = GetResultWriter(spec);
+                }
+                catch (Exception ex)
+                {
+                    throw new NUnitEngineException($"Error encountered in resolving output specification: {spec}", ex);
+                }
+
+                try
+                {
+                    resultWriter.CheckWritability(outputPath);
                 }
                 catch (SystemException ex)
                 {

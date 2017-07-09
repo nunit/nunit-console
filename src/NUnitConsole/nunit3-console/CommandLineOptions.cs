@@ -335,13 +335,12 @@ namespace NUnit.Common
                 v => ErrFile = RequiredValue(v, "--err"));
 
             this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.",
-                v => resultOutputSpecifications.Add(new OutputSpecification(RequiredValue(v, "--resultxml"))));
+                v => ResolveOutputSpecification(RequiredValue(v, "--resultxml"), resultOutputSpecifications));
 
             this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
             {
                 Explore = true;
-                if (v != null)
-                    ExploreOutputSpecifications.Add(new OutputSpecification(v));
+                ResolveOutputSpecification(v, ExploreOutputSpecifications);
             });
 
             this.Add("noresult", "Don't save any test results.",
@@ -384,6 +383,37 @@ namespace NUnit.Common
             });
         }
 
-#endregion
+        private void ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications)
+        {
+            if (value == null)
+                return;
+
+            OutputSpecification spec;
+
+            try
+            {
+                spec = new OutputSpecification(value);
+            }
+            catch (ArgumentException e)
+            {
+                ErrorMessages.Add(e.Message);
+                return;
+            }
+
+            if (spec.Transform != null)
+            {
+                var transformPath = Path.Combine(WorkDirectory, spec.Transform);
+
+                if (!File.Exists(transformPath))
+                {
+                    ErrorMessages.Add($"Transform {spec.Transform} could not be found. (Path searched: {transformPath})");
+                    return;
+                }
+            }
+
+            outputSpecifications.Add(spec);
+        }
+
+        #endregion
     }
 }
