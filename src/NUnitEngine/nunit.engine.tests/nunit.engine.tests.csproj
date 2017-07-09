@@ -79,6 +79,7 @@
     <Compile Include="Drivers\NUnit3FrameworkDriverTests.cs" />
     <Compile Include="DummyExtensions.cs" />
     <Compile Include="HangingAppDomainFixture.cs" />
+    <Compile Include="Helpers\On.cs" />
     <Compile Include="Helpers\ProcessUtils.cs" />
     <Compile Include="Helpers\ShadowCopyUtils.cs" />
     <Compile Include="Integration\DirectoryWithNeededAssemblies.cs" />
