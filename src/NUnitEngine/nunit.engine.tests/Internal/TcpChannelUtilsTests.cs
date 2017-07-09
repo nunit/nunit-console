@@ -36,8 +36,10 @@ namespace NUnit.Engine.Internal.Tests
 		[TearDown]
 		public void ReleaseChannels()
 		{
-			TcpChannelUtils.SafeReleaseChannel( channel1 );
-			TcpChannelUtils.SafeReleaseChannel( channel2 );
+			channel1.StopListening(null);
+			ChannelServices.UnregisterChannel(channel1);
+			channel2.StopListening(null);
+			ChannelServices.UnregisterChannel(channel2);
 		}
 
 		[Test]

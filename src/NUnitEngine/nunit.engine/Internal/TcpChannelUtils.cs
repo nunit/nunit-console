@@ -128,22 +128,5 @@ namespace NUnit.Engine.Internal
 
             return null;
         }
-
-        /// <summary>
-        /// Unregisters the <see cref="IChannel"/> from the <see cref="ChannelServices"/> registry.
-        /// </summary>
-        /// <param name="channel">The channel to unregister.</param>
-        public static void SafeReleaseChannel(IChannel channel)
-        {
-            if (channel == null) return;
-            try
-            {
-                ChannelServices.UnregisterChannel(channel);
-            }
-            catch (RemotingException)
-            {
-                // Channel was not registered - ignore
-            }
-        }
     }
 }
