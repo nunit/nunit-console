@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -52,9 +52,8 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(new Services.ExtensionService());
             _services.Add(new Services.DriverService());
             _services.Add(new Services.ProjectService());
-            _services.Add(new Services.DefaultTestRunnerFactory());
             _services.Add(new Services.RuntimeFrameworkService());
-            _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
+            _services.Add(new Services.InProcessTestRunnerFactory());
             _services.ServiceManager.StartServices();
 
             _runner = new MasterTestRunner(_services, _package);
