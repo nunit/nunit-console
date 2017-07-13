@@ -39,7 +39,7 @@ namespace NUnit.Engine.Runners.Tests
     //[TestFixture(typeof(ProcessRunner))]
     [TestFixture(typeof(MultipleTestDomainRunner), 1)]
     [TestFixture(typeof(MultipleTestDomainRunner), 3)]
-    [TestFixture(typeof(MultipleTestProcessRunner), 1)]
+    //[TestFixture(typeof(MultipleTestProcessRunner), 1)]
     //[TestFixture(typeof(MultipleTestProcessRunner), 3)]
     //[Platform(Exclude = "Mono", Reason = "Currently causing long delays or hangs under Mono")]
     public class TestEngineRunnerTests<TRunner> where TRunner : AbstractTestRunner
@@ -65,6 +65,8 @@ namespace NUnit.Engine.Runners.Tests
             _services = new ServiceContext();
             _services.Add(new Services.DriverService());
             _services.Add(new Services.DomainManager());
+            _services.Add(new Services.ProjectService());
+            _services.Add(new Services.DefaultTestRunnerFactory());
             _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
             _services.ServiceManager.StartServices();
 

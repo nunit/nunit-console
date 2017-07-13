@@ -35,9 +35,9 @@ namespace NUnit.Engine.Internal
     /// A collection of utility methods used to create, retrieve
     /// and release <see cref="TcpChannel"/>s.
     /// </summary>
-    public static partial class ServerUtilities
+    public static partial class TcpChannelUtils
     {
-        private static readonly Logger Log = InternalTrace.GetLogger(typeof(ServerUtilities));
+        private static readonly Logger Log = InternalTrace.GetLogger(typeof(TcpChannelUtils));
 
         /// <summary>
         /// Create a <see cref="TcpChannel"/> with a given name on a given port.
@@ -127,23 +127,6 @@ namespace NUnit.Engine.Internal
                 }
 
             return null;
-        }
-
-        /// <summary>
-        /// Unregisters the <see cref="IChannel"/> from the <see cref="ChannelServices"/> registry.
-        /// </summary>
-        /// <param name="channel">The channel to unregister.</param>
-        public static void SafeReleaseChannel(IChannel channel)
-        {
-            if (channel == null) return;
-            try
-            {
-                ChannelServices.UnregisterChannel(channel);
-            }
-            catch (RemotingException)
-            {
-                // Channel was not registered - ignore
-            }
         }
     }
 }

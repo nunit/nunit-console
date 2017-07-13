@@ -46,6 +46,8 @@ namespace NUnit.Engine
 
         public ServiceManager ServiceManager { get; private set; }
 
+        public int ServiceCount { get { return ServiceManager.ServiceCount; } }
+
         #endregion
 
         #region Methods

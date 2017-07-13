@@ -35,7 +35,6 @@ namespace NUnit.Engine.Agents
     {
         #region Private Fields
 
-        private readonly ITestAgency agency;
         private readonly Guid agentId;
         private readonly IServiceLocator services;
 
@@ -47,11 +46,9 @@ namespace NUnit.Engine.Agents
         /// Initializes a new instance of the <see cref="TestAgent"/> class.
         /// </summary>
         /// <param name="agentId">The identifier of the agent.</param>
-        /// <param name="agency">The agency that this agent is associated with.</param>
         /// <param name="services">The services available to the agent.</param>
-        public TestAgent( Guid agentId, ITestAgency agency, IServiceLocator services )
+        public TestAgent(Guid agentId, IServiceLocator services)
         {
-            this.agency = agency;
             this.agentId = agentId;
             this.services = services;
         }
@@ -71,16 +68,6 @@ namespace NUnit.Engine.Agents
         #endregion
 
         #region ITestAgent members
-
-        /// <summary>
-        /// Gets a reference to the TestAgency with which this agent 
-        /// is associated. Returns null if the agent is not 
-        /// connected to an agency.
-        /// </summary>
-        public ITestAgency Agency
-        {
-            get { return agency; }
-        }
 
         /// <summary>
         /// Gets a Guid that uniquely identifies this agent.

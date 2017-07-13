@@ -30,9 +30,6 @@ using NUnit.Engine.Services;
 
 namespace NUnit.Agent
 {
-    /// <summary>
-    /// Summary description for Program.
-    /// </summary>
     public class NUnitTestAgent
     {
         static Logger log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
@@ -40,7 +37,6 @@ namespace NUnit.Agent
         static Guid AgentId;
         static string AgencyUrl;
         static Process AgencyProcess;
-        static ITestAgency Agency;
         static RemoteTestAgent Agent;
 
         private const string LOG_FILE_FORMAT = "nunit-agent_{0}.log";
@@ -125,21 +121,8 @@ namespace NUnit.Agent
             log.Info("Initializing Services");
             engine.Initialize();
 
-            // Owns the channel used for communications with the agency and with clients
-            var testAgencyServer = engine.Services.GetService<TestAgency>();
-
-            log.Info("Connecting to TestAgency at {0}", AgencyUrl);
-            try
-            {
-                Agency = Activator.GetObject(typeof(ITestAgency), AgencyUrl) as ITestAgency;
-            }
-            catch (Exception ex)
-            {
-                log.Error("Unable to connect", ex);
-            }
-
             log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
+            Agent = new RemoteTestAgent(AgentId, AgencyUrl, engine.Services);
 
             try
             {
@@ -151,16 +134,6 @@ namespace NUnit.Agent
             catch (Exception ex)
             {
                 log.Error("Exception in RemoteTestAgent", ex);
-            }
-
-            try
-            {
-                // Unregister the channel
-                testAgencyServer.Stop();
-            }
-            catch (Exception ex)
-            {
-                log.Error("Exception in TestAgency.Stop", ex);
             }
 
             log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);
