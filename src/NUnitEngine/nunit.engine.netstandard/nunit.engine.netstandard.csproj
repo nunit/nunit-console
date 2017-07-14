@@ -14,7 +14,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>nunit.engine.netstandard</PackageId>
     <Title>NUnit .NET Standard Engine</Title>
-    <Authors>Charlie Poole</Authors>
+    <Authors>Charlie Poole, Rob Prouse</Authors>
+    <Owners>Charlie Poole, Rob Prouse</Owners>
     <Description>Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard</Description>
     <Copyright>Copyright (C) 2017 Charlie Poole, Rob Prouse</Copyright>
     <Version>$(PackageVersion)</Version>
