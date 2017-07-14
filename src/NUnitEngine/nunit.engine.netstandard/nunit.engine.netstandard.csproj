@@ -12,6 +12,12 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>nunit.engine.netstandard</PackageId>
+    <Title>NUnit .NET Standard Engine</Title>
+    <Authors>Charlie Poole, Rob Prouse</Authors>
+    <Owners>Charlie Poole, Rob Prouse</Owners>
+    <Description>Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard</Description>
+    <Copyright>Copyright (C) 2017 Charlie Poole, Rob Prouse</Copyright>
     <Version>$(PackageVersion)</Version>
     <PackageLicenseUrl>http://nunit.org/nuget/nunit3-license.txt</PackageLicenseUrl>
     <PackageProjectUrl>http://nunit.org</PackageProjectUrl>
@@ -150,7 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta4" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta6" />
     <PackageReference Include="System.ComponentModel.EventBasedAsync" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />

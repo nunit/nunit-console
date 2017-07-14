@@ -26,10 +26,10 @@ using System.Reflection;
 //
 // Common Information for the NUnit assemblies
 //
-[assembly: AssemblyCompany("NUnit Software")]
 [assembly: AssemblyProduct("NUnit 3")]
-[assembly: AssemblyCopyright("Copyright (c) 2017 Charlie Poole, Rob Prouse")]
 [assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
+[assembly: AssemblyCompany("NUnit Software")]
+[assembly: AssemblyCopyright("Copyright (c) 2017 Charlie Poole, Rob Prouse")]
 
 #if PORTABLE
 [assembly: AssemblyMetadata("PCL", "True")]
