@@ -29,4 +29,4 @@ using System.Reflection;
 // as new releases of the engine itself are created.
 //
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.7.0.0")]
+[assembly: AssemblyFileVersion("3.8.0.0")]

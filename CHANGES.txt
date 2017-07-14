@@ -1,4 +1,43 @@
-﻿NUnit 3.6.1 - March 6, 2017
+﻿NUnit 3.7 - July 13, 2017
+
+Engine
+
+ * Creates a .NET Standard version of the engine for use in the Visual Studio Adapter
+ * Fixes several issues that caused the runner to exit with a SocketException
+
+Issues Resolved
+
+ * 10 Create a .NET Standard version of the Engine
+ * 11 insufficient info on driver reflection exception
+ * 12 Upgrade Cake build to latest version
+ * 24 Update --labels switch with option to show real-time pass/fail results in console runner
+ * 31 Nunit 3.4.1 NUnit.Engine.Runners
+ * 72 TestContext.Progress.Write writes new line
+ * 82 Remove unused repository paths from repositories.config
+ * 99 Remove unused --verbose and --full command line options
+ * 126 Resolve differences between NUnit Console and NUnitLite implementations of @filename
+ * 162 Add namespace keyword to Test Selection Language
+ * 171 Socket Exception when stopping Remote Agent
+ * 172 Limit Language level to C#6
+ * 193 Settings are stored with invariant culture but retrieved with CurrentCulture
+ * 194 Better logging or error handling in SettingsStore.SaveSettings
+ * 196 Allow comments in @FILE files
+ * 200 Remove obsolete warnings from build script
+ * 206 Remove reference to removed noxml option
+ * 207 Create Chocolatey package(s) for the console
+ * 208 Explore flags test update
+ * 213 Master build failing after merging .NET Standard Engine
+ * 216 Compiling mock-assembly in Visual Studio 2017 fails
+ * 217 NUnit .NET Standard NuGet package missing some values
+ * 219 Runtime.Remoting.RemotingException in NUnit.Engine.Runners.ProcessRunner.Dispose
+ * 221 Added missing nuget package info
+ * 222 Improve missing agent error message
+ * 225 SocketException thrown by nunit3-console.exe --explore option
+ * 248 Agent TestEngine contains duplicate services
+ * 254 Correct misprint ".con" -> ".com"
+ * 252 Console crashes when specifying both format and transform for result
+
+NUnit 3.6.1 - March 6, 2017
 
 Engine
 

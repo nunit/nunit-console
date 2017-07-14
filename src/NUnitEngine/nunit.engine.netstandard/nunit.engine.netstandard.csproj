@@ -3,7 +3,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <AssemblyName>nunit.engine.netstandard</AssemblyName>
-    <PackageVersion Condition=" '$(PackageVersion)' == '' ">3.7.0-dev</PackageVersion>
+    <PackageVersion Condition=" '$(PackageVersion)' == '' ">3.8.0-dev</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
