@@ -475,7 +475,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml;transform=transform.xslt");
+            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml;transform=TextSummary.xslt");
             Assert.True(options.Validate());
             Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
             Assert.AreEqual("tests.dll", options.InputFiles[0]);
@@ -483,7 +483,7 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ResultOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual("transform.xslt", spec.Transform);
+            Assert.AreEqual("TextSummary.xslt", spec.Transform);
         }
 
         [Test]
@@ -506,7 +506,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", "-result:myresult.xml;transform=mytransform.xslt");
+            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", "-result:myresult.xml;transform=TextSummary.xslt");
             Assert.True(options.Validate(), "Should be valid");
 
             var specs = options.ResultOutputSpecifications;
@@ -525,7 +525,7 @@ namespace NUnit.ConsoleRunner.Tests
             var spec3 = specs[2];
             Assert.AreEqual("myresult.xml", spec3.OutputPath);
             Assert.AreEqual("user", spec3.Format);
-            Assert.AreEqual("mytransform.xslt", spec3.Transform);
+            Assert.AreEqual("TextSummary.xslt", spec3.Transform);
         }
 
         [Test]
@@ -552,6 +552,27 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("test.dll", "-result:results.xml", "-noresult", "-result:nunit2results.xml;format=nunit2");
             Assert.AreEqual(0, options.ResultOutputSpecifications.Count);
+        }
+
+        [Test]
+        public void InvalidResultSpecRecordsError()
+        {
+            var options = new ConsoleOptions("test.dll", "-result:userspecifed.xml;format=nunit2;format=nunit3");
+            Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
+                .And.Exactly(1).Property(nameof(OutputSpecification.OutputPath)).EqualTo("TestResult.xml"));
+            Assert.That(options.ErrorMessages, Has.Exactly(1).Contains("conflicting format options").IgnoreCase);
+        }
+
+        [Test]
+        public void MissingXsltFileRecordsError()
+        {
+            const string missingXslt = "missing.xslt";
+            Assert.That(missingXslt, Does.Not.Exist);
+
+            var options = new ConsoleOptions("test.dll", $"-result:userspecifed.xml;transform={missingXslt}");
+            Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
+                                                               .And.Exactly(1).Property(nameof(OutputSpecification.Transform)).Null);
+            Assert.That(options.ErrorMessages, Has.Exactly(1).Contains($"{missingXslt} could not be found").IgnoreCase);
         }
 
         #endregion
@@ -599,7 +620,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore:results.xml;transform=myreport.xslt");
+            ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore:results.xml;transform=TextSummary.xslt");
             Assert.True(options.Validate());
             Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
             Assert.AreEqual("tests.dll", options.InputFiles[0]);
@@ -608,7 +629,7 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual("myreport.xslt", spec.Transform);
+            Assert.AreEqual("TextSummary.xslt", spec.Transform);
         }
 
         [Test]

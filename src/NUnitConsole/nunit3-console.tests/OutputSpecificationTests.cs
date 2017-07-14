@@ -33,7 +33,7 @@ namespace NUnit.Common.Tests
         {
             Assert.That(
                 () => new OutputSpecification(null),
-                Throws.TypeOf<NullReferenceException>());
+                Throws.TypeOf<ArgumentNullException>());
         }
 
 

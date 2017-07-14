@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Text;
 
 namespace NUnit.Common
 {
@@ -40,7 +41,7 @@ namespace NUnit.Common
         public OutputSpecification(string spec)
         {
             if (spec == null)
-                throw new NullReferenceException("Output spec may not be null");
+                throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
 
             string[] parts = spec.Split(';');
             this.OutputPath = parts[0];
@@ -50,7 +51,7 @@ namespace NUnit.Common
                 string[] opt = parts[i].Split('=');
 
                 if (opt.Length != 2)
-                    throw new ArgumentException();
+                    throw new ArgumentException($"Invalid output specification: {spec}");
 
                 switch (opt[0].Trim())
                 {
@@ -105,5 +106,13 @@ namespace NUnit.Common
         public string Transform { get; private set; }
 
         #endregion
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder($"OutputPath: {OutputPath}");
+            if (Format != null) sb.Append($", Format: {Format}");
+            if (Transform != null) sb.Append($", Transform: {Transform}");
+            return sb.ToString();
+        }
     }
 }
