@@ -5,10 +5,6 @@ Engine
  * Creates a .NET Standard version of the engine for use in the Visual Studio Adapter
  * Fixes several issues that caused the runner to exit with a SocketException
 
-Console
-
- * Created Chocolatey packages for the console runner
-
 Issues Resolved
 
  * 10 Create a .NET Standard version of the Engine
