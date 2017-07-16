@@ -39,8 +39,6 @@ namespace NUnit.Common
     /// </summary>
     public class CommandLineOptions : OptionSet
     {
-        private static readonly string DEFAULT_WORK_DIRECTORY = Environment.CurrentDirectory;
-
         private bool validated;
         private bool noresult;
 
@@ -129,7 +127,7 @@ namespace NUnit.Common
         private string workDirectory = null;
         public string WorkDirectory 
         {
-            get { return workDirectory ?? DEFAULT_WORK_DIRECTORY; }
+            get { return workDirectory ?? Environment.CurrentDirectory; }
         }
         public bool WorkDirectorySpecified { get { return workDirectory != null; } }
 
@@ -402,7 +400,7 @@ namespace NUnit.Common
 
             if (spec.Transform != null)
             {
-                var transformPath = Path.Combine(WorkDirectory, spec.Transform);
+                var transformPath = Path.Combine(Environment.CurrentDirectory, spec.Transform);
 
                 if (!File.Exists(transformPath))
                 {
