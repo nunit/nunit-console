@@ -42,6 +42,8 @@ namespace NUnit.ConsoleRunner
             OverallResult = resultNode.GetAttribute("result");
             if (OverallResult == "Skipped")
                 OverallResult = "Warning";
+            if (OverallResult == null)
+                OverallResult = "Unknown";
 
             Summary = new ResultSummary(resultNode);
         }
