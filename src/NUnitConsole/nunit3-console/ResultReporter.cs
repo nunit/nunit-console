@@ -104,7 +104,7 @@ namespace NUnit.ConsoleRunner
         {
             ColorStyle overall = OverallResult == "Passed"
                 ? ColorStyle.Pass
-                : OverallResult == "Failed" 
+                : OverallResult == "Failed"  || OverallResult == "Unknown"
                     ? ColorStyle.Failure
                     : OverallResult == "Warning"
                         ? ColorStyle.Warning
