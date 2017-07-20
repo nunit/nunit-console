@@ -42,6 +42,8 @@ namespace NUnit.ConsoleRunner
             OverallResult = resultNode.GetAttribute("result");
             if (OverallResult == "Skipped")
                 OverallResult = "Warning";
+            if (OverallResult == null)
+                OverallResult = "Unknown";
 
             Summary = new ResultSummary(resultNode);
         }
@@ -102,7 +104,7 @@ namespace NUnit.ConsoleRunner
         {
             ColorStyle overall = OverallResult == "Passed"
                 ? ColorStyle.Pass
-                : OverallResult == "Failed" 
+                : OverallResult == "Failed"  || OverallResult == "Unknown"
                     ? ColorStyle.Failure
                     : OverallResult == "Warning"
                         ? ColorStyle.Warning
