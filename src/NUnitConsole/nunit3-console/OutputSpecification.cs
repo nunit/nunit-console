@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.IO;
 using System.Text;
 
 namespace NUnit.Common
@@ -38,7 +39,8 @@ namespace NUnit.Common
         /// Construct an OutputSpecification from an option value.
         /// </summary>
         /// <param name="spec">The option value string.</param>
-        public OutputSpecification(string spec)
+        /// <param name="transformFolder">The folder containing the transform.</param>
+        public OutputSpecification(string spec, string transformFolder)
         {
             if (spec == null)
                 throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
@@ -77,7 +79,7 @@ namespace NUnit.Common
                                 string.Format("Conflicting format options: {0}", spec));
 
                         this.Format = "user";
-                        this.Transform = opt[1].Trim();
+                        this.Transform = Path.Combine(transformFolder ?? "", val);
                         break;
                 }
             }

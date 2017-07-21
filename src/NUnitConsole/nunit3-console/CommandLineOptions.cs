@@ -39,19 +39,27 @@ namespace NUnit.Common
     /// </summary>
     public class CommandLineOptions : OptionSet
     {
-        private static readonly string DEFAULT_WORK_DIRECTORY = Environment.CurrentDirectory;
+        private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Environment.CurrentDirectory;
 
         private bool validated;
         private bool noresult;
 
+        /// <summary>
+        /// An abstraction of the file system
+        /// </summary>
+        protected readonly IFileSystem _fileSystem;
+
 #region Constructor
 
-        internal CommandLineOptions(IDefaultOptionsProvider defaultOptionsProvider, params string[] args)
+        internal CommandLineOptions(IDefaultOptionsProvider defaultOptionsProvider, IFileSystem fileSystem, params string[] args)
         {
             // Apply default options
-            if (defaultOptionsProvider == null) throw new ArgumentNullException("defaultOptionsProvider");
+            if (defaultOptionsProvider == null) throw new ArgumentNullException(nameof(defaultOptionsProvider));
             TeamCity = defaultOptionsProvider.TeamCity;
-            
+
+            if (fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
+            _fileSystem = fileSystem;
+
             ConfigureOptions();            
             if (args != null)
                 Parse(args);
@@ -129,7 +137,7 @@ namespace NUnit.Common
         private string workDirectory = null;
         public string WorkDirectory 
         {
-            get { return workDirectory ?? DEFAULT_WORK_DIRECTORY; }
+            get { return workDirectory ?? CURRENT_DIRECTORY_ON_ENTRY; }
         }
         public bool WorkDirectorySpecified { get { return workDirectory != null; } }
 
@@ -145,7 +153,8 @@ namespace NUnit.Common
                     return new OutputSpecification[0];
 
                 if (resultOutputSpecifications.Count == 0)
-                    resultOutputSpecifications.Add(new OutputSpecification("TestResult.xml"));
+                    resultOutputSpecifications.Add(
+                        new OutputSpecification("TestResult.xml", CURRENT_DIRECTORY_ON_ENTRY));
 
                 return resultOutputSpecifications;
             }
@@ -392,7 +401,7 @@ namespace NUnit.Common
 
             try
             {
-                spec = new OutputSpecification(value);
+                spec = new OutputSpecification(value, CURRENT_DIRECTORY_ON_ENTRY);
             }
             catch (ArgumentException e)
             {
@@ -402,11 +411,9 @@ namespace NUnit.Common
 
             if (spec.Transform != null)
             {
-                var transformPath = Path.Combine(WorkDirectory, spec.Transform);
-
-                if (!File.Exists(transformPath))
+                if (!_fileSystem.FileExists(spec.Transform))
                 {
-                    ErrorMessages.Add($"Transform {spec.Transform} could not be found. (Path searched: {transformPath})");
+                    ErrorMessages.Add($"Transform {spec.Transform} could not be found.");
                     return;
                 }
             }
