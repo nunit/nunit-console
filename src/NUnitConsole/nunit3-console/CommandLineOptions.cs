@@ -154,7 +154,7 @@ namespace NUnit.Common
 
                 if (resultOutputSpecifications.Count == 0)
                     resultOutputSpecifications.Add(
-                        new OutputSpecification("TestResult.xml", CURRENT_DIRECTORY_ON_ENTRY, _fileSystem));
+                        new OutputSpecification("TestResult.xml", CURRENT_DIRECTORY_ON_ENTRY));
 
                 return resultOutputSpecifications;
             }
@@ -401,12 +401,21 @@ namespace NUnit.Common
 
             try
             {
-                spec = new OutputSpecification(value, CURRENT_DIRECTORY_ON_ENTRY, _fileSystem);
+                spec = new OutputSpecification(value, CURRENT_DIRECTORY_ON_ENTRY);
             }
             catch (ArgumentException e)
             {
                 ErrorMessages.Add(e.Message);
                 return;
+            }
+
+            if (spec.Transform != null)
+            {
+                if (!_fileSystem.FileExists(spec.Transform))
+                {
+                    ErrorMessages.Add($"Transform {spec.Transform} could not be found.");
+                    return;
+                }
             }
 
             outputSpecifications.Add(spec);

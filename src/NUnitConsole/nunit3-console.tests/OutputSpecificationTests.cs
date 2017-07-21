@@ -22,7 +22,6 @@
 // ***********************************************************************
 #if !PORTABLE
 using System;
-using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 
@@ -34,7 +33,7 @@ namespace NUnit.Common.Tests
         public void SpecMayNotBeNull()
         {
             Assert.That(
-                () => new OutputSpecification(null),
+                () => new OutputSpecification(null, null),
                 Throws.TypeOf<ArgumentNullException>());
         }
 
@@ -43,7 +42,7 @@ namespace NUnit.Common.Tests
         public void SpecOptionMustContainEqualSign()
         {
             Assert.That(
-                () => new OutputSpecification("MyFile.xml;transform.xslt"),
+                () => new OutputSpecification("MyFile.xml;transform.xslt", null),
                 Throws.TypeOf<ArgumentException>());
         }
 
@@ -51,14 +50,14 @@ namespace NUnit.Common.Tests
         public void SpecOptionMustContainJustOneEqualSign()
         {
             Assert.That(
-                () => new OutputSpecification("MyFile.xml;transform=xslt=transform.xslt"),
+                () => new OutputSpecification("MyFile.xml;transform=xslt=transform.xslt", null),
                 Throws.TypeOf<ArgumentException>());
         }
 
         [Test]
         public void FileNameOnly()
         {
-            var spec = new OutputSpecification("MyFile.xml");
+            var spec = new OutputSpecification("MyFile.xml", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec.Transform);
@@ -67,34 +66,17 @@ namespace NUnit.Common.Tests
         [Test]
         public void FileNamePlusFormat()
         {
-            var spec = new OutputSpecification("MyFile.xml;format=nunit2");
+            var spec = new OutputSpecification("MyFile.xml;format=nunit2", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit2"));
             Assert.Null(spec.Transform);
         }
 
         [Test]
-        public void FolderMustBeSpecifiedForTransform()
-        {
-            Assert.That(() =>
-                new OutputSpecification("MyFile.xml;transform=transform.xslt"),
-                Throws.TypeOf<ArgumentNullException>());
-        }
-
-        [Test]
-        public void FolderMustNotBeNullForTransform()
-        {
-            Assert.That(() =>
-                new OutputSpecification("MyFile.xml;transform=transform.xslt", null),
-                Throws.TypeOf<ArgumentNullException>());
-        }
-
-        [Test]
         public void FileNamePlusTransform()
         {
             const string fileName = "transform.xslt";
-            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", fileName);
-            var spec = new OutputSpecification($"MyFile.xml;transform={fileName}", ".", fileSystem);
+            var spec = new OutputSpecification($"MyFile.xml;transform={fileName}", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
             Assert.That(spec.Transform, Is.EqualTo(fileName));
@@ -104,8 +86,7 @@ namespace NUnit.Common.Tests
         public void UserFormatMayBeIndicatedExplicitlyAfterTransform()
         {
             const string fileName = "transform.xslt";
-            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", fileName);
-            var spec = new OutputSpecification($"MyFile.xml;transform={fileName};format=user", ".", fileSystem);
+            var spec = new OutputSpecification($"MyFile.xml;transform={fileName};format=user", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
             Assert.That(spec.Transform, Is.EqualTo(fileName));
@@ -115,8 +96,7 @@ namespace NUnit.Common.Tests
         public void UserFormatMayBeIndicatedExplicitlyBeforeTransform()
         {
             const string fileName = "transform.xslt";
-            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", fileName);
-            var spec = new OutputSpecification($"MyFile.xml;format=user;transform={fileName}", ".", fileSystem);
+            var spec = new OutputSpecification($"MyFile.xml;format=user;transform={fileName}", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
             Assert.That(spec.Transform, Is.EqualTo(fileName));
@@ -126,16 +106,15 @@ namespace NUnit.Common.Tests
         public void MultipleFormatSpecifiersNotAllowed()
         {
             Assert.That(
-                () => new OutputSpecification("MyFile.xml;format=nunit2;format=nunit3"),
+                () => new OutputSpecification("MyFile.xml;format=nunit2;format=nunit3", null),
                 Throws.TypeOf<ArgumentException>());
         }
 
         [Test]
         public void MultipleTransformSpecifiersNotAllowed()
         {
-            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", new List<string> { "transform1.xslt", "transform2.xslt" });
             Assert.That(
-                () => new OutputSpecification("MyFile.xml;transform=transform1.xslt;transform=transform2.xslt", ".", fileSystem),
+                () => new OutputSpecification("MyFile.xml;transform=transform1.xslt;transform=transform2.xslt", null),
                 Throws.TypeOf<ArgumentException>());
         }
 
@@ -143,35 +122,21 @@ namespace NUnit.Common.Tests
         public void TransformWithNonUserFormatNotAllowed()
         {
             Assert.That(
-                () => new OutputSpecification("MyFile.xml;format=nunit2;transform=transform.xslt"),
+                () => new OutputSpecification("MyFile.xml;format=nunit2;transform=transform.xslt", null),
                 Throws.TypeOf<ArgumentException>());
         }
 
-        class SimpleVirtualFileSystem : IFileSystem
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(@"C:\")]
+        [TestCase(@"C:\Temp")]
+
+        public void TransformFolderIsUsedToSpecifyTransform(string transformFolder)
         {
-            private readonly List<string> _fullFileNames;
-
-            public SimpleVirtualFileSystem(string folder, string fileName)
-                : this(folder, new List<string> { fileName })
-            {
-            }
-
-            public SimpleVirtualFileSystem(string folder, List<string> fileNames)
-            {
-                _fullFileNames = new List<string>(fileNames.Count);
-                foreach (var fileName in fileNames)
-                    _fullFileNames.Add(Path.Combine(folder, fileName));
-            }
-
-            public bool FileExists(string fullFileName)
-            {
-                return _fullFileNames.Contains(fullFileName);
-            }
-
-            public IEnumerable<string> ReadLines(string fileName)
-            {
-                throw new NotImplementedException();
-            }
+            const string fileName = "transform.xslt";
+            var spec = new OutputSpecification($"MyFile.xml;transform=transform.xslt", transformFolder);
+            var expectedTransform = Path.Combine(transformFolder ?? "", fileName);
+            Assert.That(spec.Transform, Is.EqualTo(expectedTransform));
         }
     }
 }

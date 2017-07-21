@@ -456,7 +456,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("nunit3", spec.Format);
             Assert.Null(spec.Transform);
-            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -471,7 +470,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("nunit2", spec.Format);
             Assert.Null(spec.Transform);
-            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -491,8 +489,8 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ResultOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual(transformFile, spec.Transform);
-            Assert.That(spec.TransformFullPath, Does.Contain(spec.Transform));
+            var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
+            Assert.AreEqual(fullFilePath, spec.Transform);
         }
 
         [Test]
@@ -531,19 +529,17 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec1.OutputPath);
             Assert.AreEqual("nunit3", spec1.Format);
             Assert.Null(spec1.Transform);
-            Assert.Null(spec1.TransformFullPath);
 
             var spec2 = specs[1];
             Assert.AreEqual("nunit2results.xml", spec2.OutputPath);
             Assert.AreEqual("nunit2", spec2.Format);
             Assert.Null(spec2.Transform);
-            Assert.Null(spec2.TransformFullPath);
 
             var spec3 = specs[2];
             Assert.AreEqual("myresult.xml", spec3.OutputPath);
             Assert.AreEqual("user", spec3.Format);
-            Assert.AreEqual(transformFile, spec3.Transform);
-            Assert.That(spec3.TransformFullPath, Does.Contain(transformFile));
+            var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
+            Assert.AreEqual(fullFilePath, spec3.Transform);
         }
 
         [Test]
@@ -556,7 +552,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("TestResult.xml", spec.OutputPath);
             Assert.AreEqual("nunit3", spec.Format);
             Assert.Null(spec.Transform);
-            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -621,7 +616,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("nunit3", spec.Format);
             Assert.Null(spec.Transform);
-            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -637,7 +631,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("cases", spec.Format);
             Assert.Null(spec.Transform);
-            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -657,8 +650,8 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual(transformFile, spec.Transform);
-            Assert.That(spec.TransformFullPath, Does.Contain(transformFile));
+            var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
+            Assert.AreEqual(fullFilePath, spec.Transform);
         }
 
         [Test]

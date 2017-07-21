@@ -39,15 +39,8 @@ namespace NUnit.Common
         /// Construct an OutputSpecification from an option value.
         /// </summary>
         /// <param name="spec">The option value string.</param>
-        /// <param name="transformFolder">
-        /// The folder containing the transform.
-        /// Must not be <c>null</c> if <paramref name="spec"/> contains a 'transform'.
-        /// </param>
-        /// <param name="fileSystem">
-        /// An abstraction of the file system.
-        /// Must not be <c>null</c> if <paramref name="spec"/> contains a 'transform'.
-        /// </param>
-        public OutputSpecification(string spec, string transformFolder = null, IFileSystem fileSystem = null)
+        /// <param name="transformFolder">The folder containing the transform.</param>
+        public OutputSpecification(string spec, string transformFolder)
         {
             if (spec == null)
                 throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
@@ -85,20 +78,8 @@ namespace NUnit.Common
                             throw new ArgumentException(
                                 string.Format("Conflicting format options: {0}", spec));
 
-                        if (transformFolder == null)
-                            throw new ArgumentNullException(nameof(transformFolder), "Transform folder may not be null");
-
-                        if (fileSystem == null)
-                            throw new ArgumentNullException(nameof(fileSystem), "Filesystem may not be null");
-
                         this.Format = "user";
-                        this.Transform = opt[1].Trim();
-                        var transformPath = Path.Combine(transformFolder, this.Transform);
-
-                        if (!fileSystem.FileExists(transformPath))
-                            throw new ArgumentException(
-                                $"Transform {this.Transform} could not be found. (Path searched: {transformPath})");
-                        this.TransformFullPath = transformPath;
+                        this.Transform = Path.Combine(transformFolder ?? "", val);
                         break;
                 }
             }
@@ -126,11 +107,6 @@ namespace NUnit.Common
         /// </summary>
         public string Transform { get; private set; }
 
-        /// <summary>
-        /// Gets the full rooted path of a transform to be applied
-        /// </summary>
-        public string TransformFullPath { get; private set; }
-
         #endregion
 
         public override string ToString()
@@ -138,7 +114,6 @@ namespace NUnit.Common
             var sb = new StringBuilder($"OutputPath: {OutputPath}");
             if (Format != null) sb.Append($", Format: {Format}");
             if (Transform != null) sb.Append($", Transform: {Transform}");
-            if (TransformFullPath != null) sb.Append($", TransformFullPath: {TransformFullPath}");
             return sb.ToString();
         }
     }
