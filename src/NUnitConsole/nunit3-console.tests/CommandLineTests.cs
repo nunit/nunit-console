@@ -456,6 +456,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("nunit3", spec.Format);
             Assert.Null(spec.Transform);
+            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -470,12 +471,19 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("nunit2", spec.Format);
             Assert.Null(spec.Transform);
+            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml;transform=TextSummary.xslt");
+            const string transformFile = "TextSummary.xslt";
+            IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
+
+            ConsoleOptions options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                fileSystem,
+                "tests.dll", $"-result:results.xml;transform={transformFile}");
             Assert.True(options.Validate());
             Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
             Assert.AreEqual("tests.dll", options.InputFiles[0]);
@@ -483,7 +491,8 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ResultOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual("TextSummary.xslt", spec.Transform);
+            Assert.AreEqual(transformFile, spec.Transform);
+            Assert.That(spec.TransformFullPath, Does.Contain(spec.Transform));
         }
 
         [Test]
@@ -506,7 +515,13 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", "-result:myresult.xml;transform=TextSummary.xslt");
+            const string transformFile = "TextSummary.xslt";
+            IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
+
+            ConsoleOptions options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                fileSystem,
+                "tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", $"-result:myresult.xml;transform={transformFile}");
             Assert.True(options.Validate(), "Should be valid");
 
             var specs = options.ResultOutputSpecifications;
@@ -516,16 +531,19 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec1.OutputPath);
             Assert.AreEqual("nunit3", spec1.Format);
             Assert.Null(spec1.Transform);
+            Assert.Null(spec1.TransformFullPath);
 
             var spec2 = specs[1];
             Assert.AreEqual("nunit2results.xml", spec2.OutputPath);
             Assert.AreEqual("nunit2", spec2.Format);
             Assert.Null(spec2.Transform);
+            Assert.Null(spec2.TransformFullPath);
 
             var spec3 = specs[2];
             Assert.AreEqual("myresult.xml", spec3.OutputPath);
             Assert.AreEqual("user", spec3.Format);
-            Assert.AreEqual("TextSummary.xslt", spec3.Transform);
+            Assert.AreEqual(transformFile, spec3.Transform);
+            Assert.That(spec3.TransformFullPath, Does.Contain(transformFile));
         }
 
         [Test]
@@ -538,6 +556,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("TestResult.xml", spec.OutputPath);
             Assert.AreEqual("nunit3", spec.Format);
             Assert.Null(spec.Transform);
+            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -567,9 +586,11 @@ namespace NUnit.ConsoleRunner.Tests
         public void MissingXsltFileRecordsError()
         {
             const string missingXslt = "missing.xslt";
-            Assert.That(missingXslt, Does.Not.Exist);
 
-            var options = new ConsoleOptions("test.dll", $"-result:userspecifed.xml;transform={missingXslt}");
+            var options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                new VirtualFileSystem(),
+                "test.dll", $"-result:userspecifed.xml;transform={missingXslt}");
             Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
                                                                .And.Exactly(1).Property(nameof(OutputSpecification.Transform)).Null);
             Assert.That(options.ErrorMessages, Has.Exactly(1).Contains($"{missingXslt} could not be found").IgnoreCase);
@@ -600,6 +621,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("nunit3", spec.Format);
             Assert.Null(spec.Transform);
+            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
@@ -615,12 +637,18 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("cases", spec.Format);
             Assert.Null(spec.Transform);
+            Assert.Null(spec.TransformFullPath);
         }
 
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore:results.xml;transform=TextSummary.xslt");
+            const string transformFile = "TextSummary.xslt";
+            IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
+            ConsoleOptions options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                fileSystem,
+                "tests.dll", $"-explore:results.xml;transform={transformFile}");
             Assert.True(options.Validate());
             Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
             Assert.AreEqual("tests.dll", options.InputFiles[0]);
@@ -629,7 +657,8 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual("TextSummary.xslt", spec.Transform);
+            Assert.AreEqual(transformFile, spec.Transform);
+            Assert.That(spec.TransformFullPath, Does.Contain(transformFile));
         }
 
         [Test]
@@ -752,6 +781,13 @@ namespace NUnit.ConsoleRunner.Tests
         #endregion
 
         #region Helper Methods
+
+        private static IFileSystem GetFileSystemContainingFile(string fileName)
+        {
+            var fileSystem = new VirtualFileSystem();
+            fileSystem.SetupFile(Path.Combine(Environment.CurrentDirectory, fileName), new List<string>());
+            return fileSystem;
+        }
 
         private static FieldInfo GetFieldInfo(string fieldName)
         {

@@ -22,6 +22,8 @@
 // ***********************************************************************
 #if !PORTABLE
 using System;
+using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 
 namespace NUnit.Common.Tests
@@ -72,30 +74,52 @@ namespace NUnit.Common.Tests
         }
 
         [Test]
+        public void FolderMustBeSpecifiedForTransform()
+        {
+            Assert.That(() =>
+                new OutputSpecification("MyFile.xml;transform=transform.xslt"),
+                Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public void FolderMustNotBeNullForTransform()
+        {
+            Assert.That(() =>
+                new OutputSpecification("MyFile.xml;transform=transform.xslt", null),
+                Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
         public void FileNamePlusTransform()
         {
-            var spec = new OutputSpecification("MyFile.xml;transform=transform.xslt");
+            const string fileName = "transform.xslt";
+            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", fileName);
+            var spec = new OutputSpecification($"MyFile.xml;transform={fileName}", ".", fileSystem);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
-            Assert.That(spec.Transform, Is.EqualTo("transform.xslt"));
+            Assert.That(spec.Transform, Is.EqualTo(fileName));
         }
 
         [Test]
         public void UserFormatMayBeIndicatedExplicitlyAfterTransform()
         {
-            var spec = new OutputSpecification("MyFile.xml;transform=transform.xslt;format=user");
+            const string fileName = "transform.xslt";
+            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", fileName);
+            var spec = new OutputSpecification($"MyFile.xml;transform={fileName};format=user", ".", fileSystem);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
-            Assert.That(spec.Transform, Is.EqualTo("transform.xslt"));
+            Assert.That(spec.Transform, Is.EqualTo(fileName));
         }
 
         [Test]
         public void UserFormatMayBeIndicatedExplicitlyBeforeTransform()
         {
-            var spec = new OutputSpecification("MyFile.xml;format=user;transform=transform.xslt");
+            const string fileName = "transform.xslt";
+            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", fileName);
+            var spec = new OutputSpecification($"MyFile.xml;format=user;transform={fileName}", ".", fileSystem);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
-            Assert.That(spec.Transform, Is.EqualTo("transform.xslt"));
+            Assert.That(spec.Transform, Is.EqualTo(fileName));
         }
 
         [Test]
@@ -109,8 +133,9 @@ namespace NUnit.Common.Tests
         [Test]
         public void MultipleTransformSpecifiersNotAllowed()
         {
+            IFileSystem fileSystem = new SimpleVirtualFileSystem(".", new List<string> { "transform1.xslt", "transform2.xslt" });
             Assert.That(
-                () => new OutputSpecification("MyFile.xml;transform=transform1.xslt;transform=transform2.xslt"),
+                () => new OutputSpecification("MyFile.xml;transform=transform1.xslt;transform=transform2.xslt", ".", fileSystem),
                 Throws.TypeOf<ArgumentException>());
         }
 
@@ -120,6 +145,33 @@ namespace NUnit.Common.Tests
             Assert.That(
                 () => new OutputSpecification("MyFile.xml;format=nunit2;transform=transform.xslt"),
                 Throws.TypeOf<ArgumentException>());
+        }
+
+        class SimpleVirtualFileSystem : IFileSystem
+        {
+            private readonly List<string> _fullFileNames;
+
+            public SimpleVirtualFileSystem(string folder, string fileName)
+                : this(folder, new List<string> { fileName })
+            {
+            }
+
+            public SimpleVirtualFileSystem(string folder, List<string> fileNames)
+            {
+                _fullFileNames = new List<string>(fileNames.Count);
+                foreach (var fileName in fileNames)
+                    _fullFileNames.Add(Path.Combine(folder, fileName));
+            }
+
+            public bool FileExists(string fullFileName)
+            {
+                return _fullFileNames.Contains(fullFileName);
+            }
+
+            public IEnumerable<string> ReadLines(string fileName)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -158,7 +158,7 @@ namespace NUnit.ConsoleRunner
             {
                 foreach (OutputSpecification spec in _options.ExploreOutputSpecifications)
                 {
-                    _resultService.GetResultWriter(spec.Format, new object[] {spec.Transform}).WriteResultFile(result, spec.OutputPath);
+                    _resultService.GetResultWriter(spec.Format, new object[] {spec.TransformFullPath}).WriteResultFile(result, spec.OutputPath);
                     _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
             }
@@ -368,7 +368,7 @@ namespace NUnit.ConsoleRunner
 
         private IResultWriter GetResultWriter(OutputSpecification spec)
         {
-            return _resultService.GetResultWriter(spec.Format, new object[] {spec.Transform});
+            return _resultService.GetResultWriter(spec.Format, new object[] {spec.TransformFullPath});
         }
 
         // This is public static for ease of testing

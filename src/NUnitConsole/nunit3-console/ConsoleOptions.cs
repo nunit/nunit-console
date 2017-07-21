@@ -29,26 +29,20 @@ using System.Text.RegularExpressions;
 
 namespace NUnit.Common
 {
-    using ConsoleRunner;
-
     /// <summary>
     /// ConsoleOptions encapsulates the option settings for
     /// the nunit3-console program.
     /// </summary>
     public class ConsoleOptions : CommandLineOptions
     {
-        private readonly IFileSystem _fileSystem;
-
         #region Constructors
 
         internal ConsoleOptions(
             IDefaultOptionsProvider provider,
             IFileSystem fileSystem,
             params string[] args)
-            : base(provider, args)
+            : base(provider, fileSystem, args)
         {
-            if (fileSystem == null) throw new ArgumentNullException("fileSystem");
-            _fileSystem = fileSystem;
         }
 
         public ConsoleOptions(params string[] args) : base(args) { }
