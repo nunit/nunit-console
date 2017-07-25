@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Include>
 
-    <Condition Message="NUnit requires .NET 2.0, .NET 4.0 or Mono to be installed as a prerequisite.">
-        <![CDATA[Installed OR FRAMEWORK20 OR FRAMEWORK40 OR MONODIRECTORY]]>
+    <Condition Message="NUnit requires Mono or .NET 2.0 or later, to be installed as a prerequisite.">
+        <![CDATA[Installed OR NETFRAMEWORK20 OR NETFRAMEWORK35 OR WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED OR MONODIRECTORY]]>
     </Condition>
 
     <!-- ***************************************************************** -->
     <!-- **********  Define Properties used in the install      ********** -->
     <!-- ***************************************************************** -->
 
-    <Property Id="FRAMEWORK20">
-        <RegistrySearch Id="Framework20Registry" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework\policy\v2.0" Name="50727" />
-    </Property>
+    <PropertyRef Id="NETFRAMEWORK20"/>
 
-    <Property Id="FRAMEWORK40">
-        <RegistrySearch Id="Framework40Registry" Type="raw" Root="HKLM" Key="Software\Microsoft\.NETFramework\policy\v4.0" Name="30319" />
-    </Property>
+    <PropertyRef Id="NETFRAMEWORK35"/>
 
-    <Property Id="MONODEFAULTCLR">
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED"/>
+
+  <Property Id="MONODEFAULTCLR">
         <RegistrySearch Id="MonoDefaultClr" Type="raw" Root="HKLM" Key="Software\Novell\Mono" Name="DefaultCLR" />
     </Property>
 
@@ -32,7 +30,7 @@
     <!-- ***************************************************************** -->
 
     <Icon Id="nunit.ico" SourceFile="$(var.InstallImage)\nunit.ico"/>
-    <Property Id="ARPCONTACT" Value="Charlie Poole" />
+    <Property Id="ARPCONTACT" Value="The NUnit Project" />
     <Property Id="ARPPRODUCTICON" Value="nunit.ico" />
     <Property Id="ARPHELPLINK" Value="https://groups.google.com/forum/#!forum/nunit-discuss" />
     <Property Id="ARPURLINFOABOUT" Value="NUnit is a testing framework for all .NET languages" />
