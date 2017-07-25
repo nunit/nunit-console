@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Include>
     <Fragment>
-        <ComponentGroup Id="NUNIT.COMMON" Directory="INSTALLDIR">
+        <ComponentGroup Id="NUNIT.RUNNERS" Directory="INSTALLDIR">
             <Component Id="COMPONENTS.txt" Location="local" Guid="DD64E89E-8ADC-42F7-8F53-6594A97C291C">
                 <File Id="COMPONENTS.txt" Source="$(var.InstallImage)\COMPONENTS.txt" />
             </Component>
