@@ -60,8 +60,13 @@ namespace NUnit.Engine.Services
 
             if (targetFramework != null)
             {
-                var platform = targetFramework.Split(new char[] { ',' })[0];
-                if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETCompactFramework")
+                // This takes care of an issue with Roslyn. It may get fixed, but we still 
+                // have to deal with assemblies having this setting. I'm assuming that
+                // any true Portable assembly would have a Profile as part of its name.
+                var platform = targetFramework == ".NETPortable,Version=v5.0"
+                    ? ".NETStandard"
+                    : targetFramework.Split(new char[] { ',' })[0];
+                if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
                     return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not yet supported by the engine");
             }
 
