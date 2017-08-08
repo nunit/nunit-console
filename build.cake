@@ -411,6 +411,7 @@ Task("PackageConsole")
 // for all the different packages, but it's for a separate change.
 Task("PackageChocolatey")
 	.Description("Creates chocolatey packages of the console runner")
+	.IsDependentOn("Build")
 	.Does(() =>
 	{
 		EnsureDirectoryExists(PACKAGE_DIR);
@@ -424,8 +425,8 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "NOTICES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
-			        new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
-			        new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe", Target="tools" },
                     new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools" },
@@ -449,7 +450,7 @@ Task("PackageChocolatey")
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "NOTICES.txt", Target = "tools" },
-			        new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
                 }
 			});
 	});
