@@ -7,11 +7,11 @@ matrix:
       mono: latest
     - os: linux
       dist: trusty
-      mono: 4.2.4
+      mono: 4.6.2
     - os: osx
       mono: latest
-  allow_failures:
-    - mono: latest
+    - os: osx
+      mono: 4.6.2
   fast_finish: true
 
 script:
