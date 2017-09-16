@@ -15,4 +15,4 @@ matrix:
   fast_finish: true
 
 script:
-  - ./build.sh --target "Travis"
+  - ./build.sh --target "Travis" --configuration "Release"
