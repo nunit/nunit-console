@@ -92,7 +92,7 @@ Setup(context =>
     }
 
     // Executed BEFORE the first task.
-    Information("Building version {0} of NUnit.", packageVersion);
+    Information("Building {0} version {1} of NUnit.", configuration, packageVersion);
     IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
 });
 
@@ -415,8 +415,8 @@ Task("PackageChocolatey")
 	.Does(() =>
 	{
 		EnsureDirectoryExists(PACKAGE_DIR);
-		
-		ChocolateyPack("choco/nunit-console-runner.nuspec", 
+
+		ChocolateyPack("choco/nunit-console-runner.nuspec",
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
@@ -441,8 +441,8 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
                 }
 			});
-		
-		ChocolateyPack("choco/nunit-console-with-extensions.nuspec", 
+
+		ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
 			new ChocolateyPackSettings()
 			{
 				Version = packageVersion,
