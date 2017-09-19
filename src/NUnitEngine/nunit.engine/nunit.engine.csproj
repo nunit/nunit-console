@@ -117,7 +117,6 @@
     <Compile Include="Runners\ParallelTaskWorkerPool.cs" />
     <Compile Include="Runners\TestEventDispatcher.cs" />
     <Compile Include="Runners\TestExecutionTask.cs" />
-    <Compile Include="RuntimeType.cs" />
     <Compile Include="Services\AgentDataBase.cs" />
     <Compile Include="Services\ExtensionAssembly.cs" />
     <Compile Include="Services\ExtensionService.cs" />

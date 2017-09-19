@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.Collections.Generic;
 
 namespace NUnit.Engine
@@ -28,11 +29,13 @@ namespace NUnit.Engine
     /// <summary>
     /// Interface that returns a list of available runtime frameworks.
     /// </summary>
+    [Obsolete]
     public interface IAvailableRuntimes
     {
         /// <summary>
         /// Gets a list of available runtime frameworks.
         /// </summary>
+        [Obsolete]
         IList<IRuntimeFramework> AvailableRuntimes { get; }
     }
 }

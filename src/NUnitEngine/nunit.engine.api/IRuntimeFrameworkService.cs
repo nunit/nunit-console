@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace NUnit.Engine
 {
@@ -49,5 +50,10 @@ namespace NUnit.Engine
         /// <param name="package">A TestPackage</param>
         /// <returns>The selected RuntimeFramework</returns>
         string SelectRuntimeFramework(TestPackage package);
+
+        /// <summary>
+        /// Gets all available runtime frameworks.
+        /// </summary>
+        IEnumerable<IRuntimeFramework> AvailableRuntimes { get; }
     }
 }

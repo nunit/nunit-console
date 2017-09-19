@@ -29,19 +29,30 @@ using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
 {
+#pragma warning disable 612
     public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
+#pragma warning restore 612
     {
         static Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
         // HACK: This line forces RuntimeFramework to initialize the static property
         // AvailableFrameworks before it is accessed by multiple threads. See comment
-        // on RuntimeFramework class for a more detailled explanation.
-        static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
+        // on RuntimeFramework class for a more detailed explanation.
+        static readonly IList<IRuntimeFramework> _availableRuntimes = RuntimeFramework.AvailableFrameworks;
 
         /// <summary>
         /// Gets a list of available runtimes.
         /// </summary>
-        public IList<IRuntimeFramework> AvailableRuntimes
+        public IEnumerable<IRuntimeFramework> AvailableRuntimes
+        {
+            get { return _availableRuntimes; }
+        }
+
+        /// <summary>
+        /// Gets a list of available runtimes.
+        /// </summary>
+        [Obsolete]
+        IList<IRuntimeFramework> IAvailableRuntimes.AvailableRuntimes
         {
             get { return _availableRuntimes; }
         }
