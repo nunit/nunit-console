@@ -130,10 +130,17 @@ namespace NUnit.Engine.Services
         #region Helper Methods
         private Guid LaunchAgentProcess(TestPackage package)
         {
-            RuntimeFramework targetRuntime = RuntimeFramework.CurrentFramework;
+            RuntimeFramework targetRuntime;
             string runtimeSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
-            if (runtimeSetting != "")
-                targetRuntime = RuntimeFramework.Parse(runtimeSetting);
+            if (runtimeSetting.Length > 0)
+            {
+                if (!RuntimeFramework.TryParse(runtimeSetting, out targetRuntime))
+                    throw new NUnitEngineException("Invalid or unknown framework requested: " + runtimeSetting);
+            }
+            else
+            {
+                targetRuntime = RuntimeFramework.CurrentFramework;
+            }
 
             if (targetRuntime.Runtime == RuntimeType.Any)
                 targetRuntime = new RuntimeFramework(RuntimeFramework.CurrentFramework.Runtime, targetRuntime.ClrVersion);

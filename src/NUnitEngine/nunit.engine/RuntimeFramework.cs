@@ -438,6 +438,20 @@ namespace NUnit.Engine
             return new RuntimeFramework(runtime, version);
         }
 
+        public static bool TryParse(string s, out RuntimeFramework runtimeFramework)
+        {
+            try
+            {
+                runtimeFramework = Parse(s);
+                return true;
+            }
+            catch
+            {
+                runtimeFramework = null;
+                return false;
+            }
+        }
+
         /// <summary>
         /// Returns the best available framework that matches a target framework.
         /// If the target framework has a build number specified, then an exact

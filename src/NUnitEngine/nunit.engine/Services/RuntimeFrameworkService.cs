@@ -54,7 +54,12 @@ namespace NUnit.Engine.Services
         /// <returns>True if the framework is available, false if unavailable or nonexistent</returns>
         public bool IsAvailable(string name)
         {
-            var requestedFramework = RuntimeFramework.Parse(name);
+            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
+
+            RuntimeFramework requestedFramework;
+            if (!RuntimeFramework.TryParse(name, out requestedFramework))
+                throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
+
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
                 if (FrameworksMatch(requestedFramework, framework))
                     return true;
@@ -102,9 +107,17 @@ namespace NUnit.Engine.Services
             // Examine the provided settings
             RuntimeFramework currentFramework = RuntimeFramework.CurrentFramework;
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
-            RuntimeFramework requestedFramework = frameworkSetting.Length > 0
-                ? RuntimeFramework.Parse(frameworkSetting)
-                : new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
+
+            RuntimeFramework requestedFramework;
+            if (frameworkSetting.Length > 0)
+            {
+                if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
+                    throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+            }
+            else
+            {
+                requestedFramework = new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
+            }
 
             log.Debug("Current framework is {0}", currentFramework);
             if (requestedFramework == null)
