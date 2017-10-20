@@ -303,7 +303,11 @@ namespace NUnit.Engine.Runners
                 if (processModel == "single" || processModel == "inprocess")
                 {
                     var currentFramework = RuntimeFramework.CurrentFramework;
-                    var requestedFramework = RuntimeFramework.Parse(frameworkSetting);
+
+                    RuntimeFramework requestedFramework;
+                    if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
+                        throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+
                     if (!currentFramework.Supports(requestedFramework))
                         throw new NUnitEngineException(string.Format(
                             "Cannot run {0} framework in process already running {1}.", frameworkSetting, currentFramework));
