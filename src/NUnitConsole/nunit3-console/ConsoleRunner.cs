@@ -243,7 +243,7 @@ namespace NUnit.ConsoleRunner
 
                 // Since we got a result, we display any engine exception as a warning
                 if (engineException != null)
-                    writer.WriteLine(ColorStyle.Warning, Environment.NewLine + engineException.Message);
+                    writer.WriteLine(ColorStyle.Warning, Environment.NewLine + ExceptionHelper.BuildMessage(engineException));
 
                 if (reporter.Summary.UnexpectedError)
                     return ConsoleRunner.UNEXPECTED_ERROR;
@@ -258,7 +258,11 @@ namespace NUnit.ConsoleRunner
 
             // If we got here, it's because we had an exception, but check anyway
             if (engineException != null)
-                writer.WriteLine(ColorStyle.Error, engineException.Message);
+            {
+                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(engineException));
+                writer.WriteLine();
+                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(engineException));
+            }
 
             return ConsoleRunner.UNEXPECTED_ERROR;
         }

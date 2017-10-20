@@ -64,6 +64,7 @@
     <Compile Include="ConsoleOutputTests.cs" />
     <Compile Include="ConsoleRunnerTests.cs" />
     <Compile Include="DefaultOptionsProviderTests.cs" />
+    <Compile Include="ExceptionHelperTests.cs" />
     <Compile Include="ExtendedTextWrapperTests.cs" />
     <Compile Include="MakeTestPackageTests.cs" />
     <Compile Include="OutputSpecificationTests.cs" />
