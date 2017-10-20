@@ -134,7 +134,9 @@ namespace NUnit.ConsoleRunner
                     }
                     catch (Exception ex)
                     {
-                        OutWriter.WriteLine(ColorStyle.Error, ex.ToString());
+                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
+                        OutWriter.WriteLine();
+                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(ex));
                         return ConsoleRunner.UNEXPECTED_ERROR;
                     }
                     finally
@@ -147,8 +149,6 @@ namespace NUnit.ConsoleRunner
                                 Console.ReadKey(true);
                             }
                         }
-
-                        //    log.Info( "NUnit3-console.exe terminating" );
                     }
                 }
             }

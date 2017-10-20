@@ -54,6 +54,9 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\NUnitEngine\nunit.engine\Internal\ExceptionHelper.cs">
+      <Link>Utilities\ExceptionHelper.cs</Link>
+    </Compile>
     <Compile Include="..\ConsoleVersion.cs">
       <Link>Properties\ConsoleVersion.cs</Link>
     </Compile>
