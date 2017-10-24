@@ -155,10 +155,10 @@ namespace NUnit.Engine.Services
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
             string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
+            if (traceLevel != "Off")                    //Pass --trace as first non-optional arg as it intialises log
+                agentArgs += " --trace:" + traceLevel;
             if (debugAgent)
                 agentArgs += " --debug-agent";
-            if (traceLevel != "Off")
-                agentArgs += " --trace:" + traceLevel;
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
