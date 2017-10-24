@@ -56,6 +56,7 @@
     <Compile Include="..\EngineVersion.cs">
       <Link>Properties\EngineVersion.cs</Link>
     </Compile>
+    <Compile Include="AgentExitCodes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

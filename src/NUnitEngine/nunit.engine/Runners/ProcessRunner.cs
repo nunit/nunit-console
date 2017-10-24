@@ -280,7 +280,7 @@ namespace NUnit.Engine.Runners
                 _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
 
                 if (_agent == null)
-                    throw new Exception("Unable to acquire remote process agent");
+                    throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
             if (_remoteRunner == null)

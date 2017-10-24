@@ -23,6 +23,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Security;
+using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
@@ -51,6 +53,7 @@ namespace NUnit.Agent
             AgencyUrl = args[1];
 
             InternalTraceLevel traceLevel = InternalTraceLevel.Off;
+            int pid = Process.GetCurrentProcess().Id;
 
             for (int i = 2; i < args.Length; i++)
             {
@@ -61,11 +64,15 @@ namespace NUnit.Agent
                 if (arg == "--debug-agent")
                 {
                     if (!Debugger.IsAttached)
-                        Debugger.Launch();
+                        TryLaunchDebugger();
                 }
                 else if (arg.StartsWith("--trace:"))
                 {
                     traceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), arg.Substring(8));
+
+                    // Initialize trace so we can see what's happening
+                    string logname = string.Format(LOG_FILE_FORMAT, pid);
+                    InternalTrace.Initialize(logname, traceLevel);
                 }
                 else if (arg.StartsWith("--pid="))
                 {
@@ -73,11 +80,6 @@ namespace NUnit.Agent
                     AgencyProcess = Process.GetProcessById(agencyProcessId);
                 }
             }
-
-            // Initialize trace so we can see what's happening
-            int pid = Process.GetCurrentProcess().Id;
-            string logname = string.Format(LOG_FILE_FORMAT, pid);
-            InternalTrace.Initialize(logname, traceLevel);
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
@@ -107,7 +109,7 @@ namespace NUnit.Agent
 
             // TODO: We need to get this from somewhere. Argument?
             engine.InternalTraceLevel = InternalTraceLevel.Debug;
-            
+
             // Custom Service Initialization
             //log.Info("Adding Services");
             engine.Services.Add(new SettingsService(false));
@@ -129,16 +131,19 @@ namespace NUnit.Agent
                 if (Agent.Start())
                     WaitForStop();
                 else
+                {
                     log.Error("Failed to start RemoteTestAgent");
+                    return AgentExitCodes.FAILED_TO_START_AGENT;
+                }
             }
             catch (Exception ex)
             {
                 log.Error("Exception in RemoteTestAgent", ex);
+                return AgentExitCodes.UNEXPECTED_EXCEPTION;
             }
+            log.Info("Agent process {0} exiting cleanly", Process.GetCurrentProcess().Id);
 
-            log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);
-
-            return 0;
+            return AgentExitCodes.OK;
         }
 
         private static void WaitForStop()
@@ -150,11 +155,35 @@ namespace NUnit.Agent
                 if (AgencyProcess.HasExited)
                 {
                     log.Error("Parent process has been terminated.");
-                    Environment.Exit(-1);
+                    Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
                 }
             }
 
             log.Debug("Stop signal received");
+        }
+
+        private static void TryLaunchDebugger()
+        {
+            try
+            {
+                Debugger.Launch();
+            }
+            catch (SecurityException se)
+            {
+                if (InternalTrace.Initialized)
+                {
+                    log.Error($"System.Security.Permissions.UIPermission is not set to start the debugger. {se} {se.StackTrace}");
+                }
+                Environment.Exit(AgentExitCodes.NO_DEBUGGER_SECURITY);
+            }
+            catch (NotImplementedException nie) //Debugger is not implemented on mono
+            {
+                if (InternalTrace.Initialized)
+                {
+                    log.Error($"Debugger is not available on all platforms. {nie} {nie.StackTrace}");
+                }
+                Environment.Exit(AgentExitCodes.NO_DEBUGGER_NOT_IMPLEMENTED);
+            }
         }
     }
 }
