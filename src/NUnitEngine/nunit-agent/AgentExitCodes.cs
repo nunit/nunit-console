@@ -28,9 +28,9 @@ namespace NUnit.Common
         public const int OK = 0;
         public const int PARENT_PROCESS_TERMINATED = -1;
         public const int UNEXPECTED_EXCEPTION = -2;
-        public const int FAILED_TO_START_AGENT = -3;
-        public const int NO_DEBUGGER_SECURITY = -4;
-        public const int NO_DEBUGGER_NOT_IMPLEMENTED = -5;
+        public const int FAILED_TO_START_REMOTE_AGENT = -3;
+        public const int DEBUGGER_SECURITY_VIOLATION = -4;
+        public const int DEBUGGER_NOT_IMPLEMENTED = -5;
 
     }
 }

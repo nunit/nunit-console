@@ -155,7 +155,7 @@ namespace NUnit.Engine.Services
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
             string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
-            if (traceLevel != "Off")                    //Pass --trace as first non-optional arg as it intialises log
+            if (traceLevel != "Off")
                 agentArgs += " --trace:" + traceLevel;
             if (debugAgent)
                 agentArgs += " --debug-agent";
@@ -275,13 +275,13 @@ namespace NUnit.Engine.Services
                     errorMsg = "Unhandled exception on remote test agent. " +
                                "To debug, try running with the --inprocess flag, or using --trace=debug to output logs.";
                     break;
-                case AgentExitCodes.FAILED_TO_START_AGENT:
+                case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
                     errorMsg = "Failed to start remote test agent.";
                     break;
-                case AgentExitCodes.NO_DEBUGGER_SECURITY:
+                case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
                     errorMsg = "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
                     break;
-                case AgentExitCodes.NO_DEBUGGER_NOT_IMPLEMENTED:
+                case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
                     errorMsg = "Debugger could not be started on remote agent as not available on platform.";
                     break;
                 default:
