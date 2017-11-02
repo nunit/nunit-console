@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -287,8 +287,8 @@ namespace NUnit.ConsoleRunner
                     var unixVariant = Marshal.PtrToStringAnsi(buf);
                     if (unixVariant.Equals("Darwin"))
                         unixVariant = "MacOSX";
-                    
-                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack); 
+
+                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack);
                 }
                 Marshal.FreeHGlobal(buf);
             }
@@ -385,6 +385,9 @@ namespace NUnit.ConsoleRunner
 
             if (options.DomainUsageSpecified)
                 package.AddSetting(EnginePackageSettings.DomainUsage, options.DomainUsage);
+
+            if (options.ContinueOnUnloadError)
+                package.AddSetting(EnginePackageSettings.ContinueOnUnloadError, options.ContinueOnUnloadError);
 
             if (options.FrameworkSpecified)
                 package.AddSetting(EnginePackageSettings.RuntimeFramework, options.Framework);

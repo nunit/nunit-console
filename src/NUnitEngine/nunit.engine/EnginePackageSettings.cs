@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,7 +25,7 @@ namespace NUnit
 {
     /// <summary>
     /// EngineSettings contains constant values that
-    /// are used as keys in setting up a TestPackage. 
+    /// are used as keys in setting up a TestPackage.
     /// Values here are used in the engine, and set by the runner.
     /// Setting values may be a string, int or bool.
     /// </summary>
@@ -47,7 +47,7 @@ namespace NUnit
         public const string AutoBinPath = "AutoBinPath";
 
         /// <summary>
-        /// The ApplicationBase to use in loading the tests. If not 
+        /// The ApplicationBase to use in loading the tests. If not
         /// specified, and each assembly has its own process, then the
         /// location of the assembly is used. For multiple  assemblies
         /// in a single process, the closest common root directory is used.
@@ -55,7 +55,7 @@ namespace NUnit
         public const string BasePath = "BasePath";
 
         /// <summary>
-        /// Path to the config file to use in running the tests. 
+        /// Path to the config file to use in running the tests.
         /// </summary>
         public const string ConfigurationFile = "ConfigurationFile";
 
@@ -65,7 +65,7 @@ namespace NUnit
         public const string DebugTests = "DebugTests";
 
         /// <summary>
-        /// Bool flag indicating whether a debugger should be launched at agent 
+        /// Bool flag indicating whether a debugger should be launched at agent
         /// startup. Used only for debugging NUnit itself.
         /// </summary>
         public const string DebugAgent = "DebugAgent";
@@ -86,7 +86,7 @@ namespace NUnit
         public const string PrivateBinPath = "PrivateBinPath";
 
         /// <summary>
-        /// The maximum number of test agents permitted to run simultaneously. 
+        /// The maximum number of test agents permitted to run simultaneously.
         /// Ignored if the ProcessModel is not set or defaulted to Multiple.
         /// </summary>
         public const string MaxAgents = "MaxAgents";
@@ -99,14 +99,14 @@ namespace NUnit
         public const string ProcessModel = "ProcessModel";
 
         /// <summary>
-        /// Indicates the desired runtime to use for the tests. Values 
+        /// Indicates the desired runtime to use for the tests. Values
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
         public const string RuntimeFramework = "RuntimeFramework";
 
         /// <summary>
-        /// Bool flag indicating that the test should be run in a 32-bit process 
+        /// Bool flag indicating that the test should be run in a 32-bit process
         /// on a 64-bit system. By default, NUNit runs in a 64-bit process on
         /// a 64-bit system. Ignored if set on a 32-bit system.
         /// </summary>
@@ -118,7 +118,7 @@ namespace NUnit
         public const string DisposeRunners = "DisposeRunners";
 
         /// <summary>
-        /// Bool flag indicating that the test assemblies should be shadow copied. 
+        /// Bool flag indicating that the test assemblies should be shadow copied.
         /// Defaults to false.
         /// </summary>
         public const string ShadowCopyFiles = "ShadowCopyFiles";
@@ -151,6 +151,13 @@ namespace NUnit
         /// "UnauthenticatedPrincipal", "NoPrincipal" and "WindowsPrincipal".
         /// </summary>
         public const string PrincipalPolicy = "PrincipalPolicy";
+
+        /// <summary>
+        /// Flag (bool) indicating whether to continue if unloading test assemblies fail. The default is false,
+        /// in which case an exception is thrown.
+        /// </summary>
+        public const string ContinueOnUnloadError = "ContinueOnUnloadError";
+
 
         #endregion
     }
