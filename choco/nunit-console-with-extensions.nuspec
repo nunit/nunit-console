@@ -37,7 +37,7 @@
       <group>
           <dependency id="nunit-console-runner" version="$version$" />
           <dependency id="nunit-extension-nunit-project-loader" version="3.5.0" />
-          <dependency id="nunit-extension-vs-project-loader" version="3.5.0" />
+          <dependency id="nunit-extension-vs-project-loader" version="3.7.0" />
           <dependency id="nunit-extension-nunit-v2-result-writer" version="3.5.0" />
           <dependency id="nunit-extension-nunit-v2-driver" version="3.6.0" />
           <dependency id="nunit-extension-teamcity-event-listener" version="1.0.2" />
