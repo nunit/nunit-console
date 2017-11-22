@@ -26,6 +26,7 @@ using System.IO;
 using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -154,10 +155,10 @@ namespace NUnit.Engine.Services
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
             string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
-            if (debugAgent)
-                agentArgs += " --debug-agent";
             if (traceLevel != "Off")
                 agentArgs += " --trace:" + traceLevel;
+            if (debugAgent)
+                agentArgs += " --debug-agent";
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
@@ -177,6 +178,8 @@ namespace NUnit.Engine.Services
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
+            p.EnableRaisingEvents = true;
+            p.Exited += OnAgentExit;
             Guid agentId = Guid.NewGuid();
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
@@ -251,6 +254,42 @@ namespace NUnit.Engine.Services
                 : "nunit-agent.exe";
 
             return Path.Combine(engineDir, agentName);
+        }
+
+        private static void OnAgentExit(object sender, EventArgs e)
+        {
+            var process = sender as Process;
+            if (process == null)
+                return;
+
+            string errorMsg;
+
+            switch (process.ExitCode)
+            {
+                case AgentExitCodes.OK:
+                    return;
+                case AgentExitCodes.PARENT_PROCESS_TERMINATED:
+                    errorMsg = "Remote test agent believes agency process has exited.";
+                    break;
+                case AgentExitCodes.UNEXPECTED_EXCEPTION:
+                    errorMsg = "Unhandled exception on remote test agent. " +
+                               "To debug, try running with the --inprocess flag, or using --trace=debug to output logs.";
+                    break;
+                case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
+                    errorMsg = "Failed to start remote test agent.";
+                    break;
+                case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
+                    errorMsg = "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
+                    break;
+                case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
+                    errorMsg = "Debugger could not be started on remote agent as not available on platform.";
+                    break;
+                default:
+                    errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
+                    break;
+            }
+            throw new NUnitEngineException(errorMsg);
+
         }
 
         #endregion

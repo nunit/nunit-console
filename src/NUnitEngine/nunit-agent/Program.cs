@@ -23,6 +23,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Security;
+using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
@@ -39,8 +41,6 @@ namespace NUnit.Agent
         static Process AgencyProcess;
         static RemoteTestAgent Agent;
 
-        private const string LOG_FILE_FORMAT = "nunit-agent_{0}.log";
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -51,6 +51,8 @@ namespace NUnit.Agent
             AgencyUrl = args[1];
 
             InternalTraceLevel traceLevel = InternalTraceLevel.Off;
+            int pid = Process.GetCurrentProcess().Id;
+            bool debugArgPassed = false;
 
             for (int i = 2; i < args.Length; i++)
             {
@@ -60,8 +62,7 @@ namespace NUnit.Agent
                 // they originate from the engine itself.
                 if (arg == "--debug-agent")
                 {
-                    if (!Debugger.IsAttached)
-                        Debugger.Launch();
+                    debugArgPassed = true;
                 }
                 else if (arg.StartsWith("--trace:"))
                 {
@@ -74,10 +75,10 @@ namespace NUnit.Agent
                 }
             }
 
-            // Initialize trace so we can see what's happening
-            int pid = Process.GetCurrentProcess().Id;
-            string logname = string.Format(LOG_FILE_FORMAT, pid);
-            InternalTrace.Initialize(logname, traceLevel);
+            InternalTrace.Initialize($"nunit-agent_{pid}.log", traceLevel);
+
+            if (debugArgPassed)
+                TryLaunchDebugger();
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
@@ -107,7 +108,7 @@ namespace NUnit.Agent
 
             // TODO: We need to get this from somewhere. Argument?
             engine.InternalTraceLevel = InternalTraceLevel.Debug;
-            
+
             // Custom Service Initialization
             //log.Info("Adding Services");
             engine.Services.Add(new SettingsService(false));
@@ -129,16 +130,19 @@ namespace NUnit.Agent
                 if (Agent.Start())
                     WaitForStop();
                 else
+                {
                     log.Error("Failed to start RemoteTestAgent");
+                    return AgentExitCodes.FAILED_TO_START_REMOTE_AGENT;
+                }
             }
             catch (Exception ex)
             {
                 log.Error("Exception in RemoteTestAgent", ex);
+                return AgentExitCodes.UNEXPECTED_EXCEPTION;
             }
+            log.Info("Agent process {0} exiting cleanly", pid);
 
-            log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);
-
-            return 0;
+            return AgentExitCodes.OK;
         }
 
         private static void WaitForStop()
@@ -150,11 +154,38 @@ namespace NUnit.Agent
                 if (AgencyProcess.HasExited)
                 {
                     log.Error("Parent process has been terminated.");
-                    Environment.Exit(-1);
+                    Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
                 }
             }
 
             log.Debug("Stop signal received");
+        }
+
+        private static void TryLaunchDebugger()
+        {
+            if (Debugger.IsAttached)
+                return;
+
+            try
+            {
+                Debugger.Launch();
+            }
+            catch (SecurityException se)
+            {
+                if (InternalTrace.Initialized)
+                {
+                    log.Error($"System.Security.Permissions.UIPermission is not set to start the debugger. {se} {se.StackTrace}");
+                }
+                Environment.Exit(AgentExitCodes.DEBUGGER_SECURITY_VIOLATION);
+            }
+            catch (NotImplementedException nie) //Debugger is not implemented on mono
+            {
+                if (InternalTrace.Initialized)
+                {
+                    log.Error($"Debugger is not available on all platforms. {nie} {nie.StackTrace}");
+                }
+                Environment.Exit(AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED);
+            }
         }
     }
 }

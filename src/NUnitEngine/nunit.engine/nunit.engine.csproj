@@ -60,6 +60,9 @@
     <Compile Include="..\EngineVersion.cs">
       <Link>Properties\EngineVersion.cs</Link>
     </Compile>
+    <Compile Include="..\nunit-agent\AgentExitCodes.cs">
+      <Link>Agents\AgentExitCodes.cs</Link>
+    </Compile>
     <Compile Include="Drivers\NotRunnableFrameworkDriver.cs" />
     <Compile Include="Drivers\NUnit2DriverFactory.cs">
       <SubType>Code</SubType>
