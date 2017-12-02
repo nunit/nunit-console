@@ -25,11 +25,13 @@ using System;
 using System.Globalization;
 using System.Xml;
 
+#if NET_2_0
 namespace System.Runtime.CompilerServices
 {
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
     sealed class ExtensionAttribute : Attribute { }
 }
+#endif
 
 namespace NUnit.ConsoleRunner
 {

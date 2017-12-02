@@ -62,6 +62,10 @@ namespace NUnit.Engine.Services
             }
 
             string domainName = "domain-" + hashCode + package.Name;
+
+            log.Info("Creating AppDomain " + domainName);
+
+#if NET_2_0
             // Setup the Evidence
             Evidence evidence = new Evidence(AppDomain.CurrentDomain.Evidence);
             if (evidence.Count == 0)
@@ -75,10 +79,13 @@ namespace NUnit.Engine.Services
                 evidence.AddHost(hash);
             }
             
-            log.Info("Creating AppDomain " + domainName);
-
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
-
+#else
+            Evidence evidence = new Evidence();
+            var grantSet = new PermissionSet(System.Security.Permissions.PermissionState.Unrestricted);
+            var fullTrustAssemblies = new StrongName[] { };
+            AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup, grantSet, fullTrustAssemblies);
+#endif
             // Set PrincipalPolicy for the domain if called for in the package settings
             if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
             {
