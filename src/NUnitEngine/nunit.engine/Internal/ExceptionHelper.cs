@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using NUnit.Engine;
 
 namespace NUnit.Common
 {
@@ -100,9 +101,18 @@ namespace NUnit.Common
         {
             var result = new List<Exception>();
 
-            if (exception is ReflectionTypeLoadException)
+            var engineException = exception as NUnitEngineException;
+            if (engineException?.AggregatedExceptions != null)
             {
-                var reflectionException = exception as ReflectionTypeLoadException;
+                result.AddRange(engineException.AggregatedExceptions);
+
+                foreach (var aggregatedException in engineException.AggregatedExceptions)
+                    result.AddRange(FlattenExceptionHierarchy(aggregatedException));
+            }
+
+            var reflectionException = exception as ReflectionTypeLoadException;
+            if (reflectionException != null)
+            {
                 result.AddRange(reflectionException.LoaderExceptions);
 
                 foreach (var innerException in reflectionException.LoaderExceptions)

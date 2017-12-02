@@ -21,7 +21,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.Collections.Generic;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
@@ -38,6 +40,11 @@ namespace NUnit.Engine.Runners
         // The runners created by the derived class will (at least at the time
         // of writing this comment) be either TestDomainRunners or ProcessRunners.
         private List<ITestEngineRunner> _runners;
+
+        // Exceptions from individual runners are caught and rethrown
+        // on AggregatingTestRunner disposal, to allow TestResults to be
+        // written and execution of other runners to continue.
+        private readonly List<Exception> _thrownExceptions = new List<Exception>();
 
         // Public for testing purposes
         public virtual int LevelOfParallelism
@@ -115,7 +122,16 @@ namespace NUnit.Engine.Runners
         public override void UnloadPackage()
         {
             foreach (ITestEngineRunner runner in Runners)
-                runner.Unload();
+            {
+                try
+                {
+                    runner.Unload();
+                }
+                catch (Exception e)
+                {
+                    _thrownExceptions.Add(e);
+                }
+            }
         }
 
         /// <summary>
@@ -169,8 +185,9 @@ namespace NUnit.Engine.Runners
         {
             foreach (ITestEngineRunner runner in Runners)
             {
-                results.Add(runner.Run(listener, filter));
-                if (disposeRunners) runner.Dispose();
+                var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
+                task.Execute();
+                LogResultsFromTask(task, results, _thrownExceptions);
             }
         }
 
@@ -191,7 +208,7 @@ namespace NUnit.Engine.Runners
             workerPool.WaitAll();
 
             foreach (var task in tasks)
-                results.Add(task.Result());
+                LogResultsFromTask(task, results, _thrownExceptions);
         }
 #endif
 
@@ -210,16 +227,40 @@ namespace NUnit.Engine.Runners
             base.Dispose(disposing);
 
             foreach (var runner in Runners)
-                runner.Dispose();
+            {
+                try
+                {
+                    runner.Dispose();
+                }
+                catch (NUnitEngineException e)
+                {
+                    _thrownExceptions.Add(e);
+                }
+            }
 
             Runners.Clear();
+            throw new NUnitEngineException(_thrownExceptions);
         }
 
-#endregion
+        #endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {
             return TestRunnerFactory.MakeTestRunner(package);
+        }
+
+        private static void LogResultsFromTask(TestExecutionTask task, List<TestEngineResult> results, List<Exception> thrownExceptions)
+        {
+            var result = task.Result();
+            if (result != null)
+            {
+                results.Add(result);
+            }
+
+            if (task.ThrownException != null)
+            {
+                thrownExceptions.Add(task.ThrownException);
+            }
         }
     }
 }

@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
 #if !NETSTANDARD1_3
 using System.Runtime.Serialization;
 #endif
@@ -38,17 +39,33 @@ namespace NUnit.Engine
 #endif
     public class NUnitEngineException : Exception
     {
+        private const string AggregatedExceptionsMsg =
+            "Multiple exceptions encountered. Retrieve AggregatedExceptions property for more information";
+
         /// <summary>
         /// Construct with a message
         /// </summary>
-        public NUnitEngineException(string message) : base(message) { }
+        public NUnitEngineException(string message) : base(message)
+        {
+        }
 
         /// <summary>
         /// Construct with a message and inner exception
         /// </summary>
         /// <param name="message"></param>
         /// <param name="innerException"></param>
-        public NUnitEngineException(string message, Exception innerException) : base(message, innerException) { }
+        public NUnitEngineException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        /// <summary>
+        /// Construct with a message and collection of inner exceptions
+        /// </summary>
+        public NUnitEngineException(ICollection<Exception> aggregatedExceptions) 
+            : base(AggregatedExceptionsMsg, new NUnitEngineException(AggregatedExceptionsMsg))
+        {
+            AggregatedExceptions = aggregatedExceptions;
+        }
 
 #if !NETSTANDARD1_3
         /// <summary>
@@ -56,5 +73,11 @@ namespace NUnit.Engine
         /// </summary>
         public NUnitEngineException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 #endif
+
+        /// <summary>
+        /// Gets the Exception instance that caused the current exception.
+        /// </summary>
+        public ICollection<Exception> AggregatedExceptions { get; }
+
     }
 }
