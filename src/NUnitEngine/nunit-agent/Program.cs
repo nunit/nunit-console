@@ -34,18 +34,17 @@ namespace NUnit.Agent
 {
     public class NUnitTestAgent
     {
-        static Logger log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
-
         static Guid AgentId;
         static string AgencyUrl;
         static Process AgencyProcess;
         static RemoteTestAgent Agent;
+        private static Logger log;
 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             AgentId = new Guid(args[0]);
             AgencyUrl = args[1];
@@ -76,6 +75,7 @@ namespace NUnit.Agent
             }
 
             InternalTrace.Initialize($"nunit-agent_{pid}.log", traceLevel);
+            log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
             if (debugArgPassed)
                 TryLaunchDebugger();
@@ -132,17 +132,17 @@ namespace NUnit.Agent
                 else
                 {
                     log.Error("Failed to start RemoteTestAgent");
-                    return AgentExitCodes.FAILED_TO_START_REMOTE_AGENT;
+                    Environment.Exit(AgentExitCodes.FAILED_TO_START_REMOTE_AGENT);
                 }
             }
             catch (Exception ex)
             {
                 log.Error("Exception in RemoteTestAgent", ex);
-                return AgentExitCodes.UNEXPECTED_EXCEPTION;
+                Environment.Exit(AgentExitCodes.UNEXPECTED_EXCEPTION);
             }
             log.Info("Agent process {0} exiting cleanly", pid);
 
-            return AgentExitCodes.OK;
+            Environment.Exit(AgentExitCodes.OK);
         }
 
         private static void WaitForStop()

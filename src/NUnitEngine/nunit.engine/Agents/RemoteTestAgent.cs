@@ -129,14 +129,19 @@ namespace NUnit.Engine.Agents
             // including the message which is waiting for this method to return so it can report back.
             ThreadPool.QueueUserWorkItem(_ =>
             {
+                log.Info("Waiting for messages to complete");
+
                 // Wait till all messages are finished
                 _currentMessageCounter.WaitForAllCurrentMessages();
+
+                log.Info("Attempting shut down channel");
 
                 // Shut down nicely
                 _channel.StopListening(null);
                 ChannelServices.UnregisterChannel(_channel);
 
                 // Signal to other threads that it's okay to exit the process or start a new channel, etc.
+                log.Info("Set stop signal");
                 stopSignal.Set();
             });
         }
