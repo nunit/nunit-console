@@ -55,7 +55,7 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_data.Count, Is.EqualTo(5));
 
             var snap = _data.TakeSnapshot();
-            Assert.That(snap.Guids, Is.EqualTo(_generatedGuids));
+            Assert.That(snap.Guids, Is.EquivalentTo(_generatedGuids));
         }
 
         [TestCaseSource(COUNTS)]
@@ -68,7 +68,7 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_data.Count, Is.EqualTo(count));
 
             var snap = _data.TakeSnapshot();
-            Assert.That(snap.Guids, Is.EqualTo(_generatedGuids));
+            Assert.That(snap.Guids, Is.EquivalentTo(_generatedGuids));
         }
 
         [Test]
