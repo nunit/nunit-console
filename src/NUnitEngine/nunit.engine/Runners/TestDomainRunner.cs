@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -32,10 +32,12 @@ namespace NUnit.Engine.Runners
     public class TestDomainRunner : DirectTestRunner
     {
         private DomainManager _domainManager;
+        private bool _continueOnUnloadError;
 
-        public TestDomainRunner(IServiceLocator services, TestPackage package) : base(services, package) 
+        public TestDomainRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
             _domainManager = Services.GetService<DomainManager>();
+            _continueOnUnloadError = package.GetSetting(EnginePackageSettings.ContinueOnUnloadError, false);
         }
 
         #region DirectTestRunner Overrides
@@ -54,7 +56,7 @@ namespace NUnit.Engine.Runners
         {
             if (this.TestDomain != null)
             {
-                _domainManager.Unload(this.TestDomain);
+                _domainManager.Unload(this.TestDomain, _continueOnUnloadError);
                 this.TestDomain = null;
             }
         }

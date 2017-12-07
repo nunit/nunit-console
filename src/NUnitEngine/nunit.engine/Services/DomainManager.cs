@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -74,7 +74,7 @@ namespace NUnit.Engine.Services
                 Hash hash = new Hash(assembly);
                 evidence.AddHost(hash);
             }
-            
+
             log.Info("Creating AppDomain " + domainName);
 
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
@@ -105,7 +105,7 @@ namespace NUnit.Engine.Services
             string appBase = GetApplicationBase(package);
             setup.ApplicationBase = appBase;
             setup.ConfigurationFile = GetConfigFile(appBase, package);
-            setup.PrivateBinPath = GetPrivateBinPath(appBase, package); 
+            setup.PrivateBinPath = GetPrivateBinPath(appBase, package);
 
             if (!string.IsNullOrEmpty(package.FullName))
             {
@@ -135,9 +135,9 @@ namespace NUnit.Engine.Services
             return setup;
         }
 
-        public void Unload(AppDomain domain)
+        public void Unload(AppDomain domain, bool continueOnUnloadError = false)
         {
-            new DomainUnloader(domain).Unload();
+            new DomainUnloader(domain, continueOnUnloadError).Unload();
         }
 
         #endregion
@@ -148,10 +148,12 @@ namespace NUnit.Engine.Services
             private Thread _unloadThread;
             private AppDomain _domain;
             private Exception _unloadException;
+            private bool _continueOnUnloadError;
 
-            public DomainUnloader(AppDomain domain)
+            public DomainUnloader(AppDomain domain, bool continueOnUnloadError)
             {
                 _domain = domain;
+                _continueOnUnloadError = continueOnUnloadError;
             }
 
             public void Unload()
@@ -167,17 +169,21 @@ namespace NUnit.Engine.Services
                     log.Error(msg);
                     Kill(_unloadThread);
 
-                    throw new NUnitEngineException(msg);
+                    if(!_continueOnUnloadError)
+                        throw new NUnitEngineException(msg);
                 }
 
                 if (_unloadException != null)
-                    throw new NUnitEngineException("Exception encountered unloading AppDomain", _unloadException);
+                    if(_continueOnUnloadError)
+                        log.Error("Exception encountered unloading AppDomain. {0}", _unloadException);
+                    else
+                        throw new NUnitEngineException("Exception encountered unloading AppDomain", _unloadException);
             }
 
             private void UnloadOnThread()
             {
                 bool shadowCopy = false;
-                string domainName = "UNKNOWN";               
+                string domainName = "UNKNOWN";
 
                 try
                 {
@@ -197,7 +203,7 @@ namespace NUnit.Engine.Services
                     _unloadException = ex;
 
                     // We assume that the tests did something bad and just leave
-                    // the orphaned AppDomain "out there". 
+                    // the orphaned AppDomain "out there".
                     // TODO: Something useful.
                     log.Error("Unable to unload AppDomain " + domainName, ex);
                 }
@@ -242,7 +248,7 @@ namespace NUnit.Engine.Services
             string configFile = package.GetSetting(EnginePackageSettings.ConfigurationFile, string.Empty);
             if (configFile != string.Empty)
                 return Path.Combine(appBase, configFile);
-        
+
             // The ProjectService adds any project config to the settings.
             // So, at this point, we only want to handle assemblies or an
             // anonymous package created from the command-line.
@@ -332,7 +338,7 @@ namespace NUnit.Engine.Services
             foreach( string assembly in assemblies )
             {
                 string dir = PathUtils.RelativePath(
-                    Path.GetFullPath(basePath), 
+                    Path.GetFullPath(basePath),
                     Path.GetDirectoryName( Path.GetFullPath(assembly) ) );
                 if ( dir != null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
                 {

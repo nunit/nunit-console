@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -109,6 +109,18 @@ namespace NUnit.Engine.Services.Tests
 
             CheckDomainIsUnloaded(domain);
         }
+
+        [Test]
+        public void UnloadingTwiceDoesNotThrowNUnitEngineExceptionIfContinueOnUnloadErrorIsSet()
+        {
+            var domain = _domainManager.CreateDomain(_package);
+            _domainManager.Unload(domain, true);
+
+            Assert.That(() => _domainManager.Unload(domain, true), Throws.Nothing);
+
+            CheckDomainIsUnloaded(domain);
+        }
+
 
         #region Helper Methods
 

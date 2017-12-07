@@ -62,6 +62,8 @@ namespace NUnit.Common
         public string DomainUsage { get; private set; }
         public bool DomainUsageSpecified { get { return DomainUsage != null; } }
 
+        public bool ContinueOnUnloadError { get; private set; }
+
         // How to Run Tests
 
         public string Framework { get; private set; }
@@ -159,6 +161,9 @@ namespace NUnit.Common
 
             this.Add("pause", "Pause before running to allow attaching a debugger.",
                 v => PauseBeforeRun = v != null);
+
+            this.Add("continue-on-unload-error", "Continue if unload errors happen.",
+                v => ContinueOnUnloadError = v != null);
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
