@@ -113,5 +113,34 @@ namespace NUnit.Engine.Internal.Tests
             Assert.That(combined.Attributes["skipped"].Value, Is.EqualTo("2"));
             Assert.That(combined.Attributes["asserts"].Value, Is.EqualTo("93"));
         }
+
+        [Test]
+        [TestCase("Skipped", "Skipped", "Skipped")]
+        [TestCase("Passed", "Passed", "Passed")]
+        [TestCase("Failed", "Failed", "Failed")]
+        [TestCase("Warning", "Warning", "Warning")]
+        [TestCase("Skipped", "Passed", "Passed")]
+        [TestCase("Passed", "Skipped", "Passed")]
+        [TestCase("Skipped", "Failed", "Failed")]
+        [TestCase("Failed", "Skipped", "Failed")]
+        [TestCase("Skipped", "Warning", "Warning")]
+        [TestCase("Warning", "Skipped", "Warning")]
+        [TestCase("Passed", "Failed", "Failed")]
+        [TestCase("Failed", "Passed", "Failed")]
+        [TestCase("Passed", "Warning", "Warning")]
+        [TestCase("Warning", "Passed", "Warning")]
+        [TestCase("Failed", "Warning", "Failed")]
+        [TestCase("Warning", "Failed", "Failed")]
+        public void Aggregate_CalculatesAggregateResultCorrectly(string firstResult, string secondResult, string aggregateResult)
+        {
+            string firstResultText = $"<test-assembly result=\"{firstResult}\" total=\"23\" passed=\"23\" failed=\"0\" inconclusive=\"0\" skipped=\"0\" asserts=\"40\" />";
+            string secondResultText = $"<test-assembly result=\"{secondResult}\" total=\"42\" passed=\"31\" failed=\"4\" inconclusive=\"5\" skipped=\"2\" asserts=\"53\" />";
+
+            var firstEngineResult = new TestEngineResult(firstResultText);
+            var secondEngineResult = new TestEngineResult(secondResultText);
+            var data = new XmlNode[]{ firstEngineResult.Xml, secondEngineResult.Xml };
+            XmlNode combined = ResultHelper.Aggregate("test-run", "NAME", "FULLNAME", data);
+            Assert.That(combined.Attributes["result"].Value, Is.EqualTo(aggregateResult));
+        }
     }
 }
