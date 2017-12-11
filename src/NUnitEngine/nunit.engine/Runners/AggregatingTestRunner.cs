@@ -41,10 +41,10 @@ namespace NUnit.Engine.Runners
         // of writing this comment) be either TestDomainRunners or ProcessRunners.
         private List<ITestEngineRunner> _runners;
 
-        // Exceptions from individual runners are caught and rethrown
+        // Exceptions from unloading individual runners are caught and rethrown
         // on AggregatingTestRunner disposal, to allow TestResults to be
         // written and execution of other runners to continue.
-        private readonly List<Exception> _thrownExceptions = new List<Exception>();
+        private readonly List<Exception> _unloadExceptions = new List<Exception>();
 
         // Public for testing purposes
         public virtual int LevelOfParallelism
@@ -129,7 +129,7 @@ namespace NUnit.Engine.Runners
                 }
                 catch (Exception e)
                 {
-                    _thrownExceptions.Add(e);
+                    _unloadExceptions.Add(e);
                 }
             }
         }
@@ -187,7 +187,7 @@ namespace NUnit.Engine.Runners
             {
                 var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
                 task.Execute();
-                LogResultsFromTask(task, results, _thrownExceptions);
+                LogResultsFromTask(task, results, _unloadExceptions);
             }
         }
 
@@ -208,7 +208,7 @@ namespace NUnit.Engine.Runners
             workerPool.WaitAll();
 
             foreach (var task in tasks)
-                LogResultsFromTask(task, results, _thrownExceptions);
+                LogResultsFromTask(task, results, _unloadExceptions);
         }
 #endif
 
@@ -232,14 +232,16 @@ namespace NUnit.Engine.Runners
                 {
                     runner.Dispose();
                 }
-                catch (NUnitEngineException e)
+                catch (Exception e)
                 {
-                    _thrownExceptions.Add(e);
+                    _unloadExceptions.Add(e);
                 }
             }
 
             Runners.Clear();
-            throw new NUnitEngineException(_thrownExceptions);
+
+            if (_unloadExceptions.Count > 0)
+                throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
         #endregion
@@ -249,17 +251,17 @@ namespace NUnit.Engine.Runners
             return TestRunnerFactory.MakeTestRunner(package);
         }
 
-        private static void LogResultsFromTask(TestExecutionTask task, List<TestEngineResult> results, List<Exception> thrownExceptions)
+        private static void LogResultsFromTask(TestExecutionTask task, List<TestEngineResult> results, List<Exception> unloadExceptions)
         {
-            var result = task.Result();
+            var result = task.Result;
             if (result != null)
             {
                 results.Add(result);
             }
 
-            if (task.ThrownException != null)
+            if (task.UnloadException != null)
             {
-                thrownExceptions.Add(task.ThrownException);
+                unloadExceptions.Add(task.UnloadException);
             }
         }
     }

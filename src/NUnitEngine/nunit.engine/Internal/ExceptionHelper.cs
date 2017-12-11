@@ -101,12 +101,12 @@ namespace NUnit.Common
         {
             var result = new List<Exception>();
 
-            var engineException = exception as NUnitEngineException;
-            if (engineException?.AggregatedExceptions != null)
+            var unloadException = exception as NUnitEngineUnloadException;
+            if (unloadException != null)
             {
-                result.AddRange(engineException.AggregatedExceptions);
+                result.AddRange(unloadException.AggregatedExceptions);
 
-                foreach (var aggregatedException in engineException.AggregatedExceptions)
+                foreach (var aggregatedException in unloadException.AggregatedExceptions)
                     result.AddRange(FlattenExceptionHierarchy(aggregatedException));
             }
 
