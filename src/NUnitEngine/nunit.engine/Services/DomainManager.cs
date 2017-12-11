@@ -145,9 +145,9 @@ namespace NUnit.Engine.Services
         #region Nested DomainUnloader Class
         class DomainUnloader
         {
+            private readonly AppDomain _domain;
             private Thread _unloadThread;
-            private AppDomain _domain;
-            private Exception _unloadException;
+            private NUnitEngineException _unloadException;
 
             public DomainUnloader(AppDomain domain)
             {
@@ -157,12 +157,14 @@ namespace NUnit.Engine.Services
             public void Unload()
             {
                 _unloadThread = new Thread(new ThreadStart(UnloadOnThread));
-
                 _unloadThread.Start();
 
-                if (!_unloadThread.Join(30000))
+                var timeout = TimeSpan.FromSeconds(30);
+
+                if (!_unloadThread.Join((int)timeout.TotalMilliseconds))
                 {
-                    string msg = "Unable to unload AppDomain, Unload thread timed out.";
+                    var msg = DomainDetailsBuilder.DetailsFor(_domain,
+                        $"Unable to unload AppDomain: unload thread timed out after {timeout.TotalSeconds} seconds.");
 
                     log.Error(msg);
                     Kill(_unloadThread);
@@ -176,14 +178,8 @@ namespace NUnit.Engine.Services
 
             private void UnloadOnThread()
             {
-                bool shadowCopy = false;
-                string domainName = "UNKNOWN";               
-
                 try
                 {
-                    shadowCopy = _domain.ShadowCopyFiles;
-                    domainName = _domain.FriendlyName;
-
                     // Uncomment to simulate an error in unloading
                     //throw new Exception("Testing: simulated unload error");
 
@@ -194,12 +190,13 @@ namespace NUnit.Engine.Services
                 }
                 catch (Exception ex)
                 {
-                    _unloadException = ex;
-
                     // We assume that the tests did something bad and just leave
-                    // the orphaned AppDomain "out there". 
-                    // TODO: Something useful.
-                    log.Error("Unable to unload AppDomain " + domainName, ex);
+                    // the orphaned AppDomain "out there".
+                    var msg = DomainDetailsBuilder.DetailsFor(_domain,
+                    $"Exception encountered unloading AppDomain: {ex.Message}");
+
+                    _unloadException = new NUnitEngineException(msg);
+                    log.Error(msg);
                 }
             }
         }

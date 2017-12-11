@@ -261,7 +261,7 @@ namespace NUnit.Engine.Runners
                 }
 
                 if (unloadError != null) // Add message line indicating we managed to stop agent anyway
-                    throw (new NUnitEngineException(unloadError + "\nAgent Process was terminated successfully after error."));
+                    throw (new NUnitEngineException(unloadError + Environment.NewLine + "Agent Process was terminated successfully after error."));
             }
         }
 
