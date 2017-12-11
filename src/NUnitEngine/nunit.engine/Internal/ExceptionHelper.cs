@@ -102,7 +102,7 @@ namespace NUnit.Common
             var result = new List<Exception>();
 
             var unloadException = exception as NUnitEngineUnloadException;
-            if (unloadException != null)
+            if (unloadException?.AggregatedExceptions != null)
             {
                 result.AddRange(unloadException.AggregatedExceptions);
 

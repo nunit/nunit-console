@@ -167,11 +167,11 @@ namespace NUnit.Engine.Services
                     log.Error(msg);
                     Kill(_unloadThread);
 
-                    throw new NUnitEngineException(msg);
+                    throw new NUnitEngineUnloadException(msg);
                 }
 
                 if (_unloadException != null)
-                    throw new NUnitEngineException("Exception encountered unloading AppDomain", _unloadException);
+                    throw new NUnitEngineUnloadException("Exception encountered unloading AppDomain", _unloadException);
             }
 
             private void UnloadOnThread()

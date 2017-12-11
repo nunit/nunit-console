@@ -41,6 +41,21 @@ namespace NUnit.Engine
         private const string AggregatedExceptionsMsg =
             "Multiple exceptions encountered. Retrieve AggregatedExceptions property for more information";
 
+
+        /// <summary>
+        /// Construct with a message
+        /// </summary>
+        public NUnitEngineUnloadException(string message) : base(message)
+        {
+        }
+
+        /// <summary>
+        /// Construct with a message and inner exception
+        /// </summary>
+        public NUnitEngineUnloadException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
         /// <summary>
         /// Construct with a message and a collection of exceptions.
         /// </summary>
