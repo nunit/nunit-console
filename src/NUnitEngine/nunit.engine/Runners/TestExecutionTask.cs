@@ -46,16 +46,21 @@ namespace NUnit.Engine.Runners
         public void Execute()
         {
             _hasExecuted = true;
-            _result = _runner.Run(_listener, _filter);
-
             try
             {
-                if (_disposeRunner)
-                    _runner.Dispose();
+                _result = _runner.Run(_listener, _filter);
             }
-            catch (Exception e)
+            finally
             {
-                _unloadException = e;
+                try
+                {
+                    if (_disposeRunner)
+                        _runner.Dispose();
+                }
+                catch (Exception e)
+                {
+                    _unloadException = e;
+                }
             }
         }
 
