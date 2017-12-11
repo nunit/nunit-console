@@ -23,8 +23,11 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Common;
 using NUnit.Engine.Internal;
+
+#if !NETSTANDARD1_3
+using NUnit.Common;
+#endif
 
 namespace NUnit.Engine.Runners
 {
@@ -80,7 +83,7 @@ namespace NUnit.Engine.Runners
         }
 #endif
 
-        #region AbstractTestRunner Overrides
+#region AbstractTestRunner Overrides
 
         /// <summary>
         /// Explore a TestPackage and return information about
@@ -244,7 +247,7 @@ namespace NUnit.Engine.Runners
                 throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
-        #endregion
+#endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {
