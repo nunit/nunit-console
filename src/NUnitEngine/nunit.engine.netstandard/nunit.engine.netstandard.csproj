@@ -29,6 +29,8 @@
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
     <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
+    <Compile Include="..\nunit.engine.api\Exceptions\NUnitEngineException.cs" Link="NUnitEngineException.cs" />
+    <Compile Include="..\nunit.engine.api\Exceptions\NUnitEngineUnloadException.cs" Link="NUnitEngineUnloadException.cs" />
     <Compile Include="..\nunit.engine.api\Extensibility\IFrameworkDriver.cs">
       <Link>Extensibility\IFrameworkDriver.cs</Link>
     </Compile>
@@ -138,9 +140,6 @@
     </Compile>
     <Compile Include="..\nunit.engine.api\ITestRunner.cs">
       <Link>ITestRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\nunit.engine.api\NUnitEngineException.cs">
-      <Link>NUnitEngineException.cs</Link>
     </Compile>
     <Compile Include="..\nunit.engine.api\TestFilter.cs">
       <Link>TestFilter.cs</Link>

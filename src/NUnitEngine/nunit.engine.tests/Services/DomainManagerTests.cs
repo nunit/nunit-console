@@ -100,12 +100,12 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void UnloadingTwiceThrowsNUnitEngineException()
+        public void UnloadingTwiceThrowsNUnitEngineUnloadException()
         {
             var domain = _domainManager.CreateDomain(_package);
             _domainManager.Unload(domain);
 
-            Assert.That(() => _domainManager.Unload(domain), Throws.TypeOf<NUnitEngineException>());
+            Assert.That(() => _domainManager.Unload(domain), Throws.TypeOf<NUnitEngineUnloadException>());
 
             CheckDomainIsUnloaded(domain);
         }

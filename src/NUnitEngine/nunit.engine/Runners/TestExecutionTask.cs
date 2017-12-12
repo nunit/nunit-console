@@ -21,6 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
+
 namespace NUnit.Engine.Runners
 {
     public class TestExecutionTask : ITestExecutionTask
@@ -30,6 +32,8 @@ namespace NUnit.Engine.Runners
         private readonly TestFilter _filter;
         private volatile TestEngineResult _result;
         private readonly bool _disposeRunner;
+        private bool _hasExecuted = false;
+        private Exception _unloadException;
 
         public TestExecutionTask(ITestEngineRunner runner, ITestEventListener listener, TestFilter filter, bool disposeRunner)
         {
@@ -41,14 +45,44 @@ namespace NUnit.Engine.Runners
 
         public void Execute()
         {
-            _result = _runner.Run(_listener, _filter);
-            if (_disposeRunner)
-                _runner.Dispose();
+            _hasExecuted = true;
+            try
+            {
+                _result = _runner.Run(_listener, _filter);
+            }
+            finally
+            {
+                try
+                {
+                    if (_disposeRunner)
+                        _runner.Dispose();
+                }
+                catch (Exception e)
+                {
+                    _unloadException = e;
+                }
+            }
         }
 
-        public TestEngineResult Result()
+        public TestEngineResult Result
         {
-            return _result;
+            get
+            {
+                Guard.OperationValid(_hasExecuted, "Can not access result until task has been executed");
+                return _result;
+            }
+        }
+
+        /// <summary>
+        /// Stored exception thrown during test assembly unload.
+        /// </summary>
+        public Exception UnloadException
+        {
+            get
+            {
+                Guard.OperationValid(_hasExecuted, "Can not access thrown exceptions until task has been executed");
+                return _unloadException;
+            }
         }
     }
 }

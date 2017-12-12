@@ -41,14 +41,16 @@ namespace NUnit.Engine
         /// <summary>
         /// Construct with a message
         /// </summary>
-        public NUnitEngineException(string message) : base(message) { }
+        public NUnitEngineException(string message) : base(message)
+        {
+        }
 
         /// <summary>
         /// Construct with a message and inner exception
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="innerException"></param>
-        public NUnitEngineException(string message, Exception innerException) : base(message, innerException) { }
+        public NUnitEngineException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
 
 #if !NETSTANDARD1_3
         /// <summary>
