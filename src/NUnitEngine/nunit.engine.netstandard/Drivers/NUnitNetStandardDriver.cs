@@ -79,7 +79,7 @@ namespace NUnit.Engine.Drivers
             if(_testAssembly == null)
                 throw new NUnitEngineException(string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyRef.FullName));
 
-            var nunitRef = assemblyRef.MainModule.AssemblyReferences.Where(reference => reference.Name == "nunit.framework").FirstOrDefault();
+            var nunitRef = assemblyRef.MainModule.AssemblyReferences.Where(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (nunitRef == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
 

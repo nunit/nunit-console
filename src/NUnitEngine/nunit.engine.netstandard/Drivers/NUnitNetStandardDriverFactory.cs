@@ -38,7 +38,7 @@ namespace NUnit.Engine.Drivers
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         public bool IsSupportedTestFramework(AssemblyName reference)
         {
-            return reference.Name == NUNIT_FRAMEWORK && reference.Version.Major == 3;
+            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 3;
         }
 
         /// <summary>
