@@ -29,7 +29,7 @@ namespace NUnit.Engine.Agents
     /// Abstract base for all types of TestAgents.
     /// A TestAgent provides services of locating,
     /// loading and running tests in a particular
-    /// context such as an AppDomain or Process.
+    /// context such as an application domain or process.
     /// </summary>
     public abstract class TestAgent : MarshalByRefObject, ITestAgent, IDisposable
     {

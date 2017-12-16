@@ -57,7 +57,7 @@ namespace NUnit.Engine.Drivers
         /// <summary>
         /// Construct an NUnit3FrameworkDriver
         /// </summary>
-        /// <param name="testDomain">The AppDomain in which to create the FrameworkController</param>
+        /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
         public NUnit3FrameworkDriver(AppDomain testDomain)
         {
             _testDomain = testDomain;

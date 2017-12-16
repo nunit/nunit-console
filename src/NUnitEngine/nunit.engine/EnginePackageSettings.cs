@@ -71,7 +71,7 @@ namespace NUnit
         public const string DebugAgent = "DebugAgent";
 
         /// <summary>
-        /// Indicates how to load tests across AppDomains. Values are:
+        /// Indicates how to load tests across application domains. Values are:
         /// "Default", "None", "Single", "Multiple". Default is "Multiple"
         /// if more than one assembly is loaded in a process. Otherwise,
         /// it is "Single".
@@ -147,7 +147,7 @@ namespace NUnit
         public const string InternalTraceLevel = "InternalTraceLevel";
 
         /// <summary>
-        /// The PrincipalPolicy to set on the test AppDomain. Values are:
+        /// The PrincipalPolicy to set on the test application domain. Values are:
         /// "UnauthenticatedPrincipal", "NoPrincipal" and "WindowsPrincipal".
         /// </summary>
         public const string PrincipalPolicy = "PrincipalPolicy";

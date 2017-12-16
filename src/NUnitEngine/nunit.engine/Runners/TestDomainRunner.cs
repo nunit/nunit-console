@@ -48,7 +48,7 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// Unload any loaded TestPackage as well as the AppDomain.
+        /// Unload any loaded TestPackage as well as the application domain.
         /// </summary>
         public override void UnloadPackage()
         {

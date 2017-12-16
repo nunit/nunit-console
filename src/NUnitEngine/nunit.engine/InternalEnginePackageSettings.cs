@@ -48,7 +48,7 @@ namespace NUnit.Engine
 
         /// <summary>
         /// True if any assembly in the package requires a special assembly resolution hook
-        /// in the default AppDomain in order to find dependent assemblies.
+        /// in the default application domain in order to find dependent assemblies.
         /// </summary>
         public const string ImageRequiresDefaultAppDomainAssemblyResolver = "ImageRequiresDefaultAppDomainAssemblyResolver";
 

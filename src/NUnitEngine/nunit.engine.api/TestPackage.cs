@@ -93,7 +93,7 @@ namespace NUnit.Engine
         /// Every test package gets a unique ID used to prefix test IDs within that package.
         /// </summary>
         /// <remarks>
-        /// The generated ID is only unique for packages created within the same AppDomain.
+        /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
         public string ID { get; private set; }

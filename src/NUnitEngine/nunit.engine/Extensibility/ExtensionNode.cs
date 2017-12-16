@@ -127,7 +127,7 @@ namespace NUnit.Engine.Extensibility
         #region Methods
 
         /// <summary>
-        /// Gets a newly created extension object, created in the domain specified
+        /// Gets a newly created extension object, created in the current application domain
         /// </summary>
         public object CreateExtensionObject(params object[] args)
         {
