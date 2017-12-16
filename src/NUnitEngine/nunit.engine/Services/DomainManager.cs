@@ -75,7 +75,7 @@ namespace NUnit.Engine.Services
                 evidence.AddHost(hash);
             }
             
-            log.Info("Creating AppDomain " + domainName);
+            log.Info("Creating application domain " + domainName);
 
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
 
@@ -164,7 +164,7 @@ namespace NUnit.Engine.Services
                 if (!_unloadThread.Join((int)timeout.TotalMilliseconds))
                 {
                     var msg = DomainDetailsBuilder.DetailsFor(_domain,
-                        $"Unable to unload AppDomain: unload thread timed out after {timeout.TotalSeconds} seconds.");
+                        $"Unable to unload application domain: unload thread timed out after {timeout.TotalSeconds} seconds.");
 
                     log.Error(msg);
                     Kill(_unloadThread);
@@ -173,7 +173,7 @@ namespace NUnit.Engine.Services
                 }
 
                 if (_unloadException != null)
-                    throw new NUnitEngineUnloadException("Exception encountered unloading AppDomain", _unloadException);
+                    throw new NUnitEngineUnloadException("Exception encountered unloading application domain", _unloadException);
             }
 
             private void UnloadOnThread()
@@ -193,7 +193,7 @@ namespace NUnit.Engine.Services
                     // We assume that the tests did something bad and just leave
                     // the orphaned AppDomain "out there".
                     var msg = DomainDetailsBuilder.DetailsFor(_domain,
-                    $"Exception encountered unloading AppDomain: {ex.Message}");
+                        $"Exception encountered unloading application domain: {ex.Message}");
 
                     _unloadException = new NUnitEngineException(msg);
                     log.Error(msg);

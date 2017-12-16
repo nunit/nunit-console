@@ -25,7 +25,7 @@ namespace NUnit.Engine.Internal
 {
     /// <summary>
     /// Represents the manner in which test assemblies use
-    /// AppDomains to provide isolation
+    /// application domains to provide isolation
     /// </summary>
     public enum DomainUsage
     {
@@ -35,7 +35,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         Default,
         /// <summary>
-        /// Don't create a test domain - run in the primary AppDomain.
+        /// Don't create a test domain - run in the primary application domain.
         /// Note that this requires the tests to be available in the
         /// NUnit appbase or probing path.
         /// </summary>

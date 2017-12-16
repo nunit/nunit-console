@@ -25,7 +25,7 @@ namespace NUnit.Engine.Runners
 {
     /// <summary>
     /// MultipleTestDomainRunner runs tests using separate
-    /// AppDomains for each assembly.
+    /// application domains for each assembly.
     /// </summary>
     public class MultipleTestDomainRunner : AggregatingTestRunner
     {

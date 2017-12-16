@@ -45,7 +45,7 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
         /// </summary>
-        /// <param name="domain">The AppDomain to use for the tests</param>
+        /// <param name="domain">The application domain to use for the tests</param>
         /// <param name="assemblyPath">The full path to the test assembly</param>
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>

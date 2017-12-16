@@ -26,7 +26,7 @@ using System;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// LocalTestRunner runs tests in the current AppDomain.
+    /// LocalTestRunner runs tests in the current application domain.
     /// </summary>
     public class LocalTestRunner : DirectTestRunner
     {
