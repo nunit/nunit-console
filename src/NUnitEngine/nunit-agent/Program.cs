@@ -23,6 +23,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Security;
 using NUnit.Common;
 using NUnit.Engine;
@@ -52,6 +53,7 @@ namespace NUnit.Agent
             InternalTraceLevel traceLevel = InternalTraceLevel.Off;
             int pid = Process.GetCurrentProcess().Id;
             bool debugArgPassed = false;
+            string workDirectory = string.Empty;
 
             for (int i = 2; i < args.Length; i++)
             {
@@ -72,9 +74,14 @@ namespace NUnit.Agent
                     int agencyProcessId = int.Parse(arg.Substring(6));
                     AgencyProcess = Process.GetProcessById(agencyProcessId);
                 }
+                else if (arg.StartsWith("--work="))
+                {
+                    workDirectory = arg.Substring(7);
+                }
             }
 
-            InternalTrace.Initialize($"nunit-agent_{pid}.log", traceLevel);
+            var logName = $"nunit-agent_{pid}.log";
+            InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
             log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
             if (debugArgPassed)
