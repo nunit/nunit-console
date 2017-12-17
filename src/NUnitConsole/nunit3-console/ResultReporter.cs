@@ -191,7 +191,7 @@ namespace NUnit.ConsoleRunner
                         else
                         {
                             var site = resultNode.GetAttribute("site");
-                            if (site != null && site != "Parent" && site != "Child")
+                            if (site == "SetUp" || site == "TearDown")
                                 new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                             if (site == "SetUp") return;
                         }
