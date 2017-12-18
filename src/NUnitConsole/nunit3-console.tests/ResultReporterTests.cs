@@ -127,7 +127,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "Warning Message",
                 "6) Invalid : NUnit.Tests.BadFixture" + nl +
                 "No suitable constructor was found"
-        };
+            };
             
             var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsFailuresAndWarningsReport);
 

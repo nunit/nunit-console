@@ -66,7 +66,7 @@ namespace NUnit.ConsoleRunner
             if (Summary.ExplicitCount + Summary.SkipCount + Summary.IgnoreCount > 0)
                 WriteNotRunReport();
 
-            if (OverallResult == "Failed")
+            if (OverallResult == "Failed" || Summary.WarningCount > 0)
                 WriteErrorsFailuresAndWarningsReport();
 
             WriteRunSettingsReport();
@@ -191,7 +191,7 @@ namespace NUnit.ConsoleRunner
                         else
                         {
                             var site = resultNode.GetAttribute("site");
-                            if (site != "Parent" && site != "Child")
+                            if (site == "SetUp" || site == "TearDown")
                                 new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                             if (site == "SetUp") return;
                         }
