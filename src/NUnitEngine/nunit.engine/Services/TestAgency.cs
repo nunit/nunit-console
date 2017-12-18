@@ -151,6 +151,7 @@ namespace NUnit.Engine.Services
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
+            string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
@@ -159,6 +160,8 @@ namespace NUnit.Engine.Services
                 agentArgs += " --trace:" + traceLevel;
             if (debugAgent)
                 agentArgs += " --debug-agent";
+            if (workDirectory != string.Empty)
+                agentArgs += " --work=" + workDirectory;
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 

@@ -152,6 +152,12 @@ namespace NUnit
         /// </summary>
         public const string PrincipalPolicy = "PrincipalPolicy";
 
+        /// <summary>
+        /// Full path of the directory to be used for work and result files.
+        /// This path is provided to tests by the framework TestContext.
+        /// </summary>
+        public const string WorkDirectory = "WorkDirectory";
+
         #endregion
     }
 }
