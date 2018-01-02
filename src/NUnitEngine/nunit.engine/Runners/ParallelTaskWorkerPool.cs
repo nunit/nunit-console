@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {

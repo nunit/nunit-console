@@ -24,6 +24,7 @@
 using System;
 using System.Threading;
 using System.Xml;
+using NUnit.Common;
 
 namespace NUnit.Engine
 {

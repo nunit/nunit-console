@@ -24,6 +24,7 @@
 using System;
 using System.IO;
 using System.Text;
+using NUnit.Common;
 
 namespace NUnit.ConsoleRunner
 {
