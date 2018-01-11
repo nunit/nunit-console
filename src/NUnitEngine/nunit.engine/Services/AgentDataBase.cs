@@ -54,13 +54,16 @@ namespace NUnit.Engine.Services
         private readonly Dictionary<Guid, AgentRecord> _agentData = new Dictionary<Guid, AgentRecord>();
         private readonly object _lock = new object();
 
+        // NOTE: Calling code is written to assume that an invalid id will result in
+        // null being returned, similar to how Hashtables worked in the past.
         public AgentRecord this[Guid id]
         {
             get
             {
                 lock (_lock)
                 {
-                    return _agentData[id];
+                    AgentRecord record;
+                    return _agentData.TryGetValue(id, out record) ? record : null;
                 }
             }
         }
@@ -90,6 +93,20 @@ namespace NUnit.Engine.Services
             lock (_lock)
             {
                 _agentData[r.Id] = r;
+            }
+        }
+
+        public AgentRecord GetDataForProcess(Process process)
+        {
+            lock (_lock)
+            {
+                foreach (var r in _agentData.Values)
+                {
+                    if (r.Process == process)
+                        return r;
+                }
+
+                return null;
             }
         }
 

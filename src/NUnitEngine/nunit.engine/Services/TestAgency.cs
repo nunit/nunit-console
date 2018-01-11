@@ -27,6 +27,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using NUnit.Common;
+using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -40,7 +41,8 @@ namespace NUnit.Engine.Services
         Starting,
         Ready,
         Busy,
-        Stopping
+        Stopping,
+        Terminated
     }
 
     /// <summary>
@@ -106,7 +108,7 @@ namespace NUnit.Engine.Services
 
         #endregion
 
-        #region Public Methods - Called by Clients
+        #region Method Called by Clients
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
         {
@@ -124,6 +126,12 @@ namespace NUnit.Engine.Services
                 r.Status = AgentStatus.Ready;
                 log.Debug("Releasing agent " + agent.Id.ToString());
             }
+        }
+
+        internal bool IsAgentRunning(Guid id)
+        {
+            var agentRecord = _agentData[id];
+            return agentRecord != null && agentRecord.Status != AgentStatus.Terminated;
         }
 
         #endregion
@@ -236,11 +244,12 @@ namespace NUnit.Engine.Services
             {
                 Thread.Sleep( pollTime );
                 if ( !infinite ) waitTime -= pollTime;
-                ITestAgent agent = _agentData[agentId].Agent;
-                if ( agent != null )
+                var agentRecord = _agentData[agentId];
+                
+                if ( agentRecord.Agent != null )
                 {
                     log.Debug( "Returning new agent {0}", agentId.ToString("B") );
-                    return agent;
+                    return new RemoteTestAgentProxy(agentRecord.Agent, agentRecord.Id);
                 }
             }
 
@@ -256,14 +265,17 @@ namespace NUnit.Engine.Services
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 
-            return Path.Combine(engineDir, agentName);
+            return Path.Combine(engineDir, agentName);//
         }
 
-        private static void OnAgentExit(object sender, EventArgs e)
+        private void OnAgentExit(object sender, EventArgs e)
         {
             var process = sender as Process;
             if (process == null)
                 return;
+
+            var agentRecord = _agentData.GetDataForProcess(process);
+            agentRecord.Status = AgentStatus.Terminated;
 
             string errorMsg;
 
@@ -291,6 +303,8 @@ namespace NUnit.Engine.Services
                     errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
                     break;
             }
+
+            //_agentData[agentId]
             throw new NUnitEngineException(errorMsg);
 
         }
