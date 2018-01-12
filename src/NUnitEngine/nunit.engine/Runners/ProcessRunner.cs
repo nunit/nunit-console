@@ -237,7 +237,7 @@ namespace NUnit.Engine.Runners
                     log.Error(unloadError);
                 }
 
-                if (_agent != null)
+                if (_agent != null && _agency.IsAgentRunning(_agent.Id))
                 {
                     try
                     {
