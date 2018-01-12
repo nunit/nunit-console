@@ -44,7 +44,13 @@ namespace NUnit.Engine.Runners.Tests
         public void Initialize()
         {
 #if !NETCOREAPP1_1
-            _package = new TestPackage("mock-assembly.dll");
+            var dir = Path.GetDirectoryName(typeof(MasterTestRunnerTests).Assembly.Location);
+#else
+            var dir = Path.GetDirectoryName(typeof(MasterTestRunnerTests).GetTypeInfo().Assembly.Location);
+#endif
+            _package = new TestPackage(Path.Combine(dir, "mock-assembly.dll"));
+
+#if !NETCOREAPP1_1
 
             // Add all services needed
             _services = new ServiceContext();
@@ -58,8 +64,6 @@ namespace NUnit.Engine.Runners.Tests
 
             _runner = new MasterTestRunner(_services, _package);
 #else
-            var dir = Path.GetDirectoryName(typeof(MasterTestRunnerTests).GetTypeInfo().Assembly.Location);
-            _package = new TestPackage(Path.Combine(dir, "mock-assembly.dll"));
             _runner = new MasterTestRunner(_package);
 #endif
             _events = new List<XmlNode>();

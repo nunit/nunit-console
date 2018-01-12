@@ -475,7 +475,14 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-            const string transformFile = "TextSummary.xslt";
+
+#if !NETCOREAPP1_1
+            var dir = Path.GetDirectoryName(typeof(CommandLineTests).Assembly.Location);
+#else
+            var dir = Path.GetDirectoryName(typeof(CommandLineTests).GetTypeInfo().Assembly.Location);
+#endif
+
+            string transformFile = Path.Combine(dir, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
@@ -513,7 +520,13 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-            const string transformFile = "TextSummary.xslt";
+#if !NETCOREAPP1_1
+            var dir = Path.GetDirectoryName(typeof(CommandLineTests).Assembly.Location);
+#else
+            var dir = Path.GetDirectoryName(typeof(CommandLineTests).GetTypeInfo().Assembly.Location);
+#endif
+
+            string transformFile = Path.Combine(dir, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
@@ -636,7 +649,13 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-            const string transformFile = "TextSummary.xslt";
+#if !NETCOREAPP1_1
+            var dir = Path.GetDirectoryName(typeof(CommandLineTests).Assembly.Location);
+#else
+            var dir = Path.GetDirectoryName(typeof(CommandLineTests).GetTypeInfo().Assembly.Location);
+#endif
+
+            string transformFile = Path.Combine(dir, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
             ConsoleOptions options = new ConsoleOptions(
                 new DefaultOptionsProviderStub(false),

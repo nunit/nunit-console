@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using NUnit.Framework;
 
@@ -58,7 +59,13 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("nunit-agent-x86.exe", true)]
         public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
         {
-            var package = new TestPackage(assemblyName);
+#if !NETCOREAPP1_1
+            var dir = Path.GetDirectoryName(typeof(RuntimeFrameworkServiceTests).Assembly.Location);
+#else
+            var dir = Path.GetDirectoryName(typeof(RuntimeFrameworkServiceTests).GetTypeInfo().Assembly.Location);
+#endif
+
+            var package = new TestPackage(Path.Combine(dir, assemblyName));
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
 
