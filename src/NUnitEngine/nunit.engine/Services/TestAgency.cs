@@ -265,7 +265,7 @@ namespace NUnit.Engine.Services
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 
-            return Path.Combine(engineDir, agentName);//
+            return Path.Combine(engineDir, agentName);
         }
 
         private void OnAgentExit(object sender, EventArgs e)
@@ -304,9 +304,7 @@ namespace NUnit.Engine.Services
                     break;
             }
 
-            //_agentData[agentId]
             throw new NUnitEngineException(errorMsg);
-
         }
 
         #endregion
