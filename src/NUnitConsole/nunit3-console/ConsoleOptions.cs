@@ -67,6 +67,8 @@ namespace NUnit.Common
         public string Framework { get; private set; }
         public bool FrameworkSpecified { get { return Framework != null; } }
 
+        public string ConfigurationFile { get; private set; }
+
         public bool RunAsX86 { get; private set; }
 
         public bool DisposeRunners { get; private set; }
@@ -115,6 +117,9 @@ namespace NUnit.Common
 
             this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).",
                 v => ActiveConfig = RequiredValue(v, "--config"));
+
+            this.Add("configfile=", "{NAME} of configuration file to use for this run.",
+                v => ConfigurationFile = RequiredValue(v, "--configfile"));
 
             // Where to Run Tests
             this.Add("process=", "{PROCESS} isolation for test assemblies.\nValues: InProcess, Separate, Multiple. If not specified, defaults to Separate for a single assembly or Multiple for more than one.",
