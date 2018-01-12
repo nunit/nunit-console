@@ -91,6 +91,9 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void ProperConfigFileIsUsed()
         {
+            // NOTE: The alternate config file, alt.config, is copied to the bin directory and
+            // may be specified from the command-line, using --configfile=alt.config. This allows
+            // manual testing of the option while permitting this test to still pass.
             var expectedPath = Path.Combine(TestContext.CurrentContext.TestDirectory, STANDARD_CONFIG_FILE);
             var alternatePath = Path.Combine(TestContext.CurrentContext.TestDirectory, ALTERNATE_CONFIG_FILE);
             Assert.That(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile, Is.SamePath(expectedPath).Or.SamePath(alternatePath));
@@ -99,6 +102,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void CanReadConfigFile()
         {
+            // NOTE: The alternate config file has a different value so we can see it being used
             var expectedSetting = Path.GetFileName(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) == ALTERNATE_CONFIG_FILE
                 ? "Alternate config used"
                 : "54321";
