@@ -35,6 +35,9 @@ namespace NUnit.Engine.Services.Tests
         static string path2 = TestPath("/test/bin/debug/test2.dll");
         static string path3 = TestPath("/test/utils/test3.dll");
 
+        const string STANDARD_CONFIG_FILE = "nunit.engine.tests.dll.config";
+        const string ALTERNATE_CONFIG_FILE = "alt.config";
+
         [Test]
         public static void GetPrivateBinPath()
         {
@@ -88,15 +91,22 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void ProperConfigFileIsUsed()
         {
-            var configFileName = "nunit.engine.tests.dll.config";
-            var expectedPath = Path.Combine(TestContext.CurrentContext.TestDirectory, configFileName);
-            Assert.That(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile, Is.SamePath(expectedPath));
+            // NOTE: The alternate config file, alt.config, is copied to the bin directory and
+            // may be specified from the command-line, using --configfile=alt.config. This allows
+            // manual testing of the option while permitting this test to still pass.
+            var expectedPath = Path.Combine(TestContext.CurrentContext.TestDirectory, STANDARD_CONFIG_FILE);
+            var alternatePath = Path.Combine(TestContext.CurrentContext.TestDirectory, ALTERNATE_CONFIG_FILE);
+            Assert.That(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile, Is.SamePath(expectedPath).Or.SamePath(alternatePath));
         }
 
         [Test]
         public static void CanReadConfigFile()
         {
-            Assert.That(ConfigurationManager.AppSettings.Get("test.setting"), Is.EqualTo("54321"));
+            // NOTE: The alternate config file has a different value so we can see it being used
+            var expectedSetting = Path.GetFileName(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) == ALTERNATE_CONFIG_FILE
+                ? "Alternate config used"
+                : "54321";
+            Assert.That(ConfigurationManager.AppSettings.Get("test.setting"), Is.EqualTo(expectedSetting));
         }
 
         [TestCase("/path/to/mytest.dll", null, "/path/to/")]

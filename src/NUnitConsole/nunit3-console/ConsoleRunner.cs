@@ -459,6 +459,9 @@ namespace NUnit.ConsoleRunner
             if (options.TestParameters.Count != 0)
                 AddTestParametersSetting(package, options.TestParameters);
 
+            if (options.ConfigurationFile != null)
+                package.AddSetting(EnginePackageSettings.ConfigurationFile, options.ConfigurationFile);
+
             return package;
         }
 

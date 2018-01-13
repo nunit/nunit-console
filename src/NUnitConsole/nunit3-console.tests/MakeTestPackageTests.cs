@@ -65,6 +65,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--domain=multiple", "DomainUsage", "Multiple")]
         [TestCase("--framework=net-4.0", "RuntimeFramework", "net-4.0")]
         [TestCase("--config=Release", "ActiveConfig", "Release")]
+        [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
         [TestCase("--trace=Error", "InternalTraceLevel", "Error")]
         [TestCase("--trace=error", "InternalTraceLevel", "Error")]
         [TestCase("--seed=1234", "RandomSeed", 1234)]
