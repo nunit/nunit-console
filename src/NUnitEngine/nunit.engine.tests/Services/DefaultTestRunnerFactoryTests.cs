@@ -52,15 +52,15 @@ namespace NUnit.Engine.Services.Tests
         {
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));
         }
-
+        
         // Single file
-        [TestCase("EngineTests.nunit", null,        typeof(ProcessRunner))] // Needs to exist because contents are checked
+        [TestCase("x.nunit",           null,        typeof(AggregatingTestRunner))]
         [TestCase("x.dll",             null,        typeof(ProcessRunner))]
-        [TestCase("EngineTests.nunit", "Single",    typeof(TestDomainRunner))]
+        [TestCase("x.nunit",           "Single",    typeof(TestDomainRunner))]
         [TestCase("x.dll",             "Single",    typeof(TestDomainRunner))]
-        [TestCase("EngineTests.nunit", "Separate",  typeof(ProcessRunner))]
+        [TestCase("x.nunit",           "Separate",  typeof(ProcessRunner))]
         [TestCase("x.dll",             "Separate",  typeof(ProcessRunner))]
-        [TestCase("EngineTests.nunit", "Multiple",  typeof(MultipleTestProcessRunner))]
+        [TestCase("x.nunit",           "Multiple",  typeof(MultipleTestProcessRunner))]
         [TestCase("x.dll",             "Multiple",  typeof(MultipleTestProcessRunner))]
         // Two files
         [TestCase("x.nunit y.nunit",   null,        typeof(AggregatingTestRunner))]
@@ -89,9 +89,6 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("x.dll y.dll z.dll",     "Multiple", typeof(MultipleTestProcessRunner))]
         public void CorrectRunnerIsUsed(string files, string processModel, Type expectedType)
         {
-            if (files == "EngineTests.nunit")
-                files = Path.Combine(TestContext.CurrentContext.TestDirectory, files);
-
             var package = new TestPackage(files.Split(new char[] { ' ' }));
             if (processModel != null)
                 package.AddSetting("ProcessModel", processModel);
