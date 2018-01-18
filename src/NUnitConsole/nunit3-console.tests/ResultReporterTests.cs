@@ -30,7 +30,6 @@ using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
-using NUnit.Framework.Internal;
 using NUnit.Tests.Assemblies;
 using NUnit.Engine.Internal;
 
@@ -46,12 +45,21 @@ namespace NUnit.ConsoleRunner.Tests
         [OneTimeSetUp]
         public void CreateResult()
         {
-            var mockAssembly = typeof (MockAssembly).Assembly;
-            var emptySettings = new Dictionary<string, object>();
+            var mockAssembly = typeof(MockAssembly).Assembly;
+            var emptySettings = new Dictionary<string, object>
+            {
+                { "TestParameters", "1=d;2=c" },
+                { "TestParametersDictionary", new Dictionary<string, string>
+                {
+                    { "1", "d" },
+                    { "2", "c" }
+                }}
+            };
 
-            var runner = new NUnitTestAssemblyRunner(new DefaultTestAssemblyBuilder());
-            runner.Load(mockAssembly, emptySettings);
-            var xmlText = runner.Run(TestListener.NULL, Framework.Internal.TestFilter.Empty).ToXml(true).OuterXml;
+            var controller = new FrameworkController(mockAssembly, "id", emptySettings);
+
+            controller.LoadTests();
+            var xmlText = controller.RunTests(null);
             var engineResult = AddMetadata(new TestEngineResult(xmlText));
             _result = engineResult.Xml;
 
@@ -92,7 +100,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void SummaryReportTest()
         {
-            var expected = new [] {
+            var expected = new[] {
                 "Test Run Summary",
                 "  Overall result: Failed",
                $"  Test Count: {MockAssembly.Tests}, Passed: {MockAssembly.Passed}, Failed: 5, Warnings: 1, Inconclusive: 1, Skipped: 7",
@@ -128,7 +136,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "6) Invalid : NUnit.Tests.BadFixture" + nl +
                 "No suitable constructor was found"
             };
-            
+
             var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsFailuresAndWarningsReport);
 
             foreach (var ex in expected)
@@ -140,7 +148,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void TestsNotRunTest()
         {
-            var expected = new [] {
+            var expected = new[] {
                 "Tests Not Run",
                 "",
                 "1) Explicit : NUnit.Tests.Assemblies.MockTestFixture.ExplicitTest",
@@ -175,11 +183,23 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.Warn("Just a warning");
         }
 
-        #region Helper Methods
-
-        private TestEngineResult AddMetadata(TestEngineResult input)
+        [Test]
+        public void TestParameterSettingsWrittenCorrectly()
         {
-            input.Add("<settings><setting name=\"Setting1Name\" value=\"Setting1Value\"></setting><setting name=\"Setting2Name\" value=\"Setting2Value\"></setting></settings>");
+            var expected = new[] {
+                "    TestParameters: 1=d;2=c",
+                "    TestParametersDictionary:",
+                "        1 -> d",
+                "        2 -> c",
+                "    NumberOfTestWorkers: 8"
+            };
+
+            var report = GetReportLines(_reporter.WriteRunSettingsReport);
+            Assert.That(report, Is.SupersetOf(expected));
+        }
+
+        private static TestEngineResult AddMetadata(TestEngineResult input)
+        {
             return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty);
         }
 
@@ -200,7 +220,5 @@ namespace NUnit.ConsoleRunner.Tests
 
             return lines;
         }
-
-        #endregion
     }
 }
