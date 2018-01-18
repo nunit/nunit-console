@@ -190,8 +190,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "    TestParameters: 1=d;2=c",
                 "    TestParametersDictionary:",
                 "        1 -> d",
-                "        2 -> c",
-                "    NumberOfTestWorkers: 8"
+                "        2 -> c"
             };
 
             var report = GetReportLines(_reporter.WriteRunSettingsReport);
