@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
+using NSubstitute;
 using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
@@ -11,16 +12,14 @@ namespace NUnit.ConsoleRunner.Tests
 {
     class ConsoleRunnerTests
     {
-        [Test, Ignore("Needs to be rewritten")]
+        [Test]
         public void ThrowsNUnitEngineExceptionWhenTestResultsAreNotWriteable()
         {
             var testEngine = new TestEngine();
 
-            // This worked when we only needed one service. We now
-            // would need to create three fakes. We should find a
-            // better way to test this. Since it's a relatively
-            // minor test, I'm leaving it for the future.
             testEngine.Services.Add(new FakeResultService());
+            testEngine.Services.Add(new TestFilterService());
+            testEngine.Services.Add(Substitute.For<IService, IExtensionService>());
 
             var consoleRunner = new ConsoleRunner(testEngine, new ConsoleOptions("mock-assembly.dll"), new ColorConsoleWriter());
             
