@@ -169,6 +169,12 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(report, Is.EqualTo(expected));
         }
 
+        [Test, Explicit("Displays failure behavior")]
+        public void WarningsOnlyDisplayOnce()
+        {
+            Assert.Warn("Just a warning");
+        }
+
         #region Helper Methods
 
         private TestEngineResult AddMetadata(TestEngineResult input)
