@@ -34,8 +34,6 @@ namespace NUnit.ConsoleRunner.Tests
 {
     public class BadFileTests : ITestEventListener
     {
-        static string NL = Environment.NewLine;
-
         [TestCase("junk.dll", "File not found")]
         [TestCase("EngineTests.nunit", "File type is not supported")]
         public void MissingFileTest(string filename, string message)
