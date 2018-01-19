@@ -93,7 +93,7 @@ namespace NUnit.Engine.Services
                 case ProcessModel.Default:
                     if (projectCount > 0)
                         return new AggregatingTestRunner(ServiceContext, package);
-                    else if (package.SubPackages.Count > 1 || projectCount > 0)
+                    else if (package.SubPackages.Count > 1)
                         return new MultipleTestProcessRunner(this.ServiceContext, package);
                     else
                         return new ProcessRunner(this.ServiceContext, package);
