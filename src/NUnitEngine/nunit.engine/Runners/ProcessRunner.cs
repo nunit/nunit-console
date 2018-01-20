@@ -224,7 +224,7 @@ namespace NUnit.Engine.Runners
             {
                 _disposed = true;
 
-                string unloadError = null;
+                Exception unloadException = null;
 
                 try
                 {
@@ -233,8 +233,9 @@ namespace NUnit.Engine.Runners
                 catch(Exception ex)
                 {
                     // Save and log the unload error
-                    unloadError = ex.Message;
-                    log.Error(unloadError);
+                    unloadException = ex;
+                    log.Error(ExceptionHelper.BuildMessage(ex));
+                    log.Error(ExceptionHelper.BuildStackTrace(ex));
                 }
 
                 if (_agent != null && _agency.IsAgentRunning(_agent.Id))
@@ -252,16 +253,16 @@ namespace NUnit.Engine.Runners
                         _agent = null;
 
                         // Stop error with no unload error, just rethrow
-                        if (unloadError == null)
+                        if (unloadException == null)
                             throw;
 
                         // Both kinds of errors, throw exception with combined message
-                        throw new NUnitEngineException(unloadError + Environment.NewLine + stopError);
+                        throw new NUnitEngineUnloadException(unloadException.Message + Environment.NewLine + stopError);
                     }
                 }
 
-                if (unloadError != null) // Add message line indicating we managed to stop agent anyway
-                    throw new NUnitEngineException(unloadError + Environment.NewLine + "Agent Process was terminated successfully after error.");
+                if (unloadException != null) // Add message line indicating we managed to stop agent anyway
+                    throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
             }
         }
 
