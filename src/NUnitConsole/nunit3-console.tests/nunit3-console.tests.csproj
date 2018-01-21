@@ -62,6 +62,7 @@
     <Compile Include="..\ConsoleVersion.cs">
       <Link>Properties\ConsoleVersion.cs</Link>
     </Compile>
+    <Compile Include="BadFileTests.cs" />
     <Compile Include="ColorConsoleTests.cs" />
     <Compile Include="ColorStyleTests.cs" />
     <Compile Include="CommandLineTests.cs" />
