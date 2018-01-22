@@ -44,7 +44,7 @@ namespace NUnit.Engine.Runners.Tests
         [SetUp]
         public void Initialize()
         {
-            _package = new TestPackage(Path.Combine(MockAssembly.AssemblyPath, "mock-assembly.dll"));
+            _package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll"));
 
 #if !NETCOREAPP1_1
 

@@ -77,7 +77,7 @@ namespace NUnit.Tests
             public const int TestOutputEvents = 1;
 
             public const int Nodes = Tests + Suites;
-
+            
             public const int ExplicitFixtures = 1;
             public const int SuitesRun = Suites - ExplicitFixtures;
 
@@ -102,10 +102,13 @@ namespace NUnit.Tests
 
             public const int Inconclusive = MockTestFixture.Inconclusive;
 
-            public static readonly string AssemblyPath = TestContextHelper.TestDirectoryFrom(typeof(MockAssembly));
+#if !NETSTANDARD1_6
+            //Replace with TestContext.CurrentContext.TestDirectory ?
+            public static readonly string AssemblyPath = AssemblyHelper.GetAssemblyPath(typeof(MockAssembly).Assembly);
+#endif
         }
 
-        [TestFixture(Description = "Fake Test Fixture")]
+        [TestFixture(Description="Fake Test Fixture")]
         [Category("FixtureCategory")]
         public class MockTestFixture
         {
@@ -127,7 +130,7 @@ namespace NUnit.Tests
 
             public const int Inconclusive = 1;
 
-            [Test(Description = "Mock Test #1")]
+            [Test(Description="Mock Test #1")]
             [Category("MockCategory")]
             [Property("Severity", "Critical")]
             public void TestWithDescription() { }
@@ -155,7 +158,7 @@ namespace NUnit.Tests
             public void ExplicitTest() { }
 
             [Test]
-            public void NotRunnableTest(int a, int b) { }
+            public void NotRunnableTest( int a, int b) { }
 
             [Test]
             public void InconclusiveTest()
@@ -182,11 +185,11 @@ namespace NUnit.Tests
         public class OneTestCase
         {
             public const int Tests = 1;
-            public const int Suites = 1;
+            public const int Suites = 1;		
 
             [Test]
-            public virtual void TestCase()
-            { }
+            public virtual void TestCase() 
+            {}
         }
     }
 
@@ -216,12 +219,12 @@ namespace NUnit.Tests
 
         [Test]
         public void Test2() { }
-
+        
         [Test]
         public void Test3() { }
     }
 
-    [TestFixture, Explicit]
+    [TestFixture,Explicit]
     public class ExplicitFixture
     {
         public const int Tests = 2;
@@ -246,27 +249,27 @@ namespace NUnit.Tests
         [Test]
         public void SomeTest() { }
     }
-
+    
     [TestFixture]
     public class FixtureWithTestCases
     {
         public const int Tests = 4;
         public const int Suites = 3;
-
-        [TestCase(2, 2, ExpectedResult = 4)]
-        [TestCase(9, 11, ExpectedResult = 20)]
+        
+        [TestCase(2, 2, ExpectedResult=4)]
+        [TestCase(9, 11, ExpectedResult=20)]
         public int MethodWithParameters(int x, int y)
         {
-            return x + y;
+            return x+y;
         }
-
+        
         [TestCase(2, 4)]
         [TestCase(9.2, 11.7)]
         public void GenericMethod<T>(T x, T y)
         {
         }
     }
-
+    
     [TestFixture(5)]
     [TestFixture(42)]
     public class ParameterizedFixture
@@ -275,29 +278,29 @@ namespace NUnit.Tests
         public const int Suites = 3;
 
         public ParameterizedFixture(int num) { }
-
+        
         [Test]
         public void Test1() { }
-
+        
         [Test]
         public void Test2() { }
     }
-
+    
     public class GenericFixtureConstants
     {
         public const int Tests = 4;
         public const int Suites = 3;
     }
-
+    
     [TestFixture(5)]
     [TestFixture(11.5)]
     public class GenericFixture<T>
     {
-        public GenericFixture(T num) { }
-
+        public GenericFixture(T num){ }
+        
         [Test]
         public void Test1() { }
-
+        
         [Test]
         public void Test2() { }
     }

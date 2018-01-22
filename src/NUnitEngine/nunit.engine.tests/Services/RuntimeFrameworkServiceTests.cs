@@ -60,8 +60,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("nunit-agent-x86.exe", true)]
         public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
         {
-            var dir = TestContextHelper.TestDirectoryFrom();
-            var package = new TestPackage(Path.Combine(dir, assemblyName));
+            var package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, assemblyName));
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
 

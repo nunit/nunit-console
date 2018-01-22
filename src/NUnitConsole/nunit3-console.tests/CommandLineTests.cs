@@ -476,9 +476,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-            var dir = TestContextHelper.TestDirectoryFrom();
-
-            string transformFile = Path.Combine(dir, "TextSummary.xslt");
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
@@ -516,9 +514,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-            var dir = TestContextHelper.TestDirectoryFrom();
-
-            string transformFile = Path.Combine(dir, "TextSummary.xslt");
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
@@ -641,9 +637,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-            var dir = TestContextHelper.TestDirectoryFrom();
-
-            string transformFile = Path.Combine(dir, "TextSummary.xslt");
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
             ConsoleOptions options = new ConsoleOptions(
                 new DefaultOptionsProviderStub(false),

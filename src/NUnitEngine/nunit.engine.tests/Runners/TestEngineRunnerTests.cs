@@ -72,7 +72,7 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
             _services.ServiceManager.StartServices();
 
-            var mockAssemblyPath = Path.Combine(MockAssembly.AssemblyPath, "mock-assembly.dll");
+            var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
 
             var assemblies = new List<string>();
             for (int i = 0; i < _numAssemblies; i++)
