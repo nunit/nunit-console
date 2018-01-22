@@ -181,7 +181,7 @@ namespace NUnit.Engine.Services
                 try
                 {
                     // Uncomment to simulate an error in unloading
-                    //throw new Exception("Testing: simulated unload error");
+                    //throw new CannotUnloadAppDomainException("Testing: simulated unload error");
 
                     // Uncomment to simulate a timeout while unloading
                     //while (true) ;

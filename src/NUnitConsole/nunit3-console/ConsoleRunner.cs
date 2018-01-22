@@ -47,6 +47,7 @@ namespace NUnit.ConsoleRunner
         public static readonly int INVALID_ASSEMBLY = -2;
         //public static readonly int FIXTURE_NOT_FOUND = -3;    //No longer in use
         public static readonly int INVALID_TEST_FIXTURE = -4;
+        public static readonly int UNLOAD_ERROR = -5;
         public static readonly int UNEXPECTED_ERROR = -100;
 
         #endregion
@@ -204,6 +205,7 @@ namespace NUnit.ConsoleRunner
                 : "ON";
 
             XmlNode result = null;
+            NUnitEngineUnloadException unloadException = null;
             NUnitEngineException engineException = null;
 
             try
@@ -217,6 +219,10 @@ namespace NUnit.ConsoleRunner
 
                     result = runner.Run(eventHandler, filter);
                 }
+            }
+            catch (NUnitEngineUnloadException ex)
+            {
+                unloadException = ex;
             }
             catch (NUnitEngineException ex)
             {
@@ -238,12 +244,20 @@ namespace NUnit.ConsoleRunner
                 {
                     var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
                     GetResultWriter(spec).WriteResultFile(result, outputPath);
-                    _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
+                    writer.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
 
-                // Since we got a result, we display any engine exception as a warning
                 if (engineException != null)
-                    writer.WriteLine(ColorStyle.Warning, Environment.NewLine + ExceptionHelper.BuildMessage(engineException));
+                {
+                    writer.WriteLine(ColorStyle.Error, Environment.NewLine + ExceptionHelper.BuildMessage(engineException));
+                    return ConsoleRunner.UNEXPECTED_ERROR;
+                }
+
+                if (unloadException != null)
+                {
+                    writer.WriteLine(ColorStyle.Warning, Environment.NewLine + ExceptionHelper.BuildMessage(unloadException));
+                    return ConsoleRunner.UNLOAD_ERROR;
+                }
 
                 if (reporter.Summary.UnexpectedError)
                     return ConsoleRunner.UNEXPECTED_ERROR;
