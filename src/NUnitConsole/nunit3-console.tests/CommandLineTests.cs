@@ -28,6 +28,7 @@ using NUnit.Common;
 using NUnit.Options;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Tests;
 
 namespace NUnit.ConsoleRunner.Tests
 {
@@ -475,12 +476,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-
-#if !NETCOREAPP1_1
-            var dir = Path.GetDirectoryName(typeof(CommandLineTests).Assembly.Location);
-#else
-            var dir = Path.GetDirectoryName(typeof(CommandLineTests).GetTypeInfo().Assembly.Location);
-#endif
+            var dir = TestContextHelper.TestDirectoryFrom();
 
             string transformFile = Path.Combine(dir, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
@@ -520,11 +516,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-#if !NETCOREAPP1_1
-            var dir = Path.GetDirectoryName(typeof(CommandLineTests).Assembly.Location);
-#else
-            var dir = Path.GetDirectoryName(typeof(CommandLineTests).GetTypeInfo().Assembly.Location);
-#endif
+            var dir = TestContextHelper.TestDirectoryFrom();
 
             string transformFile = Path.Combine(dir, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
@@ -649,11 +641,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-#if !NETCOREAPP1_1
-            var dir = Path.GetDirectoryName(typeof(CommandLineTests).Assembly.Location);
-#else
-            var dir = Path.GetDirectoryName(typeof(CommandLineTests).GetTypeInfo().Assembly.Location);
-#endif
+            var dir = TestContextHelper.TestDirectoryFrom();
 
             string transformFile = Path.Combine(dir, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);

@@ -28,6 +28,7 @@ using NUnit.Framework;
 using NUnit.Tests.Assemblies;
 using System.Reflection;
 using System.IO;
+using NUnit.Tests;
 
 namespace NUnit.Engine.Runners.Tests
 {
@@ -43,12 +44,7 @@ namespace NUnit.Engine.Runners.Tests
         [SetUp]
         public void Initialize()
         {
-#if !NETCOREAPP1_1
-            var dir = Path.GetDirectoryName(typeof(MasterTestRunnerTests).Assembly.Location);
-#else
-            var dir = Path.GetDirectoryName(typeof(MasterTestRunnerTests).GetTypeInfo().Assembly.Location);
-#endif
-            _package = new TestPackage(Path.Combine(dir, "mock-assembly.dll"));
+            _package = new TestPackage(Path.Combine(MockAssembly.AssemblyPath, "mock-assembly.dll"));
 
 #if !NETCOREAPP1_1
 
