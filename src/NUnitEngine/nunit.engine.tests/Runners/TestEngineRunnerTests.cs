@@ -23,10 +23,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using NUnit.Engine.Internal;
 using NUnit.Framework;
+using NUnit.Tests;
 using NUnit.Tests.Assemblies;
 
 namespace NUnit.Engine.Runners.Tests
@@ -70,9 +72,14 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
             _services.ServiceManager.StartServices();
 
+            var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
+
             var assemblies = new List<string>();
             for (int i = 0; i < _numAssemblies; i++)
-                assemblies.Add("mock-assembly.dll");
+            {
+                assemblies.Add(mockAssemblyPath);
+            }
+
             _package = new TestPackage(assemblies);
 
             // HACK: Depends on the fact that all TestEngineRunners support this constructor

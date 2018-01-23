@@ -28,6 +28,7 @@ using NUnit.Common;
 using NUnit.Options;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Tests;
 
 namespace NUnit.ConsoleRunner.Tests
 {
@@ -476,7 +477,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-            const string transformFile = "TextSummary.xslt";
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
@@ -514,7 +515,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-            const string transformFile = "TextSummary.xslt";
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
@@ -637,7 +638,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-            const string transformFile = "TextSummary.xslt";
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
             ConsoleOptions options = new ConsoleOptions(
                 new DefaultOptionsProviderStub(false),
