@@ -17,7 +17,7 @@
     <packageSourceUrl>https://github.com/nunit/nunit-console</packageSourceUrl>
     <releaseNotes>https://raw.githubusercontent.com/nunit/nunit-console/master/CHANGES.txt</releaseNotes>
     <mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
-    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
