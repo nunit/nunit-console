@@ -6,7 +6,7 @@
     <version>$version$</version>
     <authors>Charlie Poole</authors>
     <owners>Charlie Poole</owners>
-    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
     <projectUrl>http://nunit.org</projectUrl>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
