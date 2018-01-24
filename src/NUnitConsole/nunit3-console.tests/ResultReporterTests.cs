@@ -46,7 +46,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void CreateResult()
         {
             var mockAssembly = typeof(MockAssembly).Assembly;
-            var emptySettings = new Dictionary<string, object>
+            var frameworkSettings = new Dictionary<string, object>
             {
                 { "TestParameters", "1=d;2=c" },
                 { "TestParametersDictionary", new Dictionary<string, string>
@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner.Tests
                 }}
             };
 
-            var controller = new FrameworkController(mockAssembly, "id", emptySettings);
+            var controller = new FrameworkController(mockAssembly, "id", frameworkSettings);
 
             controller.LoadTests();
             var xmlText = controller.RunTests(null);
