@@ -19,7 +19,7 @@
     <Description>Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard</Description>
     <Copyright>Copyright (C) 2017 Charlie Poole, Rob Prouse</Copyright>
     <Version>$(PackageVersion)</Version>
-    <PackageLicenseUrl>http://nunit.org/nuget/nunit3-license.txt</PackageLicenseUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>http://nunit.org</PackageProjectUrl>
     <PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/nunit/nunit-console.git</RepositoryUrl>

@@ -24,13 +24,13 @@
     <bugTrackerUrl>https://github.com/nunit/nunit-console/issues</bugTrackerUrl>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <packageSourceUrl>https://github.com/nunit/nunit-console</packageSourceUrl>
-	<releaseNotes>https://raw.githubusercontent.com/nunit/nunit-console/master/CHANGES.txt</releaseNotes>
-	<mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
-    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <releaseNotes>https://raw.githubusercontent.com/nunit/nunit-console/master/CHANGES.txt</releaseNotes>
+    <mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
-	<language>en-US</language>
+    <language>en-US</language>
     <tags>nunit console runner test testing tdd</tags>
     <copyright>Copyright (c) 2017 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
