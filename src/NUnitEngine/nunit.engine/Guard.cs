@@ -23,7 +23,7 @@
 
 using System;
 
-namespace NUnit.Engine
+namespace NUnit.Common
 {
     /// <summary>
     /// Class used to guard against unexpected argument values

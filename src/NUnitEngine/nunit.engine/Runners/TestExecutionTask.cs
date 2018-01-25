@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {

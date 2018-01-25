@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
 

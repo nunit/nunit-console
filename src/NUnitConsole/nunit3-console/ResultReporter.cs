@@ -76,7 +76,7 @@ namespace NUnit.ConsoleRunner
 
         #region Summary Report
 
-        public void WriteRunSettingsReport()
+        internal void WriteRunSettingsReport()
         {
             var firstSuite = ResultNode.SelectSingleNode("test-suite");
             if (firstSuite != null)
@@ -88,15 +88,26 @@ namespace NUnit.ConsoleRunner
                     Writer.WriteLine(ColorStyle.SectionHeader, "Run Settings");
 
                     foreach (XmlNode node in settings)
-                    {
-                        string name = node.GetAttribute("name");
-                        string val = node.GetAttribute("value");
-                        string label = string.Format("    {0}: ", name);
-                        Writer.WriteLabelLine(label, val);
-                    }
+                        WriteSettingsNode(node);
 
                     Writer.WriteLine();
                 }
+            }
+        }
+
+        private void WriteSettingsNode(XmlNode node)
+        {
+            var items = node.SelectNodes("item");
+            var name = node.GetAttribute("name");
+            var val = node.GetAttribute("value") ?? string.Empty;
+
+            Writer.WriteLabelLine($"    {name}:", items.Count > 0 ? string.Empty : $" {val}");
+
+            foreach (XmlNode item in items)
+            {
+                var key = item.GetAttribute("key");
+                var value = item.GetAttribute("value");
+                Writer.WriteLine(ColorStyle.Value, $"        {key} -> {value}");
             }
         }
 
