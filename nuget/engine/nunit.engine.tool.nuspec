@@ -15,7 +15,7 @@
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
-    <copyright>Copyright (c) 2017 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
   </metadata>
   <files>
     <file src="LICENSE.txt" />

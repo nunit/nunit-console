@@ -164,7 +164,7 @@ namespace NUnit.ConsoleRunner
             string versionText = executingAssembly.GetName().Version.ToString(3);
 
             string programName = "NUnit Console Runner";
-            string copyrightText = "Copyright (C) 2017 Charlie Poole, Rob Prouse.\r\nAll Rights Reserved.";
+            string copyrightText = "Copyright (C) 2018 Charlie Poole, Rob Prouse.\r\nAll Rights Reserved.";
             string configText = String.Empty;
 
             object[] attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);

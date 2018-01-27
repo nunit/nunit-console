@@ -29,7 +29,7 @@ using System.Reflection;
 [assembly: AssemblyProduct("NUnit 3")]
 [assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
 [assembly: AssemblyCompany("NUnit Software")]
-[assembly: AssemblyCopyright("Copyright (c) 2017 Charlie Poole, Rob Prouse")]
+[assembly: AssemblyCopyright("Copyright (c) 2018 Charlie Poole, Rob Prouse")]
 
 #if PORTABLE
 [assembly: AssemblyMetadata("PCL", "True")]
