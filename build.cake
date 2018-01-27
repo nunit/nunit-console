@@ -14,8 +14,8 @@ var configuration = Argument("configuration", "Release");
 // VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.7.0";
-var displayVersion = "3.7.0";
+var version = "3.8.0";
+var displayVersion = "3.8.0";
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGES
