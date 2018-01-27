@@ -1,4 +1,4 @@
-﻿NUnit 3.8 - February 27, 2018
+﻿NUnit 3.8 - January 27, 2018
 
 This release includes several fixes when unloading AppDomains and better error reporting. The
 aggregate NuGet packages also include updated versions of several extensions.
