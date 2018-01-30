@@ -1,4 +1,40 @@
-﻿NUnit 3.7 - July 13, 2017
+﻿NUnit 3.8 - January 27, 2018
+
+This release includes several fixes when unloading AppDomains and better error reporting. The
+aggregate NuGet packages also include updated versions of several extensions.
+
+Issues Resolved
+
+ * 6 TypeLoadException in nunit3-console 3.0.1
+ * 93 Update Readme with information about the NuGet packages
+ * 111 Provide better info when AppDomain won't unload
+ * 116 NUnit 3.5.0 defaults to single agent process when using an nunit project file
+ * 191 Exception encountered unloading AppDomain
+ * 228 System.Reflection.TargetInvocationException with nunit3-console --debug on Mono
+ * 246 No way to specify app.config with console runner
+ * 256 Rewrite ConsoleRunnerTests.ThrowsNUnitEngineExceptionWhenTestResultsAreNotWriteable()
+ * 259 NUnit3 agent hangs after encountering an "CannotUnloadAppDomainException"
+ * 262 Transform file existence check should check current directory instead of WorkDirectory
+ * 267 Fix possible NRE
+ * 273 Insufficient error handling message in ProcessRunner -> RunTests method
+ * 275 Integrate chocolatey packages with build script
+ * 284 NUnit3: An exception occured in the driver while loading tests...   bei NUnit.Engine.Runners.ProcessRunner.RunTests(ITestEventListener listener, TestFilter filter)
+ * 285 ColorConsoleWriter.WriteLabel causes NullReferenceException
+ * 289 Warnings not displayed
+ * 298 Invalid --framework option throws exception
+ * 300 Agents do not respect the Console WORK parameter when writing log file
+ * 304 Catch agent debugger launch exceptions, and improve agent crash handling
+ * 309 No driver found if framework assembly reference has uppercase characters
+ * 314 Update NUnit.Extension.VSProjectLoader to 3.7.0
+ * 318 Update NUnit.Extension.TeamCityEventListener to 1.0.3
+ * 320 Return error code -5 when AppDomain fails to unload
+ * 323 Assertion should not be ordered in AgentDatabaseTests
+ * 343 Superfluous unload error shown in console
+ * 349 Get all TestEngine tests running under NUnitAdapter apart from those .
+ * 350 Invalid assemblies no longer give an error message
+ * 355 NuGet package links to outdated license
+
+NUnit 3.7 - July 13, 2017
 
 Engine
 
