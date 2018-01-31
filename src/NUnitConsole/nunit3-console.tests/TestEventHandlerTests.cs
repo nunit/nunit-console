@@ -94,21 +94,60 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(Output, Does.Not.Contain("This is an error"));
         }
 
-        [TestCase(ErrorOutput)]
-        [TestCase(ErrorOutputWithoutNewline)]
-        public void ErrorOutputAlwaysAddsNewline(string result)
+        [Test]
+        public void ErrorWriteDoesNotIncludeNewlinesInSameTest()
         {
             var errOutput = new StringBuilder();
             var errWriter = new StringWriter(errOutput);
-            var handler = new TestEventHandler(_writer, errWriter, "Off");
+            var handler = new TestEventHandler(_writer, errWriter, "Before");
 
-            handler.OnTestEvent(ErrorOutput);
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "One"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "Two"));
 
-            Assert.That(errOutput.ToString(), Does.EndWith(Environment.NewLine));
+            Assert.That(errOutput.ToString(), Is.EqualTo($"=> ErrorTest{Environment.NewLine}OneTwo"));
         }
 
-        const string ErrorOutput = "<test-output stream=\"Error\" testname=\"ErrorOutput\"><![CDATA[This is an error\r\n]]></test-output>";
-        const string ErrorOutputWithoutNewline = "<test-output stream=\"Error\" testname=\"ErrorOutput\"><![CDATA[This is an error]]></test-output>";
+        [Test]
+        public void ErrorWriteLineDoesIncludeNewlinesInSameTest()
+        {
+            var errOutput = new StringBuilder();
+            var errWriter = new StringWriter(errOutput);
+            var handler = new TestEventHandler(_writer, errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "One\r\n"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "Two\r\n"));
+
+            Assert.That(errOutput.ToString(), Is.EqualTo($"=> ErrorTest{Environment.NewLine}One{Environment.NewLine}Two{Environment.NewLine}"));
+        }
+
+        [Test]
+        public void ErrorWriteDoesIncludeNewlinesInMultipleTests()
+        {
+            var errOutput = new StringBuilder();
+            var errWriter = new StringWriter(errOutput);
+            var handler = new TestEventHandler(_writer, errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest1", "One"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest2", "Two"));
+
+            Assert.That(errOutput.ToString(), Is.EqualTo($"=> ErrorTest1{Environment.NewLine}One{Environment.NewLine}=> ErrorTest2{Environment.NewLine}Two"));
+        }
+
+        [Test]
+        public void ErrorWriteLineDoesIncludeNewlinesInMultipleTest()
+        {
+            var errOutput = new StringBuilder();
+            var errWriter = new StringWriter(errOutput);
+            var handler = new TestEventHandler(_writer, errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest1", "One\r\n"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest2", "Two\r\n"));
+
+            Assert.That(errOutput.ToString(), Is.EqualTo($"=> ErrorTest1{Environment.NewLine}One{Environment.NewLine}=> ErrorTest2{Environment.NewLine}Two{Environment.NewLine}"));
+        }
+
+        const string ErrorOutputFormat = "<test-output stream=\"Error\" testname=\"{0}\"><![CDATA[{1}]]></test-output>";
+        static readonly string ErrorOutput = string.Format(ErrorOutputFormat, "ErrorOutput", "This is an error\r\n");
 
         static TestCaseData[] ErrorData = new TestCaseData[]
         {

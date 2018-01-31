@@ -44,7 +44,9 @@ namespace NUnit.ConsoleRunner
         private readonly bool _displayBeforeOutput;
 
         private string _lastTestOutput;
+        private string _lastErrorTestOutput;
         private bool _wantNewLine = false;
+        private bool _errorWantsNewLine = false;
 
         public TestEventHandler(TextWriter outWriter, TextWriter errWriter, string labelsOption)
         {
@@ -147,15 +149,24 @@ namespace NUnit.ConsoleRunner
         {
             if (_displayBeforeOutput && testName != null && testName != _currentErrorLabel)
             {
+                FlushErrorNewLineIfNeeded();
+                _lastErrorTestOutput = testName;
+
                 _errWriter.WriteLine("=> {0}", testName);
                 _currentErrorLabel = testName;
             }
+
+            if (_lastErrorTestOutput != testName)
+            {
+                FlushNewLineIfNeeded();
+                _lastErrorTestOutput = testName;
+            }
+
             _errWriter.Write(outputNode.InnerText);
 
-            // If the text we just wrote did not have a new line, emit one.
             if (!outputNode.InnerText.EndsWith("\n"))
             {
-                _errWriter.WriteLine();
+                _errorWantsNewLine = true;
             }
         }
 
@@ -220,6 +231,15 @@ namespace NUnit.ConsoleRunner
                 {
                     _wantNewLine = true;
                 }
+            }
+        }
+
+        private void FlushErrorNewLineIfNeeded()
+        {
+            if (_errorWantsNewLine)
+            {
+                _errWriter.WriteLine();
+                _errorWantsNewLine = false;
             }
         }
 
