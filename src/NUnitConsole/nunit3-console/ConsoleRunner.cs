@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -61,7 +61,6 @@ namespace NUnit.ConsoleRunner
         private IExtensionService _extensionService;
 
         private ExtendedTextWriter _outWriter;
-        private TextWriter _errorWriter = Console.Error;
 
         private string _workDirectory;
 
@@ -197,9 +196,6 @@ namespace NUnit.ConsoleRunner
                 }
             }
 
-            // TODO: Incorporate this in EventCollector?
-            RedirectErrorOutputAsRequested();
-
             var labels = _options.DisplayTestLabels != null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
@@ -214,8 +210,9 @@ namespace NUnit.ConsoleRunner
                 using (new ColorConsole(ColorStyle.Output))
                 using (ITestRunner runner = _engine.GetRunner(package))
                 using (var output = CreateOutputWriter())
+                using (var errOutput = CreateErrorWriter())
                 {
-                    var eventHandler = new TestEventHandler(output, labels);
+                    var eventHandler = new TestEventHandler(output, errOutput, labels);
 
                     result = runner.Run(eventHandler, filter);
                 }
@@ -227,10 +224,6 @@ namespace NUnit.ConsoleRunner
             catch (NUnitEngineException ex)
             {
                 engineException = ex;
-            }
-            finally
-            {
-                RestoreErrorOutput();
             }
 
             var writer = new ColorConsoleWriter(!_options.NoColor);
@@ -301,8 +294,8 @@ namespace NUnit.ConsoleRunner
                     var unixVariant = Marshal.PtrToStringAnsi(buf);
                     if (unixVariant.Equals("Darwin"))
                         unixVariant = "MacOSX";
-                    
-                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack); 
+
+                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack);
                 }
                 Marshal.FreeHGlobal(buf);
             }
@@ -354,14 +347,16 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        private void RedirectErrorOutputAsRequested()
+        private ExtendedTextWriter CreateErrorWriter()
         {
             if (_options.ErrFileSpecified)
             {
                 var errorStreamWriter = new StreamWriter(Path.Combine(_workDirectory, _options.ErrFile));
                 errorStreamWriter.AutoFlush = true;
-                _errorWriter = errorStreamWriter;
+                return new ExtendedTextWrapper(errorStreamWriter);
             }
+
+            return _outWriter;
         }
 
         private ExtendedTextWriter CreateOutputWriter()
@@ -375,13 +370,6 @@ namespace NUnit.ConsoleRunner
             }
 
             return _outWriter;
-        }
-
-        private void RestoreErrorOutput()
-        {
-            _errorWriter.Flush();
-            if (_options.ErrFileSpecified)
-                _errorWriter.Close();
         }
 
         private IResultWriter GetResultWriter(OutputSpecification spec)

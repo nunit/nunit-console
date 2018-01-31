@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -29,7 +29,7 @@ using NUnit.Engine;
 using NUnit.ConsoleRunner.Utilities;
 
 namespace NUnit.ConsoleRunner
-{    
+{
     /// <summary>
     /// TestEventHandler processes events from the running
     /// test for the console runner.
@@ -37,6 +37,7 @@ namespace NUnit.ConsoleRunner
     public class TestEventHandler : MarshalByRefObject, ITestEventListener
     {
         private readonly TextWriter _outWriter;
+        private readonly TextWriter _errWriter;
 
         private readonly bool _displayBeforeTest;
         private readonly bool _displayAfterTest;
@@ -45,9 +46,10 @@ namespace NUnit.ConsoleRunner
         private string _lastTestOutput;
         private bool _wantNewLine = false;
 
-        public TestEventHandler(TextWriter outWriter, string labelsOption)
+        public TestEventHandler(TextWriter outWriter, TextWriter errWriter, string labelsOption)
         {
             _outWriter = outWriter;
+            _errWriter = errWriter;
 
             labelsOption = labelsOption.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
             _displayBeforeTest = labelsOption == "ALL" || labelsOption == "BEFORE";
@@ -133,7 +135,32 @@ namespace NUnit.ConsoleRunner
         {
             var testName = outputNode.GetAttribute("testname");
             var stream = outputNode.GetAttribute("stream");
+            if (stream == "Error" && _outWriter != _errWriter)
+                TestErrorOutput(outputNode, testName);
+            else
+                TestOutput(outputNode, testName, stream);
+        }
 
+        private string _currentErrorLabel;
+
+        private void TestErrorOutput(XmlNode outputNode, string testName)
+        {
+            if (_displayBeforeOutput && testName != null && testName != _currentErrorLabel)
+            {
+                _errWriter.WriteLine("=> {0}", testName);
+                _currentErrorLabel = testName;
+            }
+            _errWriter.Write(outputNode.InnerText);
+
+            // If the text we just wrote did not have a new line, emit one.
+            if (!outputNode.InnerText.EndsWith("\n"))
+            {
+                _errWriter.WriteLine();
+            }
+        }
+
+        private void TestOutput(XmlNode outputNode, string testName, string stream)
+        {
             if (_displayBeforeOutput && testName != null)
                 WriteLabelLine(testName);
 

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -45,7 +45,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCaseSource("SingleEventData")]
         public void SingleEventsWriteExpectedOutput(string report, string labels, string expected)
         {
-            var handler = new TestEventHandler(_writer, labels);
+            var handler = new TestEventHandler(_writer, _writer, labels);
 
             handler.OnTestEvent(report);
 
@@ -57,7 +57,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCaseSource("MultipleEventData")]
         public void MultipleEvents(string[] reports, string labels, string expected)
         {
-            var handler = new TestEventHandler(_writer, labels);
+            var handler = new TestEventHandler(_writer, _writer, labels);
 
             foreach (string report in reports)
                 handler.OnTestEvent(report);
@@ -70,6 +70,54 @@ namespace NUnit.ConsoleRunner.Tests
 
             Assert.That(Output, Is.EqualTo(expected));
         }
+
+        [TestCaseSource(nameof(ErrorData))]
+        public void ErrorOutputGoesToOutputWhenNotOverridden(string labels, string expected)
+        {
+            var handler = new TestEventHandler(_writer, _writer, labels);
+
+            handler.OnTestEvent(ErrorOutput);
+
+            Assert.That(Output, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(ErrorData))]
+        public void ErrorOutputGoesToErrorOutputWhenOverridden(string labels, string expected)
+        {
+            var errOutput = new StringBuilder();
+            var errWriter = new StringWriter(errOutput);
+            var handler = new TestEventHandler(_writer, errWriter, labels);
+
+            handler.OnTestEvent(ErrorOutput);
+
+            Assert.That(errOutput.ToString(), Is.EqualTo(expected));
+            Assert.That(Output, Does.Not.Contain("This is an error"));
+        }
+
+        [TestCase(ErrorOutput)]
+        [TestCase(ErrorOutputWithoutNewline)]
+        public void ErrorOutputAlwaysAddsNewline(string result)
+        {
+            var errOutput = new StringBuilder();
+            var errWriter = new StringWriter(errOutput);
+            var handler = new TestEventHandler(_writer, errWriter, "Off");
+
+            handler.OnTestEvent(ErrorOutput);
+
+            Assert.That(errOutput.ToString(), Does.EndWith(Environment.NewLine));
+        }
+
+        const string ErrorOutput = "<test-output stream=\"Error\" testname=\"ErrorOutput\"><![CDATA[This is an error\r\n]]></test-output>";
+        const string ErrorOutputWithoutNewline = "<test-output stream=\"Error\" testname=\"ErrorOutput\"><![CDATA[This is an error]]></test-output>";
+
+        static TestCaseData[] ErrorData = new TestCaseData[]
+        {
+            new TestCaseData("Off", $"This is an error{Environment.NewLine}"),
+            new TestCaseData("On", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}"),
+            new TestCaseData("Before", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}"),
+            new TestCaseData("After", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}"),
+            new TestCaseData("All", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}")
+        };
 
 #pragma warning disable 414
         static TestCaseData[] SingleEventData = new TestCaseData[]
