@@ -152,7 +152,9 @@ namespace NUnit.ConsoleRunner
                 FlushErrorNewLineIfNeeded();
                 _lastErrorTestOutput = testName;
 
-                _errWriter.WriteLine("=> {0}", testName);
+                using (new ColorConsole(ColorStyle.SectionHeader))
+                    _errWriter.WriteLine("=> {0}", testName);
+
                 _currentErrorLabel = testName;
             }
 
@@ -162,7 +164,8 @@ namespace NUnit.ConsoleRunner
                 _lastErrorTestOutput = testName;
             }
 
-            _errWriter.Write(outputNode.InnerText);
+            using (new ColorConsole(ColorStyle.Error))
+                _errWriter.Write(outputNode.InnerText);
 
             if (!outputNode.InnerText.EndsWith("\n"))
             {
