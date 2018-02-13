@@ -48,7 +48,8 @@ namespace NUnit.Engine.Services.Tests
 #if NETCOREAPP1_1
             _driver = new NUnitNetStandardDriver();
 #else
-            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain);
+            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
+            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName);
 #endif
             _driver.Load(mockAssemblyPath, new Dictionary<string, object>());
         }

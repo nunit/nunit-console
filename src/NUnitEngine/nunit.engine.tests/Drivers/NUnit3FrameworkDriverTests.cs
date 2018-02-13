@@ -45,8 +45,9 @@ namespace NUnit.Engine.Drivers.Tests
         [SetUp]
         public void CreateDriver()
         {
+            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
             _mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
-            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain);
+            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName);
         }
 
         #region Construction Test
@@ -61,7 +62,8 @@ namespace NUnit.Engine.Drivers.Tests
 
         public void ConstructController_MissingFile_ThrowsArgumentInvalid()
         {
-            Assert.That(new NUnit3FrameworkDriver(AppDomain.CurrentDomain), Throws.ArgumentException);
+            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
+            Assert.That(new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName), Throws.ArgumentException);
         }
         #endregion
 
