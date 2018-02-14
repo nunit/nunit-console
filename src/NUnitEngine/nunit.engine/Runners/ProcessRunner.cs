@@ -248,7 +248,7 @@ namespace NUnit.Engine.Runners
                     }
                     catch (Exception e)
                     {
-                        string stopError = string.Format("Failed to stop the remote agent. {0}", e.Message);
+                        string stopError = string.Format("Failed to stop the remote agent. {0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
                         log.Error(stopError);
                         _agent = null;
 
