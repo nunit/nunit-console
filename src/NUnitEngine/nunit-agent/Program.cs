@@ -25,6 +25,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
+using System.Threading;
 using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
