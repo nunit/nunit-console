@@ -134,10 +134,10 @@ namespace NUnit.Engine.Services
             return agentRecord != null && agentRecord.Status != AgentStatus.Terminated;
         }
 
-        internal int GetAgentExitCode(Guid id)
+        internal int? GetAgentExitCode(Guid id)
         {
             var agentRecord = _agentData[id];
-            return agentRecord.Process.ExitCode;
+            return agentRecord?.Process.ExitCode;
         }
 
         #endregion

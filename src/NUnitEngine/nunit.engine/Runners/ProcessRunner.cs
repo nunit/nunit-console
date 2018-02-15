@@ -246,17 +246,17 @@ namespace NUnit.Engine.Runners
                         log.Debug("Stopping remote agent");
                         _agent.Stop();
                     }
-                    catch (SocketException se) when (se.Message.Contains("An existing connection was forcibly closed by the remote host"))
+                    catch (SocketException se) when (se.Message.ToLower().Contains("an existing connection was forcibly closed by the remote host"))
                     {
                         var exitCode = _agency.GetAgentExitCode(_agent.Id);
 
-                        if (exitCode == 0)
+                        if (exitCode.HasValue && exitCode == 0)
                         {
                             log.Warning("Agent connection was forcibly closed. - Exit code was 0, so agent shutdown OK");
                         }
                         else
                         {
-                            string stopError = string.Format("Agent connection was forcibly closed. - Exit code was {0}. {1}{2}{3}", exitCode, se.Message, Environment.NewLine, se.StackTrace);
+                            string stopError = string.Format("Agent connection was forcibly closed. - Exit code was {0}. {1}{2}{3}", exitCode.GetValueOrDefault(-999), se.Message, Environment.NewLine, se.StackTrace);
                             log.Error(stopError);
 
                             // Stop error with no unload error, just rethrow
