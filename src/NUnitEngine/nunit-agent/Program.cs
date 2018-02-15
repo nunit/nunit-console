@@ -139,17 +139,17 @@ namespace NUnit.Agent
                 else
                 {
                     log.Error("Failed to start RemoteTestAgent");
-                    Environment.Exit(AgentExitCodes.FAILED_TO_START_REMOTE_AGENT);
+                    ExitWithPause(AgentExitCodes.FAILED_TO_START_REMOTE_AGENT);
                 }
             }
             catch (Exception ex)
             {
                 log.Error("Exception in RemoteTestAgent", ex);
-                Environment.Exit(AgentExitCodes.UNEXPECTED_EXCEPTION);
+                ExitWithPause(AgentExitCodes.UNEXPECTED_EXCEPTION);
             }
             log.Info("Agent process {0} exiting cleanly", pid);
 
-            Environment.Exit(AgentExitCodes.OK);
+            ExitWithPause(AgentExitCodes.OK);
         }
 
         private static void WaitForStop()
@@ -161,7 +161,7 @@ namespace NUnit.Agent
                 if (AgencyProcess.HasExited)
                 {
                     log.Error("Parent process has been terminated.");
-                    Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
+                    ExitWithPause(AgentExitCodes.PARENT_PROCESS_TERMINATED);
                 }
             }
 
@@ -183,7 +183,7 @@ namespace NUnit.Agent
                 {
                     log.Error($"System.Security.Permissions.UIPermission is not set to start the debugger. {se} {se.StackTrace}");
                 }
-                Environment.Exit(AgentExitCodes.DEBUGGER_SECURITY_VIOLATION);
+                ExitWithPause(AgentExitCodes.DEBUGGER_SECURITY_VIOLATION);
             }
             catch (NotImplementedException nie) //Debugger is not implemented on mono
             {
@@ -191,8 +191,14 @@ namespace NUnit.Agent
                 {
                     log.Error($"Debugger is not available on all platforms. {nie} {nie.StackTrace}");
                 }
-                Environment.Exit(AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED);
+                ExitWithPause(AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED);
             }
+        }
+
+        private static void ExitWithPause(int exitCode)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(2));
+            Environment.Exit(exitCode);
         }
     }
 }
