@@ -25,7 +25,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
-using System.Collections.Generic;
 using NUnit.Common;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
@@ -132,6 +131,23 @@ namespace NUnit.Engine.Services
         {
             var agentRecord = _agentData[id];
             return agentRecord != null && agentRecord.Status != AgentStatus.Terminated;
+        }
+
+        internal int? GetAgentExitCode(Guid id)
+        {
+            var agentRecord = _agentData[id];
+            if (agentRecord?.Process != null && agentRecord.Process.HasExited)
+            {
+                try
+                {
+                    return agentRecord.Process.ExitCode;
+                }
+                catch (NotSupportedException)
+                {
+                    return null;
+                }
+            }
+            return null;
         }
 
         #endregion
