@@ -246,17 +246,18 @@ namespace NUnit.Engine.Runners
                         log.Debug("Stopping remote agent");
                         _agent.Stop();
                     }
-                    catch (SocketException se) when (se.Message.ToLower().Contains("an existing connection was forcibly closed by the remote host"))
+                    catch (SocketException se)
                     {
                         var exitCode = _agency.GetAgentExitCode(_agent.Id);
 
                         if (exitCode.HasValue && exitCode == 0)
                         {
-                            log.Warning("Agent connection was forcibly closed. - Exit code was 0, so agent shutdown OK");
+                            log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
                         }
                         else
                         {
-                            string stopError = string.Format("Agent connection was forcibly closed. - Exit code was {0}. {1}{2}{3}", exitCode.GetValueOrDefault(-999), se.Message, Environment.NewLine, se.StackTrace);
+
+                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {ExceptionHelper.BuildMessage(se)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(se)}";
                             log.Error(stopError);
 
                             // Stop error with no unload error, just rethrow
@@ -264,12 +265,12 @@ namespace NUnit.Engine.Runners
                                 throw;
 
                             // Both kinds of errors, throw exception with combined message
-                            throw new NUnitEngineUnloadException(unloadException.Message + Environment.NewLine + stopError);
+                            throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
                         }
                     }
                     catch (Exception e)
                     {
-                        string stopError = string.Format("Failed to stop the remote agent. {0}{1}{2}", e.Message, Environment.NewLine, e.StackTrace);
+                        var stopError = $"Failed to stop the remote agent. {ExceptionHelper.BuildMessage(e)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(e)}";
                         log.Error(stopError);
 
                         // Stop error with no unload error, just rethrow
@@ -277,7 +278,7 @@ namespace NUnit.Engine.Runners
                             throw;
 
                         // Both kinds of errors, throw exception with combined message
-                        throw new NUnitEngineUnloadException(unloadException.Message + Environment.NewLine + stopError);
+                        throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
                     }
                     finally
                     {
