@@ -38,7 +38,6 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnit3FrameworkDriver : IFrameworkDriver
     {
-        private const string NUNIT_FRAMEWORK = "nunit.framework";
         private const string LOAD_MESSAGE = "Method called without calling Load first";
 
         private static readonly string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
@@ -51,6 +50,7 @@ namespace NUnit.Engine.Drivers
         static ILogger log = InternalTrace.GetLogger("NUnitFrameworkDriver");
 
         AppDomain _testDomain;
+        AssemblyName _reference;
         string _testAssemblyPath;
 
         object _frameworkController;
@@ -59,9 +59,11 @@ namespace NUnit.Engine.Drivers
         /// Construct an NUnit3FrameworkDriver
         /// </summary>
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
-        public NUnit3FrameworkDriver(AppDomain testDomain)
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        public NUnit3FrameworkDriver(AppDomain testDomain, AssemblyName reference)
         {
             _testDomain = testDomain;
+            _reference = reference;
         }
 
         public string ID { get; set; }
@@ -166,7 +168,7 @@ namespace NUnit.Engine.Drivers
             try
             {
                 return _testDomain.CreateInstanceAndUnwrap(
-                    NUNIT_FRAMEWORK, typeName, false, 0,
+                    _reference.FullName, typeName, false, 0,
 #if !NET_4_0
                     null, args, null, null, null);
 #else
