@@ -1,6 +1,6 @@
 #addin "nuget:?package=Cake.ExtendedNuGet&version=1.0.0.22"
 #addin "nuget:?package=NuGet.Core&version=2.12.0"
-#addin "Cake.FileHelpers"
+#addin "nuget:?package=Cake.FileHelpers&version=1.0.4"
 
 
 //////////////////////////////////////////////////////////////////////
