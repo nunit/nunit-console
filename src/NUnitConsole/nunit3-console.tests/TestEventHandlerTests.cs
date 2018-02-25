@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -32,20 +32,25 @@ namespace NUnit.ConsoleRunner.Tests
     {
         private StringBuilder _output;
         private TextWriter _writer;
+        private StringBuilder _errOutput;
+        private TextWriter _errWriter;
 
         private string Output {  get { return _output.ToString(); } }
+        private string ErrorOutput { get { return _errOutput.ToString(); } }
 
         [SetUp]
         public void CreateWriter()
         {
             _output = new StringBuilder();
             _writer = new StringWriter(_output);
+            _errOutput = new StringBuilder();
+            _errWriter = new StringWriter(_errOutput);
         }
 
         [TestCaseSource("SingleEventData")]
         public void SingleEventsWriteExpectedOutput(string report, string labels, string expected)
         {
-            var handler = new TestEventHandler(_writer, labels);
+            var handler = new TestEventHandler(_writer, _writer, labels);
 
             handler.OnTestEvent(report);
 
@@ -57,7 +62,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCaseSource("MultipleEventData")]
         public void MultipleEvents(string[] reports, string labels, string expected)
         {
-            var handler = new TestEventHandler(_writer, labels);
+            var handler = new TestEventHandler(_writer, _writer, labels);
 
             foreach (string report in reports)
                 handler.OnTestEvent(report);
@@ -70,6 +75,83 @@ namespace NUnit.ConsoleRunner.Tests
 
             Assert.That(Output, Is.EqualTo(expected));
         }
+
+        [TestCaseSource(nameof(ErrorData))]
+        public void ErrorOutputGoesToOutputWhenNotOverridden(string labels, string expected)
+        {
+            var handler = new TestEventHandler(_writer, _writer, labels);
+
+            handler.OnTestEvent(ErrorOutputXml);
+
+            Assert.That(Output, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(ErrorData))]
+        public void ErrorOutputGoesToErrorOutputWhenOverridden(string labels, string expected)
+        {
+            var handler = new TestEventHandler(_writer, _errWriter, labels);
+
+            handler.OnTestEvent(ErrorOutputXml);
+
+            Assert.That(ErrorOutput, Is.EqualTo(expected));
+            Assert.That(Output, Does.Not.Contain("This is an error"));
+        }
+
+        [Test]
+        public void ErrorWriteDoesNotIncludeNewlinesInSameTest()
+        {
+            var handler = new TestEventHandler(_writer, _errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "One"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "Two"));
+
+            Assert.That(ErrorOutput, Is.EqualTo($"=> ErrorTest{Environment.NewLine}OneTwo"));
+        }
+
+        [Test]
+        public void ErrorWriteLineDoesIncludeNewlinesInSameTest()
+        {
+            var handler = new TestEventHandler(_writer, _errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "One\r\n"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest", "Two\r\n"));
+
+            Assert.That(ErrorOutput, Is.EqualTo($"=> ErrorTest{Environment.NewLine}One{Environment.NewLine}Two{Environment.NewLine}"));
+        }
+
+        [Test]
+        public void ErrorWriteDoesIncludeNewlinesInMultipleTests()
+        {
+            var handler = new TestEventHandler(_writer, _errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest1", "One"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest2", "Two"));
+
+            Assert.That(ErrorOutput, Is.EqualTo($"=> ErrorTest1{Environment.NewLine}One{Environment.NewLine}=> ErrorTest2{Environment.NewLine}Two"));
+        }
+
+        [Test]
+        public void ErrorWriteLineDoesIncludeNewlinesInMultipleTest()
+        {
+            var handler = new TestEventHandler(_writer, _errWriter, "Before");
+
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest1", "One\r\n"));
+            handler.OnTestEvent(string.Format(ErrorOutputFormat, "ErrorTest2", "Two\r\n"));
+
+            Assert.That(ErrorOutput, Is.EqualTo($"=> ErrorTest1{Environment.NewLine}One{Environment.NewLine}=> ErrorTest2{Environment.NewLine}Two{Environment.NewLine}"));
+        }
+
+        const string ErrorOutputFormat = "<test-output stream=\"Error\" testname=\"{0}\"><![CDATA[{1}]]></test-output>";
+        static readonly string ErrorOutputXml = string.Format(ErrorOutputFormat, "ErrorOutput", "This is an error\r\n");
+
+        static TestCaseData[] ErrorData = new TestCaseData[]
+        {
+            new TestCaseData("Off", $"This is an error{Environment.NewLine}"),
+            new TestCaseData("On", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}"),
+            new TestCaseData("Before", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}"),
+            new TestCaseData("After", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}"),
+            new TestCaseData("All", $"=> ErrorOutput{Environment.NewLine}This is an error{Environment.NewLine}")
+        };
 
 #pragma warning disable 414
         static TestCaseData[] SingleEventData = new TestCaseData[]
