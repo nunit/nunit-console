@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -60,7 +60,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("\"--arg = abc\"", "--arg = abc")]
         [TestCase("\"--arg=abc,xyz\"", "--arg=abc,xyz")]
         [TestCase("\"--arg=abc, xyz\"", "--arg=abc, xyz")]
-        [TestCase("\"@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz\"", 
+        [TestCase("\"@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz\"",
             "@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz")]
         public void GetArgsFromCommandLine(string cmdline, params string[] expectedArgs)
         {
@@ -91,11 +91,11 @@ namespace NUnit.ConsoleRunner.Tests
         // Where clauses
         [TestCase("testfile.dll @file1.txt --arg2", "file1.txt:--where test==somelongname", "testfile.dll", "--where", "test==somelongname", "--arg2")]
         // NOTE: The next is not valid. Where clause is spread over several args and therefore won't parse. Quotes are required.
-        [TestCase("testfile.dll @file1.txt --arg2", 
-            "file1.txt:--where test == somelongname", 
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where test == somelongname",
             "testfile.dll", "--where", "test", "==", "somelongname", "--arg2")]
         [TestCase("testfile.dll @file1.txt --arg2",
-            "file1.txt:--where \"test == somelongname\"", 
+            "file1.txt:--where \"test == somelongname\"",
             "testfile.dll", "--where", "test == somelongname", "--arg2")]
         [TestCase("testfile.dll @file1.txt --arg2",
             "file1.txt:--where\n    \"test == somelongname\"",
@@ -138,7 +138,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         [Test]
         public void GetArgsFromFiles_NestingOverflow()
-        { 
+        {
             var fileSystem = new VirtualFileSystem();
             var lines = new string[] { "@file1.txt" };
             fileSystem.SetupFile("file1.txt", lines);
@@ -218,7 +218,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
         [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
         [TestCase("OutFile", "output|out", new string[] { "output.txt" }, new string[0])]
-        [TestCase("ErrFile", "err", new string[] { "error.txt" }, new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" }, new string[] { "JUNK" })]
@@ -326,7 +325,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--framework")]
         [TestCase("--timeout")]
         [TestCase("--output")]
-        [TestCase("--err")]
         [TestCase("--work")]
         [TestCase("--trace")]
         [TestCase("--test-name-format")]

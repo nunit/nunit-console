@@ -196,10 +196,7 @@ namespace NUnit.ConsoleRunner
                             spec.OutputPath), ex);
                 }
             }
-
-            // TODO: Incorporate this in EventCollector?
-            RedirectErrorOutputAsRequested();
-
+            
             var labels = _options.DisplayTestLabels != null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
@@ -227,10 +224,6 @@ namespace NUnit.ConsoleRunner
             catch (NUnitEngineException ex)
             {
                 engineException = ex;
-            }
-            finally
-            {
-                RestoreErrorOutput();
             }
 
             var writer = new ColorConsoleWriter(!_options.NoColor);
@@ -354,16 +347,6 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        private void RedirectErrorOutputAsRequested()
-        {
-            if (_options.ErrFileSpecified)
-            {
-                var errorStreamWriter = new StreamWriter(Path.Combine(_workDirectory, _options.ErrFile));
-                errorStreamWriter.AutoFlush = true;
-                _errorWriter = errorStreamWriter;
-            }
-        }
-
         private ExtendedTextWriter CreateOutputWriter()
         {
             if (_options.OutFileSpecified)
@@ -375,13 +358,6 @@ namespace NUnit.ConsoleRunner
             }
 
             return _outWriter;
-        }
-
-        private void RestoreErrorOutput()
-        {
-            _errorWriter.Flush();
-            if (_options.ErrFileSpecified)
-                _errorWriter.Close();
         }
 
         private IResultWriter GetResultWriter(OutputSpecification spec)
