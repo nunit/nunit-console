@@ -60,7 +60,7 @@ namespace NUnit.Common
             if (fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             _fileSystem = fileSystem;
 
-            ConfigureOptions();            
+            ConfigureOptions();
             if (args != null)
                 Parse(args);
         }
@@ -71,9 +71,9 @@ namespace NUnit.Common
             if (args != null)
                 Parse(args);
         }
-        
+
 #endregion
-        
+
 #region Properties
 
         // Action to Perform
@@ -129,13 +129,10 @@ namespace NUnit.Common
         public string OutFile { get; private set; }
         public bool OutFileSpecified { get { return OutFile != null; } }
 
-        public string ErrFile { get; private set; }
-        public bool ErrFileSpecified { get { return ErrFile != null; } }
-
         public string DisplayTestLabels { get; private set; }
 
         private string workDirectory = null;
-        public string WorkDirectory 
+        public string WorkDirectory
         {
             get { return workDirectory ?? CURRENT_DIRECTORY_ON_ENTRY; }
         }
@@ -169,7 +166,7 @@ namespace NUnit.Common
         public IList<string> ErrorMessages { get { return errorMessages; } }
 
 #endregion
-        
+
 #region Public Methods
 
         public bool Validate()
@@ -339,9 +336,6 @@ namespace NUnit.Common
 
             this.Add("output|out=", "File {PATH} to contain text output from the tests.",
                 v => OutFile = RequiredValue(v, "--output"));
-
-            this.Add("err=", "File {PATH} to contain error output from the tests.",
-                v => ErrFile = RequiredValue(v, "--err"));
 
             this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.",
                 v => ResolveOutputSpecification(RequiredValue(v, "--resultxml"), resultOutputSpecifications));
