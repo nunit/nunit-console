@@ -61,7 +61,6 @@ namespace NUnit.ConsoleRunner
         private IExtensionService _extensionService;
 
         private ExtendedTextWriter _outWriter;
-        private TextWriter _errorWriter = Console.Error;
 
         private string _workDirectory;
 
