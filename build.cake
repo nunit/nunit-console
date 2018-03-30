@@ -368,14 +368,6 @@ Task("PackageEngine")
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
-
-        NuGetPack("nuget/engine/nunit.engine.tool.nuspec", new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
     });
 
 Task("PackageConsole")
