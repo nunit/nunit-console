@@ -1,15 +1,12 @@
 //////////////////////////////////////////////////////////////////////
-// ARGUMENTS
+// ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Debug");
-
-//////////////////////////////////////////////////////////////////////
-// SET ERROR LEVELS
-//////////////////////////////////////////////////////////////////////
+var configuration = Argument("configuration", "Release");
 
 var ErrorDetail = new List<string>();
+bool IsDotNetCoreInstalled = false;
 
 //////////////////////////////////////////////////////////////////////
 // SET PACKAGE VERSION
@@ -32,17 +29,14 @@ var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
+var MSI_DIR = PROJECT_DIR + "msi/";
+var CURRENT_IMG_DIR = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+var CURRENT_IMG_BIN_DIR = CURRENT_IMG_DIR + "bin/";
+var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
+var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
 var SOLUTION_FILE = "NUnitConsole.sln";
 var DOTNETCORE_SOLUTION_FILE = "NUnit.Engine.NetStandard.sln";
-var DOTNETCORE_TEST_ASSEMBLY = "src/NUnitEngine/nunit.engine.tests.netstandard/bin/" + configuration + "/netcoreapp1.1/nunit.engine.tests.netstandard.dll";
-
-// Package sources for nuget restore
-var PACKAGE_SOURCE = new string[]
-	{
-		"https://www.nuget.org/api/v2",
-		"https://www.myget.org/F/nunit/api/v2"
-	};
 
 // Test Runner
 var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
@@ -50,8 +44,23 @@ var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
+var DOTNETCORE_TEST_ASSEMBLY = "src/NUnitEngine/nunit.engine.tests.netstandard/bin/" + configuration + "/netcoreapp1.1/nunit.engine.tests.netstandard.dll";
 
-bool IsDotNetCoreInstalled = false;
+// Package sources for nuget restore
+var PACKAGE_SOURCE = new string[]
+{
+    "https://www.nuget.org/api/v2",
+    "https://www.myget.org/F/nunit/api/v2"
+};
+
+var EXTENSION_PACKAGES = new []
+{
+  "NUnit.Extension.VSProjectLoader",
+  "NUnit.Extension.NUnitProjectLoader",
+  "NUnit.Extension.NUnitV2Driver",
+  "NUnit.Extension.NUnitV2ResultWriter",
+  "NUnit.Extension.TeamCityEventListener"
+};
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
@@ -105,12 +114,16 @@ Teardown(context =>
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-    .Description("Deletes all files in the BIN directory")
+    .Description("Cleans directories.")
     .Does(() =>
     {
-        CleanDirectory(BIN_DIR);
+        CleanDirectory(PROJECT_DIR + "bin/");
+        CleanDirectory(PROJECT_DIR + "packages/");
+        CleanDirectory(IMAGE_DIR);
+        CleanDirectory(EXTENSION_PACKAGES_DIR);
+        CleanDirectory(ZIP_IMG);
+        CleanDirectory(PACKAGE_DIR);
     });
-
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
@@ -316,22 +329,19 @@ Task("CreateImage")
     .Description("Copies all files into the image directory")
     .Does(() =>
     {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-        var imageBinDir = currentImageDir + "bin/";
+        CleanDirectory(CURRENT_IMG_DIR);
 
-        CleanDirectory(currentImageDir);
+        CopyFiles(RootFiles, CURRENT_IMG_DIR);
 
-        CopyFiles(RootFiles, currentImageDir);
-
-        CreateDirectory(imageBinDir);
-        Information("Created directory " + imageBinDir);
+        CreateDirectory(CURRENT_IMG_BIN_DIR);
+        Information("Created directory " + CURRENT_IMG_BIN_DIR);
 
         foreach(FilePath file in BinFiles)
         {
           if (FileExists(BIN_DIR + file))
           {
-              CreateDirectory(imageBinDir + file.GetDirectory());
-              CopyFile(BIN_DIR + file, imageBinDir + file);
+              CreateDirectory(CURRENT_IMG_BIN_DIR + file.GetDirectory());
+              CopyFile(BIN_DIR + file, CURRENT_IMG_BIN_DIR + file);
             }
         }
     });
@@ -341,14 +351,12 @@ Task("PackageEngine")
     .IsDependentOn("CreateImage")
     .Does(() =>
     {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-
         CreateDirectory(PACKAGE_DIR);
 
         NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -356,7 +364,7 @@ Task("PackageEngine")
         NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -367,14 +375,12 @@ Task("PackageConsole")
     .IsDependentOn("CreateImage")
     .Does(() =>
     {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-
         CreateDirectory(PACKAGE_DIR);
 
         NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -382,7 +388,7 @@ Task("PackageConsole")
         NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -390,18 +396,14 @@ Task("PackageConsole")
         NuGetPack("nuget/runners/nunit.runners.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
     });
 
-// Unlike other tasks, this one does not depend on creation of the
-// image directory. I think this is the direction we want to go
-// for all the different packages, but it's for a separate change.
 Task("PackageChocolatey")
 	.Description("Creates chocolatey packages of the console runner")
-	.IsDependentOn("Build")
 	.Does(() =>
 	{
 		EnsureDirectoryExists(PACKAGE_DIR);
@@ -464,6 +466,70 @@ Task("PackageNetStandardEngine")
             CopyFile(src, dest);
         }
     });
+
+//////////////////////////////////////////////////////////////////////
+// PACKAGE COMBINED DISTRIBUTIONS
+//////////////////////////////////////////////////////////////////////
+
+Task("FetchExtensions")
+.Does(() =>
+{
+    foreach(var package in EXTENSION_PACKAGES)
+    {
+        NuGetInstall(package, new NuGetInstallSettings {
+                        OutputDirectory = EXTENSION_PACKAGES_DIR,
+                        Source = new [] { "https://www.nuget.org/api/v2" }
+                    });
+    }
+});
+
+Task("CreateCombinedImage")
+.IsDependentOn("FetchExtensions")
+.Does(() =>
+{
+    var addinsImgDir = CURRENT_IMG_BIN_DIR + "addins/";
+
+    CopyDirectory(MSI_DIR + "resources/", CURRENT_IMG_DIR);
+    CleanDirectory(addinsImgDir);
+
+    foreach(var packageDir in GetAllDirectories(EXTENSION_PACKAGES_DIR))
+        CopyPackageContents(packageDir, addinsImgDir);
+});
+
+Task("PackageMsi")
+.IsDependentOn("CreateCombinedImage")
+.Does(() =>
+{
+    MSBuild(MSI_DIR + "nunit/nunit.wixproj", new MSBuildSettings()
+        .WithTarget("Rebuild")
+        .SetConfiguration(configuration)
+        .WithProperty("Version", version)
+        .WithProperty("DisplayVersion", version)
+        .WithProperty("OutDir", PACKAGE_DIR)
+        .WithProperty("Image", CURRENT_IMG_DIR)
+        .SetMSBuildPlatform(MSBuildPlatform.x86)
+        .SetNodeReuse(false)
+        );
+});
+
+Task("PackageZip")
+.IsDependentOn("CreateCombinedImage")
+.Does(() =>
+{
+    CleanDirectory(ZIP_IMG);
+
+    //Flatten for zip
+    CopyDirectory(CURRENT_IMG_DIR, ZIP_IMG);
+    CopyDirectory(ZIP_IMG + "bin/", ZIP_IMG);
+    DeleteDirectory(ZIP_IMG + "bin/", new DeleteDirectorySettings { Recursive = true });
+
+    //Ensure single and correct addins file
+    DeleteFiles(ZIP_IMG + "*.addins");
+    CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", ZIP_IMG + "nunit.bundle.addins");
+
+    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, version);
+    Zip(ZIP_IMG, zipPath);
+});
 
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
@@ -572,6 +638,21 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string arguments, strin
 }
 
 //////////////////////////////////////////////////////////////////////
+// HELPER METHODS - PACKAGE
+//////////////////////////////////////////////////////////////////////
+
+public string[] GetAllDirectories(string dirPath)
+{
+    return System.IO.Directory.GetDirectories(dirPath);
+}
+
+public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
+{
+    var files = GetFiles(packageDir + "/tools/*");
+    CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
+}
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
@@ -598,7 +679,9 @@ Task("Package")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageConsole")
     .IsDependentOn("PackageNetStandardEngine")
-	.IsDependentOn("PackageChocolatey");
+	.IsDependentOn("PackageChocolatey")
+    .IsDependentOn("PackageMsi")
+    .IsDependentOn("PackageZip");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

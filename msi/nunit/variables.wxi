@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Include>
+
+    <Condition Message="NUnit requires Mono or .NET 2.0 or later, to be installed as a prerequisite.">
+        <![CDATA[Installed OR NETFRAMEWORK20 OR NETFRAMEWORK35 OR WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED OR MONODIRECTORY]]>
+    </Condition>
+
+    <!-- ***************************************************************** -->
+    <!-- **********  Define Properties used in the install      ********** -->
+    <!-- ***************************************************************** -->
+
+    <PropertyRef Id="NETFRAMEWORK20"/>
+
+    <PropertyRef Id="NETFRAMEWORK35"/>
+
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED"/>
+
+  <Property Id="MONODEFAULTCLR">
+        <RegistrySearch Id="MonoDefaultClr" Type="raw" Root="HKLM" Key="Software\Novell\Mono" Name="DefaultCLR" />
+    </Property>
+
+    <Property Id="MONODIRECTORY">
+        <RegistrySearch Id="MonoDirectory" Type="directory" Root="HKLM" Key="Software\Novell\Mono\[MONODEFAULTCLR]" Name="SDKInstallRoot" />
+    </Property>
+    
+    <Property Id="CMD_EXE" Value="[!SystemFolder]cmd.exe" />
+    
+    <!-- ***************************************************************** -->
+    <!-- *********  Properties for the Add Remove Programs list  ********* -->
+    <!-- ***************************************************************** -->
+
+    <Icon Id="nunit.ico" SourceFile="$(var.InstallImage)\nunit.ico"/>
+    <Property Id="ARPCONTACT" Value="The NUnit Project" />
+    <Property Id="ARPPRODUCTICON" Value="nunit.ico" />
+    <Property Id="ARPHELPLINK" Value="https://groups.google.com/forum/#!forum/nunit-discuss" />
+    <Property Id="ARPURLINFOABOUT" Value="NUnit is a testing framework for all .NET languages" />
+    <Property Id="ARPURLUPDATEINFO" Value="http://nunit.org" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- ***************************************************************** -->
+    <!-- **********  Define our GUI using standard WiX UI       ********** -->
+    <!-- ***************************************************************** -->
+
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.InstallImage)\License.rtf" />
+    <UIRef Id="WixUI_Mondo" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
+</Include>

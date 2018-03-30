@@ -181,3 +181,5 @@ MockAssemblyResult.xml
 PortabilityAnalysis*.html
 tools
 !tools/packages.config
+extension-packages
+zip-image
