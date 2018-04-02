@@ -61,8 +61,7 @@ namespace NUnit.Engine.Drivers
         /// which the assembly is already known to reference.
         /// </summary>
         /// <param name="domain">The domain in which the assembly will be loaded</param>
-        /// <param name="assemblyName">The name of the test framework reference</param>
-        /// <param name="version">The version of the test framework reference</param>
+        /// <param name="reference">The name of the test framework reference</param>
         /// <returns></returns>
         public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
         {

@@ -38,6 +38,7 @@ namespace NUnit.Engine
         /// <param name="domain">The application domain in which to run the tests</param>
         /// <param name="assemblyPath">The path to the test assembly</param>
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
+        /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
         IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies);
     }
