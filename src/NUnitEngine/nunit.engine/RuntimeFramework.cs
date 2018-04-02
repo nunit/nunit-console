@@ -94,8 +94,9 @@ namespace NUnit.Engine
         /// or more, it is taken as a CLR version. In either case, the other
         /// version is deduced based on the runtime type and provided version.
         /// </summary>
-        /// <param name="runtime">The runtime type of the framework</param>
-        /// <param name="version">The version of the framework</param>
+        /// <param name="runtime">The runtime type of the framework.</param>
+        /// <param name="version">The version of the framework.</param>
+        /// <param name="profile">The profile of the framework. Null if unspecified.</param>
         public RuntimeFramework(RuntimeType runtime, Version version, string profile)
         {
             Runtime = runtime;
