@@ -1,116 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit3-console</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <LangVersion>6</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NUNIT_CONSOLE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Commandlineparameters>nunit.engine.tests.dll --inprocess</Commandlineparameters>
+    <TargetFrameworks>net20</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NUNIT_CONSOLE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <Commandlineparameters>nunit.engine.tests.dll -process:Single</Commandlineparameters>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NUnitEngine\nunit.engine\Guard.cs">
-      <Link>Utilities\Guard.cs</Link>
-    </Compile>
-    <Compile Include="..\..\NUnitEngine\nunit.engine\Internal\ExceptionHelper.cs">
-      <Link>Utilities\ExceptionHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\ConsoleVersion.cs">
-      <Link>Properties\ConsoleVersion.cs</Link>
-    </Compile>
-    <Compile Include="ColorConsole.cs" />
-    <Compile Include="ColorConsoleWriter.cs" />
-    <Compile Include="ColorStyle.cs" />
-    <Compile Include="CommandLineOptions.cs" />
-    <Compile Include="ConsoleOptions.cs" />
-    <Compile Include="ConsoleRunner.cs" />
-    <Compile Include="ConsoleTestResult.cs" />
-    <Compile Include="DefaultOptionsProvider.cs" />
-    <Compile Include="EnginePackageSettings.cs" />
-    <Compile Include="ExtendedTextWrapper.cs" />
-    <Compile Include="ExtendedTextWriter.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="FrameworkPackageSettings.cs" />
-    <Compile Include="IConverter.cs" />
-    <Compile Include="IDefaultOptionsProvider.cs" />
-    <Compile Include="IFileSystem.cs" />
-    <Compile Include="Options.cs" />
-    <Compile Include="OutputSpecification.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="ResultSummary.cs" />
-    <Compile Include="SafeAttributeAccess.cs" />
-    <Compile Include="TestEventHandler.cs" />
-    <Compile Include="TestNameParser.cs" />
-    <Compile Include="Utilities\SaveConsoleOutput.cs" />
-    <Compile Include="ResultReporter.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <Compile Include="..\ConsoleVersion.cs" Link="Properties\ConsoleVersion.cs" />
+    <Compile Include="..\..\NUnitEngine\nunit.engine\Guard.cs" Link="Utilities\Guard.cs" />
+    <Compile Include="..\..\NUnitEngine\nunit.engine\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
+    <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
     <None Include="app.config" />
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj">
-      <Project>{775FAD50-3623-4922-97C4-DFB29A8BE4C7}</Project>
-      <Name>nunit.engine.api</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\..\nunit.ico">
-      <Link>nunit.ico</Link>
-    </Content>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
