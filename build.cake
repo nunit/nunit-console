@@ -25,7 +25,7 @@ var packageVersion = version + modifier + dbgSuffix;
 
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = PROJECT_DIR + "package/";
-var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/net35/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";

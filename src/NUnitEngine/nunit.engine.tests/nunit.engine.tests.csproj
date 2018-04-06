@@ -46,6 +46,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)'=='net35'">
-    <Exec Command="xcopy /Y $(SolutionDir)bin\$(Configuration)\net20\* $(TargetDir)" />
+    <Exec Command="xcopy /Y $(ProjectDir)..\..\..\bin\$(Configuration)\net20\* $(TargetDir)" />
   </Target>
 </Project>
