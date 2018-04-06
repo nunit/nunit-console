@@ -7,7 +7,7 @@
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>$(OutputPath)nunit.engine.api.xml</DocumentationFile>
+    <DocumentationFile>$(OutputPath)\$(TargetFramework)\nunit.engine.api.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
