@@ -201,47 +201,24 @@ namespace NUnit.Engine.Services
             }
             else if (File.Exists(packageName) && PathUtils.IsAssemblyFileType(packageName))
             {
-                var assemblyDef = AssemblyDefinition.ReadAssembly(packageName);
-                var module = assemblyDef.MainModule;
+                var assembly = new TargetFrameworkHelper(packageName);
 
-                var NativeEntryPoint = (ModuleAttributes)16;
-                var mask = ModuleAttributes.Required32Bit | NativeEntryPoint;
+                targetVersion = assembly.TargetRuntimeVersion;
+                log.Debug($"Assembly {packageName} uses version {targetVersion}");
 
-                if (module.Architecture != TargetArchitecture.AMD64 &&
-                    module.Architecture != TargetArchitecture.IA64 &&
-                    (module.Attributes & mask) != 0)
+                frameworkName = assembly.FrameworkName;
+                log.Debug($"Assembly {packageName} targets {frameworkName}");
+
+                if (assembly.RequiresX86)
                 {
                     requiresX86 = true;
-                    log.Debug("Assembly {0} will be run x86", packageName);
+                    log.Debug($"Assembly {packageName} will be run x86");
                 }
 
-                targetVersion = new Version(module.RuntimeVersion.Substring(1));
-                log.Debug("Assembly {0} uses version {1}", packageName, targetVersion);
-
-                foreach (var attr in assemblyDef.CustomAttributes)
+                if (assembly.RequiresAssemblyResolver)
                 {
-                    if (attr.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute")
-                    {
-                        frameworkName = attr.ConstructorArguments[0].Value as string;
-                    }
-                    else if (attr.AttributeType.FullName == "NUnit.Framework.TestAssemblyDirectoryResolveAttribute")
-                    {
-                        requiresAssemblyResolver = true;
-                    }
-                }
-
-                if (frameworkName == null)
-                {
-                    foreach (var reference in module.AssemblyReferences)
-                        if (reference.Name == "mscorlib" && BitConverter.ToUInt64(reference.PublicKeyToken, 0) == 0xac22333d05b89d96)
-                        {
-                            // We assume 3.5, since that's all we are supporting
-                            // Could be extended to other versions if necessary
-                            // Format for FrameworkName is invented - it is not
-                            // known if any compilers supporting CF use the attribute
-                            frameworkName = ".NETCompactFramework,Version=3.5";
-                            break;
-                        }
+                    requiresAssemblyResolver = true;
+                    log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
                 }
             }
 
