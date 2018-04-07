@@ -88,6 +88,7 @@
     <Compile Include="Internal\Logging\InternalTrace.cs" />
     <Compile Include="Internal\Logging\InternalTraceWriter.cs" />
     <Compile Include="Internal\Logging\Logger.cs" />
+    <Compile Include="Internal\TargetFrameworkHelper.cs" />
     <Compile Include="Internal\TcpChannelUtils.ObservableServerChannelSinkProvider.cs" />
     <Compile Include="Internal\ProvidedPathsAssemblyResolver.cs" />
     <Compile Include="ITestAgency.cs" />
