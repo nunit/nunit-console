@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>mock-assembly</AssemblyName>
     <RootNamespace>NUnit.Tests</RootNamespace>
-    <TargetFrameworks>net20;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>net35;netstandard1.6</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
