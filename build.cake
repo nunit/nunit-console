@@ -151,20 +151,18 @@ Task("InitializeBuild")
 // BUILD ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("BuildEngine")
-    .Description("Builds the engine")
+Task("BuildNetFramework")
+    .Description("Builds the .NET Framework version of the engine and console")
     .IsDependentOn("InitializeBuild")
     .Does(() =>
     {
-        // Engine Commponents
-        BuildProject("./src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj", configuration);
-        BuildProject("./src/NUnitEngine/nunit.engine/nunit.engine.csproj", configuration);
-        BuildProject("./src/NUnitEngine/nunit-agent/nunit-agent.csproj", configuration);
-        BuildProject("./src/NUnitEngine/nunit-agent/nunit-agent-x86.csproj", configuration);
-
-        // Engine tests
-        BuildProject("./src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj", configuration);
-        BuildProject("./src/NUnitEngine/notest-assembly/notest-assembly.csproj", configuration);
+        // Use MSBuild
+        MSBuild(SOLUTION_FILE, new MSBuildSettings()
+            .SetConfiguration(configuration)
+            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
+            .SetVerbosity(Verbosity.Minimal)
+			.SetPlatformTarget(PlatformTarget.MSIL)
+        );
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -191,19 +189,6 @@ Task("BuildNetStandardEngine")
         {
             Warning("Skipping .NET Standard build because .NET Core is not installed");
         }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// BUILD CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("BuildConsole")
-    .Description("Builds the console runner")
-    .IsDependentOn("InitializeBuild")
-    .Does(() =>
-    {
-        BuildProject("src/NUnitConsole/nunit3-console/nunit3-console.csproj", configuration);
-        BuildProject("src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj", configuration);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -574,35 +559,6 @@ void CheckForError(ref List<string> errorDetail)
 }
 
 //////////////////////////////////////////////////////////////////////
-// HELPER METHODS - BUILD
-//////////////////////////////////////////////////////////////////////
-
-void BuildProject(string projectPath, string configuration)
-{
-    if(IsRunningOnWindows())
-    {
-        // Use MSBuild
-        MSBuild(projectPath, new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
-            .SetVerbosity(Verbosity.Minimal)
-            .SetNodeReuse(false)
-			.SetPlatformTarget(PlatformTarget.MSIL)
-        );
-    }
-    else
-    {
-        Information(string.Format("Building {0}...", projectPath));
-        // Use XBuild
-        XBuild(projectPath, new XBuildSettings()
-            .WithTarget("Build")
-            .WithProperty("Configuration", configuration)
-            .SetVerbosity(Verbosity.Minimal)
-        );
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
 // HELPER METHODS - TEST
 //////////////////////////////////////////////////////////////////////
 
@@ -658,8 +614,7 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 
 Task("Build")
     .Description("Builds the engine and console runner")
-    .IsDependentOn("BuildEngine")
-    .IsDependentOn("BuildConsole")
+    .IsDependentOn("BuildNetFramework")
     .IsDependentOn("BuildNetStandardEngine");
 
 Task("Rebuild")
