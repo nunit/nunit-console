@@ -45,7 +45,10 @@
     </None>
     <None Include="App.config" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)'=='net35'">
-    <Exec Command="xcopy /Y $(ProjectDir)..\..\..\bin\$(Configuration)\net20\* $(TargetDir)" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <Net20Files Include="..\..\..\bin\$(Configuration)\net20\*" />
+    </ItemGroup>
+    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)"/>
   </Target>
 </Project>

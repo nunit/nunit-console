@@ -99,7 +99,7 @@ Setup(context =>
     }
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit.", configuration, packageVersion);
+    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, packageVersion);
     IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
 });
 
@@ -134,17 +134,10 @@ Task("InitializeBuild")
     .Does(() =>
     {
         Information("Restoring NuGet packages");
-		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings
-        {
-            Source = PACKAGE_SOURCE,
-            Verbosity = NuGetVerbosity.Detailed
-        });
+		DotNetCoreRestore(SOLUTION_FILE);
 
-        if(IsDotNetCoreInstalled && IsRunningOnWindows())
-        {
-            Information("Restoring .NET Core packages");
-            DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
-        }
+        Information("Restoring .NET Core packages");
+        DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
 	});
 
 //////////////////////////////////////////////////////////////////////
