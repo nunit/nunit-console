@@ -136,8 +136,11 @@ Task("InitializeBuild")
         Information("Restoring NuGet packages");
 		DotNetCoreRestore(SOLUTION_FILE);
 
-        Information("Restoring .NET Core packages");
-        DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
+        if(IsRunningOnWindows())
+        {
+            Information("Restoring .NET Core packages");
+            DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
+        }
 	});
 
 //////////////////////////////////////////////////////////////////////
