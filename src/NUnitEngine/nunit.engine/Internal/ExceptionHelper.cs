@@ -63,17 +63,16 @@ namespace NUnit.Common
         public static string BuildStackTrace(Exception exception)
         {
             var sb = new StringBuilder("--");
-            sb.Append(exception.GetType().Name);
-            sb.Append(Environment.NewLine);
-            sb.Append(GetSafeStackTrace(exception));
+            sb.AppendLine(exception.GetType().Name);
+            sb.AppendLine(GetExceptionMessage(exception));
+            sb.AppendLine(GetSafeStackTrace(exception));
 
             foreach (Exception inner in FlattenExceptionHierarchy(exception))
             {
-                sb.Append(Environment.NewLine);
-                sb.Append("--");
-                sb.Append(inner.GetType().Name);
-                sb.Append(Environment.NewLine);
-                sb.Append(GetSafeStackTrace(inner));
+                sb.AppendLine("--");
+                sb.AppendLine(inner.GetType().Name);
+                sb.AppendLine(GetExceptionMessage(inner));
+                sb.AppendLine(GetSafeStackTrace(inner));
             }
 
             return sb.ToString();
