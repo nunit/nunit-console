@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
@@ -34,6 +35,8 @@ namespace NUnit.Engine.Internal
     /// </summary>
     internal static class DomainDetailsBuilder
     {
+        private static readonly ILogger Log = InternalTrace.GetLogger(nameof(DomainDetailsBuilder));
+
         /// <summary>
         /// Get human readable string containing details of application domain.
         /// </summary>
@@ -58,14 +61,15 @@ namespace NUnit.Engine.Internal
                         WriteAssemblyInformation(sb, assembly);
                 }
             }
-            catch (AppDomainUnloadedException)
+            catch (AppDomainUnloadedException ex)
             {
                 sb.AppendLine("Application domain was unloaded before all details could be read.");
+                Log.Error(ExceptionHelper.BuildStackTrace(ex));
             }
             catch (Exception ex)
             {
                 sb.AppendLine($"Error trying to read application domain details: {ex.Message}");
-                sb.AppendLine($"{ex.StackTrace}");
+                Log.Error(ExceptionHelper.BuildStackTrace(ex));
             }
             return sb.ToString();
         }
