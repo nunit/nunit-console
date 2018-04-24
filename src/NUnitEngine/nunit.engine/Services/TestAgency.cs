@@ -210,7 +210,7 @@ namespace NUnit.Engine.Services
             Guid agentId = Guid.NewGuid();
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
-            targetRuntime = RuntimeFramework.GetBestAvailableFramework(targetRuntime);
+            targetRuntime = ServiceContext.GetService<RuntimeFrameworkService>().GetBestAvailableFramework(targetRuntime);
 
             switch( targetRuntime.Runtime )
             {

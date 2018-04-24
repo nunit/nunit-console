@@ -454,28 +454,6 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Returns the best available framework that matches a target framework.
-        /// If the target framework has a build number specified, then an exact
-        /// match is needed. Otherwise, the matching framework with the highest
-        /// build number is used.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public static RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
-        {
-            RuntimeFramework result = target;
-
-            foreach (RuntimeFramework framework in AvailableFrameworks)
-                if (framework.Supports(target))
-                {
-                    if (framework.ClrVersion.Build > result.ClrVersion.Build)
-                        result = framework;
-                }
-
-            return result;
-        }
-
-        /// <summary>
         /// Overridden to return the short name of the framework
         /// </summary>
         /// <returns></returns>

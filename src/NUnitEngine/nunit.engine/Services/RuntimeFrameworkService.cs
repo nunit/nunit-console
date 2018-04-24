@@ -150,6 +150,27 @@ namespace NUnit.Engine.Services
             return targetFramework.ToString();
         }
 
+
+        /// <summary>
+        /// Returns the best available framework that matches a target framework.
+        /// If the target framework has a build number specified, then an exact
+        /// match is needed. Otherwise, the matching framework with the highest
+        /// build number is used.
+        /// </summary>
+        public RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
+        {
+            RuntimeFramework result = target;
+
+            foreach (RuntimeFramework framework in _availableRuntimes)
+                if (framework.Supports(target))
+                {
+                    if (framework.ClrVersion.Build > result.ClrVersion.Build)
+                        result = framework;
+                }
+
+            return result;
+        }
+
         #region Helper Methods
 
         /// <summary>
