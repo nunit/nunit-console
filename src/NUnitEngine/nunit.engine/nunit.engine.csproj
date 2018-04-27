@@ -8,21 +8,17 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <PackageReference Include="Mono.Cecil" Version="0.9.6.1" />
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
-    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
-    <Compile Include="..\nunit-agent\AgentExitCodes.cs" Link="Agents\AgentExitCodes.cs" />
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />

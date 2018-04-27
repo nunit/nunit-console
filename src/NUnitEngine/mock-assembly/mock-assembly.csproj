@@ -5,24 +5,18 @@
     <TargetFrameworks>net35;netstandard1.6</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.9.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
-    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\nunit.snk">
-      <Link>nunit.snk</Link>
-    </None>
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <None Include="..\..\nunit.snk" Link="nunit.snk" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

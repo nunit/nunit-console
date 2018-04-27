@@ -7,17 +7,15 @@
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>$(OutputPath)\$(TargetFramework)\nunit.engine.api.xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
-    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
 </Project>

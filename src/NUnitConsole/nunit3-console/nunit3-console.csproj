@@ -8,24 +8,18 @@
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Commandlineparameters>nunit.engine.tests.dll -process:Single</Commandlineparameters>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
-    <Compile Include="..\ConsoleVersion.cs" Link="Properties\ConsoleVersion.cs" />
-    <Compile Include="..\..\NUnitEngine\nunit.engine\Guard.cs" Link="Utilities\Guard.cs" />
-    <Compile Include="..\..\NUnitEngine\nunit.engine\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\..\NUnitEngine\nunit.engine\Guard.cs" LinkBase="Utilities" />
+    <Compile Include="..\..\NUnitEngine\nunit.engine\Internal\ExceptionHelper.cs" LinkBase="Utilities" />
     <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
-    <None Include="app.config" />
-    <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />

@@ -9,19 +9,16 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
-    <Reference Include="System" />
     <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
-    <Compile Include="..\EngineVersion.cs" Link="Properties\EngineVersion.cs" />
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="app.manifest" />
     <Content Include="..\..\..\nunit.ico">
       <Link>nunit.ico</Link>
     </Content>

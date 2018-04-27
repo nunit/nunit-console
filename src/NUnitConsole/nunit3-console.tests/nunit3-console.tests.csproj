@@ -8,19 +8,15 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" Version="3.9.0" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net35'">
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
-    <Compile Include="..\ConsoleVersion.cs" Link="Properties\ConsoleVersion.cs" />
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestListWithEmptyLine.tst">
