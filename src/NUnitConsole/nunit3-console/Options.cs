@@ -13,10 +13,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -37,16 +37,16 @@
 // A Getopt::Long-inspired option parsing library for C#.
 //
 // NDesk.Options.OptionSet is built upon a key/value table, where the
-// key is a option format string and the value is a delegate that is 
+// key is a option format string and the value is a delegate that is
 // invoked when the format string is matched.
 //
 // Option format strings:
-//  Regex-like BNF Grammar: 
+//  Regex-like BNF Grammar:
 //    name: .+
 //    type: [=:]
 //    sep: ( [^{}]+ | '{' .+ '}' )?
 //    aliases: ( name type sep ) ( '|' name type sep )*
-// 
+//
 // Each '|'-delimited name is an alias for the associated action.  If the
 // format string ends in a '=', it has a required value.  If the format
 // string ends in a ':', it has an optional value.  If neither '=' or ':'
@@ -92,7 +92,7 @@
 //  p.Parse (new string[]{"-v", "--v", "/v", "-name=A", "/name", "B", "extra"});
 //
 // The above would parse the argument string array, and would invoke the
-// lambda expression three times, setting `verbose' to 3 when complete.  
+// lambda expression three times, setting `verbose' to 3 when complete.
 // It would also print out "A" and "B" to standard output.
 // The returned array would contain the string "extra".
 //
@@ -122,12 +122,12 @@
 //      p.Parse (new string[]{"-a+"});  // sets v != null
 //      p.Parse (new string[]{"-a-"});  // sets v == null
 //
-// The NUnit version of this file introduces conditional compilation for 
-// building under the Compact Framework (NETCF) and Silverlight (SILVERLIGHT) 
+// The NUnit version of this file introduces conditional compilation for
+// building under the Compact Framework (NETCF) and Silverlight (SILVERLIGHT)
 // as well as for use with a portable class library  (PORTABLE).
 //
 // 11/5/2015 -
-// Change namespace to avoid conflict with user code use of mono.options 
+// Change namespace to avoid conflict with user code use of mono.options
 
 using System;
 using System.Collections;
@@ -158,13 +158,7 @@ using System.Linq;
 using NDesk.Options;
 #endif
 
-#if NUNIT_CONSOLE || NUNITLITE || NUNIT_ENGINE
 namespace NUnit.Options
-#elif NDESK_OPTIONS
-namespace NDesk.Options
-#else
-namespace Mono.Options
-#endif
 {
     public class OptionValueCollection : IList, IList<string> {
 
@@ -225,7 +219,7 @@ namespace Mono.Options
             if (c.Option.OptionValueType == OptionValueType.Required &&
                     index >= values.Count)
                 throw new OptionException (string.Format (
-                            c.OptionSet.MessageLocalizer ("Missing required value for option '{0}'."), c.OptionName), 
+                            c.OptionSet.MessageLocalizer ("Missing required value for option '{0}'."), c.OptionName),
                         c.OptionName);
         }
 
@@ -274,7 +268,7 @@ namespace Mono.Options
             set {option = value;}
         }
 
-        public string OptionName { 
+        public string OptionName {
             get {return name;}
             set {name = value;}
         }
@@ -294,7 +288,7 @@ namespace Mono.Options
     }
 
     public enum OptionValueType {
-        None, 
+        None,
         Optional,
         Required,
     }
@@ -335,7 +329,7 @@ namespace Mono.Options
                 throw new ArgumentException (
                         string.Format ("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
                         "maxValueCount");
-            if (Array.IndexOf (names, "<>") >= 0 && 
+            if (Array.IndexOf (names, "<>") >= 0 &&
                     ((names.Length == 1 && this.type != OptionValueType.None) ||
                      (names.Length > 1 && this.MaxValueCount > 1)))
                 throw new ArgumentException (
@@ -364,13 +358,13 @@ namespace Mono.Options
         {
             Type tt = typeof (T);
 #if PORTABLE
-            bool nullable = tt.GetTypeInfo().IsValueType && tt.GetTypeInfo().IsGenericType && 
-                !tt.GetTypeInfo().IsGenericTypeDefinition && 
+            bool nullable = tt.GetTypeInfo().IsValueType && tt.GetTypeInfo().IsGenericType &&
+                !tt.GetTypeInfo().IsGenericTypeDefinition &&
                 tt.GetGenericTypeDefinition () == typeof (Nullable<>);
             Type targetType = nullable ? tt.GetGenericArguments () [0] : typeof (T);
 #else
-            bool nullable = tt.IsValueType && tt.IsGenericType && 
-                !tt.IsGenericTypeDefinition && 
+            bool nullable = tt.IsValueType && tt.IsGenericType &&
+                !tt.IsGenericTypeDefinition &&
                 tt.GetGenericTypeDefinition () == typeof (Nullable<>);
             Type targetType = nullable ? tt.GetGenericArguments () [0] : typeof (T);
 #endif
@@ -417,7 +411,7 @@ namespace Mono.Options
                 names [i] = name.Substring (0, end);
                 if (type == '\0' || type == name [end])
                     type = name [end];
-                else 
+                else
                     throw new ArgumentException (
                             string.Format ("Conflicting option types: '{0}' vs. '{1}'.", type, name [end]),
                             "prototype");
@@ -666,7 +660,7 @@ namespace Mono.Options
         {
             if (action == null)
                 throw new ArgumentNullException ("action");
-            Option p = new ActionOption (prototype, description, 1, 
+            Option p = new ActionOption (prototype, description, 1,
                     delegate (OptionValueCollection v) { action (v [0]); });
             base.Add (p);
             return this;
@@ -681,7 +675,7 @@ namespace Mono.Options
         {
             if (action == null)
                 throw new ArgumentNullException ("action");
-            Option p = new ActionOption (prototype, description, 2, 
+            Option p = new ActionOption (prototype, description, 2,
                     delegate (OptionValueCollection v) {action (v [0], v [1]);});
             base.Add (p);
             return this;
@@ -755,18 +749,18 @@ namespace Mono.Options
             OptionContext c = CreateOptionContext ();
             c.OptionIndex = -1;
             var def = GetOptionForName ("<>");
-            var unprocessed = 
+            var unprocessed =
                 from argument in arguments
                 where ++c.OptionIndex >= 0 && (process || def != null)
                     ? process
-                        ? argument == "--" 
+                        ? argument == "--"
                             ? (process = false)
                             : !Parse (argument, c)
-                                ? def != null 
-                                    ? Unprocessed (null, def, c, argument) 
+                                ? def != null
+                                    ? Unprocessed (null, def, c, argument)
                                     : true
                                 : false
-                        : def != null 
+                        : def != null
                             ? Unprocessed (null, def, c, argument)
                             : true
                     : true
@@ -859,7 +853,7 @@ namespace Mono.Options
                         c.Option.Invoke (c);
                         break;
                     case OptionValueType.Optional:
-                    case OptionValueType.Required: 
+                    case OptionValueType.Required:
                         ParseValue (v, c);
                         break;
                 }
@@ -878,17 +872,17 @@ namespace Mono.Options
         private void ParseValue (string option, OptionContext c)
         {
             if (option != null)
-                foreach (string o in c.Option.ValueSeparators != null 
+                foreach (string o in c.Option.ValueSeparators != null
                         ? option.Split (c.Option.ValueSeparators, StringSplitOptions.None)
                         : new string[]{option}) {
                     c.OptionValues.Add (o);
                 }
-            if (c.OptionValues.Count == c.Option.MaxValueCount || 
+            if (c.OptionValues.Count == c.Option.MaxValueCount ||
                     c.Option.OptionValueType == OptionValueType.Optional)
                 c.Option.Invoke (c);
             else if (c.OptionValues.Count > c.Option.MaxValueCount) {
                 throw new OptionException (localizer (string.Format (
-                                "Error: Found {0} option values when expecting {1}.", 
+                                "Error: Found {0} option values when expecting {1}.",
                                 c.OptionValues.Count, c.Option.MaxValueCount)),
                         c.OptionName);
             }
@@ -972,7 +966,7 @@ namespace Mono.Options
                 bool indent = false;
                 string prefix = new string (' ', OptionWidth+2);
                 foreach (string line in GetLines (localizer (GetDescription (p.Description)))) {
-                    if (indent) 
+                    if (indent)
                         o.Write (prefix);
                     o.WriteLine (line);
                     indent = true;
@@ -997,7 +991,7 @@ namespace Mono.Options
                 Write (o, ref written, names [0]);
             }
 
-            for ( i = GetNextOptionIndex (names, i+1); 
+            for ( i = GetNextOptionIndex (names, i+1);
                     i < names.Length; i = GetNextOptionIndex (names, i+1)) {
                 Write (o, ref written, ", ");
                 Write (o, ref written, names [i].Length == 1 ? "-" : "--");
@@ -1010,7 +1004,7 @@ namespace Mono.Options
                     Write (o, ref written, localizer ("["));
                 }
                 Write (o, ref written, localizer ("=" + GetArgumentName (0, p.MaxValueCount, p.Description)));
-                string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0 
+                string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
                     ? p.ValueSeparators [0]
                     : " ";
                 for (int c = 1; c < p.MaxValueCount; ++c) {
