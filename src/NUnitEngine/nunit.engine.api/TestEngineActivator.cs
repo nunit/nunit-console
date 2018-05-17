@@ -39,6 +39,19 @@ namespace NUnit.Engine
         private const string DefaultAssemblyName = "nunit.engine.dll";
         internal const string DefaultTypeName = "NUnit.Engine.TestEngine";
 
+#if NETSTANDARD1_3 || NETSTANDARD2_0
+        /// <summary>
+        /// Create an instance of the test engine.
+        /// </summary>
+        /// <returns>An <see cref="NUnit.Engine.ITestEngine"/></returns>
+        public static ITestEngine CreateInstance()
+        {
+            var assemblyName = new AssemblyName(DefaultAssemblyName);
+            var assembly = Assembly.Load(assemblyName);
+            var engineType = assembly.GetType(DefaultTypeName);
+            return Activator.CreateInstance(engineType) as ITestEngine;
+        }
+#else
         #region Public Methods
 
         /// <summary>
@@ -190,7 +203,7 @@ namespace NUnit.Engine
             catch (Exception) { }
             return null;
         }
-
         #endregion
+#endif
     }
 }

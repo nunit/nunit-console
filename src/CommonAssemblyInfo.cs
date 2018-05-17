@@ -31,10 +31,6 @@ using System.Reflection;
 [assembly: AssemblyCompany("NUnit Software")]
 [assembly: AssemblyCopyright("Copyright (c) 2018 Charlie Poole, Rob Prouse")]
 
-#if PORTABLE
-[assembly: AssemblyMetadata("PCL", "True")]
-#endif
-
 #if DEBUG
 #if NET_4_5
 [assembly: AssemblyConfiguration(".NET 4.5 Debug")]
