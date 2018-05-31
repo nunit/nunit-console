@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,25 +24,26 @@
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Extensibility;
+using System.Reflection;
 
 namespace NUnit.Engine.Drivers
 {
-    public class NotRunnableFrameworkDriver : IFrameworkDriver
+    public abstract class NotRunnableFrameworkDriver : IFrameworkDriver
     {
         private const string LOAD_RESULT_FORMAT =
-            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='NotRunnable'>" +
+            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='{4}'>" +
                 "<properties>" +
-                    "<property name='_SKIPREASON' value='{4}'/>" +
+                    "<property name='_SKIPREASON' value='{5}'/>" +
                 "</properties>" +
             "</test-suite>";
 
         private const string RUN_RESULT_FORMAT =
-            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='NotRunnable' result='Failed' label='Invalid'>" +
+            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='{4}' result='{5}' label='{6}'>" +
                 "<properties>" +
-                    "<property name='_SKIPREASON' value='{4}'/>" +
+                    "<property name='_SKIPREASON' value='{7}'/>" +
                 "</properties>" +
                 "<reason>" +
-                    "<message>{4}</message>" +
+                    "<message>{7}</message>" +
                 "</reason>" +
             "</test-suite>";
 
@@ -51,19 +52,24 @@ namespace NUnit.Engine.Drivers
         private string _message;
         private string _type;
 
+        protected string _runstate;
+        protected string _result;
+        protected string _label;
+
         public NotRunnableFrameworkDriver(string assemblyPath, string message)
         {
             _name = Escape(Path.GetFileName(assemblyPath));
             _fullname = Escape(Path.GetFullPath(assemblyPath));
             _message = Escape(message);
-            _type = new List<string> {".dll", ".exe"}.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
+            _type = new List<string> { ".dll", ".exe" }.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
         }
 
         public string ID { get; set; }
 
+        
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
-            return string.Format(LOAD_RESULT_FORMAT, _type, TestID, _name, _fullname, _message);
+            return GetLoadResult();
         }
 
         public int CountTestCases(string filter)
@@ -73,12 +79,13 @@ namespace NUnit.Engine.Drivers
 
         public string Run(ITestEventListener listener, string filter)
         {
-            return string.Format(RUN_RESULT_FORMAT, _type, TestID, _name, _fullname, _message);
+            return string.Format(RUN_RESULT_FORMAT, 
+                _type, TestID, _name, _fullname, _runstate, _result, _label, _message);
         }
 
         public string Explore(string filter)
         {
-            return string.Format(LOAD_RESULT_FORMAT, _type, TestID, _name, _fullname, _message);
+            return GetLoadResult();
         }
 
         public void StopRun(bool force)
@@ -95,6 +102,13 @@ namespace NUnit.Engine.Drivers
                 .Replace(">", "&gt;");
         }
 
+        private string GetLoadResult()
+        {
+            return string.Format(
+                LOAD_RESULT_FORMAT,
+                _type, TestID, _name, _fullname, _runstate, _message);
+        }
+
         private string TestID
         {
             get
@@ -103,6 +117,28 @@ namespace NUnit.Engine.Drivers
                     ? "1"
                     : ID + "-1";
             }
+        }
+    }
+
+    public class InvalidAssemblyFrameworkDriver :NotRunnableFrameworkDriver
+    {
+        public InvalidAssemblyFrameworkDriver(string assemblyPath, string message)
+            : base(assemblyPath, message)
+        {
+            _runstate = "NotRunnable";
+            _result = "Failed";
+            _label = "Invalid";
+        }
+    }
+
+    public class SkippedAssemblyFrameworkDriver : NotRunnableFrameworkDriver
+    {
+        public SkippedAssemblyFrameworkDriver(string assemblyPath)
+            : base(assemblyPath, "Skipping non-test assembly")
+        {
+            _runstate = "Runnable";
+            _result = "Skipped";
+            _label = "NoTests";
         }
     }
 }

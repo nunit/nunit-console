@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -48,7 +48,7 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// Unload any loaded TestPackage as well as the AppDomain.
+        /// Unload any loaded TestPackage as well as the application domain.
         /// </summary>
         public override void UnloadPackage()
         {

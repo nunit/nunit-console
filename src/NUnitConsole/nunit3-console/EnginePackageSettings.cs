@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -71,7 +71,7 @@ namespace NUnit
         public const string DebugAgent = "DebugAgent";
 
         /// <summary>
-        /// Indicates how to load tests across AppDomains. Values are:
+        /// Indicates how to load tests across application domains. Values are:
         /// "Default", "None", "Single", "Multiple". Default is "Multiple"
         /// if more than one assembly is loaded in a process. Otherwise,
         /// it is "Single".
@@ -86,7 +86,7 @@ namespace NUnit
         public const string PrivateBinPath = "PrivateBinPath";
 
         /// <summary>
-        /// The maximum number of test agents permitted to run simultneously. 
+        /// The maximum number of test agents permitted to run simultaneously. 
         /// Ignored if the ProcessModel is not set or defaulted to Multiple.
         /// </summary>
         public const string MaxAgents = "MaxAgents";
@@ -129,8 +129,13 @@ namespace NUnit
         public const string LoadUserProfile = "LoadUserProfile";
 
         /// <summary>
+        /// Bool flag indicating that non-test assemblies should be skipped without error.
+        /// </summary>
+        public const string SkipNonTestAssemblies = "SkipNonTestAssemblies";
+
+        /// <summary>
         /// Flag (bool) indicating whether to pause execution of tests to allow
-        /// the user to attache a debugger.
+        /// the user to attach a debugger.
         /// </summary>
         public const string PauseBeforeRun = "PauseBeforeRun";
 
@@ -140,6 +145,12 @@ namespace NUnit
         /// Default is "Off". "Debug" and "Verbose" are synonyms.
         /// </summary>
         public const string InternalTraceLevel = "InternalTraceLevel";
+
+        /// <summary>
+        /// The PrincipalPolicy to set on the test application domain. Values are:
+        /// "UnauthenticatedPrincipal", "NoPrincipal" and "WindowsPrincipal".
+        /// </summary>
+        public const string PrincipalPolicy = "PrincipalPolicy";
 
         #endregion
     }

@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2007 Charlie Poole
+// Copyright (c) 2007 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -49,7 +49,7 @@ namespace NUnit.Engine
         // the job of the RuntimeFrameworkService. Other functions
         // may actually belong in TestAgency.
         //
-        // All the static properties of RuntimeFrameowork need to be
+        // All the static properties of RuntimeFramework need to be
         // examined for thread-safety, particularly CurrentFramework
         // and AvailableFrameworks. The latter caused a problem with
         // parallel loading, which has been fixed for now through a
@@ -94,8 +94,9 @@ namespace NUnit.Engine
         /// or more, it is taken as a CLR version. In either case, the other
         /// version is deduced based on the runtime type and provided version.
         /// </summary>
-        /// <param name="runtime">The runtime type of the framework</param>
-        /// <param name="version">The version of the framework</param>
+        /// <param name="runtime">The runtime type of the framework.</param>
+        /// <param name="version">The version of the framework.</param>
+        /// <param name="profile">The profile of the framework. Null if unspecified.</param>
         public RuntimeFramework(RuntimeType runtime, Version version, string profile)
         {
             Runtime = runtime;
@@ -377,7 +378,7 @@ namespace NUnit.Engine
         public Version ClrVersion { get; private set; }
 
         /// <summary>
-        /// The Profile for this framwork, where relevant.
+        /// The Profile for this framework, where relevant.
         /// May be null and will have different sets of 
         /// values for each Runtime.
         /// </summary>
@@ -438,26 +439,18 @@ namespace NUnit.Engine
             return new RuntimeFramework(runtime, version);
         }
 
-        /// <summary>
-        /// Returns the best available framework that matches a target framework.
-        /// If the target framework has a build number specified, then an exact
-        /// match is needed. Otherwise, the matching framework with the highest
-        /// build number is used.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public static RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
+        public static bool TryParse(string s, out RuntimeFramework runtimeFramework)
         {
-            RuntimeFramework result = target;
-
-            foreach (RuntimeFramework framework in AvailableFrameworks)
-                if (framework.Supports(target))
-                {
-                    if (framework.ClrVersion.Build > result.ClrVersion.Build)
-                        result = framework;
-                }
-
-            return result;
+            try
+            {
+                runtimeFramework = Parse(s);
+                return true;
+            }
+            catch
+            {
+                runtimeFramework = null;
+                return false;
+            }
         }
 
         /// <summary>

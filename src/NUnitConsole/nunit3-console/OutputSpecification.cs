@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,6 +22,8 @@
 // ***********************************************************************
 
 using System;
+using System.IO;
+using System.Text;
 
 namespace NUnit.Common
 {
@@ -37,10 +39,11 @@ namespace NUnit.Common
         /// Construct an OutputSpecification from an option value.
         /// </summary>
         /// <param name="spec">The option value string.</param>
-        public OutputSpecification(string spec)
+        /// <param name="transformFolder">The folder containing the transform.</param>
+        public OutputSpecification(string spec, string transformFolder)
         {
             if (spec == null)
-                throw new NullReferenceException("Output spec may not be null");
+                throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
 
             string[] parts = spec.Split(';');
             this.OutputPath = parts[0];
@@ -50,7 +53,7 @@ namespace NUnit.Common
                 string[] opt = parts[i].Split('=');
 
                 if (opt.Length != 2)
-                    throw new ArgumentException();
+                    throw new ArgumentException($"Invalid output specification: {spec}");
 
                 switch (opt[0].Trim())
                 {
@@ -76,7 +79,7 @@ namespace NUnit.Common
                                 string.Format("Conflicting format options: {0}", spec));
 
                         this.Format = "user";
-                        this.Transform = opt[1].Trim();
+                        this.Transform = Path.Combine(transformFolder ?? "", val);
                         break;
                 }
             }
@@ -105,5 +108,13 @@ namespace NUnit.Common
         public string Transform { get; private set; }
 
         #endregion
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder($"OutputPath: {OutputPath}");
+            if (Format != null) sb.Append($", Format: {Format}");
+            if (Transform != null) sb.Append($", Transform: {Transform}");
+            return sb.ToString();
+        }
     }
 }

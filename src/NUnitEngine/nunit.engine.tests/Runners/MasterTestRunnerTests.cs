@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,34 +26,42 @@ using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
+using System.Reflection;
+using System.IO;
+using NUnit.Tests;
 
 namespace NUnit.Engine.Runners.Tests
 {
     public class MasterTestRunnerTests : ITestEventListener
     {
         private TestPackage _package;
+#if !NETCOREAPP1_1
         private ServiceContext _services;
+#endif
         private MasterTestRunner _runner;
         private List<XmlNode> _events;
 
         [SetUp]
         public void Initialize()
         {
+            _package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll"));
+
+#if !NETCOREAPP1_1
+
             // Add all services needed
             _services = new ServiceContext();
             _services.Add(new Services.DomainManager());
             _services.Add(new Services.ExtensionService());
             _services.Add(new Services.DriverService());
             _services.Add(new Services.ProjectService());
-            _services.Add(new Services.DefaultTestRunnerFactory());
             _services.Add(new Services.RuntimeFrameworkService());
-            _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
+            _services.Add(new Services.InProcessTestRunnerFactory());
             _services.ServiceManager.StartServices();
 
-            _package = new TestPackage("mock-assembly.dll");
-
             _runner = new MasterTestRunner(_services, _package);
-
+#else
+            _runner = new MasterTestRunner(_package);
+#endif
             _events = new List<XmlNode>();
         }
 
@@ -63,8 +71,10 @@ namespace NUnit.Engine.Runners.Tests
             if (_runner != null)
                 _runner.Dispose();
 
+#if !NETCOREAPP1_1
             if (_services != null)
                 _services.ServiceManager.Dispose();
+#endif
         }
 
         [Test]
@@ -106,6 +116,7 @@ namespace NUnit.Engine.Runners.Tests
             CheckTestRunResult(result);
         }
 
+#if !NETCOREAPP1_1
         [Test]
         public void RunAsync()
         {
@@ -114,6 +125,7 @@ namespace NUnit.Engine.Runners.Tests
             testRun.Wait(-1);
             CheckTestRunResult(testRun.Result);
         }
+#endif
 
         private void CheckTestRunResult(XmlNode result)
         {

@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using NUnit.Common;
@@ -29,6 +30,7 @@ using NUnit.ConsoleRunner.Utilities;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace NUnit.ConsoleRunner
 {
@@ -45,6 +47,7 @@ namespace NUnit.ConsoleRunner
         public static readonly int INVALID_ASSEMBLY = -2;
         //public static readonly int FIXTURE_NOT_FOUND = -3;    //No longer in use
         public static readonly int INVALID_TEST_FIXTURE = -4;
+        //public static readonly int UNLOAD_ERROR = -5;         //No longer in use
         public static readonly int UNEXPECTED_ERROR = -100;
 
         #endregion
@@ -58,7 +61,6 @@ namespace NUnit.ConsoleRunner
         private IExtensionService _extensionService;
 
         private ExtendedTextWriter _outWriter;
-        private TextWriter _errorWriter = Console.Error;
 
         private string _workDirectory;
 
@@ -169,9 +171,21 @@ namespace NUnit.ConsoleRunner
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
+
+                IResultWriter resultWriter;
+
                 try
                 {
-                    GetResultWriter(spec).CheckWritability(outputPath);
+                    resultWriter = GetResultWriter(spec);
+                }
+                catch (Exception ex)
+                {
+                    throw new NUnitEngineException($"Error encountered in resolving output specification: {spec}", ex);
+                }
+
+                try
+                {
+                    resultWriter.CheckWritability(outputPath);
                 }
                 catch (SystemException ex)
                 {
@@ -181,15 +195,13 @@ namespace NUnit.ConsoleRunner
                             spec.OutputPath), ex);
                 }
             }
-
-            // TODO: Incorporate this in EventCollector?
-            RedirectErrorOutputAsRequested();
-
+            
             var labels = _options.DisplayTestLabels != null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
 
             XmlNode result = null;
+            NUnitEngineUnloadException unloadException = null;
             NUnitEngineException engineException = null;
 
             try
@@ -204,13 +216,13 @@ namespace NUnit.ConsoleRunner
                     result = runner.Run(eventHandler, filter);
                 }
             }
+            catch (NUnitEngineUnloadException ex)
+            {
+                unloadException = ex;
+            }
             catch (NUnitEngineException ex)
             {
                 engineException = ex;
-            }
-            finally
-            {
-                RestoreErrorOutput();
             }
 
             var writer = new ColorConsoleWriter(!_options.NoColor);
@@ -224,12 +236,19 @@ namespace NUnit.ConsoleRunner
                 {
                     var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
                     GetResultWriter(spec).WriteResultFile(result, outputPath);
-                    _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
+                    writer.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
 
-                // Since we got a result, we display any engine exception as a warning
                 if (engineException != null)
-                    writer.WriteLine(ColorStyle.Warning, Environment.NewLine + engineException.Message);
+                {
+                    writer.WriteLine(ColorStyle.Error, Environment.NewLine + ExceptionHelper.BuildMessage(engineException));
+                    return ConsoleRunner.UNEXPECTED_ERROR;
+                }
+
+                if (unloadException != null)
+                {
+                    writer.WriteLine(ColorStyle.Warning, Environment.NewLine + ExceptionHelper.BuildMessage(unloadException));
+                }
 
                 if (reporter.Summary.UnexpectedError)
                     return ConsoleRunner.UNEXPECTED_ERROR;
@@ -244,7 +263,11 @@ namespace NUnit.ConsoleRunner
 
             // If we got here, it's because we had an exception, but check anyway
             if (engineException != null)
-                writer.WriteLine(ColorStyle.Error, engineException.Message);
+            {
+                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(engineException));
+                writer.WriteLine();
+                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(engineException));
+            }
 
             return ConsoleRunner.UNEXPECTED_ERROR;
         }
@@ -322,16 +345,6 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        private void RedirectErrorOutputAsRequested()
-        {
-            if (_options.ErrFileSpecified)
-            {
-                var errorStreamWriter = new StreamWriter(Path.Combine(_workDirectory, _options.ErrFile));
-                errorStreamWriter.AutoFlush = true;
-                _errorWriter = errorStreamWriter;
-            }
-        }
-
         private ExtendedTextWriter CreateOutputWriter()
         {
             if (_options.OutFileSpecified)
@@ -343,13 +356,6 @@ namespace NUnit.ConsoleRunner
             }
 
             return _outWriter;
-        }
-
-        private void RestoreErrorOutput()
-        {
-            _errorWriter.Flush();
-            if (_options.ErrFileSpecified)
-                _errorWriter.Close();
         }
 
         private IResultWriter GetResultWriter(OutputSpecification spec)
@@ -383,6 +389,9 @@ namespace NUnit.ConsoleRunner
 
             if (options.LoadUserProfile)
                 package.AddSetting(EnginePackageSettings.LoadUserProfile, true);
+
+            if (options.SkipNonTestAssemblies)
+                package.AddSetting(EnginePackageSettings.SkipNonTestAssemblies, true);
 
             if (options.DefaultTimeout >= 0)
                 package.AddSetting(FrameworkPackageSettings.DefaultTimeout, options.DefaultTimeout);
@@ -420,6 +429,9 @@ namespace NUnit.ConsoleRunner
             if (options.PauseBeforeRun)
                 package.AddSetting(FrameworkPackageSettings.PauseBeforeRun, true);
 
+            if (options.PrincipalPolicy != null)
+                package.AddSetting(EnginePackageSettings.PrincipalPolicy, options.PrincipalPolicy);
+
 #if DEBUG
             if (options.DebugAgent)
                 package.AddSetting(EnginePackageSettings.DebugAgent, true);
@@ -432,10 +444,33 @@ namespace NUnit.ConsoleRunner
             if (options.DefaultTestNamePattern != null)
                 package.AddSetting(FrameworkPackageSettings.DefaultTestNamePattern, options.DefaultTestNamePattern);
 
-            if (options.TestParameters != null)
-                package.AddSetting(FrameworkPackageSettings.TestParameters, options.TestParameters);
+            if (options.TestParameters.Count != 0)
+                AddTestParametersSetting(package, options.TestParameters);
+
+            if (options.ConfigurationFile != null)
+                package.AddSetting(EnginePackageSettings.ConfigurationFile, options.ConfigurationFile);
 
             return package;
+        }
+
+        /// <summary>
+        /// Sets test parameters, handling backwards compatibility.
+        /// </summary>
+        private static void AddTestParametersSetting(TestPackage testPackage, IDictionary<string, string> testParameters)
+        {
+            testPackage.AddSetting(FrameworkPackageSettings.TestParametersDictionary, testParameters);
+
+            if (testParameters.Count != 0)
+            {
+                // This cannot be changed without breaking backwards compatibility with old frameworks.
+                // Reserializes the way old frameworks understand, even if this runner's parsing is changed.
+
+                var oldFrameworkSerializedParameters = new StringBuilder();
+                foreach (var parameter in testParameters)
+                    oldFrameworkSerializedParameters.Append(parameter.Key).Append('=').Append(parameter.Value).Append(';');
+
+                testPackage.AddSetting(FrameworkPackageSettings.TestParameters, oldFrameworkSerializedParameters.ToString(0, oldFrameworkSerializedParameters.Length - 1));
+            }
         }
 
         private TestFilter CreateTestFilter(ConsoleOptions options)

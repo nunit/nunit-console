@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -52,8 +52,8 @@ namespace NUnit.Engine.Drivers
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         public bool IsSupportedTestFramework(AssemblyName reference)
         {
-            return reference.Name == NUNIT_FRAMEWORK && reference.Version.Major == 2
-                || reference.Name == NUNITLITE_FRAMEWORK && reference.Version.Major == 1;
+            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 2
+                || NUNITLITE_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 1;
         }
 
         /// <summary>
@@ -61,8 +61,7 @@ namespace NUnit.Engine.Drivers
         /// which the assembly is already known to reference.
         /// </summary>
         /// <param name="domain">The domain in which the assembly will be loaded</param>
-        /// <param name="assemblyName">The name of the test framework reference</param>
-        /// <param name="version">The version of the test framework reference</param>
+        /// <param name="reference">The name of the test framework reference</param>
         /// <returns></returns>
         public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
         {

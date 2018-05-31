@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2015 Charlie Poole
+// Copyright (c) 2011-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -65,6 +65,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--domain=multiple", "DomainUsage", "Multiple")]
         [TestCase("--framework=net-4.0", "RuntimeFramework", "net-4.0")]
         [TestCase("--config=Release", "ActiveConfig", "Release")]
+        [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
         [TestCase("--trace=Error", "InternalTraceLevel", "Error")]
         [TestCase("--trace=error", "InternalTraceLevel", "Error")]
         [TestCase("--seed=1234", "RandomSeed", 1234)]
@@ -74,6 +75,8 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--debug", "DebugTests", true)]
         [TestCase("--pause", "PauseBeforeRun", true)]
         [TestCase("--params:X=5;Y=7", "TestParameters", "X=5;Y=7")]
+        [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
+        [TestCase("--set-principal-policy:UnauthenticatedPrincipal", "PrincipalPolicy", "UnauthenticatedPrincipal")]
 #if DEBUG
         [TestCase("--debug-agent", "DebugAgent", true)]
 #endif

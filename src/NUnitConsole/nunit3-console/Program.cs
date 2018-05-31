@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -37,7 +37,7 @@ namespace NUnit.ConsoleRunner
     public class Program
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
-        static ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem(), new ArgumentsFileParser());
+        static ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem());
         private static ExtendedTextWriter _outWriter;
 
         // This has to be lazy otherwise NoColor command line option is not applied correctly
@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner
         {
             try
             {
-                Options.Parse(Options.Expand(args));
+                Options.Parse(Options.PreParse(args));
             }
             catch (OptionException ex)
             {
@@ -79,17 +79,6 @@ namespace NUnit.ConsoleRunner
                 }
             }
 
-            //ColorConsole.Enabled = !Options.NoColor;
-
-            // Create SettingsService early so we know the trace level right at the start
-            //SettingsService settingsService = new SettingsService();
-            //InternalTraceLevel level = (InternalTraceLevel)settingsService.GetSetting("Options.InternalTraceLevel", InternalTraceLevel.Default);
-            //if (options.trace != InternalTraceLevel.Default)
-            //    level = options.trace;
-
-            //InternalTrace.Initialize("nunit3-console_%p.log", level);
-            
-            //log.Info("NUnit3-console.exe starting");
             try
             {
                 if (Options.ShowVersion || !Options.NoHeader)
@@ -116,7 +105,7 @@ namespace NUnit.ConsoleRunner
                     return ConsoleRunner.INVALID_ARG;
                 }
 
-                using (ITestEngine engine = TestEngineActivator.CreateInstance(false))
+                using (ITestEngine engine = TestEngineActivator.CreateInstance())
                 {
                     if (Options.WorkDirectory != null)
                         engine.WorkDirectory = Options.WorkDirectory;
@@ -145,7 +134,9 @@ namespace NUnit.ConsoleRunner
                     }
                     catch (Exception ex)
                     {
-                        OutWriter.WriteLine(ColorStyle.Error, ex.ToString());
+                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
+                        OutWriter.WriteLine();
+                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(ex));
                         return ConsoleRunner.UNEXPECTED_ERROR;
                     }
                     finally
@@ -158,8 +149,6 @@ namespace NUnit.ConsoleRunner
                                 Console.ReadKey(true);
                             }
                         }
-
-                        //    log.Info( "NUnit3-console.exe terminating" );
                     }
                 }
             }
@@ -175,7 +164,7 @@ namespace NUnit.ConsoleRunner
             string versionText = executingAssembly.GetName().Version.ToString(3);
 
             string programName = "NUnit Console Runner";
-            string copyrightText = "Copyright (C) 2016 Charlie Poole.\r\nAll Rights Reserved.";
+            string copyrightText = "Copyright (C) 2018 Charlie Poole, Rob Prouse.\r\nAll Rights Reserved.";
             string configText = String.Empty;
 
             object[] attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
@@ -245,19 +234,24 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("          --OPTION:filename;transform=xsltfile");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      The --result option may use any of the following formats:");
-                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3.0");
+                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3");
                 OutWriter.WriteLine("          nunit2 - legacy XML format used by earlier releases of NUnit");
+                OutWriter.WriteLine("                   Requires the engine extension NUnitV2ResultWriter.");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      The --explore option may use any of the following formats:");
-                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3.0");
+                OutWriter.WriteLine("          nunit3 - the native XML format for NUnit 3");
                 OutWriter.WriteLine("          cases  - a text file listing the full names of all test cases.");
                 OutWriter.WriteLine("      If --explore is used without any specification following, a list of");
                 OutWriter.WriteLine("      test cases is output to the writer.");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      If none of the options {--result, --explore, --noxml} is used,");
-                OutWriter.WriteLine("      NUnit saves the results to TestResult.xml in nunit3 format");
+                OutWriter.WriteLine("      If none of the options {--result, --explore, --noresult} is used,");
+                OutWriter.WriteLine("      NUnit saves the results to TestResult.xml in nunit3 format.");
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      Any transforms provided must handle input in the native nunit3 format.");
+                OutWriter.WriteLine();
+                OutWriter.WriteLine("      To be able to load NUnit projects, file type .nunit, the engine");
+                OutWriter.WriteLine("      extension NUnitProjectLoader is required. For Visual Studio projects");
+                OutWriter.WriteLine("      and solutions the engine extension VSProjectLoader is required.");
                 OutWriter.WriteLine();
                 //writer.WriteLine("Options that take values may use an equal sign, a colon");
                 //writer.WriteLine("or a space to separate the option from its value.");

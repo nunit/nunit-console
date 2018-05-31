@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>nunit-console-runner</id>
+    <version>0.0.0</version>
+    <title>NUnit 3 Console Runner</title>
+    <summary>Console runner for the NUnit 3 unit-testing framework.</summary>
+    <description>
+      This package includes the nunit3-console runner and test engine for version 3 of the NUnit unit-testing framework.
+    </description>
+    <projectUrl>http://nunit.org</projectUrl>
+    <projectSourceUrl>https://github.com/nunit/nunit-console</projectSourceUrl>
+    <docsUrl>https://github.com/nunit/docs/wiki/Console-Command-Line</docsUrl>
+    <bugTrackerUrl>https://github.com/nunit/nunit-console/issues</bugTrackerUrl>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <packageSourceUrl>https://github.com/nunit/nunit-console</packageSourceUrl>
+    <releaseNotes>https://raw.githubusercontent.com/nunit/nunit-console/master/CHANGES.txt</releaseNotes>
+    <mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <authors>Charlie Poole, Rob Prouse</authors>
+    <owners>Charlie Poole, Rob Prouse</owners>
+    <language>en-US</language>
+    <tags>nunit console runner test testing tdd</tags>
+    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
+  </metadata>
+</package>

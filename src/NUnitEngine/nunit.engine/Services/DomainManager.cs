@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2007-2015 Charlie Poole
+// Copyright (c) 2007-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -31,6 +31,7 @@ using System.Diagnostics;
 using System.Security;
 using System.Security.Policy;
 using System.Security.Principal;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -45,8 +46,6 @@ namespace NUnit.Engine.Services
 
         private static readonly PropertyInfo TargetFrameworkNameProperty =
             typeof(AppDomainSetup).GetProperty("TargetFrameworkName", BindingFlags.Public | BindingFlags.Instance);
-
-        private ISettings _settingsService;
 
         #region Create and Unload Domains
         /// <summary>
@@ -76,17 +75,18 @@ namespace NUnit.Engine.Services
                 Hash hash = new Hash(assembly);
                 evidence.AddHost(hash);
             }
-
-            log.Info("Creating AppDomain " + domainName);
+            
+            log.Info("Creating application domain " + domainName);
 
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
 
-            // Set PrincipalPolicy for the domain if called for in the settings
-            if (_settingsService != null && _settingsService.GetSetting("Options.TestLoader.SetPrincipalPolicy", false))
+            // Set PrincipalPolicy for the domain if called for in the package settings
+            if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
             {
-                runnerDomain.SetPrincipalPolicy(_settingsService.GetSetting(
-                    "Options.TestLoader.PrincipalPolicy", 
-                    PrincipalPolicy.UnauthenticatedPrincipal));
+                PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy),
+                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPrincipal"));
+
+                runnerDomain.SetPrincipalPolicy(policy);
             }
 
             return runnerDomain;
@@ -146,9 +146,9 @@ namespace NUnit.Engine.Services
         #region Nested DomainUnloader Class
         class DomainUnloader
         {
+            private readonly AppDomain _domain;
             private Thread _unloadThread;
-            private AppDomain _domain;
-            private Exception _unloadException;
+            private NUnitEngineException _unloadException;
 
             public DomainUnloader(AppDomain domain)
             {
@@ -158,35 +158,31 @@ namespace NUnit.Engine.Services
             public void Unload()
             {
                 _unloadThread = new Thread(new ThreadStart(UnloadOnThread));
-
                 _unloadThread.Start();
 
-                if (!_unloadThread.Join(30000))
+                var timeout = TimeSpan.FromSeconds(30);
+
+                if (!_unloadThread.Join((int)timeout.TotalMilliseconds))
                 {
-                    string msg = "Unable to unload AppDomain, Unload thread timed out.";
+                    var msg = DomainDetailsBuilder.DetailsFor(_domain,
+                        $"Unable to unload application domain: unload thread timed out after {timeout.TotalSeconds} seconds.");
 
                     log.Error(msg);
                     Kill(_unloadThread);
 
-                    throw new NUnitEngineException(msg);
+                    throw new NUnitEngineUnloadException(msg);
                 }
 
                 if (_unloadException != null)
-                    throw new NUnitEngineException("Exception encountered unloading AppDomain", _unloadException);
+                    throw new NUnitEngineUnloadException("Exception encountered unloading application domain", _unloadException);
             }
 
             private void UnloadOnThread()
             {
-                bool shadowCopy = false;
-                string domainName = "UNKNOWN";               
-
                 try
                 {
-                    shadowCopy = _domain.ShadowCopyFiles;
-                    domainName = _domain.FriendlyName;
-
                     // Uncomment to simulate an error in unloading
-                    //throw new Exception("Testing: simulated unload error");
+                    //throw new CannotUnloadAppDomainException("Testing: simulated unload error");
 
                     // Uncomment to simulate a timeout while unloading
                     //while (true) ;
@@ -195,12 +191,13 @@ namespace NUnit.Engine.Services
                 }
                 catch (Exception ex)
                 {
-                    _unloadException = ex;
-
                     // We assume that the tests did something bad and just leave
-                    // the orphaned AppDomain "out there". 
-                    // TODO: Something useful.
-                    log.Error("Unable to unload AppDomain " + domainName, ex);
+                    // the orphaned AppDomain "out there".
+                    var msg = DomainDetailsBuilder.DetailsFor(_domain,
+                        $"Exception encountered unloading application domain: {ex.Message}");
+
+                    _unloadException = new NUnitEngineException(msg);
+                    log.Error(msg);
                 }
             }
         }
@@ -246,7 +243,7 @@ namespace NUnit.Engine.Services
         
             // The ProjectService adds any project config to the settings.
             // So, at this point, we only want to handle assemblies or an
-            // anonymous package created from the comnand-line.
+            // anonymous package created from the command-line.
             string fullName = package.FullName;
             if (IsExecutable(fullName))
                 return fullName + ".config";
@@ -368,27 +365,6 @@ namespace NUnit.Engine.Services
 
             if ((thread.ThreadState & System.Threading.ThreadState.WaitSleepJoin) != 0)
                 thread.Interrupt();
-        }
-
-        #endregion
-
-        #region Service Overrides
-
-        public override void StartService() 
-        {
-            try
-            {
-                // DomainManager has a soft dependency on the SettingsService.
-                // If it's not available, default values are used.
-                _settingsService = ServiceContext.GetService<ISettings>();
-
-                Status = ServiceStatus.Started;
-            }
-            catch
-            {
-                Status = ServiceStatus.Error;
-                throw;
-            }
         }
 
         #endregion

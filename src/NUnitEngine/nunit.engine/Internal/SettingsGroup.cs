@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2013 Charlie Poole
+// Copyright (c) 2013 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,10 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Xml;
 
 namespace NUnit.Engine.Internal
 {
@@ -79,7 +76,7 @@ namespace NUnit.Engine.Internal
                 if (converter == null)
                     return defaultValue;
 
-                return (T)converter.ConvertFrom(result);
+                return (T)converter.ConvertFrom(null, CultureInfo.InvariantCulture, result);
             }
             catch(Exception ex)
             {

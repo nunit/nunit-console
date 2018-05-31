@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2008-2014 Charlie Poole
+// Copyright (c) 2008-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,6 +22,8 @@
 // ***********************************************************************
 
 using System;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
 using NUnit.Engine.Internal;
 
@@ -36,15 +38,20 @@ namespace NUnit.Engine.Agents
     /// </summary>
     public class RemoteTestAgent : TestAgent, ITestEngineRunner
     {
-        static Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
 
         #region Fields
+
+        private readonly string _agencyUrl;
 
         private ITestEngineRunner _runner;
         private TestPackage _package;
 
-        private ManualResetEvent stopSignal = new ManualResetEvent(false);
-        
+        private readonly ManualResetEvent stopSignal = new ManualResetEvent(false);
+        private readonly CurrentMessageCounter _currentMessageCounter = new CurrentMessageCounter();
+        private TcpChannel _channel;
+        private ITestAgency _agency;
+
         #endregion
 
         #region Constructor
@@ -52,18 +59,21 @@ namespace NUnit.Engine.Agents
         /// <summary>
         /// Construct a RemoteTestAgent
         /// </summary>
-        public RemoteTestAgent( Guid agentId, ITestAgency agency, IServiceLocator services )
-            : base(agentId, agency, services) 
+        public RemoteTestAgent(Guid agentId, string agencyUrl, IServiceLocator services)
+            : base(agentId, services)
         {
+            _agencyUrl = agencyUrl;
         }
 
         #endregion
 
         #region Properties
+
         public int ProcessId
         {
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }
         }
+
         #endregion
 
         #region Public Methods
@@ -79,14 +89,28 @@ namespace NUnit.Engine.Agents
         {
             log.Info("Agent starting");
 
+            // Open the TCP channel so we can activate an ITestAgency instance from _agencyUrl
+            _channel = TcpChannelUtils.GetTcpChannel(_currentMessageCounter);
+
+            log.Info("Connecting to TestAgency at {0}", _agencyUrl);
             try
             {
-                this.Agency.Register( this );
-                log.Debug( "Registered with TestAgency" );
+                // Direct cast, not safe cast. If the cast fails we need a clear InvalidCastException message, not a null _agency.
+                _agency = (ITestAgency)Activator.GetObject(typeof(ITestAgency), _agencyUrl);
             }
-            catch( Exception ex )
+            catch (Exception ex)
             {
-                log.Error( "RemoteTestAgent: Failed to register with TestAgency", ex );
+                log.Error("Unable to connect", ex);
+            }
+
+            try
+            {
+                _agency.Register(this);
+                log.Debug("Registered with TestAgency");
+            }
+            catch (Exception ex)
+            {
+                log.Error("RemoteTestAgent: Failed to register with TestAgency", ex);
                 return false;
             }
 
@@ -101,13 +125,30 @@ namespace NUnit.Engine.Agents
             //if (agency != null)
             //    agency.ReportStatus(this.ProcessId, AgentStatus.Stopping);
 
+            // Do this on a different thread since we need to wait until all messages are through,
+            // including the message which is waiting for this method to return so it can report back.
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                log.Info("Waiting for messages to complete");
 
-            stopSignal.Set();
+                // Wait till all messages are finished
+                _currentMessageCounter.WaitForAllCurrentMessages();
+
+                log.Info("Attempting shut down channel");
+
+                // Shut down nicely
+                _channel.StopListening(null);
+                ChannelServices.UnregisterChannel(_channel);
+
+                // Signal to other threads that it's okay to exit the process or start a new channel, etc.
+                log.Info("Set stop signal");
+                stopSignal.Set();
+            });
         }
 
-        public void WaitForStop()
+        public bool WaitForStop(int timeout)
         {
-            stopSignal.WaitOne();
+            return stopSignal.WaitOne(timeout);
         }
 
         #endregion

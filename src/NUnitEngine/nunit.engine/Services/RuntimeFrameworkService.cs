@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Mono.Cecil;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -34,7 +35,7 @@ namespace NUnit.Engine.Services
         static Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
         // HACK: This line forces RuntimeFramework to initialize the static property
-        // AvailableFrameworks before it is accessed by mulitiple threads. See comment
+        // AvailableFrameworks before it is accessed by multiple threads. See comment
         // on RuntimeFramework class for a more detailled explanation.
         static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
 
@@ -54,7 +55,12 @@ namespace NUnit.Engine.Services
         /// <returns>True if the framework is available, false if unavailable or nonexistent</returns>
         public bool IsAvailable(string name)
         {
-            var requestedFramework = RuntimeFramework.Parse(name);
+            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
+
+            RuntimeFramework requestedFramework;
+            if (!RuntimeFramework.TryParse(name, out requestedFramework))
+                throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
+
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
                 if (FrameworksMatch(requestedFramework, framework))
                     return true;
@@ -96,12 +102,23 @@ namespace NUnit.Engine.Services
         /// <returns>A string representing the selected RuntimeFramework</returns>
         public string SelectRuntimeFramework(TestPackage package)
         {
-            // Start by examining the provided settings
+            // Evaluate package target framework
+            ApplyImageData(package);
+
+            // Examine the provided settings
             RuntimeFramework currentFramework = RuntimeFramework.CurrentFramework;
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
-            RuntimeFramework requestedFramework = frameworkSetting.Length > 0
-                ? RuntimeFramework.Parse(frameworkSetting)
-                : new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
+
+            RuntimeFramework requestedFramework;
+            if (frameworkSetting.Length > 0)
+            {
+                if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
+                    throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+            }
+            else
+            {
+                requestedFramework = new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
+            }
 
             log.Debug("Current framework is {0}", currentFramework);
             if (requestedFramework == null)
@@ -115,13 +132,10 @@ namespace NUnit.Engine.Services
             if (targetRuntime == RuntimeType.Any)
                 targetRuntime = currentFramework.Runtime;
 
-            // Examine the package 
-            ApplyImageData(package);
+            if (targetVersion == RuntimeFramework.DefaultVersion)
+                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, currentFramework.FrameworkVersion);
 
-            // Modify settings if necessary
-            targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, targetVersion);
-            RuntimeFramework checkFramework = new RuntimeFramework(targetRuntime, targetVersion);
-            if (!checkFramework.IsAvailable)
+            if (!new RuntimeFramework(targetRuntime, targetVersion).IsAvailable)
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
                 if (targetVersion < currentFramework.FrameworkVersion)
@@ -134,6 +148,27 @@ namespace NUnit.Engine.Services
             log.Debug("Test will use {0} framework", targetFramework);
 
             return targetFramework.ToString();
+        }
+
+
+        /// <summary>
+        /// Returns the best available framework that matches a target framework.
+        /// If the target framework has a build number specified, then an exact
+        /// match is needed. Otherwise, the matching framework with the highest
+        /// build number is used.
+        /// </summary>
+        public RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
+        {
+            RuntimeFramework result = target;
+
+            foreach (RuntimeFramework framework in _availableRuntimes)
+                if (framework.Supports(target))
+                {
+                    if (framework.ClrVersion.Build > result.ClrVersion.Build)
+                        result = framework;
+                }
+
+            return result;
         }
 
         #region Helper Methods
@@ -187,47 +222,24 @@ namespace NUnit.Engine.Services
             }
             else if (File.Exists(packageName) && PathUtils.IsAssemblyFileType(packageName))
             {
-                var assemblyDef = AssemblyDefinition.ReadAssembly(packageName);
-                var module = assemblyDef.MainModule;
+                var assembly = new TargetFrameworkHelper(packageName);
 
-                var NativeEntryPoint = (ModuleAttributes)16;
-                var mask = ModuleAttributes.Required32Bit | NativeEntryPoint;
+                targetVersion = assembly.TargetRuntimeVersion;
+                log.Debug($"Assembly {packageName} uses version {targetVersion}");
 
-                if (module.Architecture != TargetArchitecture.AMD64 &&
-                    module.Architecture != TargetArchitecture.IA64 &&
-                    (module.Attributes & mask) != 0)
+                frameworkName = assembly.FrameworkName;
+                log.Debug($"Assembly {packageName} targets {frameworkName}");
+
+                if (assembly.RequiresX86)
                 {
                     requiresX86 = true;
-                    log.Debug("Assembly {0} will be run x86", packageName);
+                    log.Debug($"Assembly {packageName} will be run x86");
                 }
 
-                targetVersion = new Version(module.RuntimeVersion.Substring(1));
-                log.Debug("Assembly {0} uses version {1}", packageName, targetVersion);
-
-                foreach (var attr in assemblyDef.CustomAttributes)
+                if (assembly.RequiresAssemblyResolver)
                 {
-                    if (attr.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute")
-                    {
-                        frameworkName = attr.ConstructorArguments[0].Value as string;
-                    }
-                    else if (attr.AttributeType.FullName == "NUnit.Framework.TestAssemblyDirectoryResolveAttribute")
-                    {
-                        requiresAssemblyResolver = true;
-                    }
-                }
-
-                if (frameworkName == null)
-                {
-                    foreach (var reference in module.AssemblyReferences)
-                        if (reference.Name == "mscorlib" && BitConverter.ToUInt64(reference.PublicKeyToken, 0) == 0xac22333d05b89d96)
-                        {
-                            // We assume 3.5, since that's all we are supporting
-                            // Could be extended to other versions if necessary
-                            // Format for FrameworkName is invented - it is not
-                            // known if any compilers supporting CF use the attribute
-                            frameworkName = ".NETCompactFramework,Version=3.5";
-                            break;
-                        }
+                    requiresAssemblyResolver = true;
+                    log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
                 }
             }
 

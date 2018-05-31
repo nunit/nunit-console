@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -36,6 +36,13 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public abstract class AbstractTestRunner : ITestEngineRunner
     {
+#if NETSTANDARD1_3
+        public AbstractTestRunner(TestPackage package)
+        {
+            TestRunnerFactory = new DefaultTestRunnerFactory();
+            TestPackage = package;
+        }
+#else
         public AbstractTestRunner(IServiceLocator services, TestPackage package)
         {
             Services = services;
@@ -43,15 +50,18 @@ namespace NUnit.Engine.Runners
             ProjectService = Services.GetService<IProjectService>();
             TestPackage = package;
         }
+#endif
 
         #region Properties
 
+#if !NETSTANDARD1_3
         /// <summary>
         /// Our Service Context
         /// </summary>
         protected IServiceLocator Services { get; private set; }
 
         protected IProjectService ProjectService { get; private set; }
+#endif
 
         protected ITestRunnerFactory TestRunnerFactory { get; private set; }
 
@@ -108,7 +118,8 @@ namespace NUnit.Engine.Runners
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         protected abstract TestEngineResult RunTests(ITestEventListener listener, TestFilter filter);
-
+        
+#if !NETSTANDARD1_3
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage, returning immediately.
         /// The tests are run asynchronously and the listener interface is notified 
@@ -133,6 +144,7 @@ namespace NUnit.Engine.Runners
 
             return testRun;
         }
+#endif
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
@@ -203,6 +215,7 @@ namespace NUnit.Engine.Runners
             return RunTests(listener, filter);
         }
 
+#if !NETSTANDARD1_3
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.
@@ -214,6 +227,7 @@ namespace NUnit.Engine.Runners
         {
             return RunTestsAsync(listener, filter);
         }
+#endif
 
         #endregion
 

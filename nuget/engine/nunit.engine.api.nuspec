@@ -4,18 +4,18 @@
     <id>NUnit.Engine.Api</id>
     <title>NUnit Test Engine Api</title>
     <version>$version$</version>
-    <authors>Charlie Poole</authors>
-    <owners>Charlie Poole</owners>
-    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <authors>Charlie Poole, Rob Prouse</authors>
+    <owners>Charlie Poole, Rob Prouse</owners>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
     <projectUrl>http://nunit.org</projectUrl>
-    <iconUrl>http://nunit.org/nuget/nunitv3_32x32.png</iconUrl>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine Api is used by runners to interface with the NUnit Engine in order to discover and execute tests.</summary>
     <description>This package includes the nunit.engine.api, which is normally the only assembly referenced by runners as well as by engine extensions. It is not intended for direct use by users who simply want to run tests using NUnit.</description>
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
-    <copyright>Copyright (c) 2016 Charlie Poole</copyright>
+    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
   </metadata>
   <files>
     <file src="LICENSE.txt" />

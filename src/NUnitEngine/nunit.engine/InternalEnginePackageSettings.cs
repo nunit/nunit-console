@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -48,7 +48,7 @@ namespace NUnit.Engine
 
         /// <summary>
         /// True if any assembly in the package requires a special assembly resolution hook
-        /// in the default AppDomain in order to find dependent assemblies.
+        /// in the default application domain in order to find dependent assemblies.
         /// </summary>
         public const string ImageRequiresDefaultAppDomainAssemblyResolver = "ImageRequiresDefaultAppDomainAssemblyResolver";
 

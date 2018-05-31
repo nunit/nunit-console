@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -84,28 +84,27 @@ namespace NUnit.Engine
         /// </summary>
         public void Initialize()
         {
-            SettingsService settingsService = new SettingsService(true);
-
-            if(InternalTraceLevel == InternalTraceLevel.Default)
-                InternalTraceLevel = settingsService.GetSetting("Options.InternalTraceLevel", InternalTraceLevel.Off);
-
             if(InternalTraceLevel != InternalTraceLevel.Off && !InternalTrace.Initialized)
             {
                 var logName = string.Format("InternalTrace.{0}.log", Process.GetCurrentProcess().Id);
                 InternalTrace.Initialize(Path.Combine(WorkDirectory, logName), InternalTraceLevel);
             }
 
-            Services.Add(settingsService);
-            Services.Add(new DomainManager());
-            Services.Add(new ExtensionService());
-            Services.Add(new DriverService());
-            Services.Add(new RecentFilesService());
-            Services.Add(new ProjectService());
-            Services.Add(new RuntimeFrameworkService());
-            Services.Add(new DefaultTestRunnerFactory());
-            Services.Add(new TestAgency());
-            Services.Add(new ResultService());
-            Services.Add(new TestFilterService());
+            // If caller added services beforehand, we don't add any
+            if (Services.ServiceCount == 0)
+            {
+                Services.Add(new SettingsService(true));
+                Services.Add(new DomainManager());
+                Services.Add(new ExtensionService());
+                Services.Add(new DriverService());
+                Services.Add(new RecentFilesService());
+                Services.Add(new ProjectService());
+                Services.Add(new RuntimeFrameworkService());
+                Services.Add(new DefaultTestRunnerFactory());
+                Services.Add(new TestAgency());
+                Services.Add(new ResultService());
+                Services.Add(new TestFilterService());
+            }
 
             Services.ServiceManager.StartServices();
         }

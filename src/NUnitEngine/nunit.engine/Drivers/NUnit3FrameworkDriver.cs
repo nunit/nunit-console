@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2009-2014 Charlie Poole
+// Copyright (c) 2009-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,11 +22,13 @@
 // ***********************************************************************
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Serialization;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
-using System.Runtime.Serialization;
 
 namespace NUnit.Engine.Drivers
 {
@@ -36,7 +38,6 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnit3FrameworkDriver : IFrameworkDriver
     {
-        private const string NUNIT_FRAMEWORK = "nunit.framework";
         private const string LOAD_MESSAGE = "Method called without calling Load first";
 
         private static readonly string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
@@ -49,6 +50,7 @@ namespace NUnit.Engine.Drivers
         static ILogger log = InternalTrace.GetLogger("NUnitFrameworkDriver");
 
         AppDomain _testDomain;
+        AssemblyName _reference;
         string _testAssemblyPath;
 
         object _frameworkController;
@@ -56,10 +58,12 @@ namespace NUnit.Engine.Drivers
         /// <summary>
         /// Construct an NUnit3FrameworkDriver
         /// </summary>
-        /// <param name="testDomain">The AppDomain in which to create the FrameworkController</param>
-        public NUnit3FrameworkDriver(AppDomain testDomain)
+        /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        public NUnit3FrameworkDriver(AppDomain testDomain, AssemblyName reference)
         {
             _testDomain = testDomain;
+            _reference = reference;
         }
 
         public string ID { get; set; }
@@ -80,7 +84,7 @@ namespace NUnit.Engine.Drivers
             }
             catch (SerializationException ex)
             {
-                throw new NUnitEngineException("The NUnit 3.0 driver cannot support this test assembly. Use a platform specific runner.", ex);
+                throw new NUnitEngineException("The NUnit 3 driver cannot support this test assembly. Use a platform specific runner.", ex);
             }
 
             CallbackHandler handler = new CallbackHandler();
@@ -161,13 +165,20 @@ namespace NUnit.Engine.Drivers
 
         private object CreateObject(string typeName, params object[] args)
         {
-            return _testDomain.CreateInstanceAndUnwrap(
-                NUNIT_FRAMEWORK, typeName, false, 0,
+            try
+            {
+                return _testDomain.CreateInstanceAndUnwrap(
+                    _reference.FullName, typeName, false, 0,
 #if !NET_4_0
-                null, args, null, null, null );
+                    null, args, null, null, null);
 #else
                 null, args, null, null );
 #endif
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new NUnitEngineException("The NUnit 3 driver encountered an error while executing reflected code.", ex.InnerException);
+            }
         }
 
         #endregion

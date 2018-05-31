@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -29,7 +29,11 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// TestEventDispatcher is used to send test events to a number of listeners
     /// </summary>
-    public class TestEventDispatcher : MarshalByRefObject, ITestEventListener
+    public class TestEventDispatcher :
+#if !NETSTANDARD1_3
+        MarshalByRefObject, 
+#endif
+        ITestEventListener
     {
         private object _eventLock = new object();
 
@@ -49,9 +53,11 @@ namespace NUnit.Engine.Runners
             }
         }
 
+#if !NETSTANDARD1_3
         public override object InitializeLifetimeService()
         {
             return null;
         }
+#endif
     }
 }

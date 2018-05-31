@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,6 +22,8 @@
 // ***********************************************************************
 
 using System;
+using System.Net.Sockets;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
@@ -41,7 +43,7 @@ namespace NUnit.Engine.Runners
         private ITestEngineRunner _remoteRunner;
         private TestAgency _agency;
 
-        public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package) 
+        public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
             _agency = Services.GetService<TestAgency>();
         }
@@ -223,44 +225,69 @@ namespace NUnit.Engine.Runners
             {
                 _disposed = true;
 
-                string unloadError = null;
+                Exception unloadException = null;
 
                 try
                 {
                     Unload();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     // Save and log the unload error
-                    unloadError = ex.Message;
-                    log.Error(unloadError);
+                    unloadException = ex;
+                    log.Error(ExceptionHelper.BuildMessage(ex));
+                    log.Error(ExceptionHelper.BuildStackTrace(ex));
                 }
 
-                if (_agent != null)
+                if (_agent != null && _agency.IsAgentRunning(_agent.Id))
                 {
                     try
                     {
                         log.Debug("Stopping remote agent");
                         _agent.Stop();
-                        _agent = null;
+                    }
+                    catch (SocketException se)
+                    {
+                        var exitCode = _agency.GetAgentExitCode(_agent.Id);
+
+                        if (exitCode.HasValue && exitCode == 0)
+                        {
+                            log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
+                        }
+                        else
+                        {
+
+                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {ExceptionHelper.BuildMessage(se)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(se)}";
+                            log.Error(stopError);
+
+                            // Stop error with no unload error, just rethrow
+                            if (unloadException == null)
+                                throw;
+
+                            // Both kinds of errors, throw exception with combined message
+                            throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
+                        }
                     }
                     catch (Exception e)
                     {
-                        string stopError = string.Format("Failed to stop the remote agent. {0}", e.Message);
+                        var stopError = $"Failed to stop the remote agent. {ExceptionHelper.BuildMessage(e)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(e)}";
                         log.Error(stopError);
-                        _agent = null;
 
                         // Stop error with no unload error, just rethrow
-                        if (unloadError == null)
+                        if (unloadException == null)
                             throw;
 
                         // Both kinds of errors, throw exception with combined message
-                        throw new NUnitEngineException(unloadError + Environment.NewLine + stopError);
+                        throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
+                    }
+                    finally
+                    {
+                        _agent = null;
                     }
                 }
 
-                if (unloadError != null) // Add message line indicating we managed to stop agent anyway
-                    throw (new NUnitEngineException(unloadError + "\nAgent Process was terminated successfully after error."));
+                if (unloadException != null) // Add message line indicating we managed to stop agent anyway
+                    throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
             }
         }
 
@@ -279,7 +306,7 @@ namespace NUnit.Engine.Runners
                 _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
 
                 if (_agent == null)
-                    throw new Exception("Unable to acquire remote process agent");
+                    throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
             if (_remoteRunner == null)
@@ -308,8 +335,8 @@ namespace NUnit.Engine.Runners
             XmlHelper.AddAttribute(suite, "asserts", "0");
 
             var failure = suite.AddElement("failure");
-            failure.AddElementWithCDataSection("message", e.Message);
-            failure.AddElementWithCDataSection("stack-trace", e.StackTrace);
+            failure.AddElementWithCDataSection("message", ExceptionHelper.BuildMessage(e));
+            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildStackTrace(e));
 
             return new TestEngineResult(suite);
         }

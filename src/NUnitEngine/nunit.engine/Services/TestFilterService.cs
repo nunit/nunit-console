@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2013-2015 Charlie Poole
+// Copyright (c) 2013-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,7 +23,11 @@
 
 namespace NUnit.Engine.Services
 {
-    public class TestFilterService : Service, ITestFilterService
+    public class TestFilterService :
+#if !NETSTANDARD1_3
+        Service, 
+#endif
+        ITestFilterService
     {
         public ITestFilterBuilder GetTestFilterBuilder()
         {

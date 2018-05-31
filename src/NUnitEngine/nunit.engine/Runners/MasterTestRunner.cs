@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -111,7 +111,7 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// Reload the currently loaded test jpackage.
+        /// Reload the currently loaded test package.
         /// </summary>
         /// <returns>An XmlNode representing the loaded package</returns>
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
@@ -229,8 +229,9 @@ namespace NUnit.Engine.Runners
             // be used to determine how to run the assembly.
             _runtimeService.SelectRuntimeFramework(TestPackage);
 
-            if (IntPtr.Size == 8 &&
-                TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "") == "InProcess" &&
+            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
+
+            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single")  &&
                 TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false))
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
@@ -298,11 +299,15 @@ namespace NUnit.Engine.Runners
                     throw new NUnitEngineException(string.Format("The requested framework {0} is unknown or not available.", frameworkSetting));
 
                 // If running in process, check requested framework is compatible
-                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default");
-                if (processModel.ToLower() == "single")
+                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
+                if (processModel == "single" || processModel == "inprocess")
                 {
                     var currentFramework = RuntimeFramework.CurrentFramework;
-                    var requestedFramework = RuntimeFramework.Parse(frameworkSetting);
+
+                    RuntimeFramework requestedFramework;
+                    if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
+                        throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+
                     if (!currentFramework.Supports(requestedFramework))
                         throw new NUnitEngineException(string.Format(
                             "Cannot run {0} framework in process already running {1}.", frameworkSetting, currentFramework));

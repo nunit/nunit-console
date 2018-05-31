@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+// Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,8 +23,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using NUnit.Framework;
+using NUnit.Tests;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -58,7 +60,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("nunit-agent-x86.exe", true)]
         public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
         {
-            var package = new TestPackage(assemblyName);
+            var package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, assemblyName));
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
 
@@ -73,6 +75,21 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(available.Count, Is.GreaterThan(0));
             foreach (var framework in available)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
+        }
+
+        [TestCase("mono", 4, 5, "net-4.5")]
+        [TestCase("net", 4, 0, "net-4.5")]
+        [TestCase("net", 4, 5, "net-4.5")]
+
+        public void EngineOptionPreferredOverImageTarget(string framework, int majorVersion, int minorVersion, string requested)
+        {
+            var package = new TestPackage("test");
+            package.AddSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, framework);
+            package.AddSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(majorVersion, minorVersion));
+            package.AddSetting(EnginePackageSettings.RuntimeFramework, requested);
+
+            _runtimeService.SelectRuntimeFramework(package);
+            Assert.That(package.GetSetting<string>(EnginePackageSettings.RuntimeFramework, null), Is.EqualTo(requested));
         }
     }
 }

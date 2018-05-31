@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -47,12 +47,16 @@ namespace NUnit.Engine
     /// for combining multiple TestEngineResults into one.
     /// 
     /// </summary>
+ #if !NETSTANDARD1_3
     [Serializable]
+#endif
     public class TestEngineResult
     {
         private List<string> _xmlText = new List<string>();
 
+#if !NETSTANDARD1_3
         [NonSerialized]
+#endif
         private List<XmlNode> _xmlNodes = new List<XmlNode>();
 
         #region Constructors

@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2008-2014 Charlie Poole
+// Copyright (c) 2008-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,6 +23,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using NUnit.Common;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
@@ -80,7 +81,7 @@ namespace NUnit.Engine.Services
             foreach (var subPackage in tempPackage.SubPackages)
                 package.AddSubPackage(subPackage);
 
-            // If no config is specified (by user or by the proejct loader) check
+            // If no config is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use it's own config, if present.
             if (!package.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))

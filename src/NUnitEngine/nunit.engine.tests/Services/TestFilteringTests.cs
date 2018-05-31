@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -35,13 +35,22 @@ namespace NUnit.Engine.Services.Tests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
 
+#if NETCOREAPP1_1
+        private NUnitNetStandardDriver _driver;
+#else
         private NUnit3FrameworkDriver _driver;
+#endif
 
         [SetUp]
         public void LoadAssembly()
         {
             var mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
-            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain);
+#if NETCOREAPP1_1
+            _driver = new NUnitNetStandardDriver();
+#else
+            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
+            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName);
+#endif
             _driver.Load(mockAssemblyPath, new Dictionary<string, object>());
         }
 

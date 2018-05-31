@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -30,11 +30,6 @@ namespace NUnit.Engine
     /// </summary>
     public interface ITestAgent
     {
-        /// <summary>
-        /// Gets the agency with which this agent is associated.
-        /// </summary>
-        ITestAgency Agency { get; }
-
         /// <summary>
         /// Gets a Guid that uniquely identifies this agent.
         /// </summary>
