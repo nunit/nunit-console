@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -50,6 +50,11 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started), "Failed to start service");
         }
 
+#if NETCOREAPP1_1 || NETCOREAPP2_0
+        [TestCase("x.dll", null, typeof(LocalTestRunner))]
+        [TestCase("x.dll y.dll", null, typeof(LocalTestRunner))]
+        [TestCase("x.dll y.dll z.dll", null, typeof(LocalTestRunner))]
+#else
         // Single file
         [TestCase("x.dll",  null,      typeof(TestDomainRunner))]
         [TestCase("x.dll", "Single",   typeof(TestDomainRunner))]
@@ -62,6 +67,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("x.dll y.dll z.dll", null,       typeof(MultipleTestDomainRunner))]
         [TestCase("x.dll y.dll z.dll", "Single",   typeof(TestDomainRunner))]
         [TestCase("x.dll y.dll z.dll", "Multiple", typeof(MultipleTestDomainRunner))]
+#endif
         public void CorrectRunnerIsUsed(string files, string domainUsage, Type expectedType)
         {
             var package = new TestPackage(files.Split(new char[] { ' ' }));

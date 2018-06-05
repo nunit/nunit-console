@@ -72,14 +72,7 @@ namespace NUnit.Engine.Services
                 else if (_projectService.CanLoadFrom(testFile))
                     projectCount++;
             }
-#if NETSTANDARD1_3 || NETSTANDARD2_0
 
-            if (assemblyCount > 0)
-                return new AggregatingTestRunner(ServiceContext, package);
-
-            return new LocalTestRunner(ServiceContext, package);
-        }
-#else
             // If we have multiple projects or a project plus assemblies
             // then defer to the AggregatingTestRunner, which will make
             // the decision on a file by file basis so that each project
@@ -88,6 +81,12 @@ namespace NUnit.Engine.Services
             // really matter since they will result in an error anyway.
             if (projectCount > 1 || projectCount > 0 && assemblyCount > 0)
                 return new AggregatingTestRunner(ServiceContext, package);
+
+#if NETSTANDARD1_3 || NETSTANDARD2_0
+
+            return base.MakeTestRunner(package);
+        }
+#else
 
             ProcessModel processModel = GetTargetProcessModel(package);
 

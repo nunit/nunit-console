@@ -2,7 +2,8 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit.engine.tests</AssemblyName>
-    <TargetFrameworks>net35</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <OutputType Condition="'$(TargetFramework)'=='netcoreapp1.1' or '$(TargetFramework)'=='netcoreapp2.0'">Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
@@ -16,9 +17,13 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp1.1' or '$(TargetFramework)'=='netcoreapp2.0'">
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnitLite" Version="3.10.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
@@ -45,6 +50,6 @@
     <ItemGroup>
       <Net20Files Include="..\..\..\bin\$(Configuration)\net20\*" />
     </ItemGroup>
-    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)"/>
+    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)" />
   </Target>
 </Project>

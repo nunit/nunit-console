@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 namespace NUnit.Engine.Tests
 {
     using System;
@@ -61,7 +62,7 @@ namespace NUnit.Engine.Tests
         public void Dispose()
         {
             File.Delete(this.path);
-            
+
             string path = this.path;
             while(true)
             {
@@ -84,3 +85,4 @@ namespace NUnit.Engine.Tests
         }
     }
 }
+#endif

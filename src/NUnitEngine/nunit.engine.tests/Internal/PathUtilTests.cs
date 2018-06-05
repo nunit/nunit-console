@@ -86,7 +86,7 @@ namespace NUnit.Engine.Internal.Tests
 				PathUtils.Canonicalize( @"folder1\folder2\..\..\..\file.tmp" ) );
 		}
 
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
         [Test]
 		[Platform(Exclude="Linux,UNIX,MacOSX")]
         public void RelativePath()
