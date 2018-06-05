@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>notest_assembly</RootNamespace>
     <AssemblyName>notest-assembly</AssemblyName>
-    <TargetFrameworks>net35</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp1.1</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
