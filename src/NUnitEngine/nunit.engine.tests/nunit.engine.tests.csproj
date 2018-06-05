@@ -3,7 +3,8 @@
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit.engine.tests</AssemblyName>
     <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
-    <OutputType Condition="'$(TargetFramework)'=='netcoreapp1.1' or '$(TargetFramework)'=='netcoreapp2.0'">Exe</OutputType>
+    <!--<OutputType Condition="'$(TargetFramework)'=='netcoreapp1.1' or '$(TargetFramework)'=='netcoreapp2.0'">Exe</OutputType>-->
+    <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
@@ -50,6 +51,6 @@
     <ItemGroup>
       <Net20Files Include="..\..\..\bin\$(Configuration)\net20\*" />
     </ItemGroup>
-    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)" />
+    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)" Condition="'$(TargetFramework)'=='net35'" />
   </Target>
 </Project>

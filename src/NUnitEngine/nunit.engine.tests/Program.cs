@@ -1,4 +1,4 @@
-﻿#if !NET35
+﻿//#if !NET35
 using NUnitLite;
 using System;
 using System.Reflection;
@@ -9,9 +9,12 @@ namespace NUnit.Engine.Tests
     {
         static int Main(string[] args)
         {
-            int result = new TextRunner(typeof(Program).GetTypeInfo().Assembly).Execute(args);
-            return result;
+#if !NET35
+            return new TextRunner(typeof(Program).GetTypeInfo().Assembly).Execute(args);
+#else
+            return new TextRunner(typeof(Program).Assembly).Execute(args);
+#endif
         }
     }
 }
-#endif
+//#endif

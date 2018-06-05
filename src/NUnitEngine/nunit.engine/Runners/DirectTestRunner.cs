@@ -97,8 +97,6 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         protected override TestEngineResult LoadPackage()
         {
-            EnsurePackageIsLoaded();
-
             var result = new TestEngineResult();
 
             // DirectRunner may be called with a single-assembly package
