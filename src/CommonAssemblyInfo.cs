@@ -40,8 +40,10 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 2.0 Debug")]
 #elif PORTABLE
 [assembly: AssemblyConfiguration("Portable Debug")]
-#elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
-[assembly: AssemblyConfiguration(".NET Standard Debug")]
+#elif NETSTANDARD1_3 || NETCOREAPP1_0
+[assembly: AssemblyConfiguration(".NET Standard 1.3 Debug")]
+#elif NETSTANDARD2_0 || NETCOREAPP2_0
+[assembly: AssemblyConfiguration(".NET Standard 2.0 Debug")]
 #else
 [assembly: AssemblyConfiguration("Debug")]
 #endif
@@ -54,8 +56,10 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 2.0")]
 #elif PORTABLE
 [assembly: AssemblyConfiguration("Portable")]
-#elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
-[assembly: AssemblyConfiguration(".NET Standard")]
+#elif NETSTANDARD1_3 || NETCOREAPP1_0
+[assembly: AssemblyConfiguration(".NET Standard 1.3")]
+#elif NETSTANDARD2_0 || NETCOREAPP2_0
+[assembly: AssemblyConfiguration(".NET Standard 2.0")]
 #else
 [assembly: AssemblyConfiguration("")]
 #endif

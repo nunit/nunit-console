@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -29,18 +29,16 @@ namespace NUnit.Engine
     /// <summary>
     /// ITestEngine represents an instance of the test engine.
     /// Clients wanting to discover, explore or run tests start
-    /// require an instance of the engine, which is generally 
+    /// require an instance of the engine, which is generally
     /// acquired from the TestEngineActivator class.
     /// </summary>
     public interface ITestEngine : IDisposable
     {
-#if !NETSTANDARD1_3
         /// <summary>
         /// Gets the IServiceLocator interface, which gives access to
         /// certain services provided by the engine.
         /// </summary>
         IServiceLocator Services { get; }
-#endif
 
         /// <summary>
         /// Gets and sets the directory path used by the engine for saving files.
@@ -58,12 +56,12 @@ namespace NUnit.Engine
 
         /// <summary>
         /// Initialize the engine. This includes initializing mono addins,
-        /// setting the trace level and creating the standard set of services 
+        /// setting the trace level and creating the standard set of services
         /// used in the Engine.
-        /// 
-        /// This interface is not normally called by user code. Programs linking 
+        ///
+        /// This interface is not normally called by user code. Programs linking
         /// only to the nunit.engine.api assembly are given a
-        /// pre-initialized instance of TestEngine. Programs 
+        /// pre-initialized instance of TestEngine. Programs
         /// that link directly to nunit.engine usually do so
         /// in order to perform custom initialization.
         /// </summary>

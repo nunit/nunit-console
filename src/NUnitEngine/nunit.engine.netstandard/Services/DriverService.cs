@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -42,9 +42,7 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
         /// </summary>
-        /// <param name="domain">The AppDomain to use for the tests</param>
         /// <param name="assemblyPath">The full path to the test assembly</param>
-        /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
         public IFrameworkDriver GetDriver(string assemblyPath, bool skipNonTestAssemblies)

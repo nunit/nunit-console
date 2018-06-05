@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -32,7 +32,11 @@ namespace NUnit.Engine.Internal
     public class Logger : ILogger
     {
         private readonly static string TIME_FMT = "HH:mm:ss.fff";
+#if NETSTANDARD1_3
+        private readonly static string TRACE_FMT = "{0} {1,-5} {2}: {3}";
+#else
         private readonly static string TRACE_FMT = "{0} {1,-5} [{2,2}] {3}: {4}";
+#endif
 
         private string name;
         private string fullname;
@@ -148,6 +152,7 @@ namespace NUnit.Engine.Internal
         #endregion
 
         #region Helper Methods
+
         private void Log(InternalTraceLevel level, string message)
         {
             if (writer != null && this.maxLevel >= level)
@@ -165,9 +170,12 @@ namespace NUnit.Engine.Internal
             writer.WriteLine(TRACE_FMT,
                 DateTime.Now.ToString(TIME_FMT),
                 level == InternalTraceLevel.Verbose ? "Debug" : level.ToString(),
-                System.Threading.Thread.CurrentThread.ManagedThreadId, name, message);
+#if !NETSTANDARD1_3
+                System.Threading.Thread.CurrentThread.ManagedThreadId,
+#endif
+                name, message);
         }
 
-#endregion
+        #endregion
     }
 }

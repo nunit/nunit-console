@@ -22,7 +22,7 @@
 // ***********************************************************************
 
 using System;
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6
+#if !NETSTANDARD1_3
 using System.Runtime.Serialization;
 #endif
 
@@ -33,7 +33,7 @@ namespace NUnit.Engine
     /// called with improper values or when a particular facility
     /// is not available.
     /// </summary>
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6
+#if !NETSTANDARD1_3
     [Serializable]
 #endif
     public class NUnitEngineException : Exception
@@ -52,7 +52,7 @@ namespace NUnit.Engine
         {
         }
 
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6
+#if !NETSTANDARD1_3
         /// <summary>
         /// Serialization constructor
         /// </summary>

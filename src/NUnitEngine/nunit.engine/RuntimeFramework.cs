@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,7 +37,7 @@ namespace NUnit.Engine
     /// </summary>
     [Serializable]
     public sealed class RuntimeFramework : IRuntimeFramework
-    { 
+    {
         // TODO: RuntimeFramework was originally created for use in
         // a single-threaded environment. The introduction of parallel
         // execution and especially parallel loading of tests has
@@ -44,7 +45,7 @@ namespace NUnit.Engine
         //
         // Ideally, we should remove all knowledge of the environment
         // from RuntimeFramework. An instance of RuntimeFramework does
-        // not need to know, for example, if it is available on the 
+        // not need to know, for example, if it is available on the
         // current system. In the present architecture, that's really
         // the job of the RuntimeFrameworkService. Other functions
         // may actually belong in TestAgency.
@@ -68,7 +69,7 @@ namespace NUnit.Engine
         private static RuntimeFramework _currentFramework;
         private static List<RuntimeFramework> _availableFrameworks;
 
-        private static readonly string DEFAULT_WINDOWS_MONO_DIR = 
+        private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
 
         #endregion
@@ -379,7 +380,7 @@ namespace NUnit.Engine
 
         /// <summary>
         /// The Profile for this framework, where relevant.
-        /// May be null and will have different sets of 
+        /// May be null and will have different sets of
         /// values for each Runtime.
         /// </summary>
         public string Profile { get; private set; }
@@ -554,7 +555,7 @@ namespace NUnit.Engine
         {
             if (CurrentFramework.Runtime == RuntimeType.Mono)
                 UseCurrentMonoFramework();
-            else 
+            else
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 FindBestMonoFrameworkOnWindows();
         }
@@ -615,7 +616,7 @@ namespace NUnit.Engine
                 AddMonoFramework(new Version(4, 5), null);
                 return;
             }
-            
+
             // Look in the Software\Novell key for older versions
             key = Registry.LocalMachine.OpenSubKey(@"Software\Novell\Mono");
             if (key != null)
@@ -735,7 +736,7 @@ namespace NUnit.Engine
             {
                 var profileKey = versionKey.OpenSubKey(profile);
                 if (profileKey == null) continue;
-                
+
                 if (CheckInstallDword(profileKey))
                 {
                     AddDotNetFramework(new Version(4, 0), profile);
@@ -767,3 +768,4 @@ namespace NUnit.Engine
         #endregion
     }
 }
+#endif

@@ -23,7 +23,7 @@
 
 using System;
 using System.Collections.Generic;
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6
+#if !NETSTANDARD1_3
 using System.Runtime.Serialization;
 #endif
 
@@ -35,7 +35,7 @@ namespace NUnit.Engine
     /// but one or more errors were encountered when attempting to unload
     /// and shut down the test run cleanly.
     /// </summary>
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6
+#if !NETSTANDARD1_3
     [Serializable]
 #endif
     public class NUnitEngineUnloadException : NUnitEngineException  //Inherits from NUnitEngineException for backwards compatibility of calling runners
@@ -66,7 +66,7 @@ namespace NUnit.Engine
             AggregatedExceptions = aggregatedExceptions;
         }
 
-#if !NETSTANDARD1_3 && !NETSTANDARD1_6
+#if !NETSTANDARD1_3
         /// <summary>
         /// Serialization constructor.
         /// </summary>
