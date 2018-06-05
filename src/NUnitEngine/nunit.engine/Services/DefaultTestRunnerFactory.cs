@@ -33,12 +33,15 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class DefaultTestRunnerFactory : InProcessTestRunnerFactory, ITestRunnerFactory
     {
+#if !NETSTANDARD1_3
         private IProjectService _projectService;
+#endif
 
         #region Service Overrides
 
         public override void StartService()
         {
+#if !NETSTANDARD1_3
             // TestRunnerFactory requires the ProjectService
             _projectService = ServiceContext.GetService<IProjectService>();
 
@@ -46,6 +49,7 @@ namespace NUnit.Engine.Services
             Status = _projectService != null && ((IService)_projectService).Status == ServiceStatus.Started
                 ? ServiceStatus.Started
                 : ServiceStatus.Error;
+#endif
         }
 
         #endregion
@@ -69,8 +73,10 @@ namespace NUnit.Engine.Services
 
                 if (PathUtils.IsAssemblyFileType(testFile))
                     assemblyCount++;
+#if !NETSTANDARD1_3
                 else if (_projectService.CanLoadFrom(testFile))
                     projectCount++;
+#endif
             }
 
             // If we have multiple projects or a project plus assemblies
@@ -83,6 +89,8 @@ namespace NUnit.Engine.Services
                 return new AggregatingTestRunner(ServiceContext, package);
 
 #if NETSTANDARD1_3 || NETSTANDARD2_0
+            if (projectCount > 0 || package.SubPackages.Count > 1)
+                return new AggregatingTestRunner(ServiceContext, package);
 
             return base.MakeTestRunner(package);
         }
@@ -129,7 +137,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #region Helper Methods
+#region Helper Methods
 
         private ProcessModel GetTargetProcessModel(TestPackage package)
         {
@@ -138,7 +146,7 @@ namespace NUnit.Engine.Services
                 package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
         }
 
-        #endregion
+#endregion
 
 #endif
     }

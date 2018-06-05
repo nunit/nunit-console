@@ -38,8 +38,8 @@ namespace NUnit.Engine.Runners
         private const string TEST_RUN_ELEMENT = "test-run";
         private readonly ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0
         private readonly IRuntimeFrameworkService _runtimeService;
-#if !NETSTANDARD1_3
         private readonly ExtensionService _extensionService;
 #endif
         private readonly IProjectService _projectService;
@@ -55,8 +55,8 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
-#if !NETSTANDARD1_3
             _extensionService = _services.GetService<ExtensionService>();
 #endif
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
@@ -234,7 +234,9 @@ namespace NUnit.Engine.Runners
             // Info will be left behind in the package about
             // each contained assembly, which will subsequently
             // be used to determine how to run the assembly.
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0
             _runtimeService.SelectRuntimeFramework(TestPackage);
+#endif
 
             var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
 
@@ -360,7 +362,7 @@ namespace NUnit.Engine.Runners
             var eventDispatcher = new TestEventDispatcher();
             if (listener != null)
                 eventDispatcher.Listeners.Add(listener);
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
                 eventDispatcher.Listeners.Add(extension);
 #endif

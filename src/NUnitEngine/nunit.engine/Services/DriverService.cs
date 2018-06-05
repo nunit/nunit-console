@@ -73,7 +73,7 @@ namespace NUnit.Engine.Services
                     ? ".NETStandard"
                     : targetFramework.Split(new char[] { ',' })[0];
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
-                    return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not yet supported by the engine");
+                    return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not supported by this version of the engine");
             }
 #endif
 

@@ -101,7 +101,6 @@ namespace NUnit.Engine
                 Services.Add(new SettingsService(true));
                 Services.Add(new DriverService());
                 Services.Add(new RecentFilesService());
-                Services.Add(new DefaultTestRunnerFactory());
                 Services.Add(new ResultService());
                 Services.Add(new TestFilterService());
 #if !NETSTANDARD1_3
@@ -113,6 +112,7 @@ namespace NUnit.Engine
                 Services.Add(new TestAgency());
 #endif
 #endif
+                Services.Add(new DefaultTestRunnerFactory());
             }
 
             Services.ServiceManager.StartServices();

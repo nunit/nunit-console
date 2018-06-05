@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AvailableFormats()
         {
-#if NETCOREAPP1_1
+#if NETCOREAPP1_1 || NETCOREAPP2_0
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases" }));
 #else
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services.Tests
             return writer.GetType().Name;
         }
 
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
         [Test]
         public void CanGetWriterUser()
         {
