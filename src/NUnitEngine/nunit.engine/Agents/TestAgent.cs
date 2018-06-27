@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -29,15 +29,14 @@ namespace NUnit.Engine.Agents
     /// Abstract base for all types of TestAgents.
     /// A TestAgent provides services of locating,
     /// loading and running tests in a particular
-    /// context such as an AppDomain or Process.
+    /// context such as an application domain or process.
     /// </summary>
     public abstract class TestAgent : MarshalByRefObject, ITestAgent, IDisposable
     {
         #region Private Fields
 
-        private ITestAgency agency;
-        private Guid agentId;
-        private IServiceLocator services;
+        private readonly Guid agentId;
+        private readonly IServiceLocator services;
 
         #endregion
 
@@ -47,11 +46,9 @@ namespace NUnit.Engine.Agents
         /// Initializes a new instance of the <see cref="TestAgent"/> class.
         /// </summary>
         /// <param name="agentId">The identifier of the agent.</param>
-        /// <param name="agency">The agency that this agent is associated with.</param>
         /// <param name="services">The services available to the agent.</param>
-        public TestAgent( Guid agentId, ITestAgency agency, IServiceLocator services )
+        public TestAgent(Guid agentId, IServiceLocator services)
         {
-            this.agency = agency;
             this.agentId = agentId;
             this.services = services;
         }
@@ -71,16 +68,6 @@ namespace NUnit.Engine.Agents
         #endregion
 
         #region ITestAgent members
-
-        /// <summary>
-        /// Gets a reference to the TestAgency with which this agent 
-        /// is associated. Returns null if the agent is not 
-        /// connected to an agency.
-        /// </summary>
-        public ITestAgency Agency
-        {
-            get { return agency; }
-        }
 
         /// <summary>
         /// Gets a Guid that uniquely identifies this agent.

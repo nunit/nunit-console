@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,7 +24,6 @@
 using System;
 using System.Threading;
 using System.Runtime.Remoting;
-using System.Runtime.Remoting.Services;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 
@@ -47,11 +46,6 @@ namespace NUnit.Engine.Internal
         {
         }
 
-        /// <summary>
-        /// Constructor used to provide
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="port"></param>
         protected ServerBase(string uri, int port)
         {
             this.uri = uri;
@@ -69,7 +63,7 @@ namespace NUnit.Engine.Internal
             {
                 lock (theLock)
                 {
-                    this.channel = ServerUtilities.GetTcpChannel(uri + "Channel", port, 100);
+                    this.channel = TcpChannelUtils.GetTcpChannel(uri + "Channel", port, 100);
 
                     RemotingServices.Marshal(this, uri);
                     this.isMarshalled = true;

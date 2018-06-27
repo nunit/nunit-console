@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -29,6 +29,7 @@ using System.Reflection;
 using System.Xml;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
+using System.ComponentModel;
 
 namespace NUnit.Engine.Runners
 {
@@ -50,11 +51,13 @@ namespace NUnit.Engine.Runners
             _services = services;
             TestPackage = package;
 
+            // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
             _extensionService = _services.GetService<ExtensionService>();
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
-            LoadPackage();
+
+            InitializePackage();
         }
 
         #region Properties
@@ -108,7 +111,7 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// Reload the currently loaded test jpackage.
+        /// Reload the currently loaded test package.
         /// </summary>
         /// <returns>An XmlNode representing the loaded package</returns>
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
@@ -151,7 +154,7 @@ namespace NUnit.Engine.Runners
         /// <returns></returns>
         public ITestRun RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            return _engineRunner.RunAsync(listener, filter);
+            return RunTestsAsync(listener, filter);
         }
 
         /// <summary>
@@ -171,8 +174,10 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            return PrepareResult(_engineRunner.Explore(filter))
-                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName).Xml;
+            LoadResult = PrepareResult(_engineRunner.Explore(filter))
+                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+
+            return LoadResult.Xml;
         }
 
         #endregion
@@ -204,10 +209,10 @@ namespace NUnit.Engine.Runners
         #region Helper Methods
 
         /// <summary>
-        /// Load a TestPackage for possible execution,
-        /// saving the result in the LoadResult property.
+        /// Check the package settings, expand projects and
+        /// determine what runtimes may be needed.
         /// </summary>
-        private void LoadPackage()
+        private void InitializePackage()
         {
             // Last chance to catch invalid settings in package,
             // in case the client runner missed them.
@@ -224,14 +229,13 @@ namespace NUnit.Engine.Runners
             // be used to determine how to run the assembly.
             _runtimeService.SelectRuntimeFramework(TestPackage);
 
-            if (IntPtr.Size == 8 &&
-                TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "") == "InProcess" &&
+            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
+
+            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single")  &&
                 TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false))
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
             }
-
-            LoadResult = _engineRunner.Load().Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
         }
 
         private TestEngineResult PrepareResult(TestEngineResult result)
@@ -295,11 +299,15 @@ namespace NUnit.Engine.Runners
                     throw new NUnitEngineException(string.Format("The requested framework {0} is unknown or not available.", frameworkSetting));
 
                 // If running in process, check requested framework is compatible
-                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default");
-                if (processModel.ToLower() == "single")
+                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
+                if (processModel == "single" || processModel == "inprocess")
                 {
                     var currentFramework = RuntimeFramework.CurrentFramework;
-                    var requestedFramework = RuntimeFramework.Parse(frameworkSetting);
+
+                    RuntimeFramework requestedFramework;
+                    if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
+                        throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+
                     if (!currentFramework.Supports(requestedFramework))
                         throw new NUnitEngineException(string.Format(
                             "Cannot run {0} framework in process already running {1}.", frameworkSetting, currentFramework));
@@ -372,6 +380,24 @@ namespace NUnit.Engine.Runners
             eventDispatcher.OnTestEvent(result.Xml.OuterXml);
 
             return result;
+        }
+
+        private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
+        {
+            var testRun = new AsyncTestEngineResult();
+
+            using (var worker = new BackgroundWorker())
+            {
+                worker.DoWork += (s, ea) =>
+                {
+                    var result = RunTests(listener, filter);
+                    testRun.SetResult(result);
+                };
+
+                worker.RunWorkerAsync();
+            }
+
+            return testRun;
         }
 
         private static void InsertCommandLineElement(XmlNode resultNode)

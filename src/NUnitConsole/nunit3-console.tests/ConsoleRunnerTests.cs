@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
+using NSubstitute;
 using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
@@ -15,7 +16,10 @@ namespace NUnit.ConsoleRunner.Tests
         public void ThrowsNUnitEngineExceptionWhenTestResultsAreNotWriteable()
         {
             var testEngine = new TestEngine();
+
             testEngine.Services.Add(new FakeResultService());
+            testEngine.Services.Add(new TestFilterService());
+            testEngine.Services.Add(Substitute.For<IService, IExtensionService>());
 
             var consoleRunner = new ConsoleRunner(testEngine, new ConsoleOptions("mock-assembly.dll"), new ColorConsoleWriter());
             

@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -27,11 +27,19 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    public class ResultService : Service, IResultService
+    public class ResultService :
+#if !NETSTANDARD1_3
+        Service, 
+#endif
+        IResultService
     {
+#if NETSTANDARD1_3
+        private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases" };
+#else
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases", "user" };
 
         private IEnumerable<ExtensionNode> _extensionNodes;
+#endif
 
         private string[] _formats;
         public string[] Formats
@@ -42,9 +50,11 @@ namespace NUnit.Engine.Services
                 {
                     var formatList = new List<string>(BUILT_IN_FORMATS);
 
+#if !NETSTANDARD1_3
                     foreach (var node in _extensionNodes)
                         foreach (var format in node.GetValues("Format"))
                             formatList.Add(format);
+#endif
  
                     _formats = formatList.ToArray();
                 }
@@ -67,6 +77,10 @@ namespace NUnit.Engine.Services
                     return new NUnit3XmlResultWriter();
                 case "cases":
                     return new TestCaseResultWriter();
+#if NETSTANDARD1_3
+                default:
+                    return null;
+#else
                 case "user":
                     return new XmlTransformResultWriter(args);
                 default:
@@ -76,9 +90,11 @@ namespace NUnit.Engine.Services
                                 return node.ExtensionObject as IResultWriter;
 
                     return null;
+#endif
             }
         }
 
+#if !NETSTANDARD1_3
         #region IService Members
 
         public override void StartService()
@@ -101,5 +117,6 @@ namespace NUnit.Engine.Services
         }
 
         #endregion
+#endif
     }
 }

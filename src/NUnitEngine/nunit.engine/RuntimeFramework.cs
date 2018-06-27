@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2007 Charlie Poole
+// Copyright (c) 2007 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -27,6 +27,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
+using NUnit.Engine.Internal.RuntimeFrameworks;
 
 namespace NUnit.Engine
 {
@@ -36,7 +37,27 @@ namespace NUnit.Engine
     /// </summary>
     [Serializable]
     public sealed class RuntimeFramework : IRuntimeFramework
-    {
+    { 
+        // TODO: RuntimeFramework was originally created for use in
+        // a single-threaded environment. The introduction of parallel
+        // execution and especially parallel loading of tests has
+        // exposed some weaknesses.
+        //
+        // Ideally, we should remove all knowledge of the environment
+        // from RuntimeFramework. An instance of RuntimeFramework does
+        // not need to know, for example, if it is available on the 
+        // current system. In the present architecture, that's really
+        // the job of the RuntimeFrameworkService. Other functions
+        // may actually belong in TestAgency.
+        //
+        // All the static properties of RuntimeFramework need to be
+        // examined for thread-safety, particularly CurrentFramework
+        // and AvailableFrameworks. The latter caused a problem with
+        // parallel loading, which has been fixed for now through a
+        // hack added to RuntimeFrameworkService. We may be able to
+        // move all this functionality to services, eliminating the
+        // use of public static properties here.
+
         #region Static Fields
 
         /// <summary>
@@ -74,8 +95,9 @@ namespace NUnit.Engine
         /// or more, it is taken as a CLR version. In either case, the other
         /// version is deduced based on the runtime type and provided version.
         /// </summary>
-        /// <param name="runtime">The runtime type of the framework</param>
-        /// <param name="version">The version of the framework</param>
+        /// <param name="runtime">The runtime type of the framework.</param>
+        /// <param name="version">The version of the framework.</param>
+        /// <param name="profile">The profile of the framework. Null if unspecified.</param>
         public RuntimeFramework(RuntimeType runtime, Version version, string profile)
         {
             Runtime = runtime;
@@ -357,7 +379,7 @@ namespace NUnit.Engine
         public Version ClrVersion { get; private set; }
 
         /// <summary>
-        /// The Profile for this framwork, where relevant.
+        /// The Profile for this framework, where relevant.
         /// May be null and will have different sets of 
         /// values for each Runtime.
         /// </summary>
@@ -418,26 +440,18 @@ namespace NUnit.Engine
             return new RuntimeFramework(runtime, version);
         }
 
-        /// <summary>
-        /// Returns the best available framework that matches a target framework.
-        /// If the target framework has a build number specified, then an exact
-        /// match is needed. Otherwise, the matching framework with the highest
-        /// build number is used.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public static RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
+        public static bool TryParse(string s, out RuntimeFramework runtimeFramework)
         {
-            RuntimeFramework result = target;
-
-            foreach (RuntimeFramework framework in AvailableFrameworks)
-                if (framework.Supports(target))
-                {
-                    if (framework.ClrVersion.Build > result.ClrVersion.Build)
-                        result = framework;
-                }
-
-            return result;
+            try
+            {
+                runtimeFramework = Parse(s);
+                return true;
+            }
+            catch
+            {
+                runtimeFramework = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -528,7 +542,7 @@ namespace NUnit.Engine
             _availableFrameworks = new List<RuntimeFramework>();
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                FindDotNetFrameworks();
+                _availableFrameworks.AddRange(DotNetFrameworkLocator.FindDotNetFrameworks());
 
             FindDefaultMonoFramework();
         }
@@ -673,82 +687,6 @@ namespace NUnit.Engine
             };
 
             _availableFrameworks.Add(framework);
-        }
-
-        #endregion
-
-        #region Helper Methods - .NET
-
-        private static void FindDotNetFrameworks()
-        {
-            // Handle Version 1.0, using a different registry key
-            FindExtremelyOldDotNetFrameworkVersions();
-
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\NET Framework Setup\NDP");
-            if (key != null)
-            {
-                foreach (string name in key.GetSubKeyNames())
-                {
-                    if (name.StartsWith("v") && name != "v4.0") // v4.0 is a duplicate, legacy key
-                    {
-                        var versionKey = key.OpenSubKey(name);
-                        if (versionKey == null) continue;
-
-                        if (name.StartsWith("v4", StringComparison.Ordinal))
-                            // Version 4 and 4.5
-                            AddDotNetFourFrameworkVersions(versionKey);
-                        else if (CheckInstallDword(versionKey))
-                            // Versions 1.1 through 3.5
-                            AddDotNetFramework(new Version(name.Substring(1)));
-                    }
-                }
-            }
-        }
-
-        private static void FindExtremelyOldDotNetFrameworkVersions()
-        {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\.NETFramework\policy\v1.0");
-            if (key != null)
-                foreach (string build in key.GetValueNames())
-                    _availableFrameworks.Add(new RuntimeFramework(RuntimeType.Net, new Version("1.0." + build)));
-        }
-
-        // Note: this method cannot be generalized past V4, because (a)  it has
-        // specific code for detecting .NET 4.5 and (b) we don't know what
-        // microsoft will do in the future
-        private static void AddDotNetFourFrameworkVersions(RegistryKey versionKey)
-        {
-            foreach (string profile in new string[] { "Full", "Client" })
-            {
-                var profileKey = versionKey.OpenSubKey(profile);
-                if (profileKey == null) continue;
-                
-                if (CheckInstallDword(profileKey))
-                {
-                    AddDotNetFramework(new Version(4, 0), profile);
-
-                    var release = (int)profileKey.GetValue("Release", 0);
-                    if (release > 0) // TODO: Other higher versions?
-                        AddDotNetFramework(new Version(4, 5));
-
-                    return;     //If full profile found, return and don't check for client profile
-                }
-            }
-        }
-
-        private static void AddDotNetFramework(Version version)
-        {
-            _availableFrameworks.Add(new RuntimeFramework(RuntimeType.Net, version));
-        }
-
-        private static void AddDotNetFramework(Version version, string profile)
-        {
-            _availableFrameworks.Add(new RuntimeFramework(RuntimeType.Net, version, profile));
-        }
-
-        private static bool CheckInstallDword(RegistryKey key)
-        {
-            return ((int)key.GetValue("Install", 0) == 1);
         }
 
         #endregion

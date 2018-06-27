@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -149,7 +149,7 @@ namespace NUnit.ConsoleRunner
         {
             return Result == "Failed"
                 ? ColorStyle.Failure
-                : Status == "Ignored"
+                : Result == "Warning" || Status == "Ignored"
                     ? ColorStyle.Warning
                     : ColorStyle.Output;
         }

@@ -2,15 +2,18 @@ branches:
   except:
     - /travis-.*/
 
-build_script: 
-  - ps: .\build.ps1 -Target "Appveyor"
+image: Visual Studio 2017
+
+build_script:
+  - ps: .\build.ps1 -Target "Appveyor" -Configuration "Release"
 
 # disable built-in tests.
 test: off
 
 artifacts:
 - path: package\*.nupkg
-#  - path: package\*.msi
+- path: package\*.msi
+- path: package\*.zip
 
 deploy:
   - provider: NuGet

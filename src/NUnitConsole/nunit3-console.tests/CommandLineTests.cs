@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,38 +28,132 @@ using NUnit.Common;
 using NUnit.Options;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Tests;
 
 namespace NUnit.ConsoleRunner.Tests
 {
     [TestFixture]
     public class CommandLineTests
     {
-        #region General Tests
+        #region Argument Preprocessor Tests
 
-        [Test]
-        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
-        [TestCase("--arg1 @file1.txt --arg2", "", "--arg1 --arg2", "The file \"file1.txt\" was not found.")]
-        [TestCase("--arg1 @ --arg2", "", "--arg1 --arg2", "You must include a file name after @.")]
-        [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--fileArg1\n--fileArg2,file2.txt:--fileArg3", "--arg1 --fileArg1 --fileArg2 --arg2 --fileArg3", "")]
-        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:", "--arg1 --arg2", "")]
-        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n\n\n--fileArg2", "--arg1 --fileArg1 --fileArg2 --arg2", "")]
-        public void ArgumentsFromFilesTests(string args, string files, string expectedExpandedArgs, string expectedErrorMessages)
+        [TestCase("--arg", "--arg")]
+        [TestCase("--ArG", "--ArG")]
+        [TestCase("--arg1 --arg2", "--arg1", "--arg2")]
+        [TestCase("--arg1 data --arg2", "--arg1", "data", "--arg2")]
+        [TestCase("")]
+        [TestCase("   ")]
+        [TestCase("\"--arg 1\" --arg2", "--arg 1", "--arg2")]
+        [TestCase("--arg1 \"--arg 2\"", "--arg1", "--arg 2")]
+        [TestCase("\"--arg 1\" \"--arg 2\"", "--arg 1", "--arg 2")]
+        [TestCase("\"--arg 1\" \"--arg 2\" arg3 \"arg 4\"", "--arg 1", "--arg 2", "arg3", "arg 4")]
+        [TestCase("--arg1 \"--arg 2\" arg3 \"arg 4\"", "--arg1", "--arg 2", "arg3", "arg 4")]
+        [TestCase("\"--arg 1\" \"--arg 2\" arg3 \"arg 4\" \"--arg 1\" \"--arg 2\" arg3 \"arg 4\"",
+            "--arg 1", "--arg 2", "arg3", "arg 4", "--arg 1", "--arg 2", "arg3", "arg 4")]
+        [TestCase("\"--arg\"", "--arg")]
+        [TestCase("\"--arg 1\"", "--arg 1")]
+        [TestCase("\"--arg abc\"", "--arg abc")]
+        [TestCase("\"--arg   abc\"", "--arg   abc")]
+        [TestCase("\" --arg   abc \"", " --arg   abc ")]
+        [TestCase("\"--arg=abc\"", "--arg=abc")]
+        [TestCase("\"--arg=aBc\"", "--arg=aBc")]
+        [TestCase("\"--arg = abc\"", "--arg = abc")]
+        [TestCase("\"--arg=abc,xyz\"", "--arg=abc,xyz")]
+        [TestCase("\"--arg=abc, xyz\"", "--arg=abc, xyz")]
+        [TestCase("\"@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz\"",
+            "@arg = ~ ` ! @ # $ % ^ & * ( ) _ - : ; + ' ' { } [ ] | \\ ? / . , , xYz")]
+        public void GetArgsFromCommandLine(string cmdline, params string[] expectedArgs)
+        {
+            var actualArgs = ConsoleOptions.GetArgs(cmdline);
+
+            Assert.AreEqual(expectedArgs, actualArgs);
+        }
+
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 --filearg2", "--arg1", "--filearg1", "--filearg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n--fileArg2", "--arg1", "--fileArg1", "--fileArg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 data", "--arg1", "--filearg1", "data", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 \"data in quotes\"", "--arg1", "--filearg1", "data in quotes", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 \"data in quotes with 'single' quotes\"", "--arg1", "--filearg1", "data in quotes with 'single' quotes", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 \"data in quotes with /slashes/\"", "--arg1", "--filearg1", "data in quotes with /slashes/", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--fileArg1\n--fileArg2,file2.txt:--fileArg3", "--arg1", "--fileArg1", "--fileArg2", "--arg2", "--fileArg3")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:", "--arg1", "--arg2")]
+        // Blank lines
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n\n\n--fileArg2", "--arg1", "--fileArg1", "--fileArg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n    \n\t\t\n--fileArg2", "--arg1", "--fileArg1", "--fileArg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\r\n\r\n\r\n--fileArg2", "--arg1", "--fileArg1", "--fileArg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\r\n    \r\n\t\t\r\n--fileArg2", "--arg1", "--fileArg1", "--fileArg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 --filearg2\r\n\n--filearg3 --filearg4", "--arg1", "--filearg1", "--filearg2", "--filearg3", "--filearg4", "--arg2")]
+        // Comments
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\nThis is NOT treated as a COMMENT\n--fileArg2", "--arg1", "--fileArg1", "This", "is", "NOT", "treated", "as", "a", "COMMENT", "--fileArg2", "--arg2")]
+        [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--fileArg1\n#This is treated as a COMMENT\n--fileArg2", "--arg1", "--fileArg1", "--fileArg2", "--arg2")]
+        // Nesting of files
+        [TestCase("--arg1 @file1.txt --arg2 @file2.txt", "file1.txt:--filearg1 --filearg2,file2.txt:--filearg3 @file3.txt,file3.txt:--filearg4", "--arg1", "--filearg1", "--filearg2", "--arg2", "--filearg3", "--filearg4")]
+        // Where clauses
+        [TestCase("testfile.dll @file1.txt --arg2", "file1.txt:--where test==somelongname", "testfile.dll", "--where", "test==somelongname", "--arg2")]
+        // NOTE: The next is not valid. Where clause is spread over several args and therefore won't parse. Quotes are required.
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where test == somelongname",
+            "testfile.dll", "--where", "test", "==", "somelongname", "--arg2")]
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where \"test == somelongname\"",
+            "testfile.dll", "--where", "test == somelongname", "--arg2")]
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where\n    \"test == somelongname\"",
+            "testfile.dll", "--where", "test == somelongname", "--arg2")]
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where\n    \"test == somelongname or test == /another long name/ or cat == SomeCategory\"",
+            "testfile.dll", "--where", "test == somelongname or test == /another long name/ or cat == SomeCategory", "--arg2")]
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where\n    \"test == somelongname or\ntest == /another long name/ or\ncat == SomeCategory\"",
+            "testfile.dll", "--where", "test == somelongname or test == /another long name/ or cat == SomeCategory", "--arg2")]
+        [TestCase("testfile.dll @file1.txt --arg2",
+            "file1.txt:--where\n    \"test == somelongname ||\ntest == /another long name/ ||\ncat == SomeCategory\"",
+            "testfile.dll", "--where", "test == somelongname || test == /another long name/ || cat == SomeCategory", "--arg2")]
+        public void GetArgsFromFiles(string commandline, string files, params string[] expectedArgs)
         {
             // Given
             var fileSystem = new VirtualFileSystem();
             fileSystem.SetupFiles(files);
 
-            var expectedErrors = expectedErrorMessages.Split(new [] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
-
-            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem, new SimpleArgumentsFileParser());
+            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem);
 
             // When
-            var actualExpectedExpandedArgs = string.Join(" ", new List<string>(options.Expand(args.Split(' '))).ToArray());
+            var expandedArgs = options.PreParse(commandline.Split(' '));
 
             // Then
-            Assert.AreEqual(expectedExpandedArgs, actualExpectedExpandedArgs);
+            Assert.AreEqual(expectedArgs, expandedArgs);
+            Assert.IsEmpty(options.ErrorMessages);
+        }
+
+        [TestCase("--arg1 @file1.txt --arg2", "The file \"file1.txt\" was not found.")]
+        [TestCase("--arg1 @ --arg2", "You must include a file name after @.")]
+        public void GetArgsFromFiles_FailureTests(string args, string errorMessage)
+        {
+            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), new VirtualFileSystem());
+
+            options.PreParse(args.Split(' '));
+
+            Assert.That(options.ErrorMessages, Is.EqualTo(new object[] { errorMessage }));
+        }
+
+        [Test]
+        public void GetArgsFromFiles_NestingOverflow()
+        {
+            var fileSystem = new VirtualFileSystem();
+            var lines = new string[] { "@file1.txt" };
+            fileSystem.SetupFile("file1.txt", lines);
+            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem);
+            var expectedErrors = new string[] { "Arguments file nesting exceeds maximum depth of 3." };
+
+            var arglist = options.PreParse(lines);
+
+            Assert.AreEqual(lines, arglist);
             Assert.AreEqual(expectedErrors, options.ErrorMessages);
         }
+
+        #endregion
+
+        #region General Tests
 
         [Test]
         public void NoInputFiles()
@@ -81,6 +175,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DebugTests", "debug")]
         [TestCase("PauseBeforeRun", "pause")]
         [TestCase("LoadUserProfile", "loaduserprofile")]
+        [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
 #endif
@@ -117,18 +212,19 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
-        [TestCase("WhereClause",        "where",      new string[] { "cat==Fast" },                      new string[0])]
-        [TestCase("ActiveConfig",       "config",     new string[] { "Debug" },                          new string[0])]
-        [TestCase("ProcessModel",       "process",    new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
-        [TestCase("DomainUsage",        "domain",     new string[] { "None", "Single", "Multiple" },     new string[] { "JUNK" })]
-        [TestCase("Framework",          "framework",  new string[] { "net-4.0" },                        new string[0])]
-        [TestCase("OutFile",            "output|out", new string[] { "output.txt" },                     new string[0])]
-        [TestCase("ErrFile",            "err",        new string[] { "error.txt" },                      new string[0])]
-        [TestCase("WorkDirectory",      "work",       new string[] { "results" },                        new string[0])]
-        [TestCase("DisplayTestLabels",  "labels",     new string[] { "Off", "On", "All" },               new string[] { "JUNK" })]
-        [TestCase("InternalTraceLevel", "trace",      new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
+        [TestCase("WhereClause", "where", new string[] { "cat==Fast" }, new string[0])]
+        [TestCase("ActiveConfig", "config", new string[] { "Debug" }, new string[0])]
+        [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
+        [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
+        [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
+        [TestCase("OutFile", "output|out", new string[] { "output.txt" }, new string[0])]
+        [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
+        [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" }, new string[] { "JUNK" })]
+        [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
-        [TestCase("ConsoleEncoding",    "encoding",   new string[] { "utf-8", "ascii", "unicode" },      new string[0])]
+        [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
+        [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)
         {
             string[] prototypes = pattern.Split('|');
@@ -156,7 +252,7 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void CanRegognizeInProcessOption()
+        public void CanRecognizeInProcessOption()
         {
             ConsoleOptions options = new ConsoleOptions("--inprocess");
             Assert.True(options.Validate(), "Should be valid: --inprocess");
@@ -165,7 +261,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
-        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "All" })]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
@@ -229,7 +325,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--framework")]
         [TestCase("--timeout")]
         [TestCase("--output")]
-        [TestCase("--err")]
         [TestCase("--work")]
         [TestCase("--trace")]
         [TestCase("--test-name-format")]
@@ -380,7 +475,13 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionWithFilePathAndTransform()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml;transform=transform.xslt");
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
+            IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
+
+            ConsoleOptions options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                fileSystem,
+                "tests.dll", $"-result:results.xml;transform={transformFile}");
             Assert.True(options.Validate());
             Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
             Assert.AreEqual("tests.dll", options.InputFiles[0]);
@@ -388,7 +489,8 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ResultOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual("transform.xslt", spec.Transform);
+            var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
+            Assert.AreEqual(fullFilePath, spec.Transform);
         }
 
         [Test]
@@ -411,7 +513,13 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ResultOptionMayBeRepeated()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", "-result:myresult.xml;transform=mytransform.xslt");
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
+            IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
+
+            ConsoleOptions options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                fileSystem,
+                "tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", $"-result:myresult.xml;transform={transformFile}");
             Assert.True(options.Validate(), "Should be valid");
 
             var specs = options.ResultOutputSpecifications;
@@ -430,7 +538,8 @@ namespace NUnit.ConsoleRunner.Tests
             var spec3 = specs[2];
             Assert.AreEqual("myresult.xml", spec3.OutputPath);
             Assert.AreEqual("user", spec3.Format);
-            Assert.AreEqual("mytransform.xslt", spec3.Transform);
+            var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
+            Assert.AreEqual(fullFilePath, spec3.Transform);
         }
 
         [Test]
@@ -457,6 +566,29 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("test.dll", "-result:results.xml", "-noresult", "-result:nunit2results.xml;format=nunit2");
             Assert.AreEqual(0, options.ResultOutputSpecifications.Count);
+        }
+
+        [Test]
+        public void InvalidResultSpecRecordsError()
+        {
+            var options = new ConsoleOptions("test.dll", "-result:userspecifed.xml;format=nunit2;format=nunit3");
+            Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
+                .And.Exactly(1).Property(nameof(OutputSpecification.OutputPath)).EqualTo("TestResult.xml"));
+            Assert.That(options.ErrorMessages, Has.Exactly(1).Contains("conflicting format options").IgnoreCase);
+        }
+
+        [Test]
+        public void MissingXsltFileRecordsError()
+        {
+            const string missingXslt = "missing.xslt";
+
+            var options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                new VirtualFileSystem(),
+                "test.dll", $"-result:userspecifed.xml;transform={missingXslt}");
+            Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
+                                                               .And.Exactly(1).Property(nameof(OutputSpecification.Transform)).Null);
+            Assert.That(options.ErrorMessages, Has.Exactly(1).Contains($"{missingXslt} could not be found").IgnoreCase);
         }
 
         #endregion
@@ -504,7 +636,12 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void ExploreOptionWithFilePathAndTransform()
         {
-            ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore:results.xml;transform=myreport.xslt");
+            string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
+            IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
+            ConsoleOptions options = new ConsoleOptions(
+                new DefaultOptionsProviderStub(false),
+                fileSystem,
+                "tests.dll", $"-explore:results.xml;transform={transformFile}");
             Assert.True(options.Validate());
             Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
             Assert.AreEqual("tests.dll", options.InputFiles[0]);
@@ -513,7 +650,8 @@ namespace NUnit.ConsoleRunner.Tests
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
             Assert.AreEqual("results.xml", spec.OutputPath);
             Assert.AreEqual("user", spec.Format);
-            Assert.AreEqual("myreport.xslt", spec.Transform);
+            var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
+            Assert.AreEqual(fullFilePath, spec.Transform);
         }
 
         [Test]
@@ -534,7 +672,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase(false, false, false)]
         [TestCase(true, true, true)]
         [TestCase(false, true, true)]
-        public void ShouldSetTeamCityFlagAccordingToArgsAndDefauls(bool hasTeamcityInCmd, bool? defaultTeamcity, bool expectedTeamCity)
+        public void ShouldSetTeamCityFlagAccordingToArgsAndDefaults(bool hasTeamcityInCmd, bool? defaultTeamcity, bool expectedTeamCity)
         {
             // Given
             List<string> args = new List<string> { "tests.dll" };
@@ -546,7 +684,7 @@ namespace NUnit.ConsoleRunner.Tests
             ConsoleOptions options;
             if (defaultTeamcity.HasValue)
             {
-                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), new VirtualFileSystem(), new SimpleArgumentsFileParser(), args.ToArray());
+                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), new VirtualFileSystem(), args.ToArray());
             }
             else
             {
@@ -584,7 +722,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("--params=X=5");
             Assert.That(options.errorMessages, Is.Empty);
-            Assert.That(options.TestParameters, Is.EqualTo("X=5"));
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
         }
 
         [Test]
@@ -592,7 +730,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("--params:X=5;Y=7");
             Assert.That(options.errorMessages, Is.Empty);
-            Assert.That(options.TestParameters, Is.EqualTo("X=5;Y=7"));
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
         [Test]
@@ -600,7 +738,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("-p:X=5", "-p:Y=7");
             Assert.That(options.errorMessages, Is.Empty);
-            Assert.That(options.TestParameters, Is.EqualTo("X=5;Y=7"));
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
         [Test]
@@ -608,7 +746,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("--params:X=5;Y=7", "-p:Z=3");
             Assert.That(options.errorMessages, Is.Empty);
-            Assert.That(options.TestParameters, Is.EqualTo("X=5;Y=7;Z=3"));
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" }, { "Z", "3" } }));
         }
 
         [Test]
@@ -636,6 +774,13 @@ namespace NUnit.ConsoleRunner.Tests
         #endregion
 
         #region Helper Methods
+
+        private static IFileSystem GetFileSystemContainingFile(string fileName)
+        {
+            var fileSystem = new VirtualFileSystem();
+            fileSystem.SetupFile(Path.Combine(Environment.CurrentDirectory, fileName), new List<string>());
+            return fileSystem;
+        }
 
         private static FieldInfo GetFieldInfo(string fieldName)
         {

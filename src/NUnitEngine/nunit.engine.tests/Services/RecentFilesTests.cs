@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2007 Charlie Poole
+// Copyright (c) 2007 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -36,10 +36,6 @@ namespace NUnit.Engine.Services.Tests
     [TestFixture]
     public class RecentFilesTests
     {
-        private const int MAX = 24;
-        private const int MIN = 0;
-        private const int DEFAULT = 5;
-
         RecentFilesService _recentFiles;
 
         [SetUp]
@@ -59,40 +55,6 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void CountDefault()
-        {
-            Assert.AreEqual( DEFAULT, _recentFiles.MaxFiles );
-        }
-
-        [Test]
-        public void CountOverMax()
-        {
-            _recentFiles.MaxFiles = MAX + 1;
-            Assert.AreEqual( MAX, _recentFiles.MaxFiles );
-        }
-
-        [Test]
-        public void CountUnderMin()
-        {
-            _recentFiles.MaxFiles = MIN - 1;
-            Assert.AreEqual( MIN, _recentFiles.MaxFiles );
-        }
-
-        [Test]
-        public void CountAtMax()
-        {
-            _recentFiles.MaxFiles = MAX;
-            Assert.AreEqual( MAX, _recentFiles.MaxFiles );
-        }
-
-        [Test]
-        public void CountAtMin()
-        {
-            _recentFiles.MaxFiles = MIN;
-            Assert.AreEqual( MIN, _recentFiles.MaxFiles );
-        }
-
-        [Test]
         public void EmptyList()
         {
             Assert.IsNotNull(  _recentFiles.Entries, "Entries should never be null" );
@@ -106,48 +68,31 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
+        public void AddTenItems()
+        {
+            CheckAddItems(10);
+        }
+
+        [Test]
         public void AddMaxItems()
         {
-            CheckAddItems( 5 );
+            CheckAddItems( _recentFiles.MaxFiles );
         }
 
         [Test]
         public void AddTooManyItems()
         {
-            CheckAddItems( 10 );
+            CheckAddItems( _recentFiles.MaxFiles + 5 );
         }
 
         [Test]
-        public void IncreaseSize()
-        {
-            _recentFiles.MaxFiles = 10;
-            CheckAddItems( 10 );
-        }
-
-        [Test]
-        public void ReduceSize()
-        {
-            _recentFiles.MaxFiles = 3;
-            CheckAddItems( 10 );
-        }
-
-        [Test]
-        public void IncreaseSizeAfterAdd()
+        public void AddMixedItems()
         {
             SetMockValues(5);
-            _recentFiles.MaxFiles = 7;
             _recentFiles.SetMostRecent( "30" );
             _recentFiles.SetMostRecent( "20" );
             _recentFiles.SetMostRecent( "10" );
-            CheckListContains( 10, 20, 30, 1, 2, 3, 4 );
-        }
-
-        [Test]
-        public void ReduceSizeAfterAdd()
-        {
-            SetMockValues( 5 );
-            _recentFiles.MaxFiles = 3;
-            CheckMockValues( 3 );
+            CheckListContains( 10, 20, 30, 1, 2, 3, 4, 5 );
         }
 
         [Test]
@@ -182,14 +127,6 @@ namespace NUnit.Engine.Services.Tests
             SetMockValues( 5 );
             _recentFiles.SetMostRecent( "1" );
             CheckListContains( 1, 2, 3, 4, 5 );
-        }
-
-        [Test]
-        public void ReorderWithListNotFull()
-        {
-            SetMockValues( 3 );
-            _recentFiles.SetMostRecent( "3" );
-            CheckListContains( 3, 1, 2 );
         }
 
         [Test]

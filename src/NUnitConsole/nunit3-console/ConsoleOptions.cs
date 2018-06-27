@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+// Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,33 +23,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NUnit.Common
 {
-    using ConsoleRunner;
-
     /// <summary>
     /// ConsoleOptions encapsulates the option settings for
     /// the nunit3-console program.
     /// </summary>
     public class ConsoleOptions : CommandLineOptions
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly IConverter<IEnumerable<string>, IEnumerable<string>> _argumentsFileParser;
-
         #region Constructors
 
         internal ConsoleOptions(
             IDefaultOptionsProvider provider,
             IFileSystem fileSystem,
-            IConverter<IEnumerable<string>, IEnumerable<string>> argumentsFileParser,
             params string[] args)
-            : base(provider, args)
+            : base(provider, fileSystem, args)
         {
-            if (fileSystem == null) throw new ArgumentNullException("fileSystem");
-            if (argumentsFileParser == null) throw new ArgumentNullException("argumentsFileParser");
-            _fileSystem = fileSystem;
-            _argumentsFileParser = argumentsFileParser;
         }
 
         public ConsoleOptions(params string[] args) : base(args) { }
@@ -74,6 +67,8 @@ namespace NUnit.Common
         public string Framework { get; private set; }
         public bool FrameworkSpecified { get { return Framework != null; } }
 
+        public string ConfigurationFile { get; private set; }
+
         public bool RunAsX86 { get; private set; }
 
         public bool DisposeRunners { get; private set; }
@@ -81,6 +76,8 @@ namespace NUnit.Common
         public bool ShadowCopyFiles { get; private set; }
 
         public bool LoadUserProfile { get; private set; }
+
+        public bool SkipNonTestAssemblies { get; private set; }
 
         private int _maxAgents = -1;
         public int MaxAgents { get { return _maxAgents; } }
@@ -93,6 +90,8 @@ namespace NUnit.Common
         public bool ListExtensions { get; private set; }
 
         public bool PauseBeforeRun { get; private set; }
+
+        public string PrincipalPolicy { get; private set; }
 
         #endregion
 
@@ -118,6 +117,9 @@ namespace NUnit.Common
 
             this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).",
                 v => ActiveConfig = RequiredValue(v, "--config"));
+
+            this.Add("configfile=", "{NAME} of configuration file to use for this run.",
+                v => ConfigurationFile = RequiredValue(v, "--configfile"));
 
             // Where to Run Tests
             this.Add("process=", "{PROCESS} isolation for test assemblies.\nValues: InProcess, Separate, Multiple. If not specified, defaults to Separate for a single assembly or Multiple for more than one.",
@@ -151,6 +153,9 @@ namespace NUnit.Common
             this.Add("loaduserprofile", "Load user profile in test runner processes",
                 v => LoadUserProfile = v != null);
 
+            this.Add("skipnontestassemblies", "Skip any non-test assemblies specified, without error.",
+                v => SkipNonTestAssemblies = v != null);
+
             this.Add("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
                 v => _maxAgents = RequiredInt(v, "--agents"));
 
@@ -163,6 +168,9 @@ namespace NUnit.Common
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
 
+            this.Add("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
+                v => PrincipalPolicy = RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
+
 #if DEBUG
             this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",
                 v => DebugAgent = v != null);
@@ -171,56 +179,86 @@ namespace NUnit.Common
 
         #endregion
 
-        public IEnumerable<string> Expand(IEnumerable<string> args)
+        #region Pre-Parse Arguments Files
+
+        private int _nesting = 0;
+
+        public IEnumerable<string> PreParse(IEnumerable<string> args)
         {
             if (args == null) throw new ArgumentNullException("args");
+
+            if (++_nesting > 3)
+            {
+                ErrorMessages.Add("Arguments file nesting exceeds maximum depth of 3.");
+                --_nesting;
+                return args;
+            }
+
+            var listArgs = new List<string>();
 
             foreach (var arg in args)
             {
                 if (arg.Length == 0 || arg[0] != '@')
                 {
-                    yield return arg;
+                    listArgs.Add(arg);
                     continue;
                 }
 
-                var fileName = arg.Substring(1, arg.Length - 1);
-                if (string.IsNullOrEmpty(fileName))
+                var filename = arg.Substring(1, arg.Length - 1);
+                if (string.IsNullOrEmpty(filename))
                 {
                     ErrorMessages.Add("You must include a file name after @.");
                     continue;
                 }
 
-                if (!_fileSystem.FileExists(fileName))
+                if (!_fileSystem.FileExists(filename))
                 {
-                    ErrorMessages.Add("The file \"" + fileName + "\" was not found.");
+                    ErrorMessages.Add("The file \"" + filename + "\" was not found.");
                     continue;
                 }
 
-
-                using (var linesEnumerator = _argumentsFileParser.Convert(_fileSystem.ReadLines(fileName)).GetEnumerator())
+                try
                 {
-                    while (true)
-                    {
-                        try
-                        {
-                            if (!linesEnumerator.MoveNext())
-                            {
-                                break;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            ErrorMessages.Add("Error occurred while reading the file \"" + fileName + "\".");
-                            break;
-                        }
-
-                        if (!string.IsNullOrEmpty(linesEnumerator.Current))
-                        {
-                            yield return linesEnumerator.Current;
-                        }
-                    }
+                    listArgs.AddRange(PreParse(GetArgsFromFile(filename)));
+                }
+                catch (IOException ex)
+                {
+                    ErrorMessages.Add("Error reading \"" + filename + "\": " + ex.Message);
                 }
             }
+
+            --_nesting;
+            return listArgs;
         }
+
+        private static readonly Regex ArgsRegex = new Regex(@"\G(""((""""|[^""])+)""|(\S+)) *", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        // Get args from a string of args
+        internal static IEnumerable<string> GetArgs(string commandLine)
+        {
+            var ms = ArgsRegex.Matches(commandLine);
+            foreach (Match m in ms)
+                yield return Regex.Replace(m.Groups[2].Success ? m.Groups[2].Value : m.Groups[4].Value, @"""""", @"""");
+        }
+
+        // Get args from an included file
+        private IEnumerable<string> GetArgsFromFile(string filename)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var line in _fileSystem.ReadLines(filename))
+            {
+                if (!string.IsNullOrEmpty(line) && line[0] != '#' && line.Trim().Length > 0)
+                {
+                    if (sb.Length > 0)
+                        sb.Append(' ');
+                    sb.Append(line);
+                }
+            }
+
+            return GetArgs(sb.ToString());
+        }
+
+        #endregion
     }
 }

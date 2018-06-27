@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011-2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -25,7 +25,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
-using System.Collections.Generic;
+using NUnit.Common;
+using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -39,7 +40,8 @@ namespace NUnit.Engine.Services
         Starting,
         Ready,
         Busy,
-        Stopping
+        Stopping,
+        Terminated
     }
 
     /// <summary>
@@ -52,11 +54,11 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class TestAgency : ServerBase, ITestAgency, IService
     {
-        static Logger log = InternalTrace.GetLogger(typeof(TestAgency));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
         #region Private Fields
 
-        private AgentDataBase _agentData = new AgentDataBase();
+        private readonly AgentDataBase _agentData = new AgentDataBase();
 
         #endregion
 
@@ -103,27 +105,13 @@ namespace NUnit.Engine.Services
             r.Agent = agent;
         }
 
-        public void ReportStatus( Guid agentId, AgentStatus status )
-        {
-            AgentRecord r = _agentData[agentId];
-
-            if ( r == null )
-                throw new ArgumentException(
-                    string.Format("Agent {0} is not in the agency database", agentId),
-                    "agentId" );
-
-            r.Status = status;
-        }
         #endregion
 
-        #region Public Methods - Called by Clients
+        #region Method Called by Clients
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
         {
             // TODO: Decide if we should reuse agents
-            //AgentRecord r = FindAvailableRemoteAgent(type);
-            //if ( r == null )
-            //    r = CreateRemoteAgent(type, framework, waitTime);
             return CreateRemoteAgent(package, waitTime);
         }
 
@@ -139,25 +127,45 @@ namespace NUnit.Engine.Services
             }
         }
 
-        //public void DestroyAgent( ITestAgent agent )
-        //{
-        //    AgentRecord r = agentData[agent.Id];
-        //    if ( r != null )
-        //    {
-        //        if( !r.Process.HasExited )
-        //            r.Agent.Stop();
-        //        agentData[r.Id] = null;
-        //    }
-        //}
+        internal bool IsAgentRunning(Guid id)
+        {
+            var agentRecord = _agentData[id];
+            return agentRecord != null && agentRecord.Status != AgentStatus.Terminated;
+        }
+
+        internal int? GetAgentExitCode(Guid id)
+        {
+            var agentRecord = _agentData[id];
+            if (agentRecord?.Process != null && agentRecord.Process.HasExited)
+            {
+                try
+                {
+                    return agentRecord.Process.ExitCode;
+                }
+                catch (NotSupportedException)
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
+
         #endregion
 
         #region Helper Methods
         private Guid LaunchAgentProcess(TestPackage package)
         {
-            RuntimeFramework targetRuntime = RuntimeFramework.CurrentFramework;
+            RuntimeFramework targetRuntime;
             string runtimeSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
-            if (runtimeSetting != "")
-                targetRuntime = RuntimeFramework.Parse(runtimeSetting);
+            if (runtimeSetting.Length > 0)
+            {
+                if (!RuntimeFramework.TryParse(runtimeSetting, out targetRuntime))
+                    throw new NUnitEngineException("Invalid or unknown framework requested: " + runtimeSetting);
+            }
+            else
+            {
+                targetRuntime = RuntimeFramework.CurrentFramework;
+            }
 
             if (targetRuntime.Runtime == RuntimeType.Any)
                 targetRuntime = new RuntimeFramework(RuntimeFramework.CurrentFramework.Runtime, targetRuntime.ClrVersion);
@@ -167,14 +175,17 @@ namespace NUnit.Engine.Services
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
+            string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
-            string agentArgs = string.Empty;
-            if (debugAgent)
-                agentArgs += " --debug-agent";
+            string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
             if (traceLevel != "Off")
                 agentArgs += " --trace:" + traceLevel;
+            if (debugAgent)
+                agentArgs += " --debug-agent";
+            if (workDirectory != string.Empty)
+                agentArgs += " --work=" + workDirectory;
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
@@ -183,21 +194,23 @@ namespace NUnit.Engine.Services
                     string.Format("The {0} framework is not available", targetRuntime),
                     "framework");
 
-            string agentExePath = GetTestAgentExePath(targetRuntime.ClrVersion, useX86Agent);
+            string agentExePath = GetTestAgentExePath(useX86Agent);
 
-            if (agentExePath == null)
-                throw new ArgumentException(
-                    string.Format("NUnit components for version {0} of the CLR are not installed",
-                    targetRuntime.ClrVersion.ToString()), "targetRuntime");
+            if (!File.Exists(agentExePath))
+                throw new FileNotFoundException(
+                    $"{Path.GetFileName(agentExePath)} could not be found.", agentExePath);
 
             log.Debug("Using nunit-agent at " + agentExePath);
 
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+            p.EnableRaisingEvents = true;
+            p.Exited += OnAgentExit;
             Guid agentId = Guid.NewGuid();
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
-            targetRuntime = RuntimeFramework.GetBestAvailableFramework(targetRuntime);
+            targetRuntime = ServiceContext.GetService<RuntimeFrameworkService>().GetBestAvailableFramework(targetRuntime);
 
             switch( targetRuntime.Runtime )
             {
@@ -226,7 +239,6 @@ namespace NUnit.Engine.Services
                     break;
             }
             
-            //p.Exited += new EventHandler(OnProcessExit);
             p.Start();
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
@@ -234,26 +246,6 @@ namespace NUnit.Engine.Services
             _agentData.Add( new AgentRecord( agentId, p, null, AgentStatus.Starting ) );
             return agentId;
         }
-
-        //private void OnProcessExit(object sender, EventArgs e)
-        //{
-        //    Process p = sender as Process;
-        //    if (p != null)
-        //        agentData.Remove(p.Id);
-        //}
-
-        //private AgentRecord FindAvailableAgent()
-        //{
-        //    foreach( AgentRecord r in agentData )
-        //        if ( r.Status == AgentStatus.Ready)
-        //        {
-        //            log.Debug( "Reusing agent {0}", r.Id );
-        //            r.Status = AgentStatus.Busy;
-        //            return r;
-        //        }
-
-        //    return null;
-        //}
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
@@ -268,85 +260,67 @@ namespace NUnit.Engine.Services
             {
                 Thread.Sleep( pollTime );
                 if ( !infinite ) waitTime -= pollTime;
-                ITestAgent agent = _agentData[agentId].Agent;
-                if ( agent != null )
+                var agentRecord = _agentData[agentId];
+                
+                if ( agentRecord.Agent != null )
                 {
                     log.Debug( "Returning new agent {0}", agentId.ToString("B") );
-                    return agent;
+                    return new RemoteTestAgentProxy(agentRecord.Agent, agentRecord.Id);
                 }
             }
 
             return null;
         }
 
-        /// <summary>
-        /// Return the NUnit Bin Directory for a particular
-        /// runtime version, or null if it's not installed.
-        /// For normal installations, there are only 1.1 and
-        /// 2.0 directories. However, this method accommodates
-        /// 3.5 and 4.0 directories for the benefit of NUnit
-        /// developers using those runtimes.
-        /// </summary>
-        private static string GetNUnitBinDirectory(Version v)
-        {
-            // Get current bin directory
-            string dir = NUnitConfiguration.EngineDirectory;
-
-            // Return current directory if current and requested
-            // versions are both >= 2 or both 1
-            if ((Environment.Version.Major >= 2) == (v.Major >= 2))
-                return dir;
-
-            // Check whether special support for version 1 is installed
-            if (v.Major == 1)
-            {
-                string altDir = Path.Combine(dir, "net-1.1");
-                if (Directory.Exists(altDir))
-                    return altDir;
-
-                // The following is only applicable to the dev environment,
-                // which uses parallel build directories. We try to substitute
-                // one version number for another in the path.
-                string[] search = new string[] { "2.0", "3.0", "3.5", "4.0" };
-                string[] replace = v.Minor == 0
-                    ? new string[] { "1.0", "1.1" }
-                    : new string[] { "1.1", "1.0" };
-
-                // Look for current value in path so it can be replaced
-                string current = null;
-                foreach (string s in search)
-                    if (dir.IndexOf(s) >= 0)
-                    {
-                        current = s;
-                        break;
-                    }
-
-                // Try the substitution
-                if (current != null)
-                {
-                    foreach (string target in replace)
-                    {
-                        altDir = dir.Replace(current, target);
-                        if (Directory.Exists(altDir))
-                            return altDir;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static string GetTestAgentExePath(Version v, bool requires32Bit)
+        private static string GetTestAgentExePath(bool requires32Bit)
         {
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
 
-            string agentName = v.Major > 1 && requires32Bit
+            string agentName = requires32Bit
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 
-            string agentExePath = Path.Combine(engineDir, agentName);
-            return File.Exists(agentExePath) ? agentExePath : null;
+            return Path.Combine(engineDir, agentName);
+        }
+
+        private void OnAgentExit(object sender, EventArgs e)
+        {
+            var process = sender as Process;
+            if (process == null)
+                return;
+
+            var agentRecord = _agentData.GetDataForProcess(process);
+            agentRecord.Status = AgentStatus.Terminated;
+
+            string errorMsg;
+
+            switch (process.ExitCode)
+            {
+                case AgentExitCodes.OK:
+                    return;
+                case AgentExitCodes.PARENT_PROCESS_TERMINATED:
+                    errorMsg = "Remote test agent believes agency process has exited.";
+                    break;
+                case AgentExitCodes.UNEXPECTED_EXCEPTION:
+                    errorMsg = "Unhandled exception on remote test agent. " +
+                               "To debug, try running with the --inprocess flag, or using --trace=debug to output logs.";
+                    break;
+                case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
+                    errorMsg = "Failed to start remote test agent.";
+                    break;
+                case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
+                    errorMsg = "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
+                    break;
+                case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
+                    errorMsg = "Debugger could not be started on remote agent as not available on platform.";
+                    break;
+                default:
+                    errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
+                    break;
+            }
+
+            throw new NUnitEngineException(errorMsg);
         }
 
         #endregion
@@ -381,86 +355,6 @@ namespace NUnit.Engine.Services
                 Status = ServiceStatus.Error;
                 throw;
             }
-        }
-
-        #endregion
-
-        #region Nested Class - AgentRecord
-        private class AgentRecord
-        {
-            public Guid Id;
-            public Process Process;
-            public ITestAgent Agent;
-            public AgentStatus Status;
-
-            public AgentRecord( Guid id, Process p, ITestAgent a, AgentStatus s )
-            {
-                this.Id = id;
-                this.Process = p;
-                this.Agent = a;
-                this.Status = s;
-            }
-
-        }
-        #endregion
-
-        #region Nested Class - AgentDataBase
-        /// <summary>
-        ///  A simple class that tracks data about this
-        ///  agencies active and available agents
-        /// </summary>
-        private class AgentDataBase
-        {
-            private Dictionary<Guid, AgentRecord> agentData = new Dictionary<Guid, AgentRecord>();
-
-            public AgentRecord this[Guid id]
-            {
-                get { return agentData[id]; }
-                set
-                {
-                    if ( value == null )
-                        agentData.Remove( id );
-                    else
-                        agentData[id] = value;
-                }
-            }
-
-            public AgentRecord this[ITestAgent agent]
-            {
-                get
-                {
-                    foreach( KeyValuePair<Guid, AgentRecord> entry in agentData)
-                    {
-                        AgentRecord r = entry.Value;
-                        if ( r.Agent == agent )
-                            return r;
-                    }
-
-                    return null;
-                }
-            }
-
-            public void Add( AgentRecord r )
-            {
-                agentData[r.Id] = r;
-            }
-
-            public void Remove(Guid agentId)
-            {
-                agentData.Remove(agentId);
-            }
-
-            public void Clear()
-            {
-                agentData.Clear();
-            }
-
-            //#region IEnumerable Members
-            //public IEnumerator<KeyValuePair<Guid,AgentRecord>> GetEnumerator()
-            //{
-            //    return agentData.GetEnumerator();
-            //}
-            //#endregion
         }
 
         #endregion

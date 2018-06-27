@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011-2015 Charlie Poole
+// Copyright (c) 2011-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,8 +22,11 @@
 // ***********************************************************************
 
 using System;
+using System.ComponentModel;
 using NUnit.Framework;
-using Microsoft.Win32;
+#if !NETCOREAPP1_1
+using System.Drawing;
+#endif
 
 namespace NUnit.Engine.Internal.Tests
 {
@@ -97,5 +100,21 @@ namespace NUnit.Engine.Internal.Tests
             settings.SaveSetting( "X", "1y25" );
             Assert.AreEqual( 42, settings.GetSetting( "X", 42 ) );
         }
+
+#if !NETCOREAPP1_1
+        [Test]
+        [SetCulture("da-DK")]
+        public void SaveAndGetSettingShouldReturnTheOriginalValue()
+        {
+            var settingName = "MySetting";
+            var settingValue = new Point(10, 20);
+            var typeConverter = TypeDescriptor.GetConverter(settingValue);
+            var settingsValue = typeConverter.ConvertToInvariantString(settingValue);
+
+            settings.SaveSetting(settingName, settingsValue);
+            var point = settings.GetSetting(settingName, new Point(30, 40));
+            Assert.That(point, Is.EqualTo(settingValue));
+        }
+#endif
     }
 }

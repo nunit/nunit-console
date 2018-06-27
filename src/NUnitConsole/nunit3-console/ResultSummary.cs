@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -81,6 +81,8 @@ namespace NUnit.ConsoleRunner
             get { return FailureCount + InvalidCount + ErrorCount;  }
         }
 
+        public int WarningCount { get; private set; }
+
         /// <summary>
         /// Returns the sum of skipped test cases, including ignored and explicit tests
         /// </summary>
@@ -155,6 +157,7 @@ namespace NUnit.ConsoleRunner
             TestCount = 0;
             PassCount = 0;
             FailureCount = 0;
+            WarningCount = 0;
             ErrorCount = 0;
             InconclusiveCount = 0;
             SkipCount = 0;
@@ -188,6 +191,9 @@ namespace NUnit.ConsoleRunner
                             else
                                 ErrorCount++;
                             break;
+                        case "Warning":
+                            WarningCount++;
+                            break;
                         case "Inconclusive":
                             InconclusiveCount++;
                             break;
@@ -200,7 +206,7 @@ namespace NUnit.ConsoleRunner
                                 SkipCount++;
                             break;
                         default:
-                            SkipCount++;
+                            //SkipCount++;
                             break;
                     }
                     break;

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+    <Fragment>
+        <ComponentGroup Id="NUNIT.RUNNERS" Directory="INSTALLDIR">
+            <Component Id="LICENSE.txt" Location="local" Guid="310C1DF5-BF3B-4758-B1BC-8B40D3F75E62">
+                <File Id="LICENSE.txt" Source="$(var.InstallImage)\LICENSE.txt" />
+            </Component>
+            <Component Id="NOTICES.txt" Location="local" Guid="0B4963E5-84B0-48B1-AE38-CFBB444CB6F3">
+                <File Id="NOTICES.txt" Source="$(var.InstallImage)\NOTICES.txt" />
+            </Component>
+            <Component Id="nunit.ico" Location="local" Guid="CF734A2C-C02E-470D-9248-E836760EBBDC">
+                <File Id="nunit.ico" Source="$(var.InstallImage)\nunit.ico" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Include>

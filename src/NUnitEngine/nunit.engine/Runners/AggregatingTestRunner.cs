@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,8 +21,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.Collections.Generic;
 using NUnit.Engine.Internal;
+
+#if !NETSTANDARD1_3
+using NUnit.Common;
+#endif
 
 namespace NUnit.Engine.Runners
 {
@@ -38,6 +43,11 @@ namespace NUnit.Engine.Runners
         // The runners created by the derived class will (at least at the time
         // of writing this comment) be either TestDomainRunners or ProcessRunners.
         private List<ITestEngineRunner> _runners;
+
+        // Exceptions from unloading individual runners are caught and rethrown
+        // on AggregatingTestRunner disposal, to allow TestResults to be
+        // written and execution of other runners to continue.
+        private readonly List<Exception> _unloadExceptions = new List<Exception>();
 
         // Public for testing purposes
         public virtual int LevelOfParallelism
@@ -63,11 +73,17 @@ namespace NUnit.Engine.Runners
             }
         }
 
+#if NETSTANDARD1_3
+        public AggregatingTestRunner(TestPackage package) : base(package)
+        {
+        }
+#else
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
         }
+#endif
 
-        #region AbstractTestRunner Overrides
+#region AbstractTestRunner Overrides
 
         /// <summary>
         /// Explore a TestPackage and return information about
@@ -109,7 +125,16 @@ namespace NUnit.Engine.Runners
         public override void UnloadPackage()
         {
             foreach (ITestEngineRunner runner in Runners)
-                runner.Unload();
+            {
+                try
+                {
+                    runner.Unload();
+                }
+                catch (Exception e)
+                {
+                    _unloadExceptions.Add(e);
+                }
+            }
         }
 
         /// <summary>
@@ -142,37 +167,53 @@ namespace NUnit.Engine.Runners
 
             bool disposeRunners = TestPackage.GetSetting(EnginePackageSettings.DisposeRunners, false);
 
+#if NETSTANDARD1_3
+            RunTestsSequentially(listener, filter, results, disposeRunners);
+#else
             if (LevelOfParallelism <= 1)
             {
-                foreach (ITestEngineRunner runner in Runners)
-                {
-                    results.Add(runner.Run(listener, filter));
-                    if (disposeRunners) runner.Dispose();
-                }
+                RunTestsSequentially(listener, filter, results, disposeRunners);
             }
             else
             {
-                var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
-                var tasks = new List<TestExecutionTask>();
-
-                foreach (ITestEngineRunner runner in Runners)
-                {
-                    var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
-                    tasks.Add(task);
-                    workerPool.Enqueue(task);
-                }
-
-                workerPool.Start();
-                workerPool.WaitAll();
-
-                foreach (var task in tasks)
-                    results.Add(task.Result());
+                RunTestsInParallel(listener, filter, results, disposeRunners);
             }
-
+#endif
             if (disposeRunners) Runners.Clear();
 
             return ResultHelper.Merge(results);
         }
+
+        private void RunTestsSequentially(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
+        {
+            foreach (ITestEngineRunner runner in Runners)
+            {
+                var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
+                task.Execute();
+                LogResultsFromTask(task, results, _unloadExceptions);
+            }
+        }
+
+#if !NETSTANDARD1_3
+        private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
+        {
+            var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
+            var tasks = new List<TestExecutionTask>();
+
+            foreach (ITestEngineRunner runner in Runners)
+            {
+                var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
+                tasks.Add(task);
+                workerPool.Enqueue(task);
+            }
+
+            workerPool.Start();
+            workerPool.WaitAll();
+
+            foreach (var task in tasks)
+                LogResultsFromTask(task, results, _unloadExceptions);
+        }
+#endif
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
@@ -189,16 +230,42 @@ namespace NUnit.Engine.Runners
             base.Dispose(disposing);
 
             foreach (var runner in Runners)
-                runner.Dispose();
+            {
+                try
+                {
+                    runner.Dispose();
+                }
+                catch (Exception e)
+                {
+                    _unloadExceptions.Add(e);
+                }
+            }
 
             Runners.Clear();
+
+            if (_unloadExceptions.Count > 0)
+                throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
-        #endregion
+#endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {
             return TestRunnerFactory.MakeTestRunner(package);
+        }
+
+        private static void LogResultsFromTask(TestExecutionTask task, List<TestEngineResult> results, List<Exception> unloadExceptions)
+        {
+            var result = task.Result;
+            if (result != null)
+            {
+                results.Add(result);
+            }
+
+            if (task.UnloadException != null)
+            {
+                unloadExceptions.Add(task.UnloadException);
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -25,11 +25,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
-    #region Public Methods
-
     /// <summary>
     /// DirectoryFinder is a utility class used for extended wildcard
     /// selection of directories and files. It's less than a full-fledged
@@ -37,10 +36,12 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class DirectoryFinder
     {
+        #region Public Methods
+
         /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
         /// Each path component may have wildcard characters and a component
-        /// of "**" may be used to represent all directories, recusively.
+        /// of "**" may be used to represent all directories, recursively.
         /// </summary>
         /// <param name="baseDir">A DirectoryInfo from which the matching starts</param>
         /// <param name="pattern">The pattern to match</param>
@@ -94,7 +95,7 @@ namespace NUnit.Engine.Internal
             if (lastSep < 0) // Simple file name entry, no path
                 return baseDir.GetFiles(pattern);
 
-            // Othersise split pattern into two parts around last separator
+            // Otherwise split pattern into two parts around last separator
             var pattern1 = pattern.Substring(0, lastSep);
             var pattern2 = pattern.Substring(lastSep + 1);
 

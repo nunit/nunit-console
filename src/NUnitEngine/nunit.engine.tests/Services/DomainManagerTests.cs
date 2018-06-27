@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2015 Charlie Poole
+// Copyright (c) 2011-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -100,12 +100,12 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void UnloadingTwiceThrowsNUnitEngineException()
+        public void UnloadingTwiceThrowsNUnitEngineUnloadException()
         {
             var domain = _domainManager.CreateDomain(_package);
             _domainManager.Unload(domain);
 
-            Assert.That(() => _domainManager.Unload(domain), Throws.TypeOf<NUnitEngineException>());
+            Assert.That(() => _domainManager.Unload(domain), Throws.TypeOf<NUnitEngineUnloadException>());
 
             CheckDomainIsUnloaded(domain);
         }

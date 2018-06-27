@@ -1,76 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B310A760-8AE1-41CA-81F8-03B12E2FCE30}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
     <AssemblyName>nunit3-console.tests</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NUNIT_CONSOLE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>1685</NoWarn>
+    <TargetFrameworks>net35</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1685</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NUNIT_CONSOLE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>1685</NoWarn>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>1685</NoWarn>
+    <DebugType>Full</DebugType>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
-      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="NUnit.System.Linq, Version=0.2.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
-      <HintPath>..\..\..\packages\NUnit.3.4.1\lib\net20\NUnit.System.Linq.dll</HintPath>
-    </Reference>
+    <PackageReference Include="NSubstitute" Version="2.0.3" />
+    <PackageReference Include="NUnit" Version="3.9.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ConsoleVersion.cs">
-      <Link>Properties\ConsoleVersion.cs</Link>
-    </Compile>
-    <Compile Include="ArgumentsFileParserTests.cs" />
-    <Compile Include="ColorConsoleTests.cs" />
-    <Compile Include="ColorStyleTests.cs" />
-    <Compile Include="CommandLineTests.cs" />
-    <Compile Include="ConsoleOutputTests.cs" />
-    <Compile Include="ConsoleRunnerTests.cs" />
-    <Compile Include="DefaultOptionsProviderTests.cs" />
-    <Compile Include="ExtendedTextWrapperTests.cs" />
-    <Compile Include="MakeTestPackageTests.cs" />
-    <Compile Include="OutputSpecificationTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResultReporterTests.cs" />
-    <Compile Include="SimpleArgumentsFileParser.cs" />
-    <Compile Include="TestEventHandlerTests.cs" />
-    <Compile Include="TestNameParserTests.cs" />
-    <Compile Include="VirtualFileSystem.cs" />
+    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
+    <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TestListWithEmptyLine.tst">
@@ -80,45 +26,19 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="NUnit2TestResult.xsd">
-      <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj">
-      <Project>{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}</Project>
-      <Name>mock-assembly</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj">
-      <Project>{372A3447-D657-40FF-A089-77C19FEC30C8}</Project>
-      <Name>nunit.engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\nunit3-console\nunit3-console.csproj">
-      <Project>{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}</Project>
-      <Name>nunit3-console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj">
-      <Project>{775FAD50-3623-4922-97C4-DFB29A8BE4C7}</Project>
-      <Name>nunit.engine.api</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="ConsoleTests.nunit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+    <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
+    <ProjectReference Include="..\nunit3-console\nunit3-console.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

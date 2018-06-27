@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -79,15 +79,11 @@ namespace NUnit.Engine.Services
             // If we have multiple projects or a project plus assemblies
             // then defer to the AggregatingTestRunner, which will make
             // the decision on a file by file basis so that each project
-            // runs with its own settings.
+            // runs with its own settings. Note that bad extensions are
+            // ignored rather than assumed to be projects. This doesn't
+            // really matter since they will result in an error anyway.
             if (projectCount > 1 || projectCount > 0 && assemblyCount > 0)
                 return new AggregatingTestRunner(ServiceContext, package);
-
-            // If we have a single project by itself, make it the top level project.
-            if (projectCount > 0 && assemblyCount == 0)
-                package = package.SubPackages[0];
-
-            // TODO: What about bad extensions?
 
             ProcessModel processModel = GetTargetProcessModel(package);
 
@@ -95,7 +91,9 @@ namespace NUnit.Engine.Services
             {
                 default:
                 case ProcessModel.Default:
-                    if (package.SubPackages.Count > 1)
+                    if (projectCount > 0)
+                        return new AggregatingTestRunner(ServiceContext, package);
+                    else if (package.SubPackages.Count > 1)
                         return new MultipleTestProcessRunner(this.ServiceContext, package);
                     else
                         return new ProcessRunner(this.ServiceContext, package);

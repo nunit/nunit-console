@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+// Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -175,7 +175,7 @@ namespace NUnit.Engine.Internal
                             }
                             break;
                         case "Passed":
-                            if (aggregateResult != "Failed" && aggregateLabel != "Ignored")
+                            if (aggregateResult != "Failed" && aggregateLabel != "Ignored" && aggregateResult != "Warning")
                                 aggregateResult = "Passed";
                             break;
                         case "Failed":
@@ -183,6 +183,10 @@ namespace NUnit.Engine.Internal
                             aggregateLabel = label;
                             if (elementName == "test-suite")
                                 aggregateSite = "Child";
+                            break;
+                        case "Warning":
+                            if (aggregateResult == "Inconclusive" || aggregateResult == "Passed" || aggregateResult == "Skipped")
+                                aggregateResult = "Warning";
                             break;
                     }
 

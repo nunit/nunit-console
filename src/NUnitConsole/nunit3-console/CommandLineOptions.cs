@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+// Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -39,20 +39,28 @@ namespace NUnit.Common
     /// </summary>
     public class CommandLineOptions : OptionSet
     {
-        private static readonly string DEFAULT_WORK_DIRECTORY = Environment.CurrentDirectory;
+        private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Environment.CurrentDirectory;
 
         private bool validated;
         private bool noresult;
 
+        /// <summary>
+        /// An abstraction of the file system
+        /// </summary>
+        protected readonly IFileSystem _fileSystem;
+
 #region Constructor
 
-        internal CommandLineOptions(IDefaultOptionsProvider defaultOptionsProvider, params string[] args)
+        internal CommandLineOptions(IDefaultOptionsProvider defaultOptionsProvider, IFileSystem fileSystem, params string[] args)
         {
             // Apply default options
-            if (defaultOptionsProvider == null) throw new ArgumentNullException("defaultOptionsProvider");
+            if (defaultOptionsProvider == null) throw new ArgumentNullException(nameof(defaultOptionsProvider));
             TeamCity = defaultOptionsProvider.TeamCity;
-            
-            ConfigureOptions();            
+
+            if (fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
+            _fileSystem = fileSystem;
+
+            ConfigureOptions();
             if (args != null)
                 Parse(args);
         }
@@ -63,9 +71,9 @@ namespace NUnit.Common
             if (args != null)
                 Parse(args);
         }
-        
+
 #endregion
-        
+
 #region Properties
 
         // Action to Perform
@@ -84,7 +92,8 @@ namespace NUnit.Common
         private List<string> testList = new List<string>();
         public IList<string> TestList { get { return testList; } }
 
-        public string TestParameters { get; private set; }
+        private Dictionary<string, string> testParameters = new Dictionary<string, string>();
+        public IDictionary<string, string> TestParameters { get { return testParameters; } }
 
         public string WhereClause { get; private set; }
         public bool WhereClauseSpecified { get { return WhereClause != null; } }
@@ -115,30 +124,22 @@ namespace NUnit.Common
 
         public bool NoColor { get; private set; }
 
-        public bool Verbose { get; private set; }
-
         public bool TeamCity { get; private set; }
 
         public string OutFile { get; private set; }
         public bool OutFileSpecified { get { return OutFile != null; } }
 
-        public string ErrFile { get; private set; }
-        public bool ErrFileSpecified { get { return ErrFile != null; } }
-
         public string DisplayTestLabels { get; private set; }
 
         private string workDirectory = null;
-        public string WorkDirectory 
+        public string WorkDirectory
         {
-            get { return workDirectory ?? DEFAULT_WORK_DIRECTORY; }
+            get { return workDirectory ?? CURRENT_DIRECTORY_ON_ENTRY; }
         }
         public bool WorkDirectorySpecified { get { return workDirectory != null; } }
 
         public string InternalTraceLevel { get; private set; }
         public bool InternalTraceLevelSpecified { get { return InternalTraceLevel != null; } }
-
-        /// <summary>Indicates whether a full report should be displayed.</summary>
-        public bool Full { get; private set; }
 
         private List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
         public IList<OutputSpecification> ResultOutputSpecifications
@@ -149,7 +150,8 @@ namespace NUnit.Common
                     return new OutputSpecification[0];
 
                 if (resultOutputSpecifications.Count == 0)
-                    resultOutputSpecifications.Add(new OutputSpecification("TestResult.xml"));
+                    resultOutputSpecifications.Add(
+                        new OutputSpecification("TestResult.xml", CURRENT_DIRECTORY_ON_ENTRY));
 
                 return resultOutputSpecifications;
             }
@@ -164,7 +166,7 @@ namespace NUnit.Common
         public IList<string> ErrorMessages { get { return errorMessages; } }
 
 #endregion
-        
+
 #region Public Methods
 
         public bool Validate()
@@ -295,16 +297,22 @@ namespace NUnit.Common
                 {
                     string parameters = RequiredValue( v, "--params");
 
+                    // This can be changed without breaking backwards compatibility with frameworks.
                     foreach (string param in parameters.Split(new[] { ';' }))
                     {
-                        if (!param.Contains("="))
+                        int eq = param.IndexOf("=");
+                        if (eq == -1 || eq == param.Length - 1)
+                        {
                             ErrorMessages.Add("Invalid format for test parameter. Use NAME=VALUE.");
-                    }
+                        }
+                        else
+                        {
+                            string name = param.Substring(0, eq);
+                            string val = param.Substring(eq + 1);
 
-                    if (TestParameters == null)
-                        TestParameters = parameters;
-                    else
-                        TestParameters += ";" + parameters;
+                            TestParameters[name] = val;
+                        }
+                    }
                 });
 
             this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
@@ -329,27 +337,20 @@ namespace NUnit.Common
             this.Add("output|out=", "File {PATH} to contain text output from the tests.",
                 v => OutFile = RequiredValue(v, "--output"));
 
-            this.Add("err=", "File {PATH} to contain error output from the tests.",
-                v => ErrFile = RequiredValue(v, "--err"));
-
-            this.Add("full", "Prints full report of all test results.",
-                v => Full = v != null);
-
             this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.",
-                v => resultOutputSpecifications.Add(new OutputSpecification(RequiredValue(v, "--resultxml"))));
+                v => ResolveOutputSpecification(RequiredValue(v, "--resultxml"), resultOutputSpecifications));
 
             this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
             {
                 Explore = true;
-                if (v != null)
-                    ExploreOutputSpecifications.Add(new OutputSpecification(v));
+                ResolveOutputSpecification(v, ExploreOutputSpecifications);
             });
 
             this.Add("noresult", "Don't save any test results.",
                 v => noresult = v != null);
 
-            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, All",
-                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "All"));
+            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, Before, After, All",
+                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "Before", "After", "All"));
 
             this.Add("test-name-format=", "Non-standard naming pattern to use in generating test names.",
                 v => DefaultTestNamePattern = RequiredValue(v, "--test-name-format"));
@@ -365,9 +366,6 @@ namespace NUnit.Common
 
             this.Add("nocolor|noc", "Displays console output without color.",
                 v => NoColor = v != null);
-
-            this.Add("verbose|v", "Display additional information as the test runs.",
-                v => Verbose = v != null);
 
             this.Add("help|h", "Display this message and exit.",
                 v => ShowHelp = v != null);
@@ -388,6 +386,35 @@ namespace NUnit.Common
             });
         }
 
-#endregion
+        private void ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications)
+        {
+            if (value == null)
+                return;
+
+            OutputSpecification spec;
+
+            try
+            {
+                spec = new OutputSpecification(value, CURRENT_DIRECTORY_ON_ENTRY);
+            }
+            catch (ArgumentException e)
+            {
+                ErrorMessages.Add(e.Message);
+                return;
+            }
+
+            if (spec.Transform != null)
+            {
+                if (!_fileSystem.FileExists(spec.Transform))
+                {
+                    ErrorMessages.Add($"Transform {spec.Transform} could not be found.");
+                    return;
+                }
+            }
+
+            outputSpecifications.Add(spec);
+        }
+
+        #endregion
     }
 }

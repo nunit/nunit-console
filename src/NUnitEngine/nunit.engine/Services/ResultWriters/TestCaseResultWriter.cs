@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -32,7 +32,7 @@ namespace NUnit.Engine.Services
     {
         public void CheckWritability(string outputPath)
         {
-            using (new StreamWriter(outputPath, false, Encoding.UTF8))
+            using (new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
                 // Opening is enough to check
             }
@@ -40,7 +40,8 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode resultNode, string outputPath)
         {
-            using (var writer = new StreamWriter(outputPath, false, Encoding.UTF8))
+            using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(stream))
             {
                 WriteResultFile(resultNode, writer);
             }

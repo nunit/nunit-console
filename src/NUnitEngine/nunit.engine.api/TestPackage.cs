@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2015 Charlie Poole
+// Copyright (c) 2011-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -33,7 +33,9 @@ namespace NUnit.Engine
     /// tests for one or more test files. TestPackages may be named 
     /// or anonymous, depending on how they are constructed.
     /// </summary>
+#if !NETSTANDARD1_3
     [Serializable]
+#endif
     public class TestPackage
     {
         #region Constructors
@@ -49,7 +51,14 @@ namespace NUnit.Engine
 
             if (filePath != null)
             {
+#if NETSTANDARD1_3
+                if (!Path.IsPathRooted(filePath))
+                    throw new NUnitEngineException("Paths to test assemblies must not be relative in .NET Standard");
+
+                FullName = filePath;
+#else
                 FullName = Path.GetFullPath(filePath);
+#endif
                 Settings = new Dictionary<string,object>();
                 SubPackages = new List<TestPackage>();
             }
@@ -84,7 +93,7 @@ namespace NUnit.Engine
         /// Every test package gets a unique ID used to prefix test IDs within that package.
         /// </summary>
         /// <remarks>
-        /// The generated ID is only unique for packages created within the same AppDomain.
+        /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
         public string ID { get; private set; }

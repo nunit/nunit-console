@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -33,7 +33,7 @@ namespace NUnit.Engine.Services
 
     /// <summary>
     /// NUnit3XmlResultWriter is responsible for writing the results
-    /// of a test to a file in NUnit 3.0 format.
+    /// of a test to a file in NUnit 3 format.
     /// </summary>
     public class NUnit3XmlResultWriter : IResultWriter
     {
@@ -50,7 +50,8 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode resultNode, string outputPath)
         {
-            using (var writer = new StreamWriter(outputPath, false, Encoding.UTF8))
+            using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(stream))
             {
                 WriteResultFile(resultNode, writer);
             }
@@ -75,10 +76,12 @@ namespace NUnit.Engine.Services
             test.AddAttribute("start-time", DateTime.UtcNow.ToString("u"));
             doc.AppendChild(test);
 
+#if !NETSTANDARD1_3
             var cmd = doc.CreateElement("command-line");
             var cdata = doc.CreateCDataSection(Environment.CommandLine);
             cmd.AppendChild(cdata);
             test.AppendChild(cmd);
+#endif
             return doc;
         }
     }

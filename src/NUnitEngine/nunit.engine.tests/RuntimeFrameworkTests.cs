@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -70,7 +70,7 @@ namespace NUnit.Engine.Tests
         }
 
         [Test]
-        public void AvalableFrameworksList_IncludesCurrentFramework()
+        public void AvailableFrameworksList_IncludesCurrentFramework()
         {
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
                 if (RuntimeFramework.CurrentFramework.Supports(framework))

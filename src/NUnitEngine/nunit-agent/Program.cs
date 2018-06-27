@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2008 Charlie Poole
+// Copyright (c) 2008 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -22,9 +22,10 @@
 // ***********************************************************************
 
 using System;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
 using System.Diagnostics;
+using System.IO;
+using System.Security;
+using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
@@ -32,57 +33,59 @@ using NUnit.Engine.Services;
 
 namespace NUnit.Agent
 {
-    /// <summary>
-    /// Summary description for Program.
-    /// </summary>
     public class NUnitTestAgent
     {
-        static Logger log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
-
         static Guid AgentId;
         static string AgencyUrl;
-        static ITestAgency Agency;
-
-        /// <summary>
-        /// Channel used for communications with the agency
-        /// and with clients
-        /// </summary>
-        static TcpChannel Channel;
-
-        private const string LOG_FILE_FORMAT = "nunit-agent_{0}.log";
+        static Process AgencyProcess;
+        static RemoteTestAgent Agent;
+        private static Logger log;
 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             AgentId = new Guid(args[0]);
             AgencyUrl = args[1];
 
             InternalTraceLevel traceLevel = InternalTraceLevel.Off;
+            int pid = Process.GetCurrentProcess().Id;
+            bool debugArgPassed = false;
+            string workDirectory = string.Empty;
 
             for (int i = 2; i < args.Length; i++)
             {
                 string arg = args[i];
-                
+
                 // NOTE: we can test these strings exactly since
                 // they originate from the engine itself.
                 if (arg == "--debug-agent")
                 {
-                    if (!Debugger.IsAttached)
-                        Debugger.Launch();
+                    debugArgPassed = true;
                 }
                 else if (arg.StartsWith("--trace:"))
                 {
                     traceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), arg.Substring(8));
                 }
+                else if (arg.StartsWith("--pid="))
+                {
+                    int agencyProcessId = int.Parse(arg.Substring(6));
+                    AgencyProcess = Process.GetProcessById(agencyProcessId);
+                }
+                else if (arg.StartsWith("--work="))
+                {
+                    workDirectory = arg.Substring(7);
+                }
             }
 
-            // Initialize trace so we can see what's happening
-            int pid = Process.GetCurrentProcess().Id;
-            string logname = string.Format(LOG_FILE_FORMAT, pid);
-            InternalTrace.Initialize(logname, traceLevel);
+            var logName = $"nunit-agent_{pid}.log";
+            InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
+            log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
+
+            if (debugArgPassed)
+                TryLaunchDebugger();
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
@@ -112,7 +115,7 @@ namespace NUnit.Agent
 
             // TODO: We need to get this from somewhere. Argument?
             engine.InternalTraceLevel = InternalTraceLevel.Debug;
-            
+
             // Custom Service Initialization
             //log.Info("Adding Services");
             engine.Services.Add(new SettingsService(false));
@@ -121,59 +124,75 @@ namespace NUnit.Agent
             engine.Services.Add(new DomainManager());
             engine.Services.Add(new InProcessTestRunnerFactory());
             engine.Services.Add(new DriverService());
-            //engine.Services.Add( new TestLoader() );
 
             // Initialize Services
             log.Info("Initializing Services");
             engine.Initialize();
 
-            Channel = ServerUtilities.GetTcpChannel();
+            log.Info("Starting RemoteTestAgent");
+            Agent = new RemoteTestAgent(AgentId, AgencyUrl, engine.Services);
 
-            log.Info("Connecting to TestAgency at {0}", AgencyUrl);
             try
             {
-                Agency = Activator.GetObject(typeof(ITestAgency), AgencyUrl) as ITestAgency;
+                if (Agent.Start())
+                    WaitForStop();
+                else
+                {
+                    log.Error("Failed to start RemoteTestAgent");
+                    Environment.Exit(AgentExitCodes.FAILED_TO_START_REMOTE_AGENT);
+                }
             }
             catch (Exception ex)
             {
-                log.Error("Unable to connect", ex);
+                log.Error("Exception in RemoteTestAgent", ex);
+                Environment.Exit(AgentExitCodes.UNEXPECTED_EXCEPTION);
             }
+            log.Info("Agent process {0} exiting cleanly", pid);
 
-            if (Channel != null)
+            Environment.Exit(AgentExitCodes.OK);
+        }
+
+        private static void WaitForStop()
+        {
+            log.Debug("Waiting for stopSignal");
+
+            while (!Agent.WaitForStop(500))
             {
-                log.Info("Starting RemoteTestAgent");
-                RemoteTestAgent agent = new RemoteTestAgent(AgentId, Agency, engine.Services);
-
-                try
+                if (AgencyProcess.HasExited)
                 {
-                    if (agent.Start())
-                    {
-                        log.Debug("Waiting for stopSignal");
-                        agent.WaitForStop();
-                        log.Debug("Stop signal received");
-                    }
-                    else
-                        log.Error("Failed to start RemoteTestAgent");
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Exception in RemoteTestAgent", ex);
-                }
-
-                //log.Info("Unregistering Channel");
-                try
-                {
-                    ChannelServices.UnregisterChannel(Channel);
-                }
-                catch (Exception ex)
-                {
-                    log.Error("ChannelServices.UnregisterChannel threw an exception", ex);
+                    log.Error("Parent process has been terminated.");
+                    Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
                 }
             }
 
-            log.Info("Agent process {0} exiting", Process.GetCurrentProcess().Id);
+            log.Debug("Stop signal received");
+        }
 
-            return 0;
+        private static void TryLaunchDebugger()
+        {
+            if (Debugger.IsAttached)
+                return;
+
+            try
+            {
+                Debugger.Launch();
+            }
+            catch (SecurityException se)
+            {
+                if (InternalTrace.Initialized)
+                {
+                    log.Error($"System.Security.Permissions.UIPermission is not set to start the debugger. {se} {se.StackTrace}");
+                }
+                Environment.Exit(AgentExitCodes.DEBUGGER_SECURITY_VIOLATION);
+            }
+            catch (NotImplementedException nie) //Debugger is not implemented on mono
+            {
+                if (InternalTrace.Initialized)
+                {
+                    log.Error($"Debugger is not available on all platforms. {nie} {nie.StackTrace}");
+                }
+                Environment.Exit(AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED);
+            }
         }
     }
 }

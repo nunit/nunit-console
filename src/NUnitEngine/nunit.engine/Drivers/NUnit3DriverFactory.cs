@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,6 +23,7 @@
 
 using System;
 using System.Reflection;
+using NUnit.Common;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Drivers
@@ -38,7 +39,7 @@ namespace NUnit.Engine.Drivers
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         public bool IsSupportedTestFramework(AssemblyName reference)
         {
-            return reference.Name == NUNIT_FRAMEWORK && reference.Version.Major == 3;
+            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 3;
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace NUnit.Engine.Drivers
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
 
-            return new NUnit3FrameworkDriver(domain);
+            return new NUnit3FrameworkDriver(domain, reference);
         }
     }
 }

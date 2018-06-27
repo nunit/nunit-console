@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole
+// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -34,11 +34,13 @@ namespace NUnit.Engine
     /// </summary>
     public interface ITestEngine : IDisposable
     {
+#if !NETSTANDARD1_3
         /// <summary>
         /// Gets the IServiceLocator interface, which gives access to
         /// certain services provided by the engine.
         /// </summary>
         IServiceLocator Services { get; }
+#endif
 
         /// <summary>
         /// Gets and sets the directory path used by the engine for saving files.

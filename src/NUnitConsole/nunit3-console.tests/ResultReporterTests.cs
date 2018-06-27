@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole
+// Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -30,7 +30,6 @@ using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
-using NUnit.Framework.Internal;
 using NUnit.Tests.Assemblies;
 using NUnit.Engine.Internal;
 
@@ -46,12 +45,21 @@ namespace NUnit.ConsoleRunner.Tests
         [OneTimeSetUp]
         public void CreateResult()
         {
-            var mockAssembly = typeof (MockAssembly).Assembly;
-            var emptySettings = new Dictionary<string, object>();
+            var mockAssembly = typeof(MockAssembly).Assembly;
+            var frameworkSettings = new Dictionary<string, object>
+            {
+                { "TestParameters", "1=d;2=c" },
+                { "TestParametersDictionary", new Dictionary<string, string>
+                {
+                    { "1", "d" },
+                    { "2", "c" }
+                }}
+            };
 
-            var runner = new NUnitTestAssemblyRunner(new DefaultTestAssemblyBuilder());
-            runner.Load(mockAssembly, emptySettings);
-            var xmlText = runner.Run(TestListener.NULL, Framework.Internal.TestFilter.Empty).ToXml(true).OuterXml;
+            var controller = new FrameworkController(mockAssembly, "id", frameworkSettings);
+
+            controller.LoadTests();
+            var xmlText = controller.RunTests(null);
             var engineResult = AddMetadata(new TestEngineResult(xmlText));
             _result = engineResult.Xml;
 
@@ -74,7 +82,7 @@ namespace NUnit.ConsoleRunner.Tests
             var reportSequence = new[]
             {
                 "Tests Not Run",
-                "Errors and Failures",
+                "Errors, Failures and Warnings",
                 "Test Run Summary"
             };
 
@@ -92,10 +100,10 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void SummaryReportTest()
         {
-            var expected = new [] {
+            var expected = new[] {
                 "Test Run Summary",
                 "  Overall result: Failed",
-                "  Test Count: 28, Passed: 15, Failed: 5, Inconclusive: 1, Skipped: 7",
+               $"  Test Count: {MockAssembly.Tests}, Passed: {MockAssembly.Passed}, Failed: 5, Warnings: 1, Inconclusive: 1, Skipped: 7",
                 "    Failed Tests - Failures: 1, Errors: 1, Invalid: 3",
                 "    Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
                 "  Start time: 2015-10-19 02:12:28Z",
@@ -114,7 +122,7 @@ namespace NUnit.ConsoleRunner.Tests
             var nl = Environment.NewLine;
 
             var expected = new[] {
-                "Errors and Failures",
+                "Errors, Failures and Warnings",
                 "1) Failed : NUnit.Tests.Assemblies.MockTestFixture.FailingTest" + nl +
                 "Intentional failure",
                 "2) Invalid : NUnit.Tests.Assemblies.MockTestFixture.NonPublicTest" + nl +
@@ -123,11 +131,13 @@ namespace NUnit.ConsoleRunner.Tests
                 "No arguments were provided",
                 "4) Error : NUnit.Tests.Assemblies.MockTestFixture.TestWithException" + nl +
                 "System.Exception : Intentional Exception",
-                "5) Invalid : NUnit.Tests.BadFixture" + nl +
+                "5) Warning : NUnit.Tests.Assemblies.MockTestFixture.WarningTest" + nl +
+                "Warning Message",
+                "6) Invalid : NUnit.Tests.BadFixture" + nl +
                 "No suitable constructor was found"
-        };
+            };
 
-            var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsAndFailuresReport);
+            var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsFailuresAndWarningsReport);
 
             foreach (var ex in expected)
             {
@@ -138,7 +148,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void TestsNotRunTest()
         {
-            var expected = new [] {
+            var expected = new[] {
                 "Tests Not Run",
                 "",
                 "1) Explicit : NUnit.Tests.Assemblies.MockTestFixture.ExplicitTest",
@@ -167,11 +177,28 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(report, Is.EqualTo(expected));
         }
 
-        #region Helper Methods
-
-        private TestEngineResult AddMetadata(TestEngineResult input)
+        [Test, Explicit("Displays failure behavior")]
+        public void WarningsOnlyDisplayOnce()
         {
-            input.Add("<settings><setting name=\"Setting1Name\" value=\"Setting1Value\"></setting><setting name=\"Setting2Name\" value=\"Setting2Value\"></setting></settings>");
+            Assert.Warn("Just a warning");
+        }
+
+        [Test]
+        public void TestParameterSettingsWrittenCorrectly()
+        {
+            var expected = new[] {
+                "    TestParameters: 1=d;2=c",
+                "    TestParametersDictionary:",
+                "        1 -> d",
+                "        2 -> c"
+            };
+
+            var report = GetReportLines(_reporter.WriteRunSettingsReport);
+            Assert.That(report, Is.SupersetOf(expected));
+        }
+
+        private static TestEngineResult AddMetadata(TestEngineResult input)
+        {
             return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty);
         }
 
@@ -192,7 +219,5 @@ namespace NUnit.ConsoleRunner.Tests
 
             return lines;
         }
-
-        #endregion
     }
 }

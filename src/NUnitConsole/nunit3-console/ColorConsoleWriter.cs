@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,6 +24,7 @@
 using System;
 using System.IO;
 using System.Text;
+using NUnit.Common;
 
 namespace NUnit.ConsoleRunner
 {
@@ -107,6 +108,8 @@ namespace NUnit.ConsoleRunner
         /// <param name="valueStyle">The color to display the value with</param>
         public override void WriteLabel(string label, object option, ColorStyle valueStyle)
         {
+            Guard.ArgumentNotNull(option, nameof(option));
+
             Write(ColorStyle.Label, label);
             Write(valueStyle, option.ToString());
         }

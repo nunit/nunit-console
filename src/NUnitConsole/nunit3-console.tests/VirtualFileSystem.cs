@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -59,7 +59,8 @@ namespace NUnit.ConsoleRunner.Tests
             foreach (var file in files.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var fileParts = file.Split(':');
-                SetupFile(fileParts[0], fileParts[1].Split(new[] { '\n' }, StringSplitOptions.None));
+                var lines = fileParts[1].Replace("\r\n", "\n").Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                SetupFile(fileParts[0], lines);
             }
         }
     }

@@ -1,21 +1,18 @@
 //////////////////////////////////////////////////////////////////////
-// ARGUMENTS
+// ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Debug");
-
-//////////////////////////////////////////////////////////////////////
-// SET ERROR LEVELS
-//////////////////////////////////////////////////////////////////////
+var configuration = Argument("configuration", "Release");
 
 var ErrorDetail = new List<string>();
+bool IsDotNetCoreInstalled = false;
 
 //////////////////////////////////////////////////////////////////////
 // SET PACKAGE VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.6.0";
+var version = "3.9.0";
 var modifier = "";
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
@@ -28,17 +25,18 @@ var packageVersion = version + modifier + dbgSuffix;
 
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = PROJECT_DIR + "package/";
-var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/net35/";
+var CHOCO_DIR = PROJECT_DIR + "choco/";
+var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
+var MSI_DIR = PROJECT_DIR + "msi/";
+var CURRENT_IMG_DIR = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+var CURRENT_IMG_BIN_DIR = CURRENT_IMG_DIR + "bin/";
+var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
+var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
 var SOLUTION_FILE = "NUnitConsole.sln";
-
-// Package sources for nuget restore
-var PACKAGE_SOURCE = new string[]
-	{
-		"https://www.nuget.org/api/v2",
-		"https://www.myget.org/F/nunit/api/v2"
-	};
+var DOTNETCORE_SOLUTION_FILE = "NUnit.Engine.NetStandard.sln";
 
 // Test Runner
 var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
@@ -46,22 +44,86 @@ var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
+var DOTNETCORE_TEST_ASSEMBLY = "src/NUnitEngine/nunit.engine.tests.netstandard/bin/" + configuration + "/netcoreapp1.1/nunit.engine.tests.netstandard.dll";
 
-// Packages
-var SRC_PACKAGE = PACKAGE_DIR + "NUnit-" + version + modifier + "-src.zip";
-var ZIP_PACKAGE = PACKAGE_DIR + "NUnit-" + packageVersion + ".zip";
+// Package sources for nuget restore
+var PACKAGE_SOURCE = new string[]
+{
+    "https://www.nuget.org/api/v2",
+    "https://www.myget.org/F/nunit/api/v2"
+};
+
+var EXTENSION_PACKAGES = new []
+{
+  "NUnit.Extension.VSProjectLoader",
+  "NUnit.Extension.NUnitProjectLoader",
+  "NUnit.Extension.NUnitV2Driver",
+  "NUnit.Extension.NUnitV2ResultWriter",
+  "NUnit.Extension.TeamCityEventListener"
+};
+
+//////////////////////////////////////////////////////////////////////
+// SETUP AND TEARDOWN TASKS
+//////////////////////////////////////////////////////////////////////
+Setup(context =>
+{
+    if (BuildSystem.IsRunningOnAppVeyor)
+    {
+        var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
+        var branch = AppVeyor.Environment.Repository.Branch;
+        var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
+
+        if (branch == "master" && !isPullRequest)
+        {
+            packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+        }
+        else
+        {
+            var suffix = "-ci-" + buildNumber + dbgSuffix;
+
+            if (isPullRequest)
+                suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
+            else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+                suffix += "-pre-" + buildNumber;
+            else
+                suffix += "-" + branch;
+
+            // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
+            if (suffix.Length > 21)
+                suffix = suffix.Substring(0, 21);
+
+            packageVersion = version + suffix;
+        }
+
+        AppVeyor.UpdateBuildVersion(packageVersion);
+    }
+
+    // Executed BEFORE the first task.
+    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, packageVersion);
+    IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
+});
+
+Teardown(context =>
+{
+    // Executed AFTER the last task.
+    CheckForError(ref ErrorDetail);
+});
 
 //////////////////////////////////////////////////////////////////////
 // CLEAN
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-    .Description("Deletes all files in the BIN directory")
+    .Description("Cleans directories.")
     .Does(() =>
     {
-        CleanDirectory(BIN_DIR);
+        CleanDirectory(PROJECT_DIR + "bin/");
+        CleanDirectory(PROJECT_DIR + "packages/");
+        CleanDirectory(IMAGE_DIR);
+        CleanDirectory(EXTENSION_PACKAGES_DIR);
+        CleanDirectory(ZIP_IMG);
+        CleanDirectory(PACKAGE_DIR);
     });
-
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
@@ -71,82 +133,58 @@ Task("InitializeBuild")
     .Description("Initializes the build")
     .Does(() =>
     {
-		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
-		{
-			Source = PACKAGE_SOURCE
-		});
+        Information("Restoring NuGet packages");
+		DotNetCoreRestore(SOLUTION_FILE);
 
-		if (BuildSystem.IsRunningOnAppVeyor)
-		{
-			var tag = AppVeyor.Environment.Repository.Tag;
-
-			if (tag.IsTag)
-			{
-				packageVersion = tag.Name;
-			}
-			else
-			{
-				var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
-				var branch = AppVeyor.Environment.Repository.Branch;
-				var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
-
-				if (branch == "master" && !isPullRequest)
-				{
-					packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
-				}
-				else
-				{
-				    var suffix = "-ci-" + buildNumber + dbgSuffix;
-
-					if (isPullRequest)
-						suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
-					else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-						suffix += "-pre-" + buildNumber;
-					else
-						suffix += "-" + branch;
-
-					// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-					if (suffix.Length > 21)
-						suffix = suffix.Substring(0, 21);
-
-					packageVersion = version + suffix;
-				}
-			}
-
-			AppVeyor.UpdateBuildVersion(packageVersion);
-		}
+        if(IsRunningOnWindows())
+        {
+            Information("Restoring .NET Core packages");
+            DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
+        }
 	});
 
 //////////////////////////////////////////////////////////////////////
 // BUILD ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("BuildEngine")
-    .Description("Builds the engine")
+Task("BuildNetFramework")
+    .Description("Builds the .NET Framework version of the engine and console")
     .IsDependentOn("InitializeBuild")
     .Does(() =>
     {
-        // Engine Commponents
-        BuildProject("./src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj", configuration);
-        BuildProject("./src/NUnitEngine/nunit.engine/nunit.engine.csproj", configuration);
-        BuildProject("./src/NUnitEngine/nunit-agent/nunit-agent.csproj", configuration);
-        BuildProject("./src/NUnitEngine/nunit-agent/nunit-agent-x86.csproj", configuration);
-
-        // Engine tests
-        BuildProject("./src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj", configuration);
+        // Use MSBuild
+        MSBuild(SOLUTION_FILE, new MSBuildSettings()
+            .SetConfiguration(configuration)
+            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
+            .SetVerbosity(Verbosity.Minimal)
+			.SetPlatformTarget(PlatformTarget.MSIL)
+        );
     });
 
 //////////////////////////////////////////////////////////////////////
-// BUILD CONSOLE
+// BUILD NETSTANDARD ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("BuildConsole")
-    .Description("Builds the console runner")
+Task("BuildNetStandardEngine")
+    .Description("Builds the .NET Standard engine")
     .IsDependentOn("InitializeBuild")
+    .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
-        BuildProject("src/NUnitConsole/nunit3-console/nunit3-console.csproj", configuration);
-        BuildProject("src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj", configuration);
+        if(IsDotNetCoreInstalled)
+        {
+            var settings = new DotNetCoreBuildSettings
+            {
+                Configuration = configuration,
+                EnvironmentVariables = new Dictionary<string, string>()
+            };
+            settings.EnvironmentVariables.Add("PackageVersion", packageVersion);
+            DotNetCoreBuild(DOTNETCORE_SOLUTION_FILE, settings);
+        }
+        else
+        {
+            Warning("Skipping .NET Standard build because .NET Core is not installed");
+        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -208,6 +246,27 @@ Task("TestConsole")
     });
 
 //////////////////////////////////////////////////////////////////////
+// TEST NETSTANDARD ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetStandardEngine")
+    .Description("Tests the .NET Standard Engine")
+    .IsDependentOn("BuildNetStandardEngine")
+    .WithCriteria(IsRunningOnWindows())
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        if(IsDotNetCoreInstalled)
+        {
+            DotNetCoreExecute(DOTNETCORE_TEST_ASSEMBLY);
+        }
+        else
+        {
+            Warning("Skipping .NET Standard tests because .NET Core is not installed");
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
 // PACKAGE
 //////////////////////////////////////////////////////////////////////
 
@@ -224,6 +283,7 @@ var BinFiles = new FilePath[]
     "ConsoleTests.nunit",
     "EngineTests.nunit",
     "mock-assembly.dll",
+	"notest-assembly.dll",
     "Mono.Cecil.dll",
     "nunit-agent-x86.exe",
     "nunit-agent-x86.exe.config",
@@ -246,34 +306,23 @@ var BinFiles = new FilePath[]
     "TextSummary.xslt",
 };
 
-Task("PackageSource")
-    .Description("Creates a ZIP file of the source code")
-    .Does(() =>
-    {
-        CreateDirectory(PACKAGE_DIR);
-        RunGitCommand(string.Format("archive -o {0} HEAD", SRC_PACKAGE));
-    });
-
 Task("CreateImage")
     .Description("Copies all files into the image directory")
     .Does(() =>
     {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-        var imageBinDir = currentImageDir + "bin/";
+        CleanDirectory(CURRENT_IMG_DIR);
 
-        CleanDirectory(currentImageDir);
+        CopyFiles(RootFiles, CURRENT_IMG_DIR);
 
-        CopyFiles(RootFiles, currentImageDir);
-
-        CreateDirectory(imageBinDir);
-        Information("Created directory " + imageBinDir);
+        CreateDirectory(CURRENT_IMG_BIN_DIR);
+        Information("Created directory " + CURRENT_IMG_BIN_DIR);
 
         foreach(FilePath file in BinFiles)
         {
           if (FileExists(BIN_DIR + file))
           {
-              CreateDirectory(imageBinDir + file.GetDirectory());
-              CopyFile(BIN_DIR + file, imageBinDir + file);
+              CreateDirectory(CURRENT_IMG_BIN_DIR + file.GetDirectory());
+              CopyFile(BIN_DIR + file, CURRENT_IMG_BIN_DIR + file);
             }
         }
     });
@@ -283,14 +332,12 @@ Task("PackageEngine")
     .IsDependentOn("CreateImage")
     .Does(() =>
     {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-
         CreateDirectory(PACKAGE_DIR);
 
         NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -298,15 +345,7 @@ Task("PackageEngine")
         NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
-
-        NuGetPack("nuget/engine/nunit.engine.tool.nuspec", new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -317,14 +356,12 @@ Task("PackageConsole")
     .IsDependentOn("CreateImage")
     .Does(() =>
     {
-        var currentImageDir = IMAGE_DIR + "NUnit-" + packageVersion + "/";
-
         CreateDirectory(PACKAGE_DIR);
 
         NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -332,7 +369,7 @@ Task("PackageConsole")
         NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
@@ -340,29 +377,162 @@ Task("PackageConsole")
         NuGetPack("nuget/runners/nunit.runners.nuspec", new NuGetPackSettings()
         {
             Version = packageVersion,
-            BasePath = currentImageDir,
+            BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
         });
     });
 
+Task("PackageChocolatey")
+	.Description("Creates chocolatey packages of the console runner")
+	.Does(() =>
+	{
+		EnsureDirectoryExists(PACKAGE_DIR);
+
+		ChocolateyPack("choco/nunit-console-runner.nuspec",
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
+				OutputDirectory = PACKAGE_DIR,
+				Files = new [] {
+                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "NOTICES.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.dll", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.xml", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.dll", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
+                }
+			});
+
+		ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
+			new ChocolateyPackSettings()
+			{
+				Version = packageVersion,
+				OutputDirectory = PACKAGE_DIR,
+                Files = new [] {
+                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "NOTICES.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
+                }
+			});
+	});
+
 //////////////////////////////////////////////////////////////////////
-// SETUP AND TEARDOWN TASKS
+// PACKAGE NETSTANDARD ENGINE
 //////////////////////////////////////////////////////////////////////
-Setup(() =>
+
+Task("PackageNetStandardEngine")
+    .Description("Copies the .NET Standard Engine nuget package in the packages directory")
+    .WithCriteria(IsRunningOnWindows())
+    .Does(() =>
+    {
+        if(IsDotNetCoreInstalled)
+        {
+            var nuget = "nunit.engine.netstandard." + packageVersion + ".nupkg";
+            var src   = "src/NUnitEngine/nunit.engine.netstandard/bin/" + configuration + "/" + nuget;
+            var dest  = PACKAGE_DIR + nuget;
+
+            CreateDirectory(PACKAGE_DIR);
+            CopyFile(src, dest);
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
+// PACKAGE COMBINED DISTRIBUTIONS
+//////////////////////////////////////////////////////////////////////
+
+Task("FetchExtensions")
+.Does(() =>
 {
-    // Executed BEFORE the first task.
+    foreach(var package in EXTENSION_PACKAGES)
+    {
+        NuGetInstall(package, new NuGetInstallSettings {
+                        OutputDirectory = EXTENSION_PACKAGES_DIR,
+                        Source = new [] { "https://www.nuget.org/api/v2" }
+                    });
+    }
 });
 
-Teardown(() =>
+Task("CreateCombinedImage")
+.IsDependentOn("FetchExtensions")
+.Does(() =>
 {
-    // Executed AFTER the last task.
-    CheckForError(ref ErrorDetail);
+    var addinsImgDir = CURRENT_IMG_BIN_DIR + "addins/";
+
+    CopyDirectory(MSI_DIR + "resources/", CURRENT_IMG_DIR);
+    CleanDirectory(addinsImgDir);
+
+    foreach(var packageDir in GetAllDirectories(EXTENSION_PACKAGES_DIR))
+        CopyPackageContents(packageDir, addinsImgDir);
+});
+
+Task("PackageMsi")
+.IsDependentOn("CreateCombinedImage")
+.Does(() =>
+{
+    MSBuild(MSI_DIR + "nunit/nunit.wixproj", new MSBuildSettings()
+        .WithTarget("Rebuild")
+        .SetConfiguration(configuration)
+        .WithProperty("Version", version)
+        .WithProperty("DisplayVersion", version)
+        .WithProperty("OutDir", PACKAGE_DIR)
+        .WithProperty("Image", CURRENT_IMG_DIR)
+        .SetMSBuildPlatform(MSBuildPlatform.x86)
+        .SetNodeReuse(false)
+        );
+});
+
+Task("PackageZip")
+.IsDependentOn("CreateCombinedImage")
+.Does(() =>
+{
+    CleanDirectory(ZIP_IMG);
+
+    //Flatten for zip
+    CopyDirectory(CURRENT_IMG_DIR, ZIP_IMG);
+    CopyDirectory(ZIP_IMG + "bin/", ZIP_IMG);
+    DeleteDirectory(ZIP_IMG + "bin/", new DeleteDirectorySettings { Recursive = true });
+
+    //Ensure single and correct addins file
+    DeleteFiles(ZIP_IMG + "*.addins");
+    CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", ZIP_IMG + "nunit.bundle.addins");
+
+    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, version);
+    Zip(ZIP_IMG, zipPath);
 });
 
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
+
+bool CheckIfDotNetCoreInstalled()
+{
+    try
+    {
+        Information("Checking if .NET Core SDK is installed");
+        StartProcess("dotnet", new ProcessSettings
+        {
+            Arguments = "--version"
+        });
+    }
+    catch(Exception)
+    {
+        Warning(".NET Core SDK is not installed. It can be installed from https://www.microsoft.com/net/core");
+        return false;
+    }
+    return true;
+}
 
 void RunGitCommand(string arguments)
 {
@@ -381,38 +551,6 @@ void CheckForError(ref List<string> errorDetail)
         errorDetail.Clear();
         throw new Exception("One or more unit tests failed, breaking the build.\n"
                               + copyError.Aggregate((x,y) => x + "\n" + y));
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-// HELPER METHODS - BUILD
-//////////////////////////////////////////////////////////////////////
-
-void BuildProject(string projectPath, string configuration)
-{
-    BuildProject(projectPath, configuration, MSBuildPlatform.Automatic);
-}
-
-void BuildProject(string projectPath, string configuration, MSBuildPlatform buildPlatform)
-{
-    if(IsRunningOnWindows())
-    {
-        // Use MSBuild
-        MSBuild(projectPath, new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .SetMSBuildPlatform(buildPlatform)
-            .SetVerbosity(Verbosity.Minimal)
-            .SetNodeReuse(false)
-        );
-    }
-    else
-    {
-        // Use XBuild
-        XBuild(projectPath, new XBuildSettings()
-            .WithTarget("Build")
-            .WithProperty("Configuration", configuration)
-            .SetVerbosity(Verbosity.Minimal)
-        );
     }
 }
 
@@ -452,13 +590,28 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string arguments, strin
 }
 
 //////////////////////////////////////////////////////////////////////
+// HELPER METHODS - PACKAGE
+//////////////////////////////////////////////////////////////////////
+
+public string[] GetAllDirectories(string dirPath)
+{
+    return System.IO.Directory.GetDirectories(dirPath);
+}
+
+public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
+{
+    var files = GetFiles(packageDir + "/tools/*");
+    CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
+}
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
 Task("Build")
     .Description("Builds the engine and console runner")
-    .IsDependentOn("BuildEngine")
-    .IsDependentOn("BuildConsole");
+    .IsDependentOn("BuildNetFramework")
+    .IsDependentOn("BuildNetStandardEngine");
 
 Task("Rebuild")
     .Description("Rebuilds the engine and console runner")
@@ -468,13 +621,18 @@ Task("Rebuild")
 Task("Test")
     .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestEngine")
-    .IsDependentOn("TestConsole");
+    .IsDependentOn("TestConsole")
+    .IsDependentOn("TestNetStandardEngine");
 
 Task("Package")
     .Description("Packages the engine and console runner")
     .IsDependentOn("CheckForError")
     .IsDependentOn("PackageEngine")
-    .IsDependentOn("PackageConsole");
+    .IsDependentOn("PackageConsole")
+    .IsDependentOn("PackageNetStandardEngine")
+	.IsDependentOn("PackageChocolatey")
+    .IsDependentOn("PackageMsi")
+    .IsDependentOn("PackageZip");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole
+// Copyright (c) 2016 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -85,7 +85,7 @@ namespace NUnit.Engine.Services
         {
 #if DEBUG
             if (!IsDuplicateOf(other))
-                throw new NUnitEngineException("IsBetterVersonOf should only be called on duplicate assemblies");
+                throw new NUnitEngineException("IsBetterVersionOf should only be called on duplicate assemblies");
 #endif
 
             var version = AssemblyName.Version;

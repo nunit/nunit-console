@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -25,7 +25,7 @@ namespace NUnit.Engine.Internal
 {
     /// <summary>
     /// Represents the manner in which test assemblies use
-    /// AppDomains to provide isolation
+    /// application domains to provide isolation
     /// </summary>
     public enum DomainUsage
     {
@@ -35,7 +35,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         Default,
         /// <summary>
-        /// Don't create a test domain - run in the primary AppDomain.
+        /// Don't create a test domain - run in the primary application domain.
         /// Note that this requires the tests to be available in the
         /// NUnit appbase or probing path.
         /// </summary>
