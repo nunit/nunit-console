@@ -34,6 +34,7 @@ namespace NUnit.Engine.Services
     public class DefaultTestRunnerFactory : InProcessTestRunnerFactory, ITestRunnerFactory
     {
         private IProjectService _projectService;
+        private readonly ILogger _log = InternalTrace.GetLogger(typeof(DefaultTestRunnerFactory));
 
         #region Service Overrides
 
@@ -62,7 +63,6 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public override ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-
             int assemblyCount = 0;
             int projectCount = 0;
 
@@ -83,7 +83,10 @@ namespace NUnit.Engine.Services
             // ignored rather than assumed to be projects. This doesn't
             // really matter since they will result in an error anyway.
             if (projectCount > 1 || projectCount > 0 && assemblyCount > 0)
+            {
+                _log.Debug($"Selecting {nameof(AggregatingTestRunner)} for {package.Name}");
                 return new AggregatingTestRunner(ServiceContext, package);
+            }
 
             ProcessModel processModel = GetTargetProcessModel(package);
 
@@ -92,19 +95,31 @@ namespace NUnit.Engine.Services
                 default:
                 case ProcessModel.Default:
                     if (projectCount > 0)
+                    {
+                        _log.Debug($"Selecting {nameof(AggregatingTestRunner)} for {package.Name}");
                         return new AggregatingTestRunner(ServiceContext, package);
+                    }
                     else if (package.SubPackages.Count > 1)
-                        return new MultipleTestProcessRunner(this.ServiceContext, package);
+                    {
+                        _log.Debug($"Selecting {nameof(MultipleTestProcessRunner)} for {package.Name}");
+                        return new MultipleTestProcessRunner(ServiceContext, package);
+                    }
                     else
-                        return new ProcessRunner(this.ServiceContext, package);
+                    {
+                        _log.Debug($"Selecting {nameof(ProcessRunner)} for {package.Name}");
+                        return new ProcessRunner(ServiceContext, package);
+                    }
 
                 case ProcessModel.Multiple:
-                    return new MultipleTestProcessRunner(this.ServiceContext, package);
+                    _log.Debug($"Selecting {nameof(MultipleTestProcessRunner)} for {package.Name}");
+                    return new MultipleTestProcessRunner(ServiceContext, package);
 
                 case ProcessModel.Separate:
-                    return new ProcessRunner(this.ServiceContext, package);
+                    _log.Debug($"Selecting {nameof(ProcessRunner)} for {package.Name}");
+                    return new ProcessRunner(ServiceContext, package);
 
                 case ProcessModel.InProcess:
+                    _log.Debug($"Falling through to {nameof(InProcessTestRunnerFactory)}.MakeTestRunner()");
                     return base.MakeTestRunner(package);
             }
         }

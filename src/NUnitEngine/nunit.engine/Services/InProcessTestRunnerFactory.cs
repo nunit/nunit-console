@@ -32,7 +32,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class InProcessTestRunnerFactory : Service, ITestRunnerFactory
     {
-        #region ITestRunnerFactory Members
+        private readonly ILogger _log = InternalTrace.GetLogger(typeof(InProcessTestRunnerFactory));
 
         /// <summary>
         /// Returns a test runner based on the settings in a TestPackage.
@@ -44,6 +44,15 @@ namespace NUnit.Engine.Services
         /// <returns>An ITestEngineRunner</returns>
         public virtual ITestEngineRunner MakeTestRunner(TestPackage package)
         {
+            var projectService = ServiceContext.GetService<IProjectService>();
+            var projectCount = 0;
+
+            foreach (var subPackage in package.SubPackages)
+            {
+                if (projectService.CanLoadFrom(subPackage.FullName))
+                    projectCount++;
+            }
+
             DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(
                 typeof(DomainUsage),
                 package.GetSetting(EnginePackageSettings.DomainUsage, "Default"));
@@ -52,18 +61,27 @@ namespace NUnit.Engine.Services
             {
                 default:
                 case DomainUsage.Default:
-                    if (package.SubPackages.Count > 1)
-                        return new MultipleTestDomainRunner(this.ServiceContext, package);
+                    if (package.SubPackages.Count > 1 || projectCount > 0)
+                    {
+                        _log.Debug($"Selecting {nameof(MultipleTestDomainRunner)} for {package.Name}");
+                        return new MultipleTestDomainRunner(ServiceContext, package);
+                    }
                     else
-                        return new TestDomainRunner(this.ServiceContext, package);
+                    {
+                        _log.Debug($"Selecting {nameof(TestDomainRunner)} for {package.Name}");
+                        return new TestDomainRunner(ServiceContext, package);
+                    }
 
                 case DomainUsage.Multiple:
+                    _log.Debug($"Selecting {nameof(MultipleTestDomainRunner)} for {package.Name}");
                     return new MultipleTestDomainRunner(ServiceContext, package);
 
                 case DomainUsage.None:
+                    _log.Debug($"Selecting {nameof(LocalTestRunner)} for {package.Name}");
                     return new LocalTestRunner(ServiceContext, package);
 
                 case DomainUsage.Single:
+                    _log.Debug($"Selecting {nameof(TestDomainRunner)} for {package.Name}");
                     return new TestDomainRunner(ServiceContext, package);
             }
         }
@@ -72,7 +90,5 @@ namespace NUnit.Engine.Services
         {
             return false;
         }
-
-        #endregion
     }
 }
