@@ -213,6 +213,8 @@ namespace NUnit.ConsoleRunner
                 {
                     var eventHandler = new TestEventHandler(output, labels);
 
+                    if (_options.Preload)
+                        runner.Load();
                     result = runner.Run(eventHandler, filter);
                 }
             }
