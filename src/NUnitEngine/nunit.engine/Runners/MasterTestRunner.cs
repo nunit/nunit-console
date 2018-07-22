@@ -98,7 +98,7 @@ namespace NUnit.Engine.Runners
         public XmlNode Load()
         {
             LoadResult = _engineRunner.Load();
-            return LoadResult.Xml;
+            return LoadResult.IsSingle ? LoadResult.Xml : null;
         }
 
         /// <summary>

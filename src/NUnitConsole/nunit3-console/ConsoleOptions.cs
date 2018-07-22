@@ -79,6 +79,8 @@ namespace NUnit.Common
 
         public bool SkipNonTestAssemblies { get; private set; }
 
+        public bool Preload { get; private set; }
+
         private int _maxAgents = -1;
         public int MaxAgents { get { return _maxAgents; } }
         public bool MaxAgentsSpecified { get { return _maxAgents >= 0; } }
@@ -155,6 +157,9 @@ namespace NUnit.Common
 
             this.Add("skipnontestassemblies", "Skip any non-test assemblies specified, without error.",
                 v => SkipNonTestAssemblies = v != null);
+
+            this.Add("preload", "Enumerate all tests before execution.",
+                v => Preload = v != null);
 
             this.Add("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
                 v => _maxAgents = RequiredInt(v, "--agents"));
