@@ -28,6 +28,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
+using NUnit.Engine.Internal.RuntimeFrameworks;
 
 namespace NUnit.Engine
 {
@@ -542,7 +543,7 @@ namespace NUnit.Engine
             _availableFrameworks = new List<RuntimeFramework>();
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                FindDotNetFrameworks();
+                _availableFrameworks.AddRange(DotNetFrameworkLocator.FindDotNetFrameworks());
 
             FindDefaultMonoFramework();
         }

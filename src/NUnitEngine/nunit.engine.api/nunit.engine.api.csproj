@@ -19,6 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
-    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\EngineApiVersion.cs" LinkBase="Properties" />
   </ItemGroup>
 </Project>
