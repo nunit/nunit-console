@@ -134,10 +134,13 @@ namespace NUnit.ConsoleRunner
             var testName = outputNode.GetAttribute("testname");
             var stream = outputNode.GetAttribute("stream");
 
-            if (_displayBeforeOutput && testName != null)
-                WriteLabelLine(testName);
+            if (stream != "Diagnostic")
+            {
+                if (_displayBeforeOutput && testName != null)
+                    WriteLabelLine(testName);
 
-            WriteOutputLine(testName, outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
+                WriteOutputLine(testName, outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
+            }
         }
 
         private string _currentLabel;
