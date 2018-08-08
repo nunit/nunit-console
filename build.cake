@@ -1,3 +1,5 @@
+#load ci.cake
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
@@ -143,6 +145,15 @@ Task("InitializeBuild")
         }
 	});
 
+Task("UpdateAssemblyInfo")
+    .Description("Sets the assembly versions to the calculated version.")
+    .Does(() =>
+    {
+        PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
+        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
+        PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
+    });
+
 //////////////////////////////////////////////////////////////////////
 // BUILD ENGINE
 //////////////////////////////////////////////////////////////////////
@@ -150,6 +161,7 @@ Task("InitializeBuild")
 Task("BuildNetFramework")
     .Description("Builds the .NET Framework version of the engine and console")
     .IsDependentOn("InitializeBuild")
+    .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
         // Use MSBuild
@@ -168,6 +180,7 @@ Task("BuildNetFramework")
 Task("BuildNetStandardEngine")
     .Description("Builds the .NET Standard engine")
     .IsDependentOn("InitializeBuild")
+    .IsDependentOn("UpdateAssemblyInfo")
     .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
