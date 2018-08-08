@@ -164,19 +164,16 @@ namespace NUnit.ConsoleRunner
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             var versionBlock = FileVersionInfo.GetVersionInfo(executingAssembly.ManifestModule.FullyQualifiedName);
 
-            string configText = String.Empty;
+            var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
 
-            object[] attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
-            if ( attrs.Length > 0 )
+            object[] configurationAttributes = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+            if (configurationAttributes.Length > 0)
             {
-                string configuration = ( ( AssemblyConfigurationAttribute )attrs[0] ).Configuration;
-                if ( !String.IsNullOrEmpty( configuration ) )
-                {
-                    configText = string.Format( "({0})", ( ( AssemblyConfigurationAttribute )attrs[0] ).Configuration );
-                }
+                string configuration = ((AssemblyConfigurationAttribute)configurationAttributes[0]).Configuration;
+                if (!string.IsNullOrEmpty(configuration)) header += $" ({configuration})";
             }
 
-            OutWriter.WriteLine(ColorStyle.Header, string.Format("{0} {1} {2}", versionBlock.ProductName, versionBlock.ProductVersion, configText));
+            OutWriter.WriteLine(ColorStyle.Header, header);
             OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright);
             OutWriter.WriteLine();
         }
