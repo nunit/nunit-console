@@ -165,16 +165,11 @@ namespace NUnit.ConsoleRunner
             var versionBlock = FileVersionInfo.GetVersionInfo(executingAssembly.ManifestModule.FullyQualifiedName);
 
             string programName = "NUnit Console Runner";
-            string copyrightText = "Copyright (C) 2018 Charlie Poole, Rob Prouse.\r\nAll Rights Reserved.";
             string configText = String.Empty;
 
             object[] attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
             if (attrs.Length > 0)
                 programName = ((AssemblyTitleAttribute)attrs[0]).Title;
-
-            attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            if ( attrs.Length > 0 )
-                copyrightText = ((AssemblyCopyrightAttribute)attrs[0]).Copyright;
 
             attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
             if ( attrs.Length > 0 )
@@ -187,7 +182,7 @@ namespace NUnit.ConsoleRunner
             }
 
             OutWriter.WriteLine(ColorStyle.Header, string.Format("{0} {1} {2}", programName, versionBlock.ProductVersion, configText));
-            OutWriter.WriteLine(ColorStyle.SubHeader, copyrightText);
+            OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright);
             OutWriter.WriteLine();
         }
 
