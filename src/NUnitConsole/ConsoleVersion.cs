@@ -23,8 +23,6 @@
 
 using System.Reflection;
 
-//
-// Current version for the NUnit Console
-//
+[assembly: AssemblyProduct("NUnit Console Runner")]
 [assembly: AssemblyVersion("3.9.0")]
 [assembly: AssemblyInformationalVersion("3.9.0")]
