@@ -17,7 +17,7 @@ var modifier = "";
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
-var packageVersion = version + modifier + dbgSuffix;
+var productVersion = version + modifier + dbgSuffix;
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
@@ -30,7 +30,7 @@ var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
 var MSI_DIR = PROJECT_DIR + "msi/";
-var CURRENT_IMG_DIR = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
 var CURRENT_IMG_BIN_DIR = CURRENT_IMG_DIR + "bin/";
 var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
@@ -75,7 +75,7 @@ Setup(context =>
 
         if (branch == "master" && !isPullRequest)
         {
-            packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+            productVersion = version + "-dev-" + buildNumber + dbgSuffix;
         }
         else
         {
@@ -92,14 +92,14 @@ Setup(context =>
             if (suffix.Length > 21)
                 suffix = suffix.Substring(0, 21);
 
-            packageVersion = version + suffix;
+            productVersion = version + suffix;
         }
 
-        AppVeyor.UpdateBuildVersion(packageVersion);
+        AppVeyor.UpdateBuildVersion(productVersion);
     }
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, packageVersion);
+    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
     IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
 });
 
@@ -178,7 +178,7 @@ Task("BuildNetStandardEngine")
                 Configuration = configuration,
                 EnvironmentVariables = new Dictionary<string, string>()
             };
-            settings.EnvironmentVariables.Add("PackageVersion", packageVersion);
+            settings.EnvironmentVariables.Add("PackageVersion", productVersion);
             DotNetCoreBuild(DOTNETCORE_SOLUTION_FILE, settings);
         }
         else
@@ -336,7 +336,7 @@ Task("PackageEngine")
 
         NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -344,7 +344,7 @@ Task("PackageEngine")
 
         NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -360,7 +360,7 @@ Task("PackageConsole")
 
         NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -368,7 +368,7 @@ Task("PackageConsole")
 
         NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -376,7 +376,7 @@ Task("PackageConsole")
 
         NuGetPack("nuget/runners/nunit.runners.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -392,7 +392,7 @@ Task("PackageChocolatey")
 		ChocolateyPack("choco/nunit-console-runner.nuspec",
 			new ChocolateyPackSettings()
 			{
-				Version = packageVersion,
+				Version = productVersion,
 				OutputDirectory = PACKAGE_DIR,
 				Files = new [] {
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
@@ -418,7 +418,7 @@ Task("PackageChocolatey")
 		ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
 			new ChocolateyPackSettings()
 			{
-				Version = packageVersion,
+				Version = productVersion,
 				OutputDirectory = PACKAGE_DIR,
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
@@ -439,7 +439,7 @@ Task("PackageNetStandardEngine")
     {
         if(IsDotNetCoreInstalled)
         {
-            var nuget = "nunit.engine.netstandard." + packageVersion + ".nupkg";
+            var nuget = $"nunit.engine.netstandard.{productVersion}.nupkg";
             var src   = "src/NUnitEngine/nunit.engine.netstandard/bin/" + configuration + "/" + nuget;
             var dest  = PACKAGE_DIR + nuget;
 
