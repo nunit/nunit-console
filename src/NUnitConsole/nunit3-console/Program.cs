@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -161,7 +162,7 @@ namespace NUnit.ConsoleRunner
         private static void WriteHeader()
         {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            string versionText = executingAssembly.GetName().Version.ToString(3);
+            var versionBlock = FileVersionInfo.GetVersionInfo(executingAssembly.ManifestModule.FullyQualifiedName);
 
             string programName = "NUnit Console Runner";
             string copyrightText = "Copyright (C) 2018 Charlie Poole, Rob Prouse.\r\nAll Rights Reserved.";
@@ -185,7 +186,7 @@ namespace NUnit.ConsoleRunner
                 }
             }
 
-            OutWriter.WriteLine(ColorStyle.Header, string.Format("{0} {1} {2}", programName, versionText, configText));
+            OutWriter.WriteLine(ColorStyle.Header, string.Format("{0} {1} {2}", programName, versionBlock.ProductVersion, configText));
             OutWriter.WriteLine(ColorStyle.SubHeader, copyrightText);
             OutWriter.WriteLine();
         }
