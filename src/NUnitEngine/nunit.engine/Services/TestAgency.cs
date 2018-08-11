@@ -315,6 +315,9 @@ namespace NUnit.Engine.Services
                 case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
                     errorMsg = "Debugger could not be started on remote agent as not available on platform.";
                     break;
+                case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
+                    errorMsg = "Remote test agent unable to locate agency process.";
+                    break;
                 default:
                     errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
                     break;

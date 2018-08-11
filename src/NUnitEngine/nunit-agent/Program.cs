@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -50,10 +51,11 @@ namespace NUnit.Agent
             AgentId = new Guid(args[0]);
             AgencyUrl = args[1];
 
-            InternalTraceLevel traceLevel = InternalTraceLevel.Off;
-            int pid = Process.GetCurrentProcess().Id;
-            bool debugArgPassed = false;
-            string workDirectory = string.Empty;
+            var traceLevel = InternalTraceLevel.Off;
+            var pid = Process.GetCurrentProcess().Id;
+            var debugArgPassed = false;
+            var workDirectory = string.Empty;
+            var agencyPid = string.Empty;
 
             for (int i = 2; i < args.Length; i++)
             {
@@ -71,8 +73,7 @@ namespace NUnit.Agent
                 }
                 else if (arg.StartsWith("--pid="))
                 {
-                    int agencyProcessId = int.Parse(arg.Substring(6));
-                    AgencyProcess = Process.GetProcessById(agencyProcessId);
+                    agencyPid = arg.Substring(6);
                 }
                 else if (arg.StartsWith("--work="))
                 {
@@ -86,6 +87,8 @@ namespace NUnit.Agent
 
             if (debugArgPassed)
                 TryLaunchDebugger();
+
+            LocateAgencyProcess(agencyPid);
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
@@ -150,6 +153,21 @@ namespace NUnit.Agent
             log.Info("Agent process {0} exiting cleanly", pid);
 
             Environment.Exit(AgentExitCodes.OK);
+        }
+
+        private static void LocateAgencyProcess(string agencyPid)
+        {
+            var agencyProcessId = int.Parse(agencyPid);
+            try
+            {
+                AgencyProcess = Process.GetProcessById(agencyProcessId);
+            }
+            catch (Exception e)
+            {
+                log.Error($"Unable to connect to agency process with PID: {agencyProcessId}");
+                log.Error($"Failed with exception: {e.Message} {e.StackTrace}");
+                Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_AGENCY);
+            }
         }
 
         private static void WaitForStop()
