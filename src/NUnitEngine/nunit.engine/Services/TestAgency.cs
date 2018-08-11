@@ -249,22 +249,23 @@ namespace NUnit.Engine.Services
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
-            Guid agentId = LaunchAgentProcess(package);
+            var agentId = LaunchAgentProcess(package);
 
-            log.Debug( "Waiting for agent {0} to register", agentId.ToString("B") );
+            log.Debug($"Waiting for agent {agentId:B} to register");
 
-            int pollTime = 200;
-            bool infinite = waitTime == Timeout.Infinite;
+            const int pollTime = 200;
 
-            while( infinite || waitTime > 0 )
+            var agentRecord = _agentData[agentId];
+            var agentProcess = agentRecord.Process;
+
+            //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
+            while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
             {
-                Thread.Sleep( pollTime );
-                if ( !infinite ) waitTime -= pollTime;
-                var agentRecord = _agentData[agentId];
+                Thread.Sleep(pollTime);
                 
-                if ( agentRecord.Agent != null )
+                if (agentRecord.Agent != null)
                 {
-                    log.Debug( "Returning new agent {0}", agentId.ToString("B") );
+                    log.Debug($"Returning new agent {agentId:B}");
                     return new RemoteTestAgentProxy(agentRecord.Agent, agentRecord.Id);
                 }
             }
