@@ -397,6 +397,11 @@ namespace NUnit.Engine.Services
                     if (!fromWildCard)
                         throw new NUnitEngineException(String.Format("Specified extension {0} could not be read", filePath), e);
                 }
+                catch (NUnitEngineException)
+                {
+                    if (!fromWildCard)
+                        throw;
+                }
             }
         }
 
