@@ -42,10 +42,12 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="assemblyPath">The path to the assembly where this extension is found.</param>
         /// <param name="typeName">The full name of the Type of the extension object.</param>
-        public ExtensionNode(string assemblyPath, string typeName)
+        /// <param name="targetFramework">The target framework of the extension assembly.</param>
+        public ExtensionNode(string assemblyPath, string typeName, IRuntimeFramework targetFramework)
         {
             AssemblyPath = assemblyPath;
             TypeName = typeName;
+            TargetFramework = targetFramework;
             Enabled = true; // By default
         }
 
@@ -55,6 +57,11 @@ namespace NUnit.Engine.Extensibility
         /// Gets the full name of the Type of the extension object.
         /// </summary>
         public string TypeName { get; private set; }
+
+        /// <summary>
+        /// The TargetFramework of the extension assembly.
+        /// </summary>
+        public IRuntimeFramework TargetFramework { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="NUnit.Engine.Extensibility.ExtensionNode"/> is enabled.

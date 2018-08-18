@@ -451,7 +451,7 @@ namespace NUnit.Engine.Services
                 if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
                     continue;
 
-                var node = new ExtensionNode(assembly.FilePath, type.FullName);
+                var node = new ExtensionNode(assembly.FilePath, type.FullName, assemblyTargetFramework);
                 node.Path = extensionAttr.GetNamedArgument("Path") as string;
                 node.Description = extensionAttr.GetNamedArgument("Description") as string;
 
