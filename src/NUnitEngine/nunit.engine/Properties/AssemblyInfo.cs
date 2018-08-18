@@ -29,6 +29,7 @@ using System.Runtime.InteropServices;
     "ddd692dec8fa404ba4591e847a8cf35de21c2d3723bc8d775a66b594adeb967537729fe2a446b5"+
     "48cd57a6")]
 
+//Allow NSubstitute to mock out internal types
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2,PublicKey=002400000480000094" +
     "0000000602000000240000525341310004000001000100c547cac37abd99c8db225ef2f6c8a3602" +
     "f3b3606cc9891605d02baa56104f4cfc0734aa39b93bf7852f7d9266654753cc297e7d2edfe0bac" +
