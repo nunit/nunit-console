@@ -122,10 +122,6 @@
 //      p.Parse (new string[]{"-a+"});  // sets v != null
 //      p.Parse (new string[]{"-a-"});  // sets v == null
 //
-// The NUnit version of this file introduces conditional compilation for
-// building under the Compact Framework (NETCF) and Silverlight (SILVERLIGHT)
-// as well as for use with a portable class library  (PORTABLE).
-//
 // 11/5/2015 -
 // Change namespace to avoid conflict with user code use of mono.options
 
@@ -144,11 +140,7 @@ using System.Text.RegularExpressions;
 // Missing XML Docs
 #pragma warning disable 1591
 
-#if PORTABLE
-using NUnit.Compatibility;
-#else
 using System.Security.Permissions;
-#endif
 
 #if LINQ
 using System.Linq;
@@ -474,9 +466,7 @@ namespace NUnit.Options
         }
     }
 
-#if !PORTABLE
     [Serializable]
-#endif
     public class OptionException : Exception
     {
         private string option;

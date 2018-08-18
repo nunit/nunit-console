@@ -271,7 +271,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets an array of all available frameworks
         /// </summary>
-        // TODO: Special handling for netcf
         public static RuntimeFramework[] AvailableFrameworks
         {
             get
