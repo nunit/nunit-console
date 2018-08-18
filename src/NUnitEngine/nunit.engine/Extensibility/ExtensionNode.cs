@@ -49,8 +49,6 @@ namespace NUnit.Engine.Extensibility
             Enabled = true; // By default
         }
 
-        #region IExtensionNode Members
-
         /// <summary>
         /// Gets the full name of the Type of the extension object.
         /// </summary>
@@ -96,10 +94,6 @@ namespace NUnit.Engine.Extensibility
                 return new string[0];
         }
 
-        #endregion
-
-        #region Other Properties
-
         /// <summary>
         /// Gets the path to the assembly where the extension is defined.
         /// </summary>
@@ -122,10 +116,6 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Gets a newly created extension object, created in the current application domain
         /// </summary>
@@ -146,6 +136,9 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
-        #endregion
+        public override string ToString()
+        {
+            return $"{TypeName} - {Path}";
+        }
     }
 }
