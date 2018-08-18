@@ -422,9 +422,23 @@ namespace NUnit.Engine.Services
         /// For each extension, create an ExtensionNode and link it to the
         /// correct ExtensionPoint. Public for testing.
         /// </summary>
-        public void FindExtensionsInAssembly(ExtensionAssembly assembly)
+        internal void FindExtensionsInAssembly(ExtensionAssembly assembly)
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
+
+            var assemblyTargetFramework = assembly.TargetFramework;
+            if (!assemblyTargetFramework.IsAvailable)
+            {
+                if (!assembly.FromWildCard)
+                {
+                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                }
+                else
+                {
+                    log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                    return;
+                }
+            }
 
             foreach (var type in assembly.MainModule.GetTypes())
             {
