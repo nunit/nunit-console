@@ -42,11 +42,11 @@ namespace NUnit.Engine.Services
         static Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
         static readonly Version ENGINE_VERSION = typeof(TestEngine).Assembly.GetName().Version;
 
-        private List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
-        private Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
+        private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
+        private readonly Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
 
-        private List<ExtensionNode> _extensions = new List<ExtensionNode>();
-        private List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
+        private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
+        private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
         #region IExtensionService Members
 
@@ -294,12 +294,6 @@ namespace NUnit.Engine.Services
         {
             // First check the directory itself
             ProcessAddinsFiles(startDir, false);
-
-            //// Use any packages directory we find as well
-            //var packageDir = DirectoryFinder.GetPackageDirectory(startDir);
-            //if (packageDir != null)
-            //    foreach (var dir in DirectoryFinder.GetDirectories(packageDir, "NUnit.Extension.*/**/tools/"))
-            //        ProcessDirectory(dir, false);
         }
 
         /// <summary>
