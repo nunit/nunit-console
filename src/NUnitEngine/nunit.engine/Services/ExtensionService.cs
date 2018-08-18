@@ -420,8 +420,9 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
+            var currentFramework = RuntimeFramework.CurrentFramework;
             var assemblyTargetFramework = assembly.TargetFramework;
-            if (!assemblyTargetFramework.IsAvailable)
+            if (!currentFramework.CanLoad(assemblyTargetFramework))
             {
                 if (!assembly.FromWildCard)
                 {
