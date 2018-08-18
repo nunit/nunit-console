@@ -10,11 +10,7 @@
         Any,
         /// <summary>Microsoft .NET Framework</summary>
         Net,
-        /// <summary>Microsoft .NET Compact Framework</summary>
-        NetCF,
         /// <summary>Mono</summary>
-        Mono,
-        /// <summary>Silverlight</summary>
-        Silverlight
+        Mono
     }
 }

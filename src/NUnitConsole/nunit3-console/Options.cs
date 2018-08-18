@@ -357,29 +357,18 @@ namespace NUnit.Options
         protected static T Parse<T> (string value, OptionContext c)
         {
             Type tt = typeof (T);
-#if PORTABLE
-            bool nullable = tt.GetTypeInfo().IsValueType && tt.GetTypeInfo().IsGenericType &&
-                !tt.GetTypeInfo().IsGenericTypeDefinition &&
-                tt.GetGenericTypeDefinition () == typeof (Nullable<>);
-            Type targetType = nullable ? tt.GetGenericArguments () [0] : typeof (T);
-#else
+
             bool nullable = tt.IsValueType && tt.IsGenericType &&
                 !tt.IsGenericTypeDefinition &&
                 tt.GetGenericTypeDefinition () == typeof (Nullable<>);
             Type targetType = nullable ? tt.GetGenericArguments () [0] : typeof (T);
-#endif
 
-#if !NETCF && !SILVERLIGHT && !PORTABLE
             TypeConverter conv = TypeDescriptor.GetConverter (targetType);
-#endif
+
             T t = default (T);
             try {
                 if (value != null)
-#if NETCF || SILVERLIGHT || PORTABLE
-                    t = (T)Convert.ChangeType(value, tt, CultureInfo.InvariantCulture);
-#else
                     t = (T) conv.ConvertFromString (value);
-#endif
             }
             catch (Exception e) {
                 throw new OptionException (
@@ -508,33 +497,28 @@ namespace NUnit.Options
             this.option = optionName;
         }
 
-#if !NETCF && !SILVERLIGHT && !PORTABLE
         protected OptionException (SerializationInfo info, StreamingContext context)
             : base (info, context)
         {
             this.option = info.GetString ("OptionName");
         }
-#endif
 
         public string OptionName {
             get {return this.option;}
         }
 
-#if !NETCF && !SILVERLIGHT && !PORTABLE
         [SecurityPermission (SecurityAction.LinkDemand, SerializationFormatter = true)]
         public override void GetObjectData (SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData (info, context);
             info.AddValue ("OptionName", option);
         }
-#endif
     }
 
     public delegate void OptionAction<TKey, TValue> (TKey key, TValue value);
 
     public class OptionSet : KeyedCollection<string, Option>
     {
-#if !PORTABLE
         public OptionSet ()
             : this (delegate (string f) {return f;})
         {
@@ -550,17 +534,6 @@ namespace NUnit.Options
         public Converter<string, string> MessageLocalizer {
             get {return localizer;}
         }
-#else
-        string localizer(string msg)
-        {
-            return msg;
-        }
-
-        public string MessageLocalizer(string msg)
-        {
-            return msg;
-        }
-#endif
 
         protected override string GetKeyForItem (Option item)
         {

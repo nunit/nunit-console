@@ -154,12 +154,6 @@ namespace NUnit.Engine
                                 break;
                         }
                         break;
-
-                    case RuntimeType.Silverlight:
-                        this.ClrVersion = version.Major >= 4
-                            ? new Version(4, 0, 60310)
-                            : new Version(2, 0, 50727);
-                        break;
                 }
         }
 
@@ -195,9 +189,7 @@ namespace NUnit.Engine
 
                     RuntimeType runtime = isMono
                         ? RuntimeType.Mono
-                        : Environment.OSVersion.Platform == PlatformID.WinCE
-                            ? RuntimeType.NetCF
-                            : RuntimeType.Net;
+                        : RuntimeType.Net;
 
                     int major = Environment.Version.Major;
                     int minor = Environment.Version.Minor;
