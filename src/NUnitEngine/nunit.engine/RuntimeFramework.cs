@@ -488,6 +488,11 @@ namespace NUnit.Engine
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
         }
 
+        public bool CanLoad(RuntimeFramework requested)
+        {
+            return FrameworkVersion >= requested.FrameworkVersion;
+        }
+
         #endregion
 
         #region Helper Methods - General
