@@ -30,10 +30,6 @@ using System.Reflection;
 [assembly: AssemblyCompany("NUnit Software")]
 [assembly: AssemblyCopyright("Copyright (c) 2018 Charlie Poole, Rob Prouse")]
 
-#if PORTABLE
-[assembly: AssemblyMetadata("PCL", "True")]
-#endif
-
 #if DEBUG
 #if NET_4_5
 [assembly: AssemblyConfiguration(".NET 4.5 Debug")]
@@ -41,8 +37,6 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 4.0 Debug")]
 #elif NET_2_0
 [assembly: AssemblyConfiguration(".NET 2.0 Debug")]
-#elif PORTABLE
-[assembly: AssemblyConfiguration("Portable Debug")]
 #elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
 [assembly: AssemblyConfiguration(".NET Standard Debug")]
 #else
@@ -55,8 +49,6 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 4.0")]
 #elif NET_2_0
 [assembly: AssemblyConfiguration(".NET 2.0")]
-#elif PORTABLE
-[assembly: AssemblyConfiguration("Portable")]
 #elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
 [assembly: AssemblyConfiguration(".NET Standard")]
 #else

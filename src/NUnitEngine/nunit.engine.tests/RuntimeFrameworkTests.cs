@@ -33,9 +33,7 @@ namespace NUnit.Engine.Tests
         static RuntimeType currentRuntime =
             Type.GetType("Mono.Runtime", false) != null
                 ? RuntimeType.Mono
-                : Environment.OSVersion.Platform == PlatformID.WinCE
-                    ? RuntimeType.NetCF
-                    : RuntimeType.Net;
+                : RuntimeType.Net;
 
         [Test]
         public void CanGetCurrentFramework()
