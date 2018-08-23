@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,9 +24,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.Metadata;
 
 namespace NUnit.Engine.Services
 {
@@ -174,10 +174,9 @@ namespace NUnit.Engine.Services
         #region Helper Methods
 
         /// <summary>
-        /// Use Mono.Cecil to get information about all assemblies and
-        /// apply it to the package using special internal keywords.
+        /// Reads information about all assemblies and applies it to the
+        /// package using special internal keywords.
         /// </summary>
-        /// <param name="package"></param>
         private static void ApplyImageData(TestPackage package)
         {
             string packageName = package.FullName;
@@ -190,7 +189,7 @@ namespace NUnit.Engine.Services
             // We are doing two jobs here: (1) in the else clause (below)
             // we get information about a single assembly and record it,
             // (2) in the if clause, we recursively examine all subpackages
-            // and then apply policies for promulgating each setting to 
+            // and then apply policies for promulgating each setting to
             // a containing package. We could implement the policy part at
             // a higher level, but it seems simplest to do it right here.
             if (package.SubPackages.Count > 0)
@@ -203,7 +202,7 @@ namespace NUnit.Engine.Services
                     Version v = subPackage.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(0, 0));
                     if (v > targetVersion) targetVersion = v;
 
-                    // Collect highest framework name 
+                    // Collect highest framework name
                     // TODO: This assumes lexical ordering is valid - check it
                     string fn = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
                     if (fn != "")
@@ -222,12 +221,12 @@ namespace NUnit.Engine.Services
             }
             else if (File.Exists(packageName) && PathUtils.IsAssemblyFileType(packageName))
             {
-                var assembly = new TargetFrameworkHelper(packageName);
+                var assembly = AssemblyMetadataProvider.Create(packageName);
 
-                targetVersion = assembly.TargetRuntimeVersion;
+                targetVersion = MetadataFacts.ParseMetadataVersion(assembly.MetadataVersion);
                 log.Debug($"Assembly {packageName} uses version {targetVersion}");
 
-                frameworkName = assembly.FrameworkName;
+                frameworkName = MetadataFacts.GetTargetFramework(assembly);
                 log.Debug($"Assembly {packageName} targets {frameworkName}");
 
                 if (assembly.RequiresX86)
@@ -236,7 +235,7 @@ namespace NUnit.Engine.Services
                     log.Debug($"Assembly {packageName} will be run x86");
                 }
 
-                if (assembly.RequiresAssemblyResolver)
+                if (MetadataFacts.RequiresAssemblyResolver(assembly))
                 {
                     requiresAssemblyResolver = true;
                     log.Debug($"Assembly {packageName} requires default app domain assembly resolver");

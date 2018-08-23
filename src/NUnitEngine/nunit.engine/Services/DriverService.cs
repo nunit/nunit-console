@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,12 +24,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.Metadata;
 
 namespace NUnit.Engine.Services
 {
@@ -61,7 +60,7 @@ namespace NUnit.Engine.Services
 
             if (targetFramework != null)
             {
-                // This takes care of an issue with Roslyn. It may get fixed, but we still 
+                // This takes care of an issue with Roslyn. It may get fixed, but we still
                 // have to deal with assemblies having this setting. I'm assuming that
                 // any true Portable assembly would have a Profile as part of its name.
                 var platform = targetFramework == ".NETPortable,Version=v5.0"
@@ -73,22 +72,16 @@ namespace NUnit.Engine.Services
 
             try
             {
-                var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath);
+                var assemblyDef = AssemblyMetadataProvider.Create(assemblyPath);
 
-                if (skipNonTestAssemblies)
+                if (skipNonTestAssemblies && assemblyDef.HasAttribute("NUnit.Framework.NonTestAssemblyAttribute"))
                 {
-                    foreach (var attr in assemblyDef.CustomAttributes)
-                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
-                            return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                    return new SkippedAssemblyFrameworkDriver(assemblyPath);
                 }
-
-                var references = new List<AssemblyName>();
-                foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
-                    references.Add(new AssemblyName(cecilRef.FullName));
 
                 foreach (var factory in _factories)
                 {
-                    foreach (var reference in references)
+                    foreach (var reference in assemblyDef.AssemblyReferences)
                     {
                         if (factory.IsSupportedTestFramework(reference))
                             return factory.GetDriver(domain, reference);

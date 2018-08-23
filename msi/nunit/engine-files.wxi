@@ -32,10 +32,6 @@
                 <File Id="nunit_agent_x86.exe.config"
                       Source="$(var.InstallImage)bin/nunit-agent-x86.exe.config" />
             </Component>
-            <Component Id="MONO.CECIL" Location="local" Guid="D4A15752-6685-3494-9346-F623175CEFFA">
-                <File Id="Mono.Cecil.dll"
-                      Source="$(var.InstallImage)bin/Mono.Cecil.dll" />
-            </Component>
             <Component Id="NUNIT.ENGINE.REGISTRY">
                 <RegistryKey Root="HKMU" Key="Software\NUnit.org\Engine" >
                     <RegistryValue Action="write" Type="string" Name="!(bind.FileVersion.nunit.engine.dll)" Value="[CONSOLE_BIN]nunit.engine.dll" />

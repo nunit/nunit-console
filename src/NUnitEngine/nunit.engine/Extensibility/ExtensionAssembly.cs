@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole, Rob Prouse
+// Copyright (c) 2016–2018 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -23,55 +23,49 @@
 
 using System;
 using System.IO;
-using Mono.Cecil;
+using System.Reflection;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.Metadata;
 
 namespace NUnit.Engine.Extensibility
 {
     internal class ExtensionAssembly : IExtensionAssembly
     {
-        private readonly TargetFrameworkHelper _targetFrameworkHelper;
-
         public ExtensionAssembly(string filePath, bool fromWildCard)
         {
             FilePath = filePath;
             FromWildCard = fromWildCard;
-            Assembly = GetAssemblyDefinition();
-            _targetFrameworkHelper = new TargetFrameworkHelper(Assembly);
         }
 
         public string FilePath { get; }
         public bool FromWildCard { get; }
-        public AssemblyDefinition Assembly { get; }
+
+        private IAssemblyMetadataProvider _metadata;
+
+        public IAssemblyMetadataProvider Metadata
+        {
+            get => _metadata ?? (_metadata = AssemblyMetadataProvider.Create(FilePath));
+        }
 
         public string AssemblyName
         {
-            get { return Assembly.Name.Name; }
+            get => Metadata.AssemblyName.Name;
         }
 
         public Version AssemblyVersion
         {
-            get { return Assembly.Name.Version; }
-        }
-
-        public ModuleDefinition MainModule
-        {
-            get { return Assembly.MainModule; }
+            get => Metadata.AssemblyName.Version;
         }
 
         public RuntimeFramework TargetFramework
         {
-            get { return new RuntimeFramework(RuntimeType.Any, _targetFrameworkHelper.TargetRuntimeVersion); }
+            get => new RuntimeFramework(RuntimeType.Any, MetadataFacts.ParseMetadataVersion(Metadata.MetadataVersion));
         }
 
-        private AssemblyDefinition GetAssemblyDefinition()
+        public string ResolveAssemblyPath(AssemblyName assemblyName)
         {
-            var resolver = new DefaultAssemblyResolver();
-            resolver.AddSearchDirectory(Path.GetDirectoryName(FilePath));
-            resolver.AddSearchDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
-            var parameters = new ReaderParameters { AssemblyResolver = resolver };
-
-            return AssemblyDefinition.ReadAssembly(FilePath, parameters);
+            return AssemblyMetadataProvider.TryResolveAssemblyPath(assemblyName.Name, Path.GetDirectoryName(FilePath))
+                   ?? AssemblyMetadataProvider.TryResolveAssemblyPath(assemblyName.Name, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
     }
 }

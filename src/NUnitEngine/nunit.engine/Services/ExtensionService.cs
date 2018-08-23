@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole, Rob Prouse
+// Copyright (c) 2015—2018 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,16 +25,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Xml;
-using Mono.Cecil;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.Metadata;
 
 namespace NUnit.Engine.Services
 {
     /// <summary>
     /// The ExtensionService discovers ExtensionPoints and Extensions and
-    /// maintains them in a database. It can return extension nodes or 
+    /// maintains them in a database. It can return extension nodes or
     /// actual extension objects on request.
     /// </summary>
     public class ExtensionService : Service, IExtensionService
@@ -98,7 +97,7 @@ namespace NUnit.Engine.Services
         #region Public Methods - Extension Points
 
         /// <summary>
-        /// Get an ExtensionPoint based on its unique identifying path.
+        /// Get an extension point based on its unique identifying path.
         /// </summary>
         public ExtensionPoint GetExtensionPoint(string path)
         {
@@ -106,24 +105,12 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Get an ExtensionPoint based on the required Type for extensions.
+        /// Gets the extension point with the specified full type name.
         /// </summary>
-        public ExtensionPoint GetExtensionPoint(Type type)
+        public ExtensionPoint GetExtensionPointFromTypeName(string fullName)
         {
             foreach (var ep in _extensionPoints)
-                if (ep.TypeName == type.FullName)
-                    return ep;
-
-            return null;
-        }
-
-        /// <summary>
-        /// Get an ExtensionPoint based on a Cecil TypeReference.
-        /// </summary>
-        public ExtensionPoint GetExtensionPoint(TypeReference type)
-        {
-            foreach (var ep in _extensionPoints)
-                if (ep.TypeName == type.FullName)
+                if (ep.TypeName == fullName)
                     return ep;
 
             return null;
@@ -150,7 +137,7 @@ namespace NUnit.Engine.Services
 
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
         {
-            var ep = GetExtensionPoint(typeof(T));
+            var ep = GetExtensionPoint(typeof(T).FullName);
             if (ep != null)
                 foreach (var node in ep.Extensions)
                     if (includeDisabled || node.Enabled)
@@ -177,7 +164,7 @@ namespace NUnit.Engine.Services
                 FindExtensionPoints(thisAssembly);
                 FindExtensionPoints(apiAssembly);
 
-                // Create the list of possible extension assemblies, 
+                // Create the list of possible extension assemblies,
                 // eliminating duplicates. Start in Engine directory.
                 var startDir = new DirectoryInfo(AssemblyHelper.GetDirectoryName(thisAssembly));
                 FindExtensionAssemblies(startDir);
@@ -256,28 +243,26 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Deduce the extension point based on the Type of an extension. 
+        /// Deduce the extension point based on the Type of an extension.
         /// Returns null if no extension point can be found that would
         /// be satisfied by the provided Type.
         /// </summary>
-        private ExtensionPoint DeduceExtensionPointFromType(TypeReference typeRef)
+        private ExtensionPoint DeduceExtensionPointFromType(ITypeMetadataProvider typeDef, ExtensionAssembly extensionAssembly)
         {
-            var ep = GetExtensionPoint(typeRef);
+            var ep = GetExtensionPointFromTypeName(typeDef.FullName);
             if (ep != null)
                 return ep;
 
-            TypeDefinition typeDef = typeRef.Resolve();
-
-            foreach (TypeReference iface in typeDef.Interfaces)
+            foreach (var interfaceTypeRef in typeDef.Interfaces)
             {
-                ep = DeduceExtensionPointFromType(iface);
+                ep = DeduceExtensionPointFromType(interfaceTypeRef.Resolve(extensionAssembly.ResolveAssemblyPath), extensionAssembly);
                 if (ep != null)
                     return ep;
             }
 
-            TypeReference baseType = typeDef.BaseType;
-            return baseType != null && baseType.FullName != "System.Object"
-                ? DeduceExtensionPointFromType(baseType)
+            var baseTypeRef = typeDef.BaseType;
+            return baseTypeRef != null && baseTypeRef.FullName != "System.Object"
+                ? DeduceExtensionPointFromType(baseTypeRef.Resolve(extensionAssembly.ResolveAssemblyPath), extensionAssembly)
                 : null;
         }
 
@@ -297,8 +282,8 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Scans a directory for candidate addin assemblies. Note that assemblies in 
-        /// the directory are only scanned if no file of type .addins is found. If such 
+        /// Scans a directory for candidate addin assemblies. Note that assemblies in
+        /// the directory are only scanned if no file of type .addins is found. If such
         /// a file is found, then those assemblies it references are scanned.
         /// </summary>
         private void ProcessDirectory(DirectoryInfo startDir, bool fromWildCard)
@@ -435,37 +420,27 @@ namespace NUnit.Engine.Services
                 }
             }
 
-            foreach (var type in assembly.MainModule.GetTypes())
+            foreach (var type in assembly.Metadata.Types)
             {
-                CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
-
-                if (extensionAttr == null)
-                    continue;
-
-                object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
-                if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
-                    continue;
+                var extensionAttributes = type.GetAttributes("NUnit.Engine.Extensibility.ExtensionAttribute");
+                if (!extensionAttributes.TryFirst(IsCompatible, out var extensionAttr)) continue;
 
                 var node = new ExtensionNode(assembly.FilePath, type.FullName, assemblyTargetFramework);
-                node.Path = extensionAttr.GetNamedArgument("Path") as string;
-                node.Description = extensionAttr.GetNamedArgument("Description") as string;
+                node.Path = extensionAttr.GetNamedArgumentOrDefault("Path") as string;
+                node.Description = extensionAttr.GetNamedArgumentOrDefault("Description") as string;
 
-                object enabledArg = extensionAttr.GetNamedArgument("Enabled");
-                node.Enabled = enabledArg != null
-                    ? (bool)enabledArg : true;
+                node.Enabled = !false.Equals(extensionAttr.GetNamedArgumentOrDefault("Enabled"));
 
-                log.Info("  Found ExtensionAttribute on Type " + type.Name);
+                log.Info("  Found ExtensionAttribute on Type " + type.FullName);
 
                 foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
                 {
-                    string name = attr.ConstructorArguments[0].Value as string;
-                    string value = attr.ConstructorArguments[1].Value as string;
+                    if (attr.PositionalArguments.Length != 2) continue;
+                    if (!(attr.PositionalArguments[0] is string name)) continue;
+                    var value = attr.PositionalArguments[1]?.ToString();
 
-                    if (name != null && value != null)
-                    {
-                        node.AddProperty(name, value);
-                        log.Info("        ExtensionProperty {0} = {1}", name, value);
-                    }
+                    node.AddProperty(name, value);
+                    log.Info("        ExtensionProperty {0} = {1}", name, value);
                 }
 
                 _extensions.Add(node);
@@ -473,7 +448,7 @@ namespace NUnit.Engine.Services
                 ExtensionPoint ep;
                 if (node.Path == null)
                 {
-                    ep = DeduceExtensionPointFromType(type);
+                    ep = DeduceExtensionPointFromType(type, assembly);
                     if (ep == null)
                     {
                         string msg = string.Format(
@@ -499,6 +474,13 @@ namespace NUnit.Engine.Services
 
                 ep.Install(node);
             }
+        }
+
+        private static bool IsCompatible(AttributeMetadata attribute)
+        {
+            return !(
+                attribute.GetNamedArgumentOrDefault("EngineVersion") is string str
+                && ENGINE_VERSION < new Version(str));
         }
 
         #endregion

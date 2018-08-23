@@ -296,8 +296,7 @@ var BinFiles = new FilePath[]
     "ConsoleTests.nunit",
     "EngineTests.nunit",
     "mock-assembly.dll",
-	"notest-assembly.dll",
-    "Mono.Cecil.dll",
+    "notest-assembly.dll",
     "nunit-agent-x86.exe",
     "nunit-agent-x86.exe.config",
     "nunit-agent.exe",
@@ -423,8 +422,7 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.xml", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
+                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.dll", Target="tools" }
                 }
 			});
 

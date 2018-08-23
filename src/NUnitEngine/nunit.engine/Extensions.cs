@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole, Rob Prouse
+// Copyright (c) 2018 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,57 +21,56 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
 using System.Collections.Generic;
-using System.Text;
-using Mono.Cecil;
+using NUnit.Common;
 
-namespace NUnit.Engine.Internal
+namespace NUnit.Engine
 {
-    /// <summary>
-    /// Extension methods that make it easier to work with Mono.Cecil.
-    /// </summary>
-    public static class CecilExtensions
+    internal static class Extensions
     {
-        #region TypeDefinition Extensions
-
-        public static List<CustomAttribute> GetAttributes(this TypeDefinition type, string fullName)
+        public static TSource FirstOrDefault<TSource>(this IEnumerable<TSource> source)
         {
-            var attributes = new List<CustomAttribute>();
+            Guard.ArgumentNotNull(source, nameof(source));
 
-            foreach (CustomAttribute attr in type.CustomAttributes)
+            using (var en = source.GetEnumerator())
             {
-                if (attr.AttributeType.FullName == fullName)
-                    attributes.Add(attr);
+                if (en.MoveNext()) return en.Current;
             }
 
-            return attributes;
+            return default(TSource);
         }
 
-        public static CustomAttribute GetAttribute(this TypeDefinition type, string fullName)
+        public static bool TryFirst<TSource>(this IEnumerable<TSource> source, out TSource value)
         {
-            foreach (CustomAttribute attr in type.CustomAttributes)
+            Guard.ArgumentNotNull(source, nameof(source));
+
+            using (var en = source.GetEnumerator())
             {
-                if (attr.AttributeType.FullName == fullName)
-                    return attr;
+                if (en.MoveNext())
+                {
+                    value = en.Current;
+                    return true;
+                }
             }
 
-            return null;
+            value = default(TSource);
+            return false;
         }
 
-        #endregion
-
-        #region CustomAttribute Extensions
-
-        public static object GetNamedArgument(this CustomAttribute attr, string name)
+        public static bool TryFirst<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate, out TSource value)
         {
-            foreach (var property in attr.Properties)
-                if (property.Name == name)
-                    return property.Argument.Value;
+            Guard.ArgumentNotNull(source, nameof(source));
+            Guard.ArgumentNotNull(predicate, nameof(predicate));
 
-            return null;
+            foreach (var item in source)
+            {
+                if (!predicate.Invoke(item)) continue;
+                value = item;
+                return true;
+            }
+
+            value = default(TSource);
+            return false;
         }
-
-        #endregion
     }
 }

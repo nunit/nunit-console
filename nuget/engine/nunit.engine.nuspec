@@ -24,7 +24,6 @@
     <file src="CHANGES.txt" />
     <file src="bin\nunit.engine.dll" target="lib" />
     <file src="bin\nunit.engine.api.dll" target="lib" />
-    <file src="bin\Mono.Cecil.dll" target="lib" />
     <file src="bin\nunit-agent.exe" target="lib" />
     <file src="bin\nunit-agent.exe.config" target="lib" />
     <file src="bin\nunit-agent-x86.exe" target="lib" />

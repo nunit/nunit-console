@@ -55,9 +55,6 @@
     <Compile Include="..\nunit.engine\InternalEnginePackageSettings.cs">
       <Link>InternalEnginePackageSettings.cs</Link>
     </Compile>
-    <Compile Include="..\nunit.engine\Internal\CecilExtensions.cs">
-      <Link>Internal\CecilExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\nunit.engine\Internal\DirectoryFinder.cs">
       <Link>Internal\DirectoryFinder.cs</Link>
     </Compile>
