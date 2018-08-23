@@ -83,7 +83,7 @@ namespace NUnit.Engine.Services
 
             // If no config is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
-            // use it. If not, each assembly will use it's own config, if present.
+            // use it. If not, each assembly will use its own config, if present.
             if (!package.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
