@@ -113,7 +113,7 @@ namespace NUnit.Agent
 
             // Create TestEngine - this program is
             // conceptually part of  the engine and
-            // can access it's internals as needed.
+            // can access its internals as needed.
             TestEngine engine = new TestEngine();
 
             // TODO: We need to get this from somewhere. Argument?

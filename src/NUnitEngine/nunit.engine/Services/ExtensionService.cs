@@ -67,7 +67,7 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Get an ExtensionPoint based on it's unique identifying path.
+        /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
         IExtensionPoint IExtensionService.GetExtensionPoint(string path)
         {
@@ -98,7 +98,7 @@ namespace NUnit.Engine.Services
         #region Public Methods - Extension Points
 
         /// <summary>
-        /// Get an ExtensionPoint based on it's unique identifying path.
+        /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
         public ExtensionPoint GetExtensionPoint(string path)
         {
