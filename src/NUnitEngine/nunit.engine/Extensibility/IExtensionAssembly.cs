@@ -21,19 +21,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-namespace NUnit.Engine
+using System;
+
+namespace NUnit.Engine.Extensibility
 {
-    /// <summary>
-    /// Enumeration identifying a common language
-    /// runtime implementation.
-    /// </summary>
-    public enum RuntimeType
+    internal interface IExtensionAssembly
     {
-        /// <summary>Any supported runtime framework</summary>
-        Any,
-        /// <summary>Microsoft .NET Framework</summary>
-        Net,
-        /// <summary>Mono</summary>
-        Mono
+        bool FromWildCard { get; }
+        string AssemblyName { get; }
+        Version AssemblyVersion { get; }
+        RuntimeFramework TargetFramework { get; }
     }
 }

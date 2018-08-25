@@ -56,6 +56,11 @@ namespace NUnit.Engine.Extensibility
         string Description { get; }
 
         /// <summary>
+        /// The TargetFramework of the extension assembly.
+        /// </summary>
+        IRuntimeFramework TargetFramework { get; }
+
+        /// <summary>
         /// Gets a collection of the names of all this extension's properties
         /// </summary>
         IEnumerable<string> PropertyNames { get; }

@@ -42,11 +42,11 @@ namespace NUnit.Engine.Services
         static Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
         static readonly Version ENGINE_VERSION = typeof(TestEngine).Assembly.GetName().Version;
 
-        private List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
-        private Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
+        private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
+        private readonly Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
 
-        private List<ExtensionNode> _extensions = new List<ExtensionNode>();
-        private List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
+        private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
+        private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
         #region IExtensionService Members
 
@@ -294,12 +294,6 @@ namespace NUnit.Engine.Services
         {
             // First check the directory itself
             ProcessAddinsFiles(startDir, false);
-
-            //// Use any packages directory we find as well
-            //var packageDir = DirectoryFinder.GetPackageDirectory(startDir);
-            //if (packageDir != null)
-            //    foreach (var dir in DirectoryFinder.GetDirectories(packageDir, "NUnit.Extension.*/**/tools/"))
-            //        ProcessDirectory(dir, false);
         }
 
         /// <summary>
@@ -397,6 +391,11 @@ namespace NUnit.Engine.Services
                     if (!fromWildCard)
                         throw new NUnitEngineException(String.Format("Specified extension {0} could not be read", filePath), e);
                 }
+                catch (NUnitEngineException)
+                {
+                    if (!fromWildCard)
+                        throw;
+                }
             }
         }
 
@@ -417,9 +416,24 @@ namespace NUnit.Engine.Services
         /// For each extension, create an ExtensionNode and link it to the
         /// correct ExtensionPoint. Public for testing.
         /// </summary>
-        public void FindExtensionsInAssembly(ExtensionAssembly assembly)
+        internal void FindExtensionsInAssembly(ExtensionAssembly assembly)
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
+
+            var currentFramework = RuntimeFramework.CurrentFramework;
+            var assemblyTargetFramework = assembly.TargetFramework;
+            if (!currentFramework.CanLoad(assemblyTargetFramework))
+            {
+                if (!assembly.FromWildCard)
+                {
+                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                }
+                else
+                {
+                    log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                    return;
+                }
+            }
 
             foreach (var type in assembly.MainModule.GetTypes())
             {
@@ -432,7 +446,7 @@ namespace NUnit.Engine.Services
                 if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
                     continue;
 
-                var node = new ExtensionNode(assembly.FilePath, type.FullName);
+                var node = new ExtensionNode(assembly.FilePath, type.FullName, assemblyTargetFramework);
                 node.Path = extensionAttr.GetNamedArgument("Path") as string;
                 node.Description = extensionAttr.GetNamedArgument("Description") as string;
 
