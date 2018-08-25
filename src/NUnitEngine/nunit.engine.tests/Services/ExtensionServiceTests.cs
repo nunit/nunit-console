@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,7 +36,7 @@ namespace NUnit.Engine.Services.Tests
 #pragma warning disable 414
         private static readonly string[] KnownExtensionPointPaths = {
             "/NUnit/Engine/TypeExtensions/IDriverFactory",
-            "/NUnit/Engine/TypeExtensions/IProjectLoader", 
+            "/NUnit/Engine/TypeExtensions/IProjectLoader",
             "/NUnit/Engine/TypeExtensions/IResultWriter",
             "/NUnit/Engine/TypeExtensions/ITestEventListener",
             "/NUnit/Engine/TypeExtensions/IService",
@@ -91,7 +91,7 @@ namespace NUnit.Engine.Services.Tests
             [ValueSource(nameof(KnownExtensionPointPaths))] string path,
             [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
         {
-            var ep = _serviceClass.GetExtensionPoint(type);
+            var ep = _serviceClass.GetExtensionPointFromTypeName(type.FullName);
             Assert.NotNull(ep);
             Assert.That(ep.Path, Is.EqualTo(path));
             Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
@@ -140,7 +140,7 @@ namespace NUnit.Engine.Services.Tests
         {
             _serviceInterface.EnableExtension("NUnit.Engine.Tests.DummyDisabledExtension", true);
 
-            Assert.That(_serviceInterface.Extensions, 
+            Assert.That(_serviceInterface.Extensions,
                 Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo("NUnit.Engine.Tests.DummyDisabledExtension")
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
         }

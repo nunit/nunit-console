@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole, Rob Prouse
+// Copyright (c) 2018 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -23,55 +23,41 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Mono.Cecil;
+using System.Reflection;
+using NUnit.Common;
 
-namespace NUnit.Engine.Internal
+namespace NUnit.Engine.Internal.Metadata
 {
-    /// <summary>
-    /// Extension methods that make it easier to work with Mono.Cecil.
-    /// </summary>
-    public static class CecilExtensions
+    partial class DirectReflectionMetadataProvider
     {
-        #region TypeDefinition Extensions
-
-        public static List<CustomAttribute> GetAttributes(this TypeDefinition type, string fullName)
+        private sealed class TypeMetadataProvider : ITypeMetadataProvider
         {
-            var attributes = new List<CustomAttribute>();
+            private readonly Type _type;
 
-            foreach (CustomAttribute attr in type.CustomAttributes)
+            public TypeMetadataProvider(Type type)
             {
-                if (attr.AttributeType.FullName == fullName)
-                    attributes.Add(attr);
+                Guard.ArgumentNotNull(type, nameof(type));
+                _type = type;
             }
 
-            return attributes;
-        }
+            public string FullName => _type.FullName;
 
-        public static CustomAttribute GetAttribute(this TypeDefinition type, string fullName)
-        {
-            foreach (CustomAttribute attr in type.CustomAttributes)
+            public IEnumerable<AttributeMetadata> GetAttributes(string fullAttributeTypeName)
             {
-                if (attr.AttributeType.FullName == fullName)
-                    return attr;
+                return DirectReflectionMetadataProvider.GetAttributes(
+                    CustomAttributeData.GetCustomAttributes(_type),
+                    fullAttributeTypeName);
             }
 
-            return null;
+            public IEnumerable<ITypeMetadataReference> Interfaces
+            {
+                get => _type.GetInterfaces().Select(t => (ITypeMetadataReference)new TypeMetadataReference(() => t));
+            }
+
+            public ITypeMetadataReference BaseType
+            {
+                get => _type.BaseType == null ? null : new TypeMetadataReference(() => _type.BaseType);
+            }
         }
-
-        #endregion
-
-        #region CustomAttribute Extensions
-
-        public static object GetNamedArgument(this CustomAttribute attr, string name)
-        {
-            foreach (var property in attr.Properties)
-                if (property.Name == name)
-                    return property.Argument.Value;
-
-            return null;
-        }
-
-        #endregion
     }
 }
