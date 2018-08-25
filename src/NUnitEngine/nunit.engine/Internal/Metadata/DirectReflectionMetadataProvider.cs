@@ -41,28 +41,7 @@ namespace NUnit.Engine.Internal.Metadata
             _path = path;
         }
 
-        private Assembly Assembly
-        {
-            get
-            {
-                if (_assembly == null)
-                {
-                    AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
-                    _assembly = Assembly.ReflectionOnlyLoadFrom(_path);
-                }
-
-                return _assembly;
-            }
-        }
-
-        private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            var fromSameDirectory = AssemblyMetadataProvider.TryResolveAssemblyPath(args.Name, Path.GetDirectoryName(_path));
-
-            return fromSameDirectory != null
-                ? Assembly.ReflectionOnlyLoadFrom(fromSameDirectory)
-                : Assembly.ReflectionOnlyLoad(args.Name);
-        }
+        private Assembly Assembly => _assembly ?? (_assembly = Assembly.ReflectionOnlyLoadFrom(_path));
 
         public bool RequiresX86
         {
@@ -86,7 +65,8 @@ namespace NUnit.Engine.Internal.Metadata
 
         public IEnumerable<AttributeMetadata> GetAttributes(string fullAttributeTypeName)
         {
-            return GetAttributes(CustomAttributeData.GetCustomAttributes(Assembly), fullAttributeTypeName);
+            return DoWithReflectionOnlyAssemblyResolve(() =>
+                GetAttributes(CustomAttributeData.GetCustomAttributes(Assembly), fullAttributeTypeName));
         }
 
         public IEnumerable<ITypeMetadataProvider> Types
@@ -104,6 +84,30 @@ namespace NUnit.Engine.Internal.Metadata
                         attribute.ConstructorArguments.ConvertAll(a => a.Value),
                         attribute.NamedArguments.ConvertAll(a => new NamedArgument(a.MemberInfo.Name, a.TypedValue.Value)));
                 }
+            }
+        }
+
+        private T DoWithReflectionOnlyAssemblyResolve<T>(Func<T> func)
+        {
+            Guard.ArgumentNotNull(func, nameof(func));
+
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += OnReflectionOnlyAssemblyResolve;
+            try
+            {
+                return func.Invoke();
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += OnReflectionOnlyAssemblyResolve;
+            }
+
+            Assembly OnReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+            {
+                var fromSameDirectory = AssemblyMetadataProvider.TryResolveAssemblyPath(args.Name, Path.GetDirectoryName(_path));
+
+                return fromSameDirectory != null
+                    ? Assembly.ReflectionOnlyLoadFrom(fromSameDirectory)
+                    : Assembly.ReflectionOnlyLoad(args.Name);
             }
         }
     }

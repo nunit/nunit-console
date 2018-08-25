@@ -51,12 +51,12 @@ namespace NUnit.Engine.Internal.Metadata
 
             public IEnumerable<ITypeMetadataReference> Interfaces
             {
-                get => _type.GetInterfaces().Select(t => (ITypeMetadataReference)new TypeMetadataReference(t));
+                get => _type.GetInterfaces().Select(t => (ITypeMetadataReference)new TypeMetadataReference(() => t));
             }
 
             public ITypeMetadataReference BaseType
             {
-                get => _type.BaseType == null ? null : new TypeMetadataReference(_type.BaseType);
+                get => _type.BaseType == null ? null : new TypeMetadataReference(() => _type.BaseType);
             }
         }
     }

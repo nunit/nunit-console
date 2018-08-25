@@ -261,9 +261,9 @@ namespace NUnit.Engine.Services
             }
 
             var baseTypeRef = typeDef.BaseType;
-            return baseTypeRef != null && baseTypeRef.FullName != "System.Object"
-                ? DeduceExtensionPointFromType(baseTypeRef.Resolve(extensionAssembly.ResolveAssemblyPath), extensionAssembly)
-                : null;
+            if (baseTypeRef == null) return null;
+
+            return DeduceExtensionPointFromType(baseTypeRef.Resolve(extensionAssembly.ResolveAssemblyPath), extensionAssembly);
         }
 
         #endregion
