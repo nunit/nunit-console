@@ -131,20 +131,6 @@ Task("Clean")
 // INITIALIZE FOR BUILD
 //////////////////////////////////////////////////////////////////////
 
-Task("InitializeBuild")
-    .Description("Initializes the build")
-    .Does(() =>
-    {
-        Information("Restoring NuGet packages");
-		DotNetCoreRestore(SOLUTION_FILE);
-
-        if(IsRunningOnWindows())
-        {
-            Information("Restoring .NET Core packages");
-            DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
-        }
-	});
-
 Task("UpdateAssemblyInfo")
     .Description("Sets the assembly versions to the calculated version.")
     .Does(() =>
@@ -158,41 +144,29 @@ Task("UpdateAssemblyInfo")
 // BUILD ENGINE
 //////////////////////////////////////////////////////////////////////
 
+MSBuildSettings CreateMSBuildSettings(string target) => new MSBuildSettings()
+    .SetConfiguration(configuration)
+    .SetVerbosity(Verbosity.Minimal)
+    .WithProperty("PackageVersion", productVersion)
+    .WithTarget(target);
+
 Task("BuildNetFramework")
     .Description("Builds the .NET Framework version of the engine and console")
-    .IsDependentOn("InitializeBuild")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
-        // Use MSBuild
-        MSBuild(SOLUTION_FILE, new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
-            .SetVerbosity(Verbosity.Minimal)
-			.SetPlatformTarget(PlatformTarget.MSIL)
-        );
+        MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
     });
-
-//////////////////////////////////////////////////////////////////////
-// BUILD NETSTANDARD ENGINE
-//////////////////////////////////////////////////////////////////////
 
 Task("BuildNetStandardEngine")
     .Description("Builds the .NET Standard engine")
-    .IsDependentOn("InitializeBuild")
     .IsDependentOn("UpdateAssemblyInfo")
     .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
-        if(IsDotNetCoreInstalled)
+        if (IsDotNetCoreInstalled)
         {
-            var settings = new DotNetCoreBuildSettings
-            {
-                Configuration = configuration,
-                EnvironmentVariables = new Dictionary<string, string>()
-            };
-            settings.EnvironmentVariables.Add("PackageVersion", productVersion);
-            DotNetCoreBuild(DOTNETCORE_SOLUTION_FILE, settings);
+            MSBuild(DOTNETCORE_SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
         }
         else
         {
@@ -206,22 +180,16 @@ Task("BuildNetStandardEngine")
 
 Task("BuildCppTestFiles")
     .Description("Builds the C++ mock test assemblies")
-    .IsDependentOn("InitializeBuild")
     .WithCriteria(IsRunningOnWindows)
     .Does(() =>
     {
-        MSBuild("./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj", new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .WithProperty("Platform", "x86")
-            .SetVerbosity(Verbosity.Minimal)
-            .SetNodeReuse(false)
-        );
-        MSBuild("./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj", new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .WithProperty("Platform", "x64")
-            .SetVerbosity(Verbosity.Minimal)
-            .SetNodeReuse(false)
-        );
+        MSBuild(
+            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
+             CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+
+        MSBuild(
+            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
+            CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
     });
 
 //////////////////////////////////////////////////////////////////////
