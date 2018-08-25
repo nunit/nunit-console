@@ -21,26 +21,43 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal.Metadata
 {
-    internal static class AssemblyMetadataProvider
+    partial class DirectReflectionMetadataProvider
     {
-        public static IAssemblyMetadataProvider Create(string assemblyPath)
+        private sealed class TypeMetadataProvider : ITypeMetadataProvider
         {
-            return new DirectReflectionMetadataProvider(assemblyPath);
-        }
+            private readonly Type _type;
 
-        public static string TryResolveAssemblyPath(string assemblyName, string directory)
-        {
-            var path = Path.Combine(directory, assemblyName + ".dll");
-            if (File.Exists(path)) return path;
+            public TypeMetadataProvider(Type type)
+            {
+                Guard.ArgumentNotNull(type, nameof(type));
+                _type = type;
+            }
 
-            path = Path.Combine(directory, assemblyName + ".exe");
-            if (File.Exists(path)) return path;
+            public string FullName => _type.FullName;
 
-            return null;
+            public IEnumerable<AttributeMetadata> GetAttributes(string fullAttributeTypeName)
+            {
+                return DirectReflectionMetadataProvider.GetAttributes(
+                    CustomAttributeData.GetCustomAttributes(_type),
+                    fullAttributeTypeName);
+            }
+
+            public IEnumerable<ITypeMetadataReference> Interfaces
+            {
+                get => _type.GetInterfaces().Select(t => (ITypeMetadataReference)new TypeMetadataReference(t));
+            }
+
+            public ITypeMetadataReference BaseType
+            {
+                get => _type.BaseType == null ? null : new TypeMetadataReference(_type.BaseType);
+            }
         }
     }
 }

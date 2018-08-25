@@ -21,26 +21,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System.IO;
+using System;
+using System.Reflection;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal.Metadata
 {
-    internal static class AssemblyMetadataProvider
+    partial class DirectReflectionMetadataProvider
     {
-        public static IAssemblyMetadataProvider Create(string assemblyPath)
+        private sealed class TypeMetadataReference : ITypeMetadataReference
         {
-            return new DirectReflectionMetadataProvider(assemblyPath);
-        }
+            private readonly Type _referencedType;
 
-        public static string TryResolveAssemblyPath(string assemblyName, string directory)
-        {
-            var path = Path.Combine(directory, assemblyName + ".dll");
-            if (File.Exists(path)) return path;
+            public TypeMetadataReference(Type referencedReferencedType)
+            {
+                Guard.ArgumentNotNull(referencedReferencedType, nameof(referencedReferencedType));
+                _referencedType = referencedReferencedType;
+            }
 
-            path = Path.Combine(directory, assemblyName + ".exe");
-            if (File.Exists(path)) return path;
+            public string FullName => _referencedType.FullName;
 
-            return null;
+            public ITypeMetadataProvider Resolve(Func<AssemblyName, string> assemblyPathResolver)
+            {
+                return new TypeMetadataProvider(_referencedType);
+            }
         }
     }
 }
