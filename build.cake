@@ -148,7 +148,9 @@ MSBuildSettings CreateMSBuildSettings(string target) => new MSBuildSettings()
     .SetConfiguration(configuration)
     .SetVerbosity(Verbosity.Minimal)
     .WithProperty("PackageVersion", productVersion)
-    .WithTarget(target);
+    .WithTarget(target)
+    // Workaround for https://github.com/Microsoft/msbuild/issues/3626
+    .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
 
 Task("BuildNetFramework")
     .Description("Builds the .NET Framework version of the engine and console")
