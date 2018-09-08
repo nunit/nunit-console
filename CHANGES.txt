@@ -1,4 +1,37 @@
-﻿NUnit 3.8 - January 27, 2018
+﻿NUnit 3.9 - September 5, 2018
+
+This release should stop the dreaded SocketException problem on shutdown. The
+console also no longer returns -5 when AppDomains fail to unload at the end of a
+test run. These fixes should make CI runs much more stable and predictible.
+
+For developers working on the NUnit Console and Engine project, Visual Studio
+2017 update 5 or newer is now required to compile on the command line. This does
+not effect developers using NUnit or the NUnit Console, both of which support building
+and running your tests in any IDE and on any .NET Framework back to .NET 2.0.
+
+Issues Resolved
+
+ * 103 The switch statement does not cover all values of the 'RuntimeType' enum: NetCF.
+ * 218 Move Distribution back into the nunit-console project.
+ * 253 Master Chocolatey issue
+ * 255 SocketException thrown during console run
+ * 312 CI failure: SocketException
+ * 360 CommandLineOption --err does not write error input to ErrorFile
+ * 367 nunit3-console loads nunit.framework with partial name
+ * 370 Nunit.Console 3.8 - Socket Exception
+ * 371 Remove -5 exit code on app domain unload failures
+ * 394 Multi-targeted Engine Extensions
+ * 399 Fix minor doccoment issues
+ * 411 Make output received when providing user friendly messages unloading the domain more user friendly
+ * 412 Extensions not dectected for version 3.9.0-dev-03997
+ * 436 NUnitEngineException : Unable to acquire remote process agent
+ * 446 Output CI version info to console
+ * 448 Update vs-project-loader extension to 3.8.0
+ * 450 Update NUnit.Extension.VSProjectLoader to 3.8.0
+ * 456 NuGet Package : Add `repository` metadata.
+ * 461 Use MSBuild /restore
+
+NUnit 3.8 - January 27, 2018
 
 This release includes several fixes when unloading AppDomains and better error reporting. The
 aggregate NuGet packages also include updated versions of several extensions.

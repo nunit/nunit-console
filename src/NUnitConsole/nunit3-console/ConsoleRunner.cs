@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -195,7 +195,7 @@ namespace NUnit.ConsoleRunner
                             spec.OutputPath), ex);
                 }
             }
-            
+
             var labels = _options.DisplayTestLabels != null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
@@ -292,8 +292,8 @@ namespace NUnit.ConsoleRunner
                     var unixVariant = Marshal.PtrToStringAnsi(buf);
                     if (unixVariant.Equals("Darwin"))
                         unixVariant = "MacOSX";
-                    
-                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack); 
+
+                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack);
                 }
                 Marshal.FreeHGlobal(buf);
             }
@@ -313,7 +313,7 @@ namespace NUnit.ConsoleRunner
                 foreach (var node in ep.Extensions)
                 {
                     _outWriter.Write("    Extension: ");
-                    _outWriter.Write(ColorStyle.Value, node.TypeName);
+                    _outWriter.Write(ColorStyle.Value, $"{node.TypeName} (.NET {node.TargetFramework?.FrameworkVersion})");
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
                     foreach (var prop in node.PropertyNames)
                     {

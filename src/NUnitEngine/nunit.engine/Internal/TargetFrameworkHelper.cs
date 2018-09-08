@@ -45,6 +45,12 @@ namespace NUnit.Engine.Internal
             }
         }
 
+        public TargetFrameworkHelper(AssemblyDefinition assemblyDef)
+        {
+            _assemblyDef = assemblyDef;
+            _module = _assemblyDef.MainModule;
+        }
+
         public bool RequiresX86
         {
             get

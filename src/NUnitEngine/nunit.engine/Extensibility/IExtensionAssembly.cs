@@ -1,5 +1,5 @@
-// ***********************************************************************
-// Copyright (c) 2014 Charlie Poole, Rob Prouse
+﻿// ***********************************************************************
+// Copyright (c) 2018 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,8 +21,19 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System.Reflection;
+#if !NETSTANDARD1_3
+using System;
 
-[assembly: AssemblyProduct("NUnit Engine")]
-[assembly: AssemblyVersion("3.10.0")]
-[assembly: AssemblyInformationalVersion("3.10.0")]
+namespace NUnit.Engine.Extensibility
+{
+    internal interface IExtensionAssembly
+    {
+        bool FromWildCard { get; }
+        string AssemblyName { get; }
+        Version AssemblyVersion { get; }
+#if !NETSTANDARD2_0
+        RuntimeFramework TargetFramework { get; }
+#endif
+    }
+}
+#endif

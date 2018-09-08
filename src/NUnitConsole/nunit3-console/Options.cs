@@ -122,10 +122,6 @@
 //      p.Parse (new string[]{"-a+"});  // sets v != null
 //      p.Parse (new string[]{"-a-"});  // sets v == null
 //
-// The NUnit version of this file introduces conditional compilation for
-// building under the Compact Framework (NETCF) and Silverlight (SILVERLIGHT)
-// as well as for use with a portable class library  (PORTABLE).
-//
 // 11/5/2015 -
 // Change namespace to avoid conflict with user code use of mono.options
 
@@ -508,14 +504,20 @@ namespace NUnit.Options
 
     public class OptionSet : KeyedCollection<string, Option>
     {
-        string localizer(string msg)
+        public OptionSet ()
+            : this (delegate (string f) {return f;})
         {
-            return msg;
         }
 
-        public string MessageLocalizer(string msg)
+        public OptionSet (Converter<string, string> localizer)
         {
-            return msg;
+            this.localizer = localizer;
+        }
+
+        Converter<string, string> localizer;
+
+        public Converter<string, string> MessageLocalizer {
+            get {return localizer;}
         }
 
         protected override string GetKeyForItem (Option item)

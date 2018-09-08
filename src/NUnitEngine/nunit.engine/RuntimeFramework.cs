@@ -155,12 +155,6 @@ namespace NUnit.Engine
                                 break;
                         }
                         break;
-
-                    case RuntimeType.Silverlight:
-                        this.ClrVersion = version.Major >= 4
-                            ? new Version(4, 0, 60310)
-                            : new Version(2, 0, 50727);
-                        break;
                 }
         }
 
@@ -196,9 +190,7 @@ namespace NUnit.Engine
 
                     RuntimeType runtime = isMono
                         ? RuntimeType.Mono
-                        : Environment.OSVersion.Platform == PlatformID.WinCE
-                            ? RuntimeType.NetCF
-                            : RuntimeType.Net;
+                        : RuntimeType.Net;
 
                     int major = Environment.Version.Major;
                     int minor = Environment.Version.Minor;
@@ -280,7 +272,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets an array of all available frameworks
         /// </summary>
-        // TODO: Special handling for netcf
         public static RuntimeFramework[] AvailableFrameworks
         {
             get
@@ -487,6 +478,11 @@ namespace NUnit.Engine
             return VersionsMatch(this.ClrVersion, target.ClrVersion)
                 && this.FrameworkVersion.Major >= target.FrameworkVersion.Major
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
+        }
+
+        public bool CanLoad(IRuntimeFramework requested)
+        {
+            return FrameworkVersion >= requested.FrameworkVersion;
         }
 
         #endregion

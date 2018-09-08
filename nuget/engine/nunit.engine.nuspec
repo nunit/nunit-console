@@ -8,6 +8,7 @@
     <owners>Charlie Poole, Rob Prouse</owners>
     <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
     <projectUrl>http://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine is used by runners to discover and execute tests.</summary>

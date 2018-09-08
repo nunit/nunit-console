@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -27,7 +27,7 @@ using System.Collections.Generic;
 namespace NUnit.Engine.Extensibility
 {
     /// <summary>
-    /// The IExtensionNode interface is implemented by a class that represents a 
+    /// The IExtensionNode interface is implemented by a class that represents a
     /// single extension being installed on a particular extension point.
     /// </summary>
     public interface IExtensionNode
@@ -42,9 +42,9 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         bool Enabled { get; }
-    
+
         /// <summary>
-        /// Gets the unique string identifying the ExtensionPoint for which 
+        /// Gets the unique string identifying the ExtensionPoint for which
         /// this Extension is intended. This identifier may be supplied by the attribute
         /// marking the extension or deduced by NUnit from the Type of the extension class.
         /// </summary>
@@ -54,6 +54,11 @@ namespace NUnit.Engine.Extensibility
         /// Gets an optional description of what the extension does.
         /// </summary>
         string Description { get; }
+
+        /// <summary>
+        /// The TargetFramework of the extension assembly.
+        /// </summary>
+        IRuntimeFramework TargetFramework { get; }
 
         /// <summary>
         /// Gets a collection of the names of all this extension's properties

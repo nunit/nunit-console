@@ -127,14 +127,14 @@ namespace NUnit.Engine.Services
 
             try
             {
-#if !NETSTANDARD1_3
+#if NET20 || NETSTANDARD2_0
                 var extensionService = ServiceContext.GetService<ExtensionService>();
                 if (extensionService != null)
                 {
                     foreach (IDriverFactory factory in extensionService.GetExtensions<IDriverFactory>())
                         _factories.Add(factory);
 
-#if !NETSTANDARD2_0
+#if NET20
                     var node = extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
                     if (node != null)
                         _factories.Add(new NUnit2DriverFactory(node));

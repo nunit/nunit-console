@@ -34,9 +34,7 @@ namespace NUnit.Engine.Tests
         static RuntimeType currentRuntime =
             Type.GetType("Mono.Runtime", false) != null
                 ? RuntimeType.Mono
-                : Environment.OSVersion.Platform == PlatformID.WinCE
-                    ? RuntimeType.NetCF
-                    : RuntimeType.Net;
+                : RuntimeType.Net;
 
         [Test]
         public void CanGetCurrentFramework()
@@ -89,7 +87,7 @@ namespace NUnit.Engine.Tests
             Assert.That(names, Is.Unique);
         }
 
-        [TestCaseSource("frameworkData")]
+        [TestCaseSource(nameof(frameworkData))]
         public void CanCreateUsingFrameworkVersion(FrameworkData data)
         {
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.frameworkVersion);
@@ -98,7 +96,7 @@ namespace NUnit.Engine.Tests
             Assert.AreEqual(data.clrVersion, framework.ClrVersion);
         }
 
-        [TestCaseSource("frameworkData")]
+        [TestCaseSource(nameof(frameworkData))]
         public void CanCreateUsingClrVersion(FrameworkData data)
         {
             Assume.That(data.frameworkVersion.Major != 3);
@@ -109,7 +107,7 @@ namespace NUnit.Engine.Tests
             Assert.AreEqual(data.clrVersion, framework.ClrVersion);
         }
 
-        [TestCaseSource("frameworkData")]
+        [TestCaseSource(nameof(frameworkData))]
         public void CanParseRuntimeFramework(FrameworkData data)
         {
             RuntimeFramework framework = RuntimeFramework.Parse(data.representation);
@@ -117,7 +115,7 @@ namespace NUnit.Engine.Tests
             Assert.AreEqual(data.clrVersion, framework.ClrVersion);
         }
 
-        [TestCaseSource("frameworkData")]
+        [TestCaseSource(nameof(frameworkData))]
         public void CanDisplayFrameworkAsString(FrameworkData data)
         {
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.frameworkVersion);
@@ -125,10 +123,16 @@ namespace NUnit.Engine.Tests
             Assert.AreEqual(data.displayName, framework.DisplayName);
         }
 
-        [TestCaseSource("matchData")]
+        [TestCaseSource(nameof(matchData))]
         public bool CanMatchRuntimes(RuntimeFramework f1, RuntimeFramework f2)
         {
             return f1.Supports(f2);
+        }
+
+        [TestCaseSource(nameof(CanLoadData))]
+        public bool CanLoad(RuntimeFramework f1, RuntimeFramework f2)
+        {
+            return f1.CanLoad(f2);
         }
 
 #pragma warning disable 414
@@ -208,6 +212,21 @@ namespace NUnit.Engine.Tests
             new TestCaseData(
                 new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
                 new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion))
+                .Returns(true)
+            };
+
+        private static readonly TestCaseData[] CanLoadData = {
+            new TestCaseData(
+                new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
+                new RuntimeFramework(RuntimeType.Any, new Version(2,0)))
+                .Returns(true),
+            new TestCaseData(
+                    new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
+                    new RuntimeFramework(RuntimeType.Any, new Version(4,0)))
+                .Returns(false),
+            new TestCaseData(
+                    new RuntimeFramework(RuntimeType.Any, new Version(4,0)),
+                    new RuntimeFramework(RuntimeType.Any, new Version(2,0)))
                 .Returns(true)
             };
 #pragma warning restore 414

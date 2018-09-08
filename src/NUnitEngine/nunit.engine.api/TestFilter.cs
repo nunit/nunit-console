@@ -28,7 +28,7 @@ namespace NUnit.Engine
 {
     /// <summary>
     /// Abstract base for all test filters. A filter is represented
-    /// by an XmlNode with &lt;filter&gt; as it's topmost element.
+    /// by an XmlNode with &lt;filter&gt; as its topmost element.
     /// In the console runner, filters serve only to carry this
     /// XML representation, as all filtering is done by the engine.
     /// </summary>

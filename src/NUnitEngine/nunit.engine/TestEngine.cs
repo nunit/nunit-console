@@ -98,10 +98,12 @@ namespace NUnit.Engine
             // If caller added services beforehand, we don't add any
             if (Services.ServiceCount == 0)
             {
+                // Services that depend on other services must be added after their dependencies
+                // For example, ResultService uses ExtensionService, so ExtensionService is added
+                // later.
                 Services.Add(new SettingsService(true));
                 Services.Add(new DriverService());
                 Services.Add(new RecentFilesService());
-                Services.Add(new ResultService());
                 Services.Add(new TestFilterService());
 #if !NETSTANDARD1_3
                 Services.Add(new ExtensionService());
@@ -112,6 +114,7 @@ namespace NUnit.Engine
                 Services.Add(new TestAgency());
 #endif
 #endif
+                Services.Add(new ResultService());
                 Services.Add(new DefaultTestRunnerFactory());
             }
 

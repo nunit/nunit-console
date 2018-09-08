@@ -1,3 +1,5 @@
+#load ci.cake
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
@@ -12,12 +14,12 @@ bool IsDotNetCoreInstalled = false;
 // SET PACKAGE VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.9.0";
+var version = "3.10.0";
 var modifier = "";
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
-var packageVersion = version + modifier + dbgSuffix;
+var productVersion = version + modifier + dbgSuffix;
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
@@ -30,7 +32,7 @@ var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
 var MSI_DIR = PROJECT_DIR + "msi/";
-var CURRENT_IMG_DIR = IMAGE_DIR + "NUnit-" + packageVersion + "/";
+var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
 var CURRENT_IMG_BIN_DIR = CURRENT_IMG_DIR + "bin/";
 var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
@@ -75,7 +77,7 @@ Setup(context =>
 
         if (branch == "master" && !isPullRequest)
         {
-            packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+            productVersion = version + "-dev-" + buildNumber + dbgSuffix;
         }
         else
         {
@@ -92,14 +94,14 @@ Setup(context =>
             if (suffix.Length > 21)
                 suffix = suffix.Substring(0, 21);
 
-            packageVersion = version + suffix;
+            productVersion = version + suffix;
         }
 
-        AppVeyor.UpdateBuildVersion(packageVersion);
+        AppVeyor.UpdateBuildVersion(productVersion);
     }
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, packageVersion);
+    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
     IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
 });
 
@@ -129,40 +131,34 @@ Task("Clean")
 // INITIALIZE FOR BUILD
 //////////////////////////////////////////////////////////////////////
 
-Task("NuGetRestore")
-    .Description("Restores NuGet Packages")
+Task("UpdateAssemblyInfo")
+    .Description("Sets the assembly versions to the calculated version.")
     .Does(() =>
     {
-		DotNetCoreRestore(SOLUTION_FILE);
-	});
+        PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
+        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
+        PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
+    });
 
 //////////////////////////////////////////////////////////////////////
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
+MSBuildSettings CreateMSBuildSettings(string target) => new MSBuildSettings()
+    .SetConfiguration(configuration)
+    .SetVerbosity(Verbosity.Minimal)
+    .WithProperty("PackageVersion", productVersion)
+    .WithTarget(target)
+    // Workaround for https://github.com/Microsoft/msbuild/issues/3626
+    .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
+
 Task("Build")
-    .Description("Builds the engine and console runner")
-    .IsDependentOn("NuGetRestore")
+    .Description("Builds the engine and console")
+    .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
-        // Use MSBuild
-        MSBuild(SOLUTION_FILE, CreateSettings());
+        MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
     });
-
-MSBuildSettings CreateSettings()
-{
-    var settings = new MSBuildSettings { Verbosity = Verbosity.Minimal, Configuration = configuration };
-
-    // Only needed when packaging
-    settings.WithProperty("DebugType", "pdbonly");
-
-    if (IsRunningOnWindows())
-        settings.ToolVersion = MSBuildToolVersion.VS2017;
-    else
-        settings.ToolPath = Context.Tools.Resolve("msbuild");
-
-    return settings;
-}
 
 //////////////////////////////////////////////////////////////////////
 // BUILD C++ TESTS
@@ -170,22 +166,16 @@ MSBuildSettings CreateSettings()
 
 Task("BuildCppTestFiles")
     .Description("Builds the C++ mock test assemblies")
-    .IsDependentOn("NuGetRestore")
     .WithCriteria(IsRunningOnWindows)
     .Does(() =>
     {
-        MSBuild("./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj", new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .WithProperty("Platform", "x86")
-            .SetVerbosity(Verbosity.Minimal)
-            .SetNodeReuse(false)
-        );
-        MSBuild("./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj", new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .WithProperty("Platform", "x64")
-            .SetVerbosity(Verbosity.Minimal)
-            .SetNodeReuse(false)
-        );
+        MSBuild(
+            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
+             CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+
+        MSBuild(
+            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
+            CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -312,7 +302,7 @@ Task("PackageEngine")
 
         NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -320,7 +310,7 @@ Task("PackageEngine")
 
         NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -336,7 +326,7 @@ Task("PackageConsole")
 
         NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -344,7 +334,7 @@ Task("PackageConsole")
 
         NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -352,7 +342,7 @@ Task("PackageConsole")
 
         NuGetPack("nuget/runners/nunit.runners.nuspec", new NuGetPackSettings()
         {
-            Version = packageVersion,
+            Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true
@@ -368,7 +358,7 @@ Task("PackageChocolatey")
 		ChocolateyPack("choco/nunit-console-runner.nuspec",
 			new ChocolateyPackSettings()
 			{
-				Version = packageVersion,
+				Version = productVersion,
 				OutputDirectory = PACKAGE_DIR,
 				Files = new [] {
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
@@ -394,7 +384,7 @@ Task("PackageChocolatey")
 		ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
 			new ChocolateyPackSettings()
 			{
-				Version = packageVersion,
+				Version = productVersion,
 				OutputDirectory = PACKAGE_DIR,
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
@@ -415,7 +405,7 @@ Task("PackageNetStandardEngine")
     {
         if(IsDotNetCoreInstalled)
         {
-            var nuget = "nunit.engine.netstandard." + packageVersion + ".nupkg";
+            var nuget = $"nunit.engine.netstandard.{productVersion}.nupkg";
             var src   = "src/NUnitEngine/nunit.engine.netstandard/bin/" + configuration + "/" + nuget;
             var dest  = PACKAGE_DIR + nuget;
 

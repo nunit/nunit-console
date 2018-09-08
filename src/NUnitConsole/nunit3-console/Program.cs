@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -161,32 +162,19 @@ namespace NUnit.ConsoleRunner
         private static void WriteHeader()
         {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            string versionText = executingAssembly.GetName().Version.ToString(3);
+            var versionBlock = FileVersionInfo.GetVersionInfo(executingAssembly.ManifestModule.FullyQualifiedName);
 
-            string programName = "NUnit Console Runner";
-            string copyrightText = "Copyright (C) 2018 Charlie Poole, Rob Prouse.\r\nAll Rights Reserved.";
-            string configText = String.Empty;
+            var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
 
-            object[] attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
-            if (attrs.Length > 0)
-                programName = ((AssemblyTitleAttribute)attrs[0]).Title;
-
-            attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            if ( attrs.Length > 0 )
-                copyrightText = ((AssemblyCopyrightAttribute)attrs[0]).Copyright;
-
-            attrs = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
-            if ( attrs.Length > 0 )
+            object[] configurationAttributes = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+            if (configurationAttributes.Length > 0)
             {
-                string configuration = ( ( AssemblyConfigurationAttribute )attrs[0] ).Configuration;
-                if ( !String.IsNullOrEmpty( configuration ) )
-                {
-                    configText = string.Format( "({0})", ( ( AssemblyConfigurationAttribute )attrs[0] ).Configuration );
-                }
+                string configuration = ((AssemblyConfigurationAttribute)configurationAttributes[0]).Configuration;
+                if (!string.IsNullOrEmpty(configuration)) header += $" ({configuration})";
             }
 
-            OutWriter.WriteLine(ColorStyle.Header, string.Format("{0} {1} {2}", programName, versionText, configText));
-            OutWriter.WriteLine(ColorStyle.SubHeader, copyrightText);
+            OutWriter.WriteLine(ColorStyle.Header, header);
+            OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright);
             OutWriter.WriteLine();
         }
 

@@ -48,19 +48,24 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="assemblyPath">The path to the assembly where this extension is found.</param>
         /// <param name="typeName">The full name of the Type of the extension object.</param>
-        public ExtensionNode(string assemblyPath, string typeName)
+        /// <param name="targetFramework">The target framework of the extension assembly.</param>
+        public ExtensionNode(string assemblyPath, string typeName, IRuntimeFramework targetFramework)
         {
             AssemblyPath = assemblyPath;
             TypeName = typeName;
+            TargetFramework = targetFramework;
             Enabled = true; // By default
         }
-
-        #region IExtensionNode Members
 
         /// <summary>
         /// Gets the full name of the Type of the extension object.
         /// </summary>
         public string TypeName { get; private set; }
+
+        /// <summary>
+        /// The TargetFramework of the extension assembly.
+        /// </summary>
+        public IRuntimeFramework TargetFramework { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="NUnit.Engine.Extensibility.ExtensionNode"/> is enabled.
@@ -102,10 +107,6 @@ namespace NUnit.Engine.Extensibility
                 return new string[0];
         }
 
-        #endregion
-
-        #region Other Properties
-
         /// <summary>
         /// Gets the path to the assembly where the extension is defined.
         /// </summary>
@@ -127,10 +128,6 @@ namespace NUnit.Engine.Extensibility
                 return _extensionObject;
             }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Gets a newly created extension object, created in the current application domain
@@ -162,7 +159,10 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
-        #endregion
+        public override string ToString()
+        {
+            return $"{TypeName} - {Path}";
+        }
     }
 }
 #endif
