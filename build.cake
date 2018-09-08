@@ -129,71 +129,48 @@ Task("Clean")
 // INITIALIZE FOR BUILD
 //////////////////////////////////////////////////////////////////////
 
-Task("InitializeBuild")
-    .Description("Initializes the build")
+Task("NuGetRestore")
+    .Description("Restores NuGet Packages")
     .Does(() =>
     {
-        Information("Restoring NuGet packages");
 		DotNetCoreRestore(SOLUTION_FILE);
-
-        if(IsRunningOnWindows())
-        {
-            Information("Restoring .NET Core packages");
-            DotNetCoreRestore(DOTNETCORE_SOLUTION_FILE);
-        }
 	});
 
 //////////////////////////////////////////////////////////////////////
-// BUILD ENGINE
+// BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("BuildNetFramework")
-    .Description("Builds the .NET Framework version of the engine and console")
-    .IsDependentOn("InitializeBuild")
+Task("Build")
+    .Description("Builds the engine and console runner")
+    .IsDependentOn("NuGetRestore")
     .Does(() =>
     {
         // Use MSBuild
-        MSBuild(SOLUTION_FILE, new MSBuildSettings()
-            .SetConfiguration(configuration)
-            .SetMSBuildPlatform(MSBuildPlatform.Automatic)
-            .SetVerbosity(Verbosity.Minimal)
-			.SetPlatformTarget(PlatformTarget.MSIL)
-        );
+        MSBuild(SOLUTION_FILE, CreateSettings());
     });
 
-//////////////////////////////////////////////////////////////////////
-// BUILD NETSTANDARD ENGINE
-//////////////////////////////////////////////////////////////////////
+MSBuildSettings CreateSettings()
+{
+    var settings = new MSBuildSettings { Verbosity = Verbosity.Minimal, Configuration = configuration };
 
-Task("BuildNetStandardEngine")
-    .Description("Builds the .NET Standard engine")
-    .IsDependentOn("InitializeBuild")
-    .WithCriteria(IsRunningOnWindows())
-    .Does(() =>
-    {
-        if(IsDotNetCoreInstalled)
-        {
-            var settings = new DotNetCoreBuildSettings
-            {
-                Configuration = configuration,
-                EnvironmentVariables = new Dictionary<string, string>()
-            };
-            settings.EnvironmentVariables.Add("PackageVersion", packageVersion);
-            DotNetCoreBuild(DOTNETCORE_SOLUTION_FILE, settings);
-        }
-        else
-        {
-            Warning("Skipping .NET Standard build because .NET Core is not installed");
-        }
-    });
+    // Only needed when packaging
+    settings.WithProperty("DebugType", "pdbonly");
+
+    if (IsRunningOnWindows())
+        settings.ToolVersion = MSBuildToolVersion.VS2017;
+    else
+        settings.ToolPath = Context.Tools.Resolve("msbuild");
+
+    return settings;
+}
 
 //////////////////////////////////////////////////////////////////////
-// BUILD C++  TESTS
+// BUILD C++ TESTS
 //////////////////////////////////////////////////////////////////////
 
 Task("BuildCppTestFiles")
     .Description("Builds the C++ mock test assemblies")
-    .IsDependentOn("InitializeBuild")
+    .IsDependentOn("NuGetRestore")
     .WithCriteria(IsRunningOnWindows)
     .Does(() =>
     {
@@ -251,7 +228,6 @@ Task("TestConsole")
 
 Task("TestNetStandardEngine")
     .Description("Tests the .NET Standard Engine")
-    .IsDependentOn("BuildNetStandardEngine")
     .WithCriteria(IsRunningOnWindows())
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
@@ -607,11 +583,6 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
-
-Task("Build")
-    .Description("Builds the engine and console runner")
-    .IsDependentOn("BuildNetFramework")
-    .IsDependentOn("BuildNetStandardEngine");
 
 Task("Rebuild")
     .Description("Rebuilds the engine and console runner")
