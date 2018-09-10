@@ -23,6 +23,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -175,6 +176,7 @@ namespace NUnit.ConsoleRunner
 
             OutWriter.WriteLine(ColorStyle.Header, header);
             OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright);
+            OutWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
             OutWriter.WriteLine();
         }
 
