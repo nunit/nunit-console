@@ -42,8 +42,8 @@ namespace NUnit.Engine.Services.Tests
             _services = new ServiceContext();
 #if !NETCOREAPP1_1
             _services.Add(new ExtensionService());
-#endif
             _services.Add(new FakeProjectService());
+#endif
             _factory = new DefaultTestRunnerFactory();
             _services.Add(_factory);
             _services.ServiceManager.StartServices();
@@ -55,7 +55,14 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
-#if NETCOREAPP1_1 || NETCOREAPP2_0
+#if NETCOREAPP1_1
+        // Single file
+        [TestCase("x.dll",             null,        typeof(LocalTestRunner))]
+        // Two files
+        [TestCase("x.dll y.dll",       null,        typeof(AggregatingTestRunner))]
+        // Three files
+        [TestCase("x.dll y.dll z.dll",   null,       typeof(AggregatingTestRunner))]
+#elif NETCOREAPP2_0
         // Single file
         [TestCase("x.nunit",           null,        typeof(AggregatingTestRunner))]
         [TestCase("x.dll",             null,        typeof(LocalTestRunner))]
@@ -66,6 +73,7 @@ namespace NUnit.Engine.Services.Tests
         // Three files
         [TestCase("x.nunit y.dll z.nunit", null,       typeof(AggregatingTestRunner))]
         [TestCase("x.dll y.nunit z.dll",   null,       typeof(AggregatingTestRunner))]
+
 #else
         // Single file
         [TestCase("x.nunit",           null,        typeof(AggregatingTestRunner))]

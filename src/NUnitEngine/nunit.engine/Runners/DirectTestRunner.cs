@@ -136,11 +136,7 @@ namespace NUnit.Engine.Runners
 
         private IDriverService GetDriverService()
         {
-#if NETSTANDARD1_3
-            return new Services.DriverService();
-#else
             return Services.GetService<IDriverService>();
-#endif
         }
 
         private static string LoadDriver(IFrameworkDriver driver, string testFile, TestPackage subPackage)

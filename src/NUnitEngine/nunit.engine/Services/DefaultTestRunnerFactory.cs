@@ -49,6 +49,8 @@ namespace NUnit.Engine.Services
             Status = _projectService != null && ((IService)_projectService).Status == ServiceStatus.Started
                 ? ServiceStatus.Started
                 : ServiceStatus.Error;
+#else
+            Status = ServiceStatus.Started;
 #endif
         }
 

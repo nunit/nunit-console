@@ -220,6 +220,7 @@ Task("TestNet20Console")
 
 Task("TestNetStandardEngine")
     .Description("Tests the .NET Standard Engine")
+    .IsDependentOn("Build")
     .WithCriteria(IsRunningOnWindows())
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
