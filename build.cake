@@ -27,7 +27,10 @@ var productVersion = version + modifier + dbgSuffix;
 
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = PROJECT_DIR + "package/";
-var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/net35/";
+var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var NET35_BIN_DIR = BIN_DIR + "net35/";
+var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
+var NETCOREAPP20_BIN_DIR = BIN_DIR + "netcoreapp2.0/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
@@ -41,12 +44,11 @@ var SOLUTION_FILE = "NUnitConsole.sln";
 var DOTNETCORE_SOLUTION_FILE = "NUnit.Engine.NetStandard.sln";
 
 // Test Runner
-var NUNIT3_CONSOLE = BIN_DIR + "nunit3-console.exe";
+var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
-var DOTNETCORE_TEST_ASSEMBLY = "src/NUnitEngine/nunit.engine.tests.netstandard/bin/" + configuration + "/netcoreapp1.1/nunit.engine.tests.netstandard.dll";
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]
@@ -190,26 +192,26 @@ Task("CheckForError")
 // TEST ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestEngine")
+Task("TestNet20Engine")
     .Description("Tests the engine")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NUNIT3_CONSOLE, BIN_DIR, ENGINE_TESTS, "TestEngine", ref ErrorDetail);
+        RunTest(NET20_CONSOLE, NET35_BIN_DIR, ENGINE_TESTS, "TestEngine", ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
 // TEST CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestConsole")
+Task("TestNet20Console")
     .Description("Tests the console runner")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NUNIT3_CONSOLE, BIN_DIR, CONSOLE_TESTS, "TestConsole", ref ErrorDetail);
+        RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "TestConsole", ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -224,7 +226,8 @@ Task("TestNetStandardEngine")
     {
         if(IsDotNetCoreInstalled)
         {
-            DotNetCoreExecute(DOTNETCORE_TEST_ASSEMBLY);
+            DotNetCoreExecute(NETCOREAPP11_BIN_DIR + ENGINE_TESTS);
+            DotNetCoreExecute(NETCOREAPP20_BIN_DIR + ENGINE_TESTS);
         }
         else
         {
@@ -285,10 +288,10 @@ Task("CreateImage")
 
         foreach(FilePath file in BinFiles)
         {
-          if (FileExists(BIN_DIR + file))
+          if (FileExists(NET35_BIN_DIR + file))
           {
               CreateDirectory(CURRENT_IMG_BIN_DIR + file.GetDirectory());
-              CopyFile(BIN_DIR + file, CURRENT_IMG_BIN_DIR + file);
+              CopyFile(NET35_BIN_DIR + file, CURRENT_IMG_BIN_DIR + file);
             }
         }
     });
@@ -366,18 +369,18 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit3-console.exe.config", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.api.xml", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit.engine.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = BIN_DIR + "Mono.Cecil.dll", Target="tools" }
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit3-console.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit3-console.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit.engine.api.dll", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit.engine.api.xml", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit.engine.dll", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "Mono.Cecil.dll", Target="tools" }
                 }
 			});
 
@@ -581,8 +584,8 @@ Task("Rebuild")
 
 Task("Test")
     .Description("Builds and tests the engine and console runner")
-    .IsDependentOn("TestEngine")
-    .IsDependentOn("TestConsole")
+    .IsDependentOn("TestNet20Engine")
+    .IsDependentOn("TestNet20Console")
     .IsDependentOn("TestNetStandardEngine");
 
 Task("Package")
