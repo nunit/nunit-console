@@ -66,7 +66,7 @@ namespace NUnit.Engine.Internal
                 {
                     _applicationDirectory = Path.Combine(
 #if NETSTANDARD1_3
-                    Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "Home"),
+                    Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "HOME"),
 #else
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
 #endif
