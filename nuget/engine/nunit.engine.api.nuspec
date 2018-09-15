@@ -20,6 +20,6 @@
   </metadata>
   <files>
     <file src="LICENSE.txt" />
-    <file src="bin\nunit.engine.api.dll" target="lib" />
+    <file src="bin/net20/nunit.engine.api.dll" target="lib" />
   </files>
 </package>

@@ -36,7 +36,9 @@ var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
 var MSI_DIR = PROJECT_DIR + "msi/";
 var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
-var CURRENT_IMG_BIN_DIR = CURRENT_IMG_DIR + "bin/";
+var CURRENT_IMG_NET20_BIN_DIR = CURRENT_IMG_DIR + "bin/net20/";
+var CURRENT_IMG_NETSTANDARD13_BIN_DIR = CURRENT_IMG_DIR + "bin/netstandard1.3/";
+var CURRENT_IMG_NETSTANDARD20_BIN_DIR = CURRENT_IMG_DIR + "bin/netstandard2.0/";
 var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
@@ -284,15 +286,39 @@ Task("CreateImage")
 
         CopyFiles(RootFiles, CURRENT_IMG_DIR);
 
-        CreateDirectory(CURRENT_IMG_BIN_DIR);
-        Information("Created directory " + CURRENT_IMG_BIN_DIR);
+        CreateDirectory(CURRENT_IMG_NET20_BIN_DIR);
+        Information("Created directory " + CURRENT_IMG_NET20_BIN_DIR);
 
         foreach(FilePath file in BinFiles)
         {
-          if (FileExists(NET35_BIN_DIR + file))
-          {
-              CreateDirectory(CURRENT_IMG_BIN_DIR + file.GetDirectory());
-              CopyFile(NET35_BIN_DIR + file, CURRENT_IMG_BIN_DIR + file);
+            if (FileExists(NET35_BIN_DIR + file))
+            {
+                CreateDirectory(CURRENT_IMG_NET20_BIN_DIR + file.GetDirectory());
+                CopyFile(NET35_BIN_DIR + file, CURRENT_IMG_NET20_BIN_DIR + file);
+            }
+        }
+
+        CreateDirectory(CURRENT_IMG_NETSTANDARD13_BIN_DIR);
+        Information("Created directory " + CURRENT_IMG_NETSTANDARD13_BIN_DIR);
+
+        foreach(FilePath file in BinFiles)
+        {
+            if (FileExists(NETCOREAPP11_BIN_DIR + file))
+            {
+                CreateDirectory(CURRENT_IMG_NETSTANDARD13_BIN_DIR + file.GetDirectory());
+                CopyFile(NETCOREAPP11_BIN_DIR + file, CURRENT_IMG_NETSTANDARD13_BIN_DIR + file);
+            }
+        }
+
+        CreateDirectory(CURRENT_IMG_NETSTANDARD20_BIN_DIR);
+        Information("Created directory " + CURRENT_IMG_NETSTANDARD20_BIN_DIR);
+
+        foreach(FilePath file in BinFiles)
+        {
+            if (FileExists(NETCOREAPP20_BIN_DIR + file))
+            {
+                CreateDirectory(CURRENT_IMG_NETSTANDARD20_BIN_DIR + file.GetDirectory());
+                CopyFile(NETCOREAPP20_BIN_DIR + file, CURRENT_IMG_NETSTANDARD20_BIN_DIR + file);
             }
         }
     });
@@ -365,23 +391,23 @@ Task("PackageChocolatey")
 				Version = productVersion,
 				OutputDirectory = PACKAGE_DIR,
 				Files = new [] {
-                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "NOTICES.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit3-console.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit3-console.exe.config", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit.engine.api.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit.engine.api.xml", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "nunit.engine.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = NET35_BIN_DIR + "Mono.Cecil.dll", Target="tools" }
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe.config", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.dll", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.xml", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.dll", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "Mono.Cecil.dll", Target="tools" }
                 }
 			});
 
@@ -391,8 +417,8 @@ Task("PackageChocolatey")
 				Version = productVersion,
 				OutputDirectory = PACKAGE_DIR,
                 Files = new [] {
-                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = PROJECT_DIR + "NOTICES.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
                 }
 			});
@@ -438,7 +464,7 @@ Task("CreateCombinedImage")
 .IsDependentOn("FetchExtensions")
 .Does(() =>
 {
-    var addinsImgDir = CURRENT_IMG_BIN_DIR + "addins/";
+    var addinsImgDir = CURRENT_IMG_NET20_BIN_DIR + "addins/";
 
     CopyDirectory(MSI_DIR + "resources/", CURRENT_IMG_DIR);
     CleanDirectory(addinsImgDir);
@@ -468,15 +494,13 @@ Task("PackageZip")
 .Does(() =>
 {
     CleanDirectory(ZIP_IMG);
-
-    //Flatten for zip
     CopyDirectory(CURRENT_IMG_DIR, ZIP_IMG);
-    CopyDirectory(ZIP_IMG + "bin/", ZIP_IMG);
-    DeleteDirectory(ZIP_IMG + "bin/", new DeleteDirectorySettings { Recursive = true });
 
-    //Ensure single and correct addins file
+    //Ensure single and correct addins file (.NET Framework only)
+    var net20ZipImg = ZIP_IMG + "bin/net20/";
     DeleteFiles(ZIP_IMG + "*.addins");
-    CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", ZIP_IMG + "nunit.bundle.addins");
+    DeleteFiles(net20ZipImg + "*.addins");
+    CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", net20ZipImg + "nunit.bundle.addins");
 
     var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, version);
     Zip(ZIP_IMG, zipPath);
@@ -502,14 +526,6 @@ bool CheckIfDotNetCoreInstalled()
         return false;
     }
     return true;
-}
-
-void RunGitCommand(string arguments)
-{
-    StartProcess("git", new ProcessSettings()
-    {
-        Arguments = arguments
-    });
 }
 
 void CheckForError(ref List<string> errorDetail)
@@ -595,7 +611,7 @@ Task("Package")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageConsole")
     .IsDependentOn("PackageNetStandardEngine")
-	.IsDependentOn("PackageChocolatey")
+    .IsDependentOn("PackageChocolatey")
     .IsDependentOn("PackageMsi")
     .IsDependentOn("PackageZip");
 
