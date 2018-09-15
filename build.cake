@@ -256,8 +256,14 @@ Task("TestNetStandardEngine")
     {
         if(IsDotNetCoreInstalled)
         {
-            DotNetCoreExecute(NETCOREAPP11_BIN_DIR + ENGINE_TESTS);
-            DotNetCoreExecute(NETCOREAPP20_BIN_DIR + ENGINE_TESTS);
+            DotNetCoreExecute(NETCOREAPP11_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
+            {
+                FrameworkVersion = "1.1.2"  //1.1.2 as the highest version currently available on Appveyor
+            });
+            DotNetCoreExecute(NETCOREAPP20_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
+            {
+                FrameworkVersion = "2.0.6"
+            });
         }
         else
         {
