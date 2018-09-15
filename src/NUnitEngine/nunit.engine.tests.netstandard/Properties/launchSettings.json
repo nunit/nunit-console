@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "nunit.engine.tests.netstandard": {
-      "commandName": "Project",
-      "commandLineArgs": "--wait"
-    }
-  }
-}
