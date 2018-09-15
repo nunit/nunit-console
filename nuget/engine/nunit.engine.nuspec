@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>
+  <metadata minClientVersion="2.12">
     <id>NUnit.Engine</id>
     <title>NUnit Test Engine</title>
     <version>$version$</version>
@@ -30,5 +30,11 @@
     <file src="bin/net20/nunit-agent-x86.exe" target="lib" />
     <file src="bin/net20/nunit-agent-x86.exe.config" target="lib" />
     <file src="../../nuget/engine/nunit.nuget.addins" target="lib"/>
+    <file src="bin/netstandard1.3/nunit.engine.dll" target="lib" />
+    <file src="bin/netstandard1.3/nunit.engine.api.dll" target="lib" />
+    <file src="bin/netstandard1.3/Mono.Cecil.dll" target="lib" />
+    <file src="bin/netstandard2.0/nunit.engine.dll" target="lib" />
+    <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib" />
+    <file src="bin/netstandard2.0/Mono.Cecil.dll" target="lib" />
   </files>
 </package>
