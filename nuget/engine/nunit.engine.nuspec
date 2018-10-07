@@ -17,6 +17,25 @@
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
     <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
+    <dependencies>
+      <group targetFramework="net20" />
+      <group targetFramework="netstandard1.3">
+        <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
+      <group targetFramework="netstandard2.0">
+        <dependency id="NETStandard.Library" version="2.0.0" />
+        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
