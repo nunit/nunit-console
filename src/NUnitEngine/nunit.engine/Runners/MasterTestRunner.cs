@@ -38,8 +38,10 @@ namespace NUnit.Engine.Runners
         private const string TEST_RUN_ELEMENT = "test-run";
         private readonly ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if NET20
         private readonly IRuntimeFrameworkService _runtimeService;
+#endif
+#if !NETSTANDARD1_3
         private readonly ExtensionService _extensionService;
 #endif
         private readonly IProjectService _projectService;
@@ -55,8 +57,10 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if NET20
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
+#endif
+#if !NETSTANDARD1_3
             _extensionService = _services.GetService<ExtensionService>();
 #endif
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
@@ -299,7 +303,7 @@ namespace NUnit.Engine.Runners
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings()
         {
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             if (frameworkSetting.Length > 0)
             {
@@ -362,7 +366,7 @@ namespace NUnit.Engine.Runners
             var eventDispatcher = new TestEventDispatcher();
             if (listener != null)
                 eventDispatcher.Listeners.Add(listener);
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD1_3
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
                 eventDispatcher.Listeners.Add(extension);
 #endif

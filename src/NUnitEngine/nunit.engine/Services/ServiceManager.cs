@@ -56,7 +56,6 @@ namespace NUnit.Engine.Services
                 {
 #if NETSTANDARD1_3
                     if (serviceType.GetTypeInfo().IsAssignableFrom(service.GetType().GetTypeInfo()))
-                    //if ( service.GetType().GetTypeInfo().IsAssignableFrom( serviceType.GetTypeInfo() ) )
 #else
                     if( serviceType.IsInstanceOfType( service ) )
 #endif
