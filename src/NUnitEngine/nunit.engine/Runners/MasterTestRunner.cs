@@ -38,11 +38,11 @@ namespace NUnit.Engine.Runners
         private const string TEST_RUN_ELEMENT = "test-run";
         private readonly ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
-#if NET20
-        private readonly IRuntimeFrameworkService _runtimeService;
-#endif
 #if !NETSTANDARD1_3
         private readonly ExtensionService _extensionService;
+#if !NETSTANDARD2_0
+        private readonly IRuntimeFrameworkService _runtimeService;
+#endif
 #endif
         private readonly IProjectService _projectService;
         private bool _disposed;
@@ -57,7 +57,7 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
-#if NET20
+#if !NETSTANDARD1_3 && !NETSTANDARD2_0
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
 #if !NETSTANDARD1_3
@@ -68,7 +68,7 @@ namespace NUnit.Engine.Runners
             InitializePackage();
         }
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// The TestPackage for which this is the runner
@@ -88,9 +88,9 @@ namespace NUnit.Engine.Runners
             get { return LoadResult != null; }
         }
 
-        #endregion
+#endregion
 
-        #region ITestRunner Members
+#region ITestRunner Members
 
         /// <summary>
         /// Get a flag indicating whether a test is running
@@ -191,9 +191,9 @@ namespace NUnit.Engine.Runners
             return LoadResult.Xml;
         }
 
-        #endregion
+#endregion
 
-        #region IDisposable
+#region IDisposable
 
         public void Dispose()
         {
@@ -215,9 +215,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        #endregion
+#endregion
 
-        #region Helper Methods
+#region Helper Methods
 
         /// <summary>
         /// Check the package settings, expand projects and

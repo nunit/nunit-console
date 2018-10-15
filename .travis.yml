@@ -15,16 +15,17 @@ matrix:
         - sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.2
         - sudo apt-get install dotnet-runtime-2.0.6
 
-    - os: osx
+# macOS package restore currently taking >30 mins on Travis
+#    - os: osx
       # .NET Core 2 requires OSX 10.12+
       # https://github.com/dotnet/core/blob/master/release-notes/2.0/2.0-supported-os.md#macos
       # https://docs.travis-ci.com/user/reference/osx/#OS-X-Version
-      osx_image: xcode9.4
-      install:
-        - curl https://download.microsoft.com/download/D/0/2/D028801E-0802-43C8-9F9F-C7DB0A39B344/dotnet-osx-x64.1.1.2.pkg -O
-        - sudo installer -pkg dotnet-osx-x64.1.1.2.pkg -target /
-        - curl https://download.microsoft.com/download/8/D/A/8DA04DA7-565B-4372-BBCE-D44C7809A467/dotnet-runtime-2.0.6-osx-x64.pkg -O
-        - sudo installer -pkg dotnet-runtime-2.0.6-osx-x64.pkg -target /
+#      osx_image: xcode9.4
+#      install:
+#        - curl https://download.microsoft.com/download/D/0/2/D028801E-0802-43C8-9F9F-C7DB0A39B344/dotnet-osx-x64.1.1.2.pkg -O
+#        - sudo installer -pkg dotnet-osx-x64.1.1.2.pkg -target /
+#        - curl https://download.microsoft.com/download/8/D/A/8DA04DA7-565B-4372-BBCE-D44C7809A467/dotnet-runtime-2.0.6-osx-x64.pkg -O
+#        - sudo installer -pkg dotnet-runtime-2.0.6-osx-x64.pkg -target /
 
 script:
-  - travis_wait 30 ./build.sh --target "Travis" --configuration "Release"
+  - ./build.sh --target "Travis" --configuration "Release"
