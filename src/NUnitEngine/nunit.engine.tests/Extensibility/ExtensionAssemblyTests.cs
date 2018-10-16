@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1 && !NETCOREAPP2_0
+#if !NETCOREAPP1_1
 using System;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
@@ -69,6 +69,7 @@ namespace NUnit.Engine.Tests.Extensibility
             Assert.That(_ea.AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
         }
 
+#if !NETCOREAPP2_0
         [Test]
         public void TargetFramework()
         {
@@ -78,6 +79,7 @@ namespace NUnit.Engine.Tests.Extensibility
                 Assert.That(_ea.TargetFramework, Has.Property(nameof(RuntimeFramework.FrameworkVersion)).EqualTo(new Version(2, 0)));
             });
         }
+#endif
     }
 }
 #endif
