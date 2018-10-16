@@ -31,7 +31,7 @@ namespace NUnit.Engine
     /// <summary>
     /// The TestRun class encapsulates an ongoing test run.
     /// </summary>
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD1_3
     [Serializable]
 #endif
     public class AsyncTestEngineResult : ITestRun

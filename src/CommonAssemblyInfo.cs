@@ -35,7 +35,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 3.5 Debug")]
 #elif NET20
 [assembly: AssemblyConfiguration(".NET 2.0 Debug")]
-#elif NETSTANDARD1_3 || NETCOREAPP1_0
+#elif NETSTANDARD1_3 || NETCOREAPP1_1
 [assembly: AssemblyConfiguration(".NET Standard 1.3 Debug")]
 #elif NETSTANDARD2_0 || NETCOREAPP2_0
 [assembly: AssemblyConfiguration(".NET Standard 2.0 Debug")]
@@ -47,9 +47,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration(".NET 3.5")]
 #elif NET20
 [assembly: AssemblyConfiguration(".NET 2.0")]
-#elif PORTABLE
-[assembly: AssemblyConfiguration("Portable")]
-#elif NETSTANDARD1_3 || NETCOREAPP1_0
+#elif NETSTANDARD1_3 || NETCOREAPP1_1
 [assembly: AssemblyConfiguration(".NET Standard 1.3")]
 #elif NETSTANDARD2_0 || NETCOREAPP2_0
 [assembly: AssemblyConfiguration(".NET Standard 2.0")]

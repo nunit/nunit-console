@@ -32,11 +32,7 @@ namespace NUnit.Engine.Internal
     public class Logger : ILogger
     {
         private readonly static string TIME_FMT = "HH:mm:ss.fff";
-#if NETSTANDARD1_3
-        private readonly static string TRACE_FMT = "{0} {1,-5} {2}: {3}";
-#else
         private readonly static string TRACE_FMT = "{0} {1,-5} [{2,2}] {3}: {4}";
-#endif
 
         private string name;
         private string fullname;
@@ -79,13 +75,6 @@ namespace NUnit.Engine.Internal
             Log(InternalTraceLevel.Error, message, args);
         }
 
-        //public void Error(string message, Exception ex)
-        //{
-        //    if (service.Level >= InternalTraceLevel.Error)
-        //    {
-        //        service.Log(InternalTraceLevel.Error, message, name, ex);
-        //    }
-        //}
         #endregion
 
         #region Warning
@@ -170,8 +159,10 @@ namespace NUnit.Engine.Internal
             writer.WriteLine(TRACE_FMT,
                 DateTime.Now.ToString(TIME_FMT),
                 level == InternalTraceLevel.Verbose ? "Debug" : level.ToString(),
-#if !NETSTANDARD1_3
+#if NET20
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
+#elif NETSTANDARD
+                Environment.CurrentManagedThreadId,
 #endif
                 name, message);
         }
