@@ -235,7 +235,7 @@ namespace NUnit.Common
                 }
                 catch (Exception)
                 {
-                    ErrorMessages.Add("An int value was expected for option '{0}' but a value of '{1}' was used");
+                    ErrorMessages.Add(String.Format("An int value was expected for option '{0}' but a value of '{1}' was used", option, val));
                 }
             }
 
