@@ -27,7 +27,7 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    public class ResultService : Service,  IResultService
+    public class ResultService : Service, IResultService
     {
 #if NETSTANDARD1_3 || NETSTANDARD2_0
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases" };

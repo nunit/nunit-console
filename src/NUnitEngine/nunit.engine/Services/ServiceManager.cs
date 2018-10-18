@@ -54,11 +54,7 @@ namespace NUnit.Engine.Services
             else
                 foreach( IService service in _services )
                 {
-#if NETSTANDARD1_3
-                    if (serviceType.GetTypeInfo().IsAssignableFrom(service.GetType().GetTypeInfo()))
-#else
                     if( serviceType.IsInstanceOfType( service ) )
-#endif
                     {
                         _serviceIndex[serviceType] = service;
                         theService = service;

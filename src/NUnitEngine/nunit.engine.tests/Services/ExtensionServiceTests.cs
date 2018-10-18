@@ -26,6 +26,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Engine.Extensibility;
+using System.IO;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -144,6 +145,27 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_serviceInterface.Extensions,
                 Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo("NUnit.Engine.Tests.DummyDisabledExtension")
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
+        }
+
+        [Test]
+        public void FailsGracefullyLoadingOtherFrameworkExtensionAssembly()
+        {
+#if NETCOREAPP2_0
+            string other = "net35"; // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
+#elif NET35
+            string other = "netcoreapp2.0"; // Attempt to load the .NET Core 2.0 version of the extensions from the .NET 3.5 tests
+#endif
+            var file = new FileInfo(GetType().Assembly.Location);
+            var assemblyName = Path.Combine(Path.Combine(file.Directory.Parent.FullName, other), "nunit.engine.tests.dll");
+            Assert.That(assemblyName, Does.Exist);
+
+            Assert.That(() =>
+            {
+                var service = new ExtensionService();
+                service.FindExtensionPoints(typeof(TestEngine).Assembly);
+                service.FindExtensionPoints(typeof(ITestEngine).Assembly);
+                service.FindExtensionsInAssembly(new ExtensionAssembly(assemblyName, false));
+            }, Throws.TypeOf<NUnitEngineException>());
         }
     }
 }

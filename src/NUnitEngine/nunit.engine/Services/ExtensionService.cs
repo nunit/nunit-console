@@ -431,6 +431,28 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
+            var entry = Assembly.GetEntryAssembly();
+            if (entry != null)
+            {
+                var extension = new TargetFrameworkHelper(assembly.FilePath);
+                var runner = new TargetFrameworkHelper(entry.Location);
+                if (runner.FrameworkName?.StartsWith(".NETStandard") == true)
+                {
+                    throw new NUnitEngineException("Test runners must target .NET Core or .NET Framework, not .NET Standard");
+                }
+                else if (runner.FrameworkName?.StartsWith(".NETCoreApp") == true)
+                {
+                    if (extension.FrameworkName?.StartsWith(".NETStandard") != true && extension.FrameworkName?.StartsWith(".NETCoreApp") != true)
+                    {
+                        throw new NUnitEngineException(".NET Core runners require .NET Core or .NET Standard extensions");
+                    }
+                }
+                else if (extension.FrameworkName?.StartsWith(".NETCoreApp") == true)
+                {
+                    throw new NUnitEngineException(".NET Framework runners cannot load .NET Core extensions");
+                }
+            }
+
             IRuntimeFramework assemblyTargetFramework = null;
 #if !NETSTANDARD2_0
             var currentFramework = RuntimeFramework.CurrentFramework;

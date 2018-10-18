@@ -161,7 +161,7 @@ namespace NUnit.Engine.Internal
                 level == InternalTraceLevel.Verbose ? "Debug" : level.ToString(),
 #if NET20
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
-#elif NETSTANDARD
+#else
                 Environment.CurrentManagedThreadId,
 #endif
                 name, message);

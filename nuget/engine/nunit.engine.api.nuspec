@@ -24,7 +24,6 @@
         <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
       </group>
       <group targetFramework="netstandard2.0">
-        <dependency id="NETStandard.Library" version="2.0.0" />
         <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
       </group>
     </dependencies>

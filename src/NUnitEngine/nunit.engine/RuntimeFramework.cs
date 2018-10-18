@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
