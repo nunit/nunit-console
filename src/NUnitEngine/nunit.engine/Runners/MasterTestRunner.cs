@@ -231,7 +231,7 @@ namespace NUnit.Engine.Runners
 
             var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
 
-            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single")  &&
+            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single") &&
                 TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false))
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
@@ -269,7 +269,7 @@ namespace NUnit.Engine.Runners
         {
             if (package == null) throw new ArgumentNullException("package");
 
-            return 
+            return
                 _projectService != null
                 && !string.IsNullOrEmpty(package.FullName)
                 && _projectService.CanLoadFrom(package.FullName);
@@ -351,6 +351,9 @@ namespace NUnit.Engine.Runners
             var eventDispatcher = new TestEventDispatcher();
             if (listener != null)
                 eventDispatcher.Listeners.Add(listener);
+
+            FindExtensionsInTestPackage(this.TestPackage);
+
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
                 eventDispatcher.Listeners.Add(extension);
 
@@ -435,6 +438,27 @@ namespace NUnit.Engine.Runners
 
             var filterElement = doc.ImportNode(tempNode, true);
             resultNode.InsertAfter(filterElement, null);
+        }
+
+        /// <summary>
+        /// Recursively expands <see cref="TestPackage"> and appends directories as candidates for an extension
+        /// </summary>
+        private void FindExtensionsInTestPackage(TestPackage package)
+        {
+            if (package == null) throw new ArgumentNullException(nameof(package));
+
+            if (!string.IsNullOrEmpty(package.FullName))
+            {
+                _extensionService.AppendExtensionDirectory(new DirectoryInfo(Path.GetDirectoryName(package.FullName)));
+            }
+
+            if (package.SubPackages != null)
+            {
+                foreach (var subPackage in package.SubPackages)
+                {
+                    FindExtensionsInTestPackage(subPackage);
+                }
+            }
         }
 
         #endregion

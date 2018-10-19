@@ -256,6 +256,19 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
+        /// Find extensions in specific directory.
+        /// </summary>
+        public void AppendExtensionDirectory(DirectoryInfo directory)
+        {
+            if (directory == null) throw new ArgumentNullException(nameof(directory));
+
+            ProcessDirectory(directory, false);
+
+            foreach (var candidate in _assemblies)
+                FindExtensionsInAssembly(candidate);
+        }
+
+        /// <summary>
         /// Deduce the extension point based on the Type of an extension. 
         /// Returns null if no extension point can be found that would
         /// be satisfied by the provided Type.
