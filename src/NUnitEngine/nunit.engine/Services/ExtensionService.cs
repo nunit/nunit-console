@@ -541,7 +541,7 @@ namespace NUnit.Engine.Services
                     throw new NUnitEngineException(".NET Core runners require .NET Core or .NET Standard extensions");
                 }
             }
-            else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true || extHelper.FrameworkName?.StartsWith(".NETStandard") == true)
+            else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
             {
                 throw new NUnitEngineException(".NET Framework runners cannot load .NET Core extensions");
             }
