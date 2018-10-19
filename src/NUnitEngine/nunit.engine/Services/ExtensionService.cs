@@ -431,27 +431,7 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
-            var entry = Assembly.GetEntryAssembly();
-            if (entry != null)
-            {
-                var extension = new TargetFrameworkHelper(assembly.FilePath);
-                var runner = new TargetFrameworkHelper(entry.Location);
-                if (runner.FrameworkName?.StartsWith(".NETStandard") == true)
-                {
-                    throw new NUnitEngineException("Test runners must target .NET Core or .NET Framework, not .NET Standard");
-                }
-                else if (runner.FrameworkName?.StartsWith(".NETCoreApp") == true)
-                {
-                    if (extension.FrameworkName?.StartsWith(".NETStandard") != true && extension.FrameworkName?.StartsWith(".NETCoreApp") != true)
-                    {
-                        throw new NUnitEngineException(".NET Core runners require .NET Core or .NET Standard extensions");
-                    }
-                }
-                else if (extension.FrameworkName?.StartsWith(".NETCoreApp") == true)
-                {
-                    throw new NUnitEngineException(".NET Framework runners cannot load .NET Core extensions");
-                }
-            }
+            ValidateTargetFramework(Assembly.GetEntryAssembly(), assembly);
 
             IRuntimeFramework assemblyTargetFramework = null;
 #if !NETSTANDARD2_0
@@ -537,7 +517,37 @@ namespace NUnit.Engine.Services
             }
         }
 
-#endregion
+        /// <summary>
+        /// Checks that the target framework of the current runner can load the extension assembly. For example, .NET Core
+        /// cannot load .NET Framework assemblies and visa-versa.
+        /// </summary>
+        /// <param name="runnerAsm">The executing runner</param>
+        /// <param name="extensionAsm">The extension we are attempting to load</param>
+        internal static void ValidateTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        {
+            if (runnerAsm == null)
+                return;
+
+            var extHelper = new TargetFrameworkHelper(extensionAsm.FilePath);
+            var runnerHelper = new TargetFrameworkHelper(runnerAsm.Location);
+            if (runnerHelper.FrameworkName?.StartsWith(".NETStandard") == true)
+            {
+                throw new NUnitEngineException("Test runners must target .NET Core or .NET Framework, not .NET Standard");
+            }
+            else if (runnerHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
+            {
+                if (extHelper.FrameworkName?.StartsWith(".NETStandard") != true && extHelper.FrameworkName?.StartsWith(".NETCoreApp") != true)
+                {
+                    throw new NUnitEngineException(".NET Core runners require .NET Core or .NET Standard extensions");
+                }
+            }
+            else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true || extHelper.FrameworkName?.StartsWith(".NETStandard") == true)
+            {
+                throw new NUnitEngineException(".NET Framework runners cannot load .NET Core extensions");
+            }
+        }
+
+        #endregion
     }
 }
 #endif

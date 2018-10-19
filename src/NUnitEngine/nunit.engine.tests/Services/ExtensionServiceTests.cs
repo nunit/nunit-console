@@ -27,6 +27,8 @@ using System.Linq;
 using NUnit.Framework;
 using NUnit.Engine.Extensibility;
 using System.IO;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -155,8 +157,7 @@ namespace NUnit.Engine.Services.Tests
 #elif NET35
             string other = "netcoreapp2.0"; // Attempt to load the .NET Core 2.0 version of the extensions from the .NET 3.5 tests
 #endif
-            var file = new FileInfo(GetType().Assembly.Location);
-            var assemblyName = Path.Combine(Path.Combine(file.Directory.Parent.FullName, other), "nunit.engine.tests.dll");
+            var assemblyName = Path.Combine(GetSiblingDirectory(other), "nunit.engine.tests.dll");
             Assert.That(assemblyName, Does.Exist);
 
             Assert.That(() =>
@@ -166,6 +167,96 @@ namespace NUnit.Engine.Services.Tests
                 service.FindExtensionPoints(typeof(ITestEngine).Assembly);
                 service.FindExtensionsInAssembly(new ExtensionAssembly(assemblyName, false));
             }, Throws.TypeOf<NUnitEngineException>());
+        }
+
+        [TestCaseSource(nameof(ValidCombos))]
+        public void ValidTargetFrameworkCombinations(FrameworkCombo combo)
+        {
+            Assert.That(() => ExtensionService.ValidateTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+                Throws.Nothing);
+        }
+
+        [TestCaseSource(nameof(InvalidCombos))]
+        public void InvalidTargetFrameworkCombinations(FrameworkCombo combo)
+        {
+            Assert.That(() => ExtensionService.ValidateTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+                Throws.TypeOf<NUnitEngineException>());
+        }
+
+        // ExtensionAssembly is internal, so cannot be part of the public test parameters
+        public struct FrameworkCombo
+        {
+            internal Assembly RunnerAssembly { get; }
+            internal ExtensionAssembly ExtensionAssembly { get; }
+
+            internal FrameworkCombo(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+            {
+                RunnerAssembly = runnerAsm;
+                ExtensionAssembly = extensionAsm;
+            }
+
+            public override string ToString() =>
+                $"{RunnerAssembly.GetName()}:{ExtensionAssembly.AssemblyName}";
+        }
+
+        public static IEnumerable<TestCaseData> ValidCombos()
+        {
+#if NETCOREAPP2_0
+            Assembly netstandard = typeof(ExtensionService).Assembly;
+            Assembly netcore = Assembly.GetExecutingAssembly();
+
+            var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
+            var extNetCore = new ExtensionAssembly(netcore.Location, false);
+
+            yield return new TestCaseData(new FrameworkCombo(netcore, extNetStandard)).SetName("ValidCombo(.NET Core, .NET Standard)");
+            yield return new TestCaseData(new FrameworkCombo(netcore, extNetCore)).SetName("ValidCombo(.NET Core, .Net Core)");
+#else
+            Assembly netFramework = typeof(ExtensionService).Assembly;
+
+            var extNetFramework = new ExtensionAssembly(netFramework.Location, false);
+
+            yield return new TestCaseData(new FrameworkCombo(netFramework, extNetFramework)).SetName("ValidCombo(.NET Framework, .NET Framework)");
+#endif
+        }
+
+        public static IEnumerable<TestCaseData> InvalidCombos()
+        {
+#if NETCOREAPP2_0
+            Assembly netstandard = typeof(ExtensionService).Assembly;
+            Assembly netcore = Assembly.GetExecutingAssembly();
+
+            var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
+            var extNetCore = new ExtensionAssembly(netcore.Location, false);
+            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.dll"), false);
+
+            yield return new TestCaseData(new FrameworkCombo(netstandard, extNetStandard)).SetName("InvalidCombo(.NET Standard, .NET Standard)");
+            yield return new TestCaseData(new FrameworkCombo(netstandard, extNetCore)).SetName("InvalidCombo(.NET Standard, .NET Core)");
+            yield return new TestCaseData(new FrameworkCombo(netstandard, extNetFramework)).SetName("InvalidCombo(.NET Standard, .NET Framework)");
+            yield return new TestCaseData(new FrameworkCombo(netcore, extNetFramework)).SetName("InvalidCombo(.NET Core, .NET Standard)");
+#else
+            Assembly netFramework = typeof(ExtensionService).Assembly;
+
+            var extNetStandard = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"), false);
+            var extNetCore = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netcoreapp2.0"), "nunit.engine.tests.dll"), false);
+
+            yield return new TestCaseData(new FrameworkCombo(netFramework, extNetStandard)).SetName("InvalidCombo(.NET Framework, .NET Standard)");
+            yield return new TestCaseData(new FrameworkCombo(netFramework, extNetCore)).SetName("InvalidCombo(.NET Framework, .NET Core)");
+#endif
+
+        }
+
+        /// <summary>
+        /// Returns a directory in the parent directory that the current test assembly is in. This
+        /// is used to load assemblies that target different frameworks than the current tests. So
+        /// if these tests are in bin\release\net35 and dir is netstandard2.0, this will return
+        /// bin\release\netstandard2.0.
+        /// </summary>
+        /// <param name="dir">The sibling directory</param>
+        /// <returns></returns>
+        private static string GetSiblingDirectory(string dir)
+        {
+            var file = new FileInfo(typeof(ExtensionServiceTests).Assembly.Location);
+            return Path.Combine(file.Directory.Parent.FullName, dir);
         }
     }
 }
