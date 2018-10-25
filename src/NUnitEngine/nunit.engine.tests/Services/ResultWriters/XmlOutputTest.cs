@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1 && !NETSTANDARD2_0
+#if !NETCOREAPP1_1
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,7 +49,6 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
     public abstract class XmlOutputTest
     {
         private ITestEngine engine;
-        private string localDirectory;
 
         protected TestEngineResult EngineResult { get; private set; }
 
@@ -59,15 +58,12 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
         // Method used by derived classes to get the path to a file name
         protected string GetLocalPath(string fileName)
         {
-            return Path.Combine(localDirectory, fileName);
+            return Path.Combine(TestContext.CurrentContext.TestDirectory, fileName);
         }
 
         [OneTimeSetUp]
         public void InitializeTestEngineResult()
         {
-            // Save the local directory - used by GetLocalPath
-            Uri uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
-            localDirectory = Path.GetDirectoryName(uri.LocalPath);
 
             AssemblyPath = GetLocalPath(AssemblyName);
 

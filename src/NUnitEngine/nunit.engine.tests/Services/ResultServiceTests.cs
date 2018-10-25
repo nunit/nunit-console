@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AvailableFormats()
         {
-#if NETCOREAPP1_1 || NETCOREAPP2_0
+#if NETCOREAPP1_1
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases" }));
 #else
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));

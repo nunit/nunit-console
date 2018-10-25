@@ -245,10 +245,10 @@ Task("TestNet20Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD ENGINE
+// TEST NETSTANDARD 1.3 ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNetStandardEngine")
+Task("TestNetStandard13Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
@@ -260,6 +260,25 @@ Task("TestNetStandardEngine")
             {
                 FrameworkVersion = "1.1.2"  //1.1.2 as the highest version currently available on Appveyor
             });
+        }
+        else
+        {
+            Warning("Skipping .NET Standard tests because .NET Core is not installed");
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETSTANDARD 2.0 ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetStandard20Engine")
+    .Description("Tests the .NET Standard Engine")
+    .IsDependentOn("Build")
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        if(IsDotNetCoreInstalled)
+        {
             DotNetCoreExecute(NETCOREAPP20_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
             {
                 FrameworkVersion = "2.0.6"
@@ -270,6 +289,7 @@ Task("TestNetStandardEngine")
             Warning("Skipping .NET Standard tests because .NET Core is not installed");
         }
     });
+
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE
@@ -550,7 +570,8 @@ Task("Test")
     .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestNet20Engine")
     .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNetStandardEngine");
+    .IsDependentOn("TestNetStandard13Engine")
+    .IsDependentOn("TestNetStandard20Engine");
 
 Task("Package")
     .Description("Packages the engine and console runner")

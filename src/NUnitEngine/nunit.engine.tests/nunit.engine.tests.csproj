@@ -41,6 +41,9 @@
     <Content Include="EngineTests.nunit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="..\..\NUnitConsole\nunit3-console.tests\TextSummary.xslt" Link="TextSummary.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="alt.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
