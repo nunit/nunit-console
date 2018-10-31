@@ -75,7 +75,37 @@ namespace NUnit.Engine.Services.Tests
             builder.AddTest(testName);
 
             Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(count));
+        }
 
+        [Test]
+        public void UsingTestFilterBuilderExcludeOneTest()
+        {
+            var builder = new TestFilterBuilder();
+            builder.AddTest("-NUnit.Tests.Assemblies.MockTestFixture.FailingTest");
+
+            Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(MockAssembly.Tests - 1));
+        }
+
+        [Test]
+        public void UsingTestFilterBuilderExcludeTwoTests()
+        {
+            var builder = new TestFilterBuilder();
+            builder.AddTest("-NUnit.Tests.Assemblies.MockTestFixture.FailingTest");
+            builder.AddTest("-NUnit.Tests.TestAssembly.MockTestFixture.MyTest");
+
+            Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(MockAssembly.Tests - 2));
+        }
+
+        [Test]
+        public void UsingTestFilterBuilderIncludeAndExcludeTests()
+        {
+            var builder = new TestFilterBuilder();
+            builder.AddTest("NUnit.Tests.Assemblies.MockTestFixture");
+            builder.AddTest("-NUnit.Tests.Assemblies.MockTestFixture.FailingTest");
+            // also exclude a test not included : should have no effect (only one less than MockTestFixture.Test)
+            builder.AddTest("-NUnit.Tests.TestAssembly.MockTestFixture.MyTest");
+
+            Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(MockTestFixture.Tests - 1));
         }
 
         [TestCase("test==NUnit.Tests.Assemblies.MockTestFixture", MockTestFixture.Tests, TestName = "{m}_MockTestFixture")]
@@ -91,7 +121,6 @@ namespace NUnit.Engine.Services.Tests
             builder.SelectWhere(expression);
 
             Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(count));
-
         }
     }
 }

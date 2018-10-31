@@ -77,6 +77,40 @@ namespace NUnit.Engine.Services.Tests
                 "<filter><or><test>My.First.Test</test><test>My.Second.Test</test><test>My.Third.Test</test></or></filter>"));
         }
 
+        [Theory]
+        public void OneTestExcluded(bool useBangSyntax)
+        {
+            builder.AddTest((useBangSyntax ? "!" : "-") + "My.Test.Name");
+            TestFilter filter = builder.GetFilter();
+
+            Assert.That(filter.Text, Is.EqualTo(
+                "<filter><not><test>My.Test.Name</test></not></filter>"));
+        }
+
+        [Theory]
+        public void ThreeTestsExcluded(bool useBangSyntax)
+        {
+            builder.AddTest((useBangSyntax ? "!" : "-") + "My.First.Test");
+            builder.AddTest((useBangSyntax ? "!" : "-") + "My.Second.Test");
+            builder.AddTest((useBangSyntax ? "!" : "-") + "My.Third.Test");
+            TestFilter filter = builder.GetFilter();
+
+            Assert.That(filter.Text, Is.EqualTo(
+                "<filter><not><or><test>My.First.Test</test><test>My.Second.Test</test><test>My.Third.Test</test></or></not></filter>"));
+        }
+
+        [Theory]
+        public void TestsIncludedAndExcluded(bool useBangSyntax)
+        {
+            builder.AddTest("My.First.Test");
+            builder.AddTest((useBangSyntax ? "!" : "-") + "My.Second.Test");
+            builder.AddTest("My.Third.Test");
+            TestFilter filter = builder.GetFilter();
+
+            Assert.That(filter.Text, Is.EqualTo(
+                "<filter><or><test>My.First.Test</test><test>My.Third.Test</test></or><not><test>My.Second.Test</test></not></filter>"));
+        }
+
         [Test]
         public void WhereClause()
         {

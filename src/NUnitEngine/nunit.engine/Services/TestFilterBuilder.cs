@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Copyright (c) 2013-2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -60,16 +60,32 @@ namespace NUnit.Engine
         {
             var filter = new StringBuilder("<filter>");
 
-            if (_testList.Count > 0)
+            var includedTests = new List<string>();
+            var excludedTests = new List<string>();
+            foreach (var test in _testList)
             {
-                if (_testList.Count > 1)
-                    filter.Append("<or>");
-                foreach (string test in _testList)
-                    filter.AppendFormat("<test>{0}</test>", XmlEscape(test));
-                if (_testList.Count > 1)
-                    filter.Append("</or>");
+                if (test.StartsWith("-") || test.StartsWith("!"))
+                    excludedTests.Add(test.Substring(1));
+                else
+                    includedTests.Add(test);
             }
 
+            foreach (var testList in new[] { includedTests, excludedTests })
+            {
+                if (testList.Count == 0)
+                    continue;
+                bool excluded = testList == excludedTests;
+                if (excluded)
+                    filter.Append("<not>");
+                if (testList.Count > 1)
+                    filter.Append("<or>");
+                foreach (string test in testList)
+                    filter.AppendFormat("<test>{0}</test>", XmlEscape(test));
+                if (testList.Count > 1)
+                    filter.Append("</or>");
+                if (excluded)
+                    filter.Append("</not>");
+            }
 
             if (_whereClause != null)
                 filter.Append(new TestSelectionParser().Parse(_whereClause));
