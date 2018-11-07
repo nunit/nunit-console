@@ -57,7 +57,9 @@ namespace NUnit.Tests
                         + FixtureWithTestCases.Tests
                         + ParameterizedFixture.Tests
                         + GenericFixtureConstants.Tests
-                        + AccessesCurrentTestContextDuringDiscovery.Tests;
+                        + AccessesCurrentTestContextDuringDiscovery.Tests
+                        + FixtureWithDispose.Tests
+                        + FixtureWithOneTimeTearDown.Tests;
 
             public const int Suites = MockTestFixture.Suites
                         + Singletons.OneTestCase.Suites
@@ -69,7 +71,9 @@ namespace NUnit.Tests
                         + ParameterizedFixture.Suites
                         + GenericFixtureConstants.Suites
                         + AccessesCurrentTestContextDuringDiscovery.Suites
-                        + NamespaceSuites;
+                        + NamespaceSuites
+                        + FixtureWithDispose.Suites
+                        + FixtureWithOneTimeTearDown.Suites;
 
             public const int TestStartedEvents = Tests - IgnoredFixture.Tests - BadFixture.Tests - ExplicitFixture.Tests;
             public const int TestFinishedEvents = Tests;
@@ -87,7 +91,9 @@ namespace NUnit.Tests
                         + FixtureWithTestCases.Tests
                         + ParameterizedFixture.Tests
                         + GenericFixtureConstants.Tests
-                        + AccessesCurrentTestContextDuringDiscovery.Tests;
+                        + AccessesCurrentTestContextDuringDiscovery.Tests
+                        + FixtureWithDispose.Tests
+                        + FixtureWithOneTimeTearDown.Tests;
 
             public const int Skipped_Ignored = MockTestFixture.Skipped_Ignored + IgnoredFixture.Tests;
             public const int Skipped_Explicit = MockTestFixture.Skipped_Explicit + ExplicitFixture.Tests;
@@ -302,5 +308,36 @@ namespace NUnit.Tests
         
         [Test]
         public void Test2() { }
+    }
+
+    [TestFixture]
+    public class FixtureWithDispose : IDisposable
+    {
+        public const int Suites = 1;
+        public const int Tests = 1;
+
+        [Test]
+        public void Test() { }
+
+        public void Dispose()
+        {
+            throw new Exception("Exception in Dispose");
+        }
+    }
+
+    [TestFixture]
+    public class FixtureWithOneTimeTearDown
+    {
+        public const int Suites = 1;
+        public const int Tests = 1;
+
+        [Test]
+        public void Test() { }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            throw new Exception("Exception in OneTimeTearDown");
+        }
     }
 }

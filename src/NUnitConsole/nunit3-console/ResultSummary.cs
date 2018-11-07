@@ -74,11 +74,11 @@ namespace NUnit.ConsoleRunner
         }
 
         /// <summary>
-        /// Returns the number of failed test cases (including errors and invalid tests)
+        /// Returns the number of failed test cases (including errors, invalid tests, and failures in fixture teardowns)
         /// </summary>
         public int FailedCount
         {
-            get { return FailureCount + InvalidCount + ErrorCount;  }
+            get { return FailureCount + InvalidCount + ErrorCount + FailureInFixtureTearDown;  }
         }
 
         public int WarningCount { get; private set; }
@@ -148,6 +148,11 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         public int InvalidTestFixtures { get; private set; }
 
+        /// <summary>
+        /// Gets the count of failures in test fixture teardowns (e.g. OneTimeTearDown, Dispose)
+        /// </summary>
+        public int FailureInFixtureTearDown { get; private set; }
+
         #endregion
 
         #region Helper Methods
@@ -165,6 +170,7 @@ namespace NUnit.ConsoleRunner
             ExplicitCount = 0;
             InvalidCount = 0;
             InvalidAssemblies = 0;
+            FailureInFixtureTearDown = 0;
         }
 
         private void Summarize(XmlNode node)
@@ -172,6 +178,7 @@ namespace NUnit.ConsoleRunner
             string type = node.GetAttribute("type");
             string status = node.GetAttribute("result");
             string label = node.GetAttribute("label");
+            string site = node.GetAttribute("site");
 
             switch (node.Name)
             {
@@ -221,6 +228,10 @@ namespace NUnit.ConsoleRunner
                     {
                         InvalidAssemblies++;
                         UnexpectedError = true;
+                    }
+                    if ((type == "SetUpFixture" || type == "TestFixture") && status == "Failed" && label == "Error" && site == "TearDown")
+                    {
+                        FailureInFixtureTearDown++;
                     }
 
                     Summarize(node.ChildNodes);

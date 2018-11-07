@@ -258,7 +258,7 @@ namespace NUnit.ConsoleRunner
 
                 return reporter.Summary.InvalidTestFixtures > 0
                     ? ConsoleRunner.INVALID_TEST_FIXTURE
-                    : reporter.Summary.FailureCount + reporter.Summary.ErrorCount + reporter.Summary.InvalidCount;
+                    : reporter.Summary.FailureCount + reporter.Summary.ErrorCount + reporter.Summary.InvalidCount + reporter.Summary.FailureInFixtureTearDown;
             }
 
             // If we got here, it's because we had an exception, but check anyway
