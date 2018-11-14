@@ -183,12 +183,14 @@ namespace NUnit.ConsoleRunner
                     {
                         case "Passed":
                             if (failedInFixtureTearDown)
-                                FailureCount++;
+                                ErrorCount++;
                             else
                                 PassCount++;
                             break;
                         case "Failed":
-                            if (label == null || failedInFixtureTearDown)
+                            if (failedInFixtureTearDown)
+                                ErrorCount++;
+                            else if (label == null)
                                 FailureCount++;
                             else if (label == "Invalid")
                                 InvalidCount++;
@@ -197,13 +199,13 @@ namespace NUnit.ConsoleRunner
                             break;
                         case "Warning":
                             if (failedInFixtureTearDown)
-                                FailureCount++;
+                                ErrorCount++;
                             else
                                 WarningCount++;
                             break;
                         case "Inconclusive":
                             if (failedInFixtureTearDown)
-                                FailureCount++;
+                                ErrorCount++;
                             else
                                 InconclusiveCount++;
                             break;

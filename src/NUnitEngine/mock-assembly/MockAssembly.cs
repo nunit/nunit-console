@@ -59,7 +59,8 @@ namespace NUnit.Tests
                         + GenericFixtureConstants.Tests
                         + AccessesCurrentTestContextDuringDiscovery.Tests
                         + FixtureWithDispose.Tests
-                        + FixtureWithOneTimeTearDown.Tests;
+                        + FixtureWithOneTimeTearDown.Tests
+                        + TestSetUpFixture.SetUpFixture.TestsInNamespace;
 
             public const int Suites = MockTestFixture.Suites
                         + Singletons.OneTestCase.Suites
@@ -93,7 +94,10 @@ namespace NUnit.Tests
                         + GenericFixtureConstants.Tests
                         + AccessesCurrentTestContextDuringDiscovery.Tests;
 
-            public const int PassedInAttribute = Passed + FixtureWithDispose.Tests + FixtureWithOneTimeTearDown.Tests;
+            public const int PassedInAttribute = Passed
+                        + FixtureWithDispose.Tests
+                        + FixtureWithOneTimeTearDown.Tests
+                        + TestSetUpFixture.SetUpFixture.TestsInNamespace;
 
             public const int Skipped_Ignored = MockTestFixture.Skipped_Ignored + IgnoredFixture.Tests;
             public const int Skipped_Explicit = MockTestFixture.Skipped_Explicit + ExplicitFixture.Tests;
@@ -344,6 +348,36 @@ namespace NUnit.Tests
         public void OneTimeTearDown()
         {
             throw new Exception("Exception in OneTimeTearDown");
+        }
+    }
+
+    namespace TestSetUpFixture
+    {
+        [SetUpFixture]
+        public class SetUpFixture
+        {
+            public const int SuitesInNamespace = 2;
+            public const int TestsInNamespace = 2;
+
+            [OneTimeTearDown]
+            public void OneTimeTearDown()
+            {
+                throw new Exception("Exception in SetUpFixture.OneTimeTearDown");
+            }
+        }
+
+        [TestFixture]
+        public class Fixture1
+        {
+            [Test]
+            public void Test1() { }
+        }
+
+        [TestFixture]
+        public class Fixture2
+        {
+            [Test]
+            public void Test1() { }
         }
     }
 }
