@@ -20,7 +20,7 @@ The latest stable release of the NUnit Console is [available on NuGet](https://w
 
 The Console/Engine are available in various packages:
 - [NUnit.ConsoleRunner](https://www.nuget.org/packages/NUnit.ConsoleRunner/): The NUnit Console, with no extensions.
-- [NUnit.Console](https://www.nuget.org/packages/NUnit.Console/): The NUnit Console, with key extensions additionally packaged. Also available as an [msi installer](https://github.com/nunit/nunit-console/releases), remember to add its install location to your environment variable after installing, such as `C:\Program Files (x86)\NUnit.org\nunit-console`.
+- [NUnit.Console](https://www.nuget.org/packages/NUnit.Console/): The NUnit Console, with key extensions additionally packaged. Also available as an [msi installer](https://github.com/nunit/nunit-console/releases), you may need to add your **actual** msi install location to the `Path` environment variable after installing, for example: `C:\Program Files (x86)\NUnit.org\nunit-console`.
 - [NUnit.Engine](https://www.nuget.org/packages/NUnit.Engine/) & [NUnit.Engine.Api](https://www.nuget.org/packages/NUnit.Engine.Api/): Packages intended for custom runners integrating directly with the NUnit Engine. 
 
 ## Documentation ##
