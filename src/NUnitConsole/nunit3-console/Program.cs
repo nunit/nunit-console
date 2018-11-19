@@ -56,6 +56,8 @@ namespace NUnit.ConsoleRunner
         [STAThread]
         public static int Main(string[] args)
         {
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelHandler);
+
             try
             {
                 Options.Parse(Options.PreParse(args));
@@ -247,6 +249,11 @@ namespace NUnit.ConsoleRunner
                 //writer.WriteLine("or a space to separate the option from its value.");
                 //writer.WriteLine();
             }
+        }
+
+        private static void CancelHandler(object sender, ConsoleCancelEventArgs args)
+        {
+            Console.ResetColor();
         }
     }
 }
