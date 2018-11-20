@@ -37,7 +37,7 @@ namespace NUnit.Engine.Runners
     {
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private ProvidedPathsAssemblyResolver _assemblyResolver;
 
         protected AppDomain TestDomain { get; set; }
@@ -45,7 +45,7 @@ namespace NUnit.Engine.Runners
 
         public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
             if (AppDomain.CurrentDomain.IsDefaultAppDomain())
@@ -114,7 +114,7 @@ namespace NUnit.Engine.Runners
                 string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
                 bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
                 if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
                     && subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
                 {
@@ -204,7 +204,7 @@ namespace NUnit.Engine.Runners
                 result.Add(driverResult);
             }
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             if (_assemblyResolver != null)
             {
                 var packages = TestPackage.SubPackages;

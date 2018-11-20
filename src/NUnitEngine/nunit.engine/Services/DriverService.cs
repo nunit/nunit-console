@@ -51,7 +51,7 @@ namespace NUnit.Engine.Services
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
         public IFrameworkDriver GetDriver(string assemblyPath, bool skipNonTestAssemblies)
 #else
         public IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies)
@@ -63,7 +63,7 @@ namespace NUnit.Engine.Services
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, "File type is not supported");
 
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
             if (targetFramework != null)
             {
                 // This takes care of an issue with Roslyn. It may get fixed, but we still
@@ -97,7 +97,7 @@ namespace NUnit.Engine.Services
                     foreach (var reference in references)
                     {
                         if (factory.IsSupportedTestFramework(reference))
-#if NETSTANDARD1_3 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
                             return factory.GetDriver(reference);
 #else
                             return factory.GetDriver(domain, reference);

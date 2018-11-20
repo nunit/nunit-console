@@ -19,8 +19,9 @@
     <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group targetFramework="net20" />
-      <group targetFramework="netstandard1.3">
+      <group targetFramework="netstandard1.6">
         <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="SSystem.Runtime.Loader" version="4.3.0" exclude="compile" />
         <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
       </group>
       <group targetFramework="netstandard2.0">
@@ -31,7 +32,7 @@
   <files>
     <file src="LICENSE.txt" />
     <file src="bin/net20/nunit.engine.api.dll" target="lib/net20" />
-    <file src="bin/netstandard1.3/nunit.engine.api.dll" target="lib/netstandard1.3" />
+    <file src="bin/netstandard1.6/nunit.engine.api.dll" target="lib/netstandard1.6" />
     <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netstandard2.0" />
   </files>
 </package>

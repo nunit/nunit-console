@@ -159,7 +159,7 @@ namespace NUnit.Engine.Runners
 
             bool disposeRunners = TestPackage.GetSetting(EnginePackageSettings.DisposeRunners, false);
 
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
             RunTestsSequentially(listener, filter, results, disposeRunners);
 #else
             if (LevelOfParallelism <= 1)
@@ -186,7 +186,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
         {
             var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);

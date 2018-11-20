@@ -38,7 +38,7 @@ namespace NUnit.Engine.Runners
         private const string TEST_RUN_ELEMENT = "test-run";
         private readonly ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private readonly ExtensionService _extensionService;
 #if !NETSTANDARD2_0
         private readonly IRuntimeFrameworkService _runtimeService;
@@ -57,10 +57,10 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             _extensionService = _services.GetService<ExtensionService>();
 #endif
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
@@ -154,7 +154,7 @@ namespace NUnit.Engine.Runners
         }
 
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.
@@ -238,7 +238,7 @@ namespace NUnit.Engine.Runners
             // Info will be left behind in the package about
             // each contained assembly, which will subsequently
             // be used to determine how to run the assembly.
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
             _runtimeService.SelectRuntimeFramework(TestPackage);
 #endif
 
@@ -303,7 +303,7 @@ namespace NUnit.Engine.Runners
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings()
         {
-#if !NETSTANDARD1_3 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             if (frameworkSetting.Length > 0)
             {
@@ -366,7 +366,7 @@ namespace NUnit.Engine.Runners
             var eventDispatcher = new TestEventDispatcher();
             if (listener != null)
                 eventDispatcher.Listeners.Add(listener);
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
                 eventDispatcher.Listeners.Add(extension);
 #endif
@@ -383,7 +383,7 @@ namespace NUnit.Engine.Runners
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             InsertCommandLineElement(result.Xml);
             result.Xml.AddAttribute("engine-version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
             result.Xml.AddAttribute("clr-version", Environment.Version.ToString());
@@ -404,7 +404,7 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
         {
             var testRun = new AsyncTestEngineResult();

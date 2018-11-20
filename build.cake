@@ -46,7 +46,7 @@ var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.en
 var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
-var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.3", "netstandard2.0" };
+var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.6", "netstandard2.0" };
 var NETCORE_FRAMEWORKS = new [] { "netcoreapp1.1", "netcoreapp2.0" };
 
 // Test Runner

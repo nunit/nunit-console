@@ -40,7 +40,7 @@ namespace NUnit.Engine.Extensibility
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         bool IsSupportedTestFramework(AssemblyName reference);
 
-#if NETSTANDARD1_3 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
         /// <summary>
         /// Gets a driver for a given test assembly and a framework
         /// which the assembly is already known to reference.

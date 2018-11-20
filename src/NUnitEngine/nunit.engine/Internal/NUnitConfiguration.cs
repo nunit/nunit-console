@@ -36,7 +36,7 @@ namespace NUnit.Engine.Internal
     {
         #region Public Properties
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         #region EngineDirectory
 
         private static string _engineDirectory;
@@ -65,7 +65,7 @@ namespace NUnit.Engine.Internal
                 if (_applicationDirectory == null)
                 {
                     _applicationDirectory = Path.Combine(
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
                     Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "HOME"),
 #else
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

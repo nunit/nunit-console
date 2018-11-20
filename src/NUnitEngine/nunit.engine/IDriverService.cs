@@ -32,7 +32,7 @@ namespace NUnit.Engine
     /// </summary>
     public interface IDriverService
     {
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
         /// </summary>

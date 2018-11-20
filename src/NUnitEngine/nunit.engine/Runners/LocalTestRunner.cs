@@ -32,7 +32,7 @@ namespace NUnit.Engine.Runners
     {
         public LocalTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             this.TestDomain = AppDomain.CurrentDomain;
 #endif
         }

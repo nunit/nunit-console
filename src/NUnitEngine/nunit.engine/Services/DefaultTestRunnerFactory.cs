@@ -33,7 +33,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class DefaultTestRunnerFactory : InProcessTestRunnerFactory, ITestRunnerFactory
     {
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private IProjectService _projectService;
 #endif
 
@@ -41,7 +41,7 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             // TestRunnerFactory requires the ProjectService
             _projectService = ServiceContext.GetService<IProjectService>();
 
@@ -75,7 +75,7 @@ namespace NUnit.Engine.Services
 
                 if (PathUtils.IsAssemblyFileType(testFile))
                     assemblyCount++;
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
                 else if (_projectService.CanLoadFrom(testFile))
                     projectCount++;
 #endif
@@ -90,7 +90,7 @@ namespace NUnit.Engine.Services
             if (projectCount > 1 || projectCount > 0 && assemblyCount > 0)
                 return new AggregatingTestRunner(ServiceContext, package);
 
-#if NETSTANDARD1_3 || NETSTANDARD2_0
+#if NETSTANDARD1_6 || NETSTANDARD2_0
             if (projectCount > 0 || package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
 

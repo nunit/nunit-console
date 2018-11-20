@@ -39,19 +39,21 @@ namespace NUnit.Engine
         private const string DefaultAssemblyName = "nunit.engine.dll";
         internal const string DefaultTypeName = "NUnit.Engine.TestEngine";
 
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
         /// <summary>
         /// Create an instance of the test engine.
         /// </summary>
         /// <returns>An <see cref="NUnit.Engine.ITestEngine"/></returns>
         public static ITestEngine CreateInstance()
         {
-            var assemblyName = new AssemblyName(DefaultAssemblyName);
+            var apiLocation = typeof(TestEngineActivator).GetTypeInfo().Assembly.Location;
+            var directoryName = Path.GetDirectoryName(apiLocation);
+            var enginePath = directoryName == null ? DefaultAssemblyName : Path.Combine(directoryName, DefaultAssemblyName);
+            var assemblyName = System.Runtime.Loader.AssemblyLoadContext.GetAssemblyName(enginePath);
             var assembly = Assembly.Load(assemblyName);
             var engineType = assembly.GetType(DefaultTypeName);
             return Activator.CreateInstance(engineType) as ITestEngine;
         }
-    
 #elif NETSTANDARD2_0
         /// <summary>
         /// Create an instance of the test engine.
@@ -67,7 +69,7 @@ namespace NUnit.Engine
             return Activator.CreateInstance(engineType) as ITestEngine;
         }
 #else
-#region Public Methods
+        #region Public Methods
 
         /// <summary>
         /// Create an instance of the test engine.
@@ -108,9 +110,9 @@ namespace NUnit.Engine
             }
         }
 
-#endregion
+        #endregion
 
-#region Private Methods
+        #region Private Methods
 
         private static Assembly FindNewestEngine(Version minVersion)
         {
@@ -187,7 +189,7 @@ namespace NUnit.Engine
             catch (Exception) { }
             return null;
         }
-#endregion
+        #endregion
 #endif
     }
 }

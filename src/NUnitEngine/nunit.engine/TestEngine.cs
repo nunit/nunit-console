@@ -41,7 +41,7 @@ namespace NUnit.Engine
         public TestEngine()
         {
             Services = new ServiceContext();
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
             WorkDirectory = NUnitConfiguration.ApplicationDirectory;
 #else
             WorkDirectory = Environment.CurrentDirectory;
@@ -105,7 +105,7 @@ namespace NUnit.Engine
                 Services.Add(new DriverService());
                 Services.Add(new RecentFilesService());
                 Services.Add(new TestFilterService());
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
 #if !NETSTANDARD2_0
