@@ -43,7 +43,7 @@ namespace NUnit.ConsoleRunner
 
             InitializeCounters();
 
-            Summarize(result);
+            Summarize(result, false);
         }
 
         #endregion
@@ -167,11 +167,12 @@ namespace NUnit.ConsoleRunner
             InvalidAssemblies = 0;
         }
 
-        private void Summarize(XmlNode node)
+        private void Summarize(XmlNode node, bool failedInFixtureTearDown)
         {
             string type = node.GetAttribute("type");
             string status = node.GetAttribute("result");
             string label = node.GetAttribute("label");
+            string site = node.GetAttribute("site");
 
             switch (node.Name)
             {
@@ -181,10 +182,15 @@ namespace NUnit.ConsoleRunner
                     switch (status)
                     {
                         case "Passed":
-                            PassCount++;
+                            if (failedInFixtureTearDown)
+                                ErrorCount++;
+                            else
+                                PassCount++;
                             break;
                         case "Failed":
-                            if (label == null)
+                            if (failedInFixtureTearDown)
+                                ErrorCount++;
+                            else if (label == null)
                                 FailureCount++;
                             else if (label == "Invalid")
                                 InvalidCount++;
@@ -192,10 +198,16 @@ namespace NUnit.ConsoleRunner
                                 ErrorCount++;
                             break;
                         case "Warning":
-                            WarningCount++;
+                            if (failedInFixtureTearDown)
+                                ErrorCount++;
+                            else
+                                WarningCount++;
                             break;
                         case "Inconclusive":
-                            InconclusiveCount++;
+                            if (failedInFixtureTearDown)
+                                ErrorCount++;
+                            else
+                                InconclusiveCount++;
                             break;
                         case "Skipped":
                             if (label == "Ignored")
@@ -222,20 +234,24 @@ namespace NUnit.ConsoleRunner
                         InvalidAssemblies++;
                         UnexpectedError = true;
                     }
+                    if ((type == "SetUpFixture" || type == "TestFixture") && status == "Failed" && label == "Error" && site == "TearDown")
+                    {
+                        failedInFixtureTearDown = true;
+                    }
 
-                    Summarize(node.ChildNodes);
+                    Summarize(node.ChildNodes, failedInFixtureTearDown);
                     break;
 
                 case "test-run":
-                    Summarize(node.ChildNodes);
+                    Summarize(node.ChildNodes, failedInFixtureTearDown);
                     break;
             }
         }
 
-        private void Summarize(XmlNodeList nodes)
+        private void Summarize(XmlNodeList nodes, bool failedInFixtureTearDown)
         {
             foreach (XmlNode childResult in nodes)
-                Summarize(childResult);
+                Summarize(childResult, failedInFixtureTearDown);
         }
 
         #endregion

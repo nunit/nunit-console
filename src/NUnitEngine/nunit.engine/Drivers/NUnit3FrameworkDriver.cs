@@ -75,7 +75,7 @@ namespace NUnit.Engine.Drivers
         /// <returns>An Xml string representing the loaded test</returns>
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
-            Guard.ArgumentValid(File.Exists(testAssemblyPath), "testAssemblyPath", "Framework driver constructor called with a file name that doesn't exist.");
+            Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver constructor called with a file name that doesn't exist.", "testAssemblyPath");
 
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
             _testAssemblyPath = testAssemblyPath;
