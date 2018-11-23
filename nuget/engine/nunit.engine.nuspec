@@ -24,7 +24,7 @@
         <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
         <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
         <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
-        <dependency id="System.Reflection.TypeExtensions" Version="4.4.0" exclude="compile" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.4.0" exclude="compile" />
         <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
         <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
       </group>

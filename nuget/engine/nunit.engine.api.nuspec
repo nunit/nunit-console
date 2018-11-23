@@ -21,7 +21,7 @@
       <group targetFramework="net20" />
       <group targetFramework="netstandard1.6">
         <dependency id="NETStandard.Library" version="1.6.1" />
-        <dependency id="SSystem.Runtime.Loader" version="4.3.0" exclude="compile" />
+        <dependency id="System.Runtime.Loader" version="4.3.0" exclude="compile" />
         <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
       </group>
       <group targetFramework="netstandard2.0">
