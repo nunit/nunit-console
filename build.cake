@@ -517,14 +517,6 @@ bool CheckIfDotNetCoreInstalled()
     return true;
 }
 
-void RunGitCommand(string arguments)
-{
-    StartProcess("git", new ProcessSettings()
-    {
-        Arguments = arguments
-    });
-}
-
 void CheckForError(ref List<string> errorDetail)
 {
     if(errorDetail.Count != 0)
