@@ -519,7 +519,7 @@ namespace NUnit.Engine.Services
 
         /// <summary>
         /// Checks that the target framework of the current runner can load the extension assembly. For example, .NET Core
-        /// cannot load .NET Framework assemblies and visa-versa.
+        /// cannot load .NET Framework assemblies and vice-versa.
         /// </summary>
         /// <param name="runnerAsm">The executing runner</param>
         /// <param name="extensionAsm">The extension we are attempting to load</param>

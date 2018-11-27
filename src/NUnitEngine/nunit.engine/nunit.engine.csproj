@@ -15,9 +15,6 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" PrivateAssets="compile" />
-  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6' or '$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0" />
