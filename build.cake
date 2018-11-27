@@ -245,10 +245,10 @@ Task("TestNet20Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 1.3 ENGINE
+// TEST NETSTANDARD 1.6 ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNetStandard13Engine")
+Task("TestNetStandard16Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
@@ -570,7 +570,7 @@ Task("Test")
     .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestNet20Engine")
     .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNetStandard13Engine")
+    .IsDependentOn("TestNetStandard16Engine")
     .IsDependentOn("TestNetStandard20Engine");
 
 Task("Package")

@@ -36,7 +36,7 @@ using System.Reflection;
 #elif NET20
 [assembly: AssemblyConfiguration(".NET 2.0 Debug")]
 #elif NETSTANDARD1_6 || NETCOREAPP1_1
-[assembly: AssemblyConfiguration(".NET Standard 1.3 Debug")]
+[assembly: AssemblyConfiguration(".NET Standard 1.6 Debug")]
 #elif NETSTANDARD2_0 || NETCOREAPP2_0
 [assembly: AssemblyConfiguration(".NET Standard 2.0 Debug")]
 #else
@@ -48,7 +48,7 @@ using System.Reflection;
 #elif NET20
 [assembly: AssemblyConfiguration(".NET 2.0")]
 #elif NETSTANDARD1_6 || NETCOREAPP1_1
-[assembly: AssemblyConfiguration(".NET Standard 1.3")]
+[assembly: AssemblyConfiguration(".NET Standard 1.6")]
 #elif NETSTANDARD2_0 || NETCOREAPP2_0
 [assembly: AssemblyConfiguration(".NET Standard 2.0")]
 #else
