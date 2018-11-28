@@ -33,7 +33,11 @@ namespace NUnit.Engine.Tests
     [Extension]
     public class DummyFrameworkDriverExtension : IDriverFactory
     {
+#if NETCOREAPP1_1 || NETCOREAPP2_0
+        public IFrameworkDriver GetDriver(AssemblyName reference)
+#else
         public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
+#endif
         {
             throw new NotImplementedException();
         }

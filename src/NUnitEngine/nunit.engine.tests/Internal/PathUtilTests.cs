@@ -23,6 +23,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Internal.Tests
@@ -86,11 +87,20 @@ namespace NUnit.Engine.Internal.Tests
 				PathUtils.Canonicalize( @"folder1\folder2\..\..\..\file.tmp" ) );
 		}
 
-#if !NETCOREAPP1_1
         [Test]
-		[Platform(Exclude="Linux,UNIX,MacOSX")]
         public void RelativePath()
 		{
+            bool windows = false;
+
+#if NETCOREAPP1_1 || NETCOREAPP2_0
+            windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#else
+            var platform = Environment.OSVersion.Platform;
+            windows = platform == PlatformID.Win32NT;
+#endif
+
+            Assume.That(windows, Is.True);
+
 			Assert.AreEqual( @"folder2\folder3", PathUtils.RelativePath(
 				@"c:\folder1", @"c:\folder1\folder2\folder3" ) );
 			Assert.AreEqual( @"..\folder2\folder3", PathUtils.RelativePath(
@@ -122,7 +132,6 @@ namespace NUnit.Engine.Internal.Tests
             Assert.AreEqual(@"..\Folder2\folder3", PathUtils.RelativePath(
                 @"c:\folder1", @"C:\Folder2\folder3"));
         }
-#endif
 
         [Test]
 		public void SamePathOrUnder()

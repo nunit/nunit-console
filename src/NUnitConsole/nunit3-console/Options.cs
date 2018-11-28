@@ -146,10 +146,6 @@ using System.Security.Permissions;
 using System.Linq;
 #endif
 
-#if TEST
-using NDesk.Options;
-#endif
-
 namespace NUnit.Options
 {
     public class OptionValueCollection : IList, IList<string> {
@@ -349,7 +345,6 @@ namespace NUnit.Options
         protected static T Parse<T> (string value, OptionContext c)
         {
             Type tt = typeof (T);
-
             bool nullable = tt.IsValueType && tt.IsGenericType &&
                 !tt.IsGenericTypeDefinition &&
                 tt.GetGenericTypeDefinition () == typeof (Nullable<>);

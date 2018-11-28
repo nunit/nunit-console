@@ -5,9 +5,9 @@
             <Component Id="NUNIT_CONSOLE" Location="local" Guid="EEABEE65-D977-46B7-99B4-73814BF7BE63">
                 <File Id="nunit_console.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/nunit3-console.exe" />
+                      Source="$(var.InstallImage)bin/net20/nunit3-console.exe" />
                 <File Id="nunit_console.exe.config"
-                      Source="$(var.InstallImage)bin/nunit3-console.exe.config" />
+                      Source="$(var.InstallImage)bin/net20/nunit3-console.exe.config" />
             </Component>
         </ComponentGroup>
     </Fragment>

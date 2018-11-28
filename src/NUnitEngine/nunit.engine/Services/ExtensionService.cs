@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +35,7 @@ namespace NUnit.Engine.Services
 {
     /// <summary>
     /// The ExtensionService discovers ExtensionPoints and Extensions and
-    /// maintains them in a database. It can return extension nodes or 
+    /// maintains them in a database. It can return extension nodes or
     /// actual extension objects on request.
     /// </summary>
     public class ExtensionService : Service, IExtensionService
@@ -177,7 +178,7 @@ namespace NUnit.Engine.Services
                 FindExtensionPoints(thisAssembly);
                 FindExtensionPoints(apiAssembly);
 
-                // Create the list of possible extension assemblies, 
+                // Create the list of possible extension assemblies,
                 // eliminating duplicates. Start in Engine directory.
                 var startDir = new DirectoryInfo(AssemblyHelper.GetDirectoryName(thisAssembly));
                 FindExtensionAssemblies(startDir);
@@ -256,7 +257,7 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Deduce the extension point based on the Type of an extension. 
+        /// Deduce the extension point based on the Type of an extension.
         /// Returns null if no extension point can be found that would
         /// be satisfied by the provided Type.
         /// </summary>
@@ -268,12 +269,22 @@ namespace NUnit.Engine.Services
 
             TypeDefinition typeDef = typeRef.Resolve();
 
+
+#if NETSTANDARD2_0
+            foreach (InterfaceImplementation iface in typeDef.Interfaces)
+            {
+                ep = DeduceExtensionPointFromType(iface.InterfaceType);
+                if (ep != null)
+                    return ep;
+            }
+#else
             foreach (TypeReference iface in typeDef.Interfaces)
             {
                 ep = DeduceExtensionPointFromType(iface);
                 if (ep != null)
                     return ep;
             }
+#endif
 
             TypeReference baseType = typeDef.BaseType;
             return baseType != null && baseType.FullName != "System.Object"
@@ -297,8 +308,8 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Scans a directory for candidate addin assemblies. Note that assemblies in 
-        /// the directory are only scanned if no file of type .addins is found. If such 
+        /// Scans a directory for candidate addin assemblies. Note that assemblies in
+        /// the directory are only scanned if no file of type .addins is found. If such
         /// a file is found, then those assemblies it references are scanned.
         /// </summary>
         private void ProcessDirectory(DirectoryInfo startDir, bool fromWildCard)
@@ -420,8 +431,12 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
+            ValidateTargetFramework(Assembly.GetEntryAssembly(), assembly);
+
+            IRuntimeFramework assemblyTargetFramework = null;
+#if !NETSTANDARD2_0
             var currentFramework = RuntimeFramework.CurrentFramework;
-            var assemblyTargetFramework = assembly.TargetFramework;
+            assemblyTargetFramework = assembly.TargetFramework;
             if (!currentFramework.CanLoad(assemblyTargetFramework))
             {
                 if (!assembly.FromWildCard)
@@ -434,6 +449,7 @@ namespace NUnit.Engine.Services
                     return;
                 }
             }
+#endif
 
             foreach (var type in assembly.MainModule.GetTypes())
             {
@@ -501,6 +517,37 @@ namespace NUnit.Engine.Services
             }
         }
 
+        /// <summary>
+        /// Checks that the target framework of the current runner can load the extension assembly. For example, .NET Core
+        /// cannot load .NET Framework assemblies and vice-versa.
+        /// </summary>
+        /// <param name="runnerAsm">The executing runner</param>
+        /// <param name="extensionAsm">The extension we are attempting to load</param>
+        internal static void ValidateTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        {
+            if (runnerAsm == null)
+                return;
+
+            var extHelper = new TargetFrameworkHelper(extensionAsm.FilePath);
+            var runnerHelper = new TargetFrameworkHelper(runnerAsm.Location);
+            if (runnerHelper.FrameworkName?.StartsWith(".NETStandard") == true)
+            {
+                throw new NUnitEngineException("Test runners must target .NET Core or .NET Framework, not .NET Standard");
+            }
+            else if (runnerHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
+            {
+                if (extHelper.FrameworkName?.StartsWith(".NETStandard") != true && extHelper.FrameworkName?.StartsWith(".NETCoreApp") != true)
+                {
+                    throw new NUnitEngineException(".NET Core runners require .NET Core or .NET Standard extensions");
+                }
+            }
+            else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
+            {
+                throw new NUnitEngineException(".NET Framework runners cannot load .NET Core extensions");
+            }
+        }
+
         #endregion
     }
 }
+#endif

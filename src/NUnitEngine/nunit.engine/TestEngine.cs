@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,6 +25,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
@@ -40,7 +41,11 @@ namespace NUnit.Engine
         public TestEngine()
         {
             Services = new ServiceContext();
+#if NETSTANDARD1_6
+            WorkDirectory = NUnitConfiguration.ApplicationDirectory;
+#else
             WorkDirectory = Environment.CurrentDirectory;
+#endif
             InternalTraceLevel = InternalTraceLevel.Default;
         }
 
@@ -73,12 +78,12 @@ namespace NUnit.Engine
 
         /// <summary>
         /// Initialize the engine. This includes initializing mono addins,
-        /// setting the trace level and creating the standard set of services 
+        /// setting the trace level and creating the standard set of services
         /// used in the Engine.
-        /// 
-        /// This interface is not normally called by user code. Programs linking 
+        ///
+        /// This interface is not normally called by user code. Programs linking
         /// only to the nunit.engine.api assembly are given a
-        /// pre-initialized instance of TestEngine. Programs 
+        /// pre-initialized instance of TestEngine. Programs
         /// that link directly to nunit.engine usually do so
         /// in order to perform custom initialization.
         /// </summary>
@@ -93,17 +98,24 @@ namespace NUnit.Engine
             // If caller added services beforehand, we don't add any
             if (Services.ServiceCount == 0)
             {
+                // Services that depend on other services must be added after their dependencies
+                // For example, ResultService uses ExtensionService, so ExtensionService is added
+                // later.
                 Services.Add(new SettingsService(true));
-                Services.Add(new DomainManager());
-                Services.Add(new ExtensionService());
                 Services.Add(new DriverService());
                 Services.Add(new RecentFilesService());
-                Services.Add(new ProjectService());
-                Services.Add(new RuntimeFrameworkService());
-                Services.Add(new DefaultTestRunnerFactory());
-                Services.Add(new TestAgency());
-                Services.Add(new ResultService());
                 Services.Add(new TestFilterService());
+#if !NETSTANDARD1_6
+                Services.Add(new ExtensionService());
+                Services.Add(new ProjectService());
+#if !NETSTANDARD2_0
+                Services.Add(new DomainManager());
+                Services.Add(new RuntimeFrameworkService());
+                Services.Add(new TestAgency());
+#endif
+#endif
+                Services.Add(new ResultService());
+                Services.Add(new DefaultTestRunnerFactory());
             }
 
             Services.ServiceManager.StartServices();

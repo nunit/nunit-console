@@ -23,11 +23,7 @@
 
 namespace NUnit.Engine.Services
 {
-    public class TestFilterService :
-#if !NETSTANDARD1_3
-        Service, 
-#endif
-        ITestFilterService
+    public class TestFilterService : Service, ITestFilterService
     {
         public ITestFilterBuilder GetTestFilterBuilder()
         {

@@ -35,9 +35,7 @@ namespace NUnit.Engine.Runners.Tests
     public class MasterTestRunnerTests : ITestEventListener
     {
         private TestPackage _package;
-#if !NETCOREAPP1_1
         private ServiceContext _services;
-#endif
         private MasterTestRunner _runner;
         private List<XmlNode> _events;
 
@@ -46,22 +44,22 @@ namespace NUnit.Engine.Runners.Tests
         {
             _package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll"));
 
-#if !NETCOREAPP1_1
 
             // Add all services needed
             _services = new ServiceContext();
-            _services.Add(new Services.DomainManager());
+#if !NETCOREAPP1_1
             _services.Add(new Services.ExtensionService());
-            _services.Add(new Services.DriverService());
             _services.Add(new Services.ProjectService());
+#if !NETCOREAPP2_0
+            _services.Add(new Services.DomainManager());
             _services.Add(new Services.RuntimeFrameworkService());
+#endif
+#endif
+            _services.Add(new Services.DriverService());
             _services.Add(new Services.InProcessTestRunnerFactory());
             _services.ServiceManager.StartServices();
 
             _runner = new MasterTestRunner(_services, _package);
-#else
-            _runner = new MasterTestRunner(_package);
-#endif
             _events = new List<XmlNode>();
         }
 
@@ -71,10 +69,8 @@ namespace NUnit.Engine.Runners.Tests
             if (_runner != null)
                 _runner.Dispose();
 
-#if !NETCOREAPP1_1
             if (_services != null)
                 _services.ServiceManager.Dispose();
-#endif
         }
 
         [Test]

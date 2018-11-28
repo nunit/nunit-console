@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -32,6 +32,15 @@ namespace NUnit.Engine
     /// </summary>
     public interface IDriverService
     {
+#if NETSTANDARD1_6
+        /// <summary>
+        /// Get a driver suitable for use with a particular test assembly.
+        /// </summary>
+        /// <param name="assemblyPath">The full path to the test assembly</param>
+        /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
+        /// <returns></returns>
+        IFrameworkDriver GetDriver(string assemblyPath, bool skipNonTestAssemblies);
+#else
         /// <summary>
         /// Get a driver suitable for loading and running tests in the specified assembly.
         /// </summary>
@@ -41,5 +50,6 @@ namespace NUnit.Engine
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
         IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies);
+#endif
     }
 }

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -38,8 +38,12 @@ namespace NUnit.Engine.Runners
         private const string TEST_RUN_ELEMENT = "test-run";
         private readonly ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
-        private readonly IRuntimeFrameworkService _runtimeService;
+#if !NETSTANDARD1_6
         private readonly ExtensionService _extensionService;
+#if !NETSTANDARD2_0
+        private readonly IRuntimeFrameworkService _runtimeService;
+#endif
+#endif
         private readonly IProjectService _projectService;
         private bool _disposed;
 
@@ -53,14 +57,18 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
+#endif
+#if !NETSTANDARD1_6
             _extensionService = _services.GetService<ExtensionService>();
+#endif
             _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
 
             InitializePackage();
         }
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// The TestPackage for which this is the runner
@@ -80,9 +88,9 @@ namespace NUnit.Engine.Runners
             get { return LoadResult != null; }
         }
 
-        #endregion
+#endregion
 
-        #region ITestRunner Members
+#region ITestRunner Members
 
         /// <summary>
         /// Get a flag indicating whether a test is running
@@ -90,7 +98,7 @@ namespace NUnit.Engine.Runners
         public bool IsTestRunning { get; private set; }
 
         /// <summary>
-        /// Load a TestPackage for possible execution. The 
+        /// Load a TestPackage for possible execution. The
         /// explicit implementation returns an ITestEngineResult
         /// for consumption by clients.
         /// </summary>
@@ -145,6 +153,8 @@ namespace NUnit.Engine.Runners
             return PrepareResult(RunTests(listener, filter)).Xml;
         }
 
+
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.
@@ -156,6 +166,7 @@ namespace NUnit.Engine.Runners
         {
             return RunTestsAsync(listener, filter);
         }
+#endif
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
@@ -180,9 +191,9 @@ namespace NUnit.Engine.Runners
             return LoadResult.Xml;
         }
 
-        #endregion
+#endregion
 
-        #region IDisposable
+#region IDisposable
 
         public void Dispose()
         {
@@ -204,9 +215,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        #endregion
+#endregion
 
-        #region Helper Methods
+#region Helper Methods
 
         /// <summary>
         /// Check the package settings, expand projects and
@@ -227,7 +238,9 @@ namespace NUnit.Engine.Runners
             // Info will be left behind in the package about
             // each contained assembly, which will subsequently
             // be used to determine how to run the assembly.
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
             _runtimeService.SelectRuntimeFramework(TestPackage);
+#endif
 
             var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
 
@@ -269,7 +282,7 @@ namespace NUnit.Engine.Runners
         {
             if (package == null) throw new ArgumentNullException("package");
 
-            return 
+            return
                 _projectService != null
                 && !string.IsNullOrEmpty(package.FullName)
                 && _projectService.CanLoadFrom(package.FullName);
@@ -290,6 +303,7 @@ namespace NUnit.Engine.Runners
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings()
         {
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
             if (frameworkSetting.Length > 0)
             {
@@ -313,6 +327,7 @@ namespace NUnit.Engine.Runners
                             "Cannot run {0} framework in process already running {1}.", frameworkSetting, currentFramework));
                 }
             }
+#endif
         }
 
         /// <summary>
@@ -351,8 +366,10 @@ namespace NUnit.Engine.Runners
             var eventDispatcher = new TestEventDispatcher();
             if (listener != null)
                 eventDispatcher.Listeners.Add(listener);
+#if !NETSTANDARD1_6
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
                 eventDispatcher.Listeners.Add(extension);
+#endif
 
             IsTestRunning = true;
 
@@ -365,10 +382,15 @@ namespace NUnit.Engine.Runners
 
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);
-            InsertCommandLineElement(result.Xml);
 
+#if !NETSTANDARD1_6
+            InsertCommandLineElement(result.Xml);
             result.Xml.AddAttribute("engine-version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
             result.Xml.AddAttribute("clr-version", Environment.Version.ToString());
+#else
+            result.Xml.AddAttribute("engine-version", typeof(MasterTestRunner).GetTypeInfo().Assembly.GetName().Version.ToString());
+            result.Xml.AddAttribute("clr-version", Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier());
+#endif
 
             double duration = (double)(Stopwatch.GetTimestamp() - startTicks) / Stopwatch.Frequency;
             result.Xml.AddAttribute("start-time", XmlConvert.ToString(startTime, "u"));
@@ -382,6 +404,7 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
+#if !NETSTANDARD1_6
         private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
         {
             var testRun = new AsyncTestEngineResult();
@@ -415,6 +438,7 @@ namespace NUnit.Engine.Runners
             var cdata = doc.CreateCDataSection(Environment.CommandLine);
             cmd.AppendChild(cdata);
         }
+#endif
 
         private static void InsertFilterElement(XmlNode resultNode, TestFilter filter)
         {
@@ -437,6 +461,6 @@ namespace NUnit.Engine.Runners
             resultNode.InsertAfter(filterElement, null);
         }
 
-        #endregion
+#endregion
     }
 }

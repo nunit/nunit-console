@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,16 +30,22 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// DirectTestRunner is the abstract base for runners 
+    /// DirectTestRunner is the abstract base for runners
     /// that deal directly with a framework driver.
     /// </summary>
     public abstract class DirectTestRunner : AbstractTestRunner
     {
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
+
+#if !NETSTANDARD1_6
         private ProvidedPathsAssemblyResolver _assemblyResolver;
+
+        protected AppDomain TestDomain { get; set; }
+#endif
 
         public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
+#if !NETSTANDARD1_6
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
             if (AppDomain.CurrentDomain.IsDefaultAppDomain())
@@ -47,13 +53,8 @@ namespace NUnit.Engine.Runners
                 _assemblyResolver = new ProvidedPathsAssemblyResolver();
                 _assemblyResolver.Install();
             }
+#endif
         }
-
-        #region Properties
-
-        protected AppDomain TestDomain { get; set; }
-
-        #endregion
 
         #region AbstractTestRunner Overrides
 
@@ -110,23 +111,26 @@ namespace NUnit.Engine.Runners
             {
                 var testFile = subPackage.FullName;
 
+                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
+                bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
+
+#if !NETSTANDARD1_6
                 if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
                     && subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
                 {
-                    // It's OK to do this in the loop because the Add method 
+                    // It's OK to do this in the loop because the Add method
                     // checks to see if the path is already present.
                     _assemblyResolver.AddPathFromFile(testFile);
                 }
 
-                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
-                bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
-                
                 IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
+#else
+                IFrameworkDriver driver = driverService.GetDriver(testFile, skipNonTestAssemblies);
+#endif
                 driver.ID = TestPackage.ID;
                 result.Add(LoadDriver(driver, testFile, subPackage));
                 _drivers.Add(driver);
             }
-
             return result;
         }
 
@@ -200,6 +204,7 @@ namespace NUnit.Engine.Runners
                 result.Add(driverResult);
             }
 
+#if !NETSTANDARD1_6
             if (_assemblyResolver != null)
             {
                 var packages = TestPackage.SubPackages;
@@ -210,7 +215,7 @@ namespace NUnit.Engine.Runners
                 foreach (var package in packages)
                     _assemblyResolver.RemovePathFromFile(package.FullName);
             }
-
+#endif
             return result;
         }
 

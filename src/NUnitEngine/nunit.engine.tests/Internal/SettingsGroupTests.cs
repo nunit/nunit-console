@@ -24,7 +24,7 @@
 using System;
 using System.ComponentModel;
 using NUnit.Framework;
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 using System.Drawing;
 #endif
 
@@ -101,7 +101,7 @@ namespace NUnit.Engine.Internal.Tests
             Assert.AreEqual( 42, settings.GetSetting( "X", 42 ) );
         }
 
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
         [Test]
         [SetCulture("da-DK")]
         public void SaveAndGetSettingShouldReturnTheOriginalValue()

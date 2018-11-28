@@ -25,9 +25,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Engine.Internal;
 
-#if !NETSTANDARD1_3
 using NUnit.Common;
-#endif
 
 namespace NUnit.Engine.Runners
 {
@@ -73,17 +71,11 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if NETSTANDARD1_3
-        public AggregatingTestRunner(TestPackage package) : base(package)
-        {
-        }
-#else
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
         }
-#endif
 
-#region AbstractTestRunner Overrides
+        #region AbstractTestRunner Overrides
 
         /// <summary>
         /// Explore a TestPackage and return information about
@@ -167,7 +159,7 @@ namespace NUnit.Engine.Runners
 
             bool disposeRunners = TestPackage.GetSetting(EnginePackageSettings.DisposeRunners, false);
 
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
             RunTestsSequentially(listener, filter, results, disposeRunners);
 #else
             if (LevelOfParallelism <= 1)
@@ -194,7 +186,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
         {
             var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
@@ -247,7 +239,7 @@ namespace NUnit.Engine.Runners
                 throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
-#endregion
+        #endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,7 +39,9 @@ namespace NUnit.Engine.Services.Tests
         public void CreateDriverFactory()
         {
             var serviceContext = new ServiceContext();
+#if !NETCOREAPP1_1
             serviceContext.Add(new ExtensionService());
+#endif
             _driverService = new DriverService();
             serviceContext.Add(_driverService);
             serviceContext.ServiceManager.StartServices();
@@ -52,22 +54,32 @@ namespace NUnit.Engine.Services.Tests
         }
 
 
+#if NETCOREAPP1_1 || NETCOREAPP2_0
+        [TestCase("mock-assembly.dll", false, typeof(NUnitNetStandardDriver))]
+        [TestCase("mock-assembly.dll", true, typeof(NUnitNetStandardDriver))]
+        [TestCase("notest-assembly.dll", false, typeof(NUnitNetStandardDriver))]
+#else
         [TestCase("mock-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
         [TestCase("mock-assembly.dll", true, typeof(NUnit3FrameworkDriver))]
+        [TestCase("notest-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
+#endif
         [TestCase("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("nunit.engine.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("nunit.engine.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
-        [TestCase("notest-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
         [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
             var driver = _driverService.GetDriver(
+#if !NETCOREAPP1_1
                 AppDomain.CurrentDomain,
+#endif
                 Path.Combine(TestContext.CurrentContext.TestDirectory, fileName),
+#if !NETCOREAPP1_1
                 null,
+#endif
                 skipNonTestAssemblies);
 
             Assert.That(driver, Is.InstanceOf(expectedType));

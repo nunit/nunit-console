@@ -28,7 +28,9 @@ namespace NUnit.Engine
     /// <summary>
     /// The exception that is thrown if a valid test engine is not found
     /// </summary>
+#if !NETSTANDARD1_6
     [Serializable]
+#endif
     public class NUnitEngineNotFoundException : Exception
     {
         /// <summary>

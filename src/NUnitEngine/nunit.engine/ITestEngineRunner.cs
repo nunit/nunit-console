@@ -68,7 +68,7 @@ namespace NUnit.Engine
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         TestEngineResult Run(ITestEventListener listener, TestFilter filter);
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.

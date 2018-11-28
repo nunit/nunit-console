@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using NUnit.Common;
 
 namespace NUnit.Engine.Extensibility
@@ -37,11 +38,11 @@ namespace NUnit.Engine.Extensibility
 
         /// <summary>
         /// IsBetterVersion determines whether another assembly is
-        /// a better than the current assembly. It first looks at 
+        /// a better than the current assembly. It first looks at
         /// for the highest assembly version, and then the highest target
         /// framework. With a tie situation, assemblies specified directly
         /// are prefered to those located via wildcards.
-        /// 
+        ///
         /// It is only intended to be called if IsDuplicateOf
         /// has already returned true. This method does no work to check if
         /// the target framework found is available under the current engine.
@@ -59,6 +60,7 @@ namespace NUnit.Engine.Extensibility
             if (firstVersion < secondVersion)
                 return false;
 
+#if !NETSTANDARD2_0
             //Look at target runtime
             var firstTargetRuntime = first.TargetFramework.FrameworkVersion;
             var secondTargetRuntime = second.TargetFramework.FrameworkVersion;
@@ -67,9 +69,11 @@ namespace NUnit.Engine.Extensibility
 
             if (firstTargetRuntime < secondTargetRuntime)
                 return false;
+#endif
 
             //Everything is equal, override only if this one was specified exactly while the other wasn't
             return !first.FromWildCard && second.FromWildCard;
         }
     }
 }
+#endif
