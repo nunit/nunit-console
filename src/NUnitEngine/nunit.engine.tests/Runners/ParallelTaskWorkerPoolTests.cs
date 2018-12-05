@@ -54,8 +54,7 @@ namespace NUnit.Engine.Runners.Tests
             workerPool.Enqueue(task);
             workerPool.Start();
 
-            Assert.IsFalse(workerPool.WaitAll(10),
-                "Threads should not have exited, work is in progress");
+            Assert.That(workerPool.WaitAll(10), Is.False, "Threads should not have exited, work is in progress");
 
             task.MarkTaskAsCompleted();
 
@@ -73,16 +72,14 @@ namespace NUnit.Engine.Runners.Tests
             workerPool.Enqueue(task2);
             workerPool.Start();
 
-            Assert.IsFalse(workerPool.WaitAll(10),
-                "Threads should not have exited, 2 tasks are in progress");
+            Assert.That(workerPool.WaitAll(10), Is.False, "Threads should not have exited, 2 tasks are in progress");
 
             Assert.AreEqual(BusyTaskState.Executing, task1.State);
             Assert.AreEqual(BusyTaskState.Queued, task2.State);
 
             task1.MarkTaskAsCompleted();
 
-            Assert.IsFalse(workerPool.WaitAll(10),
-                "Threads should not have exited, 1 task is in progress");
+            Assert.That(workerPool.WaitAll(10), Is.False, "Threads should not have exited, 1 task is in progress");
 
             Assert.AreEqual(BusyTaskState.Completed, task1.State);
             Assert.AreEqual(BusyTaskState.Executing, task2.State);
@@ -106,16 +103,14 @@ namespace NUnit.Engine.Runners.Tests
             workerPool.Enqueue(task2);
             workerPool.Start();
 
-            Assert.IsFalse(workerPool.WaitAll(10),
-                "Threads should not have exited, 2 tasks are in progress");
+            Assert.That(workerPool.WaitAll(10), Is.False, "Threads should not have exited, 2 tasks are in progress");
 
             Assert.AreEqual(BusyTaskState.Executing, task1.State);
             Assert.AreEqual(BusyTaskState.Executing, task2.State);
 
             task1.MarkTaskAsCompleted();
 
-            Assert.IsFalse(workerPool.WaitAll(10),
-                "Threads should not have exited, 1 task is in progress");
+            Assert.That(workerPool.WaitAll(10), Is.False, "Threads should not have exited, 1 task is in progress");
 
             Assert.AreEqual(BusyTaskState.Completed, task1.State);
             Assert.AreEqual(BusyTaskState.Executing, task2.State);

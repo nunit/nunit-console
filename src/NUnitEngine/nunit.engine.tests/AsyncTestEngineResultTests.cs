@@ -61,7 +61,7 @@ namespace NUnit.Engine.Tests
         [Test]
         public void IsComplete_FalseIfNotComplete()
         {
-            Assert.IsFalse(_asyncResult.IsComplete);
+            Assert.That(_asyncResult.IsComplete, Is.False);
         }
 
         [Test]
@@ -77,8 +77,7 @@ namespace NUnit.Engine.Tests
         {
             var result = new TestEngineResult("<test-assembly />");
 
-            Assert.IsFalse(_asyncResult.Wait(0),
-                "Expected wait to be false because test hasn't completed yet");
+            Assert.That(_asyncResult.Wait(0), Is.False, "Expected wait to be false because test hasn't completed yet");
 
             _asyncResult.SetResult(result);
 
