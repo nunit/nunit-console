@@ -34,8 +34,8 @@ namespace NUnit.Engine.Internal.Tests
 		[Test]
 		public void CheckDefaults()
 		{
-			Assert.AreEqual( Path.DirectorySeparatorChar, PathUtils.DirectorySeparatorChar );
-			Assert.AreEqual( Path.AltDirectorySeparatorChar, PathUtils.AltDirectorySeparatorChar );
+			Assert.That(PathUtils.DirectorySeparatorChar, Is.EqualTo(Path.DirectorySeparatorChar));
+			Assert.That(PathUtils.AltDirectorySeparatorChar, Is.EqualTo(Path.AltDirectorySeparatorChar));
 		}
 	}
 
@@ -75,16 +75,11 @@ namespace NUnit.Engine.Internal.Tests
 		[Test]
 		public void Canonicalize()
 		{
-			Assert.AreEqual( @"C:\folder1\file.tmp",
-				PathUtils.Canonicalize( @"C:\folder1\.\folder2\..\file.tmp" ) );
-			Assert.AreEqual( @"folder1\file.tmp",
-				PathUtils.Canonicalize( @"folder1\.\folder2\..\file.tmp" ) );
-			Assert.AreEqual( @"folder1\file.tmp",
-				PathUtils.Canonicalize( @"folder1\folder2\.\..\file.tmp" ) );
-			Assert.AreEqual( @"file.tmp",
-				PathUtils.Canonicalize( @"folder1\folder2\..\.\..\file.tmp" ) );
-			Assert.AreEqual( @"file.tmp",
-				PathUtils.Canonicalize( @"folder1\folder2\..\..\..\file.tmp" ) );
+			Assert.That(PathUtils.Canonicalize( @"C:\folder1\.\folder2\..\file.tmp" ), Is.EqualTo(@"C:\folder1\file.tmp"));
+			Assert.That(PathUtils.Canonicalize( @"folder1\.\folder2\..\file.tmp" ), Is.EqualTo(@"folder1\file.tmp"));
+			Assert.That(PathUtils.Canonicalize( @"folder1\folder2\.\..\file.tmp" ), Is.EqualTo(@"folder1\file.tmp"));
+			Assert.That(PathUtils.Canonicalize( @"folder1\folder2\..\.\..\file.tmp" ), Is.EqualTo(@"file.tmp"));
+			Assert.That(PathUtils.Canonicalize( @"folder1\folder2\..\..\..\file.tmp" ), Is.EqualTo(@"file.tmp"));
 		}
 
         [Test]
@@ -101,36 +96,34 @@ namespace NUnit.Engine.Internal.Tests
 
             Assume.That(windows, Is.True);
 
-			Assert.AreEqual( @"folder2\folder3", PathUtils.RelativePath(
-				@"c:\folder1", @"c:\folder1\folder2\folder3" ) );
-			Assert.AreEqual( @"..\folder2\folder3", PathUtils.RelativePath(
-				@"c:\folder1", @"c:\folder2\folder3" ) );
-			Assert.AreEqual( @"bin\debug", PathUtils.RelativePath(
-				@"c:\folder1", @"bin\debug" ) );
+			Assert.That(PathUtils.RelativePath(
+				@"c:\folder1", @"c:\folder1\folder2\folder3" ), Is.EqualTo(@"folder2\folder3"));
+			Assert.That(PathUtils.RelativePath(
+				@"c:\folder1", @"c:\folder2\folder3" ), Is.EqualTo(@"..\folder2\folder3"));
+			Assert.That(PathUtils.RelativePath(
+				@"c:\folder1", @"bin\debug" ), Is.EqualTo(@"bin\debug"));
 			Assert.IsNull( PathUtils.RelativePath( @"C:\folder", @"D:\folder" ),
 				"Unrelated paths should return null" );
             Assert.IsNull(PathUtils.RelativePath(@"C:\", @"D:\"),
                 "Unrelated roots should return null");
             Assert.IsNull(PathUtils.RelativePath(@"C:", @"D:"),
                 "Unrelated roots (no trailing separators) should return null");
-            Assert.AreEqual(string.Empty,
-                PathUtils.RelativePath(@"C:\folder1", @"C:\folder1"));
-            Assert.AreEqual(string.Empty,
-                PathUtils.RelativePath(@"C:\", @"C:\"));
+            Assert.That(PathUtils.RelativePath(@"C:\folder1", @"C:\folder1"), Is.EqualTo(string.Empty));
+            Assert.That(PathUtils.RelativePath(@"C:\", @"C:\"), Is.EqualTo(string.Empty));
 
             // First filePath consisting just of a root:
-            Assert.AreEqual(@"folder1\folder2", PathUtils.RelativePath(
-                @"C:\", @"C:\folder1\folder2"));
+            Assert.That(PathUtils.RelativePath(
+                @"C:\", @"C:\folder1\folder2"), Is.EqualTo(@"folder1\folder2"));
 
             // Trailing directory separator in first filePath shall be ignored:
-            Assert.AreEqual(@"folder2\folder3", PathUtils.RelativePath(
-                @"c:\folder1\", @"c:\folder1\folder2\folder3"));
+            Assert.That(PathUtils.RelativePath(
+                @"c:\folder1\", @"c:\folder1\folder2\folder3"), Is.EqualTo(@"folder2\folder3"));
 
             // Case-insensitive behavior, preserving 2nd filePath directories in result:
-            Assert.AreEqual(@"Folder2\Folder3", PathUtils.RelativePath(
-                @"C:\folder1", @"c:\folder1\Folder2\Folder3"));
-            Assert.AreEqual(@"..\Folder2\folder3", PathUtils.RelativePath(
-                @"c:\folder1", @"C:\Folder2\folder3"));
+            Assert.That(PathUtils.RelativePath(
+                @"C:\folder1", @"c:\folder1\Folder2\Folder3"), Is.EqualTo(@"Folder2\Folder3"));
+            Assert.That(PathUtils.RelativePath(
+                @"c:\folder1", @"C:\Folder2\folder3"), Is.EqualTo(@"..\Folder2\folder3"));
         }
 
         [Test]
@@ -169,48 +162,34 @@ namespace NUnit.Engine.Internal.Tests
 		[Test]
 		public void Canonicalize()
 		{
-			Assert.AreEqual( "/folder1/file.tmp",
-				PathUtils.Canonicalize( "/folder1/./folder2/../file.tmp" ) );
-			Assert.AreEqual( "folder1/file.tmp",
-				PathUtils.Canonicalize( "folder1/./folder2/../file.tmp" ) );
-			Assert.AreEqual( "folder1/file.tmp",
-				PathUtils.Canonicalize( "folder1/folder2/./../file.tmp" ) );
-			Assert.AreEqual( "file.tmp",
-				PathUtils.Canonicalize( "folder1/folder2/.././../file.tmp" ) );
-			Assert.AreEqual( "file.tmp",
-				PathUtils.Canonicalize( "folder1/folder2/../../../file.tmp" ) );
+			Assert.That(PathUtils.Canonicalize( "/folder1/./folder2/../file.tmp" ), Is.EqualTo("/folder1/file.tmp"));
+			Assert.That(PathUtils.Canonicalize( "folder1/./folder2/../file.tmp" ), Is.EqualTo("folder1/file.tmp"));
+			Assert.That(PathUtils.Canonicalize( "folder1/folder2/./../file.tmp" ), Is.EqualTo("folder1/file.tmp"));
+			Assert.That(PathUtils.Canonicalize( "folder1/folder2/.././../file.tmp" ), Is.EqualTo("file.tmp"));
+			Assert.That(PathUtils.Canonicalize( "folder1/folder2/../../../file.tmp" ), Is.EqualTo("file.tmp"));
 		}
 
 		[Test]
 		public void RelativePath()
 		{
-			Assert.AreEqual( "folder2/folder3",
-				PathUtils.RelativePath(	"/folder1", "/folder1/folder2/folder3" ) );
-			Assert.AreEqual( "../folder2/folder3",
-				PathUtils.RelativePath( "/folder1", "/folder2/folder3" ) );
-			Assert.AreEqual( "bin/debug",
-				PathUtils.RelativePath( "/folder1", "bin/debug" ) );
-			Assert.AreEqual( "../other/folder",
-				PathUtils.RelativePath( "/folder", "/other/folder" ) );
-			Assert.AreEqual( "../../d",
-				PathUtils.RelativePath( "/a/b/c", "/a/d" ) );
-            Assert.AreEqual(string.Empty,
-                PathUtils.RelativePath("/a/b", "/a/b"));
-            Assert.AreEqual(string.Empty,
-                PathUtils.RelativePath("/", "/"));
+			Assert.That(PathUtils.RelativePath(	"/folder1", "/folder1/folder2/folder3" ), Is.EqualTo("folder2/folder3"));
+			Assert.That(PathUtils.RelativePath( "/folder1", "/folder2/folder3" ), Is.EqualTo("../folder2/folder3"));
+			Assert.That(PathUtils.RelativePath( "/folder1", "bin/debug" ), Is.EqualTo("bin/debug"));
+			Assert.That(PathUtils.RelativePath( "/folder", "/other/folder" ), Is.EqualTo("../other/folder"));
+			Assert.That(PathUtils.RelativePath( "/a/b/c", "/a/d" ), Is.EqualTo("../../d"));
+            Assert.That(PathUtils.RelativePath("/a/b", "/a/b"), Is.EqualTo(string.Empty));
+            Assert.That(PathUtils.RelativePath("/", "/"), Is.EqualTo(string.Empty));
 
             // First filePath consisting just of a root:
-            Assert.AreEqual("folder1/folder2", PathUtils.RelativePath(
-                "/", "/folder1/folder2"));
+            Assert.That(PathUtils.RelativePath(
+                "/", "/folder1/folder2"), Is.EqualTo("folder1/folder2"));
 
             // Trailing directory separator in first filePath shall be ignored:
-            Assert.AreEqual("folder2/folder3", PathUtils.RelativePath(
-                "/folder1/", "/folder1/folder2/folder3"));
+            Assert.That(PathUtils.RelativePath(
+                "/folder1/", "/folder1/folder2/folder3"), Is.EqualTo("folder2/folder3"));
 
             // Case-sensitive behavior:
-            Assert.AreEqual("../Folder1/Folder2/folder3",
-                PathUtils.RelativePath("/folder1", "/Folder1/Folder2/folder3"),
-                "folders differing in case");
+            Assert.That(PathUtils.RelativePath("/folder1", "/Folder1/Folder2/folder3"), Is.EqualTo("../Folder1/Folder2/folder3"), "folders differing in case");
         }
 
 		[Test]

@@ -66,7 +66,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var actualArgs = ConsoleOptions.GetArgs(cmdline);
 
-            Assert.AreEqual(expectedArgs, actualArgs);
+            Assert.That(actualArgs, Is.EqualTo(expectedArgs));
         }
 
         [TestCase("--arg1 @file1.txt --arg2", "file1.txt:--filearg1 --filearg2", "--arg1", "--filearg1", "--filearg2", "--arg2")]
@@ -121,7 +121,7 @@ namespace NUnit.ConsoleRunner.Tests
             var expandedArgs = options.PreParse(commandline.Split(' '));
 
             // Then
-            Assert.AreEqual(expectedArgs, expandedArgs);
+            Assert.That(expandedArgs, Is.EqualTo(expectedArgs));
             Assert.IsEmpty(options.ErrorMessages);
         }
 
@@ -147,8 +147,8 @@ namespace NUnit.ConsoleRunner.Tests
 
             var arglist = options.PreParse(lines);
 
-            Assert.AreEqual(lines, arglist);
-            Assert.AreEqual(expectedErrors, options.ErrorMessages);
+            Assert.That(arglist, Is.EqualTo(lines));
+            Assert.That(options.ErrorMessages, Is.EqualTo(expectedErrors));
         }
 
         #endregion
@@ -160,7 +160,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions();
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(0, options.InputFiles.Count);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(0));
         }
 
         [TestCase("ShowHelp", "help|h")]
@@ -184,7 +184,7 @@ namespace NUnit.ConsoleRunner.Tests
             string[] prototypes = pattern.Split('|');
 
             PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.AreEqual(typeof(bool), property.PropertyType, "Property '{0}' is wrong type", propertyName);
+            Assert.That(property.PropertyType, Is.EqualTo(typeof(bool)), "Property '{0}' is wrong type", propertyName);
 
             foreach (string option in prototypes)
             {
@@ -193,22 +193,22 @@ namespace NUnit.ConsoleRunner.Tests
                 if (option.Length == 1)
                 {
                     options = new ConsoleOptions("-" + option);
-                    Assert.AreEqual(true, (bool)property.GetValue(options, null), "Didn't recognize -" + option);
+                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize -" + option);
 
                     options = new ConsoleOptions("-" + option + "+");
-                    Assert.AreEqual(true, (bool)property.GetValue(options, null), "Didn't recognize -" + option + "+");
+                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize -" + option + "+");
 
                     options = new ConsoleOptions("-" + option + "-");
-                    Assert.AreEqual(false, (bool)property.GetValue(options, null), "Didn't recognize -" + option + "-");
+                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(false), "Didn't recognize -" + option + "-");
                 }
                 else
                 {
                     options = new ConsoleOptions("--" + option);
-                    Assert.AreEqual(true, (bool)property.GetValue(options, null), "Didn't recognize --" + option);
+                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize --" + option);
                 }
 
                 options = new ConsoleOptions("/" + option);
-                Assert.AreEqual(true, (bool)property.GetValue(options, null), "Didn't recognize /" + option);
+                Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize /" + option);
             }
         }
 
@@ -230,7 +230,7 @@ namespace NUnit.ConsoleRunner.Tests
             string[] prototypes = pattern.Split('|');
 
             PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.AreEqual(typeof(string), property.PropertyType);
+            Assert.That(property.PropertyType, Is.EqualTo(typeof(string)));
 
             foreach (string option in prototypes)
             {
@@ -239,7 +239,7 @@ namespace NUnit.ConsoleRunner.Tests
                     string optionPlusValue = string.Format("--{0}:{1}", option, value);
                     ConsoleOptions options = new ConsoleOptions(optionPlusValue);
                     Assert.That(options.Validate(), Is.True, "Should be valid: " + optionPlusValue);
-                    Assert.AreEqual(value, (string)property.GetValue(options, null), "Didn't recognize " + optionPlusValue);
+                    Assert.That((string)property.GetValue(options, null), Is.EqualTo(value), "Didn't recognize " + optionPlusValue);
                 }
 
                 foreach (string value in badValues)
@@ -256,7 +256,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("--inprocess");
             Assert.That(options.Validate(), Is.True, "Should be valid: --inprocess");
-            Assert.AreEqual("InProcess", options.ProcessModel, "Didn't recognize --inprocess");
+            Assert.That(options.ProcessModel, Is.EqualTo("InProcess"), "Didn't recognize --inprocess");
         }
 
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
@@ -266,7 +266,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
             PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.AreEqual(typeof(string), property.PropertyType);
+            Assert.That(property.PropertyType, Is.EqualTo(typeof(string)));
 
             foreach (string canonicalValue in canonicalValues)
             {
@@ -274,7 +274,7 @@ namespace NUnit.ConsoleRunner.Tests
                 string optionPlusValue = string.Format("--{0}:{1}", optionName, lowercaseValue);
                 ConsoleOptions options = new ConsoleOptions(optionPlusValue);
                 Assert.That(options.Validate(), Is.True, "Should be valid: " + optionPlusValue);
-                Assert.AreEqual(canonicalValue, (string)property.GetValue(options, null), "Didn't recognize " + optionPlusValue);
+                Assert.That((string)property.GetValue(options, null), Is.EqualTo(canonicalValue), "Didn't recognize " + optionPlusValue);
             }
         }
 
@@ -287,12 +287,12 @@ namespace NUnit.ConsoleRunner.Tests
             string[] prototypes = pattern.Split('|');
 
             PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.AreEqual(typeof(int), property.PropertyType);
+            Assert.That(property.PropertyType, Is.EqualTo(typeof(int)));
 
             foreach (string option in prototypes)
             {
                 ConsoleOptions options = new ConsoleOptions("--" + option + ":42");
-                Assert.AreEqual(42, (int)property.GetValue(options, null), "Didn't recognize --" + option + ":42");
+                Assert.That((int)property.GetValue(options, null), Is.EqualTo(42), "Didn't recognize --" + option + ":42");
             }
         }
 
@@ -334,7 +334,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions(option + "=");
             Assert.That(options.Validate(), Is.False, "Missing value should not be valid");
-            Assert.AreEqual("Missing required value for option '" + option + "'.", options.ErrorMessages[0]);
+            Assert.That(options.ErrorMessages[0], Is.EqualTo("Missing required value for option '" + option + "'."));
         }
 
         [Test]
@@ -342,8 +342,8 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count);
-            Assert.AreEqual("nunit.tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1));
+            Assert.That(options.InputFiles[0], Is.EqualTo("nunit.tests.dll"));
         }
 
         //[Test]
@@ -360,7 +360,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(0, options.ErrorMessages.Count, "command line should be valid");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
         [Test, Platform("32-Bit")]
@@ -368,7 +368,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(0, options.ErrorMessages.Count, "command line should be valid");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
         [Test, Platform("64-Bit")]
@@ -376,7 +376,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
             Assert.That(options.Validate(), Is.False, "Should be invalid");
-            Assert.AreEqual("The --x86 and --inprocess options are incompatible.", options.ErrorMessages[0]);
+            Assert.That(options.ErrorMessages[0], Is.EqualTo("The --x86 and --inprocess options are incompatible."));
         }
 
         [Test]
@@ -384,8 +384,8 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("-assembly:nunit.tests.dll");
             Assert.That(options.Validate(), Is.False);
-            Assert.AreEqual(1, options.ErrorMessages.Count);
-            Assert.AreEqual("Invalid argument: -assembly:nunit.tests.dll", options.ErrorMessages[0]);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
+            Assert.That(options.ErrorMessages[0], Is.EqualTo("Invalid argument: -assembly:nunit.tests.dll"));
         }
 
 
@@ -401,9 +401,9 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("-garbage:TestFixture", "-assembly:Tests.dll");
             Assert.That(options.Validate(), Is.False);
-            Assert.AreEqual(2, options.ErrorMessages.Count);
-            Assert.AreEqual("Invalid argument: -garbage:TestFixture", options.ErrorMessages[0]);
-            Assert.AreEqual("Invalid argument: -assembly:Tests.dll", options.ErrorMessages[1]);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(2));
+            Assert.That(options.ErrorMessages[0], Is.EqualTo("Invalid argument: -garbage:TestFixture"));
+            Assert.That(options.ErrorMessages[1], Is.EqualTo("Invalid argument: -assembly:Tests.dll"));
         }
 
         #endregion
@@ -415,7 +415,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(-1, options.DefaultTimeout);
+            Assert.That(options.DefaultTimeout, Is.EqualTo(-1));
         }
 
         [Test]
@@ -429,7 +429,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-timeout:5000");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(5000, options.DefaultTimeout);
+            Assert.That(options.DefaultTimeout, Is.EqualTo(5000));
         }
 
         [Test]
@@ -437,7 +437,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-timeout:abc");
             Assert.That(options.Validate(), Is.False);
-            Assert.AreEqual(-1, options.DefaultTimeout);
+            Assert.That(options.DefaultTimeout, Is.EqualTo(-1));
         }
 
         #endregion
@@ -449,12 +449,12 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
             OutputSpecification spec = options.ResultOutputSpecifications[0];
-            Assert.AreEqual("results.xml", spec.OutputPath);
-            Assert.AreEqual("nunit3", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec.Transform);
         }
 
@@ -463,12 +463,12 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:results.xml;format=nunit2");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
             OutputSpecification spec = options.ResultOutputSpecifications[0];
-            Assert.AreEqual("results.xml", spec.OutputPath);
-            Assert.AreEqual("nunit2", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec.Format, Is.EqualTo("nunit2"));
             Assert.Null(spec.Transform);
         }
 
@@ -483,14 +483,14 @@ namespace NUnit.ConsoleRunner.Tests
                 fileSystem,
                 "tests.dll", $"-result:results.xml;transform={transformFile}");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
             OutputSpecification spec = options.ResultOutputSpecifications[0];
-            Assert.AreEqual("results.xml", spec.OutputPath);
-            Assert.AreEqual("user", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec.Format, Is.EqualTo("user"));
             var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
-            Assert.AreEqual(fullFilePath, spec.Transform);
+            Assert.That(spec.Transform, Is.EqualTo(fullFilePath));
         }
 
         [Test]
@@ -498,8 +498,8 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "results.xml");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(0, options.ErrorMessages.Count);
-            Assert.AreEqual(2, options.InputFiles.Count);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
+            Assert.That(options.InputFiles.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -507,7 +507,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:");
             Assert.That(options.Validate(), Is.False, "Should not be valid");
-            Assert.AreEqual(1, options.ErrorMessages.Count, "An error was expected");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1), "An error was expected");
         }
 
         [Test]
@@ -523,34 +523,34 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.Validate(), Is.True, "Should be valid");
 
             var specs = options.ResultOutputSpecifications;
-            Assert.AreEqual(3, specs.Count);
+            Assert.That(specs.Count, Is.EqualTo(3));
 
             var spec1 = specs[0];
-            Assert.AreEqual("results.xml", spec1.OutputPath);
-            Assert.AreEqual("nunit3", spec1.Format);
+            Assert.That(spec1.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec1.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec1.Transform);
 
             var spec2 = specs[1];
-            Assert.AreEqual("nunit2results.xml", spec2.OutputPath);
-            Assert.AreEqual("nunit2", spec2.Format);
+            Assert.That(spec2.OutputPath, Is.EqualTo("nunit2results.xml"));
+            Assert.That(spec2.Format, Is.EqualTo("nunit2"));
             Assert.Null(spec2.Transform);
 
             var spec3 = specs[2];
-            Assert.AreEqual("myresult.xml", spec3.OutputPath);
-            Assert.AreEqual("user", spec3.Format);
+            Assert.That(spec3.OutputPath, Is.EqualTo("myresult.xml"));
+            Assert.That(spec3.Format, Is.EqualTo("user"));
             var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
-            Assert.AreEqual(fullFilePath, spec3.Transform);
+            Assert.That(spec3.Transform, Is.EqualTo(fullFilePath));
         }
 
         [Test]
         public void DefaultResultSpecification()
         {
             var options = new ConsoleOptions("test.dll");
-            Assert.AreEqual(1, options.ResultOutputSpecifications.Count);
+            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(1));
 
             var spec = options.ResultOutputSpecifications[0];
-            Assert.AreEqual("TestResult.xml", spec.OutputPath);
-            Assert.AreEqual("nunit3", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("TestResult.xml"));
+            Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec.Transform);
         }
 
@@ -558,14 +558,14 @@ namespace NUnit.ConsoleRunner.Tests
         public void NoResultSuppressesDefaultResultSpecification()
         {
             var options = new ConsoleOptions("test.dll", "-noresult");
-            Assert.AreEqual(0, options.ResultOutputSpecifications.Count);
+            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
         }
 
         [Test]
         public void NoResultSuppressesAllResultSpecifications()
         {
             var options = new ConsoleOptions("test.dll", "-result:results.xml", "-noresult", "-result:nunit2results.xml;format=nunit2");
-            Assert.AreEqual(0, options.ResultOutputSpecifications.Count);
+            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -608,13 +608,13 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore:results.xml");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
 
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
-            Assert.AreEqual("results.xml", spec.OutputPath);
-            Assert.AreEqual("nunit3", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec.Transform);
         }
 
@@ -623,13 +623,13 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore:results.xml;format=cases");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
 
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
-            Assert.AreEqual("results.xml", spec.OutputPath);
-            Assert.AreEqual("cases", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec.Format, Is.EqualTo("cases"));
             Assert.Null(spec.Transform);
         }
 
@@ -643,15 +643,15 @@ namespace NUnit.ConsoleRunner.Tests
                 fileSystem,
                 "tests.dll", $"-explore:results.xml;transform={transformFile}");
             Assert.That(options.Validate(), Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
 
             OutputSpecification spec = options.ExploreOutputSpecifications[0];
-            Assert.AreEqual("results.xml", spec.OutputPath);
-            Assert.AreEqual("user", spec.Format);
+            Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
+            Assert.That(spec.Format, Is.EqualTo("user"));
             var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
-            Assert.AreEqual(fullFilePath, spec.Transform);
+            Assert.That(spec.Transform, Is.EqualTo(fullFilePath));
         }
 
         [Test]
@@ -660,9 +660,9 @@ namespace NUnit.ConsoleRunner.Tests
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-explore=C:/nunit/tests/bin/Debug/console-test.xml");
             Assert.That(options.Validate(), Is.True);
             Assert.That(options.Explore, Is.True);
-            Assert.AreEqual(1, options.InputFiles.Count, "assembly should be set");
-            Assert.AreEqual("tests.dll", options.InputFiles[0]);
-            Assert.AreEqual("C:/nunit/tests/bin/Debug/console-test.xml", options.ExploreOutputSpecifications[0].OutputPath);
+            Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
+            Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
+            Assert.That(options.ExploreOutputSpecifications[0].OutputPath, Is.EqualTo("C:/nunit/tests/bin/Debug/console-test.xml"));
         }
 
         [Test]
@@ -695,7 +695,7 @@ namespace NUnit.ConsoleRunner.Tests
             var actualTeamCity = options.TeamCity;
 
             // Then
-            Assert.AreEqual(actualTeamCity, expectedTeamCity);
+            Assert.That(expectedTeamCity, Is.EqualTo(actualTeamCity));
         }
 
         #endregion

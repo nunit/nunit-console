@@ -83,7 +83,7 @@ namespace NUnit.Engine.Tests
 
             Assert.That(_asyncResult.Wait(0), Is.True, "Expected wait to be true because the test is complete");
 
-            Assert.AreEqual(result.Xml, _asyncResult.EngineResult.Xml);
+            Assert.That(_asyncResult.EngineResult.Xml, Is.EqualTo(result.Xml));
         }
 
         [Test]
