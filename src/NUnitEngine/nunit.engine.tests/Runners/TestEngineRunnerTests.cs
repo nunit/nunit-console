@@ -161,7 +161,7 @@ namespace NUnit.Engine.Runners.Tests
             if (_runner is DirectTestRunner)
                 Assert.That(_runner.IsPackageLoaded, "Package was not loaded automatically");
             else
-                Assert.False(_runner.IsPackageLoaded, "Package should not be loaded automatically");
+                Assert.That(_runner.IsPackageLoaded, Is.False, "Package should not be loaded automatically");
         }
 
         private void CheckBasicResult(TestEngineResult result)

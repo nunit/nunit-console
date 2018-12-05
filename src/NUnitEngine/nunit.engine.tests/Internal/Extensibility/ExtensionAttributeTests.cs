@@ -38,7 +38,7 @@ namespace NUnit.Engine.Extensibility
         public void MayBeExplicitlyDisabled()
         {
             var attr = new ExtensionAttribute() { Enabled = false };
-            Assert.False(attr.Enabled);
+            Assert.That(attr.Enabled, Is.False);
         }
 
         [Test]

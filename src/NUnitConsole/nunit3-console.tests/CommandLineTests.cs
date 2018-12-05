@@ -246,7 +246,7 @@ namespace NUnit.ConsoleRunner.Tests
                 {
                     string optionPlusValue = string.Format("--{0}:{1}", option, value);
                     ConsoleOptions options = new ConsoleOptions(optionPlusValue);
-                    Assert.False(options.Validate(), "Should not be valid: " + optionPlusValue);
+                    Assert.That(options.Validate(), Is.False, "Should not be valid: " + optionPlusValue);
                 }
             }
         }
@@ -333,7 +333,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void MissingValuesAreReported(string option)
         {
             ConsoleOptions options = new ConsoleOptions(option + "=");
-            Assert.False(options.Validate(), "Missing value should not be valid");
+            Assert.That(options.Validate(), Is.False, "Missing value should not be valid");
             Assert.AreEqual("Missing required value for option '" + option + "'.", options.ErrorMessages[0]);
         }
 
@@ -375,7 +375,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void X86AndInProcessAreNotCompatibleIn64BitProcess()
         {
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
-            Assert.False(options.Validate(), "Should be invalid");
+            Assert.That(options.Validate(), Is.False, "Should be invalid");
             Assert.AreEqual("The --x86 and --inprocess options are incompatible.", options.ErrorMessages[0]);
         }
 
@@ -383,7 +383,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void InvalidOption()
         {
             ConsoleOptions options = new ConsoleOptions("-assembly:nunit.tests.dll");
-            Assert.False(options.Validate());
+            Assert.That(options.Validate(), Is.False);
             Assert.AreEqual(1, options.ErrorMessages.Count);
             Assert.AreEqual("Invalid argument: -assembly:nunit.tests.dll", options.ErrorMessages[0]);
         }
@@ -400,7 +400,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void InvalidCommandLineParms()
         {
             ConsoleOptions options = new ConsoleOptions("-garbage:TestFixture", "-assembly:Tests.dll");
-            Assert.False(options.Validate());
+            Assert.That(options.Validate(), Is.False);
             Assert.AreEqual(2, options.ErrorMessages.Count);
             Assert.AreEqual("Invalid argument: -garbage:TestFixture", options.ErrorMessages[0]);
             Assert.AreEqual("Invalid argument: -assembly:Tests.dll", options.ErrorMessages[1]);
@@ -436,7 +436,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void TimeoutCausesErrorIfValueIsNotInteger()
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-timeout:abc");
-            Assert.False(options.Validate());
+            Assert.That(options.Validate(), Is.False);
             Assert.AreEqual(-1, options.DefaultTimeout);
         }
 
@@ -506,7 +506,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void ResultOptionWithoutFileNameIsInvalid()
         {
             ConsoleOptions options = new ConsoleOptions("tests.dll", "-result:");
-            Assert.False(options.Validate(), "Should not be valid");
+            Assert.That(options.Validate(), Is.False, "Should not be valid");
             Assert.AreEqual(1, options.ErrorMessages.Count, "An error was expected");
         }
 
