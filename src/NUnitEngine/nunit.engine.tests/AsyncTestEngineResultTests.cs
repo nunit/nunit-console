@@ -69,7 +69,7 @@ namespace NUnit.Engine.Tests
         {
             var result = new TestEngineResult();
             _asyncResult.SetResult(result);
-            Assert.IsTrue(_asyncResult.IsComplete);
+            Assert.That(_asyncResult.IsComplete, Is.True);
         }
 
         [Test]
@@ -81,8 +81,7 @@ namespace NUnit.Engine.Tests
 
             _asyncResult.SetResult(result);
 
-            Assert.IsTrue(_asyncResult.Wait(0),
-                "Expected wait to be true because the test is complete");
+            Assert.That(_asyncResult.Wait(0), Is.True, "Expected wait to be true because the test is complete");
 
             Assert.AreEqual(result.Xml, _asyncResult.EngineResult.Xml);
         }
@@ -92,11 +91,9 @@ namespace NUnit.Engine.Tests
         {
             _asyncResult.SetResult(new TestEngineResult());
             
-            Assert.IsTrue(_asyncResult.Wait(0),
-                "Expected wait to be true because the test is complete");
+            Assert.That(_asyncResult.Wait(0), Is.True, "Expected wait to be true because the test is complete");
 
-            Assert.IsTrue(_asyncResult.Wait(0),
-                "Expected the second wait to be non blocking");
+            Assert.That(_asyncResult.Wait(0), Is.True, "Expected the second wait to be non blocking");
         }
     }
 }

@@ -45,7 +45,7 @@ namespace NUnit.Engine.Internal.Tests
 		public static void SamePathOrUnder( string path1, string path2 )
 		{
 			string msg = "\r\n\texpected: Same path or under <{0}>\r\n\t but was: <{1}>";
-			Assert.IsTrue( PathUtils.SamePathOrUnder( path1, path2 ), msg, path1, path2 );
+			Assert.That(PathUtils.SamePathOrUnder( path1, path2 ), Is.True, msg, path1, path2);
 		}
 
 		public static void NotSamePathOrUnder( string path1, string path2 )

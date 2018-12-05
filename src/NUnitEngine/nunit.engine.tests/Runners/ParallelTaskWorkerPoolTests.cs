@@ -58,8 +58,7 @@ namespace NUnit.Engine.Runners.Tests
 
             task.MarkTaskAsCompleted();
 
-            Assert.IsTrue(workerPool.WaitAll(100),
-                "Threads should have exited, all work is complete");
+            Assert.That(workerPool.WaitAll(100), Is.True, "Threads should have exited, all work is complete");
         }
 
         [Test]
@@ -86,8 +85,7 @@ namespace NUnit.Engine.Runners.Tests
 
             task2.MarkTaskAsCompleted();
 
-            Assert.IsTrue(workerPool.WaitAll(100),
-                "Threads should have exited, all work is complete");
+            Assert.That(workerPool.WaitAll(100), Is.True, "Threads should have exited, all work is complete");
 
             Assert.AreEqual(BusyTaskState.Completed, task1.State);
             Assert.AreEqual(BusyTaskState.Completed, task2.State);
@@ -117,8 +115,7 @@ namespace NUnit.Engine.Runners.Tests
 
             task2.MarkTaskAsCompleted();
 
-            Assert.IsTrue(workerPool.WaitAll(100),
-                "Threads should have exited, all work is complete");
+            Assert.That(workerPool.WaitAll(100), Is.True, "Threads should have exited, all work is complete");
 
             Assert.AreEqual(BusyTaskState.Completed, task1.State);
             Assert.AreEqual(BusyTaskState.Completed, task2.State);
