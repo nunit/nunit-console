@@ -128,7 +128,7 @@ namespace NUnit.Engine.Services.Tests
                 unloaded = true;
             }
 
-            Assert.True(unloaded, "Domain was not unloaded");
+            Assert.That(unloaded, Is.True, "Domain was not unloaded");
         }
 
         #endregion

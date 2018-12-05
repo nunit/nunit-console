@@ -31,7 +31,7 @@ namespace NUnit.Engine.Extensibility
         [Test]
         public void IsEnabledByDefault()
         {
-            Assert.True(new ExtensionAttribute().Enabled);
+            Assert.That(new ExtensionAttribute().Enabled, Is.True);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace NUnit.Engine.Extensibility
         public void MayBeExplicitlyEnabled()
         {
             var attr = new ExtensionAttribute() { Enabled = true };
-            Assert.True(attr.Enabled);
+            Assert.That(attr.Enabled, Is.True);
         }
     }
 }
