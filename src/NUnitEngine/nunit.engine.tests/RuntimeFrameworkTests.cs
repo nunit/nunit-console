@@ -91,9 +91,9 @@ namespace NUnit.Engine.Tests
         public void CanCreateUsingFrameworkVersion(FrameworkData data)
         {
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.frameworkVersion);
-            Assert.AreEqual(data.runtime, framework.Runtime);
-            Assert.AreEqual(data.frameworkVersion, framework.FrameworkVersion);
-            Assert.AreEqual(data.clrVersion, framework.ClrVersion);
+            Assert.That(framework.Runtime, Is.EqualTo(data.runtime));
+            Assert.That(framework.FrameworkVersion, Is.EqualTo(data.frameworkVersion));
+            Assert.That(framework.ClrVersion, Is.EqualTo(data.clrVersion));
         }
 
         [TestCaseSource(nameof(frameworkData))]
@@ -102,25 +102,25 @@ namespace NUnit.Engine.Tests
             Assume.That(data.frameworkVersion.Major != 3);
 
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.clrVersion);
-            Assert.AreEqual(data.runtime, framework.Runtime);
-            Assert.AreEqual(data.frameworkVersion, framework.FrameworkVersion);
-            Assert.AreEqual(data.clrVersion, framework.ClrVersion);
+            Assert.That(framework.Runtime, Is.EqualTo(data.runtime));
+            Assert.That(framework.FrameworkVersion, Is.EqualTo(data.frameworkVersion));
+            Assert.That(framework.ClrVersion, Is.EqualTo(data.clrVersion));
         }
 
         [TestCaseSource(nameof(frameworkData))]
         public void CanParseRuntimeFramework(FrameworkData data)
         {
             RuntimeFramework framework = RuntimeFramework.Parse(data.representation);
-            Assert.AreEqual(data.runtime, framework.Runtime);
-            Assert.AreEqual(data.clrVersion, framework.ClrVersion);
+            Assert.That(framework.Runtime, Is.EqualTo(data.runtime));
+            Assert.That(framework.ClrVersion, Is.EqualTo(data.clrVersion));
         }
 
         [TestCaseSource(nameof(frameworkData))]
         public void CanDisplayFrameworkAsString(FrameworkData data)
         {
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.frameworkVersion);
-            Assert.AreEqual(data.representation, framework.ToString());
-            Assert.AreEqual(data.displayName, framework.DisplayName);
+            Assert.That(framework.ToString(), Is.EqualTo(data.representation));
+            Assert.That(framework.DisplayName, Is.EqualTo(data.displayName));
         }
 
         [TestCaseSource(nameof(matchData))]

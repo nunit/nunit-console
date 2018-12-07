@@ -48,7 +48,7 @@ namespace NUnit.ConsoleRunner.Tests
             Environment.SetEnvironmentVariable(EnvironmentVariableTeamcityProjectName, "Abc");
 
             // Then
-            Assert.True(provider.TeamCity);
+            Assert.That(provider.TeamCity, Is.True);
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace NUnit.ConsoleRunner.Tests
             Environment.SetEnvironmentVariable(EnvironmentVariableTeamcityProjectName, string.Empty);
 
             // Then
-            Assert.False(provider.TeamCity);
+            Assert.That(provider.TeamCity, Is.False);
         }
 
         private static DefaultOptionsProvider CreateInstance()

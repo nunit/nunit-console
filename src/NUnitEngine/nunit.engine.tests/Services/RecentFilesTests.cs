@@ -58,7 +58,7 @@ namespace NUnit.Engine.Services.Tests
         public void EmptyList()
         {
             Assert.IsNotNull(  _recentFiles.Entries, "Entries should never be null" );
-            Assert.AreEqual( 0, _recentFiles.Entries.Count );
+            Assert.That(_recentFiles.Entries.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -178,17 +178,17 @@ namespace NUnit.Engine.Services.Tests
         private void CheckMockValues(int count)
         {
             var files = _recentFiles.Entries;
-            Assert.AreEqual(count, files.Count, "Count");
+            Assert.That(files.Count, Is.EqualTo(count), "Count");
 
             for (int index = 0; index < count; index++)
-                Assert.AreEqual((index + 1).ToString(), files[index], "Item");
+                Assert.That(files[index], Is.EqualTo((index + 1).ToString()), "Item");
         }
 
         // Check that we can add count items correctly
         private void CheckAddItems(int count)
         {
             SetMockValues(count);
-            Assert.AreEqual("1", _recentFiles.Entries[0], "RecentFile");
+            Assert.That(_recentFiles.Entries[0], Is.EqualTo("1"), "RecentFile");
 
             CheckMockValues(Math.Min(count, _recentFiles.MaxFiles));
         }
@@ -198,10 +198,10 @@ namespace NUnit.Engine.Services.Tests
         private void CheckListContains(params int[] item)
         {
             var files = _recentFiles.Entries;
-            Assert.AreEqual(item.Length, files.Count, "Count");
+            Assert.That(files.Count, Is.EqualTo(item.Length), "Count");
 
             for (int index = 0; index < files.Count; index++)
-                Assert.AreEqual(item[index].ToString(), files[index], "Item");
+                Assert.That(files[index], Is.EqualTo(item[index].ToString()), "Item");
         }
 
         #endregion

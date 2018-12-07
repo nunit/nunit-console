@@ -63,7 +63,7 @@ namespace NUnit.Engine.Services.Tests
                 Path.GetFileName(setup.ConfigurationFile),
                 Is.EqualTo("mock-assembly.dll.config").IgnoreCase,
                 "ConfigurationFile");
-            Assert.AreEqual(null, setup.PrivateBinPath, "PrivateBinPath");
+            Assert.That(setup.PrivateBinPath, Is.EqualTo(null), "PrivateBinPath");
             Assert.That(setup.ShadowCopyFiles, Is.Null.Or.EqualTo("false"));
             //Assert.That(setup.ShadowCopyDirectories, Is.SamePath(Path.GetDirectoryName(MockAssembly.AssemblyPath)), "ShadowCopyDirectories" );
         }
@@ -128,7 +128,7 @@ namespace NUnit.Engine.Services.Tests
                 unloaded = true;
             }
 
-            Assert.True(unloaded, "Domain was not unloaded");
+            Assert.That(unloaded, Is.True, "Domain was not unloaded");
         }
 
         #endregion

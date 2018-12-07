@@ -44,9 +44,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path2, path3 };
 
-            Assert.AreEqual(
-                TestPath("bin/debug") + Path.PathSeparator + TestPath("utils"),
-                DomainManager.GetPrivateBinPath(TestPath("/test"), assemblies));
+            Assert.That(DomainManager.GetPrivateBinPath(TestPath("/test"), assemblies), Is.EqualTo(TestPath("bin/debug") + Path.PathSeparator + TestPath("utils")));
         }
 
         [Test]
@@ -54,9 +52,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1 };
 
-            Assert.AreEqual(
-                TestPath("/test/bin/debug"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test/bin/debug")));
         }
 
         [Test]
@@ -64,9 +60,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path2 };
 
-            Assert.AreEqual(
-                TestPath("/test/bin/debug"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test/bin/debug")));
         }
 
         [Test]
@@ -74,9 +68,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path3 };
 
-            Assert.AreEqual(
-                TestPath("/test"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test")));
         }
 
         [Test]
@@ -84,9 +76,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path2, path3 };
 
-            Assert.AreEqual(
-                TestPath("/test"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test")));
         }
 
         [Test]
