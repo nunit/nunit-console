@@ -116,7 +116,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCaseSource(nameof(KnownExtensions))]
         public void CanListExtensions(string typeName)
         {
-            Assert.That(_serviceInterface.Extensions,
+            Assert.That(_serviceClass.Extensions,
                 Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(typeName)
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
         }
