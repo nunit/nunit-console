@@ -36,31 +36,17 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             get
             {
                 var testName = "Single assembly";
-                var package = new TestPackage("a.dll");
+                var package = TestPackageFactory.OneAssembly();
                 var expected = new RunnerResult { TestRunner = typeof(ProcessRunner) };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
                 testName = "Two assemblies";
-                package = new TestPackage(new[] { "a.dll", "b.dll" });
+                package = TestPackageFactory.TwoAssemblies();
                 expected = new RunnerResult
                 {
                     TestRunner = typeof(MultipleTestProcessRunner),
                     SubRunners = new[]
                     {
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) },
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) }
-                    }
-                };
-                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
-
-                testName = "Three assemblies";
-                package = new TestPackage(new[] { "a.dll", "b.dll", "c.dll" });
-                expected = new RunnerResult
-                {
-                    TestRunner = typeof(MultipleTestProcessRunner),
-                    SubRunners = new[]
-                    {
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) },
                         new RunnerResult { TestRunner = typeof(ProcessRunner) },
                         new RunnerResult { TestRunner = typeof(ProcessRunner) }
                     }
