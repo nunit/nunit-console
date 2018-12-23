@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
+namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 {
 #if NETCOREAPP1_1 || NETCOREAPP2_0
     internal static class NetStandardAssemblyTestCases
