@@ -48,6 +48,13 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
 
             Assert.That(output, Contains.Substring(summary));
         }
+
+        [Test]
+        public void XmlTransformResultWriterIgnoresDTDs()
+        {
+            var transformPath = GetLocalPath("TransformWithDTD.xslt");
+            Assert.DoesNotThrow(() => new XmlTransformResultWriter(new object[] { transformPath }));
+        }
     }
 }
 #endif

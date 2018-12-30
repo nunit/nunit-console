@@ -45,6 +45,9 @@
     <None Include="..\..\NUnitConsole\nunit3-console.tests\TextSummary.xslt" Link="TextSummary.xslt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="TransformWithDTD.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="alt.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
