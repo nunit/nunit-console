@@ -105,7 +105,9 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the loaded assembly.</returns>
         public XmlNode Load()
         {
-            LoadResult = _engineRunner.Load();
+            LoadResult = PrepareResult(_engineRunner.Load())
+                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+
             return LoadResult.Xml;
         }
 
@@ -125,7 +127,9 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public XmlNode Reload()
         {
-            LoadResult = _engineRunner.Reload();
+            LoadResult = PrepareResult(_engineRunner.Reload())
+               .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+
             return LoadResult.Xml;
         }
 
