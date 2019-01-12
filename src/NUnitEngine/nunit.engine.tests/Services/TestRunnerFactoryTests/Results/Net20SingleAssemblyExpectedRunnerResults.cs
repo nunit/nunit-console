@@ -32,71 +32,83 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
     {
         public static RunnerResult ResultFor(ProcessModel processModel, DomainUsage domainUsage)
         {
-            if (processModel == ProcessModel.Default && domainUsage == DomainUsage.Default)
+            switch (processModel)
             {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                case ProcessModel.Default:
+                    switch (domainUsage)
+                    {
+                        case DomainUsage.Default:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        case DomainUsage.None:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        case DomainUsage.Single:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        case DomainUsage.Multiple:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        default:
+                            ThrowOutOfRange(domainUsage);
+                            break;
+                    }
+                    break;
+                case ProcessModel.InProcess:
+                    switch (domainUsage)
+                    {
+                        case DomainUsage.Default:
+                            return new RunnerResult { TestRunner = typeof(TestDomainRunner) };
+                        case DomainUsage.None:
+                            return new RunnerResult { TestRunner = typeof(LocalTestRunner) };
+                        case DomainUsage.Single:
+                            return new RunnerResult { TestRunner = typeof(TestDomainRunner) };
+                        case DomainUsage.Multiple:
+                            return new RunnerResult { TestRunner = typeof(MultipleTestDomainRunner) };
+                        default:
+                            ThrowOutOfRange(domainUsage);
+                            break;
+                    }
+                    break;
+                case ProcessModel.Separate:
+                    switch (domainUsage)
+                    {
+                        case DomainUsage.Default:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        case DomainUsage.None:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        case DomainUsage.Single:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        case DomainUsage.Multiple:
+                            return new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                        default:
+                            ThrowOutOfRange(domainUsage);
+                            break;
+                    }
+                    break;
+                case ProcessModel.Multiple:
+                    switch (domainUsage)
+                    {
+                        case DomainUsage.Default:
+                            return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
+                        case DomainUsage.None:
+                            return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
+                        case DomainUsage.Single:
+                            return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
+                        case DomainUsage.Multiple:
+                            return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
+                        default:
+                            ThrowOutOfRange(domainUsage);
+                            break;
+                    }
+                    break;
+                default:
+                    ThrowOutOfRange(processModel);
+                    break;
             }
-            if (processModel == ProcessModel.Default && domainUsage == DomainUsage.None)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.Default && domainUsage == DomainUsage.Multiple)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.Default && domainUsage == DomainUsage.Single)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.InProcess && domainUsage == DomainUsage.Default)
-            {
-                return new RunnerResult { TestRunner = typeof(TestDomainRunner) };
-            }
-            if (processModel == ProcessModel.InProcess && domainUsage == DomainUsage.None)
-            {
-                return new RunnerResult { TestRunner = typeof(LocalTestRunner) };
-            }
-            if (processModel == ProcessModel.InProcess && domainUsage == DomainUsage.Multiple)
-            {
-                return new RunnerResult { TestRunner = typeof(MultipleTestDomainRunner) };
-            }
-            if (processModel == ProcessModel.InProcess && domainUsage == DomainUsage.Single)
-            {
-                return new RunnerResult { TestRunner = typeof(TestDomainRunner) };
-            }
-            if (processModel == ProcessModel.Separate && domainUsage == DomainUsage.Default)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.Separate && domainUsage == DomainUsage.None)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.Separate && domainUsage == DomainUsage.Multiple)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.Separate && domainUsage == DomainUsage.Single)
-            {
-                return new RunnerResult { TestRunner = typeof(ProcessRunner) };
-            }
-            if (processModel == ProcessModel.Multiple && domainUsage == DomainUsage.Default)
-            {
-                return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
-            }
-            if (processModel == ProcessModel.Multiple && domainUsage == DomainUsage.None)
-            {
-                return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
-            }
-            if (processModel == ProcessModel.Multiple && domainUsage == DomainUsage.Multiple)
-            {
-                return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
-            }
-            if (processModel == ProcessModel.Multiple && domainUsage == DomainUsage.Single)
-            {
-                return new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) };
-            }
-            throw new ArgumentOutOfRangeException(
+            throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage,
+                $"No expected Test result provided for this {nameof(ProcessModel)}/{nameof(DomainUsage)} combination.");
+        }
+
+        private static void ThrowOutOfRange<T>(T domainUsage)
+        {
+            throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage,
                 $"No expected Test result provided for this {nameof(ProcessModel)}/{nameof(DomainUsage)} combination.");
         }
     }
