@@ -32,18 +32,29 @@ using NUnit.Tests;
 
 namespace NUnit.Engine.Runners.Tests
 {
+    [TestFixture(1)]
+    [TestFixture(2)]
     public class MasterTestRunnerTests : ITestEventListener
     {
+        private List<string> _assemblies = new List<string>();
+        private int _numAssemblies;
         private TestPackage _package;
         private ServiceContext _services;
         private MasterTestRunner _runner;
         private List<XmlNode> _events;
 
+        public MasterTestRunnerTests(int numAssemblies)
+        {
+            _numAssemblies = numAssemblies;
+            var testDirectory = TestContext.CurrentContext.TestDirectory;
+            for (int i = 0; i < numAssemblies; i++)
+                _assemblies.Add(Path.Combine(testDirectory, "mock-assembly.dll"));
+        }
+
         [SetUp]
         public void Initialize()
         {
-            _package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll"));
-
+            _package = new TestPackage(_assemblies);
 
             // Add all services needed
             _services = new ServiceContext();
@@ -74,20 +85,56 @@ namespace NUnit.Engine.Runners.Tests
         }
 
         [Test]
+        public void CheckInternalRunner()
+        {
+            var prop = typeof(MasterTestRunner).GetField("_engineRunner", BindingFlags.NonPublic | BindingFlags.Instance);
+            var runner = prop.GetValue(_runner);
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
+            if (_numAssemblies == 1)
+                Assert.That(runner, Is.TypeOf<TestDomainRunner>());
+            else
+                Assert.That(runner, Is.TypeOf<MultipleTestDomainRunner>());
+#else
+            Assert.That(runner, Is.TypeOf<LocalTestRunner>());
+#endif
+        }
+
+        [Test]
         public void Load()
         {
             var result = _runner.Load();
 
-            Assert.That(result.Name, Is.EqualTo("test-suite"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
-            Assert.That(result.GetAttribute("runstate"), Is.EqualTo("Runnable"));
+            Assert.That(result.Name, Is.EqualTo("test-run"));
+            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests * _numAssemblies));
+
+            foreach (XmlNode child in result.SelectNodes("test-suite"))
+            {
+                Assert.That(child.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
+                Assert.That(child.GetAttribute("runstate"), Is.EqualTo("Runnable"));
+            }
+        }
+
+        [Test]
+        public void Reload()
+        {
+            _runner.Load();
+            var result = _runner.Reload();
+
+            Assert.That(result.Name, Is.EqualTo("test-run"));
+            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests * _numAssemblies));
+
+            foreach (XmlNode child in result.SelectNodes("test-suite"))
+            {
+                Assert.That(child.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
+                Assert.That(child.GetAttribute("runstate"), Is.EqualTo("Runnable"));
+            }
         }
 
         [Test]
         public void CountTestCases()
         {
             int count = _runner.CountTestCases(TestFilter.Empty);
-            Assert.That(count, Is.EqualTo(MockAssembly.Tests));
+            Assert.That(count, Is.EqualTo(MockAssembly.Tests * _numAssemblies));
         }
 
         [Test]
@@ -96,7 +143,7 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Explore(TestFilter.Empty);
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
+            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests * _numAssemblies));
 
             var suite = result.SelectSingleNode("test-suite");
             Assert.NotNull(suite, "No suite found");
@@ -126,28 +173,32 @@ namespace NUnit.Engine.Runners.Tests
         private void CheckTestRunResult(XmlNode result)
         {
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
+            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests * _numAssemblies));
             Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));
-            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
-            Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
-            Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
+            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute * _numAssemblies));
+            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed * _numAssemblies));
+            Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped * _numAssemblies));
+            Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive * _numAssemblies));
 
-            var suite = result.SelectSingleNode("test-suite");
-            Assert.NotNull("No suite found");
-            Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
-            Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));
-            Assert.That(suite.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
-            Assert.That(suite.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
-            Assert.That(suite.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
+            var children = result.SelectNodes("test-suite");
+            Assert.That(children.Count, Is.EqualTo(_numAssemblies));
+
+            foreach (XmlNode suite in children)
+            {
+                Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
+                Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
+                Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));
+                Assert.That(suite.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
+                Assert.That(suite.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
+                Assert.That(suite.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
+            }
 
             Assert.That(_events[0].Name, Is.EqualTo("start-run"));
-            Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(MockAssembly.Tests), "Start-run count value");
+            Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(MockAssembly.Tests * _numAssemblies), "Start-run count value");
             Assert.That(_events[1].Name, Is.EqualTo("start-suite"));
             Assert.That(_events[_events.Count - 2].Name, Is.EqualTo("test-suite"));
             Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"));
-            Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(MockAssembly.Tests));
+            Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(MockAssembly.Tests * _numAssemblies));
         }
 
         void ITestEventListener.OnTestEvent(string report)
