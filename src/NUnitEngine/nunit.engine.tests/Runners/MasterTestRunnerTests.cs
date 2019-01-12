@@ -89,7 +89,7 @@ namespace NUnit.Engine.Runners.Tests
         {
             var prop = typeof(MasterTestRunner).GetField("_engineRunner", BindingFlags.NonPublic | BindingFlags.Instance);
             var runner = prop.GetValue(_runner);
-#if NET35
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
             if (_numAssemblies == 1)
                 Assert.That(runner, Is.TypeOf<TestDomainRunner>());
             else
@@ -185,7 +185,6 @@ namespace NUnit.Engine.Runners.Tests
 
             foreach (XmlNode suite in children)
             {
-                //Assert.NotNull("No suite found");
                 Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
                 Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
                 Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));
