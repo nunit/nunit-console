@@ -150,16 +150,7 @@ namespace NUnit.Engine.Runners.Tests
             Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(suite.GetAttribute("runstate"), Is.EqualTo("Runnable"));
 
-            var dict = new Dictionary<string, bool>();
-            AssertThatIdsAreUnique(result, dict);
-        }
-
-        private void AssertThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
-        {
-            Assert.That(dict, Does.Not.ContainKey(test.GetAttribute("id")));
-
-            foreach (XmlNode child in test.SelectNodes("test-suite"))
-                AssertThatIdsAreUnique(child, dict);
+            AssertThatIdsAreUnique(result);
         }
 
         [Test]
@@ -204,12 +195,27 @@ namespace NUnit.Engine.Runners.Tests
                 Assert.That(suite.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
             }
 
+            AssertThatIdsAreUnique(result);
+
             Assert.That(_events[0].Name, Is.EqualTo("start-run"));
             Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(MockAssembly.Tests * _numAssemblies), "Start-run count value");
             Assert.That(_events[1].Name, Is.EqualTo("start-suite"));
             Assert.That(_events[_events.Count - 2].Name, Is.EqualTo("test-suite"));
             Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"));
             Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(MockAssembly.Tests * _numAssemblies));
+        }
+
+        private void AssertThatIdsAreUnique(XmlNode test)
+        {
+            AssertThatIdsAreUnique(test, new Dictionary<string, bool>());
+        }
+
+        private void AssertThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
+        {
+            Assert.That(dict, Does.Not.ContainKey(test.GetAttribute("id")));
+
+            foreach (XmlNode child in test.SelectNodes("test-suite"))
+                AssertThatIdsAreUnique(child, dict);
         }
 
         void ITestEventListener.OnTestEvent(string report)
