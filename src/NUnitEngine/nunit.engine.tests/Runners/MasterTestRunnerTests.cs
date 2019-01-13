@@ -149,6 +149,17 @@ namespace NUnit.Engine.Runners.Tests
             Assert.NotNull(suite, "No suite found");
             Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(suite.GetAttribute("runstate"), Is.EqualTo("Runnable"));
+
+            var dict = new Dictionary<string, bool>();
+            AssertThatIdsAreUnique(result, dict);
+        }
+
+        private void AssertThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
+        {
+            Assert.That(dict, Does.Not.ContainKey(test.GetAttribute("id")));
+
+            foreach (XmlNode child in test.SelectNodes("test-suite"))
+                AssertThatIdsAreUnique(child, dict);
         }
 
         [Test]
