@@ -21,38 +21,20 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Xml;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
-using System.Reflection;
-using System.IO;
-using NUnit.Tests;
 
 namespace NUnit.Engine.Runners.Tests
 {
-    public class AssemblyData
-    {
-        public string Name;
-        public string RunState;
-        public int Tests;
-        public int Passed;
-        public int Failed;
-        public int Skipped;
-        public int Inconclusive;
-
-        public AssemblyData(string name, string runstate, int tests, int passing, int failed, int skipped, int inconclusive)
-        {
-            Name = name;
-            RunState = runstate;
-            Tests = tests;
-            Passed = passing;
-            Failed = failed;
-            Skipped = skipped;
-            Inconclusive = inconclusive;
-        }
-    }
+    using Services;
+    using Services.Tests.Fakes;
 
     [TestFixtureSource("FixtureData")]
     public class MasterTestRunnerTests : ITestEventListener
@@ -67,30 +49,24 @@ namespace NUnit.Engine.Runners.Tests
         private int _totalSkipped = 0;
         private int _totalInconclusive = 0;
 
+        private Type _expectedRunner;
+
         private TestPackage _package;
         private ServiceContext _services;
         private MasterTestRunner _runner;
         private List<XmlNode> _events;
 
-        // Note: Unable to get a constructor taking an AssemblyData[]
-        // to work with TestFixtureSource!
-        public MasterTestRunnerTests(AssemblyData data)
-        {
-            System.Console.WriteLine("Constructor 1");
-            Initialize(new AssemblyData[] { data });
-        }
+#if !NETCOREAPP1_1
+        private FakeProjectService _projectService;
+#endif
 
-        public MasterTestRunnerTests(AssemblyData data1, AssemblyData data2)
+        public MasterTestRunnerTests(TestRunData testRunData)
         {
-            System.Console.WriteLine("Constructor 2");
-            Initialize(new AssemblyData[] { data1, data2 });
-        }
+            _expectedRunner = testRunData.ExpectedRunner;
 
-        private void Initialize(AssemblyData[] assemblyData)
-        {
             string testDirectory = TestContext.CurrentContext.TestDirectory;
 
-            foreach (var data in assemblyData)
+            foreach (var data in testRunData.AssemblyData)
             {
                 _data.Add(data);
                 _assemblies.Add(Path.Combine(testDirectory, data.Name));
@@ -109,17 +85,43 @@ namespace NUnit.Engine.Runners.Tests
         static AssemblyData NoTestsAssemblyData =
             new AssemblyData("notests-assembly.dll", "NotRunnable", 0, 0, 0, 0, 0);
 
-        static TestFixtureData[] FixtureData = new TestFixtureData[]
+        static AssemblyData UnknownProjectType =
+            new AssemblyData("project.xxx", "NotRunnable", 0, 0, 0, 0, 0);
+
+        static AssemblyData EmptyProject =
+            new AssemblyData("empty.nunit", "NotRunnable", 0, 0, 0, 0, 0);
+
+        static AssemblyData ProjectWithMockAssembly =
+            new AssemblyData("project.nunit", "Runnable", MockAssembly.Tests, MockAssembly.PassedInAttribute, MockAssembly.Failed, MockAssembly.Skipped, MockAssembly.Inconclusive);
+
+        static TestRunData[] FixtureData = new TestRunData[]
         {
-            new TestFixtureData( MockAssemblyData ),
-            new TestFixtureData( MockAssemblyData, MockAssemblyData ),
-            // NOTE: The empty tests are excluded for .NET Standard because of 
+            // NOTES: 
+            // 1. Currently, these tests document actual behavioral differrences
+            // among the different builds. We may want to change that.
+            // 2. The empty tests are excluded for .NET Core because of 
             // errors and different behavior which either needs to be accounted 
             // for in the tests or corrected.
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-            new TestFixtureData( NoTestsAssemblyData ),
-            new TestFixtureData( NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestFixtureData( MockAssemblyData, NoTestsAssemblyData )
+            // 3. .NET Standard 1.6 doesn't support projects.
+#if NETCOREAPP1_1
+            new TestRunData( typeof(LocalTestRunner), MockAssemblyData ),
+            new TestRunData( typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( typeof(LocalTestRunner), UnknownProjectType ),
+#elif NETCOREAPP2_0
+            new TestRunData( typeof(LocalTestRunner), MockAssemblyData ),
+            new TestRunData( typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( typeof(LocalTestRunner), UnknownProjectType ),
+            new TestRunData( typeof(AggregatingTestRunner), EmptyProject ),
+            new TestRunData( typeof(AggregatingTestRunner), ProjectWithMockAssembly ),
+#else
+            new TestRunData( typeof(TestDomainRunner), MockAssemblyData ),
+            new TestRunData( typeof(MultipleTestDomainRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( typeof(TestDomainRunner), UnknownProjectType ),
+            new TestRunData( typeof(TestDomainRunner), EmptyProject ),
+            new TestRunData( typeof(TestDomainRunner), ProjectWithMockAssembly ),
+            new TestRunData( typeof(TestDomainRunner), NoTestsAssemblyData ),
+            new TestRunData( typeof(MultipleTestDomainRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestsAssemblyData )
 #endif
         };
 
@@ -127,19 +129,22 @@ namespace NUnit.Engine.Runners.Tests
         public void Initialize()
         {
             _package = new TestPackage(_assemblies);
+            _package.AddSetting(EnginePackageSettings.ProcessModel, "InProcess");
 
             // Add all services needed
             _services = new ServiceContext();
 #if !NETCOREAPP1_1
-            _services.Add(new Services.ExtensionService());
-            _services.Add(new Services.ProjectService());
+            _services.Add(new ExtensionService());
+            _projectService = new FakeProjectService();
+            _projectService.Add("project.nunit", "mock-assembly.dll");
+            _services.Add(_projectService);
 #if !NETCOREAPP2_0
-            _services.Add(new Services.DomainManager());
-            _services.Add(new Services.RuntimeFrameworkService());
+            _services.Add(new DomainManager());
+            _services.Add(new RuntimeFrameworkService());
 #endif
 #endif
-            _services.Add(new Services.DriverService());
-            _services.Add(new Services.InProcessTestRunnerFactory());
+            _services.Add(new DriverService());
+            _services.Add(new DefaultTestRunnerFactory());
             _services.ServiceManager.StartServices();
 
             _runner = new MasterTestRunner(_services, _package);
@@ -161,14 +166,7 @@ namespace NUnit.Engine.Runners.Tests
         {
             var prop = typeof(MasterTestRunner).GetField("_engineRunner", BindingFlags.NonPublic | BindingFlags.Instance);
             var runner = prop.GetValue(_runner);
-#if !NETCOREAPP1_1 && !NETCOREAPP2_0
-            if (_numAssemblies == 1)
-                Assert.That(runner, Is.TypeOf<TestDomainRunner>());
-            else
-                Assert.That(runner, Is.TypeOf<MultipleTestDomainRunner>());
-#else
-            Assert.That(runner, Is.TypeOf<LocalTestRunner>());
-#endif
+            Assert.That(runner, Is.TypeOf(_expectedRunner));
         }
 
         [Test]
@@ -264,7 +262,7 @@ namespace NUnit.Engine.Runners.Tests
         }
 #endif
 
-        #region Helper Methods
+#region Helper Methods
 
         private void CheckTestRunResult(XmlNode result)
         {
@@ -295,8 +293,6 @@ namespace NUnit.Engine.Runners.Tests
 
             Assert.That(_events[0].Name, Is.EqualTo("start-run"));
             Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(_totalTests), "Start-run count value");
-            //Assert.That(_events[1].Name, Is.EqualTo("start-suite"));
-            //Assert.That(_events[_events.Count - 2].Name, Is.EqualTo("test-suite"));
             Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"));
             Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(_totalTests));
         }
@@ -319,6 +315,51 @@ namespace NUnit.Engine.Runners.Tests
             _events.Add(XmlHelper.CreateXmlNode(report));
         }
 
+        #endregion
+
+        #region Nested Helper Classes
+
+        public class TestRunData
+        {
+            public Type ExpectedRunner;
+            public AssemblyData[] AssemblyData;
+
+            public TestRunData(Type expectedRunner, params AssemblyData[] assemblyData)
+            {
+                ExpectedRunner = expectedRunner;
+                AssemblyData = assemblyData;
+            }
+
+            public override string ToString()
+            {
+                var sb = new StringBuilder(ExpectedRunner.Name);
+                foreach (var assembly in AssemblyData)
+                    sb.Append($", {assembly.Name}");
+                return sb.ToString();
+            }
+        }
+
+        public class AssemblyData
+        {
+            public string Name;
+            public string RunState;
+            public int Tests;
+            public int Passed;
+            public int Failed;
+            public int Skipped;
+            public int Inconclusive;
+
+            public AssemblyData(string name, string runstate, int tests, int passing, int failed, int skipped, int inconclusive)
+            {
+                Name = name;
+                RunState = runstate;
+                Tests = tests;
+                Passed = passing;
+                Failed = failed;
+                Skipped = skipped;
+                Inconclusive = inconclusive;
+            }
+        }
         #endregion
     }
 }
