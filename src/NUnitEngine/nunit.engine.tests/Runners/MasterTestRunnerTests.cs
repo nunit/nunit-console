@@ -40,6 +40,7 @@ namespace NUnit.Engine.Runners.Tests
     public class MasterTestRunnerTests : ITestEventListener
     {
         private List<AssemblyData> _data = new List<AssemblyData>();
+        private List<string> _testFiles = new List<string>();
         private List<string> _assemblies = new List<string>();
 
         private int _numAssemblies = 0;
@@ -56,21 +57,20 @@ namespace NUnit.Engine.Runners.Tests
         private MasterTestRunner _runner;
         private List<XmlNode> _events;
 
-#if !NETCOREAPP1_1
-        private FakeProjectService _projectService;
-#endif
-
         public MasterTestRunnerTests(TestRunData testRunData)
         {
             _expectedRunner = testRunData.ExpectedRunner;
 
             string testDirectory = TestContext.CurrentContext.TestDirectory;
 
+            foreach (string file in testRunData.CommandLine.Split(new char[] { ',' }))
+                _testFiles.Add(Path.Combine(testDirectory, file));
+
             foreach (var data in testRunData.AssemblyData)
             {
                 _data.Add(data);
-                _assemblies.Add(Path.Combine(testDirectory, data.Name));
                 _numAssemblies++;
+                _assemblies.Add(Path.Combine(testDirectory, data.Name));
                 _totalTests += data.Tests;
                 _totalPassed += data.Passed;
                 _totalFailed += data.Failed;
@@ -85,59 +85,60 @@ namespace NUnit.Engine.Runners.Tests
         static AssemblyData NoTestsAssemblyData =
             new AssemblyData("notests-assembly.dll", "NotRunnable", 0, 0, 0, 0, 0);
 
-        static AssemblyData UnknownProjectType =
-            new AssemblyData("project.xxx", "NotRunnable", 0, 0, 0, 0, 0);
-
-        static AssemblyData EmptyProject =
-            new AssemblyData("empty.nunit", "NotRunnable", 0, 0, 0, 0, 0);
-
-        static AssemblyData ProjectWithMockAssembly =
-            new AssemblyData("project.nunit", "Runnable", MockAssembly.Tests, MockAssembly.PassedInAttribute, MockAssembly.Failed, MockAssembly.Skipped, MockAssembly.Inconclusive);
-
         static TestRunData[] FixtureData = new TestRunData[]
         {
-            // NOTES: 
-            // 1. Currently, these tests document actual behavioral differrences
-            // among the different builds. We may want to change that.
-            // 2. The empty tests are excluded for .NET Core because of 
-            // errors and different behavior which either needs to be accounted 
-            // for in the tests or corrected.
-            // 3. .NET Standard 1.6 doesn't support projects.
+            // NOTE: These tests document current behavior. In some cases
+            // we may want to change that behavior.
 #if NETCOREAPP1_1
-            new TestRunData( typeof(LocalTestRunner), MockAssemblyData ),
-            new TestRunData( typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( typeof(LocalTestRunner), UnknownProjectType ),
+            new TestRunData( "mock-assembly.dll", typeof(LocalTestRunner), MockAssemblyData ),
+            new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( "notests-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
+            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData )
+            // .NET Standard 1.6 doesn't support projects.
 #elif NETCOREAPP2_0
-            new TestRunData( typeof(LocalTestRunner), MockAssemblyData ),
-            new TestRunData( typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( typeof(LocalTestRunner), UnknownProjectType ),
-            new TestRunData( typeof(AggregatingTestRunner), EmptyProject ),
-            new TestRunData( typeof(AggregatingTestRunner), ProjectWithMockAssembly ),
+            new TestRunData( "mock-assembly.dll", typeof(LocalTestRunner), MockAssemblyData ),
+            new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( "notests-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
+            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), MockAssemblyData ),
+            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData ),
+            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "project1.nunit,notests-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData, MockAssemblyData, MockAssemblyData)
 #else
-            new TestRunData( typeof(TestDomainRunner), MockAssemblyData ),
-            new TestRunData( typeof(MultipleTestDomainRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( typeof(TestDomainRunner), UnknownProjectType ),
-            new TestRunData( typeof(TestDomainRunner), EmptyProject ),
-            new TestRunData( typeof(TestDomainRunner), ProjectWithMockAssembly ),
-            new TestRunData( typeof(TestDomainRunner), NoTestsAssemblyData ),
-            new TestRunData( typeof(MultipleTestDomainRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestsAssemblyData )
+            new TestRunData( "mock-assembly.dll", typeof(TestDomainRunner), MockAssemblyData ),
+            new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( "notests-assembly.dll", typeof(TestDomainRunner), NoTestsAssemblyData ),
+            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(MultipleTestDomainRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), MockAssemblyData ),
+            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
+            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData ),
+            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "project1.nunit,notests-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData, MockAssemblyData, MockAssemblyData)
 #endif
         };
 
         [SetUp]
         public void Initialize()
         {
-            _package = new TestPackage(_assemblies);
+            _package = new TestPackage(_testFiles);
             _package.AddSetting(EnginePackageSettings.ProcessModel, "InProcess");
 
             // Add all services needed
             _services = new ServiceContext();
 #if !NETCOREAPP1_1
             _services.Add(new ExtensionService());
-            _projectService = new FakeProjectService();
-            _projectService.Add("project.nunit", "mock-assembly.dll");
-            _services.Add(_projectService);
+            var projectService = new FakeProjectService();
+            var mockPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
+            var notestsPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "empty-assembly.dll");
+            projectService.Add("project1.nunit", mockPath);
+            projectService.Add("project2.nunit", mockPath, mockPath);
+            projectService.Add("project3.nunit", notestsPath);
+            projectService.Add("project4.nunit", notestsPath, notestsPath);
+            _services.Add(projectService);
 #if !NETCOREAPP2_0
             _services.Add(new DomainManager());
             _services.Add(new RuntimeFrameworkService());
@@ -321,11 +322,13 @@ namespace NUnit.Engine.Runners.Tests
 
         public class TestRunData
         {
+            public string CommandLine;
             public Type ExpectedRunner;
             public AssemblyData[] AssemblyData;
 
-            public TestRunData(Type expectedRunner, params AssemblyData[] assemblyData)
+            public TestRunData(string commandLine, Type expectedRunner, params AssemblyData[] assemblyData)
             {
+                CommandLine = commandLine;
                 ExpectedRunner = expectedRunner;
                 AssemblyData = assemblyData;
             }
