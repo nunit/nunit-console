@@ -22,47 +22,32 @@
 // ***********************************************************************
 
 using System.Collections.Generic;
-using NUnit.Engine.Internal;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
+namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 {
-#if !NETCOREAPP
-    internal static class Net20AssemblyTestCases
+#if NETCOREAPP1_1 || NETCOREAPP2_0
+    internal static class NetStandardAssemblyTestCases
     {
         public static IEnumerable<TestCaseData> TestCases
         {
             get
             {
                 var testName = "Single assembly";
-                var package = new TestPackage("a.dll");
-                var expected = new RunnerResult { TestRunner = typeof(ProcessRunner) };
+                var package = TestPackageFactory.OneAssembly();
+                var expected = new RunnerResult { TestRunner = typeof(LocalTestRunner) };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
                 testName = "Two assemblies";
-                package = new TestPackage(new[] { "a.dll", "b.dll" });
+                package = TestPackageFactory.TwoAssemblies();
                 expected = new RunnerResult
                 {
-                    TestRunner = typeof(MultipleTestProcessRunner),
+                    TestRunner = typeof(AggregatingTestRunner),
                     SubRunners = new[]
                     {
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) },
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) }
-                    }
-                };
-                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
-
-                testName = "Three assemblies";
-                package = new TestPackage(new[] { "a.dll", "b.dll", "c.dll" });
-                expected = new RunnerResult
-                {
-                    TestRunner = typeof(MultipleTestProcessRunner),
-                    SubRunners = new[]
-                    {
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) },
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) },
-                        new RunnerResult { TestRunner = typeof(ProcessRunner) }
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
                     }
                 };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");

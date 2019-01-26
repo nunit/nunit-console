@@ -39,7 +39,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             sb.AppendLine($"TestRunner: {TestRunner.Name}");
 
             if (SubRunners.Count == 0)
-                return sb.ToString();
+                return sb.ToString().Trim();
 
             sb.AppendLine("SubRunners:");
 
@@ -48,7 +48,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
                 sb.AppendLine($"\t{subRunner}");
             }
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
     }
 }
