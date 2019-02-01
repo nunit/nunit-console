@@ -171,9 +171,10 @@ namespace NUnit.ConsoleRunner
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
+                var outputDirectory = Path.GetDirectoryName(outputPath);
 
                 IResultWriter resultWriter;
-
+                
                 try
                 {
                     resultWriter = GetResultWriter(spec);
@@ -182,7 +183,19 @@ namespace NUnit.ConsoleRunner
                 {
                     throw new NUnitEngineException($"Error encountered in resolving output specification: {spec}", ex);
                 }
-
+                
+                try
+                {
+                    Directory.CreateDirectory(outputDirectory);
+                }
+                catch (SystemException ex)
+                {
+                    throw new NUnitEngineException(
+                        String.Format(
+                            "The directory in --result {0} could not be created",
+                            spec.OutputPath), ex);
+                }
+                
                 try
                 {
                     resultWriter.CheckWritability(outputPath);
