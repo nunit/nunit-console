@@ -30,13 +30,12 @@ using System.Text;
 using System.Xml;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
+using NUnit.Engine.Services;
+using NUnit.Engine.Services.Tests.Fakes;
 
 namespace NUnit.Engine.Runners.Tests
 {
-    using Services;
-    using Services.Tests.Fakes;
-
-    [TestFixtureSource("FixtureData")]
+    [TestFixtureSource(nameof(FixtureData))]
     public class MasterTestRunnerTests : ITestEventListener
     {
         private List<AssemblyData> _data = new List<AssemblyData>();
@@ -176,7 +175,7 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Load();
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(_totalTests));
+            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
 
             var suites = result.SelectNodes("test-suite");
             Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
@@ -185,7 +184,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode child in suites)
             {
                 var data = _data[i++];
-                Assert.That(child.GetAttribute("testcasecount", 0), Is.EqualTo(data.Tests));
+                Assert.That(child.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(child.GetAttribute("runstate"), Is.EqualTo(data.RunState));
             }
 
@@ -199,7 +198,7 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Reload();
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(_totalTests));
+            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
 
             var suites = result.SelectNodes("test-suite");
             Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
@@ -208,7 +207,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode child in result.SelectNodes("test-suite"))
             {
                 var data = _data[i++];
-                Assert.That(child.GetAttribute("testcasecount", 0), Is.EqualTo(data.Tests));
+                Assert.That(child.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(child.GetAttribute("runstate"), Is.EqualTo(data.RunState));
             }
 
@@ -228,7 +227,7 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Explore(TestFilter.Empty);
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(_totalTests));
+            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
 
             var suites = result.SelectNodes("test-suite");
             Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
@@ -237,7 +236,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode suite in suites)
             {
                 var data = _data[i++];
-                Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(data.Tests));
+                Assert.That(suite.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(suite.GetAttribute("runstate"), Is.EqualTo(data.RunState));
             }
 
@@ -268,12 +267,12 @@ namespace NUnit.Engine.Runners.Tests
         private void CheckTestRunResult(XmlNode result)
         {
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(_totalTests));
+            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
             Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(_totalPassed));
-            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(_totalFailed));
-            Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(_totalSkipped));
-            Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(_totalInconclusive));
+            Assert.That(result.GetAttribute("passed", -1), Is.EqualTo(_totalPassed));
+            Assert.That(result.GetAttribute("failed", -1), Is.EqualTo(_totalFailed));
+            Assert.That(result.GetAttribute("skipped", -1), Is.EqualTo(_totalSkipped));
+            Assert.That(result.GetAttribute("inconclusive", -1), Is.EqualTo(_totalInconclusive));
 
             var suites = result.SelectNodes("test-suite");
             Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
@@ -282,7 +281,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode suite in suites)
             {
                 var data = _data[i++];
-                Assert.That(suite.GetAttribute("testcasecount", 0), Is.EqualTo(data.Tests));
+                Assert.That(suite.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
                 Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(data.Passed));
                 Assert.That(suite.GetAttribute("failed", 0), Is.EqualTo(data.Failed));
@@ -305,10 +304,13 @@ namespace NUnit.Engine.Runners.Tests
 
         private void AssertThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
         {
-            Assert.That(dict, Does.Not.ContainKey(test.GetAttribute("id")));
-
             foreach (XmlNode child in test.SelectNodes("test-suite"))
                 AssertThatIdsAreUnique(child, dict);
+
+            string id = test.GetAttribute("id");
+            Assert.That(dict, Does.Not.ContainKey(id));
+
+            dict.Add(id, true);
         }
 
         void ITestEventListener.OnTestEvent(string report)
