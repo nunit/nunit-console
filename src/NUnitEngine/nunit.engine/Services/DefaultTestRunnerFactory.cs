@@ -118,7 +118,10 @@ namespace NUnit.Engine.Services
                     return new ProcessRunner(this.ServiceContext, package);
 
                 case ProcessModel.InProcess:
-                    return base.MakeTestRunner(package);
+                    if (projectCount > 0)
+                        return new AggregatingTestRunner(ServiceContext, package);
+                    else
+                        return base.MakeTestRunner(package);
             }
         }
 

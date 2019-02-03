@@ -296,11 +296,8 @@ namespace NUnit.Engine.Runners
         {
             if (package == null) throw new ArgumentNullException("package");
 
-            string packageName = package.FullName;
-            if (File.Exists(packageName) && _projectService.CanLoadFrom(packageName))
-            {
+            if (_projectService.CanLoadFrom(package.FullName))
                 _projectService.ExpandProjectPackage(package);
-            }
         }
 
         // Any Errors thrown from this method indicate that the client
