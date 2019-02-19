@@ -25,4 +25,4 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("NUnit Engine")]
 [assembly: AssemblyVersion("3.10.0")]
-[assembly: AssemblyInformationalVersion("3.10.0")]
+[assembly: AssemblyInformationalVersion("3.10.0-tc-00001-dbg")]
