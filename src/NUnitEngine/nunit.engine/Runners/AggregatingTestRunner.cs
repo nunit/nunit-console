@@ -101,10 +101,6 @@ namespace NUnit.Engine.Runners
         {
             var results = new List<TestEngineResult>();
 
-            var packages = new List<TestPackage>(TestPackage.SubPackages);
-            if (packages.Count == 0)
-                packages.Add(TestPackage);
-
             foreach (var runner in Runners)
                 results.Add(runner.Load());
 

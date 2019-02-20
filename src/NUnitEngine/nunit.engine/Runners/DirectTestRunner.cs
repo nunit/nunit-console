@@ -99,15 +99,15 @@ namespace NUnit.Engine.Runners
         {
             var result = new TestEngineResult();
 
-            // DirectRunner may be called with a single-assembly package
-            // or a set of assemblies as subpackages.
-            var packages = TestPackage.SubPackages;
-            if (packages.Count == 0)
-                packages.Add(TestPackage);
+            // DirectRunner may be called with a single-assembly package,
+            // a set of assemblies as subpackages or even an arbitrary
+            // hierarchy of packages and subpackages with assemblies
+            // found in the terminal nodes.
+            var packagesToLoad = TestPackage.Select(p => !p.HasSubPackages());
 
             var driverService = Services.GetService<IDriverService>();
 
-            foreach (var subPackage in packages)
+            foreach (var subPackage in packagesToLoad)
             {
                 var testFile = subPackage.FullName;
 
@@ -207,12 +207,7 @@ namespace NUnit.Engine.Runners
 #if !NETSTANDARD1_6
             if (_assemblyResolver != null)
             {
-                var packages = TestPackage.SubPackages;
-
-                if (packages.Count == 0)
-                    packages.Add(TestPackage);
-
-                foreach (var package in packages)
+                foreach (var package in TestPackage.Select(p => p.IsAssemblyPackage()))
                     _assemblyResolver.RemovePathFromFile(package.FullName);
             }
 #endif
