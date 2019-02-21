@@ -258,7 +258,7 @@ Task("TestNetStandard16Engine")
         {
             DotNetCoreExecute(NETCOREAPP11_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
             {
-                FrameworkVersion = "1.1.2"  //1.1.2 as the highest version currently available on Appveyor
+                FrameworkVersion = "1.1.11" // LTS
             });
         }
         else
@@ -281,7 +281,7 @@ Task("TestNetStandard20Engine")
         {
             DotNetCoreExecute(NETCOREAPP20_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
             {
-                FrameworkVersion = "2.0.6"
+                FrameworkVersion = "2.1.8" // LTS
             });
         }
         else
