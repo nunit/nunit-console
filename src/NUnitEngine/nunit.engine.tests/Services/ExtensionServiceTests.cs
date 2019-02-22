@@ -151,7 +151,7 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void FailsGracefullyLoadingOtherFrameworkExtensionAssembly()
+        public void SkipsGracefullyLoadingOtherFrameworkExtensionAssembly()
         {
             //May be null on mono
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
@@ -169,22 +169,21 @@ namespace NUnit.Engine.Services.Tests
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
 
-            Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly),
-                Throws.TypeOf<NUnitEngineException>(), $"Loading extension targeting {new TargetFrameworkHelper(extensionAssembly.FilePath).FrameworkName} did not throw.");
+            Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly), Throws.Nothing);
         }
 
         [TestCaseSource(nameof(ValidCombos))]
         public void ValidTargetFrameworkCombinations(FrameworkCombo combo)
         {
             Assert.That(() => ExtensionService.ValidateTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
-                Throws.Nothing);
+                Is.True);
         }
 
         [TestCaseSource(nameof(InvalidCombos))]
         public void InvalidTargetFrameworkCombinations(FrameworkCombo combo)
         {
             Assert.That(() => ExtensionService.ValidateTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
-                Throws.TypeOf<NUnitEngineException>());
+                Is.False);
         }
 
         // ExtensionAssembly is internal, so cannot be part of the public test parameters
