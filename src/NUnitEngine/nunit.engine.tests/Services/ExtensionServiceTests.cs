@@ -150,7 +150,7 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void SkipsGracefullyLoadingOtherFrameworkDirectExtensionAssembly()
+        public void FailsGracefullyLoadingOtherFrameworkDirectExtensionAssembly()
         {
             //May be null on mono
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
