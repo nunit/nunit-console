@@ -6,6 +6,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+var productVersion = Argument("productVersion", "3.10.0");
 
 var ErrorDetail = new List<string>();
 bool IsDotNetCoreInstalled = false;
@@ -14,12 +15,13 @@ bool IsDotNetCoreInstalled = false;
 // SET PACKAGE VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.10.0";
-var modifier = "";
+var dash = productVersion.IndexOf('-');
+var version = dash > 0
+    ? productVersion.Substring(0, dash)
+    : productVersion;
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
-var productVersion = version + modifier + dbgSuffix;
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
