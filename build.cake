@@ -353,7 +353,15 @@ Task("PackageNuGet")
             NoPackageAnalysis = true
         });
 
-        NuGetPack("nuget/runners/nunit.runners.nuspec", new NuGetPackSettings()
+        NuGetPack("nuget/deprecated/nunit.runners.nuspec", new NuGetPackSettings()
+        {
+            Version = productVersion,
+            BasePath = CURRENT_IMG_DIR,
+            OutputDirectory = PACKAGE_DIR,
+            NoPackageAnalysis = true
+        });
+
+        NuGetPack("nuget/deprecated/nunit.engine.netstandard.nuspec", new NuGetPackSettings()
         {
             Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
