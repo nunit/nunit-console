@@ -31,7 +31,7 @@ using NUnit.Engine.Services;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// ProcessRunner loads and runs a set of tests in a single age process.
+    /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
     public class ProcessRunner : AbstractTestRunner
     {
