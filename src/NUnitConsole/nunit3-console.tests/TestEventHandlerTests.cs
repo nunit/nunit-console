@@ -31,7 +31,7 @@ namespace NUnit.ConsoleRunner.Tests
     public class TestEventHandlerTests
     {
         private StringBuilder _output;
-        private TextWriter _writer;
+        private ExtendedTextWriter _writer;
 
         private string Output {  get { return _output.ToString(); } }
 
@@ -39,7 +39,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void CreateWriter()
         {
             _output = new StringBuilder();
-            _writer = new StringWriter(_output);
+            _writer = new ExtendedTextWrapper(new StringWriter(_output));
         }
 
         [TestCaseSource("SingleEventData")]

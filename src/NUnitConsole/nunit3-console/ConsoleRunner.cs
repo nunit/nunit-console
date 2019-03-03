@@ -225,7 +225,6 @@ namespace NUnit.ConsoleRunner
             try
             {
                 using (new SaveConsoleOutput())
-                using (new ColorConsole(ColorStyle.Output))
                 using (ITestRunner runner = _engine.GetRunner(package))
                 using (var output = CreateOutputWriter())
                 {
