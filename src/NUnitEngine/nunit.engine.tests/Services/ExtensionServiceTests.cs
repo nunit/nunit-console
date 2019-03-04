@@ -29,6 +29,7 @@ using NUnit.Engine.Extensibility;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -150,7 +151,11 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
+<<<<<<< HEAD
         public void FailsGracefullyLoadingOtherFrameworkDirectExtensionAssembly()
+=======
+        public void SkipsGracefullyLoadingOtherFrameworkExtensionAssembly()
+>>>>>>> parent of e3b0ea48... Throw EngineException if extension target framework is incompatible and found via non-wildcard, otherwise just warn
         {
             //May be null on mono
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
@@ -167,28 +172,6 @@ namespace NUnit.Engine.Services.Tests
             service.FindExtensionPoints(typeof(TestEngine).Assembly);
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
-
-            Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly), Throws.TypeOf<NUnitEngineException>());
-        }
-
-        [Test]
-        public void SkipsGracefullyLoadingOtherFrameworkWildCardExtensionAssembly()
-        {
-            //May be null on mono
-            Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
-
-#if NETCOREAPP2_0
-            string other = "net35"; // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
-#elif NET35
-            string other = "netcoreapp2.0"; // Attempt to load the .NET Core 2.0 version of the extensions from the .NET 3.5 tests
-#endif
-            var assemblyName = Path.Combine(GetSiblingDirectory(other), "nunit.engine.tests.dll");
-            Assert.That(assemblyName, Does.Exist);
-
-            var service = new ExtensionService();
-            service.FindExtensionPoints(typeof(TestEngine).Assembly);
-            service.FindExtensionPoints(typeof(ITestEngine).Assembly);
-            var extensionAssembly = new ExtensionAssembly(assemblyName, true);
 
             Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly), Throws.Nothing);
         }

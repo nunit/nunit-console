@@ -517,14 +517,6 @@ namespace NUnit.Engine.Services
                     ep.Install(node);
                 }
             }
-            else if (!assembly.FromWildCard)
-            {
-                throw new NUnitEngineException($"Cannot load {assembly.FilePath} as extension assembly due not supported target framework.");
-            }
-            else
-            {
-                log.Warning($"Skipping {assembly.FilePath} assembly as extension assembly due not supported target framework.");
-            }
         }
 
         /// <summary>
