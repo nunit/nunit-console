@@ -431,7 +431,7 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
-            if (ValidateTargetFramework(Assembly.GetEntryAssembly(), assembly))
+            if (CanLoadTargetFramework(Assembly.GetEntryAssembly(), assembly))
             {
 
                 IRuntimeFramework assemblyTargetFramework = null;
@@ -525,7 +525,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="runnerAsm">The executing runner</param>
         /// <param name="extensionAsm">The extension we are attempting to load</param>
-        internal static bool ValidateTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        internal static bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
         {
             if (runnerAsm == null)
                 return true;
@@ -534,20 +534,19 @@ namespace NUnit.Engine.Services
             var runnerHelper = new TargetFrameworkHelper(runnerAsm.Location);
             if (runnerHelper.FrameworkName?.StartsWith(".NETStandard") == true)
             {
-                log.Warning($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
-                return false;
+                throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
             }
             else if (runnerHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
             {
                 if (extHelper.FrameworkName?.StartsWith(".NETStandard") != true && extHelper.FrameworkName?.StartsWith(".NETCoreApp") != true)
                 {
-                    log.Warning($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
+                    log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
                     return false;
                 }
             }
             else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
             {
-                log.Warning($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
+                log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
                 return false;
             }
 
