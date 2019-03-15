@@ -21,7 +21,6 @@ var version = dash > 0
     : productVersion;
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
-var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
@@ -87,11 +86,11 @@ Setup(context =>
 
         if (branch == "master" && !isPullRequest)
         {
-            productVersion = version + "-dev-" + buildNumber + dbgSuffix;
+            productVersion = version + "-dev-" + buildNumber;
         }
         else
         {
-            var suffix = "-ci-" + buildNumber + dbgSuffix;
+            var suffix = "-ci-" + buildNumber;
 
             if (isPullRequest)
                 suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
