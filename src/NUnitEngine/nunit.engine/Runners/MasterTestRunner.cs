@@ -295,7 +295,7 @@ namespace NUnit.Engine.Runners
 
             if (package.SubPackages.Count == 0 && IsProjectPackage(package))
             {
-                ExpandProjects(package);
+                _projectService.ExpandProjectPackage(package);
             }
         }
 
@@ -307,14 +307,6 @@ namespace NUnit.Engine.Runners
                 _projectService != null
                 && !string.IsNullOrEmpty(package.FullName)
                 && _projectService.CanLoadFrom(package.FullName);
-        }
-
-        private void ExpandProjects(TestPackage package)
-        {
-            if (package == null) throw new ArgumentNullException("package");
-
-            if (_projectService.CanLoadFrom(package.FullName))
-                _projectService.ExpandProjectPackage(package);
         }
 
         // Any Errors thrown from this method indicate that the client
