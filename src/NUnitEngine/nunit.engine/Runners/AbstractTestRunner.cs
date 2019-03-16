@@ -39,7 +39,6 @@ namespace NUnit.Engine.Runners
         {
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
-            ProjectService = Services.GetService<IProjectService>();
             TestPackage = package;
         }
 
@@ -49,8 +48,6 @@ namespace NUnit.Engine.Runners
         /// Our Service Context
         /// </summary>
         protected IServiceLocator Services { get; private set; }
-
-        protected IProjectService ProjectService { get; private set; }
 
         protected ITestRunnerFactory TestRunnerFactory { get; private set; }
 
