@@ -151,7 +151,7 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void FailsGracefullyLoadingOtherFrameworkExtensionAssembly()
+        public void SkipsGracefullyLoadingOtherFrameworkExtensionAssembly()
         {
             //May be null on mono
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
@@ -169,22 +169,28 @@ namespace NUnit.Engine.Services.Tests
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
 
-            Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly),
-                Throws.TypeOf<NUnitEngineException>(), $"Loading extension targeting {new TargetFrameworkHelper(extensionAssembly.FilePath).FrameworkName} did not throw.");
+            Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly), Throws.Nothing);
         }
 
         [TestCaseSource(nameof(ValidCombos))]
         public void ValidTargetFrameworkCombinations(FrameworkCombo combo)
         {
-            Assert.That(() => ExtensionService.ValidateTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
-                Throws.Nothing);
+            Assert.That(() => ExtensionService.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+                Is.True);
         }
 
-        [TestCaseSource(nameof(InvalidCombos))]
+        [TestCaseSource(nameof(InvalidTargetFrameworkCombos))]
         public void InvalidTargetFrameworkCombinations(FrameworkCombo combo)
         {
-            Assert.That(() => ExtensionService.ValidateTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
-                Throws.TypeOf<NUnitEngineException>());
+            Assert.That(() => ExtensionService.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+                Is.False);
+        }
+
+        [TestCaseSource(nameof(InvalidRunnerCombos))]
+        public void InvalidRunnerTargetFrameworkCombinations(FrameworkCombo combo)
+        {
+            Assert.That(() => ExtensionService.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+                Throws.Exception.TypeOf<NUnitEngineException>().And.Message.Contains("not .NET Standard"));
         }
 
         // ExtensionAssembly is internal, so cannot be part of the public test parameters
@@ -225,7 +231,29 @@ namespace NUnit.Engine.Services.Tests
 #endif
         }
 
-        public static IEnumerable<TestCaseData> InvalidCombos()
+        public static IEnumerable<TestCaseData> InvalidTargetFrameworkCombos()
+        {
+#if NETCOREAPP2_0
+            Assembly netstandard = typeof(ExtensionService).Assembly;
+            Assembly netcore = Assembly.GetExecutingAssembly();
+
+            var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
+            var extNetCore = new ExtensionAssembly(netcore.Location, false);
+            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.dll"), false);
+
+            yield return new TestCaseData(new FrameworkCombo(netcore, extNetFramework)).SetName("InvalidCombo(.NET Core, .NET Framework)");
+#else
+            Assembly netFramework = typeof(ExtensionService).Assembly;
+
+            var extNetStandard = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"), false);
+            var extNetCore = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netcoreapp2.0"), "nunit.engine.tests.dll"), false);
+
+            yield return new TestCaseData(new FrameworkCombo(netFramework, extNetCore)).SetName("InvalidCombo(.NET Framework, .NET Core)");
+#endif
+
+        }
+
+        public static IEnumerable<TestCaseData> InvalidRunnerCombos()
         {
 #if NETCOREAPP2_0
             Assembly netstandard = typeof(ExtensionService).Assembly;
@@ -238,16 +266,9 @@ namespace NUnit.Engine.Services.Tests
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetStandard)).SetName("InvalidCombo(.NET Standard, .NET Standard)");
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetCore)).SetName("InvalidCombo(.NET Standard, .NET Core)");
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetFramework)).SetName("InvalidCombo(.NET Standard, .NET Framework)");
-            yield return new TestCaseData(new FrameworkCombo(netcore, extNetFramework)).SetName("InvalidCombo(.NET Core, .NET Standard)");
 #else
-            Assembly netFramework = typeof(ExtensionService).Assembly;
-
-            var extNetStandard = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"), false);
-            var extNetCore = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netcoreapp2.0"), "nunit.engine.tests.dll"), false);
-
-            yield return new TestCaseData(new FrameworkCombo(netFramework, extNetCore)).SetName("InvalidCombo(.NET Framework, .NET Core)");
+            return new List<TestCaseData>();
 #endif
-
         }
 
         /// <summary>

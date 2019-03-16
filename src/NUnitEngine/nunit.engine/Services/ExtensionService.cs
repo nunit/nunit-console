@@ -64,7 +64,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         public IEnumerable<IExtensionNode> Extensions
         {
-            get { return _extensions.ToArray();  }
+            get { return _extensions.ToArray(); }
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace NUnit.Engine.Services
         public IEnumerable<T> GetExtensions<T>()
         {
             foreach (var node in GetExtensionNodes<T>())
-              	 yield return (T)node.ExtensionObject;
+                yield return (T)node.ExtensionObject;
         }
 
         #endregion
@@ -431,89 +431,91 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
-            ValidateTargetFramework(Assembly.GetEntryAssembly(), assembly);
-
-            IRuntimeFramework assemblyTargetFramework = null;
-#if !NETSTANDARD2_0
-            var currentFramework = RuntimeFramework.CurrentFramework;
-            assemblyTargetFramework = assembly.TargetFramework;
-            if (!currentFramework.CanLoad(assemblyTargetFramework))
+            if (CanLoadTargetFramework(Assembly.GetEntryAssembly(), assembly))
             {
-                if (!assembly.FromWildCard)
+
+                IRuntimeFramework assemblyTargetFramework = null;
+#if !NETSTANDARD2_0
+                var currentFramework = RuntimeFramework.CurrentFramework;
+                assemblyTargetFramework = assembly.TargetFramework;
+                if (!currentFramework.CanLoad(assemblyTargetFramework))
                 {
-                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                    if (!assembly.FromWildCard)
+                    {
+                        throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                    }
+                    else
+                    {
+                        log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                        return;
+                    }
                 }
-                else
-                {
-                    log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
-                    return;
-                }
-            }
 #endif
 
-            foreach (var type in assembly.MainModule.GetTypes())
-            {
-                CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
-
-                if (extensionAttr == null)
-                    continue;
-
-                object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
-                if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
-                    continue;
-
-                var node = new ExtensionNode(assembly.FilePath, type.FullName, assemblyTargetFramework);
-                node.Path = extensionAttr.GetNamedArgument("Path") as string;
-                node.Description = extensionAttr.GetNamedArgument("Description") as string;
-
-                object enabledArg = extensionAttr.GetNamedArgument("Enabled");
-                node.Enabled = enabledArg != null
-                    ? (bool)enabledArg : true;
-
-                log.Info("  Found ExtensionAttribute on Type " + type.Name);
-
-                foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
+                foreach (var type in assembly.MainModule.GetTypes())
                 {
-                    string name = attr.ConstructorArguments[0].Value as string;
-                    string value = attr.ConstructorArguments[1].Value as string;
+                    CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
 
-                    if (name != null && value != null)
+                    if (extensionAttr == null)
+                        continue;
+
+                    object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
+                    if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
+                        continue;
+
+                    var node = new ExtensionNode(assembly.FilePath, type.FullName, assemblyTargetFramework);
+                    node.Path = extensionAttr.GetNamedArgument("Path") as string;
+                    node.Description = extensionAttr.GetNamedArgument("Description") as string;
+
+                    object enabledArg = extensionAttr.GetNamedArgument("Enabled");
+                    node.Enabled = enabledArg != null
+                        ? (bool)enabledArg : true;
+
+                    log.Info("  Found ExtensionAttribute on Type " + type.Name);
+
+                    foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
                     {
-                        node.AddProperty(name, value);
-                        log.Info("        ExtensionProperty {0} = {1}", name, value);
-                    }
-                }
+                        string name = attr.ConstructorArguments[0].Value as string;
+                        string value = attr.ConstructorArguments[1].Value as string;
 
-                _extensions.Add(node);
-
-                ExtensionPoint ep;
-                if (node.Path == null)
-                {
-                    ep = DeduceExtensionPointFromType(type);
-                    if (ep == null)
-                    {
-                        string msg = string.Format(
-                            "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
-                            type.FullName);
-                        throw new NUnitEngineException(msg);
+                        if (name != null && value != null)
+                        {
+                            node.AddProperty(name, value);
+                            log.Info("        ExtensionProperty {0} = {1}", name, value);
+                        }
                     }
 
-                    node.Path = ep.Path;
-                }
-                else
-                {
-                    ep = GetExtensionPoint(node.Path);
-                    if (ep == null)
-                    {
-                        string msg = string.Format(
-                            "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
-                            type.FullName,
-                            node.Path);
-                        throw new NUnitEngineException(msg);
-                    }
-                }
+                    _extensions.Add(node);
 
-                ep.Install(node);
+                    ExtensionPoint ep;
+                    if (node.Path == null)
+                    {
+                        ep = DeduceExtensionPointFromType(type);
+                        if (ep == null)
+                        {
+                            string msg = string.Format(
+                                "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
+                                type.FullName);
+                            throw new NUnitEngineException(msg);
+                        }
+
+                        node.Path = ep.Path;
+                    }
+                    else
+                    {
+                        ep = GetExtensionPoint(node.Path);
+                        if (ep == null)
+                        {
+                            string msg = string.Format(
+                                "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
+                                type.FullName,
+                                node.Path);
+                            throw new NUnitEngineException(msg);
+                        }
+                    }
+
+                    ep.Install(node);
+                }
             }
         }
 
@@ -523,28 +525,32 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="runnerAsm">The executing runner</param>
         /// <param name="extensionAsm">The extension we are attempting to load</param>
-        internal static void ValidateTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        internal static bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
         {
             if (runnerAsm == null)
-                return;
+                return true;
 
             var extHelper = new TargetFrameworkHelper(extensionAsm.FilePath);
             var runnerHelper = new TargetFrameworkHelper(runnerAsm.Location);
             if (runnerHelper.FrameworkName?.StartsWith(".NETStandard") == true)
             {
-                throw new NUnitEngineException("Test runners must target .NET Core or .NET Framework, not .NET Standard");
+                throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
             }
             else if (runnerHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
             {
                 if (extHelper.FrameworkName?.StartsWith(".NETStandard") != true && extHelper.FrameworkName?.StartsWith(".NETCoreApp") != true)
                 {
-                    throw new NUnitEngineException(".NET Core runners require .NET Core or .NET Standard extensions");
+                    log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
+                    return false;
                 }
             }
             else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
             {
-                throw new NUnitEngineException(".NET Framework runners cannot load .NET Core extensions");
+                log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
+                return false;
             }
+
+            return true;
         }
 
         #endregion
