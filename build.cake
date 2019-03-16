@@ -27,7 +27,7 @@ var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 //////////////////////////////////////////////////////////////////////
 
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var PACKAGE_DIR = PROJECT_DIR + "package/";
+var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NET35_BIN_DIR = BIN_DIR + "net35/";
 var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
