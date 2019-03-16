@@ -260,8 +260,7 @@ Task("TestNetStandard16Engine")
             RunDotnetCoreTests(
                 NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
                 NETCOREAPP11_BIN_DIR,
-                frameworkVersion: "1.1.2", // 1.1.2 is the highest version currently available on Appveyor
-                frameworkName: "netcoreapp1.1",
+                "netcoreapp1.1",
                 ref ErrorDetail);
         }
         else
@@ -285,8 +284,7 @@ Task("TestNetStandard20Engine")
             RunDotnetCoreTests(
                 NETCOREAPP20_BIN_DIR + ENGINE_TESTS,
                 NETCOREAPP20_BIN_DIR,
-                frameworkVersion: "2.0.6",
-                frameworkName: "netcoreapp2.0",
+                "netcoreapp2.0",
                 ref ErrorDetail);
         }
         else
@@ -553,28 +551,27 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, st
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
 
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string frameworkVersion, string frameworkName, ref List<string> errorDetail)
+void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
 {
-    RunDotnetCoreTests(exePath, workingDir, arguments: null, frameworkVersion, frameworkName, ref errorDetail);
+    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
 }
 
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string frameworkVersion, string frameworkName, ref List<string> errorDetail)
+void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
 {
     int rc = StartProcess(
         "dotnet",
         new ProcessSettings
         {
             Arguments = new ProcessArgumentBuilder()
-                .AppendSwitchQuoted("--fx-version", frameworkVersion)
                 .AppendQuoted(exePath.FullPath)
                 .Append(arguments)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, frameworkName).FullPath)
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, framework).FullPath)
                 .Render(),
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed", frameworkName, rc));
+        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
     else if (rc < 0)
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
