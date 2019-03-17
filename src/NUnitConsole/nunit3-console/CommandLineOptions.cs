@@ -381,7 +381,7 @@ namespace NUnit.Common
         {
             var equalsIndex = testParameterSpecification.IndexOf("=");
 
-            if (equalsIndex == -1 || equalsIndex == testParameterSpecification.Length - 1)
+            if (equalsIndex <= 0 || equalsIndex == testParameterSpecification.Length - 1)
             {
                 ErrorMessages.Add("Invalid format for test parameter. Use NAME=VALUE.");
             }
