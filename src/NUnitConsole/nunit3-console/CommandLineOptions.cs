@@ -154,11 +154,13 @@ namespace NUnit.Common
 
         // Error Processing
 
+        public IList<string> WarningMessages { get; } = new List<string>();
+
         public IList<string> ErrorMessages { get; } = new List<string>();
 
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
 
         public bool Validate()
         {

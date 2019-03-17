@@ -722,6 +722,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("--params=X=5");
             Assert.That(options.ErrorMessages, Is.Empty);
+            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
         }
 
@@ -730,6 +731,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("--params:X=5;Y=7");
             Assert.That(options.ErrorMessages, Is.Empty);
+            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
@@ -738,6 +740,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("-p:X=5", "-p:Y=7");
             Assert.That(options.ErrorMessages, Is.Empty);
+            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
@@ -746,6 +749,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = new ConsoleOptions("--params:X=5;Y=7", "-p:Z=3");
             Assert.That(options.ErrorMessages, Is.Empty);
+            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" }, { "Z", "3" } }));
         }
 
@@ -753,6 +757,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void DeprecatedParameterWithoutEqualSignIsInvalid()
         {
             var options = new ConsoleOptions("--params=X5");
+            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
