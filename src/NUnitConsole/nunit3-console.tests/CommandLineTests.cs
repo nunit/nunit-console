@@ -802,6 +802,78 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
+        public void LeadingWhitespaceIsPreservedInParameterName()
+        {
+            // Command line examples to get in this scenario:
+            // --testparams:"  X"=5
+            // --testparams:"  X=5"
+            // "--testparams:  X=5"
+
+            var options = new ConsoleOptions("--testparam:  X=5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["  X"] = "5" }));
+        }
+
+        [Test]
+        public void TrailingWhitespaceIsPreservedInParameterName()
+        {
+            // Command line examples to get in this scenario:
+            // --testparams:"X  "=5
+            // --testparams:"X  =5"
+            // "--testparams:X  =5"
+
+            var options = new ConsoleOptions("--testparam:X  =5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X  "] = "5" }));
+        }
+
+        [Test]
+        public void WhitespaceIsPermittedAsParameterName()
+        {
+            // Command line examples to get in this scenario:
+            // --testparams:"  "=5
+            // --testparams:"  =5"
+            // "--testparams:  =5"
+
+            var options = new ConsoleOptions("--testparam:  =5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["  "] = "5" }));
+        }
+
+        [Test]
+        public void LeadingWhitespaceIsPreservedInParameterValue()
+        {
+            // Command line examples to get in this scenario:
+            // --testparams:X="  5"
+            // --testparams:"X=  5"
+            // "--testparams:X=  5"
+
+            var options = new ConsoleOptions("--testparam:X=  5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "  5" }));
+        }
+
+        [Test]
+        public void TrailingWhitespaceIsPreservedInParameterValue()
+        {
+            // Command line examples to get in this scenario:
+            // --testparams:X="5  "
+            // --testparams:"X=5  "
+            // "--testparams:X=5  "
+
+            var options = new ConsoleOptions("--testparam:X=5  ");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "5  " }));
+        }
+
+        [Test]
+        public void WhitespaceIsPermittedAsParameterValue()
+        {
+            // Command line examples to get in this scenario:
+            // --testparams:X="  "
+            // --testparams:"X=  "
+            // "--testparams:X=  "
+
+            var options = new ConsoleOptions("--testparam:X=  ");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "  " }));
+        }
+
+        [Test]
         public void DisplayTestParameters()
         {
             if (TestContext.Parameters.Count == 0)
