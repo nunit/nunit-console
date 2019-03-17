@@ -292,28 +292,19 @@ namespace NUnit.Common
             this.Add("where=", "Test selection {EXPRESSION} indicating what tests will be run. See description below.",
                 v => WhereClause = RequiredValue(v, "--where"));
 
-            this.Add("params|p=", "Define a test parameter.",
+            this.Add("params|p=", "Deprecated and will be removed in a future release. Please use --testparam instead.",
                 v =>
                 {
                     string parameters = RequiredValue( v, "--params");
 
-                    // This can be changed without breaking backwards compatibility with frameworks.
                     foreach (string param in parameters.Split(new[] { ';' }))
                     {
-                        int eq = param.IndexOf("=");
-                        if (eq == -1 || eq == param.Length - 1)
-                        {
-                            ErrorMessages.Add("Invalid format for test parameter. Use NAME=VALUE.");
-                        }
-                        else
-                        {
-                            string name = param.Substring(0, eq);
-                            string val = param.Substring(eq + 1);
-
-                            TestParameters[name] = val;
-                        }
+                        ApplyTestParameter(param);
                     }
                 });
+
+            this.Add("testparam=", "Sets a single named value which test code can access.",
+                v => ApplyTestParameter(RequiredValue(v, "--testparam")));
 
             this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
                 v => defaultTimeout = RequiredInt(v, "--timeout"));
@@ -384,6 +375,23 @@ namespace NUnit.Common
                 else
                     InputFiles.Add(v);
             });
+        }
+
+        private void ApplyTestParameter(string testParameterSpecification)
+        {
+            var equalsIndex = testParameterSpecification.IndexOf("=");
+
+            if (equalsIndex == -1 || equalsIndex == testParameterSpecification.Length - 1)
+            {
+                ErrorMessages.Add("Invalid format for test parameter. Use NAME=VALUE.");
+            }
+            else
+            {
+                string name = testParameterSpecification.Substring(0, equalsIndex);
+                string value = testParameterSpecification.Substring(equalsIndex + 1);
+
+                TestParameters[name] = value;
+            }
         }
 
         private void ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications)
