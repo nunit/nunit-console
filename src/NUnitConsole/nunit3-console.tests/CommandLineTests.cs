@@ -795,25 +795,10 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void ParameterWithWhitespaceNameIsInvalid()
-        {
-            var options = new ConsoleOptions("--testparam: =5");
-            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
-        }
-
-        [Test]
         public void ParameterWithMissingValueIsInvalid()
         {
             var options = new ConsoleOptions("--testparam:X=");
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void ParameterWithWhitespaceValueIsValid()
-        {
-            var options = new ConsoleOptions("--testparam:X= ");
-            Assert.That(options.errorMessages, Is.Empty);
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = " " }));
         }
 
         [Test]
