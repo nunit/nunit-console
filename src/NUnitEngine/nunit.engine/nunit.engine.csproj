@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
-    <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
+    <Compile Include="..\nunit-agent\AgentExitCodes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />

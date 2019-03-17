@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
+// Copyright (c) 2011–2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,12 +21,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Net.Sockets;
 using NUnit.Common;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Runners
 {
@@ -39,7 +37,7 @@ namespace NUnit.Engine.Runners
         // multiple assemblies, a project, multiple projects or a mix. It loads
         // and runs all tests in a single remote agent process.
         //
-        // If the input contains projects, which are not summarized at a lower 
+        // If the input contains projects, which are not summarized at a lower
         // level, the ProcessRunner should create an XML node for the entire
         // project, aggregating the assembly results.
 
@@ -48,13 +46,10 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private ITestAgent _agent;
         private ITestEngineRunner _remoteRunner;
-        private TestAgency _agency;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-            _agency = Services.GetService<TestAgency>();
         }
 
         /// <summary>
@@ -339,4 +334,3 @@ namespace NUnit.Engine.Runners
         }
     }
 }
-#endif

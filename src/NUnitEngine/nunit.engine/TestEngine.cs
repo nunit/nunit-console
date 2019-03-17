@@ -104,7 +104,6 @@ namespace NUnit.Engine
 #if !NETSTANDARD2_0
                 Services.Add(new DomainManager());
                 Services.Add(new RuntimeFrameworkService());
-                Services.Add(new TestAgency());
 #endif
 #endif
                 Services.Add(new DriverService());
