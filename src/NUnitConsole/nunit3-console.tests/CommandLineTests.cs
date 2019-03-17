@@ -718,7 +718,7 @@ namespace NUnit.ConsoleRunner.Tests
         #region Test Parameters
 
         [Test]
-        public void SingleTestParameter()
+        public void SingleDeprecatedTestParameter()
         {
             var options = new ConsoleOptions("--params=X=5");
             Assert.That(options.errorMessages, Is.Empty);
@@ -726,7 +726,7 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void TwoTestParametersInOneOption()
+        public void TwoDeprecatedTestParametersInOneOption()
         {
             var options = new ConsoleOptions("--params:X=5;Y=7");
             Assert.That(options.errorMessages, Is.Empty);
@@ -734,7 +734,7 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void TwoTestParametersInSeparateOptions()
+        public void TwoDeprecatedTestParametersInSeparateOptions()
         {
             var options = new ConsoleOptions("-p:X=5", "-p:Y=7");
             Assert.That(options.errorMessages, Is.Empty);
@@ -742,7 +742,7 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void ThreeTestParametersInTwoOptions()
+        public void ThreeDeprecatedTestParametersInTwoOptions()
         {
             var options = new ConsoleOptions("--params:X=5;Y=7", "-p:Z=3");
             Assert.That(options.errorMessages, Is.Empty);
@@ -750,9 +750,40 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void ParameterWithoutEqualSignIsInvalid()
+        public void DeprecatedParameterWithoutEqualSignIsInvalid()
         {
             var options = new ConsoleOptions("--params=X5");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SingleTestParameter()
+        {
+            var options = new ConsoleOptions("--testparam=X=5");
+            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
+        }
+
+        [Test]
+        public void SemicolonsDoNotSplitTestParameters()
+        {
+            var options = new ConsoleOptions("--testparam:X=5;Y=7");
+            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5;Y=7" } }));
+        }
+
+        [Test]
+        public void TwoTestParametersInSeparateOptions()
+        {
+            var options = new ConsoleOptions("--testparam:X=5", "--testparam:Y=7");
+            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
+        }
+
+        [Test]
+        public void ParameterWithoutEqualSignIsInvalid()
+        {
+            var options = new ConsoleOptions("--testparam=X5");
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
