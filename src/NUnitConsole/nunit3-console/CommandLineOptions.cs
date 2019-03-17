@@ -86,31 +86,24 @@ namespace NUnit.Common
 
         // Select tests
 
-        private List<string> inputFiles = new List<string>();
-        public IList<string> InputFiles { get { return inputFiles; } }
+        public IList<string> InputFiles { get; } = new List<string>();
 
-        private List<string> testList = new List<string>();
-        public IList<string> TestList { get { return testList; } }
+        public IList<string> TestList { get; } =  new List<string>();
 
-        private Dictionary<string, string> testParameters = new Dictionary<string, string>();
-        public IDictionary<string, string> TestParameters { get { return testParameters; } }
+        public IDictionary<string, string> TestParameters { get; } = new Dictionary<string, string>();
 
         public string WhereClause { get; private set; }
         public bool WhereClauseSpecified { get { return WhereClause != null; } }
 
-        private int defaultTimeout = -1;
-        public int DefaultTimeout { get { return defaultTimeout; } }
-        public bool DefaultTimeoutSpecified { get { return defaultTimeout >= 0; } }
+        public int DefaultTimeout { get; private set; } = -1;
+        public bool DefaultTimeoutSpecified { get { return DefaultTimeout >= 0; } }
 
-        private int randomSeed = -1;
-        public int RandomSeed { get { return randomSeed; } }
-        public bool RandomSeedSpecified { get { return randomSeed >= 0; } }
+        public int RandomSeed { get; private set; } = -1;
+        public bool RandomSeedSpecified { get { return RandomSeed >= 0; } }
 
         public string DefaultTestNamePattern { get; private set; }
-
-        private int numWorkers = -1;
-        public int NumberOfTestWorkers { get { return numWorkers; } }
-        public bool NumberOfTestWorkersSpecified { get { return numWorkers >= 0; } }
+        public int NumberOfTestWorkers { get; private set; } = -1;
+        public bool NumberOfTestWorkersSpecified { get { return NumberOfTestWorkers >= 0; } }
 
         public bool StopOnError { get; private set; }
 
@@ -141,7 +134,7 @@ namespace NUnit.Common
         public string InternalTraceLevel { get; private set; }
         public bool InternalTraceLevelSpecified { get { return InternalTraceLevel != null; } }
 
-        private List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
+        private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
         public IList<OutputSpecification> ResultOutputSpecifications
         {
             get
@@ -157,13 +150,11 @@ namespace NUnit.Common
             }
         }
 
-        private List<OutputSpecification> exploreOutputSpecifications = new List<OutputSpecification>();
-        public IList<OutputSpecification> ExploreOutputSpecifications { get { return exploreOutputSpecifications; } }
+        public IList<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
 
         // Error Processing
 
-        public List<string> errorMessages = new List<string>();
-        public IList<string> ErrorMessages { get { return errorMessages; } }
+        public IList<string> ErrorMessages { get; } = new List<string>();
 
 #endregion
 
@@ -307,13 +298,13 @@ namespace NUnit.Common
                 v => ApplyTestParameter(RequiredValue(v, "--testparam")));
 
             this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
-                v => defaultTimeout = RequiredInt(v, "--timeout"));
+                v => DefaultTimeout = RequiredInt(v, "--timeout"));
 
             this.Add("seed=", "Set the random {SEED} used to generate test cases.",
-                v => randomSeed = RequiredInt(v, "--seed"));
+                v => RandomSeed = RequiredInt(v, "--seed"));
 
             this.Add("workers=", "Specify the {NUMBER} of worker threads to be used in running tests. If not specified, defaults to 2 or the number of processors, whichever is greater.",
-                v => numWorkers = RequiredInt(v, "--workers"));
+                v => NumberOfTestWorkers = RequiredInt(v, "--workers"));
 
             this.Add("stoponerror", "Stop run immediately upon any test failure or error.",
                 v => StopOnError = v != null);

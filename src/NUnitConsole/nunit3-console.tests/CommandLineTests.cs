@@ -709,7 +709,7 @@ namespace NUnit.ConsoleRunner.Tests
             // Not copying this test file into releases
             Assume.That(testListPath, Does.Exist);
             var options = new ConsoleOptions("--testlist=" + testListPath);
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestList, Is.EqualTo(new[] {"AmazingTest"}));
         }
 
@@ -721,7 +721,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void SingleDeprecatedTestParameter()
         {
             var options = new ConsoleOptions("--params=X=5");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
         }
 
@@ -729,7 +729,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void TwoDeprecatedTestParametersInOneOption()
         {
             var options = new ConsoleOptions("--params:X=5;Y=7");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
@@ -737,7 +737,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void TwoDeprecatedTestParametersInSeparateOptions()
         {
             var options = new ConsoleOptions("-p:X=5", "-p:Y=7");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
@@ -745,7 +745,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void ThreeDeprecatedTestParametersInTwoOptions()
         {
             var options = new ConsoleOptions("--params:X=5;Y=7", "-p:Z=3");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" }, { "Z", "3" } }));
         }
 
@@ -760,7 +760,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void SingleTestParameter()
         {
             var options = new ConsoleOptions("--testparam=X=5");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
         }
 
@@ -768,7 +768,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void SemicolonsDoNotSplitTestParameters()
         {
             var options = new ConsoleOptions("--testparam:X=5;Y=7");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5;Y=7" } }));
         }
 
@@ -776,7 +776,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void TwoTestParametersInSeparateOptions()
         {
             var options = new ConsoleOptions("--testparam:X=5", "--testparam:Y=7");
-            Assert.That(options.errorMessages, Is.Empty);
+            Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
 
