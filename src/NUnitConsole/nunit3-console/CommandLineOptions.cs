@@ -288,6 +288,11 @@ namespace NUnit.Common
             this.Add("params|p=", "Deprecated and will be removed in a future release. Please use --testparam instead.",
                 v =>
                 {
+                    const string deprecationWarning = "--params is deprecated and will be removed in a future release. Please use --testparam instead.";
+
+                    if (!WarningMessages.Contains(deprecationWarning))
+                        WarningMessages.Add(deprecationWarning);
+
                     string parameters = RequiredValue( v, "--params");
 
                     foreach (string param in parameters.Split(new[] { ';' }))
