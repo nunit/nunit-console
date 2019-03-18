@@ -27,7 +27,7 @@ var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 //////////////////////////////////////////////////////////////////////
 
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var PACKAGE_DIR = PROJECT_DIR + "package/";
+var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NET35_BIN_DIR = BIN_DIR + "net35/";
 var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
@@ -97,7 +97,7 @@ Setup(context =>
             else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
                 suffix += "-pre-" + buildNumber;
             else
-                suffix += "-" + branch;
+                suffix += "-" + System.Text.RegularExpressions.Regex.Replace(branch, "[^0-9A-Za-z-]+", "-");
 
             // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
             if (suffix.Length > 21)
@@ -253,7 +253,7 @@ Task("TestNet20Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, NET35_BIN_DIR, ENGINE_TESTS, "TestEngine", ref ErrorDetail);
+        RunTest(NET20_CONSOLE, NET35_BIN_DIR, ENGINE_TESTS, "net35", ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ Task("TestNet20Console")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "TestConsole", ref ErrorDetail);
+        RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "net35", ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -279,12 +279,13 @@ Task("TestNetStandard16Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        if(IsDotNetCoreInstalled)
+        if (IsDotNetCoreInstalled)
         {
-            DotNetCoreExecute(NETCOREAPP11_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
-            {
-                FrameworkVersion = "1.1.2"  //1.1.2 as the highest version currently available on Appveyor
-            });
+            RunDotnetCoreTests(
+                NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
+                NETCOREAPP11_BIN_DIR,
+                "netcoreapp1.1",
+                ref ErrorDetail);
         }
         else
         {
@@ -302,12 +303,13 @@ Task("TestNetStandard20Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        if(IsDotNetCoreInstalled)
+        if (IsDotNetCoreInstalled)
         {
-            DotNetCoreExecute(NETCOREAPP20_BIN_DIR + ENGINE_TESTS, "", new DotNetCoreExecuteSettings 
-            {
-                FrameworkVersion = "2.0.6"
-            });
+            RunDotnetCoreTests(
+                NETCOREAPP20_BIN_DIR + ENGINE_TESTS,
+                NETCOREAPP20_BIN_DIR,
+                "netcoreapp2.0",
+                ref ErrorDetail);
         }
         else
         {
@@ -544,33 +546,56 @@ void CheckForError(ref List<string> errorDetail)
 // HELPER METHODS - TEST
 //////////////////////////////////////////////////////////////////////
 
-void RunTest(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
+FilePath GetResultXmlPath(string testAssembly, string framework)
+{
+    var assemblyName = System.IO.Path.GetFileNameWithoutExtension(testAssembly);
+
+    // Workaround for https://github.com/nunit/nunit-console/issues/501
+    CreateDirectory($@"test-results\{framework}");
+
+    return MakeAbsolute(new FilePath($@"test-results\{framework}\{assemblyName}.xml"));
+}
+
+void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, string framework, ref List<string> errorDetail)
 {
     int rc = StartProcess(
         MakeAbsolute(exePath),
         new ProcessSettings()
         {
+            Arguments = new ProcessArgumentBuilder()
+                .Append(testAssembly)
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(testAssembly, framework).FullPath)
+                .Render(),
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed",framework, rc));
+        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
     else if (rc < 0)
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
 
-void RunTest(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
+void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
+{
+    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
+}
+
+void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
 {
     int rc = StartProcess(
-        MakeAbsolute(exePath),
-        new ProcessSettings()
+        "dotnet",
+        new ProcessSettings
         {
-            Arguments = arguments,
+            Arguments = new ProcessArgumentBuilder()
+                .AppendQuoted(exePath.FullPath)
+                .Append(arguments)
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, framework).FullPath)
+                .Render(),
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed",framework, rc));
+        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
     else if (rc < 0)
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
