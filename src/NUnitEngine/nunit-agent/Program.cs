@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -22,42 +22,31 @@
 // ***********************************************************************
 
 using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
+using NUnit.Agent.AgentProtocol;
 using NUnit.Common;
 using NUnit.Engine;
-using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
 namespace NUnit.Agent
 {
-    public class NUnitTestAgent
+    public static class Program
     {
-        static Guid AgentId;
-        static string AgencyUrl;
-        static Process AgencyProcess;
-        static RemoteTestAgent Agent;
         private static Logger log;
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         public static void Main(string[] args)
         {
-            AgentId = new Guid(args[0]);
-            AgencyUrl = args[1];
-
             var traceLevel = InternalTraceLevel.Off;
             var pid = Process.GetCurrentProcess().Id;
             var debugArgPassed = false;
             var workDirectory = string.Empty;
-            var agencyPid = string.Empty;
+            var parentPid = string.Empty;
 
-            for (int i = 2; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 string arg = args[i];
 
@@ -73,7 +62,7 @@ namespace NUnit.Agent
                 }
                 else if (arg.StartsWith("--pid="))
                 {
-                    agencyPid = arg.Substring(6);
+                    parentPid = arg.Substring(6);
                 }
                 else if (arg.StartsWith("--work="))
                 {
@@ -83,12 +72,14 @@ namespace NUnit.Agent
 
             var logName = $"nunit-agent_{pid}.log";
             InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
-            log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
+            log = InternalTrace.GetLogger(typeof(Program));
 
             if (debugArgPassed)
                 TryLaunchDebugger();
 
-            LocateAgencyProcess(agencyPid);
+            var parentProcess = LocateParentProcess(int.Parse(parentPid));
+            if (parentProcess == null)
+                Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_PARENT_PROCESS);
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
@@ -129,22 +120,28 @@ namespace NUnit.Agent
             log.Info("Initializing Services");
             engine.Initialize();
 
-            log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(AgentId, AgencyUrl, engine.Services);
-
+            log.Info("Starting AgentServer");
             try
             {
-                if (Agent.Start())
-                    WaitForStop();
-                else
+                using (var standardStream = new DuplexStream(Console.OpenStandardInput(), Console.OpenStandardOutput(), keepOpen: true))
+                using (var server = new AgentServer(standardStream))
                 {
-                    log.Error("Failed to start RemoteTestAgent");
-                    Environment.Exit(AgentExitCodes.FAILED_TO_START_REMOTE_AGENT);
+                    server.Connect(engine.Services.GetService<ITestRunnerFactory>());
+
+                    log.Info("Running AgentServer");
+                    while (server.Read())
+                    {
+                        if (parentProcess.HasExited)
+                        {
+                            log.Error("Parent process has been terminated.");
+                            Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
-                log.Error("Exception in RemoteTestAgent. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
+                log.Error("Unexpected exception. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 Environment.Exit(AgentExitCodes.UNEXPECTED_EXCEPTION);
             }
             log.Info("Agent process {0} exiting cleanly", pid);
@@ -152,35 +149,18 @@ namespace NUnit.Agent
             Environment.Exit(AgentExitCodes.OK);
         }
 
-        private static void LocateAgencyProcess(string agencyPid)
+        private static Process LocateParentProcess(int parentPid)
         {
-            var agencyProcessId = int.Parse(agencyPid);
             try
             {
-                AgencyProcess = Process.GetProcessById(agencyProcessId);
+                return Process.GetProcessById(parentPid);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.Error($"Unable to connect to agency process with PID: {agencyProcessId}");
-                log.Error($"Failed with exception: {e.Message} {e.StackTrace}");
-                Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_AGENCY);
+                log.Error($"Unable to find parent process with PID: {parentPid}");
+                log.Error($"Failed with exception: {ex.Message} {ex.StackTrace}");
+                return null;
             }
-        }
-
-        private static void WaitForStop()
-        {
-            log.Debug("Waiting for stopSignal");
-
-            while (!Agent.WaitForStop(500))
-            {
-                if (AgencyProcess.HasExited)
-                {
-                    log.Error("Parent process has been terminated.");
-                    Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
-                }
-            }
-
-            log.Debug("Stop signal received");
         }
 
         private static void TryLaunchDebugger()

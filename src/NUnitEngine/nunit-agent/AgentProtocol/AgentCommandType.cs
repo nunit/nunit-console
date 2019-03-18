@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2017–2019 Charlie Poole, Rob Prouse
+// Copyright (c) 2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,15 +21,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-namespace NUnit.Common
+namespace NUnit.Agent
 {
-    internal static class AgentExitCodes
+    internal enum AgentCommandType : byte
     {
-        public const int OK = 0;
-        public const int PARENT_PROCESS_TERMINATED = -1;
-        public const int DEBUGGER_SECURITY_VIOLATION = -3;
-        public const int DEBUGGER_NOT_IMPLEMENTED = -4;
-        public const int UNABLE_TO_LOCATE_PARENT_PROCESS = -5;
-        public const int UNEXPECTED_EXCEPTION = -100;
+        Load = 1,
+        Reload = 2,
+        Unload = 3,
+        CountTestCases = 4,
+        Explore = 5,
+        Run = 6,
+        StopRun = 7
     }
 }

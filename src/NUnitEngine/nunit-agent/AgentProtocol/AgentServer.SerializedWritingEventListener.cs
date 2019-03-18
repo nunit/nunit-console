@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2017–2019 Charlie Poole, Rob Prouse
+// Copyright (c) 2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,15 +21,29 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-namespace NUnit.Common
+using NUnit.Engine;
+using System.IO;
+
+namespace NUnit.Agent.AgentProtocol
 {
-    internal static class AgentExitCodes
+    internal sealed partial class AgentServer
     {
-        public const int OK = 0;
-        public const int PARENT_PROCESS_TERMINATED = -1;
-        public const int DEBUGGER_SECURITY_VIOLATION = -3;
-        public const int DEBUGGER_NOT_IMPLEMENTED = -4;
-        public const int UNABLE_TO_LOCATE_PARENT_PROCESS = -5;
-        public const int UNEXPECTED_EXCEPTION = -100;
+        private sealed class SerializedWritingEventListener : ITestEventListener
+        {
+            private readonly BinaryWriter _writer;
+
+            public SerializedWritingEventListener(BinaryWriter writer)
+            {
+                _writer = writer;
+            }
+
+            public void OnTestEvent(string report)
+            {
+                // The framework never calls OnTestEvent concurrently, so queuing is not needed.
+                const bool isEvent = true;
+                _writer.Write(isEvent);
+                _writer.Write(report);
+            }
+        }
     }
 }

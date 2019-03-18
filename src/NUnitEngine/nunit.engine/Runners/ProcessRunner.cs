@@ -21,17 +21,19 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.Net.Sockets;
 using NUnit.Common;
+using NUnit.Engine.AgentProtocol;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Runners
 {
     /// <summary>
     /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
-    public class ProcessRunner : AbstractTestRunner
+    public partial class ProcessRunner : AbstractTestRunner
     {
         // ProcessRunner is given a TestPackage containing a single assembly
         // multiple assemblies, a project, multiple projects or a mix. It loads
@@ -41,15 +43,26 @@ namespace NUnit.Engine.Runners
         // level, the ProcessRunner should create an XML node for the entire
         // project, aggregating the assembly results.
 
-        private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
-        private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
-
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private ITestEngineRunner _remoteRunner;
+        private AgentClient _agentClient;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
+        }
+
+        private AgentClient GetAgentClient()
+        {
+            if (_agentClient == null)
+            {
+                var startInfo = CreateAgentProcessStartInfo(TestPackage, Services.GetService<RuntimeFrameworkService>());
+
+                _agentClient = new AgentClient(new DuplexStandardProcessStream(startInfo));
+
+                _agentClient.Connect(TestPackage);
+            }
+
+            return _agentClient;
         }
 
         /// <summary>
@@ -62,13 +75,12 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                CreateAgentAndRunner();
-                return _remoteRunner.Explore(filter);
+                return GetAgentClient().Explore(filter);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
-                return CreateFailedResult(e);
+                log.Error("Failed to run remote tests. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
+                return CreateFailedResult(TestPackage, ex);
             }
         }
 
@@ -81,19 +93,7 @@ namespace NUnit.Engine.Runners
             log.Info("Loading " + TestPackage.Name);
             Unload();
 
-            try
-            {
-                CreateAgentAndRunner();
-
-                return _remoteRunner.Load();
-            }
-            catch (Exception)
-            {
-                // TODO: Check if this is really needed
-                // Clean up if the load failed
-                Unload();
-                throw;
-            }
+            return GetAgentClient().Load();
         }
 
         /// <summary>
@@ -104,17 +104,12 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                if (_remoteRunner != null)
-                {
-                    log.Info("Unloading " + TestPackage.Name);
-                    _remoteRunner.Unload();
-                    _remoteRunner = null;
-                }
+                log.Info("Unloading " + TestPackage.Name);
+                GetAgentClient().Unload();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.Warning("Failed to unload the remote runner. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
-                _remoteRunner = null;
+                log.Warning("Failed to unload the remote runner. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 throw;
             }
         }
@@ -129,13 +124,11 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                CreateAgentAndRunner();
-
-                return _remoteRunner.CountTestCases(filter);
+                return GetAgentClient().CountTestCases(filter);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.Error("Failed to count remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
+                log.Error("Failed to count remote tests. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 return 0;
             }
         }
@@ -152,16 +145,14 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                CreateAgentAndRunner();
-
-                var result = _remoteRunner.Run(listener, filter);
+                var result = GetAgentClient().Run(listener, filter);
                 log.Info("Done running " + TestPackage.Name);
                 return result;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
-                return CreateFailedResult(e);
+                log.Error("Failed to run remote tests. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
+                return CreateFailedResult(TestPackage, ex);
             }
         }
 
@@ -179,15 +170,13 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                CreateAgentAndRunner();
-
-                return _remoteRunner.RunAsync(listener, filter);
+                return GetAgentClient().RunAsync(listener, filter);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
+                log.Error("Failed to run remote tests. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 var result = new AsyncTestEngineResult();
-                result.SetResult(CreateFailedResult(e));
+                result.SetResult(CreateFailedResult(TestPackage, ex));
                 return result;
             }
         }
@@ -198,120 +187,73 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
-            if (_remoteRunner != null)
+            if (_agentClient == null) return;
+
+            try
             {
-                try
-                {
-                    _remoteRunner.StopRun(force);
-                }
-                catch (Exception e)
-                {
-                    log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
-                }
+                GetAgentClient().StopRun(force);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Failed to stop the remote run. " + ExceptionHelper.BuildMessageAndStackTrace(ex));
             }
         }
 
         protected override void Dispose(bool disposing)
         {
+            if (_disposed || !disposing) return;
+            _disposed = true;
+
             // Disposal has to perform two actions, unloading the runner and
             // stopping the agent. Both must be tried even if one fails so
             // there can be up to two independent errors to be reported
             // through an NUnitEngineException. We do that by combining messages.
-            if (!_disposed && disposing)
+            Exception unloadException = null;
+
+            try
             {
-                _disposed = true;
+                Unload();
+            }
+            catch (Exception ex)
+            {
+                // Save and log the unload error
+                unloadException = ex;
+                log.Error(ExceptionHelper.BuildMessage(ex));
+                log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
+            }
 
-                Exception unloadException = null;
-
+            if (_agentClient != null)
+            {
+                log.Debug("Stopping remote agent");
                 try
                 {
-                    Unload();
+                    _agentClient.Dispose();
                 }
                 catch (Exception ex)
                 {
-                    // Save and log the unload error
-                    unloadException = ex;
-                    log.Error(ExceptionHelper.BuildMessage(ex));
-                    log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
+                    var stopError = "Failed to stop the remote agent. " + ExceptionHelper.BuildMessage(ex) + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
+                    log.Error(stopError);
+
+                    // Stop error with no unload error, just rethrow
+                    if (unloadException == null)
+                        throw;
+
+                    // Both kinds of errors, throw exception with combined message
+                    throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
                 }
-
-                if (_agent != null && _agency.IsAgentRunning(_agent.Id))
-                {
-                    try
-                    {
-                        log.Debug("Stopping remote agent");
-                        _agent.Stop();
-                    }
-                    catch (SocketException se)
-                    {
-                        var exitCode = _agency.GetAgentExitCode(_agent.Id);
-
-                        if (exitCode.HasValue && exitCode == 0)
-                        {
-                            log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
-                        }
-                        else
-                        {
-
-                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
-                            log.Error(stopError);
-
-                            // Stop error with no unload error, just rethrow
-                            if (unloadException == null)
-                                throw;
-
-                            // Both kinds of errors, throw exception with combined message
-                            throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e);
-                        log.Error(stopError);
-
-                        // Stop error with no unload error, just rethrow
-                        if (unloadException == null)
-                            throw;
-
-                        // Both kinds of errors, throw exception with combined message
-                        throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
-                    }
-                    finally
-                    {
-                        _agent = null;
-                    }
-                }
-
-                if (unloadException != null) // Add message line indicating we managed to stop agent anyway
-                    throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
-            }
-        }
-
-        private void CreateAgentAndRunner()
-        {
-            if (_agent == null)
-            {
-                // Increase the timeout to give time to attach a debugger
-                bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
-                             TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
-
-                _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
-
-                if (_agent == null)
-                    throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
-            if (_remoteRunner == null)
-                _remoteRunner = _agent.CreateRunner(TestPackage);
+            if (unloadException != null) // Add message line indicating we managed to stop agent anyway
+                throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
         }
 
-        TestEngineResult CreateFailedResult(Exception e)
+        private static TestEngineResult CreateFailedResult(TestPackage testPackage, Exception ex)
         {
             var suite = XmlHelper.CreateTopLevelElement("test-suite");
             XmlHelper.AddAttribute(suite, "type", "Assembly");
-            XmlHelper.AddAttribute(suite, "id", TestPackage.ID);
-            XmlHelper.AddAttribute(suite, "name", TestPackage.Name);
-            XmlHelper.AddAttribute(suite, "fullname", TestPackage.FullName);
+            XmlHelper.AddAttribute(suite, "id", testPackage.ID);
+            XmlHelper.AddAttribute(suite, "name", testPackage.Name);
+            XmlHelper.AddAttribute(suite, "fullname", testPackage.FullName);
             XmlHelper.AddAttribute(suite, "runstate", "NotRunnable");
             XmlHelper.AddAttribute(suite, "testcasecount", "1");
             XmlHelper.AddAttribute(suite, "result", "Failed");
@@ -327,10 +269,11 @@ namespace NUnit.Engine.Runners
             XmlHelper.AddAttribute(suite, "asserts", "0");
 
             var failure = suite.AddElement("failure");
-            failure.AddElementWithCDataSection("message", ExceptionHelper.BuildMessage(e));
-            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildMessageAndStackTrace(e));
+            failure.AddElementWithCDataSection("message", ExceptionHelper.BuildMessage(ex));
+            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildMessageAndStackTrace(ex));
 
             return new TestEngineResult(suite);
         }
     }
 }
+#endif

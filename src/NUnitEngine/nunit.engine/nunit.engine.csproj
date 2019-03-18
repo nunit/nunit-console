@@ -21,6 +21,7 @@
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" />
+    <Compile Include="..\nunit-agent\AgentProtocol\AgentCommandType.cs" LinkBase="AgentProtocol" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
