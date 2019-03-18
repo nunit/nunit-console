@@ -153,13 +153,37 @@ Task("UpdateAssemblyInfo")
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings CreateMSBuildSettings(string target) => new MSBuildSettings()
-    .SetConfiguration(configuration)
-    .SetVerbosity(Verbosity.Minimal)
-    .WithProperty("PackageVersion", productVersion)
-    .WithTarget(target)
-    // Workaround for https://github.com/Microsoft/msbuild/issues/3626
-    .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
+MSBuildSettings CreateMSBuildSettings(string target)
+{
+    var settings = new MSBuildSettings()
+        .SetConfiguration(configuration)
+        .SetVerbosity(Verbosity.Minimal)
+        .WithProperty("PackageVersion", productVersion)
+        .WithTarget(target)
+        // Workaround for https://github.com/Microsoft/msbuild/issues/3626
+        .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
+
+    if (IsRunningOnWindows())
+    {
+        // The fallback is in case only a preview of VS is installed.
+        var vsInstallation =
+            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" })
+            ?? VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
+
+        if (vsInstallation != null)
+        {
+            var msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\Current\Bin\MSBuild.exe");
+
+            if (!FileExists(msBuildPath))
+                msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
+
+            if (FileExists(msBuildPath))
+                settings.ToolPath = msBuildPath;
+        }
+    }
+
+    return settings;
+}
 
 Task("Build")
     .Description("Builds the engine and console")
