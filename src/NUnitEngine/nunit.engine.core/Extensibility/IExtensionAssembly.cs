@@ -26,7 +26,8 @@ using System;
 
 namespace NUnit.Engine.Extensibility
 {
-    internal interface IExtensionAssembly
+    // TODO: Temporarily public
+    public interface IExtensionAssembly
     {
         bool FromWildCard { get; }
         string AssemblyName { get; }

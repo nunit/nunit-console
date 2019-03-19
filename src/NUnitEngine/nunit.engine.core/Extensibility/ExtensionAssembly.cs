@@ -29,7 +29,8 @@ using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Extensibility
 {
-    internal class ExtensionAssembly : IExtensionAssembly
+    // TODO: Temporarily public
+    public class ExtensionAssembly : IExtensionAssembly
     {
         private readonly TargetFrameworkHelper _targetFrameworkHelper;
 

@@ -37,6 +37,7 @@ namespace NUnit.Engine.Extensibility
     /// on a particular extension point. It stores information needed to
     /// activate the extension object on a just-in-time basis.
     /// </summary>
+    // TODO: Temporarily public
     public class ExtensionNode : IExtensionNode
     {
         private object _extensionObject;
