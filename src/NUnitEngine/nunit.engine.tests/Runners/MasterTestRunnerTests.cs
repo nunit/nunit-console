@@ -82,7 +82,19 @@ namespace NUnit.Engine.Runners.Tests
             new AssemblyData("mock-assembly.dll", "Runnable", MockAssembly.Tests, MockAssembly.PassedInAttribute, MockAssembly.Failed, MockAssembly.Skipped, MockAssembly.Inconclusive);
 
         static AssemblyData NoTestsAssemblyData =
-            new AssemblyData("notests-assembly.dll", "NotRunnable", 0, 0, 0, 0, 0);
+            new AssemblyData("empty-assembly.dll", "NotRunnable", 0, 0, 0, 0, 0);
+
+        static AssemblyData Project1Data =
+            new AssemblyData("project1.nunit", "Runnable", MockAssembly.Tests, MockAssembly.PassedInAttribute, MockAssembly.Failed, MockAssembly.Skipped, MockAssembly.Inconclusive);
+
+        static AssemblyData Project2Data =
+            new AssemblyData("project2.nunit", "Runnable", 2*MockAssembly.Tests, 2*MockAssembly.PassedInAttribute, 2*MockAssembly.Failed, 2*MockAssembly.Skipped, 2*MockAssembly.Inconclusive);
+
+        static AssemblyData Project3Data =
+            new AssemblyData("project3.nunit", "Runnable", 0, 0, 0, 0, 0);
+
+        static AssemblyData Project4Data =
+            new AssemblyData("project4.nunit", "Runnable", 0, 0, 0, 0, 0);
 
         static TestRunData[] FixtureData = new TestRunData[]
         {
@@ -91,32 +103,32 @@ namespace NUnit.Engine.Runners.Tests
 #if NETCOREAPP1_1
             new TestRunData( "mock-assembly.dll", typeof(LocalTestRunner), MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notests-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData )
+            new TestRunData( "empty-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
+            new TestRunData( "empty-assembly.dll,empty-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "mock-assembly.dll,empty-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData )
             // .NET Standard 1.6 doesn't support projects.
 #elif NETCOREAPP2_0
             new TestRunData( "mock-assembly.dll", typeof(LocalTestRunner), MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notests-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), MockAssemblyData ),
-            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit,notests-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData, MockAssemblyData, MockAssemblyData)
+            new TestRunData( "empty-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
+            new TestRunData( "empty-assembly.dll,empty-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "mock-assembly.dll,empty-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), Project1Data ),
+            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), Project2Data ),
+            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), Project3Data ),
+            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), Project4Data ),
+            new TestRunData( "project1.nunit,empty-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), Project1Data, NoTestsAssemblyData, Project2Data)
 #else
             new TestRunData( "mock-assembly.dll", typeof(TestDomainRunner), MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notests-assembly.dll", typeof(TestDomainRunner), NoTestsAssemblyData ),
-            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(MultipleTestDomainRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), MockAssemblyData ),
-            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit,notests-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData, MockAssemblyData, MockAssemblyData)
+            new TestRunData( "empty-assembly.dll", typeof(TestDomainRunner), NoTestsAssemblyData ),
+            new TestRunData( "empty-assembly.dll,empty-assembly.dll", typeof(MultipleTestDomainRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "mock-assembly.dll,empty-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestsAssemblyData ),
+            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), Project1Data ),
+            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), Project2Data ),
+            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), Project3Data ),
+            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), Project4Data ),
+            new TestRunData( "project1.nunit,empty-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), Project1Data, NoTestsAssemblyData, Project2Data)
 #endif
         };
 
@@ -184,6 +196,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode child in suites)
             {
                 var data = _data[i++];
+                Assert.That(child.GetAttribute("name"), Is.EqualTo(data.Name));
                 Assert.That(child.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(child.GetAttribute("runstate"), Is.EqualTo(data.RunState));
             }
@@ -207,6 +220,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode child in result.SelectNodes("test-suite"))
             {
                 var data = _data[i++];
+                Assert.That(child.GetAttribute("name"), Is.EqualTo(data.Name));
                 Assert.That(child.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(child.GetAttribute("runstate"), Is.EqualTo(data.RunState));
             }
@@ -236,6 +250,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode suite in suites)
             {
                 var data = _data[i++];
+                Assert.That(suite.GetAttribute("name"), Is.EqualTo(data.Name));
                 Assert.That(suite.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(suite.GetAttribute("runstate"), Is.EqualTo(data.RunState));
             }
@@ -281,6 +296,7 @@ namespace NUnit.Engine.Runners.Tests
             foreach (XmlNode suite in suites)
             {
                 var data = _data[i++];
+                Assert.That(suite.GetAttribute("name"), Is.EqualTo(data.Name));
                 Assert.That(suite.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
                 Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
                 Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(data.Passed));

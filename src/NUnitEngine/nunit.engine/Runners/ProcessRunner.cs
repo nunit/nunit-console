@@ -76,7 +76,11 @@ namespace NUnit.Engine.Runners
             try
             {
                 CreateAgentAndRunner();
-                return _remoteRunner.Explore(filter);
+
+                var result = _remoteRunner.Explore(filter);
+                return TestPackage.IsProjectPackage()
+                    ? result.MakeProjectResult(TestPackage)
+                    : result;
             }
             catch (Exception e)
             {
@@ -98,7 +102,10 @@ namespace NUnit.Engine.Runners
             {
                 CreateAgentAndRunner();
 
-                return _remoteRunner.Load();
+                var result = _remoteRunner.Load();
+                return TestPackage.IsProjectPackage()
+                    ? result.MakeProjectResult(TestPackage)
+                    : result;
             }
             catch (Exception)
             {
@@ -169,7 +176,9 @@ namespace NUnit.Engine.Runners
 
                 var result = _remoteRunner.Run(listener, filter);
                 log.Info("Done running " + TestPackage.Name);
-                return result;
+                return TestPackage.IsProjectPackage()
+                    ? result.MakeProjectResult(TestPackage)
+                    : result;
             }
             catch (Exception e)
             {

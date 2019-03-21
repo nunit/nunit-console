@@ -111,7 +111,9 @@ namespace NUnit.Engine.Runners
                 result.Add(driverResult);
             }
 
-            return result;
+            return TestPackage.IsProjectPackage()
+                ? result.MakeProjectResult(TestPackage)
+                : result;
         }
 
         /// <summary>
@@ -154,7 +156,10 @@ namespace NUnit.Engine.Runners
                 result.Add(LoadDriver(driver, testFile, subPackage));
                 _drivers.Add(driver);
             }
-            return result;
+
+            return TestPackage.IsProjectPackage()
+                ? result.MakeProjectResult(TestPackage)
+                : result;
         }
 
         private static string LoadDriver(IFrameworkDriver driver, string testFile, TestPackage subPackage)
@@ -234,7 +239,9 @@ namespace NUnit.Engine.Runners
                     _assemblyResolver.RemovePathFromFile(package.FullName);
             }
 #endif
-            return result;
+            return TestPackage.IsProjectPackage()
+                ? result.MakeProjectResult(TestPackage)
+                : result;
         }
 
         /// <summary>

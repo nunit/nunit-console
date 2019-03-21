@@ -52,7 +52,7 @@ namespace NUnit.Engine.Runners
         // MasterTestRUnner is responsible for creating the test-run
         // element, which wraps all the individual assembly and project
         // results.
-        private const string TEST_RUN_ELEMENT = "test-run";
+
         private readonly ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
 #if !NETSTANDARD1_6
@@ -122,8 +122,8 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the loaded assembly.</returns>
         public XmlNode Load()
         {
-            LoadResult = PrepareResult(_engineRunner.Load())
-                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+            LoadResult = _engineRunner.Load()
+                .MakeTestRunResult(TestPackage.ID, TestPackage.Name, TestPackage.FullName);
 
             return LoadResult.Xml;
         }
@@ -144,8 +144,8 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public XmlNode Reload()
         {
-            LoadResult = PrepareResult(_engineRunner.Reload())
-               .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+            LoadResult = _engineRunner.Reload()
+               .MakeTestRunResult(TestPackage.ID, TestPackage.Name, TestPackage.FullName);
 
             return LoadResult.Xml;
         }
@@ -171,7 +171,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode giving the result of the test execution</returns>
         public XmlNode Run(ITestEventListener listener, TestFilter filter)
         {
-            return PrepareResult(RunTests(listener, filter)).Xml;
+            return RunTests(listener, filter).Xml;
         }
 
 
@@ -206,8 +206,8 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            LoadResult = PrepareResult(_engineRunner.Explore(filter))
-                .Aggregate(TEST_RUN_ELEMENT, TestPackage.Name, TestPackage.FullName);
+            LoadResult = _engineRunner.Explore(filter)
+                .MakeTestRunResult(TestPackage.ID, TestPackage.Name, TestPackage.FullName);
 
             return LoadResult.Xml;
         }
@@ -270,18 +270,6 @@ namespace NUnit.Engine.Runners
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
             }
-        }
-
-        private TestEngineResult PrepareResult(TestEngineResult result)
-        {
-            if (result == null) throw new ArgumentNullException("result");
-
-            if (!IsProjectPackage(TestPackage))
-            {
-                return result;
-            }
-
-            return result.MakePackageResult(TestPackage.Name, TestPackage.FullName);
         }
 
         private void EnsurePackagesAreExpanded(TestPackage package)
@@ -388,7 +376,7 @@ namespace NUnit.Engine.Runners
             DateTime startTime = DateTime.UtcNow;
             long startTicks = Stopwatch.GetTimestamp();
 
-            TestEngineResult result = _engineRunner.Run(eventDispatcher, filter).Aggregate("test-run", TestPackage.Name, TestPackage.FullName);
+            TestEngineResult result = _engineRunner.Run(eventDispatcher, filter).Aggregate("test-run", TestPackage.ID, TestPackage.Name, TestPackage.FullName);
 
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);

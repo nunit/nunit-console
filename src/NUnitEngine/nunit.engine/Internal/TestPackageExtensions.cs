@@ -43,6 +43,13 @@ namespace NUnit.Engine.Internal
             return package.SubPackages.Count > 0;
         }
 
+        public static bool IsProjectPackage(this TestPackage package)
+        {
+            // We may not have the project service available, so we assume that any expanded package
+            // is a project package. Check name to verify that it's not the anonymous command-line package.
+            return package.FullName != null && package.HasSubPackages();
+        }
+
         public static IList<TestPackage> Select(this TestPackage package, TestPackageSelectorDelegate selector)
         {
             var selection = new List<TestPackage>();

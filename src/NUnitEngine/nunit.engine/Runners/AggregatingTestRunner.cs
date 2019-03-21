@@ -105,7 +105,11 @@ namespace NUnit.Engine.Runners
             foreach (ITestEngineRunner runner in Runners)
                 results.Add(runner.Explore(filter));
 
-            return ResultHelper.Merge(results);
+            var mergedResult = ResultHelper.Merge(results);
+
+            return TestPackage.IsProjectPackage()
+                ? mergedResult.MakeProjectResult(TestPackage)
+                : mergedResult;
         }
 
         /// <summary>
@@ -119,7 +123,11 @@ namespace NUnit.Engine.Runners
             foreach (var runner in Runners)
                 results.Add(runner.Load());
 
-            return ResultHelper.Merge(results);
+            var mergedResult = ResultHelper.Merge(results);
+
+            return TestPackage.IsProjectPackage()
+                ? mergedResult.MakeProjectResult(TestPackage)
+                : mergedResult;
         }
 
         /// <summary>
@@ -184,7 +192,11 @@ namespace NUnit.Engine.Runners
 #endif
             if (disposeRunners) Runners.Clear();
 
-            return ResultHelper.Merge(results);
+            var mergedResult = ResultHelper.Merge(results);
+
+            return TestPackage.IsProjectPackage()
+                ? mergedResult.MakeProjectResult(TestPackage)
+                : mergedResult;
         }
 
         private void RunTestsSequentially(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
