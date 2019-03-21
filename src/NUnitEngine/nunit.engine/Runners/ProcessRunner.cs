@@ -21,12 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if !NETSTANDARD // Dependency on RuntimeFrameworkService
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
 using NUnit.Common;
 using NUnit.Engine.Agent;
 using NUnit.Engine.Internal;
@@ -37,7 +33,7 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
-    public partial class ProcessRunner : AbstractTestRunner
+    public class ProcessRunner : AbstractTestRunner
     {
         // ProcessRunner is given a TestPackage containing a single assembly
         // multiple assemblies, a project, multiple projects or a mix. It loads
@@ -49,7 +45,7 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private Process _agentProcess;
+        private AgentProcess _agentProcess;
         private AgentClient _agentClient;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
@@ -58,34 +54,10 @@ namespace NUnit.Engine.Runners
 
         private AgentClient GetAgentClient()
         {
-            if (_agentClient == null)
+            if (_agentProcess is null)
             {
-                var startInfo = CreateAgentProcessStartInfo(TestPackage, Services.GetService<RuntimeFrameworkService>());
-
-                startInfo.RedirectStandardInput = true;
-                startInfo.RedirectStandardOutput = true;
-
-                _agentProcess = Process.Start(startInfo);
-
-                while (true)
-                {
-                    var line = _agentProcess.StandardOutput.ReadLine();
-                    if (line is null) throw new NUnitEngineException("Agent process did not report that it was listening on a port.");
-
-                    const string prefix = "Listening on ";
-                    if (line.StartsWith(prefix))
-                    {
-                        var port = int.Parse(line.Substring(line.LastIndexOf(':') + 1));
-
-                        var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                        socket.Connect(new IPEndPoint(IPAddress.Loopback, port));
-
-                        _agentClient = new AgentClient(new NetworkStream(socket, ownsSocket: true));
-                        break;
-                    }
-                }
-
-                _agentClient.Connect(TestPackage);
+                _agentProcess = AgentProcess.Start(TestPackage, Services.GetService<RuntimeFrameworkService>());
+                _agentClient = _agentProcess.Connect(TestPackage);
             }
 
             return _agentClient;
@@ -213,7 +185,7 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
-            if (_agentClient == null) return;
+            if (_agentProcess == null) return;
 
             try
             {
@@ -248,12 +220,13 @@ namespace NUnit.Engine.Runners
                 log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
             }
 
-            if (_agentClient != null)
+            if (_agentProcess != null)
             {
                 log.Debug("Stopping remote agent");
                 try
                 {
                     _agentClient.Dispose();
+                    _agentProcess.Dispose();
                 }
                 catch (Exception ex)
                 {

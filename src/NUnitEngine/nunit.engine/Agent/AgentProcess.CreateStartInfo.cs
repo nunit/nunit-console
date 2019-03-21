@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if !NETSTANDARD // Dependency on RuntimeFrameworkService
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 using System;
@@ -29,9 +29,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace NUnit.Engine.Runners
+namespace NUnit.Engine.Agent
 {
-    public partial class ProcessRunner
+    internal partial class AgentProcess
     {
         private static ProcessStartInfo CreateAgentProcessStartInfo(TestPackage package, RuntimeFrameworkService runtimeFrameworkService)
         {
@@ -44,8 +44,6 @@ namespace NUnit.Engine.Runners
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
-            log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
-
             if (!targetRuntime.IsAvailable)
                 throw new ArgumentException($"The {targetRuntime} framework is not available.", nameof(package));
 
@@ -53,8 +51,6 @@ namespace NUnit.Engine.Runners
 
             if (!File.Exists(agentExePath))
                 throw new FileNotFoundException(Path.GetFileName(agentExePath) + " could not be found.", agentExePath);
-
-            log.Debug("Using nunit-agent at " + agentExePath);
 
             var startInfo = new ProcessStartInfo
             {
