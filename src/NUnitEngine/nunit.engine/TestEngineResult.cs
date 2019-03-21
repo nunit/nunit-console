@@ -23,9 +23,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.IO;
 using System.Xml;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine
 {
@@ -143,6 +142,26 @@ namespace NUnit.Engine
         {
             this._xmlText.Add(xml.OuterXml);
             this._xmlNodes.Add(xml);
+        }
+
+        public static void Serialize(TestEngineResult value, BinaryWriter writer)
+        {
+            writer.Write(checked((byte)value._xmlText.Count));
+
+            foreach (var text in value._xmlText)
+                writer.Write(text);
+        }
+
+        public static TestEngineResult Deserialize(BinaryReader reader)
+        {
+            var value = new TestEngineResult();
+
+            var count = reader.ReadByte();
+
+            for (var i = 0; i < count; i++)
+                value._xmlText.Add(reader.ReadString());
+
+            return value;
         }
     }
 }

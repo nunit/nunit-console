@@ -124,7 +124,7 @@ namespace NUnit.Agent.AgentProtocol
 
         private void WriteTestEngineResult(TestEngineResult result)
         {
-            _formatter.Serialize(_stream, result);
+            TestEngineResult.Serialize(result, _writer);
         }
     }
 }

@@ -168,7 +168,7 @@ namespace NUnit.Engine.AgentProtocol
 
         private TestEngineResult ReadTestEngineResult()
         {
-            return (TestEngineResult)_formatter.Deserialize(_stream);
+            return TestEngineResult.Deserialize(_reader);
         }
     }
 }
