@@ -23,8 +23,12 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using NUnit.Common;
-using NUnit.Engine.AgentProtocol;
+using NUnit.Engine.Agent;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
@@ -45,6 +49,7 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
+        private Process _agentProcess;
         private AgentClient _agentClient;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
@@ -57,7 +62,28 @@ namespace NUnit.Engine.Runners
             {
                 var startInfo = CreateAgentProcessStartInfo(TestPackage, Services.GetService<RuntimeFrameworkService>());
 
-                _agentClient = new AgentClient(new DuplexStandardProcessStream(startInfo));
+                startInfo.RedirectStandardInput = true;
+                startInfo.RedirectStandardOutput = true;
+
+                _agentProcess = Process.Start(startInfo);
+
+                while (true)
+                {
+                    var line = _agentProcess.StandardOutput.ReadLine();
+                    if (line is null) throw new NUnitEngineException("Agent process did not report that it was listening on a port.");
+
+                    const string prefix = "Listening on ";
+                    if (line.StartsWith(prefix))
+                    {
+                        var port = int.Parse(line.Substring(line.LastIndexOf(':') + 1));
+
+                        var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        socket.Connect(new IPEndPoint(IPAddress.Loopback, port));
+
+                        _agentClient = new AgentClient(new NetworkStream(socket, ownsSocket: true));
+                        break;
+                    }
+                }
 
                 _agentClient.Connect(TestPackage);
             }

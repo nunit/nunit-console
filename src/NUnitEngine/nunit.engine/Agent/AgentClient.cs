@@ -21,14 +21,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6
-using NUnit.Agent;
+#if !NETSTANDARD1_6 // Dependency on BinaryFormatter
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
-namespace NUnit.Engine.AgentProtocol
+namespace NUnit.Engine.Agent
 {
     internal sealed class AgentClient : IDisposable
     {

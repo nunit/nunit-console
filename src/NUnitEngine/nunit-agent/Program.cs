@@ -24,10 +24,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Security;
-using NUnit.Agent.AgentProtocol;
 using NUnit.Common;
 using NUnit.Engine;
+using NUnit.Engine.Agent;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
@@ -123,19 +124,37 @@ namespace NUnit.Agent
             log.Info("Starting AgentServer");
             try
             {
-                using (var standardStream = new DuplexStream(Console.OpenStandardInput(), Console.OpenStandardOutput(), keepOpen: true))
-                using (var server = new AgentServer(standardStream))
+                using (var server = AgentServer.Start(IPAddress.Loopback, engine.Services.GetService<ITestRunnerFactory>()))
                 {
-                    server.Connect(engine.Services.GetService<ITestRunnerFactory>());
+                    // Write to the console to let the parent process know which port Windows assigned
+                    Console.WriteLine("Listening on " + server.ListeningOn);
+                    log.Info("Listening on " + server.ListeningOn);
 
-                    log.Info("Running AgentServer");
-                    while (server.Read())
+                    Console.WriteLine("Type 'stop' to exit.");
+
+                    while (true)
                     {
-                        if (parentProcess.HasExited)
+                        var line = Console.ReadLine();
+                        if (line is null)
                         {
-                            log.Error("Parent process has been terminated.");
-                            Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
+                            if (parentProcess.HasExited)
+                            {
+                                log.Error("Parent process has been terminated.");
+                                Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
+                            }
+
+                            log.Info("Stopping AgentServer in response to standard input being closed.");
+                            break;
                         }
+
+                        if ("stop".Equals(line, StringComparison.OrdinalIgnoreCase))
+                        {
+                            log.Info("Stopping AgentServer in response to 'stop' command from standard input.");
+                            break;
+                        }
+
+                        log.Info($"Ignoring unrecognized command '{line}' from standard input.");
+                        Console.WriteLine($"Unrecognized command '{line}'.");
                     }
                 }
             }

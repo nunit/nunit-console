@@ -21,16 +21,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-namespace NUnit.Agent
+#if !NETSTANDARD1_6 // Dependency on AgentServerConnection
+using System.IO;
+
+namespace NUnit.Engine.Agent
 {
-    internal enum AgentCommandType : byte
+    internal sealed partial class AgentServerConnection
     {
-        Load = 1,
-        Reload = 2,
-        Unload = 3,
-        CountTestCases = 4,
-        Explore = 5,
-        Run = 6,
-        StopRun = 7
+        private sealed class EventListener : ITestEventListener
+        {
+            private readonly BinaryWriter _writer;
+
+            public EventListener(BinaryWriter writer)
+            {
+                _writer = writer;
+            }
+
+            public void OnTestEvent(string report)
+            {
+                // The framework never calls OnTestEvent concurrently, so queuing is not needed.
+                const bool isEvent = true;
+                _writer.Write(isEvent);
+                _writer.Write(report);
+            }
+        }
     }
 }
+#endif

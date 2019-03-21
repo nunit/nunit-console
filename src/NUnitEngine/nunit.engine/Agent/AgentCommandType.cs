@@ -21,29 +21,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using NUnit.Engine;
-using System.IO;
-
-namespace NUnit.Agent.AgentProtocol
+namespace NUnit.Engine.Agent
 {
-    internal sealed partial class AgentServer
+    internal enum AgentCommandType : byte
     {
-        private sealed class SerializedWritingEventListener : ITestEventListener
-        {
-            private readonly BinaryWriter _writer;
-
-            public SerializedWritingEventListener(BinaryWriter writer)
-            {
-                _writer = writer;
-            }
-
-            public void OnTestEvent(string report)
-            {
-                // The framework never calls OnTestEvent concurrently, so queuing is not needed.
-                const bool isEvent = true;
-                _writer.Write(isEvent);
-                _writer.Write(report);
-            }
-        }
+        Load = 1,
+        Reload = 2,
+        Unload = 3,
+        CountTestCases = 4,
+        Explore = 5,
+        Run = 6,
+        StopRun = 7
     }
 }
