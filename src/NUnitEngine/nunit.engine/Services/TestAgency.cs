@@ -186,7 +186,7 @@ namespace NUnit.Engine.Services
             if (debugAgent)
                 agentArgs += " --debug-agent";
             if (workDirectory != string.Empty)
-                agentArgs += " --work=" + workDirectory;
+                agentArgs += " --work=\"" + workDirectory + "\"";
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
