@@ -51,10 +51,55 @@ namespace NUnit.Engine.Runners
         /// </summary>
         public override void UnloadPackage()
         {
-            if (this.TestDomain != null)
+            var testDomain = TestDomain;
+            if (testDomain != null)
             {
-                _domainManager.Unload(this.TestDomain);
-                this.TestDomain = null;
+                /* Important: make sure TestDomain is null before unloading it.
+
+                Mono 5.18.0.240 somehow manages reentry *during* this UnloadPackage call and does a second call to _domainManager.Unload before this call returns.
+
+                Note the _ThreadPoolWaitCallback.PerformWaitCallback frame right above the first TestDomainRunner.UnloadPackage frame.
+
+                I ran out of time trying to figure out how this stack trace is even possible, but I did verify that:
+                 - it's the same TestDomainRunner instance
+                 - it's the same managed thread ID
+                 - the reentry isn't happening during the Thread.Join call in DomainUnloader.Unload because the problem still occurs with the same stack trace
+                   when it calls UnloadOnThread directly rather than starting and joining a thread.
+
+                The reentry must be caused by the AppDomain.Unload call somehow?
+                Looks like Environment.Exit can have a similar reentry effect: https://github.com/SignalR/SignalR/issues/3101
+                But I don't understand it at all and can't reproduce it on Windows.
+
+                    at System.Environment.get_StackTrace () [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at NUnit.Engine.Runners.TestDomainRunner.UnloadPackage () [0x00000] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Runners.AbstractTestRunner.Unload () [0x00000] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Runners.AbstractTestRunner.Dispose (System.Boolean disposing) [0x00000] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Runners.AbstractTestRunner.Dispose () [0x00000] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Agent.AgentServerConnection.Dispose () [0x00000] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Agent.AgentServer.RunConnectionSynchronously (System.Object state) [0x00000] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at NUnit.Engine.Runners.TestDomainRunner.UnloadPackage () [0x0008b] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Runners.AbstractTestRunner.Unload () [0x00001] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Runners.AbstractTestRunner.Dispose (System.Boolean disposing) [0x00014] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Runners.AbstractTestRunner.Dispose () [0x00001] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Agent.AgentServerConnection.Dispose () [0x0000b] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at NUnit.Engine.Agent.AgentServer.RunConnectionSynchronously (System.Object state) [0x00030] in <f769c39a7c7b4dd6a9239413413817b2>:0
+                    at System.Threading.QueueUserWorkItemCallback.WaitCallback_Context (System.Object state) [0x00007] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.ExecutionContext.RunInternal (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00071] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.ExecutionContext.Run (System.Threading.ExecutionContext executionContext, System.Threading.ContextCallback callback, System.Object state, System.Boolean preserveSyncCtx) [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.QueueUserWorkItemCallback.System.Threading.IThreadPoolWorkItem.ExecuteWorkItem () [0x00021] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading.ThreadPoolWorkQueue.Dispatch () [0x00074] in <04750267503a43e5929c1d1ba19daf3e>:0
+                    at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback () [0x00000] in <04750267503a43e5929c1d1ba19daf3e>:0
+                */
+
+                TestDomain = null;
+
+                _domainManager.Unload(testDomain);
             }
         }
     }
