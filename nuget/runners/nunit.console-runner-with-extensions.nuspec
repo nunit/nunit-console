@@ -30,12 +30,12 @@
     <copyright>Copyright (c) 2019 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group>
-          <dependency id="NUnit.ConsoleRunner" version="$version$" />
-          <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.5.0" />
-          <dependency id="NUnit.Extension.VSProjectLoader" version="3.8.0" />
-          <dependency id="NUnit.Extension.NUnitV2ResultWriter" version="3.5.0" />
-          <dependency id="NUnit.Extension.NUnitV2Driver" version="3.6.0" />
-        <dependency id="NUnit.Extension.TeamCityEventListener" version="1.0.3" />
+        <dependency id="NUnit.ConsoleRunner" version="$version$" />
+        <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.6.0" />
+        <dependency id="NUnit.Extension.VSProjectLoader" version="3.8.0" />
+        <dependency id="NUnit.Extension.NUnitV2ResultWriter" version="3.6.0" />
+        <dependency id="NUnit.Extension.NUnitV2Driver" version="3.7.0" />
+        <dependency id="NUnit.Extension.TeamCityEventListener" version="1.0.6" />
       </group>
     </dependencies>
   </metadata>
