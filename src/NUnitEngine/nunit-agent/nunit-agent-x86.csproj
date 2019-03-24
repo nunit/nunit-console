@@ -12,6 +12,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <IntermediateOutputPath>obj\$(Configuration)\x86\</IntermediateOutputPath>
     <LangVersion>7</LangVersion>
+    <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Runtime.Remoting" />
