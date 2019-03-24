@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
 [assembly: AssemblyTitle("NUnit .NET Standard Engine")]
 [assembly: AssemblyDescription("Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard")]
 #else

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -51,7 +51,11 @@ namespace NUnit.Engine.Services
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
+#if NETSTANDARD1_6
+        public IFrameworkDriver GetDriver(string assemblyPath, bool skipNonTestAssemblies)
+#else
         public IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies)
+#endif
         {
             if (!File.Exists(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, "File not found: " + assemblyPath);
@@ -59,17 +63,19 @@ namespace NUnit.Engine.Services
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, "File type is not supported");
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
             if (targetFramework != null)
             {
-                // This takes care of an issue with Roslyn. It may get fixed, but we still 
+                // This takes care of an issue with Roslyn. It may get fixed, but we still
                 // have to deal with assemblies having this setting. I'm assuming that
                 // any true Portable assembly would have a Profile as part of its name.
                 var platform = targetFramework == ".NETPortable,Version=v5.0"
                     ? ".NETStandard"
                     : targetFramework.Split(new char[] { ',' })[0];
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
-                    return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not yet supported by the engine");
+                    return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not supported by this version of the engine");
             }
+#endif
 
             try
             {
@@ -91,7 +97,11 @@ namespace NUnit.Engine.Services
                     foreach (var reference in references)
                     {
                         if (factory.IsSupportedTestFramework(reference))
+#if NETSTANDARD1_6 || NETSTANDARD2_0
+                            return factory.GetDriver(reference);
+#else
                             return factory.GetDriver(domain, reference);
+#endif
                     }
                 }
             }
@@ -117,16 +127,20 @@ namespace NUnit.Engine.Services
 
             try
             {
+#if NET20 || NETSTANDARD2_0
                 var extensionService = ServiceContext.GetService<ExtensionService>();
                 if (extensionService != null)
                 {
                     foreach (IDriverFactory factory in extensionService.GetExtensions<IDriverFactory>())
                         _factories.Add(factory);
 
+#if NET20
                     var node = extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
                     if (node != null)
                         _factories.Add(new NUnit2DriverFactory(node));
+#endif
                 }
+#endif
 
                 _factories.Add(new NUnit3DriverFactory());
 

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -40,6 +40,15 @@ namespace NUnit.Engine.Extensibility
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         bool IsSupportedTestFramework(AssemblyName reference);
 
+#if NETSTANDARD1_6 || NETSTANDARD2_0
+        /// <summary>
+        /// Gets a driver for a given test assembly and a framework
+        /// which the assembly is already known to reference.
+        /// </summary>
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        /// <returns></returns>
+        IFrameworkDriver GetDriver(AssemblyName reference);
+#else
         /// <summary>
         /// Gets a driver for a given test assembly and a framework
         /// which the assembly is already known to reference.
@@ -48,5 +57,6 @@ namespace NUnit.Engine.Extensibility
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
         /// <returns></returns>
         IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference);
+#endif
     }
 }

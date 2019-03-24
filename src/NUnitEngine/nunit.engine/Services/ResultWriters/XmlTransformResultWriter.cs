@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 using System.IO;
 using System.Text;
@@ -48,7 +49,15 @@ namespace NUnit.Engine.Services
 
             try
             {
-                _transform.Load(_xsltFile);
+                var settings = new XmlReaderSettings();
+#if NET20
+                settings.ProhibitDtd = false;
+                settings.XmlResolver = null;
+#else
+                settings.DtdProcessing = DtdProcessing.Ignore;
+#endif
+                using (var xmlReader = XmlReader.Create(_xsltFile, settings))
+                    _transform.Load(xmlReader);
             }
             catch (Exception ex)
             {
@@ -65,7 +74,7 @@ namespace NUnit.Engine.Services
         {
             using ( new StreamWriter( outputPath, false ) )
             {
-                // We don't need to check if the XSLT file exists, 
+                // We don't need to check if the XSLT file exists,
                 // that would have thrown in the constructor
             }
         }
@@ -89,3 +98,4 @@ namespace NUnit.Engine.Services
         }
     }
 }
+#endif

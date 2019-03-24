@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -27,18 +27,21 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// DefaultTestRunnerFactory handles creation of a suitable test 
-    /// runner for a given package to be loaded and run either in a 
-    /// separate process or within the same process. 
+    /// DefaultTestRunnerFactory handles creation of a suitable test
+    /// runner for a given package to be loaded and run either in a
+    /// separate process or within the same process.
     /// </summary>
     public class DefaultTestRunnerFactory : InProcessTestRunnerFactory, ITestRunnerFactory
     {
+#if !NETSTANDARD1_6
         private IProjectService _projectService;
+#endif
 
         #region Service Overrides
 
         public override void StartService()
         {
+#if !NETSTANDARD1_6
             // TestRunnerFactory requires the ProjectService
             _projectService = ServiceContext.GetService<IProjectService>();
 
@@ -46,12 +49,13 @@ namespace NUnit.Engine.Services
             Status = _projectService != null && ((IService)_projectService).Status == ServiceStatus.Started
                 ? ServiceStatus.Started
                 : ServiceStatus.Error;
+#else
+            Status = ServiceStatus.Started;
+#endif
         }
 
         #endregion
 
-        #region InProcessTestRunnerFactory Overrides
-        
         /// <summary>
         /// Returns a test runner based on the settings in a TestPackage.
         /// Any setting that is "consumed" by the factory is removed, so
@@ -62,7 +66,6 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public override ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-
             int assemblyCount = 0;
             int projectCount = 0;
 
@@ -72,8 +75,10 @@ namespace NUnit.Engine.Services
 
                 if (PathUtils.IsAssemblyFileType(testFile))
                     assemblyCount++;
+#if !NETSTANDARD1_6
                 else if (_projectService.CanLoadFrom(testFile))
                     projectCount++;
+#endif
             }
 
             // If we have multiple projects or a project plus assemblies
@@ -84,6 +89,14 @@ namespace NUnit.Engine.Services
             // really matter since they will result in an error anyway.
             if (projectCount > 1 || projectCount > 0 && assemblyCount > 0)
                 return new AggregatingTestRunner(ServiceContext, package);
+
+#if NETSTANDARD1_6 || NETSTANDARD2_0
+            if (projectCount > 0 || package.SubPackages.Count > 1)
+                return new AggregatingTestRunner(ServiceContext, package);
+
+            return base.MakeTestRunner(package);
+        }
+#else
 
             ProcessModel processModel = GetTargetProcessModel(package);
 
@@ -105,7 +118,10 @@ namespace NUnit.Engine.Services
                     return new ProcessRunner(this.ServiceContext, package);
 
                 case ProcessModel.InProcess:
-                    return base.MakeTestRunner(package);
+                    if (projectCount > 0)
+                        return new AggregatingTestRunner(ServiceContext, package);
+                    else
+                        return base.MakeTestRunner(package);
             }
         }
 
@@ -126,9 +142,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        #region Helper Methods
+#region Helper Methods
 
         private ProcessModel GetTargetProcessModel(TestPackage package)
         {
@@ -137,6 +151,8 @@ namespace NUnit.Engine.Services
                 package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
         }
 
-        #endregion
+#endregion
+
+#endif
     }
 }

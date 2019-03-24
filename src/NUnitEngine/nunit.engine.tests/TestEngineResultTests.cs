@@ -37,7 +37,7 @@ namespace NUnit.Engine.Tests
         public void CanCreateFromXmlString()
         {
             TestEngineResult result = new TestEngineResult(xmlText);
-            Assert.True(result.IsSingle);
+            Assert.That(result.IsSingle, Is.True);
             Assert.That(result.Xml.Name, Is.EqualTo("test-assembly"));
             Assert.That(result.Xml.Attributes["result"].Value, Is.EqualTo("Passed"));
             Assert.That(result.Xml.Attributes["total"].Value, Is.EqualTo("23"));
@@ -61,7 +61,7 @@ namespace NUnit.Engine.Tests
             XmlHelper.AddAttribute(node, "asserts", "40");
 
             TestEngineResult result = new TestEngineResult(node);
-            Assert.True(result.IsSingle);
+            Assert.That(result.IsSingle, Is.True);
             Assert.That(result.Xml.OuterXml, Is.EqualTo(xmlText));
         }
     }

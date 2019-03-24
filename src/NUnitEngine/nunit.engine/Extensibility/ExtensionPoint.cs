@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 using System.Collections.Generic;
 
@@ -95,8 +96,8 @@ namespace NUnit.Engine.Extensibility
                 throw new NUnitEngineException(msg);
             }
 
-            // TODO: Verify that the type is correct using Cecil or Reflection 
-            // depending on whether the assembly is pre-loaded. For now, it's not 
+            // TODO: Verify that the type is correct using Cecil or Reflection
+            // depending on whether the assembly is pre-loaded. For now, it's not
             // simple to verify the type without loading the extension, so we
             // let it throw at the time the object is accessed.
 
@@ -116,3 +117,4 @@ namespace NUnit.Engine.Extensibility
         #endregion
     }
 }
+#endif

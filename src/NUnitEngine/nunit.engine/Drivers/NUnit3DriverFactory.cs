@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -42,6 +42,7 @@ namespace NUnit.Engine.Drivers
             return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 3;
         }
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
         /// <summary>
         /// Gets a driver for a given test assembly and a framework
         /// which the assembly is already known to reference.
@@ -55,5 +56,20 @@ namespace NUnit.Engine.Drivers
 
             return new NUnit3FrameworkDriver(domain, reference);
         }
+#else
+        /// <summary>
+        /// Gets a driver for a given test assembly and a framework
+        /// which the assembly is already known to reference.
+        /// </summary>
+        /// <param name="domain">The domain in which the assembly will be loaded</param>
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        /// <returns></returns>
+        public IFrameworkDriver GetDriver(AssemblyName reference)
+        {
+            Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
+
+            return new NUnitNetStandardDriver();
+        }
+#endif
     }
 }

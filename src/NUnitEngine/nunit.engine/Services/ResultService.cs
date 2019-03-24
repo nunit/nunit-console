@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -27,17 +27,14 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    public class ResultService :
-#if !NETSTANDARD1_3
-        Service, 
-#endif
-        IResultService
+    public class ResultService : Service, IResultService
     {
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases" };
 #else
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases", "user" };
-
+#endif
+#if !NETSTANDARD1_6
         private IEnumerable<ExtensionNode> _extensionNodes;
 #endif
 
@@ -50,12 +47,12 @@ namespace NUnit.Engine.Services
                 {
                     var formatList = new List<string>(BUILT_IN_FORMATS);
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
                     foreach (var node in _extensionNodes)
                         foreach (var format in node.GetValues("Format"))
                             formatList.Add(format);
 #endif
- 
+
                     _formats = formatList.ToArray();
                 }
 
@@ -77,35 +74,33 @@ namespace NUnit.Engine.Services
                     return new NUnit3XmlResultWriter();
                 case "cases":
                     return new TestCaseResultWriter();
-#if NETSTANDARD1_3
-                default:
-                    return null;
-#else
+#if !NETSTANDARD1_6
                 case "user":
                     return new XmlTransformResultWriter(args);
+#endif
                 default:
+#if !NETSTANDARD1_6
                     foreach (var node in _extensionNodes)
                         foreach (var supported in node.GetValues("Format"))
                             if (supported == format)
                                 return node.ExtensionObject as IResultWriter;
-
-                    return null;
 #endif
+                    return null;
             }
         }
 
-#if !NETSTANDARD1_3
         #region IService Members
 
         public override void StartService()
         {
             try
             {
+#if !NETSTANDARD1_6
                 var extensionService = ServiceContext.GetService<ExtensionService>();
 
                 if (extensionService != null && extensionService.Status == ServiceStatus.Started)
                     _extensionNodes = extensionService.GetExtensionNodes<IResultWriter>();
-                
+#endif
                 // If there is no extension service, we start anyway using builtin writers
                 Status = ServiceStatus.Started;
             }
@@ -117,6 +112,5 @@ namespace NUnit.Engine.Services
         }
 
         #endregion
-#endif
     }
 }

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1 &&!NETCOREAPP2_0
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -137,7 +138,7 @@ namespace NUnit.Engine.Drivers.Tests
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("Runnable"));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo(MockAssembly.Tests.ToString()));
             Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(result.GetAttribute("passed"), Is.EqualTo(MockAssembly.Passed.ToString()));
+            Assert.That(result.GetAttribute("passed"), Is.EqualTo(MockAssembly.PassedInAttribute.ToString()));
             Assert.That(result.GetAttribute("failed"), Is.EqualTo(MockAssembly.Failed.ToString()));
             Assert.That(result.GetAttribute("skipped"), Is.EqualTo(MockAssembly.Skipped.ToString()));
             Assert.That(result.GetAttribute("inconclusive"), Is.EqualTo(MockAssembly.Inconclusive.ToString()));
@@ -199,3 +200,4 @@ namespace NUnit.Engine.Drivers.Tests
         #endregion
     }
 }
+#endif

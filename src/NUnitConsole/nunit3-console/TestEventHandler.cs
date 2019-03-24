@@ -22,11 +22,8 @@
 // ***********************************************************************
 
 using System;
-using System.IO;
 using System.Xml;
-using NUnit.Common;
 using NUnit.Engine;
-using NUnit.ConsoleRunner.Utilities;
 
 namespace NUnit.ConsoleRunner
 {    
@@ -36,7 +33,7 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class TestEventHandler : MarshalByRefObject, ITestEventListener
     {
-        private readonly TextWriter _outWriter;
+        private readonly ExtendedTextWriter _outWriter;
 
         private readonly bool _displayBeforeTest;
         private readonly bool _displayAfterTest;
@@ -45,7 +42,7 @@ namespace NUnit.ConsoleRunner
         private string _lastTestOutput;
         private bool _wantNewLine = false;
 
-        public TestEventHandler(TextWriter outWriter, string labelsOption)
+        public TestEventHandler(ExtendedTextWriter outWriter, string labelsOption)
         {
             _outWriter = outWriter;
 
@@ -149,8 +146,7 @@ namespace NUnit.ConsoleRunner
                 FlushNewLineIfNeeded();
                 _lastTestOutput = label;
 
-                using (new ColorConsole(ColorStyle.SectionHeader))
-                    _outWriter.WriteLine("=> {0}", label);
+                _outWriter.WriteLine(ColorStyle.SectionHeader, $"=> {label}");
 
                 _currentLabel = label;
             }
@@ -162,11 +158,11 @@ namespace NUnit.ConsoleRunner
             _lastTestOutput = label;
 
             if (status != null)
-                using (new ColorConsole(GetColorForResultStatus(status)))
-                    _outWriter.Write("{0} ", status);
+            {
+                _outWriter.Write(GetColorForResultStatus(status), $"{status} ");
+            }
 
-            using (new ColorConsole(ColorStyle.SectionHeader))
-                _outWriter.WriteLine("=> {0}", label);
+            _outWriter.WriteLine(ColorStyle.SectionHeader, $"=> {label}");
 
             _currentLabel = label;
         }
@@ -178,21 +174,18 @@ namespace NUnit.ConsoleRunner
 
         private void WriteOutputLine(string testName, string text, ColorStyle color)
         {
-            using (new ColorConsole(color))
+            if (_lastTestOutput != testName)
             {
-                if (_lastTestOutput != testName)
-                {
-                    FlushNewLineIfNeeded();
-                    _lastTestOutput = testName;
-                }
+                FlushNewLineIfNeeded();
+                _lastTestOutput = testName;
+            }
 
-                _outWriter.Write(text);
+            _outWriter.Write(color, text);
 
-                // If the text we just wrote did not have a new line, flag that we should eventually emit one.
-                if (!text.EndsWith("\n"))
-                {
-                    _wantNewLine = true;
-                }
+            // If the text we just wrote did not have a new line, flag that we should eventually emit one.
+            if (!text.EndsWith("\n"))
+            {
+                _wantNewLine = true;
             }
         }
 

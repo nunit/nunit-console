@@ -24,7 +24,7 @@
 using System;
 using System.ComponentModel;
 using NUnit.Framework;
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 using System.Drawing;
 #endif
 
@@ -57,7 +57,7 @@ namespace NUnit.Engine.Internal.Tests
         {
             settings.SaveSetting(name, expected);
             object actual = settings.GetSetting(name);
-            Assert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected));
             Assert.IsInstanceOf(expected.GetType(),actual);
         }
 
@@ -76,7 +76,7 @@ namespace NUnit.Engine.Internal.Tests
 
             settings.RemoveSetting("X");
             Assert.IsNull(settings.GetSetting("X"), "X not removed");
-            Assert.AreEqual("Charlie", settings.GetSetting("NAME"));
+            Assert.That(settings.GetSetting("NAME"), Is.EqualTo("Charlie"));
 
             settings.RemoveSetting("NAME");
             Assert.IsNull(settings.GetSetting("NAME"), "NAME not removed");
@@ -86,22 +86,22 @@ namespace NUnit.Engine.Internal.Tests
         public void WhenSettingIsNotInitialized_DefaultValueIsReturned()
         {
 
-            Assert.AreEqual( 5, settings.GetSetting( "X", 5 ) );
-            Assert.AreEqual( 6, settings.GetSetting( "X", 6 ) );
-            Assert.AreEqual( "7", settings.GetSetting( "X", "7" ) );
+            Assert.That(settings.GetSetting( "X", 5 ), Is.EqualTo(5));
+            Assert.That(settings.GetSetting( "X", 6 ), Is.EqualTo(6));
+            Assert.That(settings.GetSetting( "X", "7" ), Is.EqualTo("7"));
 
-            Assert.AreEqual( "Charlie", settings.GetSetting( "NAME", "Charlie" ) );
-            Assert.AreEqual( "Fred", settings.GetSetting( "NAME", "Fred" ) );
+            Assert.That(settings.GetSetting( "NAME", "Charlie" ), Is.EqualTo("Charlie"));
+            Assert.That(settings.GetSetting( "NAME", "Fred" ), Is.EqualTo("Fred"));
         }
 
         [Test]
         public void WhenSettingIsNotValid_DefaultSettingIsReturned()
         {
             settings.SaveSetting( "X", "1y25" );
-            Assert.AreEqual( 42, settings.GetSetting( "X", 42 ) );
+            Assert.That(settings.GetSetting( "X", 42 ), Is.EqualTo(42));
         }
 
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
         [Test]
         [SetCulture("da-DK")]
         public void SaveAndGetSettingShouldReturnTheOriginalValue()

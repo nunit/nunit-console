@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 using System;
 using System.IO;
 using NUnit.Framework;
@@ -62,7 +63,7 @@ namespace NUnit.Engine.Services.Tests
                 Path.GetFileName(setup.ConfigurationFile),
                 Is.EqualTo("mock-assembly.dll.config").IgnoreCase,
                 "ConfigurationFile");
-            Assert.AreEqual(null, setup.PrivateBinPath, "PrivateBinPath");
+            Assert.That(setup.PrivateBinPath, Is.EqualTo(null), "PrivateBinPath");
             Assert.That(setup.ShadowCopyFiles, Is.Null.Or.EqualTo("false"));
             //Assert.That(setup.ShadowCopyDirectories, Is.SamePath(Path.GetDirectoryName(MockAssembly.AssemblyPath)), "ShadowCopyDirectories" );
         }
@@ -127,9 +128,10 @@ namespace NUnit.Engine.Services.Tests
                 unloaded = true;
             }
 
-            Assert.True(unloaded, "Domain was not unloaded");
+            Assert.That(unloaded, Is.True, "Domain was not unloaded");
         }
 
         #endregion
     }
 }
+#endif

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>nunit.engine.netstandard</id>
+    <title>NUnit .NET Standard Engine - Deprecated: Use NUnit.Engine</title>
+    <version>$version$</version>
+    <authors>Charlie Poole, Rob Prouse</authors>
+    <owners>Charlie Poole, Rob Prouse</owners>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-console"/>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Deprecated NUnit 3 .NET Standard engine - use NUnit.Engine.</summary>
+    <description>
+      This package is now obsolete and has been replaced by the NUnit.Engine package.
+
+      Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard
+    </description>
+    <language>en-US</language>
+    <tags>nunit test testing tdd runner</tags>
+    <copyright>Copyright (C) 2019 Charlie Poole, Rob Prouse</copyright>
+    <dependencies>
+      <group>
+        <dependency id="NUnit.Engine" version="$version$" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files></files>
+</package>

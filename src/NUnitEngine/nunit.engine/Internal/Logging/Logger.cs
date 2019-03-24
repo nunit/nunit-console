@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -75,13 +75,6 @@ namespace NUnit.Engine.Internal
             Log(InternalTraceLevel.Error, message, args);
         }
 
-        //public void Error(string message, Exception ex)
-        //{
-        //    if (service.Level >= InternalTraceLevel.Error)
-        //    {
-        //        service.Log(InternalTraceLevel.Error, message, name, ex);
-        //    }
-        //}
         #endregion
 
         #region Warning
@@ -148,6 +141,7 @@ namespace NUnit.Engine.Internal
         #endregion
 
         #region Helper Methods
+
         private void Log(InternalTraceLevel level, string message)
         {
             if (writer != null && this.maxLevel >= level)
@@ -165,9 +159,14 @@ namespace NUnit.Engine.Internal
             writer.WriteLine(TRACE_FMT,
                 DateTime.Now.ToString(TIME_FMT),
                 level == InternalTraceLevel.Verbose ? "Debug" : level.ToString(),
-                System.Threading.Thread.CurrentThread.ManagedThreadId, name, message);
+#if NET20
+                System.Threading.Thread.CurrentThread.ManagedThreadId,
+#else
+                Environment.CurrentManagedThreadId,
+#endif
+                name, message);
         }
 
-#endregion
+        #endregion
     }
 }

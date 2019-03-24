@@ -35,8 +35,8 @@ namespace NUnit.ConsoleRunner.Tests
             var options = new ConsoleOptions("test.dll");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.AreEqual(1, package.SubPackages.Count);
-            Assert.AreEqual(Path.GetFullPath("test.dll"), package.SubPackages[0].FullName);
+            Assert.That(package.SubPackages.Count, Is.EqualTo(1));
+            Assert.That(package.SubPackages[0].FullName, Is.EqualTo(Path.GetFullPath("test.dll")));
         }
 
         [Test]
@@ -46,10 +46,10 @@ namespace NUnit.ConsoleRunner.Tests
             var options = new ConsoleOptions(names);
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.AreEqual(3, package.SubPackages.Count);
-            Assert.AreEqual(Path.GetFullPath("test1.dll"), package.SubPackages[0].FullName);
-            Assert.AreEqual(Path.GetFullPath("test2.dll"), package.SubPackages[1].FullName);
-            Assert.AreEqual(Path.GetFullPath("test3.dll"), package.SubPackages[2].FullName);
+            Assert.That(package.SubPackages.Count, Is.EqualTo(3));
+            Assert.That(package.SubPackages[0].FullName, Is.EqualTo(Path.GetFullPath("test1.dll")));
+            Assert.That(package.SubPackages[1].FullName, Is.EqualTo(Path.GetFullPath("test2.dll")));
+            Assert.That(package.SubPackages[2].FullName, Is.EqualTo(Path.GetFullPath("test3.dll")));
         }
 
         [TestCase("--timeout=50", "DefaultTimeout", 50)]
@@ -86,7 +86,7 @@ namespace NUnit.ConsoleRunner.Tests
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.Settings.ContainsKey(key), "Setting not included for {0}", option);
-            Assert.AreEqual(val, package.Settings[key], "NumberOfTestWorkers not set correctly for {0}", option);
+            Assert.That(package.Settings[key], Is.EqualTo(val), "NumberOfTestWorkers not set correctly for {0}", option);
         }
 
         [Test]

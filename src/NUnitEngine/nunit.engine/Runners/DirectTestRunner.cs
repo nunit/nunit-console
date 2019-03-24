@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,16 +30,45 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// DirectTestRunner is the abstract base for runners 
+    /// DirectTestRunner is the abstract base for runners
     /// that deal directly with a framework driver.
     /// </summary>
     public abstract class DirectTestRunner : AbstractTestRunner
     {
+        // DirectTestRunner loads and runs tests in a particular AppDomain using
+        // one driver per assembly. All test assemblies are ultimately executed by
+        // one of the derived classes of DirectTestRunner, either LocalTestRunner
+        // or TestDomainRunner.
+        //
+        // DirectTestRunner creates an appropriate framework driver for each assembly
+        // included in the TestPackage. All frameworks loaded by the same DirectRunner
+        // must be compatible, i.e. runnable within the same AppDomain.
+        // 
+        // DirectTestRunner is used in the engine/runner process as well as in agent
+        // processes. It may be called with a TestPackage that specifies a single 
+        // assembly, multiple assemblies, a single project, multiple projects or
+        // a mix of projects and assemblies. This variety of potential package
+        // inputs complicates things. It arises from the fact that NUnit permits 
+        // the caller to specify that all projects and assemblies should be loaded 
+        // in the same AppDomain.
+        //
+        // TODO: When there are projects included in the TestPackage, DirectTestRUnner
+        // should create intermediate result nodes for each project.
+        //
+        // TODO: We really should detect and give a meaningful message if the user 
+        // tries to load incopatible frameworks in the same AppDomain.
+
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
+
+#if !NETSTANDARD1_6
         private ProvidedPathsAssemblyResolver _assemblyResolver;
+
+        protected AppDomain TestDomain { get; set; }
+#endif
 
         public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
+#if !NETSTANDARD1_6
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
             if (AppDomain.CurrentDomain.IsDefaultAppDomain())
@@ -47,13 +76,8 @@ namespace NUnit.Engine.Runners
                 _assemblyResolver = new ProvidedPathsAssemblyResolver();
                 _assemblyResolver.Install();
             }
+#endif
         }
-
-        #region Properties
-
-        protected AppDomain TestDomain { get; set; }
-
-        #endregion
 
         #region AbstractTestRunner Overrides
 
@@ -98,35 +122,38 @@ namespace NUnit.Engine.Runners
         {
             var result = new TestEngineResult();
 
-            // DirectRunner may be called with a single-assembly package
-            // or a set of assemblies as subpackages.
-            var packages = TestPackage.SubPackages;
-            if (packages.Count == 0)
-                packages.Add(TestPackage);
+            // DirectRunner may be called with a single-assembly package,
+            // a set of assemblies as subpackages or even an arbitrary
+            // hierarchy of packages and subpackages with assemblies
+            // found in the terminal nodes.
+            var packagesToLoad = TestPackage.Select(p => !p.HasSubPackages());
 
             var driverService = Services.GetService<IDriverService>();
 
-            foreach (var subPackage in packages)
+            foreach (var subPackage in packagesToLoad)
             {
                 var testFile = subPackage.FullName;
 
+                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
+                bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
+
+#if !NETSTANDARD1_6
                 if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
                     && subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
                 {
-                    // It's OK to do this in the loop because the Add method 
+                    // It's OK to do this in the loop because the Add method
                     // checks to see if the path is already present.
                     _assemblyResolver.AddPathFromFile(testFile);
                 }
 
-                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
-                bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
-                
                 IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
+#else
+                IFrameworkDriver driver = driverService.GetDriver(testFile, skipNonTestAssemblies);
+#endif
                 driver.ID = TestPackage.ID;
                 result.Add(LoadDriver(driver, testFile, subPackage));
                 _drivers.Add(driver);
             }
-
             return result;
         }
 
@@ -200,17 +227,13 @@ namespace NUnit.Engine.Runners
                 result.Add(driverResult);
             }
 
+#if !NETSTANDARD1_6
             if (_assemblyResolver != null)
             {
-                var packages = TestPackage.SubPackages;
-
-                if (packages.Count == 0)
-                    packages.Add(TestPackage);
-
-                foreach (var package in packages)
+                foreach (var package in TestPackage.Select(p => p.IsAssemblyPackage()))
                     _assemblyResolver.RemovePathFromFile(package.FullName);
             }
-
+#endif
             return result;
         }
 

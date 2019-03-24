@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,7 +26,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// InProcessTestRunnerFactory handles creation of a suitable test 
+    /// InProcessTestRunnerFactory handles creation of a suitable test
     /// runner for a given package to be loaded and run within the
     /// same process.
     /// </summary>
@@ -44,6 +44,9 @@ namespace NUnit.Engine.Services
         /// <returns>An ITestEngineRunner</returns>
         public virtual ITestEngineRunner MakeTestRunner(TestPackage package)
         {
+#if NETSTANDARD1_6 || NETSTANDARD2_0
+            return new LocalTestRunner(ServiceContext, package);
+#else
             DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(
                 typeof(DomainUsage),
                 package.GetSetting(EnginePackageSettings.DomainUsage, "Default"));
@@ -66,6 +69,7 @@ namespace NUnit.Engine.Services
                 case DomainUsage.Single:
                     return new TestDomainRunner(ServiceContext, package);
             }
+#endif
         }
 
         public virtual bool CanReuse(ITestEngineRunner runner, TestPackage package)

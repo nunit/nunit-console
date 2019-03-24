@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -190,7 +191,7 @@ namespace NUnit.Engine.Services
             // We are doing two jobs here: (1) in the else clause (below)
             // we get information about a single assembly and record it,
             // (2) in the if clause, we recursively examine all subpackages
-            // and then apply policies for promulgating each setting to 
+            // and then apply policies for promulgating each setting to
             // a containing package. We could implement the policy part at
             // a higher level, but it seems simplest to do it right here.
             if (package.SubPackages.Count > 0)
@@ -203,7 +204,7 @@ namespace NUnit.Engine.Services
                     Version v = subPackage.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(0, 0));
                     if (v > targetVersion) targetVersion = v;
 
-                    // Collect highest framework name 
+                    // Collect highest framework name
                     // TODO: This assumes lexical ordering is valid - check it
                     string fn = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
                     if (fn != "")
@@ -259,3 +260,4 @@ namespace NUnit.Engine.Services
         #endregion
     }
 }
+#endif
