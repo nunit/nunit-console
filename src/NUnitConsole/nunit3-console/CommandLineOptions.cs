@@ -301,7 +301,7 @@ namespace NUnit.Common
                     }
                 });
 
-            this.Add("testparam=", "Followed by a key-value pair separated by an equals sign. Test code can access the value by name.",
+            this.Add("testparam|tp=", "Followed by a key-value pair separated by an equals sign. Test code can access the value by name.",
                 v => ApplyTestParameter(RequiredValue(v, "--testparam")));
 
             this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
