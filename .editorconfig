@@ -11,6 +11,6 @@ root = true
 indent_style = space
 indent_size = 4
 
-[*.{proj,csproj,vcxproj,xproj,json,config,nuspec,xml}]
+[*.{proj,csproj,vcxproj,xproj,json,config,nuspec,xml,yml}]
 indent_style = space
 indent_size = 2

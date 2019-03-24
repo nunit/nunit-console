@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.IO;
 using System.Threading;
@@ -185,7 +186,7 @@ namespace NUnit.Engine.Services
             if (debugAgent)
                 agentArgs += " --debug-agent";
             if (workDirectory != string.Empty)
-                agentArgs += " --work=" + workDirectory;
+                agentArgs += " --work=\"" + workDirectory + "\"";
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
@@ -238,7 +239,7 @@ namespace NUnit.Engine.Services
                     p.StartInfo.Arguments = arglist;
                     break;
             }
-            
+
             p.Start();
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
@@ -262,7 +263,7 @@ namespace NUnit.Engine.Services
             while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
             {
                 Thread.Sleep(pollTime);
-                
+
                 if (agentRecord.Agent != null)
                 {
                     log.Debug($"Returning new agent {agentId:B}");
@@ -364,3 +365,4 @@ namespace NUnit.Engine.Services
         #endregion
     }
 }
+#endif

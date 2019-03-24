@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Net.Sockets;
 using NUnit.Common;
@@ -30,10 +31,18 @@ using NUnit.Engine.Services;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// Summary description for ProcessRunner.
+    /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
     public class ProcessRunner : AbstractTestRunner
     {
+        // ProcessRunner is given a TestPackage containing a single assembly
+        // multiple assemblies, a project, multiple projects or a mix. It loads
+        // and runs all tests in a single remote agent process.
+        //
+        // If the input contains projects, which are not summarized at a lower 
+        // level, the ProcessRunner should create an XML node for the entire
+        // project, aggregating the assembly results.
+
         private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
         private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
 
@@ -171,7 +180,7 @@ namespace NUnit.Engine.Runners
 
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage, returning immediately.
-        /// The tests are run asynchronously and the listener interface is notified 
+        /// The tests are run asynchronously and the listener interface is notified
         /// as it progresses.
         /// </summary>
         /// <param name="listener">An ITestEventHandler to receive events</param>
@@ -291,9 +300,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#endregion
+        #endregion
 
-#region Helper Methods
+        #region Helper Methods
 
         private void CreateAgentAndRunner()
         {
@@ -341,6 +350,7 @@ namespace NUnit.Engine.Runners
             return new TestEngineResult(suite);
         }
 
-#endregion
+        #endregion
     }
 }
+#endif

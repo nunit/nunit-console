@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,40 +28,26 @@ using NUnit.Engine.Services;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// AbstractTestRunner is the base class for all runners
-    /// within the NUnit Engine. It implements the ITestRunner
-    /// interface, which is used by clients of the engine and
-    /// uses a Template pattern with abstract methods overridden
-    /// by the derived runners.
+    /// AbstractTestRunner is the base class for all internal runners
+    /// within the NUnit Engine. It implements the ITestEngineRunner
+    /// interface, which uses TestEngineResults to communicate back
+    /// to higher level runners.
     /// </summary>
     public abstract class AbstractTestRunner : ITestEngineRunner
     {
-#if NETSTANDARD1_3
-        public AbstractTestRunner(TestPackage package)
-        {
-            TestRunnerFactory = new DefaultTestRunnerFactory();
-            TestPackage = package;
-        }
-#else
         public AbstractTestRunner(IServiceLocator services, TestPackage package)
         {
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
-            ProjectService = Services.GetService<IProjectService>();
             TestPackage = package;
         }
-#endif
 
         #region Properties
 
-#if !NETSTANDARD1_3
         /// <summary>
         /// Our Service Context
         /// </summary>
         protected IServiceLocator Services { get; private set; }
-
-        protected IProjectService ProjectService { get; private set; }
-#endif
 
         protected ITestRunnerFactory TestRunnerFactory { get; private set; }
 
@@ -118,11 +104,11 @@ namespace NUnit.Engine.Runners
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         protected abstract TestEngineResult RunTests(ITestEventListener listener, TestFilter filter);
-        
-#if !NETSTANDARD1_3
+
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage, returning immediately.
-        /// The tests are run asynchronously and the listener interface is notified 
+        /// The tests are run asynchronously and the listener interface is notified
         /// as it progresses.
         /// </summary>
         /// <param name="listener">An ITestEventHandler to receive events</param>
@@ -215,7 +201,7 @@ namespace NUnit.Engine.Runners
             return RunTests(listener, filter);
         }
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.

@@ -27,7 +27,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Xml;
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
 using System.Xml.Linq;
 #endif
 
@@ -110,7 +110,7 @@ namespace NUnit.Engine.Internal
                 if (!Directory.Exists(dirPath))
                     Directory.CreateDirectory(dirPath);
 
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
                 var settings = new XElement("Settings");
 
                 List<string> keys = new List<string>(_settings.Keys);

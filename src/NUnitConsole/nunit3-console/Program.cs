@@ -23,6 +23,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -55,6 +56,8 @@ namespace NUnit.ConsoleRunner
         [STAThread]
         public static int Main(string[] args)
         {
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelHandler);
+
             try
             {
                 Options.Parse(Options.PreParse(args));
@@ -94,6 +97,14 @@ namespace NUnit.ConsoleRunner
                 // We already showed version as a part of the header
                 if (Options.ShowVersion)
                     return ConsoleRunner.OK;
+
+                if (Options.WarningMessages.Count != 0)
+                {
+                    foreach (string message in Options.WarningMessages)
+                        OutWriter.WriteLine(ColorStyle.Warning, message);
+
+                    OutWriter.WriteLine();
+                }
 
                 if (!Options.Validate())
                 {
@@ -175,6 +186,7 @@ namespace NUnit.ConsoleRunner
 
             OutWriter.WriteLine(ColorStyle.Header, header);
             OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright);
+            OutWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
             OutWriter.WriteLine();
         }
 
@@ -245,6 +257,11 @@ namespace NUnit.ConsoleRunner
                 //writer.WriteLine("or a space to separate the option from its value.");
                 //writer.WriteLine();
             }
+        }
+
+        private static void CancelHandler(object sender, ConsoleCancelEventArgs args)
+        {
+            Console.ResetColor();
         }
     }
 }

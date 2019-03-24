@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -40,8 +40,10 @@ namespace NUnit.Engine.Services.Tests
         public void CreateServiceContext()
         {
             _services = new ServiceContext();
+#if !NETCOREAPP1_1
             _services.Add(new ExtensionService());
             _services.Add(new FakeProjectService());
+#endif
             _factory = new DefaultTestRunnerFactory();
             _services.Add(_factory);
             _services.ServiceManager.StartServices();
@@ -52,11 +54,31 @@ namespace NUnit.Engine.Services.Tests
         {
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));
         }
-        
+
+#if NETCOREAPP1_1
+        // Single file
+        [TestCase("x.dll",             null,        typeof(LocalTestRunner))]
+        // Two files
+        [TestCase("x.dll y.dll",       null,        typeof(AggregatingTestRunner))]
+        // Three files
+        [TestCase("x.dll y.dll z.dll",   null,       typeof(AggregatingTestRunner))]
+#elif NETCOREAPP2_0
+        // Single file
+        [TestCase("x.nunit",           null,        typeof(AggregatingTestRunner))]
+        [TestCase("x.dll",             null,        typeof(LocalTestRunner))]
+        // Two files
+        [TestCase("x.nunit y.nunit",   null,        typeof(AggregatingTestRunner))]
+        [TestCase("x.nunit y.dll",     null,        typeof(AggregatingTestRunner))]
+        [TestCase("x.dll y.dll",       null,        typeof(AggregatingTestRunner))]
+        // Three files
+        [TestCase("x.nunit y.dll z.nunit", null,       typeof(AggregatingTestRunner))]
+        [TestCase("x.dll y.nunit z.dll",   null,       typeof(AggregatingTestRunner))]
+
+#else
         // Single file
         [TestCase("x.nunit",           null,        typeof(AggregatingTestRunner))]
         [TestCase("x.dll",             null,        typeof(ProcessRunner))]
-        [TestCase("x.nunit",           "Single",    typeof(TestDomainRunner))]
+        [TestCase("x.nunit",           "Single",    typeof(AggregatingTestRunner))]
         [TestCase("x.dll",             "Single",    typeof(TestDomainRunner))]
         [TestCase("x.nunit",           "Separate",  typeof(ProcessRunner))]
         [TestCase("x.dll",             "Separate",  typeof(ProcessRunner))]
@@ -87,6 +109,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("x.nunit y.dll z.nunit", "Multiple", typeof(AggregatingTestRunner))]
         [TestCase("x.dll y.nunit z.dll",   "Multiple", typeof(AggregatingTestRunner))]
         [TestCase("x.dll y.dll z.dll",     "Multiple", typeof(MultipleTestProcessRunner))]
+#endif
         public void CorrectRunnerIsUsed(string files, string processModel, Type expectedType)
         {
             var package = new TestPackage(files.Split(new char[] { ' ' }));
@@ -98,11 +121,19 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(runner, Is.TypeOf(expectedType));
         }
 
+#if NETCOREAPP1_1 || NETCOREAPP2_0
+        [TestCase("x.junk", typeof(LocalTestRunner))]
+        [TestCase("x.junk y.dll", typeof(AggregatingTestRunner))]
+        [TestCase("x.junk y.junk", typeof(AggregatingTestRunner))]
+        [TestCase("x.dll y.junk z.dll", typeof(AggregatingTestRunner))]
+        [TestCase("x.dll y.junk z.junk", typeof(AggregatingTestRunner))]
+#else
         [TestCase("x.junk", typeof(ProcessRunner))]
         [TestCase("x.junk y.dll", typeof(MultipleTestProcessRunner))]
         [TestCase("x.junk y.junk", typeof(MultipleTestProcessRunner))]
         [TestCase("x.dll y.junk z.dll", typeof(MultipleTestProcessRunner))]
         [TestCase("x.dll y.junk z.junk", typeof(MultipleTestProcessRunner))]
+#endif
         public void CorrectRunnerIsUsed_InvalidExtension(string files, Type expectedType)
         {
             var package = new TestPackage(files.Split(new char[] {' '}));

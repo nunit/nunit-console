@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -65,7 +66,7 @@ namespace NUnit.Engine.Services
                 log.Error(string.Format("Requested service {0} was not found", serviceType.FullName));
             else
                 log.Debug(string.Format("Request for service {0} satisfied by {1}", serviceType.Name, theService.GetType().Name));
-            
+
             return theService;
         }
 
@@ -132,9 +133,9 @@ namespace NUnit.Engine.Services
             _services.Clear();
         }
 
-        #endregion
+#endregion
 
-        #region IDisposable
+#region IDisposable
 
         private bool _disposed = false;
 
@@ -162,6 +163,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
+#endregion
     }
 }

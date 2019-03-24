@@ -25,9 +25,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Engine.Internal;
 
-#if !NETSTANDARD1_3
 using NUnit.Common;
-#endif
 
 namespace NUnit.Engine.Runners
 {
@@ -40,8 +38,23 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class AggregatingTestRunner : AbstractTestRunner
     {
+        // AggregatingTestRunner combines the results from tests run by different
+        // runners. It may be used as a base class or through one of it's derived
+        // classes, MultipleTestDomainRunner and MultipleTestProcessRunner.
+        //
         // The runners created by the derived class will (at least at the time
-        // of writing this comment) be either TestDomainRunners or ProcessRunners.
+        // of writing this comment) be either DirectTestRunners, ProcessRunners or
+        // AggregatingTestRunners.
+        //
+        // AggregatingTestRunner is used in the engine/runner process as well as in agent
+        // processes. It may be called with a TestPackage that specifies a single 
+        // assembly, multiple assemblies, a single project, multiple projects or
+        // a mix of projects and assemblies. Each file passed is handled by
+        // a single runner.
+        //
+        // TODO: Determine whether AggregatingTestRunner needs to create an XML result
+        // node for a project or if that responsibility can be delegated to the individual
+        // runners it creates.
         private List<ITestEngineRunner> _runners;
 
         // Exceptions from unloading individual runners are caught and rethrown
@@ -73,17 +86,11 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if NETSTANDARD1_3
-        public AggregatingTestRunner(TestPackage package) : base(package)
-        {
-        }
-#else
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
         }
-#endif
 
-#region AbstractTestRunner Overrides
+        #region AbstractTestRunner Overrides
 
         /// <summary>
         /// Explore a TestPackage and return information about
@@ -108,10 +115,6 @@ namespace NUnit.Engine.Runners
         protected override TestEngineResult LoadPackage()
         {
             var results = new List<TestEngineResult>();
-
-            var packages = new List<TestPackage>(TestPackage.SubPackages);
-            if (packages.Count == 0)
-                packages.Add(TestPackage);
 
             foreach (var runner in Runners)
                 results.Add(runner.Load());
@@ -167,7 +170,7 @@ namespace NUnit.Engine.Runners
 
             bool disposeRunners = TestPackage.GetSetting(EnginePackageSettings.DisposeRunners, false);
 
-#if NETSTANDARD1_3
+#if NETSTANDARD1_6
             RunTestsSequentially(listener, filter, results, disposeRunners);
 #else
             if (LevelOfParallelism <= 1)
@@ -194,7 +197,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
         private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
         {
             var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
@@ -247,7 +250,7 @@ namespace NUnit.Engine.Runners
                 throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
-#endregion
+        #endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {

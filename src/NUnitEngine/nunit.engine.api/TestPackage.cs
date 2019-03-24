@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,10 +30,10 @@ namespace NUnit.Engine
     /// <summary>
     /// TestPackage holds information about a set of test files to
     /// be loaded by a TestRunner. Each TestPackage represents
-    /// tests for one or more test files. TestPackages may be named 
+    /// tests for one or more test files. TestPackages may be named
     /// or anonymous, depending on how they are constructed.
     /// </summary>
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
     [Serializable]
 #endif
     public class TestPackage
@@ -51,14 +51,7 @@ namespace NUnit.Engine
 
             if (filePath != null)
             {
-#if NETSTANDARD1_3
-                if (!Path.IsPathRooted(filePath))
-                    throw new NUnitEngineException("Paths to test assemblies must not be relative in .NET Standard");
-
-                FullName = filePath;
-#else
                 FullName = Path.GetFullPath(filePath);
-#endif
                 Settings = new Dictionary<string,object>();
                 SubPackages = new List<TestPackage>();
             }

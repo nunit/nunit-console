@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,8 +21,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+
+#if NETSTANDARD2_0
+using System.Linq;
+#endif
 
 namespace NUnit.Engine.Extensibility
 {
@@ -68,7 +74,7 @@ namespace NUnit.Engine.Extensibility
         public bool Enabled	{ get; set; }
 
         /// <summary>
-        /// Gets and sets the unique string identifying the ExtensionPoint for which 
+        /// Gets and sets the unique string identifying the ExtensionPoint for which
         /// this Extension is intended. This identifier may be supplied by the attribute
         /// marking the extension or deduced by NUnit from the Type of the extension class.
         /// </summary>
@@ -128,7 +134,17 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         public object CreateExtensionObject(params object[] args)
         {
+#if NETSTANDARD2_0
+            var assembly = Assembly.LoadFrom(AssemblyPath);
+            var typeinfo = assembly.DefinedTypes.FirstOrDefault(t => t.FullName == TypeName);
+            if (typeinfo == null)
+            {
+                return null;
+            }
+            return Activator.CreateInstance(typeinfo.AsType(), args);
+#else
             return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null, null);
+#endif
         }
 
         public void AddProperty(string name, string val)
@@ -149,3 +165,4 @@ namespace NUnit.Engine.Extensibility
         }
     }
 }
+#endif

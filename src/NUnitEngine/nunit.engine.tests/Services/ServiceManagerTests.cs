@@ -43,7 +43,7 @@ namespace NUnit.Engine.Services.Tests
             _settingsService = new FakeSettingsService();
             _serviceManager.AddService(_settingsService);
 
-            _projectService = new FakeProjectService();
+            _projectService = new Fakes.FakeProjectService();
             _serviceManager.AddService(_projectService);
         }
 

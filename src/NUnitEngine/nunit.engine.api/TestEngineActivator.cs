@@ -39,6 +39,36 @@ namespace NUnit.Engine
         private const string DefaultAssemblyName = "nunit.engine.dll";
         internal const string DefaultTypeName = "NUnit.Engine.TestEngine";
 
+#if NETSTANDARD1_6
+        /// <summary>
+        /// Create an instance of the test engine.
+        /// </summary>
+        /// <returns>An <see cref="NUnit.Engine.ITestEngine"/></returns>
+        public static ITestEngine CreateInstance()
+        {
+            var apiLocation = typeof(TestEngineActivator).GetTypeInfo().Assembly.Location;
+            var directoryName = Path.GetDirectoryName(apiLocation);
+            var enginePath = directoryName == null ? DefaultAssemblyName : Path.Combine(directoryName, DefaultAssemblyName);
+            var assemblyName = System.Runtime.Loader.AssemblyLoadContext.GetAssemblyName(enginePath);
+            var assembly = Assembly.Load(assemblyName);
+            var engineType = assembly.GetType(DefaultTypeName);
+            return Activator.CreateInstance(engineType) as ITestEngine;
+        }
+#elif NETSTANDARD2_0
+        /// <summary>
+        /// Create an instance of the test engine.
+        /// </summary>
+        /// <returns>An <see cref="NUnit.Engine.ITestEngine"/></returns>
+        public static ITestEngine CreateInstance()
+        {
+            var apiLocation = typeof(TestEngineActivator).Assembly.Location;
+            var directoryName = Path.GetDirectoryName(apiLocation);
+            var enginePath = directoryName == null ? DefaultAssemblyName : Path.Combine(directoryName, DefaultAssemblyName);
+            var assembly = Assembly.LoadFrom(enginePath);
+            var engineType = assembly.GetType(DefaultTypeName);
+            return Activator.CreateInstance(engineType) as ITestEngine;
+        }
+#else
         #region Public Methods
 
         /// <summary>
@@ -107,37 +137,6 @@ namespace NUnit.Engine
                 }
             }
 
-            // Check for an engine that has been installed as part of a
-            // development project using NuGet.
-            //
-            // NOTE: This code assumes that we are working in
-            // bin/Debug or bin/Release and includes a lot of
-            // knowledge of how we handle nuget packages. It
-            // is only intended for use while a new runner is
-            // under development.
-            if (newestAssemblyFound == null)
-            {
-                var packages = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../packages");
-
-                if (Directory.Exists(packages))
-                {
-                    var packagesDir = new DirectoryInfo(packages);
-                    foreach (var subDir in packagesDir.GetDirectories("NUnit.Engine.*"))
-                    {
-                        // In future, we will use tools directory but currently we use lib
-                        path = Path.Combine(Path.Combine(subDir.FullName, "tools"), DefaultAssemblyName);
-                        newestAssemblyFound = CheckPathForEngine(path, minVersion, ref newestVersionFound, null);
-                        if (newestAssemblyFound != null)
-                            break;
-
-                        path = Path.Combine(Path.Combine(subDir.FullName, "lib"), DefaultAssemblyName);
-                        newestAssemblyFound = CheckPathForEngine(path, minVersion, ref newestVersionFound, null);
-                        if (newestAssemblyFound != null)
-                            break;
-                    }
-                }
-            }
-
             return newestAssemblyFound;
         }
 
@@ -190,7 +189,7 @@ namespace NUnit.Engine
             catch (Exception) { }
             return null;
         }
-
         #endregion
+#endif
     }
 }

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -43,9 +44,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path2, path3 };
 
-            Assert.AreEqual(
-                TestPath("bin/debug") + Path.PathSeparator + TestPath("utils"),
-                DomainManager.GetPrivateBinPath(TestPath("/test"), assemblies));
+            Assert.That(DomainManager.GetPrivateBinPath(TestPath("/test"), assemblies), Is.EqualTo(TestPath("bin/debug") + Path.PathSeparator + TestPath("utils")));
         }
 
         [Test]
@@ -53,9 +52,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1 };
 
-            Assert.AreEqual(
-                TestPath("/test/bin/debug"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test/bin/debug")));
         }
 
         [Test]
@@ -63,9 +60,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path2 };
 
-            Assert.AreEqual(
-                TestPath("/test/bin/debug"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test/bin/debug")));
         }
 
         [Test]
@@ -73,9 +68,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path3 };
 
-            Assert.AreEqual(
-                TestPath("/test"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test")));
         }
 
         [Test]
@@ -83,9 +76,7 @@ namespace NUnit.Engine.Services.Tests
         {
             string[] assemblies = new string[] { path1, path2, path3 };
 
-            Assert.AreEqual(
-                TestPath("/test"),
-                DomainManager.GetCommonAppBase(assemblies));
+            Assert.That(DomainManager.GetCommonAppBase(assemblies), Is.EqualTo(TestPath("/test")));
         }
 
         [Test]
@@ -178,3 +169,4 @@ namespace NUnit.Engine.Services.Tests
         }
     }
 }
+#endif

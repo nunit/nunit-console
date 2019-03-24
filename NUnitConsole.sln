@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		BUILDING.md = BUILDING.md
 		CHANGES.txt = CHANGES.txt
 		CONTRIBUTING.md = CONTRIBUTING.md
-		EngineAndConsoleTests.nunit = EngineAndConsoleTests.nunit
 		LICENSE.txt = LICENSE.txt
 		NOTICES.txt = NOTICES.txt
 		NuGet.config = NuGet.config
@@ -65,7 +64,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E8
 	ProjectSection(SolutionItems) = preProject
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
 		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
-		nuget\runners\nunit.runners.nuspec = nuget\runners\nunit.runners.nuspec
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\NUnitEngine\mock-assembly\mock-assembly.csproj", "{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}"
@@ -78,6 +76,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA
 		choco\nunit-agent.exe.ignore = choco\nunit-agent.exe.ignore
 		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
 		choco\nunit-console-with-extensions.nuspec = choco\nunit-console-with-extensions.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", "{9A7C8370-ED1F-486F-A8F5-C5BF4221464E}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\deprecated\nunit.engine.netstandard.nuspec = nuget\deprecated\nunit.engine.netstandard.nuspec
+		nuget\deprecated\nunit.runners.nuspec = nuget\deprecated\nunit.runners.nuspec
 	EndProjectSection
 EndProject
 Global
@@ -140,6 +144,7 @@ Global
 		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{4FDF7BFA-A337-41D3-898D-C6A98278E6AD} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{9A7C8370-ED1F-486F-A8F5-C5BF4221464E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

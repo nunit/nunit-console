@@ -76,7 +76,7 @@ namespace NUnit.Engine.Services
             test.AddAttribute("start-time", DateTime.UtcNow.ToString("u"));
             doc.AppendChild(test);
 
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
             var cmd = doc.CreateElement("command-line");
             var cdata = doc.CreateCDataSection(Environment.CommandLine);
             cmd.AppendChild(cdata);
