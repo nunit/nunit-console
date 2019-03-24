@@ -98,6 +98,14 @@ namespace NUnit.ConsoleRunner
                 if (Options.ShowVersion)
                     return ConsoleRunner.OK;
 
+                if (Options.WarningMessages.Count != 0)
+                {
+                    foreach (string message in Options.WarningMessages)
+                        OutWriter.WriteLine(ColorStyle.Warning, message);
+
+                    OutWriter.WriteLine();
+                }
+
                 if (!Options.Validate())
                 {
                     using (new ColorConsole(ColorStyle.Error))
