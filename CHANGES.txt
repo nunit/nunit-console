@@ -10,7 +10,7 @@ The `--params` command line option which took multiple test parameters separated
 a semi-colon is now deprecated in favor of the new `--testparam` command line option.
 One of the most common uses for test parameters was to pass connection strings into
 tests but this required workarounds to handle the semi-colons. Now you must pass in
-each test paramater separately using a `--testparam` or `-tp` option for each.
+each test parameter separately using a `--testparam` or `-tp` option for each.
 
 Issues Resolved
 
@@ -61,7 +61,7 @@ NUnit Console 3.9 - September 5, 2018
 
 This release should stop the dreaded SocketException problem on shutdown. The
 console also no longer returns -5 when AppDomains fail to unload at the end of a
-test run. These fixes should make CI runs much more stable and predictible.
+test run. These fixes should make CI runs much more stable and predictable.
 
 For developers working on the NUnit Console and Engine project, Visual Studio
 2017 update 5 or newer is now required to compile on the command line. This does
