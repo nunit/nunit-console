@@ -61,12 +61,15 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void AggregateTestResult()
         {
-            TestEngineResult combined = result2.Aggregate("test-run", "NAME", "FULLNAME");
+            TestEngineResult combined = result2.Aggregate("test-run", "ID", "NAME", "FULLNAME");
             Assert.That(combined.IsSingle);
 
             XmlNode combinedNode = combined.Xml;
 
             Assert.That(combinedNode.Name, Is.EqualTo("test-run"));
+            Assert.That(combinedNode.Attributes["id"].Value, Is.EqualTo("ID"));
+            Assert.That(combinedNode.Attributes["name"].Value, Is.EqualTo("NAME"));
+            Assert.That(combinedNode.Attributes["fullname"].Value, Is.EqualTo("FULLNAME"));
             Assert.That(combinedNode.Attributes["result"].Value, Is.EqualTo("Failed"));
             Assert.That(combinedNode.Attributes["total"].Value, Is.EqualTo("42"));
             Assert.That(combinedNode.Attributes["passed"].Value, Is.EqualTo("31"));
@@ -79,13 +82,14 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void MergeAndAggregateTestResults()
         {
-            TestEngineResult combined = ResultHelper.Merge(twoResults).Aggregate("test-suite", "Project", "NAME", "FULLNAME");
+            TestEngineResult combined = ResultHelper.Merge(twoResults).Aggregate("test-suite", "Project", "ID", "NAME", "FULLNAME");
             Assert.That(combined.IsSingle);
 
             XmlNode combinedNode = combined.Xml;
 
             Assert.That(combinedNode.Name, Is.EqualTo("test-suite"));
             Assert.That(combinedNode.Attributes["type"].Value, Is.EqualTo("Project"));
+            Assert.That(combinedNode.Attributes["id"].Value, Is.EqualTo("ID"));
             Assert.That(combinedNode.Attributes["name"].Value, Is.EqualTo("NAME"));
             Assert.That(combinedNode.Attributes["fullname"].Value, Is.EqualTo("FULLNAME"));
             Assert.That(combinedNode.Attributes["result"].Value, Is.EqualTo("Failed"));
@@ -100,9 +104,10 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void AggregateXmlNodes()
         {
-            XmlNode combined = ResultHelper.Aggregate("test-run", "NAME", "FULLNAME", twoNodes);
+            XmlNode combined = ResultHelper.Aggregate("test-run", "ID", "NAME", "FULLNAME", twoNodes);
 
             Assert.That(combined.Name, Is.EqualTo("test-run"));
+            Assert.That(combined.Attributes["id"].Value, Is.EqualTo("ID"));
             Assert.That(combined.Attributes["name"].Value, Is.EqualTo("NAME"));
             Assert.That(combined.Attributes["fullname"].Value, Is.EqualTo("FULLNAME"));
             Assert.That(combined.Attributes["result"].Value, Is.EqualTo("Failed"));
@@ -114,7 +119,6 @@ namespace NUnit.Engine.Internal.Tests
             Assert.That(combined.Attributes["asserts"].Value, Is.EqualTo("93"));
         }
 
-        [Test]
         [TestCase("Skipped", "Skipped", "Skipped")]
         [TestCase("Passed", "Passed", "Passed")]
         [TestCase("Failed", "Failed", "Failed")]
@@ -139,7 +143,7 @@ namespace NUnit.Engine.Internal.Tests
             var firstEngineResult = new TestEngineResult(firstResultText);
             var secondEngineResult = new TestEngineResult(secondResultText);
             var data = new XmlNode[]{ firstEngineResult.Xml, secondEngineResult.Xml };
-            XmlNode combined = ResultHelper.Aggregate("test-run", "NAME", "FULLNAME", data);
+            XmlNode combined = ResultHelper.Aggregate("test-run", "ID", "NAME", "FULLNAME", data);
             Assert.That(combined.Attributes["result"].Value, Is.EqualTo(aggregateResult));
         }
     }

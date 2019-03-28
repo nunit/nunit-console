@@ -89,7 +89,7 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
             // Create a TestEngineResult from the string, just as the TestEngine does,
             // then add a test-run element to the result, wrapping the result so it
             // looks just like what the engine would return!
-            this.EngineResult = new TestEngineResult(xmlText).Aggregate("test-run", AssemblyName, AssemblyPath);
+            this.EngineResult = new TestEngineResult(xmlText).Aggregate("test-run", "ID", AssemblyName, AssemblyPath);
         }
     }
 }
