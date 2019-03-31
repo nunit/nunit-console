@@ -55,7 +55,6 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         {
             var runner = _factory.MakeTestRunner(package);
             var result = GetRunnerResult(runner);
-            TestContext.Out.WriteLine(TestContext.CurrentContext.Test.Name);
             Assert.That(result, Is.EqualTo(expected).Using(RunnerResultComparer.Instance));
         }
 
