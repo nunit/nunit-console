@@ -41,7 +41,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             var services = new ServiceContext();
 #if !NETCOREAPP1_1
             services.Add(new ExtensionService());
-            services.Add(new FakeProjectService());
+            var projectService = new FakeProjectService();
+            projectService.Add(TestPackageFactory.FakeProjectName, "a.dll", "b.dll");
+            services.Add(projectService);
 #endif
             _factory = new DefaultTestRunnerFactory();
             services.Add(_factory);
@@ -53,6 +55,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         {
             var runner = _factory.MakeTestRunner(package);
             var result = GetRunnerResult(runner);
+            TestContext.Out.WriteLine(TestContext.CurrentContext.Test.Name);
             Assert.That(result, Is.EqualTo(expected).Using(RunnerResultComparer.Instance));
         }
 
@@ -69,7 +72,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if NETCOREAPP
         private static IEnumerable<TestCaseData> TestCases => NetStandardAssemblyTestCases.TestCases;
 #else
-        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases;
+        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases.Concat(Net20ProjectTestCases.TestCases);
 #endif
     }
 }

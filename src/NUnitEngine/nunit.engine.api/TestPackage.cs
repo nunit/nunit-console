@@ -164,15 +164,5 @@ namespace NUnit.Engine
         }
 
         #endregion
-
-        #region Helper Methods
-
-        private static bool IsAssemblyFileType(string path)
-        {
-            string extension = Path.GetExtension(path).ToLower();
-            return extension == ".dll" || extension == ".exe";
-        }
-
-        #endregion
     }
 }
