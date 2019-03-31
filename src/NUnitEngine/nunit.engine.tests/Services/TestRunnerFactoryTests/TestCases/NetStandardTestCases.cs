@@ -28,7 +28,7 @@ using NUnit.Framework;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 {
 #if NETCOREAPP1_1 || NETCOREAPP2_0
-    internal static class NetStandardAssemblyTestCases
+    internal static class NetStandardTestCases
     {
         public static IEnumerable<TestCaseData> TestCases
         {
@@ -51,6 +51,20 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     }
                 };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+#if NETCOREAPP2_0
+                testName = "Single project";
+                package = TestPackageFactory.OneProject();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+#endif
             }
         }
     }
