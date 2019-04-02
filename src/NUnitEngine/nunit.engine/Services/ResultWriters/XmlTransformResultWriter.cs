@@ -90,7 +90,7 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode result, string outputPath)
         {
-            using (var xmlWriter = new XmlTextWriter(outputPath, Encoding.Default))
+            using (var xmlWriter = new XmlTextWriter(outputPath, Encoding.UTF8))
             {
                 xmlWriter.Formatting = Formatting.Indented;
                 _transform.Transform(result, xmlWriter);
