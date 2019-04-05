@@ -24,25 +24,77 @@
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Xml;
+using System.Web.UI;
 
 namespace NUnit.Engine
 {
-    public class RunTestsCallbackHandler : CallbackHandler
+    public class RunTestsCallbackHandler : MarshalByRefObject, ICallbackEventHandler
     {
-        private ITestEventListener listener;
+        private ITestEventListener _listener;
+
+        public string Result { get; private set; }
 
         public RunTestsCallbackHandler(ITestEventListener listener)
         {
-            // TODO: Move this substitution into the framework?
-            this.listener = listener ?? new NullListener();
+            _listener = listener ?? new NullListener();
         }
 
-        public override void ReportProgress(string state)
+        #region MarshalByRefObject Overrides
+
+        public override object InitializeLifetimeService()
         {
-            listener.OnTestEvent(state);
+            return null;
         }
+
+        #endregion
+
+        #region ICallbackEventHandler Members
+
+        public string GetCallbackResult()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RaiseCallbackEvent(string eventArgument)
+        {
+            if (IsFinalResult(eventArgument))
+                Result = eventArgument;
+            else
+                ReportProgress(eventArgument);
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void ReportProgress(string state)
+        {
+            _listener.OnTestEvent(state);
+        }
+
+        private bool IsFinalResult(string eventArgument)
+        {
+            // Eliminate all events except for test-suite
+            if (!eventArgument.StartsWith("<test-suite"))
+                return false;
+
+            // Eliminate suites that do not represent an assembly
+            if (!eventArgument.Contains("type=\"Assembly\""))
+                return false;
+
+            // Heuristic: only final results may have an environment element
+            if (eventArgument.Contains("<environment"))
+                return true;
+
+            // Heuristic: only final results may have a settings element
+            if (eventArgument.Contains("<settings"))
+                return true;
+
+            // Heuristic: only final results have nested suites
+            return eventArgument.IndexOf("<test-suite", 12) > 0;
+        }
+
+        #endregion
 
         #region Nested NullListener class
         class NullListener : ITestEventListener
