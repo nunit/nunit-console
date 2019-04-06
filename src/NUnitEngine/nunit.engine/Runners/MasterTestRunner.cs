@@ -271,7 +271,7 @@ namespace NUnit.Engine.Runners
         }
 
         // The TestEngineResult returned to MasterTestRunner contains no info
-        // about projects. At this point, if thre are any projects, the result
+        // about projects. At this point, if there are any projects, the result
         // needs to be modified to include info about them. Doing it this way
         // allows the lower-level runners to be completely ignorant of projects
         private TestEngineResult PrepareResult(TestEngineResult result)

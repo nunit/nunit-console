@@ -47,7 +47,7 @@ namespace NUnit.Engine
             throw new NotImplementedException();
         }
 
-        public virtual void RaiseCallbackEvent(string eventArgument)
+        public void RaiseCallbackEvent(string eventArgument)
         {
             Result = eventArgument;
         }

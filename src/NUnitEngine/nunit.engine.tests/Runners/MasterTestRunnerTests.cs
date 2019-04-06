@@ -209,20 +209,20 @@ namespace NUnit.Engine.Runners.Tests
         }
 
 #if !NETCOREAPP1_1
-        //[Test]
-        //public void RunAsync()
-        //{
-        //    _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
-        //    var testRun = _runner.RunAsync(this, TestFilter.Empty);
+        [Test]
+        public void RunAsync()
+        {
+            _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
+            var testRun = _runner.RunAsync(this, TestFilter.Empty);
 
-        //    testRun.Wait(-1);
-        //    Assert.That(testRun.Result.Name, Is.EqualTo("test-run"));
-        //    CheckTestRunResult(testRun.Result, _testRunData);
+            testRun.Wait(-1);
+            Assert.That(testRun.Result.Name, Is.EqualTo("test-run"));
+            CheckTestRunResult(testRun.Result, _testRunData);
 
-        //    CheckThatIdsAreUnique(testRun.Result);
+            CheckThatIdsAreUnique(testRun.Result);
 
-        //    CheckTestRunEvents();
-        //}
+            CheckTestRunEvents();
+        }
 #endif
 
         #region Helper Methods
