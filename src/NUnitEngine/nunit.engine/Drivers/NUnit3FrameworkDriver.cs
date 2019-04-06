@@ -122,7 +122,7 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
 
-            CallbackHandler handler = new RunTestsCallbackHandler(listener);
+            var handler = new RunTestsCallbackHandler(listener);
 
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
             CreateObject(RUN_ACTION, _frameworkController, filter, handler);

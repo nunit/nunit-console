@@ -199,7 +199,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         private static TestEngineResult AddMetadata(TestEngineResult input)
         {
-            return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty);
+            return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty, string.Empty);
         }
 
         private string GetReport(TestDelegate del)

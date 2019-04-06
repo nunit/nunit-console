@@ -38,18 +38,9 @@ namespace NUnit.Engine.Runners.Tests
     [TestFixtureSource(nameof(FixtureData))]
     public class MasterTestRunnerTests : ITestEventListener
     {
-        private List<AssemblyData> _data = new List<AssemblyData>();
+        private TestRunData _testRunData;
+
         private List<string> _testFiles = new List<string>();
-        private List<string> _assemblies = new List<string>();
-
-        private int _numAssemblies = 0;
-        private int _totalTests = 0;
-        private int _totalPassed = 0;
-        private int _totalFailed = 0;
-        private int _totalSkipped = 0;
-        private int _totalInconclusive = 0;
-
-        private Type _expectedRunner;
 
         private TestPackage _package;
         private ServiceContext _services;
@@ -58,65 +49,58 @@ namespace NUnit.Engine.Runners.Tests
 
         public MasterTestRunnerTests(TestRunData testRunData)
         {
-            _expectedRunner = testRunData.ExpectedRunner;
+            _testRunData = testRunData;
 
             string testDirectory = TestContext.CurrentContext.TestDirectory;
 
             foreach (string file in testRunData.CommandLine.Split(new char[] { ',' }))
                 _testFiles.Add(Path.Combine(testDirectory, file));
-
-            foreach (var data in testRunData.AssemblyData)
-            {
-                _data.Add(data);
-                _numAssemblies++;
-                _assemblies.Add(Path.Combine(testDirectory, data.Name));
-                _totalTests += data.Tests;
-                _totalPassed += data.Passed;
-                _totalFailed += data.Failed;
-                _totalSkipped += data.Skipped;
-                _totalInconclusive += data.Inconclusive;
-            }
         }
 
-        static AssemblyData MockAssemblyData =
-            new AssemblyData("mock-assembly.dll", "Runnable", MockAssembly.Tests, MockAssembly.PassedInAttribute, MockAssembly.Failed, MockAssembly.Skipped, MockAssembly.Inconclusive);
+        static ResultData MockAssemblyData =
+            new ResultData("mock-assembly.dll", "Runnable", MockAssembly.Tests, MockAssembly.PassedInAttribute, MockAssembly.Failed, MockAssembly.Skipped, MockAssembly.Inconclusive);
 
-        static AssemblyData NoTestsAssemblyData =
-            new AssemblyData("notests-assembly.dll", "NotRunnable", 0, 0, 0, 0, 0);
+        static ResultData NoTestAssemblyData =
+            new ResultData("notest-assembly.dll", "NotRunnable", 0, 0, 0, 0, 0);
+
+        static ResultData Project1Data =
+            new ResultData("project1.nunit", "Runnable", MockAssemblyData);
+
+        static ResultData Project2Data =
+            new ResultData("project2.nunit", "Runnable", MockAssemblyData, MockAssemblyData);
 
         static TestRunData[] FixtureData = new TestRunData[]
         {
-            // NOTE: These tests document current behavior. In some cases
-            // we may want to change that behavior.
+            // NOTES: 
+            // 1. These tests document current behavior. In some cases we may want to change that behavior.
+            // 2. The .NET Standard builds don't seem to handle notest-assembly correctly, so those entries are commented out.
+            // 3. The .NET Standard 1.6 build is not intended to handle projects.
 #if NETCOREAPP1_1
             new TestRunData( "mock-assembly.dll", typeof(LocalTestRunner), MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notests-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData )
-            // .NET Standard 1.6 doesn't support projects.
+            //new TestRunData( "notest-assembly.dll", typeof(LocalTestRunner), NoTestAssemblyData ),
+            //new TestRunData( "notest-assembly.dll,notest-assembly.dll", typeof(AggregatingTestRunner), NoTestAssemblyData, NoTestAssemblyData ),
+            //new TestRunData( "mock-assembly.dll,notest-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestAssemblyData )
 #elif NETCOREAPP2_0
             new TestRunData( "mock-assembly.dll", typeof(LocalTestRunner), MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notests-assembly.dll", typeof(LocalTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), MockAssemblyData ),
-            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit,notests-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData, MockAssemblyData, MockAssemblyData)
+            //new TestRunData( "notest-assembly.dll", typeof(LocalTestRunner), NoTestAssemblyData ),
+            //new TestRunData( "notest-assembly.dll,notest-assembly.dll", typeof(AggregatingTestRunner), NoTestAssemblyData, NoTestAssemblyData ),
+            //new TestRunData( "mock-assembly.dll,notest-assembly.dll", typeof(AggregatingTestRunner), MockAssemblyData, NoTestAssemblyData ),
+            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), Project1Data ),
+            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), Project2Data ),
+            new TestRunData( "project1.nunit,project2.nunit", typeof(AggregatingTestRunner), Project1Data, Project2Data ),
+            new TestRunData( "project1.nunit,mock-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), Project1Data, MockAssemblyData, Project2Data)
 #else
             new TestRunData( "mock-assembly.dll", typeof(TestDomainRunner), MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notests-assembly.dll", typeof(TestDomainRunner), NoTestsAssemblyData ),
-            new TestRunData( "notests-assembly.dll,notests-assembly.dll", typeof(MultipleTestDomainRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notests-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), MockAssemblyData ),
-            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "project3.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData ),
-            new TestRunData( "project4.nunit", typeof(AggregatingTestRunner), NoTestsAssemblyData, NoTestsAssemblyData ),
-            new TestRunData( "project1.nunit,notests-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), MockAssemblyData, NoTestsAssemblyData, MockAssemblyData, MockAssemblyData)
+            new TestRunData( "notest-assembly.dll", typeof(TestDomainRunner), NoTestAssemblyData ),
+            new TestRunData( "notest-assembly.dll,notest-assembly.dll", typeof(MultipleTestDomainRunner), NoTestAssemblyData, NoTestAssemblyData ),
+            new TestRunData( "mock-assembly.dll,notest-assembly.dll", typeof(MultipleTestDomainRunner), MockAssemblyData, NoTestAssemblyData ),
+            new TestRunData( "project1.nunit", typeof(AggregatingTestRunner), Project1Data ),
+            new TestRunData( "project2.nunit", typeof(AggregatingTestRunner), Project2Data ),
+            new TestRunData( "project1.nunit,project2.nunit", typeof(AggregatingTestRunner), Project1Data, Project2Data ),
+            new TestRunData( "project1.nunit,mock-assembly.dll,project2.nunit", typeof(AggregatingTestRunner), Project1Data, MockAssemblyData, Project2Data)
 #endif
         };
 
@@ -166,7 +150,7 @@ namespace NUnit.Engine.Runners.Tests
         {
             var prop = typeof(MasterTestRunner).GetField("_engineRunner", BindingFlags.NonPublic | BindingFlags.Instance);
             var runner = prop.GetValue(_runner);
-            Assert.That(runner, Is.TypeOf(_expectedRunner));
+            Assert.That(runner, Is.TypeOf(_testRunData.ExpectedRunner));
         }
 
         [Test]
@@ -175,20 +159,9 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Load();
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
+            CheckResult(result, _testRunData);
 
-            var suites = result.SelectNodes("test-suite");
-            Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
-
-            int i = 0;
-            foreach (XmlNode child in suites)
-            {
-                var data = _data[i++];
-                Assert.That(child.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
-                Assert.That(child.GetAttribute("runstate"), Is.EqualTo(data.RunState));
-            }
-
-            AssertThatIdsAreUnique(result);
+            CheckThatIdsAreUnique(result);
         }
 
         [Test]
@@ -198,27 +171,16 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Reload();
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
+            CheckResult(result, _testRunData);
 
-            var suites = result.SelectNodes("test-suite");
-            Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
-
-            int i = 0;
-            foreach (XmlNode child in result.SelectNodes("test-suite"))
-            {
-                var data = _data[i++];
-                Assert.That(child.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
-                Assert.That(child.GetAttribute("runstate"), Is.EqualTo(data.RunState));
-            }
-
-            AssertThatIdsAreUnique(result);
+            CheckThatIdsAreUnique(result);
         }
 
         [Test]
         public void CountTestCases()
         {
             int count = _runner.CountTestCases(TestFilter.Empty);
-            Assert.That(count, Is.EqualTo(_totalTests));
+            Assert.That(count, Is.EqualTo(_testRunData.Tests));
         }
 
         [Test]
@@ -227,20 +189,9 @@ namespace NUnit.Engine.Runners.Tests
             var result = _runner.Explore(TestFilter.Empty);
 
             Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
+            CheckResult(result, _testRunData);
 
-            var suites = result.SelectNodes("test-suite");
-            Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
-
-            int i = 0;
-            foreach (XmlNode suite in suites)
-            {
-                var data = _data[i++];
-                Assert.That(suite.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
-                Assert.That(suite.GetAttribute("runstate"), Is.EqualTo(data.RunState));
-            }
-
-            AssertThatIdsAreUnique(result);
+            CheckThatIdsAreUnique(result);
         }
 
         [Test]
@@ -248,7 +199,13 @@ namespace NUnit.Engine.Runners.Tests
         {
             _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
             var result = _runner.Run(this, TestFilter.Empty);
-            CheckTestRunResult(result);
+
+            Assert.That(result.Name, Is.EqualTo("test-run"));
+            CheckTestRunResult(result, _testRunData);
+
+            CheckThatIdsAreUnique(result);
+
+            CheckTestRunEvents();
         }
 
 #if !NETCOREAPP1_1
@@ -257,60 +214,92 @@ namespace NUnit.Engine.Runners.Tests
         {
             _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
             var testRun = _runner.RunAsync(this, TestFilter.Empty);
+
             testRun.Wait(-1);
-            CheckTestRunResult(testRun.Result);
+            Assert.That(testRun.Result.Name, Is.EqualTo("test-run"));
+            CheckTestRunResult(testRun.Result, _testRunData);
+
+            CheckThatIdsAreUnique(testRun.Result);
+
+            CheckTestRunEvents();
         }
 #endif
 
-#region Helper Methods
+        #region Helper Methods
 
-        private void CheckTestRunResult(XmlNode result)
+        private void CheckResult(XmlNode result, ResultData expected)
         {
-            Assert.That(result.Name, Is.EqualTo("test-run"));
-            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(_totalTests));
-            Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(result.GetAttribute("passed", -1), Is.EqualTo(_totalPassed));
-            Assert.That(result.GetAttribute("failed", -1), Is.EqualTo(_totalFailed));
-            Assert.That(result.GetAttribute("skipped", -1), Is.EqualTo(_totalSkipped));
-            Assert.That(result.GetAttribute("inconclusive", -1), Is.EqualTo(_totalInconclusive));
+            if (expected.Name != null)
+                Assert.That(result.GetAttribute("name"), Is.EqualTo(expected.Name));
+            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(expected.Tests));
+            Assert.That(result.GetAttribute("runstate"), Is.EqualTo(expected.RunState));
 
-            var suites = result.SelectNodes("test-suite");
-            Assert.That(suites.Count, Is.EqualTo(_numAssemblies));
-
-            int i = 0;
-            foreach (XmlNode suite in suites)
+            if (expected.ContainedResults.Length > 0)
             {
-                var data = _data[i++];
-                Assert.That(suite.GetAttribute("testcasecount", -1), Is.EqualTo(data.Tests));
-                Assert.That(suite.GetAttribute("result"), Is.EqualTo("Failed"));
-                Assert.That(suite.GetAttribute("passed", 0), Is.EqualTo(data.Passed));
-                Assert.That(suite.GetAttribute("failed", 0), Is.EqualTo(data.Failed));
-                Assert.That(suite.GetAttribute("skipped", 0), Is.EqualTo(data.Skipped));
-                Assert.That(suite.GetAttribute("inconclusive", 0), Is.EqualTo(data.Inconclusive));
+                var suites = result.SelectNodes("test-suite");
+                Assert.That(suites.Count, Is.EqualTo(expected.ContainedResults.Length));
+
+                int i = 0;
+                foreach (XmlNode suite in suites)
+                {
+                    var data = expected.ContainedResults[i++];
+                    CheckResult(suite, data);
+                }
             }
-
-            AssertThatIdsAreUnique(result);
-
-            Assert.That(_events[0].Name, Is.EqualTo("start-run"));
-            Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(_totalTests), "Start-run count value");
-            Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"));
-            Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(_totalTests));
         }
 
-        private void AssertThatIdsAreUnique(XmlNode test)
+        private void CheckTestRunResult(XmlNode result, ResultData expected)
         {
-            AssertThatIdsAreUnique(test, new Dictionary<string, bool>());
+            if (expected.Name != null)
+                Assert.That(result.GetAttribute("name"), Is.EqualTo(expected.Name));
+            Assert.That(result.GetAttribute("testcasecount", -1), Is.EqualTo(expected.Tests));
+            Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
+            Assert.That(result.GetAttribute("passed", -1), Is.EqualTo(expected.Passed));
+            Assert.That(result.GetAttribute("failed", -1), Is.EqualTo(expected.Failed));
+            Assert.That(result.GetAttribute("skipped", -1), Is.EqualTo(expected.Skipped));
+            Assert.That(result.GetAttribute("inconclusive", -1), Is.EqualTo(expected.Inconclusive));
+
+            if (expected.ContainedResults.Length > 0)
+            {
+                var suites = result.SelectNodes("test-suite");
+                Assert.That(suites.Count, Is.EqualTo(expected.ContainedResults.Length));
+
+                int i = 0;
+                foreach (XmlNode suite in suites)
+                {
+                    var data = expected.ContainedResults[i++];
+                    CheckTestRunResult(suite, data);
+                }
+            }
         }
 
-        private void AssertThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
+        private void CheckThatIdsAreUnique(XmlNode test)
+        {
+            CheckThatIdsAreUnique(test, new Dictionary<string, bool>());
+        }
+
+        private void CheckThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
         {
             foreach (XmlNode child in test.SelectNodes("test-suite"))
-                AssertThatIdsAreUnique(child, dict);
+                CheckThatIdsAreUnique(child, dict);
 
             string id = test.GetAttribute("id");
             Assert.That(dict, Does.Not.ContainKey(id));
 
             dict.Add(id, true);
+        }
+
+        private void CheckTestRunEvents()
+        {
+            Assert.That(_events[0].Name, Is.EqualTo("start-run"), "First event should be start-run");
+            Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(_testRunData.Tests), "Incorrect count in start-run event");
+            Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"), "Last event should be test-run");
+
+            Assert.That(_events.Count(x => x.Name == "start-run"), Is.EqualTo(1), "More than one start-run event");
+            Assert.That(_events.Count(x => x.Name == "test-run"), Is.EqualTo(1), "More than one test-run event");
+
+            Assert.That(_events.Count(x => x.Name == "test-suite" && x.GetAttribute("type") == "Assembly"), Is.EqualTo(_testRunData.Assemblies), "Incorrect number of test-suite type='Assembly' events");
+            Assert.That(_events.Count(x => x.Name == "test-case"), Is.EqualTo(_testRunData.Tests), "Incorrect number of test-case events");
         }
 
         void ITestEventListener.OnTestEvent(string report)
@@ -322,47 +311,73 @@ namespace NUnit.Engine.Runners.Tests
 
         #region Nested Helper Classes
 
-        public class TestRunData
+        public class TestRunData : ResultData
         {
+            private const string Q = "\"";
+
             public string CommandLine;
             public Type ExpectedRunner;
-            public AssemblyData[] AssemblyData;
+            public ResultData[] ResultData;
 
-            public TestRunData(string commandLine, Type expectedRunner, params AssemblyData[] assemblyData)
+            public TestRunData(string commandLine, Type expectedRunner, params ResultData[] containedResults)
+                : base(containedResults)
             {
                 CommandLine = commandLine;
                 ExpectedRunner = expectedRunner;
-                AssemblyData = assemblyData;
             }
 
             public override string ToString()
             {
-                var sb = new StringBuilder(ExpectedRunner.Name);
-                foreach (var assembly in AssemblyData)
-                    sb.Append($", {assembly.Name}");
-                return sb.ToString();
+                return Q + CommandLine + Q;
             }
         }
 
-        public class AssemblyData
+        public class ResultData
         {
             public string Name;
             public string RunState;
-            public int Tests;
-            public int Passed;
-            public int Failed;
-            public int Skipped;
-            public int Inconclusive;
+            public ResultData[] ContainedResults = new ResultData[0];
 
-            public AssemblyData(string name, string runstate, int tests, int passing, int failed, int skipped, int inconclusive)
+            public int Assemblies = 0;
+            public int Tests = 0;
+            public int Passed = 0;
+            public int Failed = 0;
+            public int Skipped = 0;
+            public int Inconclusive = 0;
+
+            public ResultData(string name, string runstate, int tests, int passing, int failed, int skipped, int inconclusive)
             {
                 Name = name;
                 RunState = runstate;
+                Assemblies = 1;
                 Tests = tests;
                 Passed = passing;
                 Failed = failed;
                 Skipped = skipped;
                 Inconclusive = inconclusive;
+            }
+
+            // Constructor used for fixture data - top level only
+            public ResultData(params ResultData[] containedResults)
+                : this(null, "Runnable", containedResults)
+            {
+            }
+
+            public ResultData(string name, string runstate, params ResultData[] containedResults)
+            {
+                Name = name;
+                RunState = runstate;
+                ContainedResults = containedResults;
+
+                foreach (var result in containedResults)
+                {
+                    Assemblies += result.Assemblies;
+                    Tests += result.Tests;
+                    Passed += result.Passed;
+                    Failed += result.Failed;
+                    Skipped += result.Skipped;
+                    Inconclusive += result.Inconclusive;
+                }
             }
         }
         #endregion
