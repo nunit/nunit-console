@@ -81,18 +81,16 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode result, TextWriter writer)
         {
-            using (var xmlWriter = new XmlTextWriter(writer))
+            using (var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings {Indent = true, ConformanceLevel = ConformanceLevel.Auto}))
             {
-                xmlWriter.Formatting = Formatting.Indented;
                 _transform.Transform(result, xmlWriter);
             }
         }
 
         public void WriteResultFile(XmlNode result, string outputPath)
         {
-            using (var xmlWriter = new XmlTextWriter(outputPath, Encoding.UTF8))
+            using (var xmlWriter = XmlWriter.Create(new StreamWriter(outputPath), new XmlWriterSettings {Indent = true, ConformanceLevel = ConformanceLevel.Auto}))
             {
-                xmlWriter.Formatting = Formatting.Indented;
                 _transform.Transform(result, xmlWriter);
             }
         }
