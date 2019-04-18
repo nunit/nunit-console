@@ -123,6 +123,20 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
+        /// Reload the currently loaded test package.
+        /// </summary>
+        /// <returns>A TestEngineResult.</returns>
+        protected override TestEngineResult ReloadPackage()
+        {
+            var results = new List<TestEngineResult>();
+
+            foreach (var runner in Runners)
+                results.Add(runner.Reload());
+
+            return ResultHelper.Merge(results);
+        }
+
+        /// <summary>
         /// Unload any loaded TestPackages.
         /// </summary>
         public override void UnloadPackage()

@@ -110,6 +110,17 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
+        /// Reload the currently loaded test package.
+        /// </summary>
+        /// <returns>A TestEngineResult.</returns>
+        protected override TestEngineResult ReloadPackage()
+        {
+            log.Info("Reloading " + TestPackage.Name);
+
+            return _remoteRunner.Reload();
+        }
+
+        /// <summary>
         /// Unload any loaded TestPackage and clear
         /// the reference to the remote runner.
         /// </summary>

@@ -157,6 +157,21 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
+        protected override TestEngineResult ReloadPackage()
+        {
+            var result = new TestEngineResult();
+            var packages = TestPackage.Select(p => !p.HasSubPackages());
+
+            int index = 0;
+            foreach (IFrameworkDriver driver in _drivers)
+            {
+                var package = packages[index++];
+                result.Add(driver.Load(package.FullName, package.Settings));
+            }
+
+            return result;
+        }
+
         private static string LoadDriver(IFrameworkDriver driver, string testFile, TestPackage subPackage)
         {
             try

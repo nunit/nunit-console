@@ -80,14 +80,10 @@ namespace NUnit.Engine.Runners
         protected abstract TestEngineResult LoadPackage();
 
         /// <summary>
-        /// Reload the currently loaded test package. Overridden
-        /// in derived classes to take any additional action.
+        /// Reload the currently loaded test package.
         /// </summary>
         /// <returns>A TestEngineResult.</returns>
-        protected virtual TestEngineResult ReloadPackage()
-        {
-            return LoadPackage();
-        }
+        protected abstract TestEngineResult ReloadPackage();
 
         /// <summary>
         /// Unload any loaded TestPackage. Overridden in
