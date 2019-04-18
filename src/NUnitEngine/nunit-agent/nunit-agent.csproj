@@ -11,6 +11,7 @@
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <LangVersion>7</LangVersion>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Runtime.Remoting" />
