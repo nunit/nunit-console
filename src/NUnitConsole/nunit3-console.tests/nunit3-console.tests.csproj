@@ -9,6 +9,7 @@
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
     <LangVersion>7</LangVersion>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />

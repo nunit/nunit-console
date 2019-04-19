@@ -6,9 +6,9 @@ mono: 5.10.0 # Need 5.2+ for the included MSBuild.
 
 matrix:
   include:
-    - os: linux
+    - dist: xenial
       install:
-        - wget -q https://packages.microsoft.com/config/ubuntu/14.04/packages-microsoft-prod.deb
+        - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
         - sudo dpkg -i packages-microsoft-prod.deb
         - sudo apt-get install apt-transport-https
         - sudo apt-get update
