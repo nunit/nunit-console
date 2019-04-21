@@ -148,7 +148,7 @@ namespace NUnit.ConsoleRunner
                     {
                         OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
                         OutWriter.WriteLine();
-                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(ex));
+                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessageAndStackTrace(ex));
                         return ConsoleRunner.UNEXPECTED_ERROR;
                     }
                     finally

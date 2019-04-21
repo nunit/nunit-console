@@ -65,12 +65,12 @@ namespace NUnit.Engine.Internal
             catch (AppDomainUnloadedException ex)
             {
                 sb.AppendLine("Application domain was unloaded before all details could be read.");
-                Log.Error(ExceptionHelper.BuildStackTrace(ex));
+                Log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
             }
             catch (Exception ex)
             {
                 sb.AppendLine($"Error trying to read application domain details: {ex.Message}");
-                Log.Error(ExceptionHelper.BuildStackTrace(ex));
+                Log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
             }
             return sb.ToString();
         }

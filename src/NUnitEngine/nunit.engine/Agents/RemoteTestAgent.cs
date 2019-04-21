@@ -102,7 +102,7 @@ namespace NUnit.Engine.Agents
             }
             catch (Exception ex)
             {
-                log.Error("Unable to connect: {0}", ExceptionHelper.BuildStackTrace(ex));
+                log.Error("Unable to connect: {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
             }
 
             try
@@ -112,7 +112,7 @@ namespace NUnit.Engine.Agents
             }
             catch (Exception ex)
             {
-                log.Error("RemoteTestAgent: Failed to register with TestAgency. {0}", ExceptionHelper.BuildStackTrace(ex));
+                log.Error("RemoteTestAgent: Failed to register with TestAgency. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 return false;
             }
 

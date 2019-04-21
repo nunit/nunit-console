@@ -37,9 +37,9 @@ namespace NUnit.Engine
         /// <summary>
         /// Logs the specified message at the error level.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="format">The message.</param>
         /// <param name="args">The arguments.</param>
-        void Error(string message, params object[] args);
+        void Error(string format, params object[] args);
 
         /// <summary>
         /// Logs the specified message at the warning level.
@@ -50,9 +50,9 @@ namespace NUnit.Engine
         /// <summary>
         /// Logs the specified message at the warning level.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="format">The message.</param>
         /// <param name="args">The arguments.</param>
-        void Warning(string message, params object[] args);
+        void Warning(string format, params object[] args);
 
         /// <summary>
         /// Logs the specified message at the info level.
@@ -63,9 +63,9 @@ namespace NUnit.Engine
         /// <summary>
         /// Logs the specified message at the info level.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="format">The message.</param>
         /// <param name="args">The arguments.</param>
-        void Info(string message, params object[] args);
+        void Info(string format, params object[] args);
 
         /// <summary>
         /// Logs the specified message at the debug level.
@@ -76,8 +76,8 @@ namespace NUnit.Engine
         /// <summary>
         /// Logs the specified message at the debug level.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="format">The message.</param>
         /// <param name="args">The arguments.</param>
-        void Debug(string message, params object[] args);
+        void Debug(string format, params object[] args);
     }
 }

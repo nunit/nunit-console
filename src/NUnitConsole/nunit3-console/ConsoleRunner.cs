@@ -281,7 +281,7 @@ namespace NUnit.ConsoleRunner
             {
                 writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(engineException));
                 writer.WriteLine();
-                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(engineException));
+                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessageAndStackTrace(engineException));
             }
 
             return ConsoleRunner.UNEXPECTED_ERROR;

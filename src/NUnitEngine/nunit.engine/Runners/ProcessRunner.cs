@@ -80,7 +80,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildStackTrace(e));
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
             }
         }
@@ -126,7 +126,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Warning("Failed to unload the remote runner. {0}", ExceptionHelper.BuildStackTrace(e));
+                log.Warning("Failed to unload the remote runner. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 _remoteRunner = null;
                 throw;
             }
@@ -148,7 +148,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to count remote tests {0}", ExceptionHelper.BuildStackTrace(e));
+                log.Error("Failed to count remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return 0;
             }
         }
@@ -173,7 +173,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildStackTrace(e));
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
             }
         }
@@ -198,7 +198,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildStackTrace(e));
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 var result = new AsyncTestEngineResult();
                 result.SetResult(CreateFailedResult(e));
                 return result;
@@ -219,7 +219,7 @@ namespace NUnit.Engine.Runners
                 }
                 catch (Exception e)
                 {
-                    log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildStackTrace(e));
+                    log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 }
             }
         }
@@ -245,7 +245,7 @@ namespace NUnit.Engine.Runners
                     // Save and log the unload error
                     unloadException = ex;
                     log.Error(ExceptionHelper.BuildMessage(ex));
-                    log.Error(ExceptionHelper.BuildStackTrace(ex));
+                    log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
                 if (_agent != null && _agency.IsAgentRunning(_agent.Id))
@@ -266,7 +266,7 @@ namespace NUnit.Engine.Runners
                         else
                         {
 
-                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {ExceptionHelper.BuildMessage(se)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(se)}";
+                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {ExceptionHelper.BuildMessage(se)}{Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
                             log.Error(stopError);
 
                             // Stop error with no unload error, just rethrow
@@ -279,7 +279,7 @@ namespace NUnit.Engine.Runners
                     }
                     catch (Exception e)
                     {
-                        var stopError = $"Failed to stop the remote agent. {ExceptionHelper.BuildMessage(e)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(e)}";
+                        var stopError = $"Failed to stop the remote agent. {ExceptionHelper.BuildMessage(e)}{Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(e)}";
                         log.Error(stopError);
 
                         // Stop error with no unload error, just rethrow
@@ -345,7 +345,7 @@ namespace NUnit.Engine.Runners
 
             var failure = suite.AddElement("failure");
             failure.AddElementWithCDataSection("message", ExceptionHelper.BuildMessage(e));
-            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildStackTrace(e));
+            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildMessageAndStackTrace(e));
 
             return new TestEngineResult(suite);
         }
