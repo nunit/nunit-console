@@ -26,6 +26,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
+using System.Text;
 using NUnit.Common;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
@@ -178,15 +179,17 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
+            var agentArgs = new StringBuilder();
+
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
-            string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
+            agentArgs.Append("--pid=").Append(Process.GetCurrentProcess().Id);
             if (traceLevel != "Off")
-                agentArgs += " --trace:" + traceLevel;
+                agentArgs.Append(" --trace:").EscapeProcessArgument(traceLevel);
             if (debugAgent)
-                agentArgs += " --debug-agent";
+                agentArgs.Append(" --debug-agent");
             if (workDirectory != string.Empty)
-                agentArgs += " --work=\"" + workDirectory + "\"";
+                agentArgs.Append(" --work=").EscapeProcessArgument(workDirectory);
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
