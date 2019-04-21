@@ -114,13 +114,12 @@ namespace NUnit.Agent
             // Create TestEngine - this program is
             // conceptually part of  the engine and
             // can access its internals as needed.
-            TestEngine engine = new TestEngine();
-
-            // TODO: We need to get this from somewhere. Argument?
-            engine.InternalTraceLevel = InternalTraceLevel.Debug;
+            var engine = new TestEngine
+            {
+                InternalTraceLevel = traceLevel
+            };
 
             // Custom Service Initialization
-            //log.Info("Adding Services");
             engine.Services.Add(new ExtensionService());
             engine.Services.Add(new DomainManager());
             engine.Services.Add(new InProcessTestRunnerFactory());
