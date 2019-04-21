@@ -80,7 +80,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", e.Message);
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildStackTrace(e));
                 return CreateFailedResult(e);
             }
         }
@@ -126,7 +126,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Warning("Failed to unload the remote runner. {0}", e.Message);
+                log.Warning("Failed to unload the remote runner. {0}", ExceptionHelper.BuildStackTrace(e));
                 _remoteRunner = null;
                 throw;
             }
@@ -148,7 +148,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to count remote tests {0}", e.Message);
+                log.Error("Failed to count remote tests {0}", ExceptionHelper.BuildStackTrace(e));
                 return 0;
             }
         }
@@ -173,7 +173,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", e.Message);
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildStackTrace(e));
                 return CreateFailedResult(e);
             }
         }
@@ -198,7 +198,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", e.Message);
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildStackTrace(e));
                 var result = new AsyncTestEngineResult();
                 result.SetResult(CreateFailedResult(e));
                 return result;
@@ -219,7 +219,7 @@ namespace NUnit.Engine.Runners
                 }
                 catch (Exception e)
                 {
-                    log.Error("Failed to stop the remote run. {0}", e.Message);
+                    log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildStackTrace(e));
                 }
             }
         }

@@ -19,6 +19,7 @@
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\nunit.engine\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\..\nunit.ico">
