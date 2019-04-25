@@ -55,8 +55,8 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
-        //Note: These tests currently overlap with RunnerSelectionTests, and are being removed as they are
-        //re-implemented in that test class
+        // Note: These tests currently overlap with RunnerSelectionTests, and are being removed as they are
+        // re-implemented in that test class
 #if NETCOREAPP1_1
 #elif NETCOREAPP2_0
         // Two files
