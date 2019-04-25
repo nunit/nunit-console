@@ -49,7 +49,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCaseSource(nameof(TestCases))]
         public void StackTraceContainsAllInnerExceptions(Exception ex, params Type[] expectedExceptions)
         {
-            var stackTrace = ExceptionHelper.BuildStackTrace(ex);
+            var stackTrace = ExceptionHelper.BuildMessageAndStackTrace(ex);
 
             Assert.Multiple(() =>
             {

@@ -60,7 +60,7 @@ namespace NUnit.Common
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <returns>A combined stack trace.</returns>
-        public static string BuildStackTrace(Exception exception)
+        public static string BuildMessageAndStackTrace(Exception exception)
         {
             var sb = new StringBuilder("--");
             sb.AppendLine(exception.GetType().Name);

@@ -144,7 +144,7 @@ namespace NUnit.Agent
             }
             catch (Exception ex)
             {
-                log.Error("Exception in RemoteTestAgent", ex);
+                log.Error("Exception in RemoteTestAgent. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 Environment.Exit(AgentExitCodes.UNEXPECTED_EXCEPTION);
             }
             log.Info("Agent process {0} exiting cleanly", pid);
