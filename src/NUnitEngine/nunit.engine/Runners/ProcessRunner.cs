@@ -266,7 +266,7 @@ namespace NUnit.Engine.Runners
                         else
                         {
 
-                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {ExceptionHelper.BuildMessage(se)}{Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
+                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
                             log.Error(stopError);
 
                             // Stop error with no unload error, just rethrow
@@ -279,7 +279,7 @@ namespace NUnit.Engine.Runners
                     }
                     catch (Exception e)
                     {
-                        var stopError = $"Failed to stop the remote agent. {ExceptionHelper.BuildMessage(e)}{Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(e)}";
+                        var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e);
                         log.Error(stopError);
 
                         // Stop error with no unload error, just rethrow

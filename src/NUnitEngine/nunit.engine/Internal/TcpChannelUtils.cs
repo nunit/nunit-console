@@ -124,7 +124,7 @@ namespace NUnit.Engine.Internal
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Failed to create/register channel. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
+                    Log.Error("Failed to create/register channel." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex));
                     Thread.Sleep(300);
                 }
 
