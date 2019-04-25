@@ -31,6 +31,11 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 {
+    /// <summary>
+    /// Tests of ITestRunner tree structure for different combinations
+    /// of TestPackage and PackageSettings. Tests are currently defined
+    /// to protect existing behaviour, rather than define desired behaviour.
+    /// </summary>
     public class RunnerSelectionTests
     {
         private DefaultTestRunnerFactory _factory;

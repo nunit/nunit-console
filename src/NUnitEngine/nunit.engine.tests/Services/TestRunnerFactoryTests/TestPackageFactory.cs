@@ -27,9 +27,14 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
     {
         internal const string FakeProjectName = "a.nunit";
 
-        public static TestPackage OneAssembly()
+        public static TestPackage OneAssemblyStringCtor()
         {
             return new TestPackage("a.dll");
+        }
+
+        public static TestPackage OneAssemblyListCtor()
+        {
+            return new TestPackage(new [] { "a.dll" });
         }
 
         public static TestPackage TwoAssemblies()
@@ -37,7 +42,12 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             return new TestPackage(new[] { "a.dll", "b.dll" });
         }
 
-        public static TestPackage OneProject()
+        public static TestPackage OneProjectStringCtor()
+        {
+            return new TestPackage(FakeProjectName);
+        }
+
+        public static TestPackage OneProjectListCtor()
         {
             return new TestPackage(new[] { FakeProjectName });
         }

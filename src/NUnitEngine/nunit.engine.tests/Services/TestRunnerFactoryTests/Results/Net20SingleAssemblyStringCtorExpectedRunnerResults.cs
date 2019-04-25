@@ -28,7 +28,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
 {
 #if !NETCOREAPP
-    internal static class Net20SingleAssemblyExpectedRunnerResults
+    internal static class Net20SingleAssemblyStringCtorExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
             $"No expected Test result provided for this {nameof(ProcessModel)}/{nameof(DomainUsage)} combination.";

@@ -34,9 +34,14 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             get
             {
-                var testName = "Single assembly";
-                var package = TestPackageFactory.OneAssembly();
+                var testName = "Single assembly (string ctor)";
+                var package = TestPackageFactory.OneAssemblyStringCtor();
                 var expected = new RunnerResult { TestRunner = typeof(LocalTestRunner) };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Single assembly (list ctor)";
+                package = TestPackageFactory.OneAssemblyListCtor();
+                expected = new RunnerResult { TestRunner = typeof(LocalTestRunner) };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
                 testName = "Two assemblies";
@@ -53,8 +58,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
 #if NETCOREAPP2_0
-                testName = "Single project";
-                package = TestPackageFactory.OneProject();
+                testName = "Single project (list ctor)";
+                package = TestPackageFactory.OneProjectListCtor();
                 expected = new RunnerResult
                 {
                     TestRunner = typeof(AggregatingTestRunner),
@@ -62,6 +67,14 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     {
                         new RunnerResult { TestRunner = typeof(LocalTestRunner) }
                     }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Single project (string ctor)";
+                package = TestPackageFactory.OneProjectStringCtor();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(LocalTestRunner)
                 };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
