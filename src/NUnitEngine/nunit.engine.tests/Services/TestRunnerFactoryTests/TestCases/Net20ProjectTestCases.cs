@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2018 Charlie Poole, Rob Prouse
+// Copyright (c) 2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,36 +21,38 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.Collections.Generic;
-using NUnit.Engine.Runners;
+using System.Linq;
+using NUnit.Engine.Internal;
+using NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 {
-#if NETCOREAPP1_1 || NETCOREAPP2_0
-    internal static class NetStandardAssemblyTestCases
+#if !NETCOREAPP
+    internal static class Net20ProjectTestCases
     {
         public static IEnumerable<TestCaseData> TestCases
         {
             get
             {
-                var testName = "Single assembly";
-                var package = TestPackageFactory.OneAssembly();
-                var expected = new RunnerResult { TestRunner = typeof(LocalTestRunner) };
-                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
-
-                testName = "Two assemblies";
-                package = TestPackageFactory.TwoAssemblies();
-                expected = new RunnerResult
+                foreach (var processModel in Enum.GetValues(typeof(ProcessModel)).Cast<ProcessModel>())
                 {
-                    TestRunner = typeof(AggregatingTestRunner),
-                    SubRunners = new[]
+                    foreach (var domainUsage in Enum.GetValues(typeof(DomainUsage)).Cast<DomainUsage>())
                     {
-                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
-                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                        var testName = "Single project - " +
+                                       $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel} " +
+                                       $"{nameof(EnginePackageSettings.DomainUsage)}:{domainUsage}";
+
+                        var package = TestPackageFactory.OneProject();
+                        package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
+                        package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
+
+                        var expected = Net20SingleProjectExpectedRunnerResults.ResultFor(processModel, domainUsage);
+                        yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
                     }
-                };
-                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+                }
             }
         }
     }

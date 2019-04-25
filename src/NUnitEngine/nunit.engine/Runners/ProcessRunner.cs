@@ -57,12 +57,6 @@ namespace NUnit.Engine.Runners
             _agency = Services.GetService<TestAgency>();
         }
 
-        #region Properties
-
-        public RuntimeFramework RuntimeFramework { get; private set; }
-
-        #endregion
-
         #region AbstractTestRunner Overrides
 
         /// <summary>
