@@ -64,6 +64,19 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     }
                 };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Two projects";
+                package = TestPackageFactory.TwoProjects();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 #endif
             }
         }

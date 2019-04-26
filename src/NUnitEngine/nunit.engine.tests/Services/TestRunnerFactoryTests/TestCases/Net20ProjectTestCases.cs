@@ -51,6 +51,17 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                         var expected = Net20SingleProjectExpectedRunnerResults.ResultFor(processModel, domainUsage);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                        testName = "Two projects - " +
+                                       $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel} " +
+                                       $"{nameof(EnginePackageSettings.DomainUsage)}:{domainUsage}";
+
+                        package = TestPackageFactory.TwoProjects();
+                        package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
+                        package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
+
+                        expected = Net20TwoProjectExpectedRunnerResults.ResultFor(processModel, domainUsage);
+                        yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
                     }
                 }
             }

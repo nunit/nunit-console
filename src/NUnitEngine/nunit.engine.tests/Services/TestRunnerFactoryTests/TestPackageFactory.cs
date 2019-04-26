@@ -41,5 +41,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         {
             return new TestPackage(new[] { FakeProjectName });
         }
+
+        public static TestPackage TwoProjects()
+        {
+            return new TestPackage(new[] { FakeProjectName, FakeProjectName });
+        }
     }
 }
