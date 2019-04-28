@@ -76,7 +76,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if NETCOREAPP
         private static IEnumerable<TestCaseData> TestCases => NetStandardTestCases.TestCases;
 #else
-        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases.Concat(Net20ProjectTestCases.TestCases);
+        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases
+            .Concat(Net20ProjectTestCases.TestCases)
+            .Concat(Net20MixedProjectAndAssemblyTestCases.TestCases);
 #endif
     }
 }
