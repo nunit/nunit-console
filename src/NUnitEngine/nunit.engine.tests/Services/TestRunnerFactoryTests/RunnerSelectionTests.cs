@@ -33,7 +33,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 {
     /// <summary>
     /// Tests of ITestRunner tree structure for different combinations
-    /// of TestPackage and PackageSettings. Tests are currently defined
+    /// of TestPackage and PackageSettings. Tests are currently written
     /// to protect existing behaviour, rather than define desired behaviour.
     /// </summary>
     public class RunnerSelectionTests
