@@ -47,7 +47,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if !NETCOREAPP1_1
             services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
-            projectService.Add(TestPackageFactory.FakeProjectName, "a.dll", "b.dll");
+            projectService.Add(TestPackageFactory.FakeProject, "a.dll", "b.dll");
             services.Add(projectService);
 #endif
             _factory = new DefaultTestRunnerFactory();

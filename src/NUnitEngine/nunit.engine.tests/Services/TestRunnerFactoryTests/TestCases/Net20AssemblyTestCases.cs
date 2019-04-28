@@ -43,7 +43,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     {
                         yield return SingleAssemblyStringCtorTest(processModel, domainUsage);
                         yield return SingleAssemblyListCtorTest(processModel, domainUsage);
+                        yield return SingleUnknownExtensionTest(processModel, domainUsage);
                         yield return TwoAssembliesTest(processModel, domainUsage);
+                        yield return TwoUnknownsTest(processModel, domainUsage);
                     }
                 }
             }
@@ -78,6 +80,20 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
 
+        private static TestCaseData SingleUnknownExtensionTest(ProcessModel processModel, DomainUsage domainUsage)
+        {
+            var testName = "Single unknown - " +
+                           $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel} " +
+                           $"{nameof(EnginePackageSettings.DomainUsage)}:{domainUsage}";
+
+            var package = TestPackageFactory.OneUnknownExtension();
+            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
+            package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
+
+            var expected = Net20SingleAssemblyListCtorExpectedRunnerResults.ResultFor(processModel, domainUsage);
+            return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+        }
+
         private static TestCaseData TwoAssembliesTest(ProcessModel processModel, DomainUsage domainUsage)
         {
             var testName = "Two assemblies - " +
@@ -85,6 +101,20 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                            $"{nameof(EnginePackageSettings.DomainUsage)}:{domainUsage}";
 
             var package = TestPackageFactory.TwoAssemblies();
+            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
+            package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
+
+            var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel, domainUsage);
+            return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+        }
+
+        private static TestCaseData TwoUnknownsTest(ProcessModel processModel, DomainUsage domainUsage)
+        {
+            var testName = "Two unknown extensions - " +
+                           $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel} " +
+                           $"{nameof(EnginePackageSettings.DomainUsage)}:{domainUsage}";
+
+            var package = TestPackageFactory.TwoUnknownExtension();
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
             package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
 
