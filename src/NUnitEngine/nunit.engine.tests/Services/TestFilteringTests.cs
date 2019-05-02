@@ -54,14 +54,18 @@ namespace NUnit.Engine.Services.Tests
             _driver.Load(mockAssemblyPath, new Dictionary<string, object>());
         }
 
+        // TODO: Uncomment the "double negative" tests when we are using an updated framework that handles them correctly.
         [TestCase("<filter/>", MockAssembly.Tests)]
         [TestCase("<filter><test>NUnit.Tests.Assemblies.MockTestFixture</test></filter>", MockTestFixture.Tests)]
+        //[TestCase("<filter><not><not><test>NUnit.Tests.Assemblies.MockTestFixture</test></not></not></filter>", MockTestFixture.Tests)]
         [TestCase("<filter><test>NUnit.Tests.Assemblies.MockTestFixture.IgnoreTest</test></filter>", 1)]
+        //[TestCase("<filter><not><not><test>NUnit.Tests.Assemblies.MockTestFixture.IgnoreTest</test></not></not></filter>", 1)]
         [TestCase("<filter><class>NUnit.Tests.Assemblies.MockTestFixture</class></filter>", MockTestFixture.Tests)]
         [TestCase("<filter><name>IgnoreTest</name></filter>", 1)]
         [TestCase("<filter><name>MockTestFixture</name></filter>", MockTestFixture.Tests + NUnit.Tests.TestAssembly.MockTestFixture.Tests)]
         [TestCase("<filter><method>IgnoreTest</method></filter>", 1)]
         [TestCase("<filter><cat>FixtureCategory</cat></filter>", MockTestFixture.Tests)]
+        //[TestCase("<filter><not><not><cat>FixtureCategory</cat></not></not></filter>", MockTestFixture.Tests)]
         public void UsingXml(string filter, int count)
         {
             Assert.That(_driver.CountTestCases(filter), Is.EqualTo(count));
