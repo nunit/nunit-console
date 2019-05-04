@@ -69,6 +69,8 @@ namespace NUnit.Engine.Tests
         [TestCase("cat==Urgent && test=='My.Tests' || cat == high", "<or><and><cat>Urgent</cat><test>My.Tests</test></and><cat>high</cat></or>")]
         [TestCase("cat==Urgent && (test=='My.Tests' || cat == high)", "<and><cat>Urgent</cat><or><test>My.Tests</test><cat>high</cat></or></and>")]
         [TestCase("cat==Urgent && !(test=='My.Tests' || cat == high)", "<and><cat>Urgent</cat><not><or><test>My.Tests</test><cat>high</cat></or></not></and>")]
+        [TestCase("!(test!='My.Tests')", "<not><not><test>My.Tests</test></not></not>")]
+        [TestCase("!(cat!=Urgent)", "<not><not><cat>Urgent</cat></not></not>")]
         public void TestParser(string input, string output)
         {
             Assert.That(_parser.Parse(input), Is.EqualTo(output));
