@@ -43,13 +43,13 @@ namespace NUnit.Engine.Runners
         // MasterTestRunner is the only runner that is passed back
         // to users asking for an ITestRunner. The actual details of
         // execution are handled by various internal runners, which
-        // impement ITestEngineRunner.
+        // implement ITestEngineRunner.
         //
         // Explore and execution results from MasterTestRunner are
         // returned as XmlNodes, created from the internal 
         // TestEngineResult representation.
         // 
-        // MasterTestRUnner is responsible for creating the test-run
+        // MasterTestRunner is responsible for creating the test-run
         // element, which wraps all the individual assembly and project
         // results.
 
@@ -66,11 +66,8 @@ namespace NUnit.Engine.Runners
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
-            if (services == null) throw new ArgumentNullException("services");
-            if (package == null) throw new ArgumentNullException("package");
-
-            _services = services;
-            TestPackage = package;
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            TestPackage = package ?? throw new ArgumentNullException(nameof(package));
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
@@ -80,9 +77,9 @@ namespace NUnit.Engine.Runners
 #if !NETSTANDARD1_6
             _extensionService = _services.GetService<ExtensionService>();
 #endif
-            _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
-
             InitializePackage();
+
+            _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
         }
 
 #region Properties
@@ -335,9 +332,9 @@ namespace NUnit.Engine.Runners
             return topLevelResult;
         }
 
-        private void EnsurePackagesAreExpanded(TestPackage package)
+        internal void EnsurePackagesAreExpanded(TestPackage package)
         {
-            if (package == null) throw new ArgumentNullException("package");
+            if (package == null) throw new ArgumentNullException(nameof(package));
 
             foreach (var subPackage in package.SubPackages)
             {
@@ -352,7 +349,7 @@ namespace NUnit.Engine.Runners
 
         private bool IsProjectPackage(TestPackage package)
         {
-            if (package == null) throw new ArgumentNullException("package");
+            if (package == null) throw new ArgumentNullException(nameof(package));
 
             return
                 _projectService != null

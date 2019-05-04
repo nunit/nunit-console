@@ -35,19 +35,31 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 
         public override string ToString()
         {
+            return Environment.NewLine + ToString(0) + Environment.NewLine;
+        }
+
+        private string ToString(int level)
+        {
+            var tabs = new string('\t', level);
+
             var sb = new StringBuilder();
-            sb.AppendLine($"TestRunner: {TestRunner.Name}");
+            sb.AppendLine($"{tabs}TestRunner: {TestRunner.Name}");
 
             if (SubRunners.Count == 0)
                 return sb.ToString().Trim();
 
-            sb.AppendLine("SubRunners:");
+            level++;
+            tabs = new string('\t', level);
+
+            sb.AppendLine(tabs + "SubRunners:");
+
+            level++;
+            tabs = new string('\t', level);
 
             foreach (var subRunner in SubRunners)
             {
-                sb.AppendLine($"\t{subRunner}");
+                sb.AppendLine($"{tabs}{subRunner.ToString(level)}");
             }
-
             return sb.ToString().Trim();
         }
     }

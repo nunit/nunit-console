@@ -43,6 +43,11 @@ namespace NUnit.Engine.Internal
             return package.SubPackages.Count > 0;
         }
 
+        public static bool HasMultipleAssemblies(this TestPackage package)
+        {
+            return package.Select(p => p.IsAssemblyPackage()).Count > 1;
+        }
+
         public static IList<TestPackage> Select(this TestPackage package, TestPackageSelectorDelegate selector)
         {
             var selection = new List<TestPackage>();

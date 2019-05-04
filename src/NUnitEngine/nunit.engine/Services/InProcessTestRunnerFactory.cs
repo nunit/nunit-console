@@ -45,7 +45,9 @@ namespace NUnit.Engine.Services
         public virtual ITestEngineRunner MakeTestRunner(TestPackage package)
         {
 #if NETSTANDARD1_6 || NETSTANDARD2_0
-            return new LocalTestRunner(ServiceContext, package);
+            return package.HasMultipleAssemblies() ? 
+                (ITestEngineRunner)new AggregatingTestRunner(ServiceContext, package) : 
+                new LocalTestRunner(ServiceContext, package);
 #else
             DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(
                 typeof(DomainUsage),
@@ -55,7 +57,7 @@ namespace NUnit.Engine.Services
             {
                 default:
                 case DomainUsage.Default:
-                    if (package.SubPackages.Count > 1)
+                    if (package.HasMultipleAssemblies())
                         return new MultipleTestDomainRunner(this.ServiceContext, package);
                     else
                         return new TestDomainRunner(this.ServiceContext, package);

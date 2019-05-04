@@ -21,6 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using NUnit.Engine.Internal;
+
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 namespace NUnit.Engine.Runners
 {
@@ -41,7 +43,7 @@ namespace NUnit.Engine.Runners
 
         protected override ITestEngineRunner CreateRunner(TestPackage package)
         {
-            return new TestDomainRunner(Services, package);
+            return package.HasSubPackages() ? (ITestEngineRunner)new MultipleTestDomainRunner(Services, package) : new TestDomainRunner(Services, package);
         }
 
         #endregion

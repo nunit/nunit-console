@@ -56,5 +56,20 @@ namespace NUnit.Engine.Services.Tests.Fakes
         {
             return Path.GetExtension(path) == _supportedExtension;
         }
+
+        internal void ExpandAllProjects(TestPackage package)
+        {
+            if (package == null) throw new ArgumentNullException(nameof(package));
+
+            foreach (var subPackage in package.SubPackages)
+            {
+                ExpandAllProjects(subPackage);
+            }
+
+            if (package.Name != null)
+            {
+                ((IProjectService)this).ExpandProjectPackage(package);
+            }
+        }
     }
 }

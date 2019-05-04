@@ -23,6 +23,7 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {
@@ -54,7 +55,7 @@ namespace NUnit.Engine.Runners
 
         protected override ITestEngineRunner CreateRunner(TestPackage package)
         {
-            return new ProcessRunner(Services, package);
+            return package.HasSubPackages() ? (ITestEngineRunner)new MultipleTestProcessRunner(Services, package) : new ProcessRunner(Services, package);
         }
 
         #endregion
