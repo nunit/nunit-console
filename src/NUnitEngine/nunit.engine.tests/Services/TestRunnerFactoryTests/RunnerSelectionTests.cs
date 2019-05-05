@@ -31,6 +31,11 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 {
+    /// <summary>
+    /// Tests of ITestRunner tree structure for different combinations
+    /// of TestPackage and PackageSettings. Tests are currently written
+    /// to protect existing behaviour, rather than define desired behaviour.
+    /// </summary>
     public class RunnerSelectionTests
     {
         private DefaultTestRunnerFactory _factory;
@@ -42,7 +47,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if !NETCOREAPP1_1
             services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
-            projectService.Add(TestPackageFactory.FakeProjectName, "a.dll", "b.dll");
+            projectService.Add(TestPackageFactory.FakeProject, "a.dll", "b.dll");
             services.Add(projectService);
 #endif
             _factory = new DefaultTestRunnerFactory();
@@ -71,7 +76,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if NETCOREAPP
         private static IEnumerable<TestCaseData> TestCases => NetStandardTestCases.TestCases;
 #else
-        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases.Concat(Net20ProjectTestCases.TestCases);
+        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases
+            .Concat(Net20ProjectTestCases.TestCases)
+            .Concat(Net20MixedProjectAndAssemblyTestCases.TestCases);
 #endif
     }
 }

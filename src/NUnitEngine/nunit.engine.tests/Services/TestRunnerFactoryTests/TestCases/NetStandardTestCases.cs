@@ -34,9 +34,14 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             get
             {
-                var testName = "Single assembly";
-                var package = TestPackageFactory.OneAssembly();
+                var testName = "Single assembly (string ctor)";
+                var package = TestPackageFactory.OneAssemblyStringCtor();
                 var expected = new RunnerResult { TestRunner = typeof(LocalTestRunner) };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Single assembly (list ctor)";
+                package = TestPackageFactory.OneAssemblyListCtor();
+                expected = new RunnerResult { TestRunner = typeof(LocalTestRunner) };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
                 testName = "Two assemblies";
@@ -53,8 +58,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
 #if NETCOREAPP2_0
-                testName = "Single project";
-                package = TestPackageFactory.OneProject();
+                testName = "Single project (list ctor)";
+                package = TestPackageFactory.OneProjectListCtor();
                 expected = new RunnerResult
                 {
                     TestRunner = typeof(AggregatingTestRunner),
@@ -65,6 +70,22 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
+                testName = "Single project (string ctor)";
+                package = TestPackageFactory.OneProjectStringCtor();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(LocalTestRunner)
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Single unknown extension (list ctor)";
+                package = TestPackageFactory.OneUnknownExtension();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(LocalTestRunner)
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
                 testName = "Two projects";
                 package = TestPackageFactory.TwoProjects();
                 expected = new RunnerResult
@@ -72,6 +93,74 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     TestRunner = typeof(AggregatingTestRunner),
                     SubRunners = new[]
                     {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "One project, one assembly";
+                package = TestPackageFactory.OneProjectOneAssembly();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Two projects, one assembly";
+                package = TestPackageFactory.TwoProjectsOneAssembly();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Two assemblies, one project";
+                package = TestPackageFactory.TwoAssembliesOneProject();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "Two unknown extensions";
+                package = TestPackageFactory.TwoUnknownExtension();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                    }
+                };
+                yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+
+                testName = "One assembly, one project, one unknown";
+                package = TestPackageFactory.OneAssemblyOneProjectOneUnknown();
+                expected = new RunnerResult
+                {
+                    TestRunner = typeof(AggregatingTestRunner),
+                    SubRunners = new[]
+                    {
+                        new RunnerResult { TestRunner = typeof(LocalTestRunner) },
                         new RunnerResult { TestRunner = typeof(LocalTestRunner) },
                         new RunnerResult { TestRunner = typeof(LocalTestRunner) }
                     }
