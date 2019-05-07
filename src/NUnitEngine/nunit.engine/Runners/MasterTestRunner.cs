@@ -53,7 +53,7 @@ namespace NUnit.Engine.Runners
         // element, which wraps all the individual assembly and project
         // results.
 
-        private readonly ITestEngineRunner _engineRunner;
+        private ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
 #if !NETSTANDARD1_6
         private readonly ExtensionService _extensionService;
@@ -62,6 +62,7 @@ namespace NUnit.Engine.Runners
 #endif
 #endif
         private readonly IProjectService _projectService;
+        private ITestRunnerFactory _testRunnerFactory;
         private bool _disposed;
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
@@ -74,18 +75,19 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
+            _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
+
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
 #if !NETSTANDARD1_6
             _extensionService = _services.GetService<ExtensionService>();
 #endif
-            _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
 
             InitializePackage();
         }
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// The TestPackage for which this is the runner
@@ -122,7 +124,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the loaded assembly.</returns>
         public XmlNode Load()
         {
-            LoadResult = PrepareResult(_engineRunner.Load()).MakeTestRunResult(TestPackage);
+            LoadResult = PrepareResult(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -143,7 +145,7 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public XmlNode Reload()
         {
-            LoadResult = PrepareResult(_engineRunner.Reload()).MakeTestRunResult(TestPackage);
+            LoadResult = PrepareResult(GetEngineRunner().Reload()).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -156,7 +158,7 @@ namespace NUnit.Engine.Runners
         /// <returns>The count of test cases.</returns>
         public int CountTestCases(TestFilter filter)
         {
-            return _engineRunner.CountTestCases(filter);
+            return GetEngineRunner().CountTestCases(filter);
         }
 
         /// <summary>
@@ -204,7 +206,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            LoadResult = PrepareResult(_engineRunner.Explore(filter))
+            LoadResult = PrepareResult(GetEngineRunner().Explore(filter))
                 .MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
@@ -268,6 +270,14 @@ namespace NUnit.Engine.Runners
             {
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
             }
+        }
+
+        private ITestEngineRunner GetEngineRunner()
+        {
+            if (_engineRunner == null)
+                _engineRunner = _testRunnerFactory.MakeTestRunner(TestPackage);
+
+            return _engineRunner;
         }
 
         // The TestEngineResult returned to MasterTestRunner contains no info
@@ -412,7 +422,7 @@ namespace NUnit.Engine.Runners
         {
             if (!IsPackageLoaded) return 0;
 
-            return _engineRunner.CountTestCases(filter);
+            return GetEngineRunner().CountTestCases(filter);
         }
 
         /// <summary>
@@ -439,7 +449,7 @@ namespace NUnit.Engine.Runners
             DateTime startTime = DateTime.UtcNow;
             long startTicks = Stopwatch.GetTimestamp();
 
-            TestEngineResult result = PrepareResult(_engineRunner.Run(eventDispatcher, filter)).MakeTestRunResult(TestPackage);
+            TestEngineResult result = PrepareResult(GetEngineRunner().Run(eventDispatcher, filter)).MakeTestRunResult(TestPackage);
 
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);
