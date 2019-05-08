@@ -84,7 +84,9 @@ namespace NUnit.Engine.Runners
             _extensionService = _services.GetService<ExtensionService>();
 #endif
 
-            InitializePackage();
+            // Last chance to catch invalid settings in package,
+            // in case the client runner missed them.
+            ValidatePackageSettings();
         }
 
         #region Properties
@@ -240,42 +242,25 @@ namespace NUnit.Engine.Runners
 
 #region Helper Methods
 
-        /// <summary>
-        /// Check the package settings, expand projects and
-        /// determine what runtimes may be needed.
-        /// </summary>
-        private void InitializePackage()
-        {
-            // Last chance to catch invalid settings in package,
-            // in case the client runner missed them.
-            ValidatePackageSettings();
-
-            // Some files in the top level package may be projects.
-            // Expand them so that they contain subprojects for
-            // each contained assembly.
-            EnsurePackagesAreExpanded(TestPackage);
-
-            // Use SelectRuntimeFramework for its side effects.
-            // Info will be left behind in the package about
-            // each contained assembly, which will subsequently
-            // be used to determine how to run the assembly.
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-            _runtimeService.SelectRuntimeFramework(TestPackage);
-#endif
-
-            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
-
-            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single")  &&
-                TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false))
-            {
-                throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
-            }
-        }
-
         private ITestEngineRunner GetEngineRunner()
         {
             if (_engineRunner == null)
+            {
+                // Some files in the top level package may be projects.
+                // Expand them so that they contain subprojects for
+                // each contained assembly.
+                EnsurePackagesAreExpanded(TestPackage);
+
+                // Use SelectRuntimeFramework for its side effects.
+                // Info will be left behind in the package about
+                // each contained assembly, which will subsequently
+                // be used to determine how to run the assembly.
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+                _runtimeService.SelectRuntimeFramework(TestPackage);
+#endif
+
                 _engineRunner = _testRunnerFactory.MakeTestRunner(TestPackage);
+            }
 
             return _engineRunner;
         }
@@ -375,7 +360,11 @@ namespace NUnit.Engine.Runners
         private void ValidatePackageSettings()
         {
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
+            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
+            var runningInProcess = processModel == "single" || processModel == "inprocess";
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
+            var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
+
             if (frameworkSetting.Length > 0)
             {
                 // Check requested framework is actually available
@@ -384,8 +373,7 @@ namespace NUnit.Engine.Runners
                     throw new NUnitEngineException(string.Format("The requested framework {0} is unknown or not available.", frameworkSetting));
 
                 // If running in process, check requested framework is compatible
-                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
-                if (processModel == "single" || processModel == "inprocess")
+                if (runningInProcess)
                 {
                     var currentFramework = RuntimeFramework.CurrentFramework;
 
@@ -398,6 +386,9 @@ namespace NUnit.Engine.Runners
                             "Cannot run {0} framework in process already running {1}.", frameworkSetting, currentFramework));
                 }
             }
+
+            if (runningInProcess && runAsX86 && IntPtr.Size == 8)
+                throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
 #endif
         }
 
