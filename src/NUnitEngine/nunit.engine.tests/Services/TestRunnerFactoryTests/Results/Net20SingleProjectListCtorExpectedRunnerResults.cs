@@ -60,10 +60,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                 case DomainUsage.Multiple:
                     return new RunnerResult
                     {
-                        TestRunner = typeof(MultipleTestProcessRunner),
+                        TestRunner = typeof(AggregatingTestRunner),
                         SubRunners = new[]
                         {
-                            new RunnerResult { TestRunner = typeof(ProcessRunner) }
+                            new RunnerResult { TestRunner = typeof(MultipleTestProcessRunner) }
                         }
                     };
                 default:
@@ -81,7 +81,11 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                 case DomainUsage.Multiple:
                     return new RunnerResult
                     {
-                        TestRunner = typeof(ProcessRunner)
+                        TestRunner = typeof(AggregatingTestRunner),
+                        SubRunners = new[]
+                        {
+                            new RunnerResult { TestRunner = typeof(ProcessRunner) }
+                        }
                     };
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
