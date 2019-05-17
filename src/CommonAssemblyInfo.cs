@@ -26,40 +26,31 @@ using System.Reflection;
 //
 // Common Information for the NUnit assemblies
 //
-[assembly: AssemblyProduct("NUnit 3")]
 [assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
 [assembly: AssemblyCompany("NUnit Software")]
-[assembly: AssemblyCopyright("Copyright (c) 2018 Charlie Poole, Rob Prouse")]
-
-#if PORTABLE
-[assembly: AssemblyMetadata("PCL", "True")]
-#endif
+[assembly: AssemblyCopyright("Copyright (c) 2019 Charlie Poole, Rob Prouse")]
 
 #if DEBUG
-#if NET_4_5
-[assembly: AssemblyConfiguration(".NET 4.5 Debug")]
-#elif NET_4_0
-[assembly: AssemblyConfiguration(".NET 4.0 Debug")]
-#elif NET_2_0
+#if NET35
+[assembly: AssemblyConfiguration(".NET 3.5 Debug")]
+#elif NET20
 [assembly: AssemblyConfiguration(".NET 2.0 Debug")]
-#elif PORTABLE
-[assembly: AssemblyConfiguration("Portable Debug")]
-#elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
-[assembly: AssemblyConfiguration(".NET Standard Debug")]
+#elif NETSTANDARD1_6 || NETCOREAPP1_1
+[assembly: AssemblyConfiguration(".NET Standard 1.6 Debug")]
+#elif NETSTANDARD2_0 || NETCOREAPP2_0
+[assembly: AssemblyConfiguration(".NET Standard 2.0 Debug")]
 #else
 [assembly: AssemblyConfiguration("Debug")]
 #endif
 #else
-#if NET_4_5
-[assembly: AssemblyConfiguration(".NET 4.5")]
-#elif NET_4_0
-[assembly: AssemblyConfiguration(".NET 4.0")]
-#elif NET_2_0
+#if NET35
+[assembly: AssemblyConfiguration(".NET 3.5")]
+#elif NET20
 [assembly: AssemblyConfiguration(".NET 2.0")]
-#elif PORTABLE
-[assembly: AssemblyConfiguration("Portable")]
-#elif NETSTANDARD1_3 || NETSTANDARD1_6 || NETCOREAPP1_0
-[assembly: AssemblyConfiguration(".NET Standard")]
+#elif NETSTANDARD1_6 || NETCOREAPP1_1
+[assembly: AssemblyConfiguration(".NET Standard 1.6")]
+#elif NETSTANDARD2_0 || NETCOREAPP2_0
+[assembly: AssemblyConfiguration(".NET Standard 2.0")]
 #else
 [assembly: AssemblyConfiguration("")]
 #endif

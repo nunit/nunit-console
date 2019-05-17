@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,10 +30,20 @@ namespace NUnit.Engine
     /// <summary>
     /// TestPackage holds information about a set of test files to
     /// be loaded by a TestRunner. Each TestPackage represents
-    /// tests for one or more test files. TestPackages may be named 
-    /// or anonymous, depending on how they are constructed.
+    /// tests for one or more test files. TestPackages may be named
+    /// or anonymous, depending on the constructor used.
+    /// 
+    /// Upon construction, a package is given an ID (string), which
+    /// remains unchanged for the lifetime of the TestPackage instance.
+    /// The package ID is passed to the test framework for use in generating
+    /// test IDs.
+    /// 
+    /// A runner that reloads test assemblies and wants the ids to remain stable
+    /// should avoid creating a new package but should instead use the original
+    /// package, changing settings as needed. This gives the best chance for the
+    /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
-#if !NETSTANDARD1_3
+#if !NETSTANDARD1_6
     [Serializable]
 #endif
     public class TestPackage
@@ -51,14 +61,7 @@ namespace NUnit.Engine
 
             if (filePath != null)
             {
-#if NETSTANDARD1_3
-                if (!Path.IsPathRooted(filePath))
-                    throw new NUnitEngineException("Paths to test assemblies must not be relative in .NET Standard");
-
-                FullName = filePath;
-#else
                 FullName = Path.GetFullPath(filePath);
-#endif
                 Settings = new Dictionary<string,object>();
                 SubPackages = new List<TestPackage>();
             }
@@ -168,16 +171,6 @@ namespace NUnit.Engine
             return Settings.ContainsKey(name)
                 ? (T)Settings[name]
                 : defaultSetting;
-        }
-
-        #endregion
-
-        #region Helper Methods
-
-        private static bool IsAssemblyFileType(string path)
-        {
-            string extension = Path.GetExtension(path).ToLower();
-            return extension == ".dll" || extension == ".exe";
         }
 
         #endregion

@@ -1,25 +1,31 @@
 language: csharp
 sudo: required
 
-dotnet: 2.1.4 # SDK version; includes runtime version 2.0.5. Need 2.0+ for netcoreapp2.0 tests.
-
+dotnet: 2.1.401
 mono: 5.10.0 # Need 5.2+ for the included MSBuild.
 
 matrix:
   include:
-    - os: linux
+    - dist: xenial
       install:
-        - sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.6
+        - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+        - sudo dpkg -i packages-microsoft-prod.deb
+        - sudo apt-get install apt-transport-https
+        - sudo apt-get update
+        - sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.2
+        - sudo apt-get install dotnet-runtime-2.0.6
 
-    - os: osx
-      install:
-        - curl https://download.microsoft.com/download/A/7/E/A7EF2AFF-F77B-4F77-A21B-0F7BD09A4065/dotnet-osx-x64.1.1.6.pkg -O
-        - sudo installer -pkg dotnet-osx-x64.1.1.6.pkg -target /
-
+# macOS package restore currently taking >30 mins on Travis
+#    - os: osx
       # .NET Core 2 requires OSX 10.12+
       # https://github.com/dotnet/core/blob/master/release-notes/2.0/2.0-supported-os.md#macos
       # https://docs.travis-ci.com/user/reference/osx/#OS-X-Version
-      osx_image: xcode9.1
+#      osx_image: xcode9.4
+#      install:
+#        - curl https://download.microsoft.com/download/D/0/2/D028801E-0802-43C8-9F9F-C7DB0A39B344/dotnet-osx-x64.1.1.2.pkg -O
+#        - sudo installer -pkg dotnet-osx-x64.1.1.2.pkg -target /
+#        - curl https://download.microsoft.com/download/8/D/A/8DA04DA7-565B-4372-BBCE-D44C7809A467/dotnet-runtime-2.0.6-osx-x64.pkg -O
+#        - sudo installer -pkg dotnet-runtime-2.0.6-osx-x64.pkg -target /
 
 script:
   - ./build.sh --target "Travis" --configuration "Release"

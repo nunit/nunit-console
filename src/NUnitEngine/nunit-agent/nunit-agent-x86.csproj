@@ -12,6 +12,8 @@
     <PlatformTarget>x86</PlatformTarget>
     <IntermediateOutputPath>obj\$(Configuration)\x86\</IntermediateOutputPath>
     <LangVersion>7</LangVersion>
+    <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Runtime.Remoting" />
@@ -19,6 +21,7 @@
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\nunit.engine\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\..\nunit.ico">

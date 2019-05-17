@@ -137,10 +137,10 @@ namespace NUnit.ConsoleRunner
                 string.Format("{0}) {1} : {2}", reportID, status, fullName));
 
             if (!string.IsNullOrEmpty(message))
-                writer.WriteLine(style, message);
+                writer.WriteLine(ColorStyle.Output, message);
 
             if (!string.IsNullOrEmpty(stackTrace))
-                writer.WriteLine(style, stackTrace);
+                writer.WriteLine(ColorStyle.Output, stackTrace);
 
             writer.WriteLine(); // Skip after each item
         }

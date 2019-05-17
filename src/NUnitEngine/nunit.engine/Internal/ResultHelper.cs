@@ -36,6 +36,7 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class ResultHelper
     {
+        private const string TEST_RUN_ELEMENT = "test-run";
         private const string TEST_SUITE_ELEMENT = "test-suite";
         private const string PROJECT_SUITE_TYPE = "Project";
 
@@ -47,12 +48,13 @@ namespace NUnit.Engine.Internal
         /// <param name="result">A new TestEngineResult with xml nodes for each assembly or project.</param>
         /// <param name="elementName">The root node name under which to aggregate the nodes.</param>
         /// <param name="suiteType">The suite type to associate with the <see cref="TestEngineResult"/>.</param>
+        /// <param name="id">The id of the <see cref="TestEngineResult"/></param>
         /// <param name="name">The name of the <see cref="TestEngineResult"/>.</param>
         /// <param name="fullName">The full name of the <see cref="TestEngineResult"/>.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string suiteType, string name, string fullName)
+        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string suiteType, string id, string name, string fullName)
         {
-            return new TestEngineResult(Aggregate(elementName, suiteType, name, fullName, result.XmlNodes));
+            return new TestEngineResult(Aggregate(elementName, suiteType, id, name, fullName, result.XmlNodes));
         }
 
         /// <summary>
@@ -60,24 +62,35 @@ namespace NUnit.Engine.Internal
         /// </summary>
         /// <param name="result">A new TestEngineResult with xml nodes for each assembly or project.</param>
         /// <param name="elementName">The root node name under which to aggregate the results.</param>
+        /// <param name="id">The id of the <see cref="TestEngineResult"/></param>
         /// <param name="name">The name of the <see cref="TestEngineResult"/>.</param>
         /// <param name="fullName">The full name of the <see cref="TestEngineResult"/>.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string name, string fullName)
+        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string id, string name, string fullName)
         {
-            return new TestEngineResult(Aggregate(elementName, name, fullName, result.XmlNodes));
+            return new TestEngineResult(Aggregate(elementName, id, name, fullName, result.XmlNodes));
         }
 
         /// <summary>
         /// Aggregate all the separate assembly results of a project as a single node.
         /// </summary>
         /// <param name="result">A new TestEngineResult with xml nodes for each assembly or project.</param>
-        /// <param name="name">The name of the <see cref="TestEngineResult"/>.</param>
-        /// <param name="fullName">The full name of the <see cref="TestEngineResult"/>.</param>
+        /// <param name="package">The <see cref="TestPackage"/> for which we are aggregating.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult MakePackageResult(this TestEngineResult result, string name, string fullName)
+        public static TestEngineResult MakeProjectResult(this TestEngineResult result, TestPackage package)
         {
-            return Aggregate(result, TEST_SUITE_ELEMENT, PROJECT_SUITE_TYPE, name, fullName);
+            return Aggregate(result, TEST_SUITE_ELEMENT, PROJECT_SUITE_TYPE, package.ID, package.Name, package.FullName);
+        }
+
+        /// <summary>
+        /// Aggregate all the separate assembly results of a test run as a single node.
+        /// </summary>
+        /// <param name="result">A new TestEngineResult with xml nodes for each assembly or project.</param>
+        /// <param name="package">The <see cref="TestPackage"/> for which we are aggregating.</param>
+        /// <returns>A TestEngineResult with a single top-level element.</returns>
+        public static TestEngineResult MakeTestRunResult(this TestEngineResult result, TestPackage package)
+        {
+            return Aggregate(result, TEST_RUN_ELEMENT, package.ID, package.Name, package.FullName);
         }
 
         #endregion
@@ -114,9 +127,9 @@ namespace NUnit.Engine.Internal
         /// <param name="fullName">The full name to associated with the root node.</param>
         /// <param name="resultNodes">A collection of XmlNodes to aggregate</param>
         /// <returns>A single XmlNode containing the aggregated list of XmlNodes.</returns>
-        public static XmlNode Aggregate(string elementName, string name, string fullName, IList<XmlNode> resultNodes)
+        public static XmlNode Aggregate(string elementName, string id, string name, string fullName, IList<XmlNode> resultNodes)
         {
-            return Aggregate(elementName, null, name, fullName, resultNodes);
+            return Aggregate(elementName, null, id, name, fullName, resultNodes);
         }
 
         /// <summary>
@@ -128,16 +141,17 @@ namespace NUnit.Engine.Internal
         /// <param name="fullName">The full name to associated with the root node.</param>
         /// <param name="resultNodes">A collection of XmlNodes to aggregate</param>
         /// <returns>A single XmlNode containing the aggregated list of XmlNodes.</returns>
-        public static XmlNode Aggregate(string elementName, string testType, string name, string fullName, IList<XmlNode> resultNodes)
+        public static XmlNode Aggregate(string elementName, string testType, string id, string name, string fullName, IList<XmlNode> resultNodes)
         {
             XmlNode combinedNode = XmlHelper.CreateTopLevelElement(elementName);
             if (testType != null)
                 combinedNode.AddAttribute("type", testType);
-            combinedNode.AddAttribute("id", "2"); // TODO: Should not be hard-coded
+            combinedNode.AddAttribute("id", id);
             if (name != null && name != string.Empty)
                 combinedNode.AddAttribute("name", name);
             if (fullName != null && fullName != string.Empty)
                 combinedNode.AddAttribute("fullname", fullName);
+            combinedNode.AddAttribute("runstate", "Runnable"); // If not, we would not have gotten this far
 
             string aggregateResult = "Inconclusive";
             string aggregateLabel = null;

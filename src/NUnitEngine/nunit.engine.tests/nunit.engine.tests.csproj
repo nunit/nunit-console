@@ -2,7 +2,8 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit.engine.tests</AssemblyName>
-    <TargetFrameworks>net35</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <OutputType Condition="'$(TargetFramework)'!='net35'">Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
@@ -10,15 +11,21 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>Full</DebugType>
     <LangVersion>7</LangVersion>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net35'">
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='net35'">
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageReference Include="NUnitLite" Version="3.11.0" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="0.1.0-dev-00079" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
@@ -36,6 +43,12 @@
     <Content Include="EngineTests.nunit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="..\..\NUnitConsole\nunit3-console.tests\TextSummary.xslt" Link="TextSummary.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="TransformWithDTD.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="alt.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -45,6 +58,6 @@
     <ItemGroup>
       <Net20Files Include="..\..\..\bin\$(Configuration)\net20\*" />
     </ItemGroup>
-    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)"/>
+    <Microsoft.Build.Tasks.Copy SourceFiles="@(Net20Files)" DestinationFolder="$(TargetDir)" Condition="'$(TargetFramework)'=='net35'" />
   </Target>
 </Project>

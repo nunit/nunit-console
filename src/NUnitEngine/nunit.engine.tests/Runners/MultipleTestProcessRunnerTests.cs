@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,25 +21,29 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Runners.Tests
 {
     public class MultipleTestProcessRunnerTests
     {
-        [TestCase(1, 0, ExpectedResult = 1)]
-        [TestCase(1, 1, ExpectedResult = 1)]
-        [TestCase(3, 0, ExpectedResult = 3)]
-        [TestCase(3, 1, ExpectedResult = 1)]
-        [TestCase(3, 2, ExpectedResult = 2)]
-        [TestCase(3, 3, ExpectedResult = 3)]
-        [TestCase(20, 8, ExpectedResult = 8)]
-        [TestCase(8, 20, ExpectedResult = 8)]
-        public int CheckLevelOfParallelism_ListOfAssemblies(int assemblyCount, int maxAgents)
+        [TestCase(1, null, 1)]
+        [TestCase(1, 1, 1)]
+        [TestCase(3, null, 3)]
+        [TestCase(3, 1, 1)]
+        [TestCase(3, 2, 2)]
+        [TestCase(3, 3, 3)]
+        [TestCase(20, 8, 8)]
+        [TestCase(8, 20, 8)]
+        public void CheckLevelOfParallelism_ListOfAssemblies(int assemblyCount, int? maxAgents, int expected)
         {
-            return CreateRunner(assemblyCount, maxAgents).LevelOfParallelism;
+            if (maxAgents == null)
+                expected = Math.Min(assemblyCount, Environment.ProcessorCount);
+
+            var runner = CreateRunner(assemblyCount, maxAgents);
+            Assert.That(runner, Has.Property(nameof(MultipleTestProcessRunner.LevelOfParallelism)).EqualTo(expected));
         }
 
         [Test]
@@ -52,13 +56,14 @@ namespace NUnit.Engine.Runners.Tests
         // Create a MultipleTestProcessRunner with a fake package consisting of
         // some number of assemblies and with an optional MaxAgents setting.
         // Zero means that MaxAgents is not specified.
-        MultipleTestProcessRunner CreateRunner(int assemblyCount, int maxAgents)
+        MultipleTestProcessRunner CreateRunner(int assemblyCount, int? maxAgents)
         {
             // Currently, we can get away with null entries here
             var package = new TestPackage(new string[assemblyCount]);
-            if (maxAgents > 0)
+            if (maxAgents != null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
             return new MultipleTestProcessRunner(new ServiceContext(), package);
         }
     }
 }
+#endif

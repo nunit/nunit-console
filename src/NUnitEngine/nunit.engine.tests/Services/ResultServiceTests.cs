@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -32,24 +32,13 @@ namespace NUnit.Engine.Services.Tests
     {
         private ResultService _resultService;
 
-#if NETCOREAPP1_1
-        [SetUp]
-        public void CreateService()
-        {
-            _resultService = new ResultService();
-        }
-
-        [Test]
-        public void AvailableFormats()
-        {
-            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases" }));
-        }
-#else
         [SetUp]
         public void CreateService()
         {
             var services = new ServiceContext();
+#if !NETCOREAPP1_1
             services.Add(new ExtensionService());
+#endif
             _resultService = new ResultService();
             services.Add(_resultService);
             services.ServiceManager.StartServices();
@@ -64,9 +53,12 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AvailableFormats()
         {
+#if NETCOREAPP1_1
+            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases" }));
+#else
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
-        }
 #endif
+        }
 
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]
         //[TestCase("nunit2", null, ExpectedResult = "NUnit2XmlResultWriter")]
@@ -80,7 +72,7 @@ namespace NUnit.Engine.Services.Tests
             return writer.GetType().Name;
         }
 
-#if !NETCOREAPP1_1
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
         [Test]
         public void CanGetWriterUser()
         {
@@ -92,7 +84,7 @@ namespace NUnit.Engine.Services.Tests
         public void NUnit3Format_NonExistentTransform_ThrowsArgumentException()
         {
             Assert.That(
-                () => _resultService.GetResultWriter("user", new object[] { "junk.xslt" }), 
+                () => _resultService.GetResultWriter("user", new object[] { "junk.xslt" }),
                 Throws.ArgumentException);
         }
 

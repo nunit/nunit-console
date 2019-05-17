@@ -103,8 +103,8 @@ namespace NUnit.ConsoleRunner.Tests
             var expected = new[] {
                 "Test Run Summary",
                 "  Overall result: Failed",
-               $"  Test Count: {MockAssembly.Tests}, Passed: {MockAssembly.Passed}, Failed: 5, Warnings: 1, Inconclusive: 1, Skipped: 7",
-                "    Failed Tests - Failures: 1, Errors: 1, Invalid: 3",
+               $"  Test Count: {MockAssembly.Tests}, Passed: {MockAssembly.Passed}, Failed: 11, Warnings: 1, Inconclusive: 1, Skipped: 7",
+                "    Failed Tests - Failures: 1, Errors: 7, Invalid: 3",
                 "    Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
                 "  Start time: 2015-10-19 02:12:28Z",
                 "    End time: 2015-10-19 02:12:29Z",
@@ -199,7 +199,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         private static TestEngineResult AddMetadata(TestEngineResult input)
         {
-            return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty);
+            return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty, string.Empty);
         }
 
         private string GetReport(TestDelegate del)

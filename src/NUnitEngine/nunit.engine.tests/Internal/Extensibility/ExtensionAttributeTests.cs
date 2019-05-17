@@ -31,21 +31,21 @@ namespace NUnit.Engine.Extensibility
         [Test]
         public void IsEnabledByDefault()
         {
-            Assert.True(new ExtensionAttribute().Enabled);
+            Assert.That(new ExtensionAttribute().Enabled, Is.True);
         }
 
         [Test]
         public void MayBeExplicitlyDisabled()
         {
             var attr = new ExtensionAttribute() { Enabled = false };
-            Assert.False(attr.Enabled);
+            Assert.That(attr.Enabled, Is.False);
         }
 
         [Test]
         public void MayBeExplicitlyEnabled()
         {
             var attr = new ExtensionAttribute() { Enabled = true };
-            Assert.True(attr.Enabled);
+            Assert.That(attr.Enabled, Is.True);
         }
     }
 }

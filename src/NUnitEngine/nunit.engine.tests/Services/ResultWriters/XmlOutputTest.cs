@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,7 +40,7 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
 
     /// <summary>
     /// This is the abstract base for all XML output tests,
-    /// which need to work on a TestEngineResult. Creating a 
+    /// which need to work on a TestEngineResult. Creating a
     /// second level engine in the test domain causes
     /// problems, so this class uses internal framework
     /// classes to run the test and then transforms the XML
@@ -48,7 +49,6 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
     public abstract class XmlOutputTest
     {
         private ITestEngine engine;
-        private string localDirectory;
 
         protected TestEngineResult EngineResult { get; private set; }
 
@@ -58,15 +58,12 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
         // Method used by derived classes to get the path to a file name
         protected string GetLocalPath(string fileName)
         {
-            return Path.Combine(localDirectory, fileName);
+            return Path.Combine(TestContext.CurrentContext.TestDirectory, fileName);
         }
 
         [OneTimeSetUp]
         public void InitializeTestEngineResult()
         {
-            // Save the local directory - used by GetLocalPath
-            Uri uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
-            localDirectory = Path.GetDirectoryName(uri.LocalPath);
 
             AssemblyPath = GetLocalPath(AssemblyName);
 
@@ -83,7 +80,7 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
             // Make sure the runner loaded the mock assembly.
             Assert.That(
                 runner.Load(AssemblyPath, settings).RunState.ToString(),
-                Is.EqualTo("Runnable"), 
+                Is.EqualTo("Runnable"),
                 "Unable to load mock-assembly.dll");
 
             // Run the tests, saving the result as an XML string
@@ -92,7 +89,8 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
             // Create a TestEngineResult from the string, just as the TestEngine does,
             // then add a test-run element to the result, wrapping the result so it
             // looks just like what the engine would return!
-            this.EngineResult = new TestEngineResult(xmlText).Aggregate("test-run", AssemblyName, AssemblyPath);
+            this.EngineResult = new TestEngineResult(xmlText).Aggregate("test-run", "ID", AssemblyName, AssemblyPath);
         }
     }
 }
+#endif

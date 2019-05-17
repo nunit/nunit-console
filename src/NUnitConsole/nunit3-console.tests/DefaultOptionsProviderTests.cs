@@ -25,7 +25,6 @@ using System;
 using NUnit.Common;
 using NUnit.Framework;
 
-#if !SILVERLIGHT && !NETCF && !PORTABLE
 namespace NUnit.ConsoleRunner.Tests
 {
     [TestFixture]
@@ -49,7 +48,7 @@ namespace NUnit.ConsoleRunner.Tests
             Environment.SetEnvironmentVariable(EnvironmentVariableTeamcityProjectName, "Abc");
 
             // Then
-            Assert.True(provider.TeamCity);
+            Assert.That(provider.TeamCity, Is.True);
         }
 
         [Test]
@@ -62,7 +61,7 @@ namespace NUnit.ConsoleRunner.Tests
             Environment.SetEnvironmentVariable(EnvironmentVariableTeamcityProjectName, string.Empty);
 
             // Then
-            Assert.False(provider.TeamCity);
+            Assert.That(provider.TeamCity, Is.False);
         }
 
         private static DefaultOptionsProvider CreateInstance()
@@ -71,4 +70,3 @@ namespace NUnit.ConsoleRunner.Tests
         }
     }
 }
-#endif

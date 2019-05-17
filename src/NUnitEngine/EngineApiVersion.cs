@@ -23,10 +23,7 @@
 
 using System.Reflection;
 
-//
-// Versioning for the nunit.engine.api assembly.
-// The api is maintained at a fixed version number even
-// as new releases of the engine itself are created.
-//
+[assembly: AssemblyProduct("NUnit Engine API")]
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.9.0.0")]
+[assembly: AssemblyInformationalVersion("3.11.0")]
+[assembly: AssemblyFileVersion("3.11.0")]

@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>
+  <metadata minClientVersion="2.12">
     <id>NUnit.Engine.Api</id>
     <title>NUnit Test Engine Api</title>
     <version>$version$</version>
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
     <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
-    <projectUrl>http://nunit.org</projectUrl>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine Api is used by runners to interface with the NUnit Engine in order to discover and execute tests.</summary>
@@ -15,10 +16,23 @@
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
-    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2019 Charlie Poole, Rob Prouse</copyright>
+    <dependencies>
+      <group targetFramework="net20" />
+      <group targetFramework="netstandard1.6">
+        <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="System.Runtime.Loader" version="4.3.0" exclude="compile" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
+      <group targetFramework="netstandard2.0">
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
-    <file src="bin\nunit.engine.api.dll" target="lib" />
+    <file src="bin/net20/nunit.engine.api.dll" target="lib/net20" />
+    <file src="bin/netstandard1.6/nunit.engine.api.dll" target="lib/netstandard1.6" />
+    <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netstandard2.0" />
   </files>
 </package>

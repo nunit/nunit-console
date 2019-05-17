@@ -7,7 +7,8 @@
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
     <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
-    <projectUrl>http://nunit.org</projectUrl>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Console runner for the NUnit 3 unit-testing framework, without any extensions.</summary>
@@ -19,22 +20,22 @@
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2019 Charlie Poole, Rob Prouse</copyright>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
     <file src="NOTICES.txt" />
     <file src="CHANGES.txt" />
-    <file src="bin/nunit-agent.exe" target="tools" />
-    <file src="bin/nunit-agent.exe.config" target="tools" />
-    <file src="bin/nunit-agent-x86.exe" target="tools" />
-    <file src="bin/nunit-agent-x86.exe.config" target="tools" />
-    <file src="bin/nunit3-console.exe" target="tools" />
-    <file src="bin/nunit3-console.exe.config" target="tools" />
-    <file src="bin/nunit.engine.api.dll" target="tools" />
-    <file src="bin/nunit.engine.api.xml" target="tools" />
-    <file src="bin/nunit.engine.dll" target="tools" />
-    <file src="bin/Mono.Cecil.dll" target="tools" />
+    <file src="bin/net20/nunit-agent.exe" target="tools" />
+    <file src="bin/net20/nunit-agent.exe.config" target="tools" />
+    <file src="bin/net20/nunit-agent-x86.exe" target="tools" />
+    <file src="bin/net20/nunit-agent-x86.exe.config" target="tools" />
+    <file src="bin/net20/nunit3-console.exe" target="tools" />
+    <file src="bin/net20/nunit3-console.exe.config" target="tools" />
+    <file src="bin/net20/nunit.engine.api.dll" target="tools" />
+    <file src="bin/net20/nunit.engine.api.xml" target="tools" />
+    <file src="bin/net20/nunit.engine.dll" target="tools" />
+    <file src="bin/net20/Mono.Cecil.dll" target="tools" />
     <file src="..\..\nuget\engine\nunit.nuget.addins" target="tools"/>
   </files>
 </package>

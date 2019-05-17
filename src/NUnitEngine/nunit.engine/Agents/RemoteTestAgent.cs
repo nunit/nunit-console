@@ -21,10 +21,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Agents
@@ -100,7 +102,7 @@ namespace NUnit.Engine.Agents
             }
             catch (Exception ex)
             {
-                log.Error("Unable to connect", ex);
+                log.Error("Unable to connect: {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
             }
 
             try
@@ -110,7 +112,7 @@ namespace NUnit.Engine.Agents
             }
             catch (Exception ex)
             {
-                log.Error("RemoteTestAgent: Failed to register with TestAgency", ex);
+                log.Error("RemoteTestAgent: Failed to register with TestAgency. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 return false;
             }
 
@@ -230,3 +232,4 @@ namespace NUnit.Engine.Agents
         #endregion
     }
 }
+#endif

@@ -45,6 +45,12 @@ namespace NUnit.Engine.Internal
             }
         }
 
+        public TargetFrameworkHelper(AssemblyDefinition assemblyDef)
+        {
+            _assemblyDef = assemblyDef;
+            _module = _assemblyDef.MainModule;
+        }
+
         public bool RequiresX86
         {
             get
@@ -64,7 +70,7 @@ namespace NUnit.Engine.Internal
             {
                 var runtimeVersion = _module.RuntimeVersion;
 
-                if (runtimeVersion.StartsWith("v", StringComparison.InvariantCultureIgnoreCase))
+                if (runtimeVersion.StartsWith("v", StringComparison.OrdinalIgnoreCase))
                     runtimeVersion = runtimeVersion.Remove(0, 1);
 
                 return new Version(runtimeVersion);
@@ -85,17 +91,6 @@ namespace NUnit.Engine.Internal
                         return frameworkName;
                     break;
                 }
-
-                foreach (var reference in _module.AssemblyReferences)
-                    if (reference.Name == "mscorlib" &&
-                        BitConverter.ToUInt64(reference.PublicKeyToken, 0) == 0xac22333d05b89d96)
-                    {
-                        // We assume 3.5, since that's all we are supporting
-                        // Could be extended to other versions if necessary
-                        // Format for FrameworkName is invented - it is not
-                        // known if any compilers supporting CF use the attribute
-                        return ".NETCompactFramework,Version=3.5";
-                    }
 
                 return null;
             }

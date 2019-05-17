@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -50,10 +51,11 @@ namespace NUnit.Agent
             AgentId = new Guid(args[0]);
             AgencyUrl = args[1];
 
-            InternalTraceLevel traceLevel = InternalTraceLevel.Off;
-            int pid = Process.GetCurrentProcess().Id;
-            bool debugArgPassed = false;
-            string workDirectory = string.Empty;
+            var traceLevel = InternalTraceLevel.Off;
+            var pid = Process.GetCurrentProcess().Id;
+            var debugArgPassed = false;
+            var workDirectory = string.Empty;
+            var agencyPid = string.Empty;
 
             for (int i = 2; i < args.Length; i++)
             {
@@ -71,8 +73,7 @@ namespace NUnit.Agent
                 }
                 else if (arg.StartsWith("--pid="))
                 {
-                    int agencyProcessId = int.Parse(arg.Substring(6));
-                    AgencyProcess = Process.GetProcessById(agencyProcessId);
+                    agencyPid = arg.Substring(6);
                 }
                 else if (arg.StartsWith("--work="))
                 {
@@ -86,6 +87,8 @@ namespace NUnit.Agent
 
             if (debugArgPassed)
                 TryLaunchDebugger();
+
+            LocateAgencyProcess(agencyPid);
 
             log.Info("Agent process {0} starting", pid);
             log.Info("Running under version {0}, {1}",
@@ -110,17 +113,14 @@ namespace NUnit.Agent
 
             // Create TestEngine - this program is
             // conceptually part of  the engine and
-            // can access it's internals as needed.
-            TestEngine engine = new TestEngine();
-
-            // TODO: We need to get this from somewhere. Argument?
-            engine.InternalTraceLevel = InternalTraceLevel.Debug;
+            // can access its internals as needed.
+            var engine = new TestEngine
+            {
+                InternalTraceLevel = traceLevel
+            };
 
             // Custom Service Initialization
-            //log.Info("Adding Services");
-            engine.Services.Add(new SettingsService(false));
             engine.Services.Add(new ExtensionService());
-            engine.Services.Add(new ProjectService());
             engine.Services.Add(new DomainManager());
             engine.Services.Add(new InProcessTestRunnerFactory());
             engine.Services.Add(new DriverService());
@@ -144,12 +144,27 @@ namespace NUnit.Agent
             }
             catch (Exception ex)
             {
-                log.Error("Exception in RemoteTestAgent", ex);
+                log.Error("Exception in RemoteTestAgent. {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
                 Environment.Exit(AgentExitCodes.UNEXPECTED_EXCEPTION);
             }
             log.Info("Agent process {0} exiting cleanly", pid);
 
             Environment.Exit(AgentExitCodes.OK);
+        }
+
+        private static void LocateAgencyProcess(string agencyPid)
+        {
+            var agencyProcessId = int.Parse(agencyPid);
+            try
+            {
+                AgencyProcess = Process.GetProcessById(agencyProcessId);
+            }
+            catch (Exception e)
+            {
+                log.Error($"Unable to connect to agency process with PID: {agencyProcessId}");
+                log.Error($"Failed with exception: {e.Message} {e.StackTrace}");
+                Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_AGENCY);
+            }
         }
 
         private static void WaitForStop()

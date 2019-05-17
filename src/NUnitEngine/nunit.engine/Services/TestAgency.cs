@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,10 +21,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
+using System.Text;
 using NUnit.Common;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
@@ -177,15 +179,17 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
+            var agentArgs = new StringBuilder();
+
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
-            string agentArgs = "--pid=" + Process.GetCurrentProcess().Id.ToString();
+            agentArgs.Append("--pid=").Append(Process.GetCurrentProcess().Id);
             if (traceLevel != "Off")
-                agentArgs += " --trace:" + traceLevel;
+                agentArgs.Append(" --trace:").EscapeProcessArgument(traceLevel);
             if (debugAgent)
-                agentArgs += " --debug-agent";
+                agentArgs.Append(" --debug-agent");
             if (workDirectory != string.Empty)
-                agentArgs += " --work=" + workDirectory;
+                agentArgs.Append(" --work=").EscapeProcessArgument(workDirectory);
 
             log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
 
@@ -238,7 +242,7 @@ namespace NUnit.Engine.Services
                     p.StartInfo.Arguments = arglist;
                     break;
             }
-            
+
             p.Start();
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
@@ -249,22 +253,23 @@ namespace NUnit.Engine.Services
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
-            Guid agentId = LaunchAgentProcess(package);
+            var agentId = LaunchAgentProcess(package);
 
-            log.Debug( "Waiting for agent {0} to register", agentId.ToString("B") );
+            log.Debug($"Waiting for agent {agentId:B} to register");
 
-            int pollTime = 200;
-            bool infinite = waitTime == Timeout.Infinite;
+            const int pollTime = 200;
 
-            while( infinite || waitTime > 0 )
+            var agentRecord = _agentData[agentId];
+            var agentProcess = agentRecord.Process;
+
+            //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
+            while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
             {
-                Thread.Sleep( pollTime );
-                if ( !infinite ) waitTime -= pollTime;
-                var agentRecord = _agentData[agentId];
-                
-                if ( agentRecord.Agent != null )
+                Thread.Sleep(pollTime);
+
+                if (agentRecord.Agent != null)
                 {
-                    log.Debug( "Returning new agent {0}", agentId.ToString("B") );
+                    log.Debug($"Returning new agent {agentId:B}");
                     return new RemoteTestAgentProxy(agentRecord.Agent, agentRecord.Id);
                 }
             }
@@ -315,6 +320,9 @@ namespace NUnit.Engine.Services
                 case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
                     errorMsg = "Debugger could not be started on remote agent as not available on platform.";
                     break;
+                case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
+                    errorMsg = "Remote test agent unable to locate agency process.";
+                    break;
                 default:
                     errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
                     break;
@@ -360,3 +368,4 @@ namespace NUnit.Engine.Services
         #endregion
     }
 }
+#endif

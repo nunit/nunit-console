@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#if !NETCOREAPP1_1 && !NETCOREAPP2_0
+using System.Diagnostics;
 using NUnit.Engine.Tests.Helpers;
 using NUnit.Framework;
 
@@ -23,3 +24,4 @@ namespace NUnit.Engine.Tests.Integration
         }
     }
 }
+#endif

@@ -31,7 +31,9 @@ namespace NUnit.Engine
     /// <summary>
     /// The TestRun class encapsulates an ongoing test run.
     /// </summary>
+#if !NETSTANDARD1_6
     [Serializable]
+#endif
     public class AsyncTestEngineResult : ITestRun
     {
         private volatile TestEngineResult _result;
@@ -81,7 +83,7 @@ namespace NUnit.Engine
         /// </summary>
         public bool IsComplete { get { return _result != null; } }
 
-        #region ITestRun Members
+#region ITestRun Members
 
         XmlNode ITestRun.Result
         {
@@ -93,6 +95,6 @@ namespace NUnit.Engine
             return Wait(timeout);
         }
 
-        #endregion
+#endregion
     }
 }

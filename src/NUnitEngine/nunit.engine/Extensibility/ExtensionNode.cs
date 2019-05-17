@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,8 +21,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+
+#if NETSTANDARD2_0
+using System.Linq;
+#endif
 
 namespace NUnit.Engine.Extensibility
 {
@@ -42,19 +48,24 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="assemblyPath">The path to the assembly where this extension is found.</param>
         /// <param name="typeName">The full name of the Type of the extension object.</param>
-        public ExtensionNode(string assemblyPath, string typeName)
+        /// <param name="targetFramework">The target framework of the extension assembly.</param>
+        public ExtensionNode(string assemblyPath, string typeName, IRuntimeFramework targetFramework)
         {
             AssemblyPath = assemblyPath;
             TypeName = typeName;
+            TargetFramework = targetFramework;
             Enabled = true; // By default
         }
-
-        #region IExtensionNode Members
 
         /// <summary>
         /// Gets the full name of the Type of the extension object.
         /// </summary>
         public string TypeName { get; private set; }
+
+        /// <summary>
+        /// The TargetFramework of the extension assembly.
+        /// </summary>
+        public IRuntimeFramework TargetFramework { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="NUnit.Engine.Extensibility.ExtensionNode"/> is enabled.
@@ -63,7 +74,7 @@ namespace NUnit.Engine.Extensibility
         public bool Enabled	{ get; set; }
 
         /// <summary>
-        /// Gets and sets the unique string identifying the ExtensionPoint for which 
+        /// Gets and sets the unique string identifying the ExtensionPoint for which
         /// this Extension is intended. This identifier may be supplied by the attribute
         /// marking the extension or deduced by NUnit from the Type of the extension class.
         /// </summary>
@@ -96,10 +107,6 @@ namespace NUnit.Engine.Extensibility
                 return new string[0];
         }
 
-        #endregion
-
-        #region Other Properties
-
         /// <summary>
         /// Gets the path to the assembly where the extension is defined.
         /// </summary>
@@ -122,16 +129,22 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Gets a newly created extension object, created in the current application domain
         /// </summary>
         public object CreateExtensionObject(params object[] args)
         {
+#if NETSTANDARD2_0
+            var assembly = Assembly.LoadFrom(AssemblyPath);
+            var typeinfo = assembly.DefinedTypes.FirstOrDefault(t => t.FullName == TypeName);
+            if (typeinfo == null)
+            {
+                return null;
+            }
+            return Activator.CreateInstance(typeinfo.AsType(), args);
+#else
             return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null, null);
+#endif
         }
 
         public void AddProperty(string name, string val)
@@ -146,6 +159,10 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
-        #endregion
+        public override string ToString()
+        {
+            return $"{TypeName} - {Path}";
+        }
     }
 }
+#endif

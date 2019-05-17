@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
@@ -28,6 +29,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
@@ -122,7 +124,7 @@ namespace NUnit.Engine.Internal
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Failed to create/register channel", ex);
+                    Log.Error("Failed to create/register channel." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex));
                     Thread.Sleep(300);
                 }
 
@@ -130,3 +132,4 @@ namespace NUnit.Engine.Internal
         }
     }
 }
+#endif

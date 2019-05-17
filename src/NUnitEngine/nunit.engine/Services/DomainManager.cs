@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace NUnit.Engine.Services
                 Hash hash = new Hash(assembly);
                 evidence.AddHost(hash);
             }
-            
+
             log.Info("Creating application domain " + domainName);
 
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
@@ -106,7 +107,7 @@ namespace NUnit.Engine.Services
             string appBase = GetApplicationBase(package);
             setup.ApplicationBase = appBase;
             setup.ConfigurationFile = GetConfigFile(appBase, package);
-            setup.PrivateBinPath = GetPrivateBinPath(appBase, package); 
+            setup.PrivateBinPath = GetPrivateBinPath(appBase, package);
 
             if (!string.IsNullOrEmpty(package.FullName))
             {
@@ -240,7 +241,7 @@ namespace NUnit.Engine.Services
             string configFile = package.GetSetting(EnginePackageSettings.ConfigurationFile, string.Empty);
             if (configFile != string.Empty)
                 return Path.Combine(appBase, configFile);
-        
+
             // The ProjectService adds any project config to the settings.
             // So, at this point, we only want to handle assemblies or an
             // anonymous package created from the command-line.
@@ -330,7 +331,7 @@ namespace NUnit.Engine.Services
             foreach( string assembly in assemblies )
             {
                 string dir = PathUtils.RelativePath(
-                    Path.GetFullPath(basePath), 
+                    Path.GetFullPath(basePath),
                     Path.GetDirectoryName( Path.GetFullPath(assembly) ) );
                 if ( dir != null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
                 {
@@ -370,3 +371,4 @@ namespace NUnit.Engine.Services
         #endregion
     }
 }
+#endif

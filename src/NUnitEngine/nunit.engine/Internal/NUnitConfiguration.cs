@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -24,6 +24,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace NUnit.Engine.Internal
@@ -35,6 +36,7 @@ namespace NUnit.Engine.Internal
     {
         #region Public Properties
 
+#if !NETSTANDARD1_6
         #region EngineDirectory
 
         private static string _engineDirectory;
@@ -51,6 +53,7 @@ namespace NUnit.Engine.Internal
         }
 
         #endregion
+#endif
 
         #region ApplicationDataDirectory
 
@@ -62,7 +65,11 @@ namespace NUnit.Engine.Internal
                 if (_applicationDirectory == null)
                 {
                     _applicationDirectory = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+#if NETSTANDARD1_6
+                    Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "HOME"),
+#else
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+#endif
                         "NUnit");
                 }
 

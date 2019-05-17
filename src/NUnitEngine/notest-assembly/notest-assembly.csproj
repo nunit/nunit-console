@@ -2,11 +2,12 @@
   <PropertyGroup>
     <RootNamespace>notest_assembly</RootNamespace>
     <AssemblyName>notest-assembly</AssemblyName>
-    <TargetFrameworks>net35</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
   </ItemGroup>
 </Project>

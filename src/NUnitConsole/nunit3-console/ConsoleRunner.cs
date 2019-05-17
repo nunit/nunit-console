@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -168,12 +168,15 @@ namespace NUnit.ConsoleRunner
 
         private int RunTests(TestPackage package, TestFilter filter)
         {
+
+            var writer = new ColorConsoleWriter(!_options.NoColor);
+
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
-
+                
                 IResultWriter resultWriter;
-
+                
                 try
                 {
                     resultWriter = GetResultWriter(spec);
@@ -181,6 +184,20 @@ namespace NUnit.ConsoleRunner
                 catch (Exception ex)
                 {
                     throw new NUnitEngineException($"Error encountered in resolving output specification: {spec}", ex);
+                }
+
+                try
+                {
+                    var outputDirectory = Path.GetDirectoryName(outputPath);
+                    Directory.CreateDirectory(outputDirectory);
+                }
+                catch (SystemException ex)
+                {
+                    writer.WriteLine(ColorStyle.Error, String.Format(
+                        "The directory in --result {0} could not be created",
+                        spec.OutputPath));
+                    writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
+                    return ConsoleRunner.UNEXPECTED_ERROR;
                 }
 
                 try
@@ -194,8 +211,9 @@ namespace NUnit.ConsoleRunner
                             "The path specified in --result {0} could not be written to",
                             spec.OutputPath), ex);
                 }
+
             }
-            
+
             var labels = _options.DisplayTestLabels != null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
@@ -207,7 +225,6 @@ namespace NUnit.ConsoleRunner
             try
             {
                 using (new SaveConsoleOutput())
-                using (new ColorConsole(ColorStyle.Output))
                 using (ITestRunner runner = _engine.GetRunner(package))
                 using (var output = CreateOutputWriter())
                 {
@@ -224,8 +241,6 @@ namespace NUnit.ConsoleRunner
             {
                 engineException = ex;
             }
-
-            var writer = new ColorConsoleWriter(!_options.NoColor);
 
             if (result != null)
             {
@@ -266,7 +281,7 @@ namespace NUnit.ConsoleRunner
             {
                 writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(engineException));
                 writer.WriteLine();
-                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildStackTrace(engineException));
+                writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessageAndStackTrace(engineException));
             }
 
             return ConsoleRunner.UNEXPECTED_ERROR;
@@ -292,8 +307,8 @@ namespace NUnit.ConsoleRunner
                     var unixVariant = Marshal.PtrToStringAnsi(buf);
                     if (unixVariant.Equals("Darwin"))
                         unixVariant = "MacOSX";
-                    
-                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack); 
+
+                    osString = string.Format("{0} {1} {2}", unixVariant, os.Version, os.ServicePack);
                 }
                 Marshal.FreeHGlobal(buf);
             }
@@ -313,7 +328,9 @@ namespace NUnit.ConsoleRunner
                 foreach (var node in ep.Extensions)
                 {
                     _outWriter.Write("    Extension: ");
-                    _outWriter.Write(ColorStyle.Value, node.TypeName);
+                    _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
+                    if(node.TargetFramework != null)
+                        _outWriter.Write(ColorStyle.Value, $"(.NET {node.TargetFramework?.FrameworkVersion})");
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
                     foreach (var prop in node.PropertyNames)
                     {

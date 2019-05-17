@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>
+  <metadata minClientVersion="2.12">
     <id>NUnit.Engine</id>
     <title>NUnit Test Engine</title>
     <version>$version$</version>
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
     <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
-    <projectUrl>http://nunit.org</projectUrl>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine is used by runners to discover and execute tests.</summary>
@@ -15,19 +16,46 @@
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
-    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2019 Charlie Poole, Rob Prouse</copyright>
+    <dependencies>
+      <group targetFramework="net20" />
+      <group targetFramework="netstandard1.6">
+        <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
+      <group targetFramework="netstandard2.0">
+        <dependency id="NETStandard.Library" version="2.0.0" />
+        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
     <file src="NOTICES.txt" />
     <file src="CHANGES.txt" />
-    <file src="bin\nunit.engine.dll" target="lib" />
-    <file src="bin\nunit.engine.api.dll" target="lib" />
-    <file src="bin\Mono.Cecil.dll" target="lib" />
-    <file src="bin\nunit-agent.exe" target="lib" />
-    <file src="bin\nunit-agent.exe.config" target="lib" />
-    <file src="bin\nunit-agent-x86.exe" target="lib" />
-    <file src="bin\nunit-agent-x86.exe.config" target="lib" />
-    <file src="..\..\nuget\engine\nunit.nuget.addins" target="lib"/>
+    <file src="bin/net20/nunit.engine.dll" target="lib/net20" />
+    <file src="bin/net20/nunit.engine.api.dll" target="lib/net20" />
+    <file src="bin/net20/Mono.Cecil.dll" target="lib/net20" />
+    <file src="bin/net20/nunit-agent.exe" target="lib/net20" />
+    <file src="bin/net20/nunit-agent.exe.config" target="lib/net20" />
+    <file src="bin/net20/nunit-agent-x86.exe" target="lib/net20" />
+    <file src="bin/net20/nunit-agent-x86.exe.config" target="lib/net20" />
+    <file src="../../nuget/engine/nunit.nuget.addins" target="lib/net20"/>
+    <file src="bin/netstandard1.6/nunit.engine.dll" target="lib/netstandard1.6" />
+    <file src="bin/netstandard1.6/nunit.engine.api.dll" target="lib/netstandard1.6" />
+    <file src="bin/netstandard1.6/Mono.Cecil.dll" target="lib/netstandard1.6" />
+    <file src="../../nuget/engine/nunit.nuget.addins" target="lib/netstandard1.6"/>
+    <file src="bin/netstandard2.0/nunit.engine.dll" target="lib/netstandard2.0" />
+    <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netstandard2.0" />
+    <file src="bin/netstandard2.0/Mono.Cecil.dll" target="lib/netstandard2.0" />
+    <file src="../../nuget/engine/nunit.nuget.addins" target="lib/netstandard2.0"/>
   </files>
 </package>

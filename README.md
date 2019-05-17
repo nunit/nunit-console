@@ -1,6 +1,6 @@
 # NUnit 3 Console and Engine #
 
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/81uhucr7tlq2kwup/branch/master?svg=true)](https://ci.appveyor.com/project/CharliePoole/nunit-console/branch/master) [![Travis Build Status](https://travis-ci.org/nunit/nunit-console.svg?branch=master)](https://travis-ci.org/nunit/nunit-console) [![NuGet Version and Downloads count](https://buildstats.info/nuget/NUnit.ConsoleRunner)](https://www.nuget.org/packages/NUnit.ConsoleRunner) 
+[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/81uhucr7tlq2kwup/branch/master?svg=true)](https://ci.appveyor.com/project/CharliePoole/nunit-console/branch/master) [![Travis Build Status](https://travis-ci.org/nunit/nunit-console.svg?branch=master)](https://travis-ci.org/nunit/nunit-console) [![Azure Pipelines Build Status](https://nunit.visualstudio.com/NUnit/_apis/build/status/NUnit%20Engine%20&%20Console/NUnit%20Console%20CI?branchName=master)](https://nunit.visualstudio.com/NUnit/_build/latest?definitionId=13&branchName=master) [![NuGet Version and Downloads count](https://buildstats.info/nuget/NUnit.ConsoleRunner)](https://www.nuget.org/packages/NUnit.ConsoleRunner) 
 
 [![Follow NUnit](https://img.shields.io/twitter/follow/nunit.svg?style=social)](https://twitter.com/nunit) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/nunit/nunit) [![nunit-discuss Google Groups](https://img.shields.io/badge/mailing%20list-nunit--discuss-blue.svg)](https://groups.google.com/forum/#!forum/nunit-discuss)
 
@@ -20,7 +20,7 @@ The latest stable release of the NUnit Console is [available on NuGet](https://w
 
 The Console/Engine are available in various packages:
 - [NUnit.ConsoleRunner](https://www.nuget.org/packages/NUnit.ConsoleRunner/): The NUnit Console, with no extensions.
-- [NUnit.Console](https://www.nuget.org/packages/NUnit.Console/): The NUnit Console, with key extensions additionally packaged. Also available as an [msi installer](https://github.com/nunit/nunit-console/releases).
+- [NUnit.Console](https://www.nuget.org/packages/NUnit.Console/): The NUnit Console, with key extensions additionally packaged. Also available as an [msi installer](https://github.com/nunit/nunit-console/releases), you may need to add your **actual** msi install location to the `Path` environment variable after installing, for example: `C:\Program Files (x86)\NUnit.org\nunit-console`.
 - [NUnit.Engine](https://www.nuget.org/packages/NUnit.Engine/) & [NUnit.Engine.Api](https://www.nuget.org/packages/NUnit.Engine.Api/): Packages intended for custom runners integrating directly with the NUnit Engine. 
 
 ## Documentation ##

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -37,10 +37,12 @@ namespace NUnit.Engine.Runners.Tests
     // intermittent errors, probably due to the test
     // fixture rather than the engine.
     [TestFixture(typeof(LocalTestRunner))]
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
     [TestFixture(typeof(TestDomainRunner))]
     //[TestFixture(typeof(ProcessRunner))]
     [TestFixture(typeof(MultipleTestDomainRunner), 1)]
     [TestFixture(typeof(MultipleTestDomainRunner), 3)]
+#endif
     //[TestFixture(typeof(MultipleTestProcessRunner), 1)]
     //[TestFixture(typeof(MultipleTestProcessRunner), 3)]
     //[Platform(Exclude = "Mono", Reason = "Currently causing long delays or hangs under Mono")]
@@ -65,11 +67,17 @@ namespace NUnit.Engine.Runners.Tests
         {
             // Add all services needed by any of our TestEngineRunners
             _services = new ServiceContext();
-            _services.Add(new Services.DriverService());
-            _services.Add(new Services.DomainManager());
+#if !NETCOREAPP1_1
+            _services.Add(new Services.ExtensionService());
             _services.Add(new Services.ProjectService());
-            _services.Add(new Services.DefaultTestRunnerFactory());
+#if !NETCOREAPP2_0
+            _services.Add(new Services.DomainManager());
+            _services.Add(new Services.RuntimeFrameworkService());
             _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
+#endif
+#endif
+            _services.Add(new Services.DriverService());
+            _services.Add(new Services.DefaultTestRunnerFactory());
             _services.ServiceManager.StartServices();
 
             var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
@@ -127,11 +135,14 @@ namespace NUnit.Engine.Runners.Tests
             CheckPackageLoading();
         }
 
+#if !NETCOREAPP1_1
         [Test]
         public void RunAsync()
         {
+#if !NETCOREAPP2_0
             if (_runner is ProcessRunner || _runner is MultipleTestProcessRunner)
                 Assert.Ignore("RunAsync is not working for ProcessRunner");
+#endif
 
             var asyncResult = _runner.RunAsync(null, TestFilter.Empty);
             asyncResult.Wait(-1);
@@ -140,6 +151,7 @@ namespace NUnit.Engine.Runners.Tests
             CheckRunResult(asyncResult.EngineResult);
             CheckPackageLoading();
         }
+#endif
 
         private void CheckPackageLoading()
         {
@@ -149,7 +161,7 @@ namespace NUnit.Engine.Runners.Tests
             if (_runner is DirectTestRunner)
                 Assert.That(_runner.IsPackageLoaded, "Package was not loaded automatically");
             else
-                Assert.False(_runner.IsPackageLoaded, "Package should not be loaded automatically");
+                Assert.That(_runner.IsPackageLoaded, Is.False, "Package should not be loaded automatically");
         }
 
         private void CheckBasicResult(TestEngineResult result)
@@ -174,7 +186,7 @@ namespace NUnit.Engine.Runners.Tests
         private void CheckRunResult(XmlNode result)
         {
             CheckBasicResult(result);
-            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed));
+            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));
             Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
             Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
             Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));

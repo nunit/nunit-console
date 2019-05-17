@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -74,7 +75,7 @@ namespace NUnit.Engine.Drivers
         /// <returns>An Xml string representing the loaded test</returns>
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
-            Guard.ArgumentValid(File.Exists(testAssemblyPath), "testAssemblyPath", "Framework driver constructor called with a file name that doesn't exist.");
+            Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver constructor called with a file name that doesn't exist.", "testAssemblyPath");
 
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
             _testAssemblyPath = testAssemblyPath;
@@ -121,7 +122,7 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
 
-            CallbackHandler handler = new RunTestsCallbackHandler(listener);
+            var handler = new RunTestsCallbackHandler(listener);
 
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
             CreateObject(RUN_ACTION, _frameworkController, filter, handler);
@@ -184,3 +185,4 @@ namespace NUnit.Engine.Drivers
         #endregion
     }
 }
+#endif

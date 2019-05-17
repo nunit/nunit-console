@@ -7,7 +7,8 @@
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
     <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
-    <projectUrl>http://nunit.org</projectUrl>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Console runner for the NUnit 3 unit-testing framework with selected extensions.</summary>
@@ -19,22 +20,22 @@
       * VSProjectLoader        - loads tests from Visual Studio projects
       * NUnitV2ResultWriter    - saves results in NUnit V2 format.
       * NUnitV2FrameworkDriver - runs NUnit V2 tests.
-      * TeamCityEventListener - supports special progress messages used by teamcity.
+      * TeamCityEventListener  - supports special progress messages used by teamcity.
 
       Other extensions, if needed, must be installed separately.
     </description>
     <releaseNotes>This release uses the latest version of the TeamCityEventListener extension.</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2018 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2019 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group>
-          <dependency id="NUnit.ConsoleRunner" version="$version$" />
-          <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.5.0" />
-          <dependency id="NUnit.Extension.VSProjectLoader" version="3.7.0" />
-          <dependency id="NUnit.Extension.NUnitV2ResultWriter" version="3.5.0" />
-          <dependency id="NUnit.Extension.NUnitV2Driver" version="3.6.0" />
-        <dependency id="NUnit.Extension.TeamCityEventListener" version="1.0.3" />
+        <dependency id="NUnit.ConsoleRunner" version="$version$" />
+        <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.6.0" />
+        <dependency id="NUnit.Extension.VSProjectLoader" version="3.8.0" />
+        <dependency id="NUnit.Extension.NUnitV2ResultWriter" version="3.6.0" />
+        <dependency id="NUnit.Extension.NUnitV2Driver" version="3.7.0" />
+        <dependency id="NUnit.Extension.TeamCityEventListener" version="1.0.6" />
       </group>
     </dependencies>
   </metadata>

@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 using System.Net.Sockets;
 using NUnit.Common;
@@ -30,10 +31,18 @@ using NUnit.Engine.Services;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// Summary description for ProcessRunner.
+    /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
     public class ProcessRunner : AbstractTestRunner
     {
+        // ProcessRunner is given a TestPackage containing a single assembly
+        // multiple assemblies, a project, multiple projects or a mix. It loads
+        // and runs all tests in a single remote agent process.
+        //
+        // If the input contains projects, which are not summarized at a lower 
+        // level, the ProcessRunner should create an XML node for the entire
+        // project, aggregating the assembly results.
+
         private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
         private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
 
@@ -47,12 +56,6 @@ namespace NUnit.Engine.Runners
         {
             _agency = Services.GetService<TestAgency>();
         }
-
-        #region Properties
-
-        public RuntimeFramework RuntimeFramework { get; private set; }
-
-        #endregion
 
         #region AbstractTestRunner Overrides
 
@@ -71,7 +74,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", e.Message);
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
             }
         }
@@ -117,7 +120,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Warning("Failed to unload the remote runner. {0}", e.Message);
+                log.Warning("Failed to unload the remote runner. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 _remoteRunner = null;
                 throw;
             }
@@ -139,7 +142,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to count remote tests {0}", e.Message);
+                log.Error("Failed to count remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return 0;
             }
         }
@@ -164,14 +167,14 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", e.Message);
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
             }
         }
 
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage, returning immediately.
-        /// The tests are run asynchronously and the listener interface is notified 
+        /// The tests are run asynchronously and the listener interface is notified
         /// as it progresses.
         /// </summary>
         /// <param name="listener">An ITestEventHandler to receive events</param>
@@ -189,7 +192,7 @@ namespace NUnit.Engine.Runners
             }
             catch (Exception e)
             {
-                log.Error("Failed to run remote tests {0}", e.Message);
+                log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 var result = new AsyncTestEngineResult();
                 result.SetResult(CreateFailedResult(e));
                 return result;
@@ -210,7 +213,7 @@ namespace NUnit.Engine.Runners
                 }
                 catch (Exception e)
                 {
-                    log.Error("Failed to stop the remote run. {0}", e.Message);
+                    log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 }
             }
         }
@@ -236,7 +239,7 @@ namespace NUnit.Engine.Runners
                     // Save and log the unload error
                     unloadException = ex;
                     log.Error(ExceptionHelper.BuildMessage(ex));
-                    log.Error(ExceptionHelper.BuildStackTrace(ex));
+                    log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
                 if (_agent != null && _agency.IsAgentRunning(_agent.Id))
@@ -257,7 +260,7 @@ namespace NUnit.Engine.Runners
                         else
                         {
 
-                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {ExceptionHelper.BuildMessage(se)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(se)}";
+                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
                             log.Error(stopError);
 
                             // Stop error with no unload error, just rethrow
@@ -270,7 +273,7 @@ namespace NUnit.Engine.Runners
                     }
                     catch (Exception e)
                     {
-                        var stopError = $"Failed to stop the remote agent. {ExceptionHelper.BuildMessage(e)}{Environment.NewLine}{ExceptionHelper.BuildStackTrace(e)}";
+                        var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e);
                         log.Error(stopError);
 
                         // Stop error with no unload error, just rethrow
@@ -291,9 +294,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#endregion
+        #endregion
 
-#region Helper Methods
+        #region Helper Methods
 
         private void CreateAgentAndRunner()
         {
@@ -336,11 +339,12 @@ namespace NUnit.Engine.Runners
 
             var failure = suite.AddElement("failure");
             failure.AddElementWithCDataSection("message", ExceptionHelper.BuildMessage(e));
-            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildStackTrace(e));
+            failure.AddElementWithCDataSection("stack-trace", ExceptionHelper.BuildMessageAndStackTrace(e));
 
             return new TestEngineResult(suite);
         }
 
-#endregion
+        #endregion
     }
 }
+#endif

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if !NETCOREAPP1_1
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,3 +36,4 @@ namespace NUnit.Engine.Tests.Helpers
         }
     }
 }
+#endif

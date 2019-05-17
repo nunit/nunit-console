@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Common;
@@ -52,7 +53,7 @@ namespace NUnit.Engine.Services
 
         /// <summary>
         /// Expands a TestPackage based on a known project format, populating it
-        /// with the project contents and any settings the project provides. 
+        /// with the project contents and any settings the project provides.
         /// Note that the package file path must be checked to ensure that it is
         /// a known project format before calling this method.
         /// </summary>
@@ -83,7 +84,7 @@ namespace NUnit.Engine.Services
 
             // If no config is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
-            // use it. If not, each assembly will use it's own config, if present.
+            // use it. If not, each assembly will use its own config, if present.
             if (!package.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
@@ -169,3 +170,4 @@ namespace NUnit.Engine.Services
         #endregion
     }
 }
+#endif
