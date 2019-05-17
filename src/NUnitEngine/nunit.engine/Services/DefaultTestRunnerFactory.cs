@@ -66,15 +66,6 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public override ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-#if !NETSTANDARD1_6
-            // If we have any projects, then defer to the AggregatingTestRunner, 
-            // which will make the decision on a file by file basis so that each
-            // project runs with its own settings. Bad extensions are ignored
-            // since they will result in an error anyway.
-            if (ProjectCount(package) > 0)
-                return new AggregatingTestRunner(ServiceContext, package);
-#endif
-
 #if NETSTANDARD1_6 || NETSTANDARD2_0
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
@@ -124,7 +115,7 @@ namespace NUnit.Engine.Services
         }
 #endif
 
-        #region Helper Methods
+#region Helper Methods
 
 #if !NETSTANDARD1_6
         /// <summary>

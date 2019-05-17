@@ -62,11 +62,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 package = TestPackageFactory.OneProjectListCtor();
                 expected = new RunnerResult
                 {
-                    TestRunner = typeof(AggregatingTestRunner),
-                    SubRunners = new[]
-                    {
-                        new RunnerResult { TestRunner = typeof(LocalTestRunner) }
-                    }
+                    TestRunner = typeof(LocalTestRunner)
                 };
                 yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
