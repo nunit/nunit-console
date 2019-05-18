@@ -58,7 +58,7 @@ namespace NUnit.Engine.Services.Tests
         // Single file
         [TestCase("x.dll",  null,      typeof(TestDomainRunner))]
         [TestCase("x.dll", "Single",   typeof(TestDomainRunner))]
-        [TestCase("x.dll", "Multiple", typeof(MultipleTestDomainRunner))]
+        [TestCase("x.dll", "Multiple", typeof(TestDomainRunner))]
         // Two files
         [TestCase("x.dll y.dll",  null,     typeof(MultipleTestDomainRunner))]
         [TestCase("x.dll y.dll", "Single",   typeof(TestDomainRunner))]
