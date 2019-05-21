@@ -283,8 +283,15 @@ namespace NUnit.Engine.Runners.Tests
 
         private void CheckTestRunEvents()
         {
-            Assert.That(_events[0].Name, Is.EqualTo("start-run"), "First event should be start-run");
-            Assert.That(_events[0].GetAttribute("count", -1), Is.EqualTo(_testRunData.Tests), "Incorrect count in start-run event");
+            var startRun = _events[0];
+            Assert.That(startRun.Name, Is.EqualTo("start-run"), "First event should be start-run");
+            Assert.That(startRun.GetAttribute("engine-version"), Is.Not.Null, "Incorrect engine-version in start-run event");
+            Assert.That(startRun.GetAttribute("clr-version"), Is.Not.Null, "Incorrect clr-version in start-run event");
+            Assert.That(startRun.GetAttribute("start-time", DateTime.Now.AddDays(-2)), Is.GreaterThan(DateTime.Now.AddDays(-1)), "Incorrect start-time in start-run event");
+            Assert.That(startRun.GetAttribute("count", -1), Is.EqualTo(_testRunData.Tests), "Incorrect count in start-run event");
+#if !NETSTANDARD1_6
+            Assert.That(startRun.FirstChild.Name, Is.EqualTo("command-line"), "First child of start-run should be command-line");
+#endif
             Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"), "Last event should be test-run");
 
             Assert.That(_events.Count(x => x.Name == "start-run"), Is.EqualTo(1), "More than one start-run event");
