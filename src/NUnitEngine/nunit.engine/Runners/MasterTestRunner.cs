@@ -433,10 +433,31 @@ namespace NUnit.Engine.Runners
 #endif
 
             IsTestRunning = true;
+            
+            string clrVersion;
+            string engineVersion;
 
-            eventDispatcher.OnTestEvent(string.Format("<start-run count='{0}'/>", CountTests(filter)));
+#if !NETSTANDARD1_6
+            clrVersion = Environment.Version.ToString();
+            engineVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+#else
+            clrVersion =  Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
+            engineVersion = typeof(MasterTestRunner).GetTypeInfo().Assembly.GetName().Version.ToString();
+#endif
 
-            DateTime startTime = DateTime.UtcNow;
+            var startTime = DateTime.UtcNow;
+            var startRunNode = XmlHelper.CreateTopLevelElement("start-run");
+            startRunNode.AddAttribute("count", CountTests(filter).ToString());
+            startRunNode.AddAttribute("start-time", XmlConvert.ToString(startTime, "u"));
+            startRunNode.AddAttribute("engine-version", engineVersion);
+            startRunNode.AddAttribute("clr-version", clrVersion);
+
+#if !NETSTANDARD1_6
+            InsertCommandLineElement(startRunNode);
+#endif
+
+            eventDispatcher.OnTestEvent(startRunNode.OuterXml);
+
             long startTicks = Stopwatch.GetTimestamp();
 
             TestEngineResult result = PrepareResult(_engineRunner.Run(eventDispatcher, filter)).MakeTestRunResult(TestPackage);
@@ -446,13 +467,10 @@ namespace NUnit.Engine.Runners
 
 #if !NETSTANDARD1_6
             InsertCommandLineElement(result.Xml);
-            result.Xml.AddAttribute("engine-version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
-            result.Xml.AddAttribute("clr-version", Environment.Version.ToString());
-#else
-            result.Xml.AddAttribute("engine-version", typeof(MasterTestRunner).GetTypeInfo().Assembly.GetName().Version.ToString());
-            result.Xml.AddAttribute("clr-version", Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier());
 #endif
 
+            result.Xml.AddAttribute("engine-version", engineVersion);
+            result.Xml.AddAttribute("clr-version", clrVersion);
             double duration = (double)(Stopwatch.GetTimestamp() - startTicks) / Stopwatch.Frequency;
             result.Xml.AddAttribute("start-time", XmlConvert.ToString(startTime, "u"));
             result.Xml.AddAttribute("end-time", XmlConvert.ToString(DateTime.UtcNow, "u"));
