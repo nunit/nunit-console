@@ -2,21 +2,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <AssemblyName>nunit3-console</AssemblyName>
     <TargetFrameworks>net20</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Commandlineparameters>nunit.engine.tests.dll -process:Single</Commandlineparameters>
-    <LangVersion>7</LangVersion>
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
     <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
     <Compile Include="..\..\NUnitEngine\nunit.engine\Guard.cs" LinkBase="Utilities" />
     <Compile Include="..\..\NUnitEngine\nunit.engine\Internal\ExceptionHelper.cs" LinkBase="Utilities" />
