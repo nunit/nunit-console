@@ -60,8 +60,6 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 
     public class RunnerResult
     {
-        public RunnerResult() { }
-
         public Type TestRunner { get; set; }
 
         public ICollection<RunnerResult> SubRunners { get; set; } = new List<RunnerResult>();
@@ -75,12 +73,13 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
                 return sb.ToString().Trim();
 
             sb.AppendLine("SubRunners:");
+            sb.AppendLine("[");
 
             foreach (var subRunner in SubRunners)
             {
                 sb.AppendLine($"\t{subRunner}");
             }
-
+            sb.AppendLine("]");
             return sb.ToString().Trim();
         }
     }

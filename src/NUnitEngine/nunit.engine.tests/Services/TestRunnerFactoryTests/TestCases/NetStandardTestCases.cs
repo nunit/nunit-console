@@ -71,7 +71,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 yield return new TestRunnerFactoryData(
                     "Single project (string ctor)",
                     new TestPackage("a.nunit"),
-                    new RunnerResult<LocalTestRunner>()
+                    new RunnerResult<AggregatingTestRunner, LocalTestRunner, LocalTestRunner>()
                 );
 
                 yield return new TestRunnerFactoryData(
@@ -83,25 +83,91 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 yield return new TestRunnerFactoryData(
                     "Two projects",
                     new TestPackage(new[] { "a.nunit", "b.nunit" }),
-                    new RunnerResult<AggregatingTestRunner, LocalTestRunner, LocalTestRunner>()
+                    new RunnerResult
+                    {
+                        TestRunner = typeof(AggregatingTestRunner),
+                        SubRunners = new List<RunnerResult>
+                        {
+                            new RunnerResult
+                            {
+                                TestRunner = typeof(AggregatingTestRunner),
+                                SubRunners = new List<RunnerResult>
+                                {
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                                }
+                            },
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                        }
+                    }
                 );
 
                 yield return new TestRunnerFactoryData(
                     "One project, one assembly",
                     new TestPackage(new[] { "a.nunit", "a.dll" }),
-                    new RunnerResult<AggregatingTestRunner, LocalTestRunner, LocalTestRunner>()
+                    new RunnerResult
+                    {
+                        TestRunner = typeof(AggregatingTestRunner),
+                        SubRunners = new List<RunnerResult>
+                        {
+                            new RunnerResult
+                            {
+                                TestRunner = typeof(AggregatingTestRunner),
+                                SubRunners = new List<RunnerResult>
+                                {
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                                }
+                            },
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                        }
+                    }
                 );
 
                 yield return new TestRunnerFactoryData(
                     "Two projects, one assembly",
                     new TestPackage(new[] { "a.nunit", "b.nunit", "a.dll" }),
-                    new RunnerResult<AggregatingTestRunner, LocalTestRunner, LocalTestRunner, LocalTestRunner>()
+                    new RunnerResult
+                    {
+                        TestRunner = typeof(AggregatingTestRunner),
+                        SubRunners = new List<RunnerResult>
+                        {
+                            new RunnerResult
+                            {
+                                TestRunner = typeof(AggregatingTestRunner),
+                                SubRunners = new List<RunnerResult>
+                                {
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                                }
+                            },
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                        }
+                    }
                 );
 
                 yield return new TestRunnerFactoryData(
-                    "Two assemblies, oneproject",
+                    "Two assemblies, one project",
                     new TestPackage(new[] { "a.dll", "b.dll", "a.nunit" }),
-                    new RunnerResult<AggregatingTestRunner, LocalTestRunner, LocalTestRunner, LocalTestRunner>()
+                    new RunnerResult
+                    {
+                        TestRunner = typeof(AggregatingTestRunner),
+                        SubRunners = new List<RunnerResult>
+                        {
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                            new RunnerResult
+                            {
+                                TestRunner = typeof(AggregatingTestRunner),
+                                SubRunners = new List<RunnerResult>
+                                {
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                                }
+                            }
+                        }
+                    }
                 );
 
                 yield return new TestRunnerFactoryData(
@@ -113,7 +179,24 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 yield return new TestRunnerFactoryData(
                     "One assembly, one project, one unknown",
                     new TestPackage(new[] { "a.junk", "a.dll", "a.nunit" }),
-                    new RunnerResult<AggregatingTestRunner, LocalTestRunner, LocalTestRunner, LocalTestRunner>()
+                    new RunnerResult
+                    {
+                        TestRunner = typeof(AggregatingTestRunner),
+                        SubRunners = new List<RunnerResult>
+                        {
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                            new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                            new RunnerResult
+                            {
+                                TestRunner = typeof(AggregatingTestRunner),
+                                SubRunners = new List<RunnerResult>
+                                {
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) },
+                                    new RunnerResult { TestRunner = typeof(LocalTestRunner) }
+                                }
+                            }
+                        }
+                    }
                 );
 #endif
             }

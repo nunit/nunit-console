@@ -242,7 +242,8 @@ namespace NUnit.Engine.Runners
 
 #region Helper Methods
 
-        private ITestEngineRunner GetEngineRunner()
+        //Exposed for testing
+        internal ITestEngineRunner GetEngineRunner()
         {
             if (_engineRunner == null)
             {

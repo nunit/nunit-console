@@ -22,8 +22,6 @@
 // ***********************************************************************
 
 using System;
-using System.IO;
-using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services.Tests.Fakes
 {
@@ -36,7 +34,7 @@ namespace NUnit.Engine.Services.Tests.Fakes
 
         string IRuntimeFrameworkService.SelectRuntimeFramework(TestPackage package)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
     }
 }
