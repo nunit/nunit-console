@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
-    <AssemblyName>nunit3-console.tests</AssemblyName>
     <TargetFrameworks>net35</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
-    <LangVersion>7</LangVersion>
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
@@ -17,7 +11,6 @@
     <PackageReference Include="NUnit.Analyzers" Version="0.1.0-dev-00079" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
     <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>

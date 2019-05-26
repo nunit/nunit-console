@@ -2,24 +2,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
-    <AssemblyName>nunit-agent-x86</AssemblyName>
     <TargetFrameworks>net20</TargetFrameworks>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
     <IntermediateOutputPath>obj\$(Configuration)\x86\</IntermediateOutputPath>
-    <LangVersion>7</LangVersion>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit.engine\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
   </ItemGroup>

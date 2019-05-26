@@ -1,17 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <AssemblyName>nunit.engine.tests</AssemblyName>
     <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <OutputType Condition="'$(TargetFramework)'!='net35'">Exe</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>Full</DebugType>
-    <LangVersion>7</LangVersion>
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net35'">
     <Reference Include="System.Configuration" />
@@ -28,7 +22,6 @@
     <PackageReference Include="NUnit.Analyzers" Version="0.1.0-dev-00079" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>
