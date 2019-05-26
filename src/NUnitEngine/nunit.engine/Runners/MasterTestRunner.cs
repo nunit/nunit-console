@@ -53,7 +53,7 @@ namespace NUnit.Engine.Runners
         // element, which wraps all the individual assembly and project
         // results.
 
-        private readonly ITestEngineRunner _engineRunner;
+        private ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
 #if !NETSTANDARD1_6
         private readonly ExtensionService _extensionService;
@@ -62,6 +62,7 @@ namespace NUnit.Engine.Runners
 #endif
 #endif
         private readonly IProjectService _projectService;
+        private ITestRunnerFactory _testRunnerFactory;
         private bool _disposed;
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
@@ -74,18 +75,21 @@ namespace NUnit.Engine.Runners
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
+            _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
+
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
 #if !NETSTANDARD1_6
             _extensionService = _services.GetService<ExtensionService>();
 #endif
-            _engineRunner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
 
-            InitializePackage();
+            // Last chance to catch invalid settings in package,
+            // in case the client runner missed them.
+            ValidatePackageSettings();
         }
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// The TestPackage for which this is the runner
@@ -122,7 +126,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the loaded assembly.</returns>
         public XmlNode Load()
         {
-            LoadResult = PrepareResult(_engineRunner.Load()).MakeTestRunResult(TestPackage);
+            LoadResult = PrepareResult(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -143,7 +147,7 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public XmlNode Reload()
         {
-            LoadResult = PrepareResult(_engineRunner.Reload()).MakeTestRunResult(TestPackage);
+            LoadResult = PrepareResult(GetEngineRunner().Reload()).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -156,7 +160,7 @@ namespace NUnit.Engine.Runners
         /// <returns>The count of test cases.</returns>
         public int CountTestCases(TestFilter filter)
         {
-            return _engineRunner.CountTestCases(filter);
+            return GetEngineRunner().CountTestCases(filter);
         }
 
         /// <summary>
@@ -204,7 +208,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            LoadResult = PrepareResult(_engineRunner.Explore(filter))
+            LoadResult = PrepareResult(GetEngineRunner().Explore(filter))
                 .MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
@@ -238,36 +242,28 @@ namespace NUnit.Engine.Runners
 
 #region Helper Methods
 
-        /// <summary>
-        /// Check the package settings, expand projects and
-        /// determine what runtimes may be needed.
-        /// </summary>
-        private void InitializePackage()
+        //Exposed for testing
+        internal ITestEngineRunner GetEngineRunner()
         {
-            // Last chance to catch invalid settings in package,
-            // in case the client runner missed them.
-            ValidatePackageSettings();
+            if (_engineRunner == null)
+            {
+                // Some files in the top level package may be projects.
+                // Expand them so that they contain subprojects for
+                // each contained assembly.
+                EnsurePackagesAreExpanded(TestPackage);
 
-            // Some files in the top level package may be projects.
-            // Expand them so that they contain subprojects for
-            // each contained assembly.
-            EnsurePackagesAreExpanded(TestPackage);
-
-            // Use SelectRuntimeFramework for its side effects.
-            // Info will be left behind in the package about
-            // each contained assembly, which will subsequently
-            // be used to determine how to run the assembly.
+                // Use SelectRuntimeFramework for its side effects.
+                // Info will be left behind in the package about
+                // each contained assembly, which will subsequently
+                // be used to determine how to run the assembly.
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
-            _runtimeService.SelectRuntimeFramework(TestPackage);
+                _runtimeService.SelectRuntimeFramework(TestPackage);
 #endif
 
-            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "").ToLower();
-
-            if (IntPtr.Size == 8 && (processModel == "inprocess" || processModel == "single")  &&
-                TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false))
-            {
-                throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
+                _engineRunner = _testRunnerFactory.MakeTestRunner(TestPackage);
             }
+
+            return _engineRunner;
         }
 
         // The TestEngineResult returned to MasterTestRunner contains no info
@@ -365,7 +361,11 @@ namespace NUnit.Engine.Runners
         private void ValidatePackageSettings()
         {
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
+            var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
+            var runningInProcess = processModel == "single" || processModel == "inprocess";
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
+            var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
+
             if (frameworkSetting.Length > 0)
             {
                 // Check requested framework is actually available
@@ -374,8 +374,7 @@ namespace NUnit.Engine.Runners
                     throw new NUnitEngineException(string.Format("The requested framework {0} is unknown or not available.", frameworkSetting));
 
                 // If running in process, check requested framework is compatible
-                var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
-                if (processModel == "single" || processModel == "inprocess")
+                if (runningInProcess)
                 {
                     var currentFramework = RuntimeFramework.CurrentFramework;
 
@@ -388,6 +387,9 @@ namespace NUnit.Engine.Runners
                             "Cannot run {0} framework in process already running {1}.", frameworkSetting, currentFramework));
                 }
             }
+
+            if (runningInProcess && runAsX86 && IntPtr.Size == 8)
+                throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
 #endif
         }
 
@@ -412,7 +414,7 @@ namespace NUnit.Engine.Runners
         {
             if (!IsPackageLoaded) return 0;
 
-            return _engineRunner.CountTestCases(filter);
+            return GetEngineRunner().CountTestCases(filter);
         }
 
         /// <summary>
@@ -460,7 +462,7 @@ namespace NUnit.Engine.Runners
 
             long startTicks = Stopwatch.GetTimestamp();
 
-            TestEngineResult result = PrepareResult(_engineRunner.Run(eventDispatcher, filter)).MakeTestRunResult(TestPackage);
+            TestEngineResult result = PrepareResult(GetEngineRunner().Run(eventDispatcher, filter)).MakeTestRunResult(TestPackage);
 
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);

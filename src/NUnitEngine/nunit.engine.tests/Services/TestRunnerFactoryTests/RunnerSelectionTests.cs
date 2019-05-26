@@ -39,26 +39,36 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
     public class RunnerSelectionTests
     {
         private DefaultTestRunnerFactory _factory;
+        private ServiceContext _services;
 
         [OneTimeSetUp]
         public void SetUp()
         {
-            var services = new ServiceContext();
+            _services = new ServiceContext();
 #if !NETCOREAPP1_1
-            services.Add(new ExtensionService());
+            _services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
+            ((IService)projectService).StartService();
             projectService.Add(TestPackageFactory.FakeProject, "a.dll", "b.dll");
-            services.Add(projectService);
+            _services.Add(projectService);
+            Assert.That(((IService)projectService).Status, Is.EqualTo(ServiceStatus.Started));
 #endif
             _factory = new DefaultTestRunnerFactory();
-            services.Add(_factory);
+            _services.Add(_factory);
             _factory.StartService();
+            Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));
+
+            var fakeRuntimeService = new FakeRuntimeService();
+            ((IService)fakeRuntimeService).StartService();
+            _services.Add(fakeRuntimeService);
+            Assert.That(((IService)fakeRuntimeService).Status, Is.EqualTo(ServiceStatus.Started));
         }
 
         [TestCaseSource(nameof(TestCases))]
         public void RunnerSelectionTest(TestPackage package, RunnerResult expected)
         {
-            var runner = _factory.MakeTestRunner(package);
+            var masterRunner = new MasterTestRunner(_services, package);
+            var runner = masterRunner.GetEngineRunner();
             var result = GetRunnerResult(runner);
             Assert.That(result, Is.EqualTo(expected).Using(RunnerResultComparer.Instance));
         }

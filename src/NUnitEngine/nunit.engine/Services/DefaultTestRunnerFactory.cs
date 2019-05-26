@@ -66,32 +66,8 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public override ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-            int assemblyCount = 0;
-            int projectCount = 0;
-
-            foreach (var subPackage in package.SubPackages)
-            {
-                var testFile = subPackage.FullName;
-
-                if (PathUtils.IsAssemblyFileType(testFile))
-                    assemblyCount++;
-#if !NETSTANDARD1_6
-                else if (_projectService.CanLoadFrom(testFile))
-                    projectCount++;
-#endif
-            }
-
-            // If we have multiple projects or a project plus assemblies
-            // then defer to the AggregatingTestRunner, which will make
-            // the decision on a file by file basis so that each project
-            // runs with its own settings. Note that bad extensions are
-            // ignored rather than assumed to be projects. This doesn't
-            // really matter since they will result in an error anyway.
-            if (projectCount > 1 || projectCount > 0 && assemblyCount > 0)
-                return new AggregatingTestRunner(ServiceContext, package);
-
 #if NETSTANDARD1_6 || NETSTANDARD2_0
-            if (projectCount > 0 || package.SubPackages.Count > 1)
+            if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
 
             return base.MakeTestRunner(package);
@@ -104,9 +80,7 @@ namespace NUnit.Engine.Services
             {
                 default:
                 case ProcessModel.Default:
-                    if (projectCount > 0)
-                        return new AggregatingTestRunner(ServiceContext, package);
-                    else if (package.SubPackages.Count > 1)
+                    if (package.SubPackages.Count > 1)
                         return new MultipleTestProcessRunner(this.ServiceContext, package);
                     else
                         return new ProcessRunner(this.ServiceContext, package);
@@ -118,14 +92,12 @@ namespace NUnit.Engine.Services
                     return new ProcessRunner(this.ServiceContext, package);
 
                 case ProcessModel.InProcess:
-                    if (projectCount > 0)
-                        return new AggregatingTestRunner(ServiceContext, package);
-                    else
-                        return base.MakeTestRunner(package);
+                    return base.MakeTestRunner(package);
             }
         }
 
-        // TODO: Review this method once we have a gui - not used by console runner
+        // TODO: Review this method once used by a gui - the implementation is
+        // overly simplistic. It is not currently used by any known runner.
         public override bool CanReuse(ITestEngineRunner runner, TestPackage package)
         {
             ProcessModel processModel = GetTargetProcessModel(package);
@@ -141,18 +113,24 @@ namespace NUnit.Engine.Services
                     return base.CanReuse(runner, package);
             }
         }
+#endif
 
 #region Helper Methods
 
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+        /// <summary>
+        /// Get the specified target process model for the package.
+        /// </summary>
+        /// <param name="package">A TestPackage</param>
+        /// <returns>The string representation of the process model or "Default" if none was specified.</returns>
         private ProcessModel GetTargetProcessModel(TestPackage package)
         {
             return (ProcessModel)System.Enum.Parse(
                 typeof(ProcessModel),
                 package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
         }
+#endif
 
 #endregion
-
-#endif
     }
 }

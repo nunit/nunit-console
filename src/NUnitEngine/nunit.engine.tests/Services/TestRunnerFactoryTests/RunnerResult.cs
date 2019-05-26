@@ -27,6 +27,37 @@ using System.Text;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 {
+    public class RunnerResult<TRUNNER> : RunnerResult where TRUNNER : ITestEngineRunner
+    {
+        public RunnerResult()
+        {
+            TestRunner = typeof(TRUNNER);
+        }
+    }
+
+    public class RunnerResult<TRUNNER, TSUB1, TSUB2> : RunnerResult<TRUNNER>
+        where TRUNNER : NUnit.Engine.Runners.AggregatingTestRunner
+        where TSUB1 : ITestEngineRunner
+        where TSUB2 : ITestEngineRunner
+    {
+        public RunnerResult()
+        {
+            SubRunners = new RunnerResult[] { new RunnerResult<TSUB1>(), new RunnerResult<TSUB2>() };
+        }
+    }
+
+    public class RunnerResult<TRUNNER, TSUB1, TSUB2, TSUB3> : RunnerResult<TRUNNER>
+        where TRUNNER : NUnit.Engine.Runners.AggregatingTestRunner
+        where TSUB1 : ITestEngineRunner
+        where TSUB2 : ITestEngineRunner
+        where TSUB3 : ITestEngineRunner
+    {
+        public RunnerResult()
+        {
+            SubRunners = new RunnerResult[] { new RunnerResult<TSUB1>(), new RunnerResult<TSUB2>(), new RunnerResult<TSUB3>() };
+        }
+    }
+
     public class RunnerResult
     {
         public Type TestRunner { get; set; }
@@ -42,12 +73,13 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
                 return sb.ToString().Trim();
 
             sb.AppendLine("SubRunners:");
+            sb.AppendLine("[");
 
             foreach (var subRunner in SubRunners)
             {
                 sb.AppendLine($"\t{subRunner}");
             }
-
+            sb.AppendLine("]");
             return sb.ToString().Trim();
         }
     }
