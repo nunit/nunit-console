@@ -117,32 +117,7 @@ namespace NUnit.Engine.Services
 
 #region Helper Methods
 
-#if !NETSTANDARD1_6
-        /// <summary>
-        /// Examine the immediate subpackages of a test package, if any
-        /// and count how many subpackages are found. Currently this is
-        /// only called (and only makes sense to call) from a top-level
-        /// package representing the command-line because that's the
-        /// only place packages may appear.
-        /// </summary>
-        /// <param name="package">A TestPackage</param>
-        /// <returns>Count of project subpackaegs</returns>
-        private int ProjectCount(TestPackage package)
-        {
-            int projectCount = 0;
-
-            foreach (var subPackage in package.SubPackages)
-            {
-                var testFile = subPackage.FullName;
-
-                if (_projectService.CanLoadFrom(testFile))
-                    projectCount++;
-            }
-
-            return projectCount;
-        }
-
-#if !NETSTANDARD2_0
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
         /// <summary>
         /// Get the specified target process model for the package.
         /// </summary>
@@ -154,7 +129,6 @@ namespace NUnit.Engine.Services
                 typeof(ProcessModel),
                 package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
         }
-#endif
 #endif
 
 #endregion
