@@ -89,7 +89,7 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode result, string outputPath)
         {
-            using (var xmlWriter = XmlWriter.Create(new StreamWriter(outputPath), new XmlWriterSettings {Indent = true, ConformanceLevel = ConformanceLevel.Auto}))
+            using (var xmlWriter = XmlWriter.Create(outputPath, new XmlWriterSettings {Indent = true, ConformanceLevel = ConformanceLevel.Auto}))
             {
                 _transform.Transform(result, xmlWriter);
             }
