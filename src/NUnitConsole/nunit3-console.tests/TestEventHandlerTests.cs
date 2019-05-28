@@ -80,30 +80,42 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
             new TestCaseData("<start-test fullname='SomeName'/>", "Before", "=> SomeName\r\n"),
             new TestCaseData("<start-test fullname='SomeName'/>", "After", ""),
+            new TestCaseData("<start-test fullname='SomeName'/>", "BeforeAndAfter", "=> SomeName\r\n"),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Off", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "On", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Before", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "After", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "BeforeAndAfter", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Off", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "On", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "All", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Before", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "After", "Passed => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "BeforeAndAfter", "Passed => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Failed'/>", "After", "Failed => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Failed' label='Invalid'/>", "After", "Invalid => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Failed' label='Cancelled'/>", "After", "Cancelled => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Failed' label='Error'/>", "After", "Error => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Failed'/>", "BeforeAndAfter", "Failed => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Failed' label='Invalid'/>", "BeforeAndAfter", "Invalid => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Failed' label='Cancelled'/>", "BeforeAndAfter", "Cancelled => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Failed' label='Error'/>", "BeforeAndAfter", "Error => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Warning'/>", "After", "Warning => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Warning'/>", "BeforeAndAfter", "Warning => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Inconclusive'/>", "After", "Inconclusive => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Inconclusive'/>", "BeforeAndAfter", "Inconclusive => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Skipped'/>", "After", "Skipped => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Skipped'/>", "BeforeAndAfter", "Skipped => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Skipped' label='Ignored'/>", "After", "Ignored => SomeName\r\n"),
+            new TestCaseData("<test-case fullname='SomeName' result='Skipped' label='Ignored'/>", "BeforeAndAfter", "Ignored => SomeName\r\n"),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Off", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "On", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "All", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "After", ""),
+            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "BeforeAndAfter", ""),
             // Finish Events - With Output
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
@@ -124,6 +136,10 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
                 "After",
+                "=> SomeName\r\nOUTPUT\r\nPassed => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
                 "=> SomeName\r\nOUTPUT\r\nPassed => SomeName\r\n"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Failed'><output>OUTPUT</output></test-case>",
@@ -158,6 +174,34 @@ namespace NUnit.ConsoleRunner.Tests
                 "After",
                 "=> SomeName\r\nOUTPUT\r\nIgnored => SomeName\r\n"),
             new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Error'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nError => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Invalid'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nInvalid => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Failed' label='Cancelled'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nCancelled => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Warning'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nWarning => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Inconclusive'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nInconclusive => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Skipped'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nSkipped => SomeName\r\n"),
+            new TestCaseData(
+                "<test-case fullname='SomeName' result='Skipped' label='Ignored'><output>OUTPUT</output></test-case>",
+                "BeforeAndAfter",
+                "=> SomeName\r\nOUTPUT\r\nIgnored => SomeName\r\n"),
+            new TestCaseData(
                 "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
                 "Off",
                 "OUTPUT"),
@@ -176,6 +220,10 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
                 "After",
+                "=> SomeName\r\nOUTPUT"),
+            new TestCaseData(
+                "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
+                "BeforeAndAfter",
                 "=> SomeName\r\nOUTPUT"),
             // Output Events
             new TestCaseData(
@@ -197,6 +245,10 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData(
                 "<test-output testname='SomeName'>OUTPUT</test-output>",
                 "After",
+                "=> SomeName\r\nOUTPUT"),
+            new TestCaseData(
+                "<test-output testname='SomeName'>OUTPUT</test-output>",
+                "BeforeAndAfter",
                 "=> SomeName\r\nOUTPUT")
         };
 
@@ -271,6 +323,10 @@ namespace NUnit.ConsoleRunner.Tests
                 "After",
                 "=> TestName\r\nOUTPUT\r\nPassed => TestName\r\n"),
             new TestCaseData(
+                SingleTest_StartAndFinish,
+                "BeforeAndAfter",
+                "=> TestName\r\nOUTPUT\r\nPassed => TestName\r\n"),
+            new TestCaseData(
                 SingleTest_ImmediateOutput,
                 "Off",
 @"Immediate output from TEST1
@@ -312,6 +368,16 @@ TEST1
 Passed => TEST1
 "),
             new TestCaseData(
+                SingleTest_ImmediateOutput,
+                "BeforeAndAfter",
+                @"=> TEST1
+Immediate output from TEST1
+Output
+from
+TEST1
+Passed => TEST1
+"),
+            new TestCaseData(
                 SingleTest_SuiteFinish,
                 "Off",
 @"Immediate output from TEST1
@@ -338,6 +404,12 @@ Output from Suite TEST1"),
                 SingleTest_SuiteFinish,
                 "After",
 @"=> TEST1
+Immediate output from TEST1
+Output from Suite TEST1"),
+            new TestCaseData(
+                SingleTest_SuiteFinish,
+                "BeforeAndAfter",
+                @"=> TEST1
 Immediate output from TEST1
 Output from Suite TEST1"),
             new TestCaseData(
@@ -370,6 +442,16 @@ Output from second test"),
                 TwoTests_SequentialExecution,
                 "After",
 @"=> TEST1
+Output from first test
+Failed => TEST1
+=> TEST2
+Output from second test
+Passed => TEST2
+"),
+            new TestCaseData(
+                TwoTests_SequentialExecution,
+                "BeforeAndAfter",
+                @"=> TEST1
 Output from first test
 Failed => TEST1
 => TEST2
@@ -437,6 +519,23 @@ Output from second test
 Passed => TEST2
 "),
             new TestCaseData(
+                TwoTests_InterleavedExecution,
+                "BeforeAndAfter",
+                @"=> TEST1
+Immediate output from first test
+=> TEST2
+=> TEST1
+Another immediate output from first test
+=> TEST2
+Immediate output from second test
+=> TEST1
+Output from first test
+Failed => TEST1
+=> TEST2
+Output from second test
+Passed => TEST2
+"),
+            new TestCaseData(
                 TwoTests_NestedExecution,
                 "Off",
 @"Immediate output from first test
@@ -477,6 +576,19 @@ Output from first test"),
                 TwoTests_NestedExecution,
                 "After",
 @"=> TEST1
+Immediate output from first test
+=> TEST2
+Immediate output from second test
+Output from second test
+Passed => TEST2
+=> TEST1
+Output from first test
+Failed => TEST1
+"),
+            new TestCaseData(
+                TwoTests_NestedExecution,
+                "BeforeAndAfter",
+                @"=> TEST1
 Immediate output from first test
 => TEST2
 Immediate output from second test

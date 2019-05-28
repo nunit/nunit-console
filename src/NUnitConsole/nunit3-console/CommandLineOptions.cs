@@ -49,7 +49,7 @@ namespace NUnit.Common
         /// </summary>
         protected readonly IFileSystem _fileSystem;
 
-#region Constructor
+        #region Constructor
 
         internal CommandLineOptions(IDefaultOptionsProvider defaultOptionsProvider, IFileSystem fileSystem, params string[] args)
         {
@@ -72,9 +72,9 @@ namespace NUnit.Common
                 Parse(args);
         }
 
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         // Action to Perform
 
@@ -174,9 +174,9 @@ namespace NUnit.Common
             return ErrorMessages.Count == 0;
         }
 
-#endregion
+        #endregion
 
-#region Helper Methods
+        #region Helper Methods
 
         protected virtual void CheckOptionCombinations()
         {
@@ -338,8 +338,8 @@ namespace NUnit.Common
             this.Add("noresult", "Don't save any test results.",
                 v => noresult = v != null);
 
-            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, Before, After, All",
-                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "Before", "After", "All"));
+            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, Before, After, BeforeAndAfter, All",
+                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "Before", "After", "BeforeAndAfter", "All"));
 
             this.Add("test-name-format=", "Non-standard naming pattern to use in generating test names.",
                 v => DefaultTestNamePattern = RequiredValue(v, "--test-name-format"));
