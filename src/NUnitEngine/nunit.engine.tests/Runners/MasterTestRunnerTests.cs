@@ -217,8 +217,6 @@ namespace NUnit.Engine.Runners.Tests
         }
 #endif
 
-        #region Helper Methods
-
         private void CheckResult(XmlNode result, ResultData expected)
         {
             if (expected.Name != null)
@@ -306,10 +304,6 @@ namespace NUnit.Engine.Runners.Tests
             _events.Add(XmlHelper.CreateXmlNode(report));
         }
 
-        #endregion
-
-        #region Nested Helper Classes
-
         public class TestRunData : ResultData
         {
             private const string Q = "\"";
@@ -377,6 +371,5 @@ namespace NUnit.Engine.Runners.Tests
                 }
             }
         }
-        #endregion
     }
 }

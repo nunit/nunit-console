@@ -37,14 +37,10 @@ namespace NUnit.Engine.Runners
         /// <param name="package">The package.</param>
         public MultipleTestDomainRunner(IServiceLocator services, TestPackage package) : base(services, package) { }
 
-        #region AggregatingTestRunner Overrides
-
         protected override ITestEngineRunner CreateRunner(TestPackage package)
         {
             return new TestDomainRunner(Services, package);
         }
-
-        #endregion
     }
 }
 #endif

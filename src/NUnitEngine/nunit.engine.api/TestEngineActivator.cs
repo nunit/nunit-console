@@ -69,7 +69,6 @@ namespace NUnit.Engine
             return Activator.CreateInstance(engineType) as ITestEngine;
         }
 #else
-        #region Public Methods
 
         /// <summary>
         /// Create an instance of the test engine.
@@ -109,10 +108,6 @@ namespace NUnit.Engine
                 throw new Exception("Failed to load the test engine", ex);
             }
         }
-
-        #endregion
-
-        #region Private Methods
 
         private static Assembly FindNewestEngine(Version minVersion)
         {
@@ -189,7 +184,6 @@ namespace NUnit.Engine
             catch (Exception) { }
             return null;
         }
-        #endregion
 #endif
     }
 }

@@ -36,8 +36,6 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class DirectoryFinder
     {
-        #region Public Methods
-
         /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
         /// Each path component may have wildcard characters and a component
@@ -123,10 +121,6 @@ namespace NUnit.Engine.Internal
             return null;
         }
 
-        #endregion
-
-        #region Helper Methods
-
         private static List<DirectoryInfo> ExpandOneStep(IList<DirectoryInfo> dirList, string pattern)
         {
             var newList = new List<DirectoryInfo>();
@@ -157,7 +151,5 @@ namespace NUnit.Engine.Internal
 
             return newList;
         }
-
-        #endregion
     }
 }

@@ -41,8 +41,6 @@ namespace NUnit.Engine.Services
     {
         readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 
-        #region IDriverService Members
-
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
         /// </summary>
@@ -117,10 +115,6 @@ namespace NUnit.Engine.Services
                                                                               "Either assembly contains no tests or proper test driver has not been found.", assemblyPath));
         }
 
-        #endregion
-
-        #region Service Overrides
-
         public override void StartService()
         {
             Guard.OperationValid(ServiceContext != null, "Can't start DriverService outside of a ServiceContext");
@@ -152,7 +146,5 @@ namespace NUnit.Engine.Services
                 throw;
             }
         }
-
-        #endregion
     }
 }

@@ -160,8 +160,6 @@ namespace NUnit.Engine.Drivers
             return ExecuteMethod(EXPLORE_METHOD, filter) as string;
         }
 
-#region Helper Methods
-
         void CheckLoadWasCalled()
         {
             if (_frameworkController == null)
@@ -198,8 +196,6 @@ namespace NUnit.Engine.Drivers
             }
             return method.Invoke(_frameworkController, args);
         }
-
-#endregion
     }
 }
 #endif

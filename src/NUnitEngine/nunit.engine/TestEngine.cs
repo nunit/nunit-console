@@ -49,17 +49,11 @@ namespace NUnit.Engine
             InternalTraceLevel = InternalTraceLevel.Default;
         }
 
-        #region Public Properties
-
         public ServiceContext Services { get; private set; }
 
         public string WorkDirectory { get; set; }
 
         public InternalTraceLevel InternalTraceLevel { get; set; }
-
-        #endregion
-
-        #region ITestEngine Members
 
         /// <summary>
         /// Access the public IServiceLocator, first initializing
@@ -135,10 +129,6 @@ namespace NUnit.Engine
             return new Runners.MasterTestRunner(Services, package);
         }
 
-        #endregion
-
-        #region IDisposable Members
-
         private bool _disposed = false;
 
         public void Dispose()
@@ -158,7 +148,5 @@ namespace NUnit.Engine
                 _disposed = true;
             }
         }
-
-        #endregion
     }
 }

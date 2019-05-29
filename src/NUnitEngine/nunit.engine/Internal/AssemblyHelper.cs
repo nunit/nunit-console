@@ -33,8 +33,6 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class AssemblyHelper
     {
-        #region GetDirectoryName
-
         /// <summary>
         /// Gets the path to the directory from which an assembly was loaded.
         /// </summary>
@@ -44,10 +42,6 @@ namespace NUnit.Engine.Internal
         {
             return Path.GetDirectoryName(GetAssemblyPath(assembly));
         }
-
-        #endregion
-
-        #region GetAssemblyPath
 
         /// <summary>
         /// Gets the path from which an assembly was loaded.
@@ -65,10 +59,6 @@ namespace NUnit.Engine.Internal
 
             return assembly.Location;
         }
-
-        #endregion
-
-        #region Helper Methods
 
         private static bool IsFileUri(string uri)
         {
@@ -101,8 +91,6 @@ namespace NUnit.Engine.Internal
 
             return codeBase.Substring(start);
         }
-
-        #endregion
     }
 }
 #endif

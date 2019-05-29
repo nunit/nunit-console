@@ -47,7 +47,6 @@ namespace NUnit.ConsoleRunner
             _colorEnabled = colorEnabled;
         }
 
-        #region Extended Methods
         /// <summary>
         /// Writes the value with the specified style.
         /// </summary>
@@ -125,7 +124,5 @@ namespace NUnit.ConsoleRunner
             WriteLabel(label, option, valueStyle);
             WriteLine();
         }
-
-        #endregion
     }
 }

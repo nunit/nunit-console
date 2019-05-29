@@ -45,8 +45,6 @@ namespace NUnit.Engine.Extensibility
             Extensions = new List<ExtensionNode>();
         }
 
-        #region IExtensionPoint Members
-
         /// <summary>
         /// Gets the unique path identifying this extension point.
         /// </summary>
@@ -70,18 +68,10 @@ namespace NUnit.Engine.Extensibility
             get { return this.Extensions.ToArray(); }
         }
 
-        #endregion
-
-        #region Other Properties
-
         /// <summary>
         /// Gets a list of ExtensionNodes for extensions installed on this extension point.
         /// </summary>
         public List<ExtensionNode> Extensions { get; private set; }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Install an extension at this extension point. If the
@@ -113,8 +103,6 @@ namespace NUnit.Engine.Extensibility
         {
             Extensions.Remove(extension);
         }
-
-        #endregion
     }
 }
 #endif

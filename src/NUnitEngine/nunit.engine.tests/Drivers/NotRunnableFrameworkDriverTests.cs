@@ -110,13 +110,7 @@ namespace NUnit.Engine.Drivers.Tests
             Assert.That(result.SelectSingleNode("reason/message").InnerText, Is.EqualTo(_expectedReason));
         }
 
-        #region Abstract Properties and Methods
-
         protected abstract IFrameworkDriver CreateDriver(string filePath);
-
-        #endregion
-
-        #region Helper Methods
 
         private IFrameworkDriver GetDriver(string filePath)
         {
@@ -131,9 +125,6 @@ namespace NUnit.Engine.Drivers.Tests
             return propNode == null ? null : propNode.GetAttribute("value");
         }
 
-        #endregion
-
-        #region Nested NullListener Class
         private class NullListener : ITestEventListener
         {
             public void OnTestEvent(string testEvent)
@@ -141,7 +132,6 @@ namespace NUnit.Engine.Drivers.Tests
                 // No action
             }
         }
-        #endregion
     }
 
     public class InvalidAssemblyFrameworkDriverTests : NotRunnableFrameworkDriverTests

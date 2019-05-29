@@ -30,8 +30,6 @@ namespace NUnit
     /// </summary>
     public static class FrameworkPackageSettings
     {
-        #region Settings u
-
         /// <summary>
         /// Flag (bool) indicating whether tests are being debugged.
         /// </summary>
@@ -114,7 +112,5 @@ namespace NUnit
         /// Parameters to be passed on to the tests, already parsed into an IDictionary&lt;string, string>. Replaces <see cref="TestParameters"/>.
         /// </summary>
         public const string TestParametersDictionary = "TestParametersDictionary";
-
-        #endregion
     }
 }

@@ -40,8 +40,6 @@ namespace NUnit.Engine.Internal
         private const string TEST_SUITE_ELEMENT = "test-suite";
         private const string PROJECT_SUITE_TYPE = "Project";
 
-        #region TestEngineResult extension methods
-
         /// <summary>
         /// Aggregate the XmlNodes under a TestEngineResult into a single XmlNode.
         /// </summary>
@@ -93,10 +91,6 @@ namespace NUnit.Engine.Internal
             return Aggregate(result, TEST_RUN_ELEMENT, package.ID, package.Name, package.FullName);
         }
 
-        #endregion
-
-        #region Methods that operate on a list of TestEngineResults
-
         /// <summary>
         /// Merges multiple test engine results into a single result. The
         /// result element contains all the XML nodes found in the input.
@@ -114,10 +108,6 @@ namespace NUnit.Engine.Internal
 
             return mergedResult;
         }
-
-        #endregion
-
-        #region Methods that operate on a list of XmlNodes
 
         /// <summary>
         /// Aggregates a collection of XmlNodes under a single XmlNode.
@@ -237,7 +227,5 @@ namespace NUnit.Engine.Internal
 
             return combinedNode;
         }
-
-        #endregion
     }
 }

@@ -39,8 +39,6 @@ namespace NUnit.Engine.Runners
             _domainManager = Services.GetService<DomainManager>();
         }
 
-        #region DirectTestRunner Overrides
-
         protected override TestEngineResult LoadPackage()
         {
             TestDomain = _domainManager.CreateDomain(TestPackage);
@@ -59,8 +57,6 @@ namespace NUnit.Engine.Runners
                 this.TestDomain = null;
             }
         }
-
-        #endregion
     }
 }
 #endif

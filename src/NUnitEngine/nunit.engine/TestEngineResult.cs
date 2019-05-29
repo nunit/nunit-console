@@ -59,8 +59,6 @@ namespace NUnit.Engine
 #endif
         private List<XmlNode> _xmlNodes = new List<XmlNode>();
 
-        #region Constructors
-
         /// <summary>
         /// Construct a TestResult from an XmlNode
         /// </summary>
@@ -86,10 +84,6 @@ namespace NUnit.Engine
         public TestEngineResult()
         {
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets a flag indicating whether this is a single result
@@ -150,7 +144,5 @@ namespace NUnit.Engine
             this._xmlText.Add(xml.OuterXml);
             this._xmlNodes.Add(xml);
         }
-
-        #endregion
     }
 }

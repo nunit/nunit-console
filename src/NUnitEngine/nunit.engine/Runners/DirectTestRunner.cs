@@ -79,8 +79,6 @@ namespace NUnit.Engine.Runners
 #endif
         }
 
-        #region AbstractTestRunner Overrides
-
         /// <summary>
         /// Explores a previously loaded TestPackage and returns information
         /// about the tests found.
@@ -258,16 +256,10 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        #endregion
-
-        #region Helper Methods
-
         private void EnsurePackageIsLoaded()
         {
             if (!IsPackageLoaded)
                 LoadResult = LoadPackage();
         }
-
-        #endregion
     }
 }

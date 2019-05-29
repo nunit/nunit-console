@@ -31,16 +31,10 @@ namespace NUnit.Engine
     {
         public string Result { get; private set; }
 
-        #region MarshalByRefObject Overrides
-
         public override object InitializeLifetimeService()
         {
             return null;
         }
-
-        #endregion
-
-        #region ICallbackEventHandler Members
 
         public string GetCallbackResult()
         {
@@ -51,8 +45,6 @@ namespace NUnit.Engine
         {
             Result = eventArgument;
         }
-
-        #endregion
     }
 }
 #endif

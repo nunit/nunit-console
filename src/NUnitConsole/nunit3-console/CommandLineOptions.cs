@@ -49,8 +49,6 @@ namespace NUnit.Common
         /// </summary>
         protected readonly IFileSystem _fileSystem;
 
-        #region Constructor
-
         internal CommandLineOptions(IDefaultOptionsProvider defaultOptionsProvider, IFileSystem fileSystem, params string[] args)
         {
             // Apply default options
@@ -71,10 +69,6 @@ namespace NUnit.Common
             if (args != null)
                 Parse(args);
         }
-
-        #endregion
-
-        #region Properties
 
         // Action to Perform
 
@@ -158,10 +152,6 @@ namespace NUnit.Common
 
         public IList<string> ErrorMessages { get; } = new List<string>();
 
-        #endregion
-
-        #region Public Methods
-
         public bool Validate()
         {
             if (!validated)
@@ -173,10 +163,6 @@ namespace NUnit.Common
 
             return ErrorMessages.Count == 0;
         }
-
-        #endregion
-
-        #region Helper Methods
 
         protected virtual void CheckOptionCombinations()
         {
@@ -420,7 +406,5 @@ namespace NUnit.Common
 
             outputSpecifications.Add(spec);
         }
-
-        #endregion
     }
 }

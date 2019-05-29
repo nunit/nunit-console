@@ -31,8 +31,6 @@ namespace NUnit
     /// </summary>
     public static class EnginePackageSettings
     {
-        #region Engine Settings - Used by the Engine itself
-
         /// <summary>
         /// The name of the config to use in loading a project.
         /// If not specified, the first config found is used.
@@ -157,7 +155,5 @@ namespace NUnit
         /// This path is provided to tests by the framework TestContext.
         /// </summary>
         public const string WorkDirectory = "WorkDirectory";
-
-        #endregion
     }
 }

@@ -49,8 +49,6 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
-        #region IExtensionService Members
-
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
         /// </summary>
@@ -94,10 +92,6 @@ namespace NUnit.Engine.Services
                     node.Enabled = enabled;
         }
 
-        #endregion
-
-        #region Public Methods - Extension Points
-
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
@@ -130,10 +124,6 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        #endregion
-
-        #region Public Methods - Extensions
-
         public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
         {
             var ep = GetExtensionPoint(path);
@@ -164,10 +154,6 @@ namespace NUnit.Engine.Services
                 yield return (T)node.ExtensionObject;
         }
 
-        #endregion
-
-        #region Service Overrides
-
         public override void StartService()
         {
             try
@@ -195,10 +181,6 @@ namespace NUnit.Engine.Services
                 throw;
             }
         }
-
-        #endregion
-
-        #region Helper Methods - Extension Points
 
         /// <summary>
         /// Find the extension points in a loaded assembly.
@@ -291,10 +273,6 @@ namespace NUnit.Engine.Services
                 ? DeduceExtensionPointFromType(baseType)
                 : null;
         }
-
-        #endregion
-
-        #region Helper Methods - Extensions
 
         /// <summary>
         /// Find candidate extension assemblies starting from a
@@ -552,8 +530,6 @@ namespace NUnit.Engine.Services
 
             return true;
         }
-
-        #endregion
     }
 }
 #endif

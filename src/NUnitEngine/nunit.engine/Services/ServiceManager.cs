@@ -43,8 +43,6 @@ namespace NUnit.Engine.Services
 
         public int ServiceCount { get { return _services.Count; } }
 
-        #region Public Methods
-
         public IService GetService( Type serviceType )
         {
             IService theService = null;
@@ -133,10 +131,6 @@ namespace NUnit.Engine.Services
             _services.Clear();
         }
 
-#endregion
-
-#region IDisposable
-
         private bool _disposed = false;
 
         public void Dispose()
@@ -162,7 +156,5 @@ namespace NUnit.Engine.Services
                 _disposed = true;
             }
         }
-
-#endregion
     }
 }

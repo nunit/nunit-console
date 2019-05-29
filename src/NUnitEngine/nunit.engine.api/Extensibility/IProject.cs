@@ -30,8 +30,6 @@ namespace NUnit.Engine.Extensibility
     /// </summary>
     public interface IProject
     {
-        #region Properties
-
         /// <summary>
         /// Gets the path to the file storing this project, if any.
         /// If the project has not been saved, this is null.
@@ -48,10 +46,6 @@ namespace NUnit.Engine.Extensibility
         /// Gets a list of the configs for this project
         /// </summary>
         IList<string> ConfigNames { get; }
-
-        #endregion
-        
-        #region Methods
 
         /// <summary>
         /// Gets a test package for the primary or active
@@ -71,7 +65,5 @@ namespace NUnit.Engine.Extensibility
         /// <param name="configName">The name of the config to use</param>
         /// <returns>A TestPackage for the named configuration.</returns>
         TestPackage GetTestPackage(string configName);
-
-        #endregion
     }
 }

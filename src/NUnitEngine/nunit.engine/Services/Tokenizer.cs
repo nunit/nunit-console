@@ -55,8 +55,6 @@ namespace NUnit.Engine
 
         public int Pos { get; set; }
 
-        #region Equality Overrides
-
         public override bool Equals(object obj)
         {
             return obj is Token && this == (Token)obj;
@@ -92,8 +90,6 @@ namespace NUnit.Engine
         {
             return !(t1 == t2);
         }
-
-        #endregion
     }
 
     /// <summary>

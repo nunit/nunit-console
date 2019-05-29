@@ -32,8 +32,6 @@ namespace NUnit.Engine
     /// </summary>
     public interface IExtensionService
     {
-        #region Public Properties
-
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
         /// </summary>
@@ -60,8 +58,6 @@ namespace NUnit.Engine
         /// <param name="typeName"></param>
         /// <param name="enabled"></param>
         void EnableExtension(string typeName, bool enabled);
-
-        #endregion
     }
 }
 

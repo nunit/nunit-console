@@ -40,8 +40,6 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ConsoleRunner
     {
-        #region Console Runner Return Codes
-
         public static readonly int OK = 0;
         public static readonly int INVALID_ARG = -1;
         public static readonly int INVALID_ASSEMBLY = -2;
@@ -49,10 +47,6 @@ namespace NUnit.ConsoleRunner
         public static readonly int INVALID_TEST_FIXTURE = -4;
         //public static readonly int UNLOAD_ERROR = -5;         //No longer in use
         public static readonly int UNEXPECTED_ERROR = -100;
-
-        #endregion
-
-        #region Instance Fields
 
         private ITestEngine _engine;
         private ConsoleOptions _options;
@@ -63,10 +57,6 @@ namespace NUnit.ConsoleRunner
         private ExtendedTextWriter _outWriter;
 
         private string _workDirectory;
-
-        #endregion
-
-        #region Constructor
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
@@ -88,10 +78,6 @@ namespace NUnit.ConsoleRunner
             // Enable TeamCityEventListener immediately, before the console is redirected
             _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
         }
-
-        #endregion
-
-        #region Execute Method
 
         /// <summary>
         /// Executes tests according to the provided commandline options.
@@ -138,10 +124,6 @@ namespace NUnit.ConsoleRunner
                 _outWriter.WriteLine(ColorStyle.Default, "    " + file);
             _outWriter.WriteLine();
         }
-
-        #endregion
-
-        #region Helper Methods
 
         private int ExploreTests(TestPackage package, TestFilter filter)
         {
@@ -527,9 +509,6 @@ namespace NUnit.ConsoleRunner
 
             return true;
         }
-
-        #endregion
-
     }
 }
 

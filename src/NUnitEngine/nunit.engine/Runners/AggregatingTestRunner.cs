@@ -90,8 +90,6 @@ namespace NUnit.Engine.Runners
         {
         }
 
-        #region AbstractTestRunner Overrides
-
         /// <summary>
         /// Explore a TestPackage and return information about
         /// the tests found.
@@ -249,8 +247,6 @@ namespace NUnit.Engine.Runners
             if (_unloadExceptions.Count > 0)
                 throw new NUnitEngineUnloadException(_unloadExceptions);
         }
-
-        #endregion
 
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {

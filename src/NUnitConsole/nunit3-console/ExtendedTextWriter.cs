@@ -31,8 +31,6 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public abstract class ExtendedTextWriter : TextWriter
     {
-        #region Extended Methods
-
         /// <summary>
         /// Writes the value with the specified style.
         /// </summary>
@@ -76,7 +74,5 @@ namespace NUnit.ConsoleRunner
         /// <param name="option">The option.</param>
         /// <param name="valueStyle">The color to display the value with</param>
         public abstract void WriteLabelLine(string label, object option, ColorStyle valueStyle);
-
-        #endregion
     }
 }
