@@ -24,42 +24,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 {
-    public class RunnerResult<TRUNNER> : RunnerResult where TRUNNER : ITestEngineRunner
-    {
-        public RunnerResult()
-        {
-            TestRunner = typeof(TRUNNER);
-        }
-    }
-
-    public class RunnerResult<TRUNNER, TSUB1, TSUB2> : RunnerResult<TRUNNER>
-        where TRUNNER : NUnit.Engine.Runners.AggregatingTestRunner
-        where TSUB1 : ITestEngineRunner
-        where TSUB2 : ITestEngineRunner
-    {
-        public RunnerResult()
-        {
-            SubRunners = new RunnerResult[] { new RunnerResult<TSUB1>(), new RunnerResult<TSUB2>() };
-        }
-    }
-
-    public class RunnerResult<TRUNNER, TSUB1, TSUB2, TSUB3> : RunnerResult<TRUNNER>
-        where TRUNNER : NUnit.Engine.Runners.AggregatingTestRunner
-        where TSUB1 : ITestEngineRunner
-        where TSUB2 : ITestEngineRunner
-        where TSUB3 : ITestEngineRunner
-    {
-        public RunnerResult()
-        {
-            SubRunners = new RunnerResult[] { new RunnerResult<TSUB1>(), new RunnerResult<TSUB2>(), new RunnerResult<TSUB3>() };
-        }
-    }
-
     public class RunnerResult
     {
+#if !NETCOREAPP
+        public static RunnerResult TestDomainRunner => new RunnerResult { TestRunner = typeof(TestDomainRunner) };
+        public static RunnerResult ProcessRunner => new RunnerResult { TestRunner = typeof(ProcessRunner) };
+#endif
+        public static RunnerResult LocalTestRunner => new RunnerResult { TestRunner = typeof(LocalTestRunner) };
+
         public Type TestRunner { get; set; }
 
         public ICollection<RunnerResult> SubRunners { get; set; } = new List<RunnerResult>();
