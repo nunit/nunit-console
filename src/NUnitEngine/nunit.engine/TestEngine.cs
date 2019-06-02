@@ -102,7 +102,6 @@ namespace NUnit.Engine
                 // For example, ResultService uses ExtensionService, so ExtensionService is added
                 // later.
                 Services.Add(new SettingsService(true));
-                Services.Add(new DriverService());
                 Services.Add(new RecentFilesService());
                 Services.Add(new TestFilterService());
 #if !NETSTANDARD1_6
@@ -114,6 +113,7 @@ namespace NUnit.Engine
                 Services.Add(new TestAgency());
 #endif
 #endif
+                Services.Add(new DriverService());
                 Services.Add(new ResultService());
                 Services.Add(new DefaultTestRunnerFactory());
             }
