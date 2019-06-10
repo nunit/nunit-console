@@ -33,34 +33,20 @@ namespace NUnit.Engine
     /// </summary>
     public class ServiceContext : IServiceLocator
     {
-        #region Constructor
-
         public ServiceContext()
         {
             ServiceManager = new ServiceManager();
         }
 
-        #endregion
-
-        #region Properties
-
         public ServiceManager ServiceManager { get; private set; }
 
         public int ServiceCount { get { return ServiceManager.ServiceCount; } }
-
-        #endregion
-
-        #region Methods
 
         public void Add(IService service)
         {
             ServiceManager.AddService(service);
             service.ServiceContext = this;
         }
-
-        #endregion
-
-        #region IServiceLocator Implementation
 
         public T GetService<T>() where T : class
         {
@@ -71,7 +57,5 @@ namespace NUnit.Engine
         {
             return ServiceManager.GetService(serviceType);
         }
-
-        #endregion
     }
 }

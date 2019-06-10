@@ -35,8 +35,6 @@ namespace NUnit.Common
     /// </summary>
     public class ConsoleOptions : CommandLineOptions
     {
-        #region Constructors
-
         internal ConsoleOptions(
             IDefaultOptionsProvider provider,
             IFileSystem fileSystem,
@@ -46,10 +44,6 @@ namespace NUnit.Common
         }
 
         public ConsoleOptions(params string[] args) : base(args) { }
-
-        #endregion
-
-        #region Properties
 
         public string ActiveConfig { get; private set; }
         public bool ActiveConfigSpecified { get { return ActiveConfig != null; } }
@@ -93,10 +87,6 @@ namespace NUnit.Common
 
         public string PrincipalPolicy { get; private set; }
 
-        #endregion
-
-        #region Overrides
-
         protected override void CheckOptionCombinations()
         {
             base.CheckOptionCombinations();
@@ -106,10 +96,6 @@ namespace NUnit.Common
             if (IntPtr.Size == 8 && RunAsX86 && ProcessModel == "InProcess")
                 ErrorMessages.Add("The --x86 and --inprocess options are incompatible.");
         }
-
-        #endregion
-
-        #region Configure Additional Options for Console
 
         protected override void ConfigureOptions()
         {
@@ -176,10 +162,6 @@ namespace NUnit.Common
                 v => DebugAgent = v != null);
 #endif
         }
-
-        #endregion
-
-        #region Pre-Parse Arguments Files
 
         private int _nesting = 0;
 
@@ -258,7 +240,5 @@ namespace NUnit.Common
 
             return GetArgs(sb.ToString());
         }
-
-        #endregion
     }
 }

@@ -39,16 +39,10 @@ namespace NUnit.Engine
             _listener = listener ?? new NullListener();
         }
 
-        #region MarshalByRefObject Overrides
-
         public override object InitializeLifetimeService()
         {
             return null;
         }
-
-        #endregion
-
-        #region ICallbackEventHandler Members
 
         public string GetCallbackResult()
         {
@@ -62,10 +56,6 @@ namespace NUnit.Engine
             else
                 ReportProgress(eventArgument);
         }
-
-        #endregion
-
-        #region Helper Methods
 
         private void ReportProgress(string state)
         {
@@ -106,16 +96,12 @@ namespace NUnit.Engine
             return eventArgument.IndexOf("<test-suite", 12, StringComparison.Ordinal) > 0;
         }
 
-        #endregion
-
-        #region Nested NullListener class
         class NullListener : ITestEventListener
         {
             public void OnTestEvent(string report)
             {
             }
         }
-        #endregion
     }
 }
 #endif

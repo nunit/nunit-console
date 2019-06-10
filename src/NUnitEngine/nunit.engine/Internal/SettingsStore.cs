@@ -42,8 +42,6 @@ namespace NUnit.Engine.Internal
         private string _settingsFile;
         private bool _writeable;
 
-        #region Constructors
-
         /// <summary>
         /// Construct a SettingsStore without a backing file - used for testing.
         /// </summary>
@@ -59,10 +57,6 @@ namespace NUnit.Engine.Internal
             _settingsFile = Path.GetFullPath(settingsFile);
             _writeable = writeable;
         }
-
-        #endregion
-
-        #region Public Methods
 
         public void LoadSettings()
         {
@@ -176,7 +170,5 @@ namespace NUnit.Engine.Internal
                 throw;
             }
         }
-
-        #endregion
     }
 }

@@ -59,8 +59,6 @@ namespace NUnit.Engine
         // move all this functionality to services, eliminating the
         // use of public static properties here.
 
-        #region Static Fields
-
         /// <summary>
         /// DefaultVersion is an empty Version, used to indicate that
         /// NUnit should select the CLR version to use for the test.
@@ -72,10 +70,6 @@ namespace NUnit.Engine
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Construct from a runtime type and version. If the version has
@@ -170,10 +164,6 @@ namespace NUnit.Engine
             if (Runtime == RuntimeType.Mono && version.Major == 1)
                 this.FrameworkVersion = new Version(1, 0);
         }
-
-        #endregion
-
-        #region Static Properties
 
         /// <summary>
         /// Static method to return a RuntimeFramework object
@@ -311,10 +301,6 @@ namespace NUnit.Engine
             }
         }
 
-        #endregion
-
-        #region Instance Properties
-
         /// <summary>
         /// Gets the unique Id for this runtime, such as "net-4.5"
         /// </summary>
@@ -390,10 +376,6 @@ namespace NUnit.Engine
         /// Returns the Display name for this framework
         /// </summary>
         public string DisplayName { get; private set; }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Parses a string representing a RuntimeFramework.
@@ -485,10 +467,6 @@ namespace NUnit.Engine
             return FrameworkVersion >= requested.FrameworkVersion;
         }
 
-        #endregion
-
-        #region Helper Methods - General
-
         private static bool IsRuntimeTypeName(string name)
         {
             foreach (string item in Enum.GetNames(typeof(RuntimeType)))
@@ -543,10 +521,6 @@ namespace NUnit.Engine
 
             FindDefaultMonoFramework();
         }
-
-        #endregion
-
-        #region Helper Methods - Mono
 
         private static void FindDefaultMonoFramework()
         {
@@ -685,8 +659,6 @@ namespace NUnit.Engine
 
             _availableFrameworks.Add(framework);
         }
-
-        #endregion
     }
 }
 #endif

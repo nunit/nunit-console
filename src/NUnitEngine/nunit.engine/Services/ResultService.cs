@@ -89,8 +89,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #region IService Members
-
         public override void StartService()
         {
             try
@@ -110,7 +108,5 @@ namespace NUnit.Engine.Services
                 throw;
             }
         }
-
-        #endregion
     }
 }

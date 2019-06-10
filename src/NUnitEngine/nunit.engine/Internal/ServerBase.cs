@@ -119,8 +119,6 @@ namespace NUnit.Engine.Internal
             }
         }
 
-        #region IDisposable Members
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -140,14 +138,10 @@ namespace NUnit.Engine.Internal
             }
         }
 
-        #endregion
-
-        #region InitializeLifetimeService
         public override object InitializeLifetimeService()
         {
             return null;
         }
-        #endregion
     }
 }
 #endif

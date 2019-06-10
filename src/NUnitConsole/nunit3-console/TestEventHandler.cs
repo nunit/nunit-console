@@ -52,8 +52,6 @@ namespace NUnit.ConsoleRunner
             _displayBeforeOutput = _displayBeforeTest || _displayAfterTest || labelsOption == "ON";
         }
 
-        #region ITestEventHandler Members
-
         public void OnTestEvent(string report)
         {
             var doc = new XmlDocument();
@@ -79,10 +77,6 @@ namespace NUnit.ConsoleRunner
                     break;
             }
         }
-
-        #endregion
-
-        #region Individual Handlers
 
         private void TestStarted(XmlNode testResult)
         {
@@ -218,15 +212,9 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        #endregion
-
-        #region InitializeLifetimeService
-
         public override object InitializeLifetimeService()
         {
             return null;
         }
-
-        #endregion
     }
 }

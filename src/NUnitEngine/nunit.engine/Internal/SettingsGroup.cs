@@ -40,8 +40,6 @@ namespace NUnit.Engine.Internal
 
         public event SettingsEventHandler Changed;
 
-        #region ISettings Members
-
         /// <summary>
         /// Load the value of one of the group's settings
         /// </summary>
@@ -142,7 +140,5 @@ namespace NUnit.Engine.Internal
             if (Changed != null)
                 Changed(this, new SettingsEventArgs(settingName));
         }
-
-        #endregion
     }
 }

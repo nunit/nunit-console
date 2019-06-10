@@ -34,8 +34,6 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ResultSummary
     {
-        #region Constructor
-
         public ResultSummary(XmlNode result)
         {
             if (result.Name != "test-run")
@@ -45,10 +43,6 @@ namespace NUnit.ConsoleRunner
 
             Summarize(result, false);
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets the number of test cases for which results
@@ -147,10 +141,6 @@ namespace NUnit.ConsoleRunner
         /// Invalid test fixture(s) were found
         /// </summary>
         public int InvalidTestFixtures { get; private set; }
-
-        #endregion
-
-        #region Helper Methods
 
         private void InitializeCounters()
         {
@@ -253,7 +243,5 @@ namespace NUnit.ConsoleRunner
             foreach (XmlNode childResult in nodes)
                 Summarize(childResult, failedInFixtureTearDown);
         }
-
-        #endregion
     }
 }

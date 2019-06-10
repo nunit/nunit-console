@@ -58,19 +58,12 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
-        #region Private Fields
-
         private readonly AgentDataBase _agentData = new AgentDataBase();
 
-        #endregion
-
-        #region Constructors
         public TestAgency() : this( "TestAgency", 0 ) { }
 
         public TestAgency( string uri, int port ) : base( uri, port ) { }
-        #endregion
 
-        #region ServerBase Overrides
         //public override void Stop()
         //{
         //    foreach( KeyValuePair<Guid,AgentRecord> pair in agentData )
@@ -94,9 +87,7 @@ namespace NUnit.Engine.Services
 
         //    base.Stop ();
         //}
-        #endregion
 
-        #region Public Methods - Called by Agents
         public void Register( ITestAgent agent )
         {
             AgentRecord r = _agentData[agent.Id];
@@ -106,10 +97,6 @@ namespace NUnit.Engine.Services
                     "agentId");
             r.Agent = agent;
         }
-
-        #endregion
-
-        #region Method Called by Clients
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
         {
@@ -152,9 +139,6 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        #endregion
-
-        #region Helper Methods
         private Guid LaunchAgentProcess(TestPackage package)
         {
             RuntimeFramework targetRuntime;
@@ -331,10 +315,6 @@ namespace NUnit.Engine.Services
             throw new NUnitEngineException(errorMsg);
         }
 
-        #endregion
-
-        #region IService Members
-
         public IServiceLocator ServiceContext { get; set; }
 
         public ServiceStatus Status { get; private set; }
@@ -364,8 +344,6 @@ namespace NUnit.Engine.Services
                 throw;
             }
         }
-
-        #endregion
     }
 }
 #endif

@@ -99,8 +99,6 @@ namespace NUnit
             return childNode;
         }
 
-        #region Safe Attribute Access
-
         /// <summary>
         /// Gets the value of the given attribute.
         /// </summary>
@@ -165,7 +163,5 @@ namespace NUnit
 
             return date;
         }
-
-        #endregion
     }
 }

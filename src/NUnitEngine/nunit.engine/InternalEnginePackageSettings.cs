@@ -31,8 +31,6 @@ namespace NUnit.Engine
     /// </summary>
     internal static class InternalEnginePackageSettings
     {
-        #region Internal Settings - Used only within the engine
-
         /// <summary>
         /// If the package represents an assembly, then this is the CLR version
         /// stored in the assembly image. If it represents a project or other
@@ -56,7 +54,5 @@ namespace NUnit.Engine
         /// The FrameworkName specified on a TargetFrameworkAttribute for the assembly
         /// </summary>
         public const string ImageTargetFrameworkName = "ImageTargetFrameworkName";
-
-        #endregion
     }
 }

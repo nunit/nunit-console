@@ -60,8 +60,6 @@ namespace NUnit.ConsoleRunner
             FullName = resultNode.GetAttribute("fullname");
         }
 
-        #region Properties
-
         public string Result { get; private set; }
         public string Label { get; private set; }
         public string Site { get; private set; }
@@ -100,10 +98,6 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        #endregion
-
-        #region Public Methods
-
         public void WriteResult(ExtendedTextWriter writer)
         {
             int numAsserts = Assertions.Count;
@@ -124,10 +118,6 @@ namespace NUnit.ConsoleRunner
             else
                 WriteResult(writer, ReportID, Status, FullName, Message, StackTrace);
         }
-
-        #endregion
-
-        #region Helper Methods
 
         private void WriteResult(ExtendedTextWriter writer, string reportID, string status, string fullName, string message, string stackTrace)
         {
@@ -164,10 +154,6 @@ namespace NUnit.ConsoleRunner
                 : null;
         }
 
-        #endregion
-
-        #region Nested AssertionResult Class
-
         public struct AssertionResult
         {
             public AssertionResult(XmlNode assertion)
@@ -179,7 +165,5 @@ namespace NUnit.ConsoleRunner
             public string Message { get; private set; }
             public string StackTrace { get; private set; }
         }
-
-        #endregion
     }
 }

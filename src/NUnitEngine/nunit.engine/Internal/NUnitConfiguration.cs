@@ -34,10 +34,7 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class NUnitConfiguration
     {
-        #region Public Properties
-
 #if !NETSTANDARD1_6
-        #region EngineDirectory
 
         private static string _engineDirectory;
         public static string EngineDirectory
@@ -52,10 +49,7 @@ namespace NUnit.Engine.Internal
             }
         }
 
-        #endregion
 #endif
-
-        #region ApplicationDataDirectory
 
         private static string _applicationDirectory;
         public static string ApplicationDirectory
@@ -76,9 +70,5 @@ namespace NUnit.Engine.Internal
                 return _applicationDirectory;
             }
         }
-
-        #endregion
-
-        #endregion
     }
 }

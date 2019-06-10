@@ -41,8 +41,6 @@ namespace NUnit.Engine.Runners
         {
         }
 
-        #region AggregatingTestRunner Overrides
-
         public override int LevelOfParallelism
         {
             get
@@ -56,8 +54,6 @@ namespace NUnit.Engine.Runners
         {
             return new ProcessRunner(Services, package);
         }
-
-        #endregion
     }
 }
 #endif

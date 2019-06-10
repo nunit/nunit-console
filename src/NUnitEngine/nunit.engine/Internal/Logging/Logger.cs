@@ -53,7 +53,6 @@ namespace NUnit.Engine.Internal
             _name = index >= 0 ? fullName.Substring(index + 1) : fullName;
         }
 
-        #region Error
         /// <summary>
         /// Logs the message at error level.
         /// </summary>
@@ -73,9 +72,6 @@ namespace NUnit.Engine.Internal
             Log(InternalTraceLevel.Error, format, args);
         }
 
-        #endregion
-
-        #region Warning
         /// <summary>
         /// Logs the message at warm level.
         /// </summary>
@@ -94,9 +90,7 @@ namespace NUnit.Engine.Internal
         {
             Log(InternalTraceLevel.Warning, format, args);
         }
-        #endregion
 
-        #region Info
         /// <summary>
         /// Logs the message at info level.
         /// </summary>
@@ -115,9 +109,7 @@ namespace NUnit.Engine.Internal
         {
             Log(InternalTraceLevel.Info, format, args);
         }
-        #endregion
 
-        #region Debug
         /// <summary>
         /// Logs the message at debug level.
         /// </summary>
@@ -136,9 +128,6 @@ namespace NUnit.Engine.Internal
         {
             Log(InternalTraceLevel.Verbose, format, args);
         }
-        #endregion
-
-        #region Helper Methods
 
         private void Log(InternalTraceLevel level, string message)
         {
@@ -164,7 +153,5 @@ namespace NUnit.Engine.Internal
 #endif
                 _name, message);
         }
-
-        #endregion
     }
 }

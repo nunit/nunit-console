@@ -160,8 +160,6 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        #region Implementation of IDisposable
-
         /// <summary>
         /// If color is enabled, restores the console colors to their defaults
         /// </summary>
@@ -169,7 +167,5 @@ namespace NUnit.ConsoleRunner
         {
             Console.ForegroundColor = _originalColor;
         }
-
-        #endregion
     }
 }

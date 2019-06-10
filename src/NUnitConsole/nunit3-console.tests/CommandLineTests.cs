@@ -35,8 +35,6 @@ namespace NUnit.ConsoleRunner.Tests
     [TestFixture]
     public class CommandLineTests
     {
-        #region Argument Preprocessor Tests
-
         [TestCase("--arg", "--arg")]
         [TestCase("--ArG", "--ArG")]
         [TestCase("--arg1 --arg2", "--arg1", "--arg2")]
@@ -150,10 +148,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(arglist, Is.EqualTo(lines));
             Assert.That(options.ErrorMessages, Is.EqualTo(expectedErrors));
         }
-
-        #endregion
-
-        #region General Tests
 
         [Test]
         public void NoInputFiles()
@@ -406,10 +400,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages[1], Is.EqualTo("Invalid argument: -assembly:Tests.dll"));
         }
 
-        #endregion
-
-        #region Timeout Option
-
         [Test]
         public void TimeoutIsMinusOneIfNoOptionIsProvided()
         {
@@ -439,10 +429,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.Validate(), Is.False);
             Assert.That(options.DefaultTimeout, Is.EqualTo(-1));
         }
-
-        #endregion
-
-        #region EngineResult Option
 
         [Test]
         public void ResultOptionWithFilePath()
@@ -591,10 +577,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages, Has.Exactly(1).Contains($"{missingXslt} could not be found").IgnoreCase);
         }
 
-        #endregion
-
-        #region Explore Option
-
         [Test]
         public void ExploreOptionWithoutPath()
         {
@@ -698,10 +680,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(expectedTeamCity, Is.EqualTo(actualTeamCity));
         }
 
-        #endregion
-
-        #region Testlist Option
-
         [Test]
         public void ShouldNotFailOnEmptyLine()
         {
@@ -712,10 +690,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestList, Is.EqualTo(new[] {"AmazingTest"}));
         }
-
-        #endregion
-
-        #region Test Parameters
 
         [Test]
         public void SingleDeprecatedTestParameter()
@@ -893,10 +867,6 @@ namespace NUnit.ConsoleRunner.Tests
                 Console.WriteLine("   Name: {0} Value: {1}", name, TestContext.Parameters[name]);
         }
 
-        #endregion
-
-        #region Helper Methods
-
         private static IFileSystem GetFileSystemContainingFile(string fileName)
         {
             var fileSystem = new VirtualFileSystem();
@@ -917,8 +887,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.IsNotNull(property, "The property '{0}' is not defined", propertyName);
             return property;
         }
-
-        #endregion
 
         internal sealed class DefaultOptionsProviderStub : IDefaultOptionsProvider
         {

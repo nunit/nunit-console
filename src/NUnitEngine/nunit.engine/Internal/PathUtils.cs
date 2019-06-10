@@ -43,8 +43,6 @@ namespace NUnit.Engine.Internal
         protected static char DirectorySeparatorChar = Path.DirectorySeparatorChar;
         protected static char AltDirectorySeparatorChar = Path.AltDirectorySeparatorChar;
 
-        #region Public methods
-
         /// <summary>
         /// Returns a boolean indicating whether the specified path
         /// is that of an assembly - that is a dll or exe file.
@@ -188,10 +186,6 @@ namespace NUnit.Engine.Internal
                 result = Path.Combine(result, path);
             return result;
         }
-        
-        #endregion
-
-        #region Helper Methods
 
         private static bool IsWindows()
         {
@@ -228,7 +222,5 @@ namespace NUnit.Engine.Internal
             else
                 return path1.Equals(path2);
         }
-
-        #endregion
     }
 }

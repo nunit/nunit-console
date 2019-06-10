@@ -42,8 +42,6 @@ namespace NUnit.Engine.Agents
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
 
-        #region Fields
-
         private readonly string _agencyUrl;
 
         private ITestEngineRunner _runner;
@@ -54,10 +52,6 @@ namespace NUnit.Engine.Agents
         private TcpChannel _channel;
         private ITestAgency _agency;
 
-        #endregion
-
-        #region Constructor
-
         /// <summary>
         /// Construct a RemoteTestAgent
         /// </summary>
@@ -67,18 +61,10 @@ namespace NUnit.Engine.Agents
             _agencyUrl = agencyUrl;
         }
 
-        #endregion
-
-        #region Properties
-
         public int ProcessId
         {
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }
         }
-
-        #endregion
-
-        #region Public Methods
 
         public override ITestEngineRunner CreateRunner(TestPackage package)
         {
@@ -153,10 +139,6 @@ namespace NUnit.Engine.Agents
             return stopSignal.WaitOne(timeout);
         }
 
-        #endregion
-
-        #region ITestEngineRunner Members
-
         /// <summary>
         /// Explore a loaded TestPackage and return information about
         /// the tests found.
@@ -228,8 +210,6 @@ namespace NUnit.Engine.Agents
             if (_runner != null)
                 _runner.StopRun(force);
         }
-
-        #endregion
     }
 }
 #endif

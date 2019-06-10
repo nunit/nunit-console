@@ -37,8 +37,6 @@ namespace NUnit.Engine.Services
         public SettingsService(bool writeable)
             : base(Path.Combine(NUnitConfiguration.ApplicationDirectory, SETTINGS_FILE), writeable) { }
 
-        #region IService Implementation
-
         public IServiceLocator ServiceContext { get; set; }
 
         public ServiceStatus Status { get; private set; }
@@ -69,6 +67,5 @@ namespace NUnit.Engine.Services
                 Status = ServiceStatus.Stopped;
             }
         }
-        #endregion
     }
 }

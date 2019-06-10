@@ -41,8 +41,6 @@ namespace NUnit.ConsoleRunner
             _writer = writer;
         }
 
-        #region TextWriter Overrides
-
         /// <summary>
         /// Write a single char value
         /// </summary>
@@ -82,10 +80,6 @@ namespace NUnit.ConsoleRunner
         {
             _writer.Dispose();
         }
-
-        #endregion
-
-        #region Extended Methods
 
         /// <summary>
         /// Writes the value with the specified style.
@@ -150,7 +144,5 @@ namespace NUnit.ConsoleRunner
         {
             WriteLabelLine(label, option);
         }
-
-        #endregion
     }
 }

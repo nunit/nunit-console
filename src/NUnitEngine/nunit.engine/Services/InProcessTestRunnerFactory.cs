@@ -32,8 +32,6 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class InProcessTestRunnerFactory : Service, ITestRunnerFactory
     {
-        #region ITestRunnerFactory Members
-
         /// <summary>
         /// Returns a test runner based on the settings in a TestPackage.
         /// Any setting that is "consumed" by the factory is removed, so
@@ -74,7 +72,5 @@ namespace NUnit.Engine.Services
         {
             return false;
         }
-
-        #endregion
     }
 }

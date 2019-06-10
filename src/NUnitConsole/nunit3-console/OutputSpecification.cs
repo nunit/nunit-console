@@ -33,8 +33,6 @@ namespace NUnit.Common
     /// </summary>
     public class OutputSpecification
     {
-        #region Constructor
-
         /// <summary>
         /// Construct an OutputSpecification from an option value.
         /// </summary>
@@ -88,10 +86,6 @@ namespace NUnit.Common
                 Format = "nunit3";
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets the path to which output will be written
         /// </summary>
@@ -106,8 +100,6 @@ namespace NUnit.Common
         /// Gets the file name of a transform to be applied
         /// </summary>
         public string Transform { get; private set; }
-
-        #endregion
 
         public override string ToString()
         {

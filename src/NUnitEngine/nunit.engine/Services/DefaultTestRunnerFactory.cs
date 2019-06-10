@@ -37,8 +37,6 @@ namespace NUnit.Engine.Services
         private IProjectService _projectService;
 #endif
 
-        #region Service Overrides
-
         public override void StartService()
         {
 #if !NETSTANDARD1_6
@@ -53,8 +51,6 @@ namespace NUnit.Engine.Services
             Status = ServiceStatus.Started;
 #endif
         }
-
-        #endregion
 
         /// <summary>
         /// Returns a test runner based on the settings in a TestPackage.
@@ -115,8 +111,6 @@ namespace NUnit.Engine.Services
         }
 #endif
 
-#region Helper Methods
-
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
         /// <summary>
         /// Get the specified target process model for the package.
@@ -130,7 +124,5 @@ namespace NUnit.Engine.Services
                 package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
         }
 #endif
-
-#endregion
     }
 }

@@ -74,8 +74,6 @@ namespace NUnit.ConsoleRunner
             WriteSummaryReport();
         }
 
-        #region Summary Report
-
         internal void WriteRunSettingsReport()
         {
             var firstSuite = ResultNode.SelectSingleNode("test-suite");
@@ -157,10 +155,6 @@ namespace NUnit.ConsoleRunner
             Writer.WriteLine();
         }
 
-        #endregion
-
-        #region Errors, Failures and Warnings Report
-
         public void WriteErrorsFailuresAndWarningsReport()
         {
             ReportIndex = 0;
@@ -236,10 +230,6 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        #endregion
-
-        #region Not Run Report
-
         public void WriteNotRunReport()
         {
             ReportIndex = 0;
@@ -269,10 +259,6 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        #endregion
-
-        #region Helper Methods
-
         private void WriteSummaryCount(string label, int count)
         {
             Writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture));
@@ -282,7 +268,5 @@ namespace NUnit.ConsoleRunner
         {
             Writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture), count > 0 ? color : ColorStyle.Value);
         }
-
-        #endregion
     }
 }

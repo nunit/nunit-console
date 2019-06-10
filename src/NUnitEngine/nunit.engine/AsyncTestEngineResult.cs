@@ -83,8 +83,6 @@ namespace NUnit.Engine
         /// </summary>
         public bool IsComplete { get { return _result != null; } }
 
-#region ITestRun Members
-
         XmlNode ITestRun.Result
         {
             get { return EngineResult.Xml; }
@@ -94,7 +92,5 @@ namespace NUnit.Engine
         {
             return Wait(timeout);
         }
-
-#endregion
     }
 }

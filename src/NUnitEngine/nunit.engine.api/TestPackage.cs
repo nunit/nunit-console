@@ -48,8 +48,6 @@ namespace NUnit.Engine
 #endif
     public class TestPackage
     {
-        #region Constructors
-
         /// <summary>
         /// Construct a named TestPackage, specifying a file path for
         /// the assembly or project to be used.
@@ -88,10 +86,6 @@ namespace NUnit.Engine
             return (_nextID++).ToString();
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Every test package gets a unique ID used to prefix test IDs within that package.
         /// </summary>
@@ -124,10 +118,6 @@ namespace NUnit.Engine
         /// Gets the settings dictionary for this package.
         /// </summary>
         public IDictionary<string,object> Settings { get; private set; }
-
-        #endregion
-
-        #region Public Methods
 
         /// <summary>
         /// Add a subproject to the package.
@@ -172,7 +162,5 @@ namespace NUnit.Engine
                 ? (T)Settings[name]
                 : defaultSetting;
         }
-
-        #endregion
     }
 }

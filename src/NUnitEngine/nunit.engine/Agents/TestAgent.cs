@@ -34,14 +34,8 @@ namespace NUnit.Engine.Agents
     /// </summary>
     public abstract class TestAgent : MarshalByRefObject, ITestAgent, IDisposable
     {
-        #region Private Fields
-
         private readonly Guid agentId;
         private readonly IServiceLocator services;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestAgent"/> class.
@@ -54,10 +48,6 @@ namespace NUnit.Engine.Agents
             this.services = services;
         }
 
-        #endregion
-
-        #region Protected Properties
-
         /// <summary>
         /// The services available to the agent
         /// </summary>
@@ -65,10 +55,6 @@ namespace NUnit.Engine.Agents
         {
             get { return services; }
         }
-
-        #endregion
-
-        #region ITestAgent members
 
         /// <summary>
         /// Gets a Guid that uniquely identifies this agent.
@@ -94,10 +80,6 @@ namespace NUnit.Engine.Agents
         /// </summary>
         public abstract ITestEngineRunner CreateRunner(TestPackage package);
 
-        #endregion
-
-        #region IDisposable Members
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -119,9 +101,7 @@ namespace NUnit.Engine.Agents
                 _disposed = true;
             }
         }
-        #endregion
 
-        #region InitializeLifeTimeService
         /// <summary>
         /// Overridden to cause object to live indefinitely
         /// </summary>
@@ -129,7 +109,6 @@ namespace NUnit.Engine.Agents
         {
             return null;
         }
-        #endregion
     }
 }
 #endif

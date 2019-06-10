@@ -42,8 +42,6 @@ namespace NUnit.Engine.Runners
             TestPackage = package;
         }
 
-        #region Properties
-
         /// <summary>
         /// Our Service Context
         /// </summary>
@@ -68,10 +66,6 @@ namespace NUnit.Engine.Runners
         {
             get { return LoadResult != null;  }
         }
-
-        #endregion
-
-        #region Abstract and Virtual Template Methods
 
         /// <summary>
         /// Loads the TestPackage for exploration or execution.
@@ -137,10 +131,6 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public abstract void StopRun(bool force);
-
-        #endregion
-
-        #region ITestEngineRunner Members
 
         /// <summary>
         /// Explores the TestPackage and returns information about
@@ -215,10 +205,6 @@ namespace NUnit.Engine.Runners
         }
 #endif
 
-        #endregion
-
-        #region IDisposable Members
-
         public void Dispose()
         {
             Dispose(true);
@@ -237,7 +223,5 @@ namespace NUnit.Engine.Runners
                 _disposed = true;
             }
         }
-
-        #endregion
     }
 }

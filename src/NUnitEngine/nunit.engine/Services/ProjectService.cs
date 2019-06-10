@@ -36,8 +36,6 @@ namespace NUnit.Engine.Services
     {
         Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
 
-        #region IProjectService Members
-
         public bool CanLoadFrom(string path)
         {
             ExtensionNode node = GetNodeForPath(path);
@@ -93,10 +91,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        #region Service Overrides
-
         public override void StartService()
         {
             if (Status == ServiceStatus.Stopped)
@@ -137,10 +131,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        #region Helper Methods
-
         private IProject LoadFrom(string path)
         {
             if (File.Exists(path))
@@ -166,8 +156,6 @@ namespace NUnit.Engine.Services
 
             return _extensionIndex[ext];
         }
-
-        #endregion
     }
 }
 #endif

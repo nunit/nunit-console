@@ -156,8 +156,6 @@ namespace NUnit.Engine.Drivers
             return handler.Result;
         }
 
-        #region Helper Methods
-
         private void CheckLoadWasCalled()
         {
             if (_frameworkController == null)
@@ -181,8 +179,6 @@ namespace NUnit.Engine.Drivers
                 throw new NUnitEngineException("The NUnit 3 driver encountered an error while executing reflected code.", ex.InnerException);
             }
         }
-
-        #endregion
     }
 }
 #endif

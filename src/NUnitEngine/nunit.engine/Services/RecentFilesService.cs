@@ -36,18 +36,12 @@ namespace NUnit.Engine.Services
 
         private const int MAX_FILES = 24;
 
-        #region Properties
-
         public int MaxFiles
         {
             get { return MAX_FILES; }
             set { /* Noop in this implementation */ }
             // NOTE: we retain the setter to avoid changing the interface
         }
-
-        #endregion
-
-        #region Public Methods
 
         public IList<string> Entries { get { return _fileEntries; } }
         
@@ -64,9 +58,6 @@ namespace NUnit.Engine.Services
             if( _fileEntries.Count > MAX_FILES )
                 _fileEntries.RemoveAt( MAX_FILES );
         }
-        #endregion
-
-        #region Helper Methods for saving and restoring the settings
 
         private void LoadEntriesFromSettings()
         {
@@ -111,9 +102,6 @@ namespace NUnit.Engine.Services
         {
             return string.Format( "{0}.File{1}", prefix, index );
         }
-        #endregion
-
-        #region Service Overrides
 
         public override void StopService()
         {
@@ -151,7 +139,5 @@ namespace NUnit.Engine.Services
                 throw;
             }
         }
-
-        #endregion
     }
 }

@@ -33,8 +33,6 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class CecilExtensions
     {
-        #region TypeDefinition Extensions
-
         public static List<CustomAttribute> GetAttributes(this TypeDefinition type, string fullName)
         {
             var attributes = new List<CustomAttribute>();
@@ -59,10 +57,6 @@ namespace NUnit.Engine.Internal
             return null;
         }
 
-        #endregion
-
-        #region CustomAttribute Extensions
-
         public static object GetNamedArgument(this CustomAttribute attr, string name)
         {
             foreach (var property in attr.Properties)
@@ -71,7 +65,5 @@ namespace NUnit.Engine.Internal
 
             return null;
         }
-
-        #endregion
     }
 }

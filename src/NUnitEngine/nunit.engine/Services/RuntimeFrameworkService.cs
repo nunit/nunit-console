@@ -172,8 +172,6 @@ namespace NUnit.Engine.Services
             return result;
         }
 
-        #region Helper Methods
-
         /// <summary>
         /// Use Mono.Cecil to get information about all assemblies and
         /// apply it to the package using special internal keywords.
@@ -256,8 +254,6 @@ namespace NUnit.Engine.Services
 
             package.Settings[InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver] = requiresAssemblyResolver;
         }
-
-        #endregion
     }
 }
 #endif

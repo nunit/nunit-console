@@ -34,8 +34,6 @@ namespace NUnit.Engine.Services
     /// </summary>
     public abstract class Service : IService, IDisposable
     {
-        #region IService Default Implementation
-
         /// <summary>
         /// The ServiceContext
         /// </summary>
@@ -62,10 +60,6 @@ namespace NUnit.Engine.Services
             Status = ServiceStatus.Stopped;
         }
 
-        #endregion
-
-        #region IDisposable Default Implementation
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -75,7 +69,5 @@ namespace NUnit.Engine.Services
         protected bool _disposed = false;
 
         protected virtual void Dispose(bool disposing) { }
-
-        #endregion
     }
 }

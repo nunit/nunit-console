@@ -163,8 +163,6 @@ namespace NUnit.Engine.Services.Tests
             CheckListContains( 1, 2, 3, 4 );
         }
 
-        #region Helper Methods
-
         // Set RecentFiles to a list of known values up
         // to a maximum. Most recent will be "1", next 
         // "2", and so on...
@@ -203,7 +201,5 @@ namespace NUnit.Engine.Services.Tests
             for (int index = 0; index < files.Count; index++)
                 Assert.That(files[index], Is.EqualTo(item[index].ToString()), "Item");
         }
-
-        #endregion
     }
 }

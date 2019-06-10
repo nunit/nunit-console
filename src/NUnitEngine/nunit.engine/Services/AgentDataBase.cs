@@ -111,8 +111,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #region Methods not currently used
-
         // These methods are not currently used, but are  being
         // maintained (and tested) for now since TestAgency is 
         // undergoing some changes and may need them again.
@@ -133,10 +131,6 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        #region Nested Snapshot Class used in Testing
-
         public class Snapshot
         {
             public Snapshot(IEnumerable<AgentRecord> data)
@@ -154,8 +148,6 @@ namespace NUnit.Engine.Services
             public ICollection<Guid> Guids { get; private set; }
             public ICollection<AgentRecord> Records { get; private set; }
         }
-
-        #endregion
     }
 }
 #endif
