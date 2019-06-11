@@ -32,6 +32,8 @@
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
     <ProjectReference Include="..\nunit3-console\nunit3-console.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit-agent\nunit-agent.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit-agent\nunit-agent-x86.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
