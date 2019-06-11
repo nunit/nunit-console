@@ -4,6 +4,6 @@
     <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
   </ItemGroup>
 </Project>
