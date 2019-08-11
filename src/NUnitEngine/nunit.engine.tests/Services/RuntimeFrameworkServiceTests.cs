@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -91,6 +91,30 @@ namespace NUnit.Engine.Services.Tests
 
             _runtimeService.SelectRuntimeFramework(package);
             Assert.That(package.GetSetting<string>(EnginePackageSettings.RuntimeFramework, null), Is.EqualTo(requested));
+        }
+
+        [Test]
+        public void RuntimeFrameworkIsSetForSubpackages()
+        {
+            //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available
+            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("2.0.50727")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
+            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("4.0.30319")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
+
+            var topLevelPackage = new TestPackage(new [] {"a.dll", "b.dll"});
+
+            var net20Package = topLevelPackage.SubPackages[0];
+            net20Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("2.0.50727"));
+            var net40Package = topLevelPackage.SubPackages[1];
+            net40Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("4.0.30319"));
+
+            _runtimeService.SelectRuntimeFramework(topLevelPackage);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(net20Package.Settings[EnginePackageSettings.RuntimeFramework], Is.EqualTo("net-2.0"));
+                Assert.That(net40Package.Settings[EnginePackageSettings.RuntimeFramework], Is.EqualTo("net-4.0"));
+                Assert.That(topLevelPackage.Settings[EnginePackageSettings.RuntimeFramework], Is.EqualTo("net-4.0"));
+            });
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Copyright (c) 2011 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -106,8 +106,21 @@ namespace NUnit.Engine.Services
             // Evaluate package target framework
             ApplyImageData(package);
 
+            var targetFramework = SelectRuntimeFrameworkInner(package);
+            return targetFramework.ToString();
+        }
+
+        private static RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
+        {
+            foreach (var subPackage in package.SubPackages)
+            {
+                SelectRuntimeFrameworkInner(subPackage);
+            }
+
             // Examine the provided settings
             RuntimeFramework currentFramework = RuntimeFramework.CurrentFramework;
+            log.Debug("Current framework is " + currentFramework);
+
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
 
             RuntimeFramework requestedFramework;
@@ -115,17 +128,14 @@ namespace NUnit.Engine.Services
             {
                 if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
                     throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+
+                log.Debug($"Requested framework for {package.Name} is {requestedFramework}");
             }
             else
             {
                 requestedFramework = new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
+                log.Debug($"No specific framework requested for {package.Name}");
             }
-
-            log.Debug("Current framework is {0}", currentFramework);
-            if (requestedFramework == null)
-                log.Debug("No specific framework requested");
-            else
-                log.Debug("Requested framework is {0}", requestedFramework);
 
             RuntimeType targetRuntime = requestedFramework.Runtime;
             Version targetVersion = requestedFramework.FrameworkVersion;
@@ -146,9 +156,8 @@ namespace NUnit.Engine.Services
             RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);
             package.Settings[EnginePackageSettings.RuntimeFramework] = targetFramework.ToString();
 
-            log.Debug("Test will use {0} framework", targetFramework);
-
-            return targetFramework.ToString();
+            log.Debug($"Test will use {targetFramework} for {package.Name}");
+            return targetFramework;
         }
 
 
