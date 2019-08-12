@@ -24,7 +24,7 @@
 
       Other extensions, if needed, must be installed separately.
     </description>
-    <releaseNotes>This release uses the latest version of the TeamCityEventListener extension.</releaseNotes>
+    <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2019 Charlie Poole, Rob Prouse</copyright>
