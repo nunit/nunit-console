@@ -72,5 +72,15 @@ namespace NUnit.Engine.Extensibility
         /// <param name="name">The property name</param>
         /// <returns>A collection of values</returns>
         IEnumerable<string> GetValues(string name);
+
+        /// <summary>
+        /// The path to the assembly implementing this extension.
+        /// </summary>
+        string AssemblyPath { get; }
+
+        /// <summary>
+        /// The Version of the assembly implementing this extension.
+        /// </summary>
+        Version AssemblyVersion { get; }
     }
 }

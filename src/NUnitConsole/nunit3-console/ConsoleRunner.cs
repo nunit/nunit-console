@@ -332,6 +332,13 @@ namespace NUnit.ConsoleRunner
                     if(node.TargetFramework != null)
                         _outWriter.Write(ColorStyle.Value, $"(.NET {node.TargetFramework?.FrameworkVersion})");
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
+
+                    _outWriter.Write("      Version: ");
+                    _outWriter.Write(ColorStyle.Value, node.AssemblyVersion.ToString());
+
+                    _outWriter.Write("      Path: ");
+                    _outWriter.Write(ColorStyle.Value, node.AssemblyPath);
+
                     foreach (var prop in node.PropertyNames)
                     {
                         _outWriter.Write("      " + prop + ":");
