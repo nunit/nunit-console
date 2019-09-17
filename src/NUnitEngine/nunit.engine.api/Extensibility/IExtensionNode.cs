@@ -79,7 +79,7 @@ namespace NUnit.Engine.Extensibility
         string AssemblyPath { get; }
 
         /// <summary>
-        /// The Version of the assembly implementing this extension.
+        /// The version of the assembly implementing this extension.
         /// </summary>
         Version AssemblyVersion { get; }
     }

@@ -334,10 +334,10 @@ namespace NUnit.ConsoleRunner
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
 
                     _outWriter.Write("      Version: ");
-                    _outWriter.Write(ColorStyle.Value, node.AssemblyVersion.ToString());
+                    _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
 
                     _outWriter.Write("      Path: ");
-                    _outWriter.Write(ColorStyle.Value, node.AssemblyPath);
+                    _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
 
                     foreach (var prop in node.PropertyNames)
                     {
