@@ -29,14 +29,12 @@ namespace NUnit.Engine.Services
 {
     internal sealed class AgentRecord
     {
-        private AgentRecord(Guid id, Process process, ITestAgent agent)
+        private AgentRecord(Process process, ITestAgent agent)
         {
-            Id = id;
             Process = process;
             Agent = agent;
         }
 
-        public Guid Id { get; }
         public Process Process { get; }
         public ITestAgent Agent { get; }
 
@@ -45,23 +43,23 @@ namespace NUnit.Engine.Services
             Agent is null ? AgentStatus.Starting :
             AgentStatus.Ready;
 
-        public static AgentRecord Starting(Guid id, Process process)
+        public static AgentRecord Starting(Process process)
         {
             if (process is null) throw new ArgumentNullException(nameof(process));
 
-            return new AgentRecord(id, process, agent: null);
+            return new AgentRecord(process, agent: null);
         }
 
         public AgentRecord Ready(ITestAgent agent)
         {
             if (agent is null) throw new ArgumentNullException(nameof(agent));
 
-            return new AgentRecord(Id, Process, agent);
+            return new AgentRecord(Process, agent);
         }
 
         public AgentRecord Terminated()
         {
-            return new AgentRecord(Id, process: null, agent: null);
+            return new AgentRecord(process: null, agent: null);
         }
     }
 }

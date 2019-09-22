@@ -39,7 +39,12 @@ namespace NUnit.Engine.Services
         {
             lock (_agentsById)
             {
-                _agentsById.Add(agentId, AgentRecord.Starting(agentId, process));
+                if (_agentsById.ContainsKey(agentId))
+                {
+                    throw new ArgumentException($"An agent has already been started with the ID '{agentId}'.", nameof(agentId));
+                }
+
+                _agentsById.Add(agentId, AgentRecord.Starting(process));
             }
         }
 
@@ -47,7 +52,8 @@ namespace NUnit.Engine.Services
         {
             lock (_agentsById)
             {
-                if (!_agentsById.TryGetValue(agent.Id, out var record) || record.Status != AgentStatus.Starting)
+                if (!_agentsById.TryGetValue(agent.Id, out var record)
+                    || record.Status != AgentStatus.Starting)
                 {
                     throw new ArgumentException($"Agent {agent.Id} must have a status of 'starting' in order to register.", nameof(agent));
                 }
