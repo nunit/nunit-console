@@ -35,7 +35,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     internal class AgentDatabase
     {
-        private readonly Dictionary<Guid, AgentRecord> _agentData = new Dictionary<Guid, AgentRecord>();
+        private readonly Dictionary<Guid, AgentRecord> _agentsById = new Dictionary<Guid, AgentRecord>();
 
         // NOTE: Calling code is written to assume that an invalid id will result in
         // null being returned, similar to how Hashtables worked in the past.
@@ -43,10 +43,10 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                lock (_agentData)
+                lock (_agentsById)
                 {
                     AgentRecord record;
-                    return _agentData.TryGetValue(id, out record) ? record : null;
+                    return _agentsById.TryGetValue(id, out record) ? record : null;
                 }
             }
         }
@@ -55,9 +55,9 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                lock (_agentData)
+                lock (_agentsById)
                 {
-                    return _agentData.Count;
+                    return _agentsById.Count;
                 }
             }
         }
@@ -65,25 +65,25 @@ namespace NUnit.Engine.Services
         // Take a snapshot of the database - used primarily in testing.
         public Snapshot TakeSnapshot()
         {
-            lock (_agentData)
+            lock (_agentsById)
             {
-                return new Snapshot(_agentData.Values);
+                return new Snapshot(_agentsById.Values);
             }
         }
 
         public void AddOrUpdate(AgentRecord record)
         {
-            lock (_agentData)
+            lock (_agentsById)
             {
-                _agentData[record.Id] = record;
+                _agentsById[record.Id] = record;
             }
         }
 
         public AgentRecord GetDataForProcess(Process process)
         {
-            lock (_agentData)
+            lock (_agentsById)
             {
-                foreach (var r in _agentData.Values)
+                foreach (var r in _agentsById.Values)
                 {
                     if (r.Process == process)
                         return r;
@@ -99,17 +99,17 @@ namespace NUnit.Engine.Services
 
         public void Remove(Guid agentId)
         {
-            lock (_agentData)
+            lock (_agentsById)
             {
-                _agentData.Remove(agentId);
+                _agentsById.Remove(agentId);
             }
         }
 
         public void Clear()
         {
-            lock (_agentData)
+            lock (_agentsById)
             {
-                _agentData.Clear();
+                _agentsById.Clear();
             }
         }
 

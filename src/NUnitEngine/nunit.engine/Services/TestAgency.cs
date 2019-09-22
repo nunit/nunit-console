@@ -45,7 +45,7 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
-        private readonly AgentDatabase _agentData = new AgentDatabase();
+        private readonly AgentDatabase _agents = new AgentDatabase();
 
         public TestAgency() : this( "TestAgency", 0 ) { }
 
@@ -77,13 +77,13 @@ namespace NUnit.Engine.Services
 
         public void Register( ITestAgent agent )
         {
-            AgentRecord r = _agentData[agent.Id];
+            AgentRecord r = _agents[agent.Id];
             if ( r == null )
                 throw new ArgumentException(
                     string.Format("Agent {0} is not in the agency database", agent.Id),
                     "agentId");
 
-            _agentData.AddOrUpdate(r.Ready(agent));
+            _agents.AddOrUpdate(r.Ready(agent));
         }
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
@@ -94,7 +94,7 @@ namespace NUnit.Engine.Services
 
         public void ReleaseAgent( ITestAgent agent )
         {
-            AgentRecord r = _agentData[agent.Id];
+            AgentRecord r = _agents[agent.Id];
             if (r == null)
                 log.Error(string.Format("Unable to release agent {0} - not in database", agent.Id));
             else
@@ -105,7 +105,7 @@ namespace NUnit.Engine.Services
 
         internal bool IsAgentRunning(Guid id, out Process process)
         {
-            process = _agentData[id]?.Process;
+            process = _agents[id]?.Process;
             return process != null;
         }
 
@@ -201,7 +201,7 @@ namespace NUnit.Engine.Services
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
 
-            _agentData.AddOrUpdate(AgentRecord.Starting(agentId, p));
+            _agents.AddOrUpdate(AgentRecord.Starting(agentId, p));
             return agentId;
         }
 
@@ -213,14 +213,14 @@ namespace NUnit.Engine.Services
 
             const int pollTime = 200;
 
-            var agentProcess = _agentData[agentId].Process;
+            var agentProcess = _agents[agentId].Process;
 
             //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
             while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
             {
                 Thread.Sleep(pollTime);
 
-                var agent = _agentData[agentId].Agent;
+                var agent = _agents[agentId].Agent;
                 if (agent != null)
                 {
                     log.Debug($"Returning new agent {agentId:B}");
@@ -249,8 +249,8 @@ namespace NUnit.Engine.Services
             if (process == null)
                 return;
 
-            var agentRecord = _agentData.GetDataForProcess(process);
-            _agentData.AddOrUpdate(agentRecord.Terminated());
+            var agentRecord = _agents.GetDataForProcess(process);
+            _agents.AddOrUpdate(agentRecord.Terminated());
 
             string errorMsg;
 
