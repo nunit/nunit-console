@@ -31,7 +31,7 @@ namespace NUnit.Engine.Services
     /// <summary>
     /// Defines the agent tracking operations that must be done atomically.
     /// </summary>
-    internal sealed class AgentDatabase
+    internal sealed partial class AgentDatabase
     {
         private readonly Dictionary<Guid, AgentRecord> _agentsById = new Dictionary<Guid, AgentRecord>();
 
