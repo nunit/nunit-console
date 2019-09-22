@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2016 Charlie Poole, Rob Prouse
+// Copyright (c) 2011-2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -29,106 +29,76 @@ using System.Diagnostics;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    ///  A simple class that tracks data about this
-    ///  agencies active and available agents.
-    ///  This class is required to be multi-thread safe.
+    /// Defines the agent tracking operations that must be done atomically.
     /// </summary>
-    internal class AgentDatabase
+    internal sealed class AgentDatabase
     {
         private readonly Dictionary<Guid, AgentRecord> _agentsById = new Dictionary<Guid, AgentRecord>();
 
-        // NOTE: Calling code is written to assume that an invalid id will result in
-        // null being returned, similar to how Hashtables worked in the past.
-        public AgentRecord this[Guid id]
-        {
-            get
-            {
-                lock (_agentsById)
-                {
-                    AgentRecord record;
-                    return _agentsById.TryGetValue(id, out record) ? record : null;
-                }
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                lock (_agentsById)
-                {
-                    return _agentsById.Count;
-                }
-            }
-        }
-
-        // Take a snapshot of the database - used primarily in testing.
-        public Snapshot TakeSnapshot()
+        public void Start(Guid agentId, Process process)
         {
             lock (_agentsById)
             {
-                return new Snapshot(_agentsById.Values);
+                _agentsById.Add(agentId, AgentRecord.Starting(agentId, process));
             }
         }
 
-        public void AddOrUpdate(AgentRecord record)
+        public void Register(ITestAgent agent)
         {
             lock (_agentsById)
             {
-                _agentsById[record.Id] = record;
-            }
-        }
-
-        public AgentRecord GetDataForProcess(Process process)
-        {
-            lock (_agentsById)
-            {
-                foreach (var r in _agentsById.Values)
+                if (!_agentsById.TryGetValue(agent.Id, out var record) || record.Status != AgentStatus.Starting)
                 {
-                    if (r.Process == process)
-                        return r;
+                    throw new ArgumentException($"Agent {agent.Id} must have a status of 'starting' in order to register.", nameof(agent));
                 }
 
-                return null;
+                _agentsById[agent.Id] = record.Ready(agent);
             }
         }
 
-        // These methods are not currently used, but are  being
-        // maintained (and tested) for now since TestAgency is
-        // undergoing some changes and may need them again.
-
-        public void Remove(Guid agentId)
+        public bool IsReady(Guid agentId, out ITestAgent agent)
         {
             lock (_agentsById)
             {
-                _agentsById.Remove(agentId);
-            }
-        }
-
-        public void Clear()
-        {
-            lock (_agentsById)
-            {
-                _agentsById.Clear();
-            }
-        }
-
-        public class Snapshot
-        {
-            public Snapshot(IEnumerable<AgentRecord> data)
-            {
-                Guids = new List<Guid>();
-                Records = new List<AgentRecord>();
-
-                foreach(var record in data)
+                if (_agentsById.TryGetValue(agentId, out var record)
+                    && record.Status == AgentStatus.Ready)
                 {
-                    Guids.Add(record.Id);
-                    Records.Add(record);
+                    agent = record.Agent;
+                    return true;
                 }
-            }
 
-            public ICollection<Guid> Guids { get; private set; }
-            public ICollection<AgentRecord> Records { get; private set; }
+                agent = null;
+                return false;
+            }
+        }
+
+        public bool IsAgentRunning(Guid agentId, out Process process)
+        {
+            lock (_agentsById)
+            {
+                if (_agentsById.TryGetValue(agentId, out var record)
+                    && record.Status != AgentStatus.Terminated)
+                {
+                    process = record.Process;
+                    return true;
+                }
+
+                process = null;
+                return false;
+            }
+        }
+
+        public void MarkTerminated(Guid agentId)
+        {
+            lock (_agentsById)
+            {
+                if (!_agentsById.TryGetValue(agentId, out var record))
+                {
+                    throw new ArgumentException($"An entry for agent {agentId} must exist in order to mark it as terminated.", nameof(agentId));
+                }
+
+                _agentsById[agentId] = record.Terminated();
+            }
         }
     }
 }

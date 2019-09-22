@@ -75,15 +75,9 @@ namespace NUnit.Engine.Services
         //    base.Stop ();
         //}
 
-        public void Register( ITestAgent agent )
+        public void Register(ITestAgent agent)
         {
-            AgentRecord r = _agents[agent.Id];
-            if ( r == null )
-                throw new ArgumentException(
-                    string.Format("Agent {0} is not in the agency database", agent.Id),
-                    "agentId");
-
-            _agents.AddOrUpdate(r.Ready(agent));
+            _agents.Register(agent);
         }
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
@@ -92,24 +86,12 @@ namespace NUnit.Engine.Services
             return CreateRemoteAgent(package, waitTime);
         }
 
-        public void ReleaseAgent( ITestAgent agent )
+        internal bool IsAgentRunning(Guid agentId, out Process process)
         {
-            AgentRecord r = _agents[agent.Id];
-            if (r == null)
-                log.Error(string.Format("Unable to release agent {0} - not in database", agent.Id));
-            else
-            {
-                log.Debug("Releasing agent " + agent.Id.ToString());
-            }
+            return _agents.IsAgentRunning(agentId, out process);
         }
 
-        internal bool IsAgentRunning(Guid id, out Process process)
-        {
-            process = _agents[id]?.Process;
-            return process != null;
-        }
-
-        private Guid LaunchAgentProcess(TestPackage package)
+        private Process LaunchAgentProcess(TestPackage package, Guid agentId)
         {
             RuntimeFramework targetRuntime;
             string runtimeSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
@@ -164,8 +146,7 @@ namespace NUnit.Engine.Services
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.EnableRaisingEvents = true;
-            p.Exited += OnAgentExit;
-            Guid agentId = Guid.NewGuid();
+            p.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
             targetRuntime = ServiceContext.GetService<RuntimeFrameworkService>().GetBestAvailableFramework(targetRuntime);
@@ -201,27 +182,26 @@ namespace NUnit.Engine.Services
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
 
-            _agents.AddOrUpdate(AgentRecord.Starting(agentId, p));
-            return agentId;
+            _agents.Start(agentId, p);
+            return p;
         }
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
-            var agentId = LaunchAgentProcess(package);
+            var agentId = Guid.NewGuid();
+            var process = LaunchAgentProcess(package, agentId);
 
             log.Debug($"Waiting for agent {agentId:B} to register");
 
             const int pollTime = 200;
 
-            var agentProcess = _agents[agentId].Process;
-
-            //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
-            while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
+            // Wait for agent registration based on the agent actually getting processor time to avoid falling over
+            // under process starvation.
+            while (waitTime > process.TotalProcessorTime.TotalMilliseconds && !process.HasExited)
             {
                 Thread.Sleep(pollTime);
 
-                var agent = _agents[agentId].Agent;
-                if (agent != null)
+                if (_agents.IsReady(agentId, out var agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
                     return new RemoteTestAgentProxy(agent, agentId);
@@ -243,14 +223,9 @@ namespace NUnit.Engine.Services
             return Path.Combine(engineDir, agentName);
         }
 
-        private void OnAgentExit(object sender, EventArgs e)
+        private void OnAgentExit(Process process, Guid agentId)
         {
-            var process = sender as Process;
-            if (process == null)
-                return;
-
-            var agentRecord = _agents.GetDataForProcess(process);
-            _agents.AddOrUpdate(agentRecord.Terminated());
+            _agents.MarkTerminated(agentId);
 
             string errorMsg;
 
