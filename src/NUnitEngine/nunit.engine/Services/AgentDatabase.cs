@@ -36,7 +36,6 @@ namespace NUnit.Engine.Services
     internal class AgentDatabase
     {
         private readonly Dictionary<Guid, AgentRecord> _agentData = new Dictionary<Guid, AgentRecord>();
-        private readonly object _lock = new object();
 
         // NOTE: Calling code is written to assume that an invalid id will result in
         // null being returned, similar to how Hashtables worked in the past.
@@ -44,7 +43,7 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                lock (_lock)
+                lock (_agentData)
                 {
                     AgentRecord record;
                     return _agentData.TryGetValue(id, out record) ? record : null;
@@ -56,7 +55,7 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                lock (_lock)
+                lock (_agentData)
                 {
                     return _agentData.Count;
                 }
@@ -66,7 +65,7 @@ namespace NUnit.Engine.Services
         // Take a snapshot of the database - used primarily in testing.
         public Snapshot TakeSnapshot()
         {
-            lock (_lock)
+            lock (_agentData)
             {
                 return new Snapshot(_agentData.Values);
             }
@@ -74,7 +73,7 @@ namespace NUnit.Engine.Services
 
         public void AddOrUpdate(AgentRecord record)
         {
-            lock (_lock)
+            lock (_agentData)
             {
                 _agentData[record.Id] = record;
             }
@@ -82,7 +81,7 @@ namespace NUnit.Engine.Services
 
         public AgentRecord GetDataForProcess(Process process)
         {
-            lock (_lock)
+            lock (_agentData)
             {
                 foreach (var r in _agentData.Values)
                 {
@@ -100,7 +99,7 @@ namespace NUnit.Engine.Services
 
         public void Remove(Guid agentId)
         {
-            lock (_lock)
+            lock (_agentData)
             {
                 _agentData.Remove(agentId);
             }
@@ -108,7 +107,7 @@ namespace NUnit.Engine.Services
 
         public void Clear()
         {
-            lock (_lock)
+            lock (_agentData)
             {
                 _agentData.Clear();
             }
