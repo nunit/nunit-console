@@ -29,11 +29,8 @@ namespace NUnit.Engine.Services
     /// </summary>
     public enum AgentStatus
     {
-        Unknown,
         Starting,
         Ready,
-        Busy,
-        Stopping,
         Terminated
     }
 }
