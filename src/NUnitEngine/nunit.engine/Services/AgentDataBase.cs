@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,23 +28,6 @@ using System.Diagnostics;
 
 namespace NUnit.Engine.Services
 {
-    internal class AgentRecord
-    {
-        public readonly Guid Id;
-        public readonly Process Process;
-        public ITestAgent Agent;
-        public AgentStatus Status;
-
-        public AgentRecord(Guid id, Process p, ITestAgent a, AgentStatus s)
-        {
-            this.Id = id;
-            this.Process = p;
-            this.Agent = a;
-            this.Status = s;
-        }
-
-    }
-
     /// <summary>
     ///  A simple class that tracks data about this
     ///  agencies active and available agents.
@@ -112,7 +95,7 @@ namespace NUnit.Engine.Services
         }
 
         // These methods are not currently used, but are  being
-        // maintained (and tested) for now since TestAgency is 
+        // maintained (and tested) for now since TestAgency is
         // undergoing some changes and may need them again.
 
         public void Remove(Guid agentId)

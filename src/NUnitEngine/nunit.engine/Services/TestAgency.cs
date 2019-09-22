@@ -34,19 +34,6 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// Enumeration used to report AgentStatus
-    /// </summary>
-    public enum AgentStatus
-    {
-        Unknown,
-        Starting,
-        Ready,
-        Busy,
-        Stopping,
-        Terminated
-    }
-
-    /// <summary>
     /// The TestAgency class provides RemoteTestAgents
     /// on request and tracks their status. Agents
     /// are wrapped in an instance of the TestAgent
