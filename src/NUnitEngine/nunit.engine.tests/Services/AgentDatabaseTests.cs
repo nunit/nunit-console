@@ -30,7 +30,7 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
 {
-    public class AgentDataBaseTests
+    public class AgentDatabaseTests
     {
 #pragma warning disable 414
         private static int[] Counts = new int[] { 1, 3, 10 };
@@ -38,13 +38,13 @@ namespace NUnit.Engine.Services.Tests
 
         const string COUNTS = nameof(Counts);
 
-        AgentDataBase _data;
+        AgentDatabase _data;
         List<Guid> _generatedGuids;
 
         [SetUp]
         public void SetUp()
         {
-            _data = new AgentDataBase();
+            _data = new AgentDatabase();
             _generatedGuids = new List<Guid>();
         }
 

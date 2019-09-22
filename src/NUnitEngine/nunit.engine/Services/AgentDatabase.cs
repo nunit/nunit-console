@@ -33,7 +33,7 @@ namespace NUnit.Engine.Services
     ///  agencies active and available agents.
     ///  This class is required to be multi-thread safe.
     /// </summary>
-    internal class AgentDataBase
+    internal class AgentDatabase
     {
         private readonly Dictionary<Guid, AgentRecord> _agentData = new Dictionary<Guid, AgentRecord>();
         private readonly object _lock = new object();
