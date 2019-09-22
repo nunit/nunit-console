@@ -72,11 +72,11 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public void Add(AgentRecord r)
+        public void AddOrUpdate(AgentRecord record)
         {
             lock (_lock)
             {
-                _agentData[r.Id] = r;
+                _agentData[record.Id] = record;
             }
         }
 

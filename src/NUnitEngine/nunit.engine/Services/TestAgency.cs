@@ -82,7 +82,8 @@ namespace NUnit.Engine.Services
                 throw new ArgumentException(
                     string.Format("Agent {0} is not in the agency database", agent.Id),
                     "agentId");
-            r.Agent = agent;
+
+            _agentData.AddOrUpdate(r.Ready(agent));
         }
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
@@ -200,7 +201,7 @@ namespace NUnit.Engine.Services
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
 
-            _agentData.Add(new AgentRecord(agentId, p, null));
+            _agentData.AddOrUpdate(AgentRecord.Starting(agentId, p));
             return agentId;
         }
 
@@ -212,18 +213,18 @@ namespace NUnit.Engine.Services
 
             const int pollTime = 200;
 
-            var agentRecord = _agentData[agentId];
-            var agentProcess = agentRecord.Process;
+            var agentProcess = _agentData[agentId].Process;
 
             //Wait for agent registration based on the agent actually getting processor time - to avoid falling over under process starvation
             while(waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
             {
                 Thread.Sleep(pollTime);
 
-                if (agentRecord.Agent != null)
+                var agent = _agentData[agentId].Agent;
+                if (agent != null)
                 {
                     log.Debug($"Returning new agent {agentId:B}");
-                    return new RemoteTestAgentProxy(agentRecord.Agent, agentRecord.Id);
+                    return new RemoteTestAgentProxy(agent, agentId);
                 }
             }
 
@@ -249,7 +250,7 @@ namespace NUnit.Engine.Services
                 return;
 
             var agentRecord = _agentData.GetDataForProcess(process);
-            agentRecord.Process = null;
+            _agentData.AddOrUpdate(agentRecord.Terminated());
 
             string errorMsg;
 

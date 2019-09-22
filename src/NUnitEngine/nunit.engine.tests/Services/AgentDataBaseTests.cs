@@ -24,6 +24,7 @@
 #if !NETCOREAPP1_1 && !NETCOREAPP2_1
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 
@@ -142,7 +143,7 @@ namespace NUnit.Engine.Services.Tests
 
         private void AddRecord(Guid guid)
         {
-            _data.Add(new AgentRecord(guid, null, null));
+            _data.AddOrUpdate(AgentRecord.Starting(guid, new Process()));
         }
 
         private void AddRecords(int count)

@@ -27,22 +27,41 @@ using System.Diagnostics;
 
 namespace NUnit.Engine.Services
 {
-    internal class AgentRecord
+    internal sealed class AgentRecord
     {
-        public readonly Guid Id;
-        public Process Process;
-        public ITestAgent Agent;
+        private AgentRecord(Guid id, Process process, ITestAgent agent)
+        {
+            Id = id;
+            Process = process;
+            Agent = agent;
+        }
+
+        public Guid Id { get; }
+        public Process Process { get; }
+        public ITestAgent Agent { get; }
 
         public AgentStatus Status =>
             Process is null ? AgentStatus.Terminated :
             Agent is null ? AgentStatus.Starting :
             AgentStatus.Ready;
 
-        public AgentRecord(Guid id, Process p, ITestAgent a)
+        public static AgentRecord Starting(Guid id, Process process)
         {
-            this.Id = id;
-            this.Process = p;
-            this.Agent = a;
+            if (process is null) throw new ArgumentNullException(nameof(process));
+
+            return new AgentRecord(id, process, agent: null);
+        }
+
+        public AgentRecord Ready(ITestAgent agent)
+        {
+            if (agent is null) throw new ArgumentNullException(nameof(agent));
+
+            return new AgentRecord(Id, Process, agent);
+        }
+
+        public AgentRecord Terminated()
+        {
+            return new AgentRecord(Id, process: null, agent: null);
         }
     }
 }
