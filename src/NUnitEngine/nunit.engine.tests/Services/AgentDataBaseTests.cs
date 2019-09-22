@@ -142,7 +142,7 @@ namespace NUnit.Engine.Services.Tests
 
         private void AddRecord(Guid guid)
         {
-            _data.Add(new AgentRecord(guid, null, null, AgentStatus.Ready));
+            _data.Add(new AgentRecord(guid, null, null));
         }
 
         private void AddRecords(int count)

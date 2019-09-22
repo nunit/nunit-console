@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011-2016 Charlie Poole, Rob Prouse
+// Copyright (c) 2011-2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -30,18 +30,20 @@ namespace NUnit.Engine.Services
     internal class AgentRecord
     {
         public readonly Guid Id;
-        public readonly Process Process;
+        public Process Process;
         public ITestAgent Agent;
-        public AgentStatus Status;
 
-        public AgentRecord(Guid id, Process p, ITestAgent a, AgentStatus s)
+        public AgentStatus Status =>
+            Process is null ? AgentStatus.Terminated :
+            Agent is null ? AgentStatus.Starting :
+            AgentStatus.Ready;
+
+        public AgentRecord(Guid id, Process p, ITestAgent a)
         {
             this.Id = id;
             this.Process = p;
             this.Agent = a;
-            this.Status = s;
         }
-
     }
 }
 #endif

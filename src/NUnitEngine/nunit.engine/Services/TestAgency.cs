@@ -98,32 +98,14 @@ namespace NUnit.Engine.Services
                 log.Error(string.Format("Unable to release agent {0} - not in database", agent.Id));
             else
             {
-                r.Status = AgentStatus.Ready;
                 log.Debug("Releasing agent " + agent.Id.ToString());
             }
         }
 
-        internal bool IsAgentRunning(Guid id)
+        internal bool IsAgentRunning(Guid id, out Process process)
         {
-            var agentRecord = _agentData[id];
-            return agentRecord != null && agentRecord.Status != AgentStatus.Terminated;
-        }
-
-        internal int? GetAgentExitCode(Guid id)
-        {
-            var agentRecord = _agentData[id];
-            if (agentRecord?.Process != null && agentRecord.Process.HasExited)
-            {
-                try
-                {
-                    return agentRecord.Process.ExitCode;
-                }
-                catch (NotSupportedException)
-                {
-                    return null;
-                }
-            }
-            return null;
+            process = _agentData[id]?.Process;
+            return process != null;
         }
 
         private Guid LaunchAgentProcess(TestPackage package)
@@ -218,7 +200,7 @@ namespace NUnit.Engine.Services
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
             log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
 
-            _agentData.Add( new AgentRecord( agentId, p, null, AgentStatus.Starting ) );
+            _agentData.Add(new AgentRecord(agentId, p, null));
             return agentId;
         }
 
@@ -267,7 +249,7 @@ namespace NUnit.Engine.Services
                 return;
 
             var agentRecord = _agentData.GetDataForProcess(process);
-            agentRecord.Status = AgentStatus.Terminated;
+            agentRecord.Process = null;
 
             string errorMsg;
 
