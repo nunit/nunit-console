@@ -23,6 +23,7 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using NUnit.Common;
 using NUnit.Engine.Internal;
@@ -240,7 +241,7 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent != null && _agency.IsAgentRunning(_agent.Id, out var process))
+                if (_agent != null && _agency.IsAgentRunning(_agent.Id, out Process process))
                 {
                     try
                     {
