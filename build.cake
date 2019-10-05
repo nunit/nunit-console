@@ -447,6 +447,8 @@ Task("PackageChocolatey")
 Task("FetchExtensions")
 .Does(() =>
 {
+    CleanDirectory(EXTENSION_PACKAGES_DIR);
+
     foreach(var package in EXTENSION_PACKAGES)
     {
         NuGetInstall(package, new NuGetInstallSettings {
