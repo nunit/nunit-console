@@ -19,6 +19,14 @@
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Drivers\**" />
+    <EmbeddedResource Remove="Drivers\**" />
+    <None Remove="Drivers\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="CallbackHandler.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
   </ItemGroup>

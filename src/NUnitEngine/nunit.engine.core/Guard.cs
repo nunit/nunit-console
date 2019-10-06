@@ -29,7 +29,7 @@ namespace NUnit.Common
     /// Class used to guard against unexpected argument values
     /// or operations by throwing an appropriate exception.
     /// </summary>
-    internal static class Guard
+    public static class Guard
     {
         /// <summary>
         /// Throws an exception if an argument is null
