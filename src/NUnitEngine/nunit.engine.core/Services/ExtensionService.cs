@@ -41,7 +41,7 @@ namespace NUnit.Engine.Services
     public class ExtensionService : Service, IExtensionService
     {
         static Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
-        static readonly Version ENGINE_VERSION = typeof(TestEngine).Assembly.GetName().Version;
+        static readonly Version ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version;
 
         private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
         private readonly Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
