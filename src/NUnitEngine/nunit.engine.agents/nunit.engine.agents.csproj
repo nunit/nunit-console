@@ -19,11 +19,6 @@
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Drivers\**" />
-    <EmbeddedResource Remove="Drivers\**" />
-    <None Remove="Drivers\**" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Remove="CallbackHandler.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -32,5 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
 </Project>
