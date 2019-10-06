@@ -86,9 +86,9 @@ namespace NUnit.Engine.Services
             return CreateRemoteAgent(package, waitTime);
         }
 
-        internal bool IsAgentRunning(Guid agentId, out Process process)
+        internal bool IsAgentProcessActive(Guid agentId, out Process process)
         {
-            return _agents.IsAgentRunning(agentId, out process);
+            return _agents.IsAgentProcessActive(agentId, out process);
         }
 
         private Process LaunchAgentProcess(TestPackage package, Guid agentId)

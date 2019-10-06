@@ -130,7 +130,7 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentDatabase();
 
-            Assert.That(database.IsAgentRunning(DummyAgent.Id, out _), Is.False);
+            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out _), Is.False);
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace NUnit.Engine.Services.Tests
             var database = new AgentDatabase();
 
             database.Start(DummyAgent.Id, DummyProcess);
-            Assert.That(database.IsAgentRunning(DummyAgent.Id, out var process), Is.True);
+            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out var process), Is.True);
             Assert.That(process, Is.SameAs(DummyProcess));
         }
 
@@ -150,7 +150,7 @@ namespace NUnit.Engine.Services.Tests
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
-            Assert.That(database.IsAgentRunning(DummyAgent.Id, out var process), Is.True);
+            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out var process), Is.True);
             Assert.That(process, Is.SameAs(DummyProcess));
         }
 
@@ -162,7 +162,7 @@ namespace NUnit.Engine.Services.Tests
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
             database.MarkTerminated(DummyAgent.Id);
-            Assert.That(database.IsAgentRunning(DummyAgent.Id, out _), Is.False);
+            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out _), Is.False);
         }
 
         [Test]
@@ -176,19 +176,19 @@ namespace NUnit.Engine.Services.Tests
                 {
                     var id = Guid.NewGuid();
 
-                    Assert.That(database.IsAgentRunning(id, out _), Is.False);
+                    Assert.That(database.IsAgentProcessActive(id, out _), Is.False);
                     Assert.That(database.IsReady(id, out _), Is.False);
 
                     database.Start(id, DummyProcess);
-                    Assert.That(database.IsAgentRunning(id, out _), Is.True);
+                    Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.False);
 
                     database.Register(new DummyTestAgent(id));
-                    Assert.That(database.IsAgentRunning(id, out _), Is.True);
+                    Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.True);
 
                     database.MarkTerminated(id);
-                    Assert.That(database.IsAgentRunning(id, out _), Is.False);
+                    Assert.That(database.IsAgentProcessActive(id, out _), Is.False);
                     Assert.That(database.IsReady(id, out _), Is.False);
                 }
             }, threadCount: Environment.ProcessorCount);

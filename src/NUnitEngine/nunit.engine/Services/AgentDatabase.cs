@@ -78,7 +78,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public bool IsAgentRunning(Guid agentId, out Process process)
+        public bool IsAgentProcessActive(Guid agentId, out Process process)
         {
             lock (_agentsById)
             {
@@ -86,7 +86,7 @@ namespace NUnit.Engine.Services
                     && record.Status != AgentStatus.Terminated)
                 {
                     process = record.Process;
-                    return true;
+                    return process != null;
                 }
 
                 process = null;
