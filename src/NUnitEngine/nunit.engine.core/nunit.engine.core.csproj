@@ -24,9 +24,6 @@
     <None Remove="Internal\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="RunTestsCallbackHandler.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
     <Compile Include="Internal\AssemblyHelper.cs" />
@@ -40,6 +37,7 @@
     <Compile Include="Internal\NUnitConfiguration.cs" />
     <Compile Include="Internal\PathUtils.cs" />
     <Compile Include="Internal\ProcessUtils.cs" />
+    <Compile Include="Internal\ProvidedPathsAssemblyResolver.cs" />
     <Compile Include="Internal\ResultHelper.cs" />
     <Compile Include="Internal\RuntimeFrameworks\DotNetFrameworkLocator.cs" />
     <Compile Include="Internal\ServerBase.cs" />
