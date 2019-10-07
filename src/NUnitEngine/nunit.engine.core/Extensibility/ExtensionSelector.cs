@@ -25,12 +25,6 @@
 using System;
 using NUnit.Common;
 
-namespace System.Runtime.CompilerServices
-{
-    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
-    sealed class ExtensionAttribute : Attribute { }
-}
-
 namespace NUnit.Engine.Extensibility
 {
     internal static class ExtensionSelector
