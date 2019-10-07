@@ -25,7 +25,7 @@ using System.Text;
 
 namespace NUnit.Engine.Internal
 {
-    internal static class ProcessUtils
+    public static class ProcessUtils
     {
         private static readonly char[] CharsThatRequireQuoting = { ' ', '"' };
         private static readonly char[] CharsThatRequireEscaping = { '\\', '"' };

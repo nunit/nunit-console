@@ -29,7 +29,7 @@ namespace NUnit.Engine
     /// Values here are set/used internally within the engine. 
     /// Setting values may be a string, int or bool.
     /// </summary>
-    internal static class InternalEnginePackageSettings
+    public static class InternalEnginePackageSettings
     {
         /// <summary>
         /// If the package represents an assembly, then this is the CLR version

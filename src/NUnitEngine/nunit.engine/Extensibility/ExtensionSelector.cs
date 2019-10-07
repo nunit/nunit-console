@@ -22,7 +22,14 @@
 // ***********************************************************************
 
 #if !NETSTANDARD1_6
+using System;
 using NUnit.Common;
+
+namespace System.Runtime.CompilerServices
+{
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
+    sealed class ExtensionAttribute : Attribute { }
+}
 
 namespace NUnit.Engine.Extensibility
 {

@@ -27,7 +27,7 @@ using Mono.Cecil;
 
 namespace NUnit.Engine.Internal
 {
-    internal class TargetFrameworkHelper
+    public class TargetFrameworkHelper
     {
         private readonly AssemblyDefinition _assemblyDef;
         private readonly ModuleDefinition _module;
