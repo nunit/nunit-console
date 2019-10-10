@@ -25,7 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
-    <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
     <Compile Include="Internal\AssemblyHelper.cs" />
     <Compile Include="Internal\CecilExtensions.cs" />
     <Compile Include="Internal\CurrentMessageCounter.cs" />
