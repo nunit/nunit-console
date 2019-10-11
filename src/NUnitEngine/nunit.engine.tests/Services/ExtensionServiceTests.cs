@@ -69,6 +69,7 @@ namespace NUnit.Engine.Services.Tests
             // in finding the extensions actually in use on the current system,
             // we simulate the start using this assemblies dummy extensions.
             _serviceClass.FindExtensionPoints(typeof(TestEngine).Assembly);
+            _serviceClass.FindExtensionPoints(typeof(CoreEngine).Assembly);
             _serviceClass.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
             _serviceClass.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
