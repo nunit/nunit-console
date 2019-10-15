@@ -53,6 +53,7 @@ namespace NUnit.Engine.Drivers
         AppDomain _testDomain;
         AssemblyName _reference;
         string _testAssemblyPath;
+        RunTestsCallbackHandler _runTestsHandler;
 
         object _frameworkController;
 
@@ -122,12 +123,12 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
 
-            var handler = new RunTestsCallbackHandler(listener);
+            _runTestsHandler = new RunTestsCallbackHandler(listener, _reference.Version);
 
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
-            CreateObject(RUN_ACTION, _frameworkController, filter, handler);
+            CreateObject(RUN_ACTION, _frameworkController, filter, _runTestsHandler);
 
-            return handler.Result;
+            return _runTestsHandler.Result;
         }
 
         /// <summary>
@@ -137,6 +138,9 @@ namespace NUnit.Engine.Drivers
         public void StopRun(bool force)
         {
             CreateObject(STOP_RUN_ACTION, _frameworkController, force, new CallbackHandler());
+
+            if (force)
+                _runTestsHandler.ForcedCancellationCleanUp();
         }
 
         /// <summary>

@@ -23,20 +23,27 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading;
 using System.Web.UI;
+using System.Xml;
 
 namespace NUnit.Engine
 {
     public class RunTestsCallbackHandler : MarshalByRefObject, ICallbackEventHandler
     {
         private ITestEventListener _listener;
+        private Version _frameworkVersion;
+
+        private static readonly Version NUNIT_3_12 = new Version(3, 12);
+        private const int WAIT_FOR_FORCED_TERMINATION = 5000;
 
         public string Result { get; private set; }
 
-        public RunTestsCallbackHandler(ITestEventListener listener)
+        public RunTestsCallbackHandler(ITestEventListener listener, Version frameworkVersion)
         {
             _listener = listener ?? new NullListener();
+            _frameworkVersion = frameworkVersion;
         }
 
         public override object InitializeLifetimeService()
@@ -57,8 +64,62 @@ namespace NUnit.Engine
                 ReportProgress(eventArgument);
         }
 
+        private List<string> _activeSuiteIds = new List<string>();
+        private Dictionary<string, XmlNode> _activeSuiteLookup = new Dictionary<string, XmlNode>();
+
+        private const string CANCELLED_SUITE_FORMAT =
+            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' result='Failed' label='Cancelled' />";
+
+        public void ForcedCancellationCleanUp()
+        {
+            if (_activeSuiteIds.Count > 0)
+            {
+                SpinWait.SpinUntil(() => _activeSuiteIds.Count == 0, WAIT_FOR_FORCED_TERMINATION);
+
+                // Notify termination of any remaining in-process suites
+                int index = _activeSuiteIds.Count;
+
+                while (index > 0)
+                {
+                    string id = _activeSuiteIds[--index];
+                    XmlNode startNode = _activeSuiteLookup[id];
+
+                    string type = startNode.GetAttribute("type");
+                    string name = startNode.GetAttribute("name");
+                    string fullname = startNode.GetAttribute("fullname");
+
+                    _listener.OnTestEvent(string.Format(CANCELLED_SUITE_FORMAT, type, id, name, fullname));
+                }
+            }
+        }
+
         private void ReportProgress(string state)
         {
+            // The NUnit framework 3.0 through 3.12 does not give notice of termination of test
+            // suites correctly after a user cancellation. Version 3.13 and later contain a fix
+            // for this. For earlier versions, the driver does essentially the same thing as the
+            // framework fix, in order to compensate for the error.
+            //
+            // Note: Check for start-suite and test-suite is for efficiency only. It avoids extra
+            // overhead of creating an XmlNode for individual test cases.
+            if (_frameworkVersion <= NUNIT_3_12 && (state.Contains("start-suite") || state.Contains("test-suite")))
+            {
+                var xmlNode = XmlHelper.CreateXmlNode(state);
+                string id = xmlNode.GetAttribute("id");
+
+                switch (xmlNode.Name)
+                {
+                    case "start-suite":
+                        _activeSuiteIds.Add(id);
+                        _activeSuiteLookup.Add(id, xmlNode);
+                        break;
+                    case "test-suite":
+                        _activeSuiteIds.Remove(id);
+                        _activeSuiteLookup.Remove(id);
+                        break;
+                }
+            }
+
             _listener.OnTestEvent(state);
         }
 
