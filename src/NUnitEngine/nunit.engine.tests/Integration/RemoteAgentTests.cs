@@ -1,4 +1,4 @@
-﻿#if !NETCOREAPP1_1 && !NETCOREAPP2_0
+﻿#if !NETCOREAPP1_1 && !NETCOREAPP2_1
 using System.Diagnostics;
 using NUnit.Engine.Tests.Helpers;
 using NUnit.Framework;

@@ -27,7 +27,7 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 {
-#if NETCOREAPP1_1 || NETCOREAPP2_0
+#if NETCOREAPP1_1 || NETCOREAPP2_1
     internal static class NetStandardTestCases
     {
         public class TestRunnerFactoryData : TestCaseData
@@ -68,7 +68,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         }
                     });
 
-#if NETCOREAPP2_0
+#if NETCOREAPP2_1
                 yield return new TestRunnerFactoryData(
                     "SingleProject (list ctor)",
                     new TestPackage(new[] { "a.nunit" }),

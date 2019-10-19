@@ -37,7 +37,7 @@ namespace NUnit.Engine.Runners.Tests
     // intermittent errors, probably due to the test
     // fixture rather than the engine.
     [TestFixture(typeof(LocalTestRunner))]
-#if !NETCOREAPP1_1 && !NETCOREAPP2_0
+#if !NETCOREAPP1_1 && !NETCOREAPP2_1
     [TestFixture(typeof(TestDomainRunner))]
     //[TestFixture(typeof(ProcessRunner))]
     [TestFixture(typeof(MultipleTestDomainRunner), 1)]
@@ -70,7 +70,7 @@ namespace NUnit.Engine.Runners.Tests
 #if !NETCOREAPP1_1
             _services.Add(new Services.ExtensionService());
             _services.Add(new Services.ProjectService());
-#if !NETCOREAPP2_0
+#if !NETCOREAPP2_1
             _services.Add(new Services.DomainManager());
             _services.Add(new Services.RuntimeFrameworkService());
             _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
@@ -139,7 +139,7 @@ namespace NUnit.Engine.Runners.Tests
         [Test]
         public void RunAsync()
         {
-#if !NETCOREAPP2_0
+#if !NETCOREAPP2_1
             if (_runner is ProcessRunner || _runner is MultipleTestProcessRunner)
                 Assert.Ignore("RunAsync is not working for ProcessRunner");
 #endif
