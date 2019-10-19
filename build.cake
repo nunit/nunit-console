@@ -47,6 +47,7 @@ var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.en
 var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
 var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";
 var CONSOLE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
+var MOCK_ASSEMBLY_CSPROJ = PROJECT_DIR + "src/NUnitEngine/mock-assembly/mock-assembly.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
 var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.6", "netstandard2.0" };
@@ -195,7 +196,7 @@ Task("Build")
     {
         MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
-        Information("Publishing netstandard engine so that dependencies are present...");
+        Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
         foreach(var framework in NETSTANDARD_FRAMEWORKS)
              MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
@@ -203,15 +204,17 @@ Task("Build")
                 .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        Information("Publishing netstandard engine api so that dependencies are present...");
-
         foreach(var framework in NETSTANDARD_FRAMEWORKS)
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        Information("Publishing netcoreapp tests so that dependencies are present...");
+        foreach(var framework in NETCORE_FRAMEWORKS)
+             MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
+                .WithProperty("TargetFramework", framework)
+                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
+                .WithProperty("PublishDir", BIN_DIR + framework));
 
         foreach(var framework in NETCORE_FRAMEWORKS)
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
@@ -228,6 +231,7 @@ Task("Build")
             .WithProperty("TargetFramework", "netcoreapp2.1")
             .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
             .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -294,7 +298,12 @@ Task("TestNetCore21Console")
     {
         if (IsDotNetCoreInstalled)
         {
-            RunTest(NETCORE21_CONSOLE, NETCOREAPP21_BIN_DIR, CONSOLE_TESTS, "netcoreapp2.1", ref ErrorDetail);
+            RunDotnetCoreTests(
+                NETCORE21_CONSOLE,
+                NETCOREAPP21_BIN_DIR, 
+                CONSOLE_TESTS,
+                "netcoreapp2.1",
+                ref ErrorDetail);
         }
         else
         {
@@ -315,7 +324,12 @@ Task("TestNetStandard16Engine")
     {
         if (IsDotNetCoreInstalled)
         {
-            RunTest(NETCORE21_CONSOLE, NETCOREAPP11_BIN_DIR, ENGINE_TESTS, "netcoreapp1.1", ref ErrorDetail);
+            RunDotnetCoreTests(
+                NETCORE21_CONSOLE,
+                NETCOREAPP11_BIN_DIR, 
+                ENGINE_TESTS,
+                "netcoreapp1.1",
+                ref ErrorDetail);
         }
         else
         {
@@ -335,7 +349,12 @@ Task("TestNetStandard20Engine")
     {
         if (IsDotNetCoreInstalled)
         {
-           RunTest(NETCORE21_CONSOLE, NETCOREAPP21_BIN_DIR, ENGINE_TESTS, "netcoreapp2.1", ref ErrorDetail);
+            RunDotnetCoreTests(
+                NETCORE21_CONSOLE,
+                NETCOREAPP21_BIN_DIR, 
+                ENGINE_TESTS,
+                "netcoreapp2.1",
+                ref ErrorDetail);
         }
         else
         {
