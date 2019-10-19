@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
 using System.IO;
 using System.Text;
 using NUnit.Common;
@@ -35,7 +34,7 @@ namespace NUnit.ConsoleRunner.Tests
     public class BadFileTests : ITestEventListener
     {
         [TestCase("junk.dll", "File not found")]
-        [TestCase("EngineTests.nunit", "File type is not supported")]
+        [TestCase("ConsoleTests.nunit", "File type is not supported")]
         public void MissingFileTest(string filename, string message)
         {
             var fullname = Path.Combine(TestContext.CurrentContext.TestDirectory, filename);
@@ -43,8 +42,10 @@ namespace NUnit.ConsoleRunner.Tests
             var services = new ServiceContext();
             services.Add(new InProcessTestRunnerFactory());
             services.Add(new ExtensionService());
-            services.Add(new RuntimeFrameworkService());
             services.Add(new DriverService());
+#if NET35
+            services.Add(new RuntimeFrameworkService());
+#endif
 
             var package = new TestPackage(fullname);
             package.AddSetting("ProcessModel", "InProcess");

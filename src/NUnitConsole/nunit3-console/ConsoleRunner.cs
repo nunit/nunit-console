@@ -272,7 +272,7 @@ namespace NUnit.ConsoleRunner
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Runtime Environment");
             OutWriter.WriteLabelLine("   OS Version: ", GetOSVersion());
 #if NET20
-            OutWriter.WriteLabelLine("  Runtime: .NET Framework - CLR v", Environment.Version.ToString());
+            OutWriter.WriteLabelLine("   Runtime: ", ".NET Framework CLR v" + Environment.Version.ToString());
 #else
             OutWriter.WriteLabelLine("  Runtime: ", RuntimeInformation.FrameworkDescription);
 #endif

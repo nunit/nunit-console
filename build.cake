@@ -45,13 +45,16 @@ var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 var ENGINE_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine/nunit.engine.csproj";
 var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
 var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";
+var CONSOLE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
 var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.6", "netstandard2.0" };
 var NETCORE_FRAMEWORKS = new [] { "netcoreapp1.1", "netcoreapp2.1" };
 
-// Test Runner
+// Test Runners
 var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
+var NETCORE21_CONSOLE = BIN_DIR + "netcoreapp2.1/" + "nunit3-console.dll";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
@@ -216,7 +219,12 @@ Task("Build")
                 .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-         MSBuild("src/NUnitConsole/nunit3-console/nunit3-console.csproj", CreateMSBuildSettings("Publish")
+        MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", "netcoreapp2.1")
+            .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+
+         MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", "netcoreapp2.1")
             .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
             .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
@@ -262,17 +270,38 @@ Task("TestNet20Engine")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST CONSOLE
+// TEST .NET 2.0 CONSOLE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNet20Console")
-    .Description("Tests the console runner")
+    .Description("Tests the .NET 2.0 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
         RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "net35", ref ErrorDetail);
     });
+
+//////////////////////////////////////////////////////////////////////
+// TEST .NET CORE 2.1 CONSOLE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore21Console")
+    .Description("Tests the .NET Core 2.1 console runner")
+    .IsDependentOn("Build")
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        if (IsDotNetCoreInstalled)
+        {
+            RunTest(NETCORE21_CONSOLE, NETCOREAPP21_BIN_DIR, CONSOLE_TESTS, "netcoreapp2.1", ref ErrorDetail);
+        }
+        else
+        {
+            Warning("Skipping .NET Standard tests because .NET Core is not installed");
+        }
+    });
+
 
 //////////////////////////////////////////////////////////////////////
 // TEST NETSTANDARD 1.6 ENGINE
@@ -635,9 +664,10 @@ Task("Rebuild")
 Task("Test")
     .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNet20Console")
     .IsDependentOn("TestNetStandard16Engine")
-    .IsDependentOn("TestNetStandard20Engine");
+    .IsDependentOn("TestNetStandard20Engine")
+    .IsDependentOn("TestNet20Console")
+    .IsDependentOn("TestNetCore21Console");
 
 Task("Package")
     .Description("Packages the engine and console runner")
