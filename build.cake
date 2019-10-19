@@ -315,11 +315,7 @@ Task("TestNetStandard16Engine")
     {
         if (IsDotNetCoreInstalled)
         {
-            RunDotnetCoreTests(
-                NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
-                NETCOREAPP11_BIN_DIR,
-                "netcoreapp1.1",
-                ref ErrorDetail);
+            RunTest(NETCORE21_CONSOLE, NETCOREAPP11_BIN_DIR, ENGINE_TESTS, "netcoreapp1.1", ref ErrorDetail);
         }
         else
         {
@@ -339,11 +335,7 @@ Task("TestNetStandard20Engine")
     {
         if (IsDotNetCoreInstalled)
         {
-            RunDotnetCoreTests(
-                NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
-                NETCOREAPP21_BIN_DIR,
-                "netcoreapp2.1",
-                ref ErrorDetail);
+           RunTest(NETCORE21_CONSOLE, NETCOREAPP21_BIN_DIR, ENGINE_TESTS, "netcoreapp2.1", ref ErrorDetail);
         }
         else
         {
