@@ -24,7 +24,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+#if NET20
 using NUnit.Options;
+#else
+using Mono.Options;
+#endif
 
 namespace NUnit.Common
 {
@@ -39,7 +44,7 @@ namespace NUnit.Common
     /// </summary>
     public class CommandLineOptions : OptionSet
     {
-        private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Environment.CurrentDirectory;
+        private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
 
         private bool validated;
         private bool noresult;

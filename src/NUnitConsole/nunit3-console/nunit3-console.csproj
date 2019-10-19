@@ -2,11 +2,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <TargetFrameworks>net20</TargetFrameworks>
-    <Commandlineparameters>nunit.engine.tests.dll -process:Single</Commandlineparameters>
+    <AssemblyName>nunit3-console</AssemblyName>
+    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
@@ -14,6 +13,9 @@
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
     <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
     <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
+    <PackageReference Include="Mono.Options" Version="5.3.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />

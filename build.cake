@@ -215,6 +215,11 @@ Task("Build")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
+
+         MSBuild("src/NUnitConsole/nunit3-console/nunit3-console.csproj", CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", "netcoreapp2.1")
+            .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
     });
 
 //////////////////////////////////////////////////////////////////////

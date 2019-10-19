@@ -28,8 +28,14 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using NUnit.Common;
-using NUnit.Options;
 using NUnit.Engine;
+
+#if NET20
+using NUnit.Options;
+#else
+using Mono.Options;
+using System.Linq;
+#endif
 
 namespace NUnit.ConsoleRunner
 {
@@ -172,12 +178,18 @@ namespace NUnit.ConsoleRunner
 
         private static void WriteHeader()
         {
-            Assembly executingAssembly = Assembly.GetExecutingAssembly();
-            var versionBlock = FileVersionInfo.GetVersionInfo(executingAssembly.ManifestModule.FullyQualifiedName);
+            Assembly entryAssembly = Assembly.GetEntryAssembly();
+
+            var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
 
             var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
 
-            object[] configurationAttributes = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+#if NET20
+            object[] configurationAttributes = entryAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+#else
+            var configurationAttributes = entryAssembly.GetCustomAttributes<AssemblyConfigurationAttribute>().ToArray();
+#endif
+
             if (configurationAttributes.Length > 0)
             {
                 string configuration = ((AssemblyConfigurationAttribute)configurationAttributes[0]).Configuration;

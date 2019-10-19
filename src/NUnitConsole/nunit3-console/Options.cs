@@ -1,3 +1,5 @@
+#if NET20
+
 //
 // Options.cs
 //
@@ -1089,3 +1091,4 @@ namespace NUnit.Options
     }
 }
 
+#endif
