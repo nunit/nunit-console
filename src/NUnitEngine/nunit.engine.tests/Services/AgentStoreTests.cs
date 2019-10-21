@@ -30,7 +30,7 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
 {
-    public static partial class AgentDatabaseTests
+    public static partial class AgentStoreTests
     {
         private static readonly Process DummyProcess = new Process();
         private static readonly ITestAgent DummyAgent = new DummyTestAgent(Guid.NewGuid());
@@ -38,7 +38,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void IdCannotBeReused()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             Assert.That(() => database.Start(DummyAgent.Id, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentMustBeStartedBeforeRegistering()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             Assert.That(() => database.Register(DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
         }
@@ -61,7 +61,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentMustNotRegisterTwice()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
@@ -71,7 +71,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentMustNotRegisterAfterTerminating()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.MarkTerminated(DummyAgent.Id);
@@ -81,7 +81,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentMustBeStartedBeforeTerminating()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             Assert.That(() => database.MarkTerminated(DummyAgent.Id), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
         }
@@ -89,7 +89,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsNotReadyWhenNotStarted()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             Assert.That(database.IsReady(DummyAgent.Id, out _), Is.False);
         }
@@ -97,7 +97,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsNotReadyWhenStarted()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             Assert.That(database.IsReady(DummyAgent.Id, out _), Is.False);
@@ -106,7 +106,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsReadyWhenRegistered()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
@@ -117,7 +117,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsNotReadyWhenTerminated()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
@@ -128,7 +128,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsNotRunningWhenNotStarted()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out _), Is.False);
         }
@@ -136,7 +136,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsRunningWhenStarted()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out var process), Is.True);
@@ -146,7 +146,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsRunningWhenRegistered()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
@@ -157,7 +157,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void AgentIsNotRunningWhenTerminated()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             database.Start(DummyAgent.Id, DummyProcess);
             database.Register(DummyAgent);
@@ -168,7 +168,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public static void ConcurrentOperationsDoNotCorruptState()
         {
-            var database = new AgentDatabase();
+            var database = new AgentStore();
 
             RunActionConcurrently(() =>
             {

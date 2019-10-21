@@ -45,7 +45,7 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
-        private readonly AgentDatabase _agents = new AgentDatabase();
+        private readonly AgentStore _agents = new AgentStore();
 
         public TestAgency() : this( "TestAgency", 0 ) { }
 

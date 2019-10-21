@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2019 Charlie Poole, Rob Prouse
+// Copyright (c) 2011-2019 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,35 +21,47 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1 && !NETCOREAPP2_0
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using System.Diagnostics;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
-    public partial class AgentDatabaseTests
+    internal sealed partial class AgentStore
     {
-        private sealed class DummyTestAgent : ITestAgent
+        private struct AgentRecord
         {
-            public DummyTestAgent(Guid id)
+            private AgentRecord(Process process, ITestAgent agent)
             {
-                Id = id;
+                Process = process;
+                Agent = agent;
             }
 
-            public Guid Id { get; }
+            public Process Process { get; }
+            public ITestAgent Agent { get; }
 
-            public ITestEngineRunner CreateRunner(TestPackage package)
+            public AgentStatus Status =>
+                Process is null ? AgentStatus.Terminated :
+                Agent is null ? AgentStatus.Starting :
+                AgentStatus.Ready;
+
+            public static AgentRecord Starting(Process process)
             {
-                throw new NotImplementedException();
+                if (process is null) throw new ArgumentNullException(nameof(process));
+
+                return new AgentRecord(process, agent: null);
             }
 
-            public bool Start()
+            public AgentRecord Ready(ITestAgent agent)
             {
-                throw new NotImplementedException();
+                if (agent is null) throw new ArgumentNullException(nameof(agent));
+
+                return new AgentRecord(Process, agent);
             }
 
-            public void Stop()
+            public AgentRecord Terminated()
             {
-                throw new NotImplementedException();
+                return new AgentRecord(process: null, agent: null);
             }
         }
     }
