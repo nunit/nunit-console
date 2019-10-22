@@ -422,6 +422,7 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.xml", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.core.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "Mono.Cecil.dll", Target="tools" }
                 }
