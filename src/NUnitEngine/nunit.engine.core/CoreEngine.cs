@@ -32,9 +32,8 @@ using NUnit.Engine.Services;
 namespace NUnit.Engine
 {
     /// <summary>
-    /// The TestEngine provides services that allow a client
-    /// program to interact with NUnit in order to explore,
-    /// load and run tests.
+    /// The CoreEngine provides services that are used by both
+    /// the TestEngine and agents.
     /// </summary>
     public class CoreEngine
     {

@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 #if NETSTANDARD1_6
-[assembly: AssemblyTitle("NUnit .NET Standard Engine  Core")]
+[assembly: AssemblyTitle("NUnit .NET Standard Engine Core")]
 #else
-[assembly: AssemblyTitle("NUnit Engine")]
+[assembly: AssemblyTitle("NUnit Engine Core")]
 #endif
 [assembly: AssemblyCulture("")]
 

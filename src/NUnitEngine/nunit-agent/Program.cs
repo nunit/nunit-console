@@ -111,9 +111,7 @@ namespace NUnit.Agent
               log.Warning("Failed to restore the COMPLUS_Version variable. " + ex.Message); // Proceed with running tests anyway
             }
 
-            // Create CoreEngine - this program is
-            // conceptually part of  the engine and
-            // can access its internals as needed.
+            // Create CoreEngine
             var engine = new CoreEngine
             {
                 WorkDirectory = workDirectory,
