@@ -31,12 +31,12 @@ jobs:
       testRunTitle: netcoreapp1.1/Windows
     condition: succeededOrFailed()
   - task: PublishTestResults@2
-    displayName: Publish netcoreapp2.0 test results
+    displayName: Publish netcoreapp2.1 test results
     inputs:
       testResultsFormat: NUnit
-      testResultsFiles: test-results\netcoreapp2.0\*.xml
+      testResultsFiles: test-results\netcoreapp2.1\*.xml
       mergeTestResults: true
-      testRunTitle: netcoreapp2.0/Windows
+      testRunTitle: netcoreapp2.1/Windows
     condition: succeededOrFailed()
 
   - powershell: .\build.ps1 -Target Package --artifact-dir='$(Build.ArtifactStagingDirectory)'
@@ -80,12 +80,12 @@ jobs:
       testRunTitle: netcoreapp1.1/Linux
     condition: succeededOrFailed()
   - task: PublishTestResults@2
-    displayName: Publish netcoreapp2.0 test results
+    displayName: Publish netcoreapp2.1 test results
     inputs:
       testResultsFormat: NUnit
-      testResultsFiles: test-results/netcoreapp2.0/*.xml
+      testResultsFiles: test-results/netcoreapp2.1/*.xml
       mergeTestResults: true
-      testRunTitle: netcoreapp2.0/Linux
+      testRunTitle: netcoreapp2.1/Linux
     condition: succeededOrFailed()
 
 - job: macOS
@@ -114,10 +114,10 @@ jobs:
       testRunTitle: netcoreapp1.1/macOS
     condition: succeededOrFailed()
   - task: PublishTestResults@2
-    displayName: Publish netcoreapp2.0 test results
+    displayName: Publish netcoreapp2.1 test results
     inputs:
       testResultsFormat: NUnit
-      testResultsFiles: test-results/netcoreapp2.0/*.xml
+      testResultsFiles: test-results/netcoreapp2.1/*.xml
       mergeTestResults: true
-      testRunTitle: netcoreapp2.0/macOS
+      testRunTitle: netcoreapp2.1/macOS
     condition: succeededOrFailed()

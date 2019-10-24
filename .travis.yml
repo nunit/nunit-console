@@ -13,7 +13,7 @@ matrix:
         - sudo apt-get install apt-transport-https
         - sudo apt-get update
         - sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.2
-        - sudo apt-get install dotnet-runtime-2.0.6
+        - sudo apt-get install dotnet-runtime-2.1
 
 # macOS package restore currently taking >30 mins on Travis
 #    - os: osx

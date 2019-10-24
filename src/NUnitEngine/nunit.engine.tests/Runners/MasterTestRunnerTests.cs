@@ -81,7 +81,7 @@ namespace NUnit.Engine.Runners.Tests
             //new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),
             //new TestRunData( "notest-assembly.dll,notest-assembly.dll", NoTestAssemblyData, NoTestAssemblyData ),
             //new TestRunData( "mock-assembly.dll,notest-assembly.dll", MockAssemblyData, NoTestAssemblyData )
-#elif NETCOREAPP2_0
+#elif NETCOREAPP2_1
             new TestRunData( "mock-assembly.dll", MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", MockAssemblyData, MockAssemblyData ),
             //new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),
@@ -122,7 +122,7 @@ namespace NUnit.Engine.Runners.Tests
             projectService.Add("project3.nunit", notestsPath);
             projectService.Add("project4.nunit", notestsPath, notestsPath);
             _services.Add(projectService);
-#if !NETCOREAPP2_0
+#if !NETCOREAPP2_1
             _services.Add(new DomainManager());
             _services.Add(new RuntimeFrameworkService());
 #endif

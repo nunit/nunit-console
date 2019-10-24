@@ -31,7 +31,7 @@ var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NET35_BIN_DIR = BIN_DIR + "net35/";
 var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
-var NETCOREAPP20_BIN_DIR = BIN_DIR + "netcoreapp2.0/";
+var NETCOREAPP21_BIN_DIR = BIN_DIR + "netcoreapp2.1/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
@@ -48,7 +48,7 @@ var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nuni
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
 var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.6", "netstandard2.0" };
-var NETCORE_FRAMEWORKS = new [] { "netcoreapp1.1", "netcoreapp2.0" };
+var NETCORE_FRAMEWORKS = new [] { "netcoreapp1.1", "netcoreapp2.1" };
 
 // Test Runner
 var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
@@ -306,9 +306,9 @@ Task("TestNetStandard20Engine")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCOREAPP20_BIN_DIR + ENGINE_TESTS,
-                NETCOREAPP20_BIN_DIR,
-                "netcoreapp2.0",
+                NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
+                NETCOREAPP21_BIN_DIR,
+                "netcoreapp2.1",
                 ref ErrorDetail);
         }
         else
