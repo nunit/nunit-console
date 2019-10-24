@@ -24,12 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
-#if NET20
 using NUnit.Options;
-#else
-using Mono.Options;
-#endif
 
 namespace NUnit.Common
 {

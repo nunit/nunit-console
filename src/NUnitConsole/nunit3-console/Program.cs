@@ -30,12 +30,11 @@ using System.Text;
 using NUnit.Common;
 using NUnit.Engine;
 
-#if NET20
-using NUnit.Options;
-#else
-using Mono.Options;
+#if !NET20
 using System.Linq;
 #endif
+
+using NUnit.Options;
 
 namespace NUnit.ConsoleRunner
 {
@@ -179,7 +178,6 @@ namespace NUnit.ConsoleRunner
         private static void WriteHeader()
         {
             Assembly entryAssembly = Assembly.GetEntryAssembly();
-
             var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
 
             var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";

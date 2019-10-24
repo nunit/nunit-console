@@ -28,11 +28,7 @@ using NUnit.Common;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-#if NET35
 using NUnit.Options;
-#else
-using Mono.Options;
-#endif
 
 
 namespace NUnit.ConsoleRunner.Tests
