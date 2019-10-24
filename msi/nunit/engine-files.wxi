@@ -7,6 +7,11 @@
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/net20/nunit.engine.dll" />
             </Component>
+            <Component Id="NUNIT.ENGINE.CORE" Location="local" Guid="F4F14D75-6096-467E-82E1-BD513645C0EF">
+                <File Id="nunit.engine.core.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/net20/nunit.engine.core.dll" />
+            </Component>
             <Component Id="NUNIT.BUNDLE.ADDINS" Location="local" Guid="AE849966-843E-43E7-B3B0-95CD5A12C2C4">
                 <File Id="nunit.bundle.addins"
                       Source="$(var.InstallImage)/nunit.bundle.addins" />

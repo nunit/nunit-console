@@ -16,7 +16,7 @@ namespace NUnit.Engine.Tests.Integration
 
         public RunnerInDirectoryWithoutFramework()
         {
-            directory = new DirectoryWithNeededAssemblies("nunit3-console", "nunit-agent", "nunit-agent-x86");
+            directory = new DirectoryWithNeededAssemblies("nunit3-console", "nunit.engine", "nunit-agent", "nunit-agent-x86");
 
             Assert.That(Path.Combine(directory.Directory, "nunit.framework.dll"), Does.Not.Exist, "This test must be run without nunit.framework.dll in the same directory as the console runner.");
         }

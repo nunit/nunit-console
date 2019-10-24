@@ -14,12 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		BUILDING.md = BUILDING.md
 		CHANGES.txt = CHANGES.txt
 		CONTRIBUTING.md = CONTRIBUTING.md
+		src\Directory.Build.props = src\Directory.Build.props
 		LICENSE.txt = LICENSE.txt
 		NOTICES.txt = NOTICES.txt
 		NuGet.config = NuGet.config
 		nunit.ico = nunit.ico
 		README.md = README.md
-		src/Directory.Build.props = src/Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{A972031D-2F61-4183-AF75-99EE1A9F6B32}"
@@ -85,6 +85,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", 
 		nuget\deprecated\nunit.runners.nuspec = nuget\deprecated\nunit.runners.nuspec
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.core", "src\NUnitEngine\nunit.engine.core\nunit.engine.core.csproj", "{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +152,7 @@ Global
 		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{4FDF7BFA-A337-41D3-898D-C6A98278E6AD} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 		{9A7C8370-ED1F-486F-A8F5-C5BF4221464E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

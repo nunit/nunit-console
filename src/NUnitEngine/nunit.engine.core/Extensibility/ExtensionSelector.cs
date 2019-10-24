@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 #if !NETSTANDARD1_6
+using System;
 using NUnit.Common;
 
 namespace NUnit.Engine.Extensibility

@@ -19,7 +19,6 @@
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" Version="3.11.0" />
-    <PackageReference Include="NUnit.Analyzers" Version="0.1.0-dev-00079" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
@@ -27,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
     <ProjectReference Include="..\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -111,11 +111,10 @@ namespace NUnit.Agent
               log.Warning("Failed to restore the COMPLUS_Version variable. " + ex.Message); // Proceed with running tests anyway
             }
 
-            // Create TestEngine - this program is
-            // conceptually part of  the engine and
-            // can access its internals as needed.
-            var engine = new TestEngine
+            // Create CoreEngine
+            var engine = new CoreEngine
             {
+                WorkDirectory = workDirectory,
                 InternalTraceLevel = traceLevel
             };
 
@@ -127,7 +126,7 @@ namespace NUnit.Agent
 
             // Initialize Services
             log.Info("Initializing Services");
-            engine.Initialize();
+            engine.InitializeServices();
 
             log.Info("Starting RemoteTestAgent");
             Agent = new RemoteTestAgent(AgentId, AgencyUrl, engine.Services);

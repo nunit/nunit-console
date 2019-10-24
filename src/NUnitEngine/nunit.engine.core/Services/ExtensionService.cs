@@ -41,13 +41,15 @@ namespace NUnit.Engine.Services
     public class ExtensionService : Service, IExtensionService
     {
         static Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
-        static readonly Version ENGINE_VERSION = typeof(TestEngine).Assembly.GetName().Version;
+        static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
 
         private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
         private readonly Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
 
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
+
+        public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -161,6 +163,8 @@ namespace NUnit.Engine.Services
                 var thisAssembly = Assembly.GetExecutingAssembly();
                 var apiAssembly = typeof(ITestEngine).Assembly;
 
+                foreach (var assembly in RootAssemblies)
+                    FindExtensionPoints(assembly);
                 FindExtensionPoints(thisAssembly);
                 FindExtensionPoints(apiAssembly);
 
