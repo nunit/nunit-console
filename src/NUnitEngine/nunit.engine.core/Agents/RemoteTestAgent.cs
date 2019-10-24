@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -34,8 +34,8 @@ namespace NUnit.Engine.Agents
     /// <summary>
     /// RemoteTestAgent represents a remote agent executing in another process
     /// and communicating with NUnit by TCP. Although it is similar to a
-    /// TestServer, it does not publish a Uri at which clients may connect 
-    /// to it. Rather, it reports back to the sponsoring TestAgency upon 
+    /// TestServer, it does not publish a Uri at which clients may connect
+    /// to it. Rather, it reports back to the sponsoring TestAgency upon
     /// startup so that the agency may in turn provide it to clients for use.
     /// </summary>
     public class RemoteTestAgent : TestAgent, ITestEngineRunner
@@ -108,10 +108,6 @@ namespace NUnit.Engine.Agents
         public override void Stop()
         {
             log.Info("Stopping");
-            // This causes an error in the client because the agent 
-            // database is not thread-safe.
-            //if (agency != null)
-            //    agency.ReportStatus(this.ProcessId, AgentStatus.Stopping);
 
             // Do this on a different thread since we need to wait until all messages are through,
             // including the message which is waiting for this method to return so it can report back.

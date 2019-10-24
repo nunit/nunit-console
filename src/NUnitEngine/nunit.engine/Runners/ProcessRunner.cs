@@ -23,6 +23,7 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using NUnit.Common;
 using NUnit.Engine.Internal;
@@ -39,7 +40,7 @@ namespace NUnit.Engine.Runners
         // multiple assemblies, a project, multiple projects or a mix. It loads
         // and runs all tests in a single remote agent process.
         //
-        // If the input contains projects, which are not summarized at a lower 
+        // If the input contains projects, which are not summarized at a lower
         // level, the ProcessRunner should create an XML node for the entire
         // project, aggregating the assembly results.
 
@@ -240,7 +241,7 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent != null && _agency.IsAgentRunning(_agent.Id))
+                if (_agent != null && _agency.IsAgentProcessActive(_agent.Id, out Process process))
                 {
                     try
                     {
@@ -249,7 +250,15 @@ namespace NUnit.Engine.Runners
                     }
                     catch (SocketException se)
                     {
-                        var exitCode = _agency.GetAgentExitCode(_agent.Id);
+                        int? exitCode;
+                        try
+                        {
+                            exitCode = process.ExitCode;
+                        }
+                        catch (NotSupportedException)
+                        {
+                            exitCode = null;
+                        }
 
                         if (exitCode.HasValue && exitCode == 0)
                         {
