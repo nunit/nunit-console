@@ -27,6 +27,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Options;
+using NUnit.ConsoleRunner.OptionsUtils;
 
 namespace NUnit.Common
 {
@@ -36,7 +37,7 @@ namespace NUnit.Common
     /// Options <see cref="OptionSet"/> class and provides a central location
     /// for defining and parsing options.
     /// </summary>
-    internal class ConsoleOptions : OptionSet
+    public class ConsoleOptions : OptionSet
     {
         private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
 
@@ -185,42 +186,24 @@ namespace NUnit.Common
 
         public string PrincipalPolicy { get; private set; }
 
-        private void CheckOptionCombinations()
-        {
-            // Normally, console is run in a 64-bit process on a 64-bit machine
-            // but this might vary if the process is started by some other program.
-            if (IntPtr.Size == 8 && RunAsX86 && ProcessModel == "InProcess")
-                ErrorMessages.Add("The --x86 and --inprocess options are incompatible.");
-        }
-
         public IList<string> WarningMessages { get; } = new List<string>();
 
         public IList<string> ErrorMessages { get; } = new List<string>();
 
-        public bool Validate()
-        {
-            if (!validated)
-            {
-                CheckOptionCombinations();
-
-                validated = true;
-            }
-
-            return ErrorMessages.Count == 0;
-        }
-
         private void ConfigureOptions()
         {
+            var parser = new OptionParser(s => ErrorMessages.Add(s));
+
             // NOTE: The order in which patterns are added
             // determines the display order for the help.
 
             this.Add("test=", "Comma-separated list of {NAMES} of tests to run or explore. This option may be repeated.",
-                v => ((List<string>)TestList).AddRange(TestNameParser.Parse(RequiredValue(v, "--test"))));
+                v => ((List<string>)TestList).AddRange(TestNameParser.Parse(parser.RequiredValue(v, "--test"))));
 
             this.Add("testlist=", "File {PATH} containing a list of tests to run, one per line. This option may be repeated.",
                 v =>
                 {
-                    string testListFile = RequiredValue(v, "--testlist");
+                    string testListFile = parser.RequiredValue(v, "--testlist");
 
                     var fullTestListPath = ExpandToFullPath(testListFile);
 
@@ -249,7 +232,7 @@ namespace NUnit.Common
                 });
 
             this.Add("where=", "Test selection {EXPRESSION} indicating what tests will be run. See description below.",
-                v => WhereClause = RequiredValue(v, "--where"));
+                v => WhereClause = parser.RequiredValue(v, "--where"));
 
             this.Add("params|p=", "Deprecated and will be removed in a future release. Please use --testparam instead.",
                 v =>
@@ -259,25 +242,36 @@ namespace NUnit.Common
                     if (!WarningMessages.Contains(deprecationWarning))
                         WarningMessages.Add(deprecationWarning);
 
-                    string parameters = RequiredValue(v, "--params");
+                    string parameters = parser.RequiredValue(v, "--params");
 
                     foreach (string param in parameters.Split(new[] { ';' }))
                     {
-                        ApplyTestParameter(param);
+                        var valuePair = parser.RequiredKeyValue(param);
+                        if (valuePair.HasValue)
+                        {
+                            TestParameters[valuePair.Value.Key] = valuePair.Value.Value;
+                        }
                     }
                 });
 
             this.Add("testparam|tp=", "Followed by a key-value pair separated by an equals sign. Test code can access the value by name.",
-                v => ApplyTestParameter(RequiredValue(v, "--testparam")));
+                v =>
+                {
+                    var valuePair = parser.RequiredKeyValue(parser.RequiredValue(v, "--testparam"));
+                    if (valuePair.HasValue)
+                    {
+                        TestParameters[valuePair.Value.Key] = valuePair.Value.Value;
+                    }
+                });
 
             this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
-                v => DefaultTimeout = RequiredInt(v, "--timeout"));
+                v => DefaultTimeout = parser.RequiredInt(v, "--timeout"));
 
             this.Add("seed=", "Set the random {SEED} used to generate test cases.",
-                v => RandomSeed = RequiredInt(v, "--seed"));
+                v => RandomSeed = parser.RequiredInt(v, "--seed"));
 
             this.Add("workers=", "Specify the {NUMBER} of worker threads to be used in running tests. If not specified, defaults to 2 or the number of processors, whichever is greater.",
-                v => NumberOfTestWorkers = RequiredInt(v, "--workers"));
+                v => NumberOfTestWorkers = parser.RequiredInt(v, "--workers"));
 
             this.Add("stoponerror", "Stop run immediately upon any test failure or error.",
                 v => StopOnError = v != null);
@@ -287,31 +281,36 @@ namespace NUnit.Common
 
             // Output Control
             this.Add("work=", "{PATH} of the directory to use for output files. If not specified, defaults to the current directory.",
-                v => workDirectory = RequiredValue(v, "--work"));
+                v => workDirectory = parser.RequiredValue(v, "--work"));
 
             this.Add("output|out=", "File {PATH} to contain text output from the tests.",
-                v => OutFile = RequiredValue(v, "--output"));
+                v => OutFile = parser.RequiredValue(v, "--output"));
 
             this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.",
-                v => ResolveOutputSpecification(RequiredValue(v, "--resultxml"), resultOutputSpecifications));
+                v =>
+                {
+                    var spec = parser.ResolveOutputSpecification(parser.RequiredValue(v, "--resultxml"), resultOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
+                    if (spec != null) ResultOutputSpecifications.Add(spec);
+                });
 
             this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
             {
                 Explore = true;
-                ResolveOutputSpecification(v, ExploreOutputSpecifications);
+                var spec = parser.ResolveOutputSpecification(v, ExploreOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
+                if (spec != null) ExploreOutputSpecifications.Add(spec);
             });
 
             this.Add("noresult", "Don't save any test results.",
                 v => noresult = v != null);
 
             this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, On, Before, After, BeforeAndAfter, All",
-                v => DisplayTestLabels = RequiredValue(v, "--labels", "Off", "On", "Before", "After", "BeforeAndAfter", "All"));
+                v => DisplayTestLabels = parser.RequiredValue(v, "--labels", "Off", "On", "Before", "After", "BeforeAndAfter", "All"));
 
             this.Add("test-name-format=", "Non-standard naming pattern to use in generating test names.",
-                v => DefaultTestNamePattern = RequiredValue(v, "--test-name-format"));
+                v => DefaultTestNamePattern = parser.RequiredValue(v, "--test-name-format"));
 
             this.Add("trace=", "Set internal trace {LEVEL}.\nValues: Off, Error, Warning, Info, Verbose (Debug)",
-                v => InternalTraceLevel = RequiredValue(v, "--trace", "Off", "Error", "Warning", "Info", "Verbose", "Debug"));
+                v => InternalTraceLevel = parser.RequiredValue(v, "--trace", "Off", "Error", "Warning", "Info", "Verbose", "Debug"));
 
             this.Add("teamcity", "Turns on use of TeamCity service messages. TeamCity engine extension is required.",
                 v => TeamCity = v != null);
@@ -329,7 +328,7 @@ namespace NUnit.Common
                 v => ShowVersion = v != null);
 
             this.Add("encoding=", "Specifies the encoding to use for Console standard output, for example utf-8, ascii, unicode.",
-                v => ConsoleEncoding = RequiredValue(v, "--encoding"));
+                v => ConsoleEncoding = parser.RequiredValue(v, "--encoding"));
 
             // Default
             this.Add("<>", v =>
@@ -341,16 +340,16 @@ namespace NUnit.Common
             });
 
             this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).",
-                v => ActiveConfig = RequiredValue(v, "--config"));
+                v => ActiveConfig = parser.RequiredValue(v, "--config"));
 
             this.Add("configfile=", "{NAME} of configuration file to use for this run.",
-                v => ConfigurationFile = RequiredValue(v, "--configfile"));
+                v => ConfigurationFile = parser.RequiredValue(v, "--configfile"));
 
             // Where to Run Tests
             this.Add("process=", "{PROCESS} isolation for test assemblies.\nValues: InProcess, Separate, Multiple. If not specified, defaults to Separate for a single assembly or Multiple for more than one.",
                 v =>
                 {
-                    ProcessModel = RequiredValue(v, "--process", "Single", "InProcess", "Separate", "Multiple");
+                    ProcessModel = parser.RequiredValue(v, "--process", "Single", "InProcess", "Separate", "Multiple");
                     // Change so it displays correctly even though it isn't absolutely needed
                     if (ProcessModel.ToLower() == "single")
                         ProcessModel = "InProcess";
@@ -360,11 +359,11 @@ namespace NUnit.Common
                 v => ProcessModel = "InProcess");
 
             this.Add("domain=", "{DOMAIN} isolation for test assemblies.\nValues: None, Single, Multiple. If not specified, defaults to Single for a single assembly or Multiple for more than one.",
-                v => DomainUsage = RequiredValue(v, "--domain", "None", "Single", "Multiple"));
+                v => DomainUsage = parser.RequiredValue(v, "--domain", "None", "Single", "Multiple"));
 
             // How to Run Tests
             this.Add("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
-                v => Framework = RequiredValue(v, "--framework"));
+                v => Framework = parser.RequiredValue(v, "--framework"));
 
             this.Add("x86", "Run tests in an x86 process on 64 bit systems",
                 v => RunAsX86 = v != null);
@@ -382,7 +381,7 @@ namespace NUnit.Common
                 v => SkipNonTestAssemblies = v != null);
 
             this.Add("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
-                v => _maxAgents = RequiredInt(v, "--agents"));
+                v => _maxAgents = parser.RequiredInt(v, "--agents"));
 
             this.Add("debug", "Launch debugger to debug tests.",
                 v => DebugTests = v != null);
@@ -394,12 +393,32 @@ namespace NUnit.Common
                 v => ListExtensions = v != null);
 
             this.Add("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
-                v => PrincipalPolicy = RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
+                v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
 
 #if DEBUG
             this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",
                 v => DebugAgent = v != null);
 #endif
+        }
+
+        public bool Validate()
+        {
+            if (!validated)
+            {
+                CheckOptionCombinations();
+
+                validated = true;
+            }
+
+            return ErrorMessages.Count == 0;
+        }
+
+        private void CheckOptionCombinations()
+        {
+            // Normally, console is run in a 64-bit process on a 64-bit machine
+            // but this might vary if the process is started by some other program.
+            if (IntPtr.Size == 8 && RunAsX86 && ProcessModel == "InProcess")
+                ErrorMessages.Add("The --x86 and --inprocess options are incompatible.");
         }
 
         private int _nesting = 0;
@@ -478,104 +497,6 @@ namespace NUnit.Common
             }
 
             return GetArgs(sb.ToString());
-        }
-
-        private void ApplyTestParameter(string testParameterSpecification)
-        {
-            var equalsIndex = testParameterSpecification.IndexOf("=");
-
-            if (equalsIndex <= 0 || equalsIndex == testParameterSpecification.Length - 1)
-            {
-                ErrorMessages.Add("Invalid format for test parameter. Use NAME=VALUE.");
-            }
-            else
-            {
-                string name = testParameterSpecification.Substring(0, equalsIndex);
-                string value = testParameterSpecification.Substring(equalsIndex + 1);
-
-                TestParameters[name] = value;
-            }
-        }
-
-        private void ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications)
-        {
-            if (value == null)
-                return;
-
-            OutputSpecification spec;
-
-            try
-            {
-                spec = new OutputSpecification(value, CURRENT_DIRECTORY_ON_ENTRY);
-            }
-            catch (ArgumentException e)
-            {
-                ErrorMessages.Add(e.Message);
-                return;
-            }
-
-            if (spec.Transform != null)
-            {
-                if (!_fileSystem.FileExists(spec.Transform))
-                {
-                    ErrorMessages.Add($"Transform {spec.Transform} could not be found.");
-                    return;
-                }
-            }
-
-            outputSpecifications.Add(spec);
-        }
-
-        /// <summary>
-        /// Case is ignored when val is compared to validValues. When a match is found, the
-        /// returned value will be in the canonical case from validValues.
-        /// </summary>
-        private string RequiredValue(string val, string option, params string[] validValues)
-        {
-            if (string.IsNullOrEmpty(val))
-                ErrorMessages.Add("Missing required value for option '" + option + "'.");
-
-            bool isValid = true;
-
-            if (validValues != null && validValues.Length > 0)
-            {
-                isValid = false;
-
-                foreach (string valid in validValues)
-                    if (string.Compare(valid, val, StringComparison.OrdinalIgnoreCase) == 0)
-                        return valid;
-
-            }
-
-            if (!isValid)
-                ErrorMessages.Add(string.Format("The value '{0}' is not valid for option '{1}'.", val, option));
-
-            return val;
-        }
-
-        private int RequiredInt(string val, string option)
-        {
-            // We have to return something even though the value will
-            // be ignored if an error is reported. The -1 value seems
-            // like a safe bet in case it isn't ignored due to a bug.
-            int result = -1;
-
-            if (string.IsNullOrEmpty(val))
-                ErrorMessages.Add("Missing required value for option '" + option + "'.");
-            else
-            {
-                // NOTE: Don't replace this with TryParse or you'll break the CF build!
-                try
-                {
-                    result = int.Parse(val);
-                }
-                catch (Exception)
-                {
-                    ErrorMessages.Add(String.Format("An int value was expected for option '{0}' but a value of '{1}' was used", option, val));
-                }
-            }
-
-            return result;
         }
 
         private string ExpandToFullPath(string path)
