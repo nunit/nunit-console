@@ -342,64 +342,84 @@ namespace NUnit.Common
             this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).",
                 v => ActiveConfig = parser.RequiredValue(v, "--config"));
 
-            this.Add("configfile=", "{NAME} of configuration file to use for this run.",
-                v => ConfigurationFile = parser.RequiredValue(v, "--configfile"));
+            this.AddNetFxOnlyOption("configfile=", "{NAME} of configuration file to use for this run.",
+                NetFxOnlyOption("configfile=", v => ConfigurationFile = parser.RequiredValue(v, "--configfile")));
 
             // Where to Run Tests
-            this.Add("process=", "{PROCESS} isolation for test assemblies.\nValues: InProcess, Separate, Multiple. If not specified, defaults to Separate for a single assembly or Multiple for more than one.",
-                v =>
+            this.AddNetFxOnlyOption("process=", "{PROCESS} isolation for test assemblies.\nValues: InProcess, Separate, Multiple. If not specified, defaults to Separate for a single assembly or Multiple for more than one.",
+                NetFxOnlyOption("process=", v =>
                 {
                     ProcessModel = parser.RequiredValue(v, "--process", "Single", "InProcess", "Separate", "Multiple");
                     // Change so it displays correctly even though it isn't absolutely needed
                     if (ProcessModel.ToLower() == "single")
                         ProcessModel = "InProcess";
-                });
+                }));
 
-            this.Add("inprocess", "Synonym for --process:InProcess",
-                v => ProcessModel = "InProcess");
+            this.AddNetFxOnlyOption("inprocess", "Synonym for --process:InProcess",
+                NetFxOnlyOption("inprocess", v => ProcessModel = "InProcess"));
 
-            this.Add("domain=", "{DOMAIN} isolation for test assemblies.\nValues: None, Single, Multiple. If not specified, defaults to Single for a single assembly or Multiple for more than one.",
-                v => DomainUsage = parser.RequiredValue(v, "--domain", "None", "Single", "Multiple"));
+            this.AddNetFxOnlyOption("domain=", "{DOMAIN} isolation for test assemblies.\nValues: None, Single, Multiple. If not specified, defaults to Single for a single assembly or Multiple for more than one.",
+                NetFxOnlyOption("domain=", v => DomainUsage = parser.RequiredValue(v, "--domain", "None", "Single", "Multiple")));
 
             // How to Run Tests
-            this.Add("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
-                v => Framework = parser.RequiredValue(v, "--framework"));
+            this.AddNetFxOnlyOption("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
+                NetFxOnlyOption("framework=", v => Framework = parser.RequiredValue(v, "--framework")));
 
-            this.Add("x86", "Run tests in an x86 process on 64 bit systems",
-                v => RunAsX86 = v != null);
+            this.AddNetFxOnlyOption("x86", "Run tests in an x86 process on 64 bit systems",
+                NetFxOnlyOption("x86", v => RunAsX86 = v != null));
 
             this.Add("dispose-runners", "Dispose each test runner after it has finished running its tests.",
                 v => DisposeRunners = v != null);
 
-            this.Add("shadowcopy", "Shadow copy test files",
-                v => ShadowCopyFiles = v != null);
+            this.AddNetFxOnlyOption("shadowcopy", "Shadow copy test files",
+                NetFxOnlyOption("shadowcopy", v => ShadowCopyFiles = v != null));
 
-            this.Add("loaduserprofile", "Load user profile in test runner processes",
-                v => LoadUserProfile = v != null);
+            this.AddNetFxOnlyOption("loaduserprofile", "Load user profile in test runner processes",
+                NetFxOnlyOption("loaduserprofile", v => LoadUserProfile = v != null));
 
             this.Add("skipnontestassemblies", "Skip any non-test assemblies specified, without error.",
                 v => SkipNonTestAssemblies = v != null);
 
-            this.Add("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
-                v => _maxAgents = parser.RequiredInt(v, "--agents"));
+            this.AddNetFxOnlyOption("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
+                NetFxOnlyOption("agents=", v => _maxAgents = parser.RequiredInt(v, "--agents")));
 
-            this.Add("debug", "Launch debugger to debug tests.",
-                v => DebugTests = v != null);
+            this.AddNetFxOnlyOption("debug", "Launch debugger to debug tests.",
+                NetFxOnlyOption("debug", v => DebugTests = v != null));
 
-            this.Add("pause", "Pause before running to allow attaching a debugger.",
-                v => PauseBeforeRun = v != null);
+            this.AddNetFxOnlyOption("pause", "Pause before running to allow attaching a debugger.",
+                NetFxOnlyOption("pause", v => PauseBeforeRun = v != null));
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
 
-            this.Add("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
-                v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
+            this.AddNetFxOnlyOption("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
+                NetFxOnlyOption("set-principal-policy=", v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal")));
 
 #if DEBUG
-            this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",
-                v => DebugAgent = v != null);
+            this.AddNetFxOnlyOption("debug-agent", "Launch debugger in nunit-agent when it starts.",
+                NetFxOnlyOption("debug-agent", v => DebugAgent = v != null));
 #endif
         }
+
+        private void AddNetFxOnlyOption(string prototype, string description, Action<string> action)
+        {
+#if NET20
+            var isHidden = false;
+#else
+            var isHidden = true;
+#endif
+            this.Add(prototype, description, action, isHidden);
+        }
+
+        private Action<string> NetFxOnlyOption(string optionName, Action<string> action)
+        {
+#if NET20
+            return action;
+#else
+            ErrorMessages.Add($"The {optionName} option is not available on this platform.");
+            return s => { };
+#endif
+         }
 
         public bool Validate()
         {
