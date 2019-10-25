@@ -283,7 +283,7 @@ namespace NUnit.Common
                 v =>
                 {
                     var spec = parser.ResolveOutputSpecification(parser.RequiredValue(v, "--resultxml"), resultOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
-                    if (spec != null) ResultOutputSpecifications.Add(spec);
+                    if (spec != null) resultOutputSpecifications.Add(spec);
                 });
 
             this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
@@ -409,10 +409,9 @@ namespace NUnit.Common
 #if NET20
             return action;
 #else
-            ErrorMessages.Add($"The {optionName} option is not available on this platform.");
-            return s => { };
+            return s => ErrorMessages.Add($"The {optionName} option is not available on this platform.");
 #endif
-         }
+        }
 
         public bool Validate()
         {

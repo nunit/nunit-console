@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 
 using NUnit.Options;
-using NSubstitute;
 
 namespace NUnit.ConsoleRunner.Tests
 {
@@ -163,14 +162,16 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("StopOnError", "stoponerror")]
         [TestCase("WaitBeforeExit", "wait")]
         [TestCase("NoHeader", "noheader|noh")]
-        [TestCase("RunAsX86", "x86")]
         [TestCase("DisposeRunners", "dispose-runners")]
-        [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase("TeamCity", "teamcity")]
+        [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
+#if NET35
+        [TestCase("RunAsX86", "x86")]
+        [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase("DebugTests", "debug")]
         [TestCase("PauseBeforeRun", "pause")]
         [TestCase("LoadUserProfile", "loaduserprofile")]
-        [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
+#endif
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
 #endif
@@ -209,17 +210,19 @@ namespace NUnit.ConsoleRunner.Tests
 
         [TestCase("WhereClause", "where", new string[] { "cat==Fast" }, new string[0])]
         [TestCase("ActiveConfig", "config", new string[] { "Debug" }, new string[0])]
-        [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
-        [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
-        [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
         [TestCase("OutFile", "output|out", new string[] { "output.txt" }, new string[0])]
-        [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" }, new string[] { "JUNK" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
+#if NET35
+        [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
+        [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
+        [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
+        [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
+#endif
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)
         {
             string[] prototypes = pattern.Split('|');
@@ -246,6 +249,7 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
+#if NET35
         [Test]
         public void CanRecognizeInProcessOption()
         {
@@ -253,9 +257,12 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.Validate(), Is.True, "Should be valid: --inprocess");
             Assert.That(options.ProcessModel, Is.EqualTo("InProcess"), "Didn't recognize --inprocess");
         }
+#endif
 
+#if NET35
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
+#endif
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
@@ -276,7 +283,9 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DefaultTimeout", "timeout")]
         [TestCase("RandomSeed", "seed")]
         [TestCase("NumberOfTestWorkers", "workers")]
+#if NET35
         [TestCase("MaxAgents", "agents")]
+#endif
         public void CanRecognizeIntOptions(string propertyName, string pattern)
         {
             string[] prototypes = pattern.Split('|');
@@ -291,33 +300,8 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
-        //[TestCase("InternalTraceLevel", "trace", typeof(InternalTraceLevel))]
-        //public void CanRecognizeEnumOptions(string propertyName, string pattern, Type enumType)
-        //{
-        //    string[] prototypes = pattern.Split('|');
-
-        //    PropertyInfo property = GetPropertyInfo(propertyName);
-        //    Assert.IsNotNull(property, "Property {0} not found", propertyName);
-        //    Assert.IsTrue(property.PropertyType.IsEnum, "Property {0} is not an enum", propertyName);
-        //    Assert.AreEqual(enumType, property.PropertyType);
-
-        //    foreach (string option in prototypes)
-        //    {
-        //        foreach (string name in Enum.GetNames(enumType))
-        //        {
-        //            {
-        //                ConsoleOptions options = ConsoleMocks.Options("--" + option + ":" + name);
-        //                Assert.AreEqual(name, property.GetValue(options, null).ToString(), "Didn't recognize -" + option + ":" + name);
-        //            }
-        //        }
-        //    }
-        //}
-
         [TestCase("--where")]
         [TestCase("--config")]
-        [TestCase("--process")]
-        [TestCase("--domain")]
-        [TestCase("--framework")]
         [TestCase("--timeout")]
         [TestCase("--output")]
         [TestCase("--work")]
@@ -325,6 +309,11 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--test-name-format")]
         [TestCase("--params")]
         [TestCase("--encoding")]
+#if NET35
+        [TestCase("--process")]
+        [TestCase("--domain")]
+        [TestCase("--framework")]
+#endif
         public void MissingValuesAreReported(string option)
         {
             ConsoleOptions options = ConsoleMocks.Options(option + "=");
@@ -349,6 +338,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
+#if NET35
         [Test]
         public void X86AndInProcessAreCompatibleIn32BitProcess()
         {
@@ -375,6 +365,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.Validate(), Is.False, "Should be invalid");
             Assert.That(options.ErrorMessages[0], Is.EqualTo("The --x86 and --inprocess options are incompatible."));
         }
+#endif
 
         [Test]
         public void InvalidOption()

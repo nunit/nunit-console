@@ -65,21 +65,21 @@ namespace NUnit.ConsoleRunner.OptionsUtils
 
         public int RequiredInt(string val, string option)
         {
-            // We have to return something even though the value will
-            // be ignored if an error is reported. The -1 value seems
-            // like a safe bet in case it isn't ignored due to a bug.
-            int result = -1;
-
             if (string.IsNullOrEmpty(val))
+            {
                 _logError("Missing required value for option '" + option + "'.");
+                return -1;
+            }
             else
             {
-                var success = int.TryParse(val, out result);
+                var success = int.TryParse(val, out var result);
                 if (!success)
+                {
                     _logError($"An int value was expected for option '{option}' but a value of '{val}' was used");
+                    return -1;
+                }
+                return result;
             }
-
-            return result;
         }
 
         public KeyValuePair<string, string>? RequiredKeyValue(string testParameterSpecification)

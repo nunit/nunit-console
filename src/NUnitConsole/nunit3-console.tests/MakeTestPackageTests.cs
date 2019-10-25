@@ -22,8 +22,6 @@
 // ***********************************************************************
 
 using System.IO;
-using NSubstitute;
-using NUnit.Common;
 using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Tests
@@ -54,8 +52,17 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [TestCase("--timeout=50", "DefaultTimeout", 50)]
-        [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--dispose-runners", "DisposeRunners", true)]
+        [TestCase("--config=Release", "ActiveConfig", "Release")]
+        [TestCase("--trace=Error", "InternalTraceLevel", "Error")]
+        [TestCase("--trace=error", "InternalTraceLevel", "Error")]
+        [TestCase("--seed=1234", "RandomSeed", 1234)]
+        [TestCase("--workers=3", "NumberOfTestWorkers", 3)]
+        [TestCase("--workers=0", "NumberOfTestWorkers", 0)]
+        [TestCase("--params:X=5;Y=7", "TestParameters", "X=5;Y=7")]
+        [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
+#if NET35
+        [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--shadowcopy", "ShadowCopyFiles", true)]
         [TestCase("--process=Separate", "ProcessModel", "Separate")]
         [TestCase("--process=separate", "ProcessModel", "Separate")]
@@ -65,21 +72,14 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--domain=Multiple", "DomainUsage", "Multiple")]
         [TestCase("--domain=multiple", "DomainUsage", "Multiple")]
         [TestCase("--framework=net-4.0", "RuntimeFramework", "net-4.0")]
-        [TestCase("--config=Release", "ActiveConfig", "Release")]
         [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
-        [TestCase("--trace=Error", "InternalTraceLevel", "Error")]
-        [TestCase("--trace=error", "InternalTraceLevel", "Error")]
-        [TestCase("--seed=1234", "RandomSeed", 1234)]
         [TestCase("--agents=5", "MaxAgents", 5)]
-        [TestCase("--workers=3", "NumberOfTestWorkers", 3)]
-        [TestCase("--workers=0", "NumberOfTestWorkers", 0)]
         [TestCase("--debug", "DebugTests", true)]
         [TestCase("--pause", "PauseBeforeRun", true)]
-        [TestCase("--params:X=5;Y=7", "TestParameters", "X=5;Y=7")]
-        [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
         [TestCase("--set-principal-policy:UnauthenticatedPrincipal", "PrincipalPolicy", "UnauthenticatedPrincipal")]
 #if DEBUG
         [TestCase("--debug-agent", "DebugAgent", true)]
+#endif
 #endif
         public void WhenOptionIsSpecified_PackageIncludesSetting(string option, string key, object val)
         {
@@ -90,6 +90,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(package.Settings[key], Is.EqualTo(val), "NumberOfTestWorkers not set correctly for {0}", option);
         }
 
+#if NET35
         [Test]
         public void WhenDebugging_NumberOfTestWorkersDefaultsToZero()
         {
@@ -109,6 +110,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
             Assert.That(package.Settings["NumberOfTestWorkers"], Is.EqualTo(3));
         }
+#endif
 
         [Test]
         public void WhenNoOptionsAreSpecified_PackageContainsOnlyTwoSettings()
