@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System.IO;
+using NSubstitute;
 using NUnit.Common;
 using NUnit.Framework;
 
@@ -32,7 +33,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void SingleAssembly()
         {
-            var options = new ConsoleOptions("test.dll");
+            var options = ConsoleMocks.Options("test.dll");
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.SubPackages.Count, Is.EqualTo(1));
@@ -43,7 +44,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void MultipleAssemblies()
         {
             var names = new [] { "test1.dll", "test2.dll", "test3.dll" };
-            var options = new ConsoleOptions(names);
+            var options = ConsoleMocks.Options(names);
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.SubPackages.Count, Is.EqualTo(3));
@@ -82,7 +83,7 @@ namespace NUnit.ConsoleRunner.Tests
 #endif
         public void WhenOptionIsSpecified_PackageIncludesSetting(string option, string key, object val)
         {
-            var options = new ConsoleOptions("test.dll", option);
+            var options = ConsoleMocks.Options("test.dll", option);
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.Settings.ContainsKey(key), "Setting not included for {0}", option);
@@ -92,7 +93,7 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void WhenDebugging_NumberOfTestWorkersDefaultsToZero()
         {
-            var options = new ConsoleOptions("test.dll", "--debug");
+            var options = ConsoleMocks.Options("test.dll", "--debug");
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
@@ -102,47 +103,21 @@ namespace NUnit.ConsoleRunner.Tests
         [Test]
         public void WhenDebugging_NumberOfTestWorkersMayBeOverridden()
         {
-            var options = new ConsoleOptions("test.dll", "--debug", "--workers=3");
+            var options = ConsoleMocks.Options("test.dll", "--debug", "--workers=3");
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
             Assert.That(package.Settings["NumberOfTestWorkers"], Is.EqualTo(3));
         }
 
-        //[Test]
-        //public void EnumOptions_MayBeSpecifiedAsInts()
-        //{
-        //    var options = new ConsoleOptions("test.dll", "--trace=4");
-        //    var package = ConsoleRunner.MakeTestPackage(options);
-
-        //    Assert.That(package.Settings.ContainsKey("InternalTraceLevel"));
-        //    Assert.AreEqual("Info", package.Settings["InternalTraceLevel"]);
-        //}
-
-        //[Test]
-        //public void EnumOptions_InvalidNamesCauseAnError()
-        //{
-        //    var options = new ConsoleOptions("test.dll", "--trace=All");
-        //    Assert.False(options.Validate());
-        //}
-
-        //[Test]
-        //public void EnumOptions_OutOfRangeValuesAreUsedAsIs()
-        //{
-        //    var options = new ConsoleOptions("test.dll", "--trace=7");
-        //    var package = ConsoleRunner.MakeTestPackage(options);
-
-        //    Assert.That(package.Settings.ContainsKey("InternalTraceLevel"));
-        //    Assert.AreEqual(7, package.Settings["InternalTraceLevel"]);
-        //}
-
         [Test]
         public void WhenNoOptionsAreSpecified_PackageContainsOnlyTwoSettings()
         {
-            var options = new ConsoleOptions("test.dll");
+            var options = ConsoleMocks.Options("test.dll");
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.Settings.Keys, Is.EquivalentTo(new string[] { "WorkDirectory", "DisposeRunners" }));
         }
+
     }
 }

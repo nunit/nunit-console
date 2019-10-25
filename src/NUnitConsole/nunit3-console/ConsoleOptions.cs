@@ -61,13 +61,6 @@ namespace NUnit.Common
                 Parse(args);
         }
 
-        public ConsoleOptions(params string[] args)
-        {
-            ConfigureOptions();
-            if (args != null)
-                Parse(args);
-        }
-
         // Action to Perform
 
         public bool Explore { get; private set; }
