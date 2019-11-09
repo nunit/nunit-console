@@ -430,17 +430,17 @@ Task("PackageNuGet")
     });
 
 Task("PackageChocolatey")
-	.Description("Creates chocolatey packages of the console runner")
-	.Does(() =>
-	{
-		EnsureDirectoryExists(PACKAGE_DIR);
+    .Description("Creates chocolatey packages of the console runner")
+    .Does(() =>
+    {
+        EnsureDirectoryExists(PACKAGE_DIR);
 
-		ChocolateyPack("choco/nunit-console-runner.nuspec",
-			new ChocolateyPackSettings()
-			{
-				Version = productVersion,
-				OutputDirectory = PACKAGE_DIR,
-				Files = new [] {
+        ChocolateyPack("choco/nunit-console-runner.nuspec",
+            new ChocolateyPackSettings()
+            {
+                Version = productVersion,
+                OutputDirectory = PACKAGE_DIR,
+                Files = new [] {
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
@@ -460,20 +460,20 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "Mono.Cecil.dll", Target="tools" }
                 }
-			});
+            });
 
-		ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
-			new ChocolateyPackSettings()
-			{
-				Version = productVersion,
-				OutputDirectory = PACKAGE_DIR,
+        ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
+            new ChocolateyPackSettings()
+            {
+                Version = productVersion,
+                OutputDirectory = PACKAGE_DIR,
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
                 }
-			});
-	});
+            });
+    });
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE COMBINED DISTRIBUTIONS
@@ -610,11 +610,6 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, st
         errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
     else if (rc < 0)
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
-}
-
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
-{
-    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
 }
 
 void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
