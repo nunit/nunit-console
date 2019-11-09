@@ -64,11 +64,9 @@ namespace NUnit.ConsoleRunner
             _options = options;
             _outWriter = writer;
 
-            _workDirectory = options.WorkDirectory;
+            _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
 
-            if (_workDirectory == null)
-                _workDirectory = Environment.CurrentDirectory;
-            else if (!Directory.Exists(_workDirectory))
+            if (!Directory.Exists(_workDirectory))
                 Directory.CreateDirectory(_workDirectory);
 
             _resultService = _engine.Services.GetService<IResultService>();
@@ -76,7 +74,7 @@ namespace NUnit.ConsoleRunner
             _extensionService = _engine.Services.GetService<IExtensionService>();
 
             // Enable TeamCityEventListener immediately, before the console is redirected
-            _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
+            _extensionService?.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
         }
 
         /// <summary>
@@ -173,7 +171,7 @@ namespace NUnit.ConsoleRunner
                     var outputDirectory = Path.GetDirectoryName(outputPath);
                     Directory.CreateDirectory(outputDirectory);
                 }
-                catch (SystemException ex)
+                catch (Exception ex)
                 {
                     writer.WriteLine(ColorStyle.Error, String.Format(
                         "The directory in --result {0} could not be created",
@@ -186,7 +184,7 @@ namespace NUnit.ConsoleRunner
                 {
                     resultWriter.CheckWritability(outputPath);
                 }
-                catch (SystemException ex)
+                catch (Exception ex)
                 {
                     throw new NUnitEngineException(
                         String.Format(
@@ -273,12 +271,19 @@ namespace NUnit.ConsoleRunner
         {
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Runtime Environment");
             OutWriter.WriteLabelLine("   OS Version: ", GetOSVersion());
-            OutWriter.WriteLabelLine("  CLR Version: ", Environment.Version.ToString());
+#if NET20
+            OutWriter.WriteLabelLine("   Runtime: ", ".NET Framework CLR v" + Environment.Version.ToString());
+#else
+            OutWriter.WriteLabelLine("  Runtime: ", RuntimeInformation.FrameworkDescription);
+#endif
+
+
             OutWriter.WriteLine();
         }
 
         private static string GetOSVersion()
         {
+#if NET20
             OperatingSystem os = Environment.OSVersion;
             string osString = os.ToString();
             if (os.Platform == PlatformID.Unix)
@@ -295,6 +300,9 @@ namespace NUnit.ConsoleRunner
                 Marshal.FreeHGlobal(buf);
             }
             return osString;
+#else
+            return RuntimeInformation.OSDescription;
+#endif
         }
 
         [DllImport("libc")]
@@ -304,7 +312,7 @@ namespace NUnit.ConsoleRunner
         {
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
-            foreach (var ep in _extensionService.ExtensionPoints)
+            foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])
             {
                 _outWriter.WriteLabelLine("  Extension Point: ", ep.Path);
                 foreach (var node in ep.Extensions)
@@ -409,7 +417,7 @@ namespace NUnit.ConsoleRunner
                 package.AddSetting(EnginePackageSettings.ActiveConfig, options.ActiveConfig);
 
             // Always add work directory, in case current directory is changed
-            var workDirectory = options.WorkDirectory ?? Environment.CurrentDirectory;
+            var workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
             package.AddSetting(FrameworkPackageSettings.WorkDirectory, workDirectory);
 
             if (options.StopOnError)

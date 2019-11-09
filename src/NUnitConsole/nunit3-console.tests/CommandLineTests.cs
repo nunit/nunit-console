@@ -25,10 +25,11 @@ using System;
 using System.IO;
 using System.Reflection;
 using NUnit.Common;
-using NUnit.Options;
 using System.Collections.Generic;
 using NUnit.Framework;
-using NUnit.Tests;
+
+using NUnit.Options;
+
 
 namespace NUnit.ConsoleRunner.Tests
 {
@@ -340,15 +341,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles[0], Is.EqualTo("nunit.tests.dll"));
         }
 
-        //[Test]
-        //public void FixtureNamePlusAssemblyIsValid()
-        //{
-        //    ConsoleOptions options = new ConsoleOptions( "-fixture:NUnit.Tests.AllTests", "nunit.tests.dll" );
-        //    Assert.AreEqual("nunit.tests.dll", options.Parameters[0]);
-        //    Assert.AreEqual("NUnit.Tests.AllTests", options.fixture);
-        //    Assert.IsTrue(options.Validate());
-        //}
-
         [Test]
         public void AssemblyAloneIsValid()
         {
@@ -357,17 +349,28 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
-        [Test, Platform("32-Bit")]
+        [Test]
         public void X86AndInProcessAreCompatibleIn32BitProcess()
         {
+            //Can be replaced with PlatformAttribute("32-Bit"), once NUnit Framework 3.12 can be used
+            if (IntPtr.Size == 8)
+            {
+                Assert.Inconclusive("Test can only be run on 32-bit platform");
+            }
+
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
             Assert.That(options.Validate(), Is.True);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
-        [Test, Platform("64-Bit")]
+        [Test]
         public void X86AndInProcessAreNotCompatibleIn64BitProcess()
         {
+            //Can be replaced with PlatformAttribute("64-Bit"), once NUnit Framework 3.12 can be used
+            if (IntPtr.Size == 4)
+            {
+                Assert.Inconclusive("Test can only be run on 64-bit platform");
+            }
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
             Assert.That(options.Validate(), Is.False, "Should be invalid");
             Assert.That(options.ErrorMessages[0], Is.EqualTo("The --x86 and --inprocess options are incompatible."));
@@ -381,14 +384,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
             Assert.That(options.ErrorMessages[0], Is.EqualTo("Invalid argument: -assembly:nunit.tests.dll"));
         }
-
-
-        //[Test]
-        //public void NoFixtureNameProvided()
-        //{
-        //    ConsoleOptions options = new ConsoleOptions( "-fixture:", "nunit.tests.dll" );
-        //    Assert.IsFalse(options.Validate());
-        //}
 
         [Test]
         public void InvalidCommandLineParms()
