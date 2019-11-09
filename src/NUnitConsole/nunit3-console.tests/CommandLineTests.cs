@@ -355,7 +355,7 @@ namespace NUnit.ConsoleRunner.Tests
             //Can be replaced with PlatformAttribute("32-Bit"), once NUnit Framework 3.12 can be used
             if (IntPtr.Size == 8)
             {
-                Assert.Inconclusive("Test can only be run on 64-bit platform");
+                Assert.Inconclusive("Test can only be run on 32-bit platform");
             }
 
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
@@ -369,7 +369,7 @@ namespace NUnit.ConsoleRunner.Tests
             //Can be replaced with PlatformAttribute("64-Bit"), once NUnit Framework 3.12 can be used
             if (IntPtr.Size == 4)
             {
-                Assert.Inconclusive("Test can only be run on 32-bit platform");
+                Assert.Inconclusive("Test can only be run on 64-bit platform");
             }
             ConsoleOptions options = new ConsoleOptions("nunit.tests.dll", "--x86", "--inprocess");
             Assert.That(options.Validate(), Is.False, "Should be invalid");

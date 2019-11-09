@@ -201,35 +201,24 @@ Task("Build")
         foreach(var framework in NETSTANDARD_FRAMEWORKS)
              MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
         foreach(var framework in NETSTANDARD_FRAMEWORKS)
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
         foreach(var framework in NETCORE_FRAMEWORKS)
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
-                .WithProperty("PublishDir", BIN_DIR + framework));
-
-        foreach(var framework in NETCORE_FRAMEWORKS)
-             MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-                .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
         MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", "netcoreapp2.1")
-            .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
             .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 
          MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", "netcoreapp2.1")
-            .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
             .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 
     });
@@ -307,7 +296,7 @@ Task("TestNetCore21Console")
         }
         else
         {
-            Warning("Skipping .NET Standard tests because .NET Core is not installed");
+            Warning("Skipping .NET Core Console tests because .NET Core is not installed");
         }
     });
 
