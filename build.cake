@@ -554,9 +554,9 @@ Task("InstallSigningTool")
         var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient -g" });
     });
 
-Task("SignNuGet")
+Task("SignPackages")
     .IsDependentOn("InstallSigningTool")
-    .IsDependentOn("PackageNuGet")
+    .IsDependentOn("Package")
     .Does(() =>
     {
         // Get the secret.
@@ -573,10 +573,10 @@ Task("SignNuGet")
         var signClientPath = Context.Tools.Resolve("SignClient.exe") ?? Context.Tools.Resolve("SignClient") ?? throw new Exception("Failed to locate sign tool");
 
         var settings = File("./signclient.json");
-        //var filter = File("./signclient.filter");
 
         // Get the files to sign.
-        var files = GetFiles(string.Concat(PACKAGE_DIR, "*.nupkg"));
+        var files = GetFiles(string.Concat(PACKAGE_DIR, "*.nupkg")) +
+            GetFiles(string.Concat(PACKAGE_DIR, "*.msi"));
 
         foreach(var file in files)
         {
@@ -587,7 +587,6 @@ Task("SignNuGet")
                 .Append("sign")
                 .AppendSwitchQuoted("-c", MakeAbsolute(settings.Path).FullPath)
                 .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
-                //.AppendSwitchQuoted("-f", MakeAbsolute(filter).FullPath)
                 .AppendSwitchQuotedSecret("-s", secret)
                 .AppendSwitchQuotedSecret("-r", user)
                 .AppendSwitchQuoted("-n", "NUnit.org")
