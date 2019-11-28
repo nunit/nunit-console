@@ -1,5 +1,8 @@
 #load ci.cake
 
+// Install Tools
+#tool "nuget:https://api.nuget.org/v3/index.json?package=nuget.commandline&version=5.3.1"
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
@@ -289,7 +292,7 @@ Task("TestNetCore21Console")
         {
             RunDotnetCoreTests(
                 NETCORE21_CONSOLE,
-                NETCOREAPP21_BIN_DIR, 
+                NETCOREAPP21_BIN_DIR,
                 CONSOLE_TESTS,
                 "netcoreapp2.1",
                 ref ErrorDetail);
@@ -315,7 +318,7 @@ Task("TestNetStandard16Engine")
         {
             RunDotnetCoreTests(
                 NETCORE21_CONSOLE,
-                NETCOREAPP11_BIN_DIR, 
+                NETCOREAPP11_BIN_DIR,
                 ENGINE_TESTS,
                 "netcoreapp1.1",
                 ref ErrorDetail);
@@ -340,7 +343,7 @@ Task("TestNetStandard20Engine")
         {
             RunDotnetCoreTests(
                 NETCORE21_CONSOLE,
-                NETCOREAPP21_BIN_DIR, 
+                NETCOREAPP21_BIN_DIR,
                 ENGINE_TESTS,
                 "netcoreapp2.1",
                 ref ErrorDetail);
@@ -544,6 +547,62 @@ Task("PackageZip")
     var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, version);
     Zip(ZIP_IMG, zipPath);
 });
+
+Task("InstallSigningTool")
+    .Does(() =>
+    {
+        var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient -g" });
+    });
+
+Task("SignNuGet")
+    .IsDependentOn("InstallSigningTool")
+    .IsDependentOn("PackageNuGet")
+    .Does(() =>
+    {
+        // Get the secret.
+        var secret = EnvironmentVariable("SIGNING_SECRET");
+        if(string.IsNullOrWhiteSpace(secret)) {
+            throw new InvalidOperationException("Could not resolve signing secret.");
+        }
+        // Get the user.
+        var user = EnvironmentVariable("SIGNING_USER");
+        if(string.IsNullOrWhiteSpace(user)) {
+            throw new InvalidOperationException("Could not resolve signing user.");
+        }
+
+        var signClientPath = Context.Tools.Resolve("SignClient.exe") ?? Context.Tools.Resolve("SignClient") ?? throw new Exception("Failed to locate sign tool");
+
+        var settings = File("./signclient.json");
+        //var filter = File("./signclient.filter");
+
+        // Get the files to sign.
+        var files = GetFiles(string.Concat(PACKAGE_DIR, "*.nupkg"));
+
+        foreach(var file in files)
+        {
+            Information("Signing {0}...", file.FullPath);
+
+            // Build the argument list.
+            var arguments = new ProcessArgumentBuilder()
+                .Append("sign")
+                .AppendSwitchQuoted("-c", MakeAbsolute(settings.Path).FullPath)
+                .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
+                //.AppendSwitchQuoted("-f", MakeAbsolute(filter).FullPath)
+                .AppendSwitchQuotedSecret("-s", secret)
+                .AppendSwitchQuotedSecret("-r", user)
+                .AppendSwitchQuoted("-n", "NUnit.org")
+                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .Net languages.")
+                .AppendSwitchQuoted("-u", "https://nunit.org/");
+
+            // Sign the binary.
+            var result = StartProcess(signClientPath.FullPath, new ProcessSettings {  Arguments = arguments });
+            if(result != 0)
+            {
+                // We should not recover from this.
+                throw new InvalidOperationException("Signing failed!");
+            }
+        }
+    });
 
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
