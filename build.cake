@@ -551,7 +551,7 @@ Task("PackageZip")
 Task("InstallSigningTool")
     .Does(() =>
     {
-        var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient -g" });
+        var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient" });
     });
 
 Task("SignPackages")
