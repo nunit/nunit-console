@@ -1,7 +1,7 @@
 #load ci.cake
 
 // Install Tools
-#tool "nuget:https://api.nuget.org/v3/index.json?package=nuget.commandline&version=5.3.1"
+#tool NuGet.CommandLine&version=5.3.1
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS & INITIALISATION
@@ -590,7 +590,7 @@ Task("SignPackages")
                 .AppendSwitchQuotedSecret("-s", secret)
                 .AppendSwitchQuotedSecret("-r", user)
                 .AppendSwitchQuoted("-n", "NUnit.org")
-                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .Net languages.")
+                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .NET languages.")
                 .AppendSwitchQuoted("-u", "https://nunit.org/");
 
             // Sign the binary.
