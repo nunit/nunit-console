@@ -591,7 +591,7 @@ Task("SignNuGet")
                 .AppendSwitchQuotedSecret("-s", secret)
                 .AppendSwitchQuotedSecret("-r", user)
                 .AppendSwitchQuoted("-n", "NUnit.org")
-                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .Net languages.")
+                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .NET languages.")
                 .AppendSwitchQuoted("-u", "https://nunit.org/");
 
             // Sign the binary.
