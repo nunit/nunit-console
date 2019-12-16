@@ -1,7 +1,7 @@
 #load ci.cake
 
 // Install Tools
-#tool "nuget:https://api.nuget.org/v3/index.json?package=nuget.commandline&version=5.3.1"
+#tool NuGet.CommandLine&version=5.3.1
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS & INITIALISATION
