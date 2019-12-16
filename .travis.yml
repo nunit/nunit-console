@@ -28,4 +28,4 @@ matrix:
 #        - sudo installer -pkg dotnet-runtime-2.0.6-osx-x64.pkg -target /
 
 script:
-  - ./build.sh --target "Travis" --configuration "Release"
+  - ./build.sh --target=Travis --configuration=Release
