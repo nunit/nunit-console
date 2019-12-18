@@ -12,8 +12,7 @@ matrix:
         - sudo dpkg -i packages-microsoft-prod.deb
         - sudo apt-get install apt-transport-https
         - sudo apt-get update
-        - sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.2
-        - sudo apt-get install dotnet-runtime-2.1
+        - sudo apt-get install dotnet-sdk-2.2
 
 # macOS package restore currently taking >30 mins on Travis
 #    - os: osx
