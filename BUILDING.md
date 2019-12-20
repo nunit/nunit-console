@@ -82,8 +82,10 @@ One convenient way to do this is to pass the same arguments to
 
 For example, to build and test everything: `.\build-mono-docker.ps1 -t test`
 
-This will run a temporary container using a custom
-[rprouse/nunit-docker](https://hub.docker.com/r/rprouse/nunit-docker/) image
+This will build a docker image and run a temporary container
 based on the [Mono image](https://hub.docker.com/r/library/mono/) and adding in
 .NET Core. The script mounts the repo inside the container and executes the
 [build.sh](build.sh) Cake bootstrapper with the arguments you specify.
+
+The first build will be slow as it builds the new image, but subsequent runs will
+be much quicker.
