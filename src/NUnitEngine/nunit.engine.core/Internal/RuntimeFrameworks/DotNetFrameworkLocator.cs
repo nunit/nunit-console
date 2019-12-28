@@ -59,7 +59,7 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
                         }
                         else if (CheckInstallDword(versionKey))
                         {
-                            // Versons 1.1, 2.0, 3.0 and 3.5 are possible here
+                            // Versions 1.1, 2.0, 3.0 and 3.5 are possible here
                             yield return new RuntimeFramework(RuntimeType.Net, new Version(name.Substring(1, 3)));
                         }
                     }
