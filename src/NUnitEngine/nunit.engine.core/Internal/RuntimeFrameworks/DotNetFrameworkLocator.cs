@@ -91,7 +91,6 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
 
         private static readonly MinimumRelease[] ReleaseTable = new MinimumRelease[]
         {
-            // TODO: Make 3-component versions work correctly
             new MinimumRelease(378389, new Version(4, 5)),
             new MinimumRelease(378675, new Version(4, 5, 1)),
             new MinimumRelease(379893, new Version(4, 5, 2)),
