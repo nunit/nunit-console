@@ -85,10 +85,11 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Construct from a runtime type, version and profile. If the version has
-        /// two parts, it is taken as a framework version. If it has three
-        /// or more, it is taken as a CLR version. In either case, the other
-        /// version is deduced based on the runtime type and provided version.
+        /// Construct from a runtime type, version and profile. The version
+        /// may be either a framework version or a CLR version. If a CLR
+        /// version is provided, we try to deduce the framework version but
+        /// this may not always be successful, in which case a version of
+        /// 0.0 is used.
         /// </summary>
         /// <param name="runtime">The runtime type of the framework.</param>
         /// <param name="version">The version of the framework.</param>
@@ -96,73 +97,75 @@ namespace NUnit.Engine
         public RuntimeFramework(RuntimeType runtime, Version version, string profile)
         {
             Runtime = runtime;
+            FrameworkVersion = ClrVersion = version;
 
-            if (version.Build < 0)
-                InitFromFrameworkVersion(version);
-            else
-                InitFromClrVersion(version);
+            // Version 0.0 means any version so we can't deduce anything
+            if (version != DefaultVersion)
+            {
+                if (IsFrameworkVersion(version))
+                    ClrVersion = GetClrVersionForFramework(version);
+                else
+                    FrameworkVersion = GetFrameworkVersionForClr(version);
+            }
 
             Profile = profile;
 
             DisplayName = GetDefaultDisplayName(runtime, FrameworkVersion, profile);
         }
 
-        private void InitFromFrameworkVersion(Version version)
+        private bool IsFrameworkVersion(Version v)
         {
-            this.FrameworkVersion = this.ClrVersion = version;
-
-            if (version.Major > 0) // 0 means any version
-                switch (Runtime)
-                {
-                    case RuntimeType.Net:
-                    case RuntimeType.Mono:
-                    case RuntimeType.Any:
-                        switch (version.Major)
-                        {
-                            case 1:
-                                switch (version.Minor)
-                                {
-                                    case 0:
-                                        this.ClrVersion = Runtime == RuntimeType.Mono
-                                            ? new Version(1, 1, 4322)
-                                            : new Version(1, 0, 3705);
-                                        break;
-                                    case 1:
-                                        if (Runtime == RuntimeType.Mono)
-                                            this.FrameworkVersion = new Version(1, 0);
-                                        this.ClrVersion = new Version(1, 1, 4322);
-                                        break;
-                                    default:
-                                        ThrowInvalidFrameworkVersion(version);
-                                        break;
-                                }
-                                break;
-                            case 2:
-                            case 3:
-                                this.ClrVersion = new Version(2, 0, 50727);
-                                break;
-                            case 4:
-                                this.ClrVersion = new Version(4, 0, 30319);
-                                break;
-                            default:
-                                ThrowInvalidFrameworkVersion(version);
-                                break;
-                        }
-                        break;
-                }
+            // All known framework versions have either two components or
+            // three. If three, then the Build is currently less than 3.
+            return v.Build < 3 && v.Revision == -1;
         }
 
-        private static void ThrowInvalidFrameworkVersion(Version version)
+        private Version GetClrVersionForFramework(Version frameworkVersion)
         {
-            throw new ArgumentException("Unknown framework version " + version.ToString(), "version");
+            switch (Runtime)
+            {
+                case RuntimeType.Net:
+                case RuntimeType.Any:
+                    switch (frameworkVersion.Major)
+                    {
+                        case 1:
+                            switch (frameworkVersion.Minor)
+                            {
+                                case 0:
+                                    return new Version(1, 0, 3705);
+                                case 1:
+                                    return new Version(1, 1, 4322);
+                            }
+                            break;
+                        case 2:
+                        case 3:
+                            return new Version(2, 0, 50727);
+                        case 4:
+                            return new Version(4, 0, 30319);
+                    }
+                    break;
+                case RuntimeType.Mono:
+                    switch (frameworkVersion.Major)
+                    {
+                        case 1:
+                            return new Version(1, 1, 4322);
+                        case 2:
+                        case 3:
+                            return new Version(2, 0, 50727);
+                        case 4:
+                            return new Version(4, 0, 30319);
+                    }
+                    break;
+            }
+
+            throw new ArgumentException("Unknown framework version " + frameworkVersion.ToString(), "version");
         }
 
-        private void InitFromClrVersion(Version version)
+        private Version GetFrameworkVersionForClr(Version clrVersion)
         {
-            this.FrameworkVersion = new Version(version.Major, version.Minor);
-            this.ClrVersion = version;
-            if (Runtime == RuntimeType.Mono && version.Major == 1)
-                this.FrameworkVersion = new Version(1, 0);
+            return Runtime == RuntimeType.Mono && clrVersion.Major == 1
+                ? new Version(1, 0)
+                : new Version(clrVersion.Major, clrVersion.Minor);
         }
 
         /// <summary>
