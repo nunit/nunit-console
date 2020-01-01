@@ -185,3 +185,9 @@ tools
 !tools/packages.config
 extension-packages
 zip-image
+
+# =========================
+# Docker Mono build packages
+# =========================
+
+*.deb
