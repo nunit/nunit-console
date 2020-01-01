@@ -212,7 +212,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("ActiveConfig", "config", new string[] { "Debug" }, new string[0])]
         [TestCase("OutFile", "output|out", new string[] { "output.txt" }, new string[0])]
         [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
-        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" }, new string[] { "JUNK" })]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "OnOutputOnly", "Before", "After", "BeforeAndAfter" }, new string[] { "JUNK" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
@@ -263,7 +263,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
 #endif
-        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "Before", "After", "All" })]
+        [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "OnOutputOnly", "Before", "After", "BeforeAndAfter" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
@@ -851,6 +851,33 @@ namespace NUnit.ConsoleRunner.Tests
 
             foreach (var name in TestContext.Parameters.Names)
                 Console.WriteLine("   Name: {0} Value: {1}", name, TestContext.Parameters[name]);
+        }
+
+        [TestCase("On", true)]
+        [TestCase("All", true)]
+        [TestCase("Off", false)]
+        [TestCase("OnOutputOnly", false)]
+        [TestCase("Before", false)]
+        [TestCase("After", false)]
+        [TestCase("BeforeAndAfter", false)]
+        public void DeprecatedLabelsOptionsWarnCorrectly(string labelOption, bool shouldWarn)
+        {
+            var options = ConsoleMocks.Options("--labels=" + labelOption);
+            options.Validate();
+            var countWarningsExpected = shouldWarn ? 1 : 0;
+            Assert.Multiple(() => {
+                Assert.That(options.ErrorMessages, Is.Empty);
+                Assert.That(options.WarningMessages, Has.Exactly(countWarningsExpected).Contains("deprecated"));
+            });
+        }
+
+        [TestCase("On", "OnOutputOnly")]
+        [TestCase("All", "Before")]
+        public void DeprecatedLabelsOptionsAreReplacedCorrectly(string oldOption, string newOption)
+        {
+            var options = ConsoleMocks.Options("--labels=" + oldOption);
+            options.Validate();
+            Assert.That(options.DisplayTestLabels, Is.EqualTo(newOption));
         }
 
         private static IFileSystem GetFileSystemContainingFile(string fileName)
