@@ -99,7 +99,10 @@ namespace NUnit.Engine.Tests
         [TestCaseSource(nameof(frameworkData))]
         public void CanCreateUsingClrVersion(FrameworkData data)
         {
+            // Versions 3.x and 4.5 or higher can't be created using CLR version
             Assume.That(data.frameworkVersion.Major != 3);
+            Assume.That(data.frameworkVersion.Major != 4 || data.frameworkVersion.Minor == 0);
+
 
             RuntimeFramework framework = new RuntimeFramework(data.runtime, data.clrVersion);
             Assert.That(framework.Runtime, Is.EqualTo(data.runtime));
@@ -258,26 +261,29 @@ namespace NUnit.Engine.Tests
 #pragma warning disable 414
         static FrameworkData[] frameworkData = new FrameworkData[] {
             new FrameworkData(RuntimeType.Net, new Version(1,0), new Version(1,0,3705), "net-1.0", ".NET 1.0"),
-            //new FrameworkData(RuntimeType.Net, new Version(1,0,3705), new Version(1,0,3705), "net-1.0.3705", "Net 1.0.3705"),
-            //new FrameworkData(RuntimeType.Net, new Version(1,0), new Version(1,0,3705), "net-1.0.3705", "Net 1.0.3705"),
             new FrameworkData(RuntimeType.Net, new Version(1,1), new Version(1,1,4322), "net-1.1", ".NET 1.1"),
-            //new FrameworkData(RuntimeType.Net, new Version(1,1,4322), new Version(1,1,4322), "net-1.1.4322", "Net 1.1.4322"),
             new FrameworkData(RuntimeType.Net, new Version(2,0), new Version(2,0,50727), "net-2.0", ".NET 2.0"),
-            //new FrameworkData(RuntimeType.Net, new Version(2,0,40607), new Version(2,0,40607), "net-2.0.40607", "Net 2.0.40607"),
-            //new FrameworkData(RuntimeType.Net, new Version(2,0,50727), new Version(2,0,50727), "net-2.0.50727", "Net 2.0.50727"),
             new FrameworkData(RuntimeType.Net, new Version(3,0), new Version(2,0,50727), "net-3.0", ".NET 3.0"),
             new FrameworkData(RuntimeType.Net, new Version(3,5), new Version(2,0,50727), "net-3.5", ".NET 3.5"),
             new FrameworkData(RuntimeType.Net, new Version(4,0), new Version(4,0,30319), "net-4.0", ".NET 4.0"),
+            new FrameworkData(RuntimeType.Net, new Version(4,5), new Version(4,0,30319), "net-4.5", ".NET 4.5"),
+            new FrameworkData(RuntimeType.Net, new Version(4,5,1), new Version(4,0,30319), "net-4.5.1", ".NET 4.5.1"),
+            new FrameworkData(RuntimeType.Net, new Version(4,5,2), new Version(4,0,30319), "net-4.5.2", ".NET 4.5.2"),
+            new FrameworkData(RuntimeType.Net, new Version(4,6), new Version(4,0,30319), "net-4.6", ".NET 4.6"),
+            new FrameworkData(RuntimeType.Net, new Version(4,6,1), new Version(4,0,30319), "net-4.6.1", ".NET 4.6.1"),
+            new FrameworkData(RuntimeType.Net, new Version(4,6,2), new Version(4,0,30319), "net-4.6.2", ".NET 4.6.2"),
+            new FrameworkData(RuntimeType.Net, new Version(4,7), new Version(4,0,30319), "net-4.7", ".NET 4.7"),
+            new FrameworkData(RuntimeType.Net, new Version(4,7,1), new Version(4,0,30319), "net-4.7.1", ".NET 4.7.1"),
+            new FrameworkData(RuntimeType.Net, new Version(4,7,2), new Version(4,0,30319), "net-4.7.2", ".NET 4.7.2"),
+            new FrameworkData(RuntimeType.Net, new Version(4,8), new Version(4,0,30319), "net-4.8", ".NET 4.8"),
             new FrameworkData(RuntimeType.Net, RuntimeFramework.DefaultVersion, RuntimeFramework.DefaultVersion, "net", ".NET"),
             new FrameworkData(RuntimeType.Mono, new Version(1,0), new Version(1,1,4322), "mono-1.0", "Mono 1.0"),
             new FrameworkData(RuntimeType.Mono, new Version(2,0), new Version(2,0,50727), "mono-2.0", "Mono 2.0"),
-            //new FrameworkData(RuntimeType.Mono, new Version(2,0,50727), new Version(2,0,50727), "mono-2.0.50727", "Mono 2.0.50727"),
             new FrameworkData(RuntimeType.Mono, new Version(3,5), new Version(2,0,50727), "mono-3.5", "Mono 3.5"),
             new FrameworkData(RuntimeType.Mono, new Version(4,0), new Version(4,0,30319), "mono-4.0", "Mono 4.0"),
             new FrameworkData(RuntimeType.Mono, RuntimeFramework.DefaultVersion, RuntimeFramework.DefaultVersion, "mono", "Mono"),
             new FrameworkData(RuntimeType.Any, new Version(1,1), new Version(1,1,4322), "v1.1", "v1.1"),
             new FrameworkData(RuntimeType.Any, new Version(2,0), new Version(2,0,50727), "v2.0", "v2.0"),
-            //new FrameworkData(RuntimeType.Any, new Version(2,0,50727), new Version(2,0,50727), "v2.0.50727", "v2.0.50727"),
             new FrameworkData(RuntimeType.Any, new Version(3,5), new Version(2,0,50727), "v3.5", "v3.5"),
             new FrameworkData(RuntimeType.Any, new Version(4,0), new Version(4,0,30319), "v4.0", "v4.0"),
             new FrameworkData(RuntimeType.Any, RuntimeFramework.DefaultVersion, RuntimeFramework.DefaultVersion, "any", "Any")

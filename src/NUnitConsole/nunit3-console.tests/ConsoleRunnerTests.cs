@@ -21,7 +21,7 @@ namespace NUnit.ConsoleRunner.Tests
             testEngine.Services.Add(new TestFilterService());
             testEngine.Services.Add(Substitute.For<IService, IExtensionService>());
 
-            var consoleRunner = new ConsoleRunner(testEngine, new ConsoleOptions("mock-assembly.dll"), new ColorConsoleWriter());
+            var consoleRunner = new ConsoleRunner(testEngine, ConsoleMocks.Options("mock-assembly.dll"), new ColorConsoleWriter());
             
             var ex = Assert.Throws<NUnitEngineException>(() => { consoleRunner.Execute(); });
             Assert.That(ex.Message, Is.EqualTo("The path specified in --result TestResult.xml could not be written to"));

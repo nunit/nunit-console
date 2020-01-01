@@ -15,4 +15,8 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("b2dfdf79-289b-4b45-ab40-8d461b7d56d7")]
+
 [assembly: InternalsVisibleTo("nunit3-console.tests")]
+
+//Allow NSubstitute to mock out internal types
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

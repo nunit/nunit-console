@@ -59,7 +59,7 @@ jobs:
       sudo apt-get install apt-transport-https
       sudo apt-get update
       sudo apt-get install dotnet-sdk-2.2
-      ./build.sh --target Test --configuration Release
+      ./build.sh --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
@@ -93,7 +93,7 @@ jobs:
     vmImage: macOS-10.13
   steps:
 
-  - bash: ./build.sh --target Test --configuration Release
+  - bash: ./build.sh --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922

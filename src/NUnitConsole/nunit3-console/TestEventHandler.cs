@@ -31,7 +31,11 @@ namespace NUnit.ConsoleRunner
     /// TestEventHandler processes events from the running
     /// test for the console runner.
     /// </summary>
+#if NET20
     public class TestEventHandler : MarshalByRefObject, ITestEventListener
+#else
+    public class TestEventHandler : ITestEventListener
+#endif
     {
         private readonly ExtendedTextWriter _outWriter;
 
@@ -46,7 +50,7 @@ namespace NUnit.ConsoleRunner
         {
             _outWriter = outWriter;
 
-            labelsOption = labelsOption.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+            labelsOption = labelsOption.ToUpperInvariant();
             _displayBeforeTest = labelsOption == "ALL" || labelsOption == "BEFORE" || labelsOption == "BEFOREANDAFTER";
             _displayAfterTest = labelsOption == "AFTER" || labelsOption == "BEFOREANDAFTER";
             _displayBeforeOutput = _displayBeforeTest || _displayAfterTest || labelsOption == "ON";
@@ -212,9 +216,11 @@ namespace NUnit.ConsoleRunner
             }
         }
 
+#if NET20
         public override object InitializeLifetimeService()
         {
             return null;
         }
+#endif
     }
 }

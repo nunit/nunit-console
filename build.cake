@@ -1,5 +1,8 @@
 #load ci.cake
 
+// Install Tools
+#tool NuGet.CommandLine&version=5.3.1
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
@@ -45,13 +48,17 @@ var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 var ENGINE_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine/nunit.engine.csproj";
 var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
 var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";
+var CONSOLE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
+var MOCK_ASSEMBLY_CSPROJ = PROJECT_DIR + "src/NUnitEngine/mock-assembly/mock-assembly.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
 var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.6", "netstandard2.0" };
 var NETCORE_FRAMEWORKS = new [] { "netcoreapp1.1", "netcoreapp2.1" };
 
-// Test Runner
+// Test Runners
 var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
+var NETCORE21_CONSOLE = BIN_DIR + "netcoreapp2.1/" + "nunit3-console.dll";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
@@ -192,29 +199,31 @@ Task("Build")
     {
         MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
-        Information("Publishing netstandard engine so that dependencies are present...");
+        Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
         foreach(var framework in NETSTANDARD_FRAMEWORKS)
              MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
-
-        Information("Publishing netstandard engine api so that dependencies are present...");
 
         foreach(var framework in NETSTANDARD_FRAMEWORKS)
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
-
-        Information("Publishing netcoreapp tests so that dependencies are present...");
 
         foreach(var framework in NETCORE_FRAMEWORKS)
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
-                .WithProperty("NoBuild", "true") // https://github.com/dotnet/cli/issues/5331#issuecomment-338392972
                 .WithProperty("PublishDir", BIN_DIR + framework));
+
+        MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", "netcoreapp2.1")
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+
+         MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", "netcoreapp2.1")
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -257,17 +266,43 @@ Task("TestNet20Engine")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST CONSOLE
+// TEST .NET 2.0 CONSOLE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNet20Console")
-    .Description("Tests the console runner")
+    .Description("Tests the .NET 2.0 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
         RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "net35", ref ErrorDetail);
     });
+
+//////////////////////////////////////////////////////////////////////
+// TEST .NET CORE 2.1 CONSOLE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore21Console")
+    .Description("Tests the .NET Core 2.1 console runner")
+    .IsDependentOn("Build")
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        if (IsDotNetCoreInstalled)
+        {
+            RunDotnetCoreTests(
+                NETCORE21_CONSOLE,
+                NETCOREAPP21_BIN_DIR,
+                CONSOLE_TESTS,
+                "netcoreapp2.1",
+                ref ErrorDetail);
+        }
+        else
+        {
+            Warning("Skipping .NET Core Console tests because .NET Core is not installed");
+        }
+    });
+
 
 //////////////////////////////////////////////////////////////////////
 // TEST NETSTANDARD 1.6 ENGINE
@@ -282,8 +317,9 @@ Task("TestNetStandard16Engine")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
+                NETCORE21_CONSOLE,
                 NETCOREAPP11_BIN_DIR,
+                ENGINE_TESTS,
                 "netcoreapp1.1",
                 ref ErrorDetail);
         }
@@ -306,8 +342,9 @@ Task("TestNetStandard20Engine")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
+                NETCORE21_CONSOLE,
                 NETCOREAPP21_BIN_DIR,
+                ENGINE_TESTS,
                 "netcoreapp2.1",
                 ref ErrorDetail);
         }
@@ -396,17 +433,17 @@ Task("PackageNuGet")
     });
 
 Task("PackageChocolatey")
-	.Description("Creates chocolatey packages of the console runner")
-	.Does(() =>
-	{
-		EnsureDirectoryExists(PACKAGE_DIR);
+    .Description("Creates chocolatey packages of the console runner")
+    .Does(() =>
+    {
+        EnsureDirectoryExists(PACKAGE_DIR);
 
-		ChocolateyPack("choco/nunit-console-runner.nuspec",
-			new ChocolateyPackSettings()
-			{
-				Version = productVersion,
-				OutputDirectory = PACKAGE_DIR,
-				Files = new [] {
+        ChocolateyPack("choco/nunit-console-runner.nuspec",
+            new ChocolateyPackSettings()
+            {
+                Version = productVersion,
+                OutputDirectory = PACKAGE_DIR,
+                Files = new [] {
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
@@ -426,20 +463,20 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "Mono.Cecil.dll", Target="tools" }
                 }
-			});
+            });
 
-		ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
-			new ChocolateyPackSettings()
-			{
-				Version = productVersion,
-				OutputDirectory = PACKAGE_DIR,
+        ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
+            new ChocolateyPackSettings()
+            {
+                Version = productVersion,
+                OutputDirectory = PACKAGE_DIR,
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
                 }
-			});
-	});
+            });
+    });
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE COMBINED DISTRIBUTIONS
@@ -511,6 +548,61 @@ Task("PackageZip")
     Zip(ZIP_IMG, zipPath);
 });
 
+Task("InstallSigningTool")
+    .Does(() =>
+    {
+        var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient" });
+    });
+
+Task("SignPackages")
+    .IsDependentOn("InstallSigningTool")
+    .IsDependentOn("Package")
+    .Does(() =>
+    {
+        // Get the secret.
+        var secret = EnvironmentVariable("SIGNING_SECRET");
+        if(string.IsNullOrWhiteSpace(secret)) {
+            throw new InvalidOperationException("Could not resolve signing secret.");
+        }
+        // Get the user.
+        var user = EnvironmentVariable("SIGNING_USER");
+        if(string.IsNullOrWhiteSpace(user)) {
+            throw new InvalidOperationException("Could not resolve signing user.");
+        }
+
+        var signClientPath = Context.Tools.Resolve("SignClient.exe") ?? Context.Tools.Resolve("SignClient") ?? throw new Exception("Failed to locate sign tool");
+
+        var settings = File("./signclient.json");
+
+        // Get the files to sign.
+        var files = GetFiles(string.Concat(PACKAGE_DIR, "*.nupkg")) +
+            GetFiles(string.Concat(PACKAGE_DIR, "*.msi"));
+
+        foreach(var file in files)
+        {
+            Information("Signing {0}...", file.FullPath);
+
+            // Build the argument list.
+            var arguments = new ProcessArgumentBuilder()
+                .Append("sign")
+                .AppendSwitchQuoted("-c", MakeAbsolute(settings.Path).FullPath)
+                .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
+                .AppendSwitchQuotedSecret("-s", secret)
+                .AppendSwitchQuotedSecret("-r", user)
+                .AppendSwitchQuoted("-n", "NUnit.org")
+                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .NET languages.")
+                .AppendSwitchQuoted("-u", "https://nunit.org/");
+
+            // Sign the binary.
+            var result = StartProcess(signClientPath.FullPath, new ProcessSettings {  Arguments = arguments });
+            if(result != 0)
+            {
+                // We should not recover from this.
+                throw new InvalidOperationException("Signing failed!");
+            }
+        }
+    });
+
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
@@ -578,11 +670,6 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, st
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
 
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
-{
-    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
-}
-
 void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
 {
     int rc = StartProcess(
@@ -627,12 +714,21 @@ Task("Rebuild")
     .IsDependentOn("Clean")
     .IsDependentOn("Build");
 
-Task("Test")
-    .Description("Builds and tests the engine and console runner")
-    .IsDependentOn("TestNet20Engine")
+Task("TestConsole")
+    .Description("Builds and tests the console runner")
     .IsDependentOn("TestNet20Console")
+    .IsDependentOn("TestNetCore21Console");
+
+Task("TestEngine")
+    .Description("Builds and tests the engine")
+    .IsDependentOn("TestNet20Engine")
     .IsDependentOn("TestNetStandard16Engine")
     .IsDependentOn("TestNetStandard20Engine");
+
+Task("Test")
+    .Description("Builds and tests the engine")
+    .IsDependentOn("TestEngine")
+    .IsDependentOn("TestConsole");
 
 Task("Package")
     .Description("Packages the engine and console runner")
