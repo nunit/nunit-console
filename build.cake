@@ -656,13 +656,21 @@ Task("Rebuild")
     .IsDependentOn("Clean")
     .IsDependentOn("Build");
 
-Task("Test")
-    .Description("Builds and tests the engine and console runner")
-    .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNetStandard16Engine")
-    .IsDependentOn("TestNetStandard20Engine")
+Task("TestConsole")
+    .Description("Builds and tests the console runner")
     .IsDependentOn("TestNet20Console")
     .IsDependentOn("TestNetCore21Console");
+
+Task("TestEngine")
+    .Description("Builds and tests the engine")
+    .IsDependentOn("TestNet20Engine")
+    .IsDependentOn("TestNetStandard16Engine")
+    .IsDependentOn("TestNetStandard20Engine");
+
+Task("Test")
+    .Description("Builds and tests the engine")
+    .IsDependentOn("TestEngine")
+    .IsDependentOn("TestConsole");
 
 Task("Package")
     .Description("Packages the engine and console runner")

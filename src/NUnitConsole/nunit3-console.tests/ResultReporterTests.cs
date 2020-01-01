@@ -71,7 +71,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             _report = new StringBuilder();
             var writer = new ExtendedTextWrapper(new StringWriter(_report));
-            _reporter = new ResultReporter(_result, writer, new ConsoleOptions());
+            _reporter = new ResultReporter(_result, writer, ConsoleMocks.Options());
         }
 
         [Test]
