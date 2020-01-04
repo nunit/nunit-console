@@ -21,6 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+
+using System.IO;
 #if NETSTANDARD
 using System;
 using System.Linq;
@@ -76,15 +78,24 @@ namespace NUnit.Engine.Drivers
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
             var assemblyRef = AssemblyDefinition.ReadAssembly(testAssembly);
+#if NETSTANDARD1_6
             _testAssembly = Assembly.Load(new AssemblyName(assemblyRef.FullName));
+#else
+            _testAssembly = Assembly.LoadFrom(testAssembly);
+#endif
             if(_testAssembly == null)
                 throw new NUnitEngineException(string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyRef.FullName));
 
+#if NETSTANDARD1_6
             var nunitRef = assemblyRef.MainModule.AssemblyReferences.Where(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             if (nunitRef == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
 
             var nunit = Assembly.Load(new AssemblyName(nunitRef.FullName));
+#else
+            var nunit = Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(testAssembly), "nunit.framework.dll"));
+#endif
+
             if (nunit == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
 
