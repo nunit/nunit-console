@@ -317,9 +317,9 @@ Task("TestNetStandard16Engine")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCORE21_CONSOLE,
-                NETCOREAPP11_BIN_DIR,
                 ENGINE_TESTS,
+                NETCOREAPP11_BIN_DIR,
+                "",
                 "netcoreapp1.1",
                 ref ErrorDetail);
         }
