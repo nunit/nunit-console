@@ -51,9 +51,9 @@ namespace NUnit.ConsoleRunner
             _outWriter = outWriter;
 
             labelsOption = labelsOption.ToUpperInvariant();
-            _displayBeforeTest = labelsOption == "ALL" || labelsOption == "BEFORE" || labelsOption == "BEFOREANDAFTER";
+            _displayBeforeTest = labelsOption == "BEFORE" || labelsOption == "BEFOREANDAFTER";
             _displayAfterTest = labelsOption == "AFTER" || labelsOption == "BEFOREANDAFTER";
-            _displayBeforeOutput = _displayBeforeTest || _displayAfterTest || labelsOption == "ON";
+            _displayBeforeOutput = _displayBeforeTest || _displayAfterTest || labelsOption == "ONOUTPUTONLY";
         }
 
         public void OnTestEvent(string report)

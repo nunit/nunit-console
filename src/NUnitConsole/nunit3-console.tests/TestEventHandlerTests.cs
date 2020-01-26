@@ -76,21 +76,18 @@ namespace NUnit.ConsoleRunner.Tests
         {
             // Start Events
             new TestCaseData("<start-test fullname='SomeName'/>", "Off", ""),
-            new TestCaseData("<start-test fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<start-test fullname='SomeName'/>", "All", "=> SomeName\r\n"),
+            new TestCaseData("<start-test fullname='SomeName'/>", "OnOutputOnly", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "Before", "=> SomeName\r\n"),
             new TestCaseData("<start-test fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-test fullname='SomeName'/>", "BeforeAndAfter", "=> SomeName\r\n"),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Off", ""),
-            new TestCaseData("<start-suite fullname='SomeName'/>", "On", ""),
-            new TestCaseData("<start-suite fullname='SomeName'/>", "All", ""),
+            new TestCaseData("<start-suite fullname='SomeName'/>", "OnOutputOnly", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "Before", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "After", ""),
             new TestCaseData("<start-suite fullname='SomeName'/>", "BeforeAndAfter", ""),
             // Finish Events - No Output
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Off", ""),
-            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "On", ""),
-            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "All", ""),
+            new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "OnOutputOnly", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "Before", ""),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "After", "Passed => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Passed'/>", "BeforeAndAfter", "Passed => SomeName\r\n"),
@@ -111,8 +108,7 @@ namespace NUnit.ConsoleRunner.Tests
             new TestCaseData("<test-case fullname='SomeName' result='Skipped' label='Ignored'/>", "After", "Ignored => SomeName\r\n"),
             new TestCaseData("<test-case fullname='SomeName' result='Skipped' label='Ignored'/>", "BeforeAndAfter", "Ignored => SomeName\r\n"),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Off", ""),
-            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "On", ""),
-            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "All", ""),
+            new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "OnOutputOnly", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "Before", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "After", ""),
             new TestCaseData("<test-suite fullname='SomeName' result='Passed'/>", "BeforeAndAfter", ""),
@@ -123,11 +119,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
-                "On",
-                "=> SomeName\r\nOUTPUT"),
-            new TestCaseData(
-                "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
-                "All",
+                "OnOutputOnly",
                 "=> SomeName\r\nOUTPUT"),
             new TestCaseData(
                 "<test-case fullname='SomeName' result='Passed'><output>OUTPUT</output></test-case>",
@@ -207,11 +199,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT"),
             new TestCaseData(
                 "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
-                "On",
-                "=> SomeName\r\nOUTPUT"),
-            new TestCaseData(
-                "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
-                "All",
+                "OnOutputOnly",
                 "=> SomeName\r\nOUTPUT"),
             new TestCaseData(
                 "<test-suite fullname='SomeName' result='Passed'><output>OUTPUT</output></test-suite>",
@@ -232,11 +220,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT"),
             new TestCaseData(
                 "<test-output testname='SomeName'>OUTPUT</test-output>",
-                "On",
-                "=> SomeName\r\nOUTPUT"),
-            new TestCaseData(
-                "<test-output testname='SomeName'>OUTPUT</test-output>",
-                "All",
+                "OnOutputOnly",
                 "=> SomeName\r\nOUTPUT"),
             new TestCaseData(
                 "<test-output testname='SomeName'>OUTPUT</test-output>",
@@ -308,11 +292,7 @@ namespace NUnit.ConsoleRunner.Tests
                 "OUTPUT"),
             new TestCaseData(
                 SingleTest_StartAndFinish,
-                "On",
-                "=> TestName\r\nOUTPUT"),
-            new TestCaseData(
-                SingleTest_StartAndFinish,
-                "All",
+                "OnOutputOnly",
                 "=> TestName\r\nOUTPUT"),
             new TestCaseData(
                 SingleTest_StartAndFinish,
@@ -335,15 +315,7 @@ from
 TEST1"),
             new TestCaseData(
                 SingleTest_ImmediateOutput,
-                "On",
-@"=> TEST1
-Immediate output from TEST1
-Output
-from
-TEST1"),
-            new TestCaseData(
-                SingleTest_ImmediateOutput,
-                "All",
+                "OnOutputOnly",
 @"=> TEST1
 Immediate output from TEST1
 Output
@@ -384,13 +356,7 @@ Passed => TEST1
 Output from Suite TEST1"),
             new TestCaseData(
                 SingleTest_SuiteFinish,
-                "On",
-@"=> TEST1
-Immediate output from TEST1
-Output from Suite TEST1"),
-            new TestCaseData(
-                SingleTest_SuiteFinish,
-                "All",
+                "OnOutputOnly",
 @"=> TEST1
 Immediate output from TEST1
 Output from Suite TEST1"),
@@ -419,14 +385,7 @@ Output from Suite TEST1"),
 Output from second test"),
             new TestCaseData(
                 TwoTests_SequentialExecution,
-                "On",
-@"=> TEST1
-Output from first test
-=> TEST2
-Output from second test"),
-            new TestCaseData(
-                TwoTests_SequentialExecution,
-                "All",
+                "OnOutputOnly",
 @"=> TEST1
 Output from first test
 => TEST2
@@ -467,23 +426,9 @@ Output from first test
 Output from second test"),
             new TestCaseData(
                 TwoTests_InterleavedExecution,
-                "On",
+                "OnOutputOnly",
 @"=> TEST1
 Immediate output from first testAnother immediate output from first test
-=> TEST2
-Immediate output from second test
-=> TEST1
-Output from first test
-=> TEST2
-Output from second test"),
-            new TestCaseData(
-                TwoTests_InterleavedExecution,
-                "All",
-@"=> TEST1
-Immediate output from first test
-=> TEST2
-=> TEST1
-Another immediate output from first test
 => TEST2
 Immediate output from second test
 => TEST1
@@ -544,17 +489,7 @@ Output from second test
 Output from first test"),
             new TestCaseData(
                 TwoTests_NestedExecution,
-                "On",
-@"=> TEST1
-Immediate output from first test
-=> TEST2
-Immediate output from second test
-Output from second test
-=> TEST1
-Output from first test"),
-            new TestCaseData(
-                TwoTests_NestedExecution,
-                "All",
+                "OnOutputOnly",
 @"=> TEST1
 Immediate output from first test
 => TEST2
