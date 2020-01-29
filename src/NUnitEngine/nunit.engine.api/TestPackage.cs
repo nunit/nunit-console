@@ -158,6 +158,8 @@ namespace NUnit.Engine
         /// <returns></returns>
         public T GetSetting<T>(string name, T defaultSetting)
         {
+            if (SubPackages != null && SubPackages.Count == 1 && SubPackages[0].Settings != null)
+                return SubPackages[0].GetSetting<T>(name, defaultSetting);
             return Settings.ContainsKey(name)
                 ? (T)Settings[name]
                 : defaultSetting;
