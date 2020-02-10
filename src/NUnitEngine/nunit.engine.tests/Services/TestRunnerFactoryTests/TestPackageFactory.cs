@@ -84,7 +84,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             return new TestPackage(new[] { UnknownExtension, UnknownExtension });
         }
 
-        public static TestPackage OneAssemblyOneProjectOneUnknown()
+        public static TestPackage OneUnknownOneAssemblyOneProject()
         {
             return new TestPackage(new[] { UnknownExtension, FakeAssembly, FakeProject });
         }

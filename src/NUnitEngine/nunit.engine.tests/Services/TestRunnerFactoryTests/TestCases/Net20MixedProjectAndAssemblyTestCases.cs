@@ -39,7 +39,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
                         package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
 
-                        expected = Net20ThreeItemExpectedRunnerResults.ResultFor(processModel,
+                        expected = Net20TwoProjectsOneAssemblyExpectedRunnerResults.ResultFor(processModel,
                             domainUsage);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
@@ -51,18 +51,18 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
                         package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
 
-                        expected = Net20ThreeItemExpectedRunnerResults.ResultFor(processModel, domainUsage);
+                        expected = Net20TwoAssembliesOneProjectExpectedRunnerResults.ResultFor(processModel, domainUsage);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
-                        testName = "One assembly, one project, one unknown - " +
+                        testName = "One unknown, one assembly, one project - " +
                                    $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel} " +
                                    $"{nameof(EnginePackageSettings.DomainUsage)}:{domainUsage}";
 
-                        package = TestPackageFactory.OneAssemblyOneProjectOneUnknown();
+                        package = TestPackageFactory.OneUnknownOneAssemblyOneProject();
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
                         package.AddSetting(EnginePackageSettings.DomainUsage, domainUsage.ToString());
 
-                        expected = Net20ThreeItemExpectedRunnerResults.ResultFor(processModel, domainUsage);
+                        expected = Net20OneUnknownOneAssemblyOneProjectExpectedRunnerResults.ResultFor(processModel, domainUsage);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
                     }
                 }
