@@ -76,7 +76,18 @@ namespace NUnit.Engine.Services
             {
                 default:
                 case ProcessModel.Default:
-                    if (package.SubPackages.Count > 1)
+                    bool isNested = false;
+                    foreach (TestPackage subPackage in package.SubPackages)
+                    {
+                        if (subPackage.SubPackages.Count > 0)
+                        {
+                            isNested = true;
+                            break;
+                        }
+                    }
+                    if (isNested)
+                        return new AggregatingTestRunner(this.ServiceContext, package);
+                    else if (package.SubPackages.Count > 1)
                         return new MultipleTestProcessRunner(this.ServiceContext, package);
                     else
                         return new ProcessRunner(this.ServiceContext, package);

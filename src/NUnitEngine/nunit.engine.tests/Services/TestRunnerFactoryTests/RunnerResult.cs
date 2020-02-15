@@ -31,10 +31,23 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
     public class RunnerResult
     {
 #if !NETCOREAPP
-        public static RunnerResult TestDomainRunner => new RunnerResult { TestRunner = typeof(TestDomainRunner) };
-        public static RunnerResult ProcessRunner => new RunnerResult { TestRunner = typeof(ProcessRunner) };
+        public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
+        public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
+        public static RunnerResult MultiRunnerWithTwoSubRunners => new RunnerResult(
+            typeof(MultipleTestProcessRunner),
+            ProcessRunner,
+            ProcessRunner);
 #endif
-        public static RunnerResult LocalTestRunner => new RunnerResult { TestRunner = typeof(LocalTestRunner) };
+        public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
+
+        public RunnerResult()
+        { }
+
+        public RunnerResult(Type testRunner, params RunnerResult[] subRunners)
+        {
+            TestRunner = testRunner;
+            SubRunners = subRunners;
+        }
 
         public Type TestRunner { get; set; }
 

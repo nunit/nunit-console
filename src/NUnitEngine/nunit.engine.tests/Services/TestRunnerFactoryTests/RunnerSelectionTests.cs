@@ -75,7 +75,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 
         private static RunnerResult GetRunnerResult(ITestEngineRunner runner)
         {
-            var result = new RunnerResult { TestRunner = runner.GetType() };
+            var result = new RunnerResult(runner.GetType());
 
             if (runner is AggregatingTestRunner aggRunner)
                 result.SubRunners = aggRunner.Runners.Select(GetRunnerResult).ToList();

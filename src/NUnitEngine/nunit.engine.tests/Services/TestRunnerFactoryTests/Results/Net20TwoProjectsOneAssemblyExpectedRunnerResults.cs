@@ -28,7 +28,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
 {
 #if !NETCOREAPP
-    internal static class Net20TwoProjectExpectedRunnerResults
+    internal static class Net20TwoProjectsOneAssemblyExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
             $"No expected Test result provided for this {nameof(ProcessModel)}/{nameof(DomainUsage)} combination.";
@@ -64,6 +64,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         SubRunners = new[]
                         {
                             RunnerResult.ProcessRunner,
+                            RunnerResult.ProcessRunner,
                             RunnerResult.ProcessRunner
                         }
                     };
@@ -97,6 +98,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         SubRunners = new[]
                         {
                             RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner
                         }
                     };
@@ -110,6 +112,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         TestRunner = typeof(MultipleTestDomainRunner),
                         SubRunners = new[]
                         {
+                            RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner
                         }
@@ -129,7 +132,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                 case DomainUsage.Multiple:
                     return new RunnerResult(typeof(AggregatingTestRunner),
                         RunnerResult.MultiRunnerWithTwoSubRunners,
-                        RunnerResult.MultiRunnerWithTwoSubRunners);
+                        RunnerResult.MultiRunnerWithTwoSubRunners,
+                        RunnerResult.ProcessRunner);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
             }

@@ -28,7 +28,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
 {
 #if !NETCOREAPP
-    internal static class Net20ThreeItemExpectedRunnerResults
+    internal static class Net20OneUnknownOneAssemblyOneProjectExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
             $"No expected Test result provided for this {nameof(ProcessModel)}/{nameof(DomainUsage)} combination.";
@@ -130,16 +130,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                 case DomainUsage.None:
                 case DomainUsage.Single:
                 case DomainUsage.Multiple:
-                    return new RunnerResult
-                    {
-                        TestRunner = typeof(MultipleTestProcessRunner),
-                        SubRunners = new[]
-                        {
-                            RunnerResult.ProcessRunner,
-                            RunnerResult.ProcessRunner,
-                            RunnerResult.ProcessRunner
-                        }
-                    };
+                    return new RunnerResult(typeof(AggregatingTestRunner),
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.MultiRunnerWithTwoSubRunners);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
             }
