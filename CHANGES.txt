@@ -1,4 +1,12 @@
-﻿NUnit Console 3.11 - January 26, 2020
+NUnit Console & Engine 3.11.1 - February 15, 2020
+This hotfix fixes a problem with NUnit Project file settings being ignored.
+
+Issues Resolved
+
+ * 730 NUnit project file settings are ignored
+ * 732 Upgrade Cake Build to fix Linux CI
+ 
+NUnit Console 3.11 - January 26, 2020
 
 This release fixes a range of minor bugs, and includes a significant amount 
 of internal restructuring work. In future, this will enable improved .NET Standard 
