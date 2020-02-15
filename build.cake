@@ -9,7 +9,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.12.0");
+var productVersion = Argument("productVersion", "3.11.1");
 
 var ErrorDetail = new List<string>();
 bool IsDotNetCoreInstalled = false;
