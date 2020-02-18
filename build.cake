@@ -373,7 +373,15 @@ Task("CreateImage")
     {
         CleanDirectory(CURRENT_IMG_DIR);
         CopyFiles(RootFiles, CURRENT_IMG_DIR);
-        CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
+        // Temporary fix to keep packages stable until we settle on a new structure
+        //CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
+        CopyDirectory(BIN_DIR + "net20", CURRENT_IMG_DIR + "bin/net20/");
+        CopyDirectory(BIN_DIR + "net35", CURRENT_IMG_DIR + "bin/net35/");
+        CopyDirectory(BIN_DIR + "netstandard1.6", CURRENT_IMG_DIR + "bin/netstandard1.6/");
+        CopyDirectory(BIN_DIR + "netstandard2.0", CURRENT_IMG_DIR + "bin/netstandard2.0/");
+        CopyDirectory(BIN_DIR + "netcoreapp1.1", CURRENT_IMG_DIR + "bin/netcoreapp1.1/");
+        CopyDirectory(BIN_DIR + "netcoreapp2.1", CURRENT_IMG_DIR + "bin/netcoreapp2.1/");
+        CopyFiles(BIN_DIR + "agents/net20/nunit-agent*", CURRENT_IMG_DIR + "bin/net20/");
     });
 
 Task("PackageNuGet")

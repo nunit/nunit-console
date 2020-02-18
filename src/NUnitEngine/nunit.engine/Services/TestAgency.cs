@@ -134,7 +134,7 @@ namespace NUnit.Engine.Services
                     string.Format("The {0} framework is not available", targetRuntime),
                     "framework");
 
-            string agentExePath = GetTestAgentExePath(useX86Agent);
+            string agentExePath = GetTestAgentExePath(targetRuntime, useX86Agent);
 
             if (!File.Exists(agentExePath))
                 throw new FileNotFoundException(
@@ -162,12 +162,6 @@ namespace NUnit.Engine.Services
 
                 case RuntimeType.Net:
                     p.StartInfo.FileName = agentExePath;
-                    // Override the COMPLUS_Version env variable, this would cause CLR meta host to run a CLR of the specific version
-                    string envVar = "v" + targetRuntime.ClrVersion.ToString(3);
-                    p.StartInfo.EnvironmentVariables["COMPLUS_Version"] = envVar;
-                    // Leave a marker that we have changed this variable, so that the agent could restore it for any code or child processes running within the agent
-                    string cpvOriginal = Environment.GetEnvironmentVariable("COMPLUS_Version");
-                    p.StartInfo.EnvironmentVariables["TestAgency_COMPLUS_Version_Original"] = string.IsNullOrEmpty(cpvOriginal) ? "NULL" : cpvOriginal;
                     p.StartInfo.Arguments = arglist;
                     p.StartInfo.LoadUserProfile = loadUserProfile;
                     break;
@@ -211,16 +205,19 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        private static string GetTestAgentExePath(bool requires32Bit)
+        private static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
         {
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
+
+            string agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
+            string runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
 
             string agentName = requires32Bit
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 
-            return Path.Combine(engineDir, agentName);
+            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName);
         }
 
         private void OnAgentExit(Process process, Guid agentId)
