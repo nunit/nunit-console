@@ -135,12 +135,10 @@ namespace NUnit.Engine.Services
                     "framework");
 
             string agentExePath = GetTestAgentExePath(targetRuntime, useX86Agent);
+            log.Debug("Using nunit-agent at " + agentExePath);
 
             if (!File.Exists(agentExePath))
-                throw new FileNotFoundException(
-                    $"{Path.GetFileName(agentExePath)} could not be found.", agentExePath);
-
-            log.Debug("Using nunit-agent at " + agentExePath);
+                throw new FileNotFoundException($"Agent {agentExePath} could not be found.");
 
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
@@ -210,7 +208,15 @@ namespace NUnit.Engine.Services
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
 
-            string agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
+            string agentsDir = Path.Combine(engineDir, "agents");
+            log.Debug($"Checking for agents at {agentsDir}");
+
+            if (!Directory.Exists(agentsDir))
+            {
+                agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
+                log.Debug($"Directory not found! Using {agentsDir}");
+            }
+
             string runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
 
             string agentName = requires32Bit

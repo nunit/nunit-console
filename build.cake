@@ -41,6 +41,7 @@ var IMAGE_DIR = PROJECT_DIR + "images/";
 var MSI_DIR = PROJECT_DIR + "msi/";
 var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
 var CURRENT_IMG_NET20_BIN_DIR = CURRENT_IMG_DIR + "bin/net20/";
+var CURRENT_IMG_AGENTS_BIN_DIR = CURRENT_IMG_DIR + "bin/agents";
 var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
@@ -373,15 +374,7 @@ Task("CreateImage")
     {
         CleanDirectory(CURRENT_IMG_DIR);
         CopyFiles(RootFiles, CURRENT_IMG_DIR);
-        // Temporary fix to keep packages stable until we settle on a new structure
-        //CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
-        CopyDirectory(BIN_DIR + "net20", CURRENT_IMG_DIR + "bin/net20/");
-        CopyDirectory(BIN_DIR + "net35", CURRENT_IMG_DIR + "bin/net35/");
-        CopyDirectory(BIN_DIR + "netstandard1.6", CURRENT_IMG_DIR + "bin/netstandard1.6/");
-        CopyDirectory(BIN_DIR + "netstandard2.0", CURRENT_IMG_DIR + "bin/netstandard2.0/");
-        CopyDirectory(BIN_DIR + "netcoreapp1.1", CURRENT_IMG_DIR + "bin/netcoreapp1.1/");
-        CopyDirectory(BIN_DIR + "netcoreapp2.1", CURRENT_IMG_DIR + "bin/netcoreapp2.1/");
-        CopyFiles(BIN_DIR + "agents/net20/nunit-agent*", CURRENT_IMG_DIR + "bin/net20/");
+        CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
     });
 
 Task("PackageNuGet")
@@ -457,12 +450,26 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent.exe.config", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent-x86.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit-agent-x86.exe.config", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent.exe", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent.exe.config", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent-x86.exe", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent-x86.exe.config", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.api.dll", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.api.xml", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.core.dll", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/Mono.Cecil.dll", Target="tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent.exe", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent.exe.config", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent-x86.exe", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent-x86.exe.config", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.api.dll", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.api.xml", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.core.dll", Target="tools/agents/net40" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/Mono.Cecil.dll", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe.config", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.dll", Target="tools" },

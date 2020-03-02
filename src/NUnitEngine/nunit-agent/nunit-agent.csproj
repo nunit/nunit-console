@@ -8,10 +8,7 @@
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
     <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
-    <Reference Include="System.Runtime.Remoting" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net40'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
     <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
   <ItemGroup>
