@@ -75,14 +75,16 @@ private bool CheckChocolateyPackage(string packageId, params ICheck[] checks)
     return CheckPackage($"{PACKAGE_DIR}{packageId}.{productVersion}.nupkg", checks);
 }
 
+// NOTE: Zip and msi packages currently use "version" rather than "productVersion"
+
 private bool CheckZipPackage(string packageName, params ICheck[] checks)
 {
-    return CheckPackage($"{PACKAGE_DIR}{packageName}-{productVersion}.zip", checks);
+    return CheckPackage($"{PACKAGE_DIR}{packageName}-{version}.zip", checks);
 }
 
 private bool CheckMsiPackage(string packageName, params ICheck[] checks)
 {
-    return CheckPackage($"{PACKAGE_DIR}{packageName}-{productVersion}.msi", checks);
+    return CheckPackage($"{PACKAGE_DIR}{packageName}-{version}.msi", checks);
 }
 
 private bool CheckPackage(string path, params ICheck[] checks)
