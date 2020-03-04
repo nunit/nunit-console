@@ -1,4 +1,5 @@
 #load ci.cake
+#load package-checks.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
@@ -618,6 +619,13 @@ Task("SignPackages")
         }
     });
 
+Task("CheckPackages")
+    .Description("Check content of NuGet packages")
+    .Does(() =>
+    {
+        CheckAllPackages();
+    });
+
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
@@ -751,7 +759,8 @@ Task("Package")
     .IsDependentOn("PackageNuGet")
     .IsDependentOn("PackageChocolatey")
     .IsDependentOn("PackageMsi")
-    .IsDependentOn("PackageZip");
+    .IsDependentOn("PackageZip")
+    .IsDependentOn("CheckPackages");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

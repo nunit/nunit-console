@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		NOTICES.txt = NOTICES.txt
 		NuGet.config = NuGet.config
 		nunit.ico = nunit.ico
+		package-checks.cake = package-checks.cake
 		README.md = README.md
 	EndProjectSection
 EndProject
