@@ -90,8 +90,19 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: macOS-10.14
+    vmImage: macOS-latest
   steps:
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core SDK'
+    inputs:
+      useGlobalJson: true
+      
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core runtime 2.1'
+    inputs:
+      packageType: runtime
+      version: 2.1.x
 
   - bash: ./build.sh --target=Test --configuration=Release
     displayName: Build and test
