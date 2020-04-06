@@ -95,8 +95,6 @@ jobs:
 
   - task: UseDotNet@2
     displayName: 'Install .NET Core SDK'
-    inputs:
-      useGlobalJson: true
       
   - task: UseDotNet@2
     displayName: 'Install .NET Core runtime 2.1'
