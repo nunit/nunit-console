@@ -90,7 +90,7 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: macOS-10.15
+    vmImage: macOS-10.14
   steps:
 
   - bash: ./build.sh --target=Test --configuration=Release
