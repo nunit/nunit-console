@@ -9,7 +9,7 @@
     <license type="file">LICENSE.txt</license>
     <projectUrl>https://nunit.org</projectUrl>
     <repository type="git" url="https://github.com/nunit/nunit-console"/>
-    <icon>images\icon_256.png</icon>
+    <icon>images\nunit_256.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine Api is used by runners to interface with the NUnit Engine in order to discover and execute tests.</summary>
     <description>This package includes the nunit.engine.api, which is normally the only assembly referenced by runners as well as by engine extensions. It is not intended for direct use by users who simply want to run tests using NUnit.</description>
@@ -34,6 +34,6 @@
     <file src="bin/net20/nunit.engine.api.dll" target="lib/net20" />
     <file src="bin/netstandard1.6/nunit.engine.api.dll" target="lib/netstandard1.6" />
     <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netstandard2.0" />
-    <file src="icon_256.png" target="images\" />
+    <file src="..\..\nunit_256.png" target="images" />
   </files>
 </package>
