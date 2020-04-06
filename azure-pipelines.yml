@@ -102,7 +102,9 @@ jobs:
       packageType: runtime
       version: 2.1.x
 
-  - bash: ./build.sh --target=Test --configuration=Release
+  - bash: |
+     dotnet tool install --global Cake.Tool
+     dotnet cake --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
