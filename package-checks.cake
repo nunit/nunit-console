@@ -21,16 +21,19 @@ public void CheckAllPackages()
         CheckNuGetPackage(
             "NUnit.ConsoleRunner",
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-            HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES),
-            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES),
-            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES)) &
+            HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
+            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckNuGetPackage("NUnit.Engine",
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard1.6").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
-            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES),
-            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES)) &
+            HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/lib/netstandard1.6").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
+            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckNuGetPackage(
             "NUnit.Engine.Api",
             HasFile("LICENSE.txt"),
@@ -42,9 +45,9 @@ public void CheckAllPackages()
             HasFile("LICENSE.txt")) &
         CheckChocolateyPackage(
             "nunit-console-runner",
-            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES),
-            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES),
-            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES)) &
+            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
+            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckChocolateyPackage(
             "nunit-console-with-extensions",
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt")) &
@@ -59,7 +62,12 @@ public void CheckAllPackages()
             HasDirectory("bin/netcoreapp1.1").WithFiles(ENGINE_FILES),
             HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES),
             HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES)) &
-        CheckMsiPackage("NUnit.Console", HasDirectory("NUnit.org/nunit-console")); // Placeholder for later implementation
+        CheckMsiPackage("NUnit.Console", 
+            HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
+            HasDirectory("NUnit.org/nunit-console").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
+            HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
+            HasDirectory("NUnit.org/nunit-console/agents/net40").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
+            HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll"));
 
     if (!isOK)
         throw new Exception("One or more package checks failed. See listing.");
@@ -87,47 +95,86 @@ private bool CheckMsiPackage(string packageName, params ICheck[] checks)
     return CheckPackage($"{PACKAGE_DIR}{packageName}-{version}.msi", checks);
 }
 
-private bool CheckPackage(string path, params ICheck[] checks)
+private bool CheckPackage(string package, params ICheck[] checks)
 {
-    Console.WriteLine("\nPackage Name: " + System.IO.Path.GetFileName(path));
+    Console.WriteLine("\nPackage Name: " + System.IO.Path.GetFileName(package));
 
-    if (!FileExists(path))
+    if (!FileExists(package))
     {
         WriteError("Package was not found!");
         return false;
     }
 
+    if (checks.Length == 0)
+    {
+        WriteWarning("Package found but no checks were specified.");
+        return true;
+    }
+
+    bool isMsi = package.EndsWith(".msi"); 
+    string tempDir = isMsi
+        ? InstallMsiToTempDir(package)
+        : UnzipToTempDir(package);
+
+    if (!System.IO.Directory.Exists(tempDir))
+    {
+        WriteError("Temporary directory was not created!");
+        return false;
+    }
+
+    try
+    {
+        bool allPassed = ApplyChecks(tempDir, checks);
+        if (allPassed)
+            WriteInfo("All checks passed!");
+
+        return allPassed;
+    }
+    finally
+    {
+        DeleteDirectory(tempDir, new DeleteDirectorySettings()
+        {
+            Recursive = true,
+            Force = true
+        });
+    }
+}
+
+private string InstallMsiToTempDir(string package)
+{
+    // Msiexec does not tolerate forward slashes!
+    package = package.Replace("/", "\\");
+    var tempDir = GetTempDirectoryPath();
+    
+    WriteInfo("Installing to " + tempDir);
+    int rc = StartProcess("msiexec", $"/a {package} TARGETDIR={tempDir} /q");
+    if (rc != 0)
+        WriteError($"Installer returned {rc.ToString()}");
+
+    return tempDir;
+}
+
+private string UnzipToTempDir(string package)
+{
+    var tempDir = GetTempDirectoryPath();
+ 
+    WriteInfo("Unzipping to " + tempDir);
+    Unzip(package, tempDir);
+
+    return tempDir;
+}
+
+private string GetTempDirectoryPath()
+{
+   return System.IO.Path.GetTempPath() + System.IO.Path.GetRandomFileName() + "\\";
+}
+
+private bool ApplyChecks(string dir, ICheck[] checks)
+{
     bool allOK = true;
 
-    // TODO: Figure out how to check content of msi
-    if (checks.Length == 0 || path.EndsWith(".msi"))
-    {
-        WriteWarning("Package found but not checked.");
-    }
-    else
-    {
-        var tempDir = System.IO.Path.GetTempPath() + System.IO.Path.GetRandomFileName() + "/";
-
-        try
-        {
-            WriteInfo("Unzipping to " + tempDir);
-            Unzip(path, tempDir);
-
-            foreach (var check in checks)
-                allOK &= check.Apply(tempDir);
-        }
-        finally
-        {
-            DeleteDirectory(tempDir, new DeleteDirectorySettings()
-            {
-                Recursive = true,
-                Force = true
-            });
-        }
-
-        if (allOK)
-            WriteInfo("All checks passed!");
-    }
+    foreach (var check in checks)
+        allOK &= check.Apply(dir);
 
     return allOK;
 }
@@ -188,6 +235,11 @@ private class DirectoryCheck : ICheck
     {
         _files.Add(file);
         return this;
+    }
+
+    public DirectoryCheck AndFile(string file)
+    {
+        return AndFiles(file);
     }
 
     public bool Apply(string dir)

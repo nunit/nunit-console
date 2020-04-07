@@ -64,6 +64,9 @@
                 <File Id="nunit_agent_net20_x86.exe.config"
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe.config" />
             </Component>
+            <Component Id="NUNIT_AGENT_ADDINS_NET20" Location="local" Guid="">
+                <File Id="nunit.agent.net20.addins" Source="$(var.InstallImage)nunit.agent.addins" />
+            </Component>
         </ComponentGroup>
         <ComponentGroup Id="NET40_AGENT" Directory="NET40_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NET40" Location="local" Guid="B35CC9EE-69FA-4CBB-A6A5-DA102FEBC485">
@@ -80,11 +83,9 @@
                 <File Id="nunit_agent_net40_x86.exe.config"
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe.config" />
             </Component>
-            <!--<Component Id="NUNIT_AGENT_NET40_DEPENDENCIES" Location="local" Guid="CCAE29F5-4767-4A63-BB55-28C99B28E4DC">
-                <CopyFile Id="nunit.agent.net40.engine.api.dll" FileId="nunit.engine.api.dll" />
-                <CopyFile Id="nunit.agent.net40.engine.core.dll" FileId="nunit.engine.core.dll" />
-                <CopyFile Id="nunit.agent.net40.Mono.Cecil.dll" FileId="Mono.Cecil.dll" />
-            </Component>-->
+            <Component Id="NUNIT_AGENT_ADDINS_NET40" Location="local" Guid="">
+                <File Id="nunit.agent.net40.addins" Source="$(var.InstallImage)nunit.agent.addins" />
+            </Component>
         </ComponentGroup>
     </Fragment>
 </Include>

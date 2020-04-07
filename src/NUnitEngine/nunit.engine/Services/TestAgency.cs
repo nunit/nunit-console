@@ -147,8 +147,6 @@ namespace NUnit.Engine.Services
             p.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
 
-            targetRuntime = ServiceContext.GetService<RuntimeFrameworkService>().GetBestAvailableFramework(targetRuntime);
-
             switch( targetRuntime.Runtime )
             {
                 case RuntimeType.Mono:
@@ -208,11 +206,16 @@ namespace NUnit.Engine.Services
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
 
+            // If running out of a package "agents" is a subdirectory
             string agentsDir = Path.Combine(engineDir, "agents");
             log.Debug($"Checking for agents at {agentsDir}");
 
             if (!Directory.Exists(agentsDir))
             {
+                // When developing and running in the output directory, "agents" is a 
+                // sibling directory the one holding the agent (e.g. net20). This is a
+                // bit of a kluge, but it's necessary unless we change the binary 
+                // output directory to match the distribution structure.
                 agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
                 log.Debug($"Directory not found! Using {agentsDir}");
             }

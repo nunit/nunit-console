@@ -42,7 +42,6 @@ var IMAGE_DIR = PROJECT_DIR + "images/";
 var MSI_DIR = PROJECT_DIR + "msi/";
 var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
 var CURRENT_IMG_NET20_BIN_DIR = CURRENT_IMG_DIR + "bin/net20/";
-var CURRENT_IMG_AGENTS_BIN_DIR = CURRENT_IMG_DIR + "bin/agents";
 var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
@@ -451,6 +450,8 @@ Task("PackageChocolatey")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/net20" },
+                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent.exe", Target="tools/agents/net20" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent.exe.config", Target="tools/agents/net20" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/net20" },
