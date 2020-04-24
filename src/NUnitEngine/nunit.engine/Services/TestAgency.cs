@@ -252,6 +252,9 @@ namespace NUnit.Engine.Services
                 case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
                     errorMsg = "Remote test agent unable to locate agency process.";
                     break;
+                case AgentExitCodes.STACK_OVERFLOW_EXCEPTION:
+                    errorMsg = "Remote test agent was terminated due to a StackOverFlow exception in one of the tests.";
+                    break;
                 default:
                     errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
                     break;
