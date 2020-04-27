@@ -54,7 +54,7 @@ namespace NUnit.Engine.Services.Tests
 
             IService service = _serviceManager.GetService(typeof(ISettings));
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
-            service = _serviceManager.GetService(typeof(IProjectService));
+            service = _serviceManager.GetService(typeof(IProjectLoadService));
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
         }
 

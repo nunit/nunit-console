@@ -61,7 +61,7 @@ namespace NUnit.Engine.Runners
         private readonly IRuntimeFrameworkService _runtimeService;
 #endif
 #endif
-        private readonly IProjectService _projectService;
+        private readonly IProjectLoadService _projectService;
         private ITestRunnerFactory _testRunnerFactory;
         private bool _disposed;
 
@@ -74,7 +74,7 @@ namespace NUnit.Engine.Runners
             TestPackage = package;
 
             // Get references to the services we use
-            _projectService = _services.GetService<IProjectService>();
+            _projectService = _services.GetService<IProjectLoadService>();
             _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0

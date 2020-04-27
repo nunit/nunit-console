@@ -32,9 +32,24 @@ namespace NUnit.Engine.Services
     /// <summary>
     /// Summary description for ProjectService.
     /// </summary>
-    public class ProjectService : Service, IProjectService
+    public class ProjectService : Service, IProjectService, IProjectLoadService
     {
         Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
+
+        public bool IsSupportedProject(string path)
+        {
+            return CanLoadFrom(path);
+        }
+
+        public string GetActiveConfig(string path)
+        {
+            return LoadFrom(path)?.ActiveConfigName;
+        }
+
+        public IList<string> GetConfigNames(string path)
+        {
+            return LoadFrom(path)?.ConfigNames;
+        }
 
         public bool CanLoadFrom(string path)
         {

@@ -30,7 +30,7 @@ namespace NUnit.Engine.Services
     /// It knows how to load projects in a specific format and can expand
     /// TestPackages based on projects.
     /// </summary>
-    public interface IProjectService
+    public interface IProjectLoadService
     {
         /// <summary>
         /// Returns true if the file indicated is one that this
