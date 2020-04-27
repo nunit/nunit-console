@@ -38,6 +38,11 @@ namespace NUnit
         public const string ActiveConfig = "ActiveConfig";
 
         /// <summary>
+        /// A list of the avaialble config names for this project.
+        /// </summary>
+        public const string ConfigNames = "ConfigNames";
+
+        /// <summary>
         /// Bool indicating whether the engine should determine the private
         /// bin path by examining the paths to all the tests. Defaults to
         /// true unless PrivateBinPath is specified.

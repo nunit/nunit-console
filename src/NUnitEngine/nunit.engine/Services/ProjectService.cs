@@ -68,8 +68,17 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path);
             Guard.ArgumentValid(project != null, "Unable to load project " + path, "package");
 
-            string configName = package.GetSetting(EnginePackageSettings.ActiveConfig, (string)null); // Need RunnerSetting
-            TestPackage tempPackage = project.GetTestPackage(configName);
+            string activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string)null);
+            if (activeConfig == null)
+                activeConfig = project.ActiveConfigName;
+            else
+                Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", "package");
+
+            TestPackage tempPackage = project.GetTestPackage(activeConfig);
+
+            // Add info about the configurations to the project package
+            tempPackage.Settings[EnginePackageSettings.ActiveConfig] = activeConfig;
+            tempPackage.Settings[EnginePackageSettings.ConfigNames] = project.ConfigNames;
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
@@ -80,7 +89,7 @@ namespace NUnit.Engine.Services
             foreach (var subPackage in tempPackage.SubPackages)
                 package.AddSubPackage(subPackage);
 
-            // If no config is specified (by user or by the project loader) check
+            // If no config file is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use its own config, if present.
             if (!package.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
