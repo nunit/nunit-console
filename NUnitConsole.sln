@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		NOTICES.txt = NOTICES.txt
 		NuGet.config = NuGet.config
 		nunit.ico = nunit.ico
+		package-checks.cake = package-checks.cake
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -56,15 +57,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-x86", "src\NUni
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219A8-2995-4884-806F-FDB9CD25D403}"
 	ProjectSection(SolutionItems) = preProject
+		nuget\engine\nunit.agent.addins = nuget\engine\nunit.agent.addins
 		nuget\engine\nunit.engine.api.nuspec = nuget\engine\nunit.engine.api.nuspec
+		nuget\engine\nunit.engine.nuget.addins = nuget\engine\nunit.engine.nuget.addins
 		nuget\engine\nunit.engine.nuspec = nuget\engine\nunit.engine.nuspec
-		nuget\engine\nunit.nuget.addins = nuget\engine\nunit.nuget.addins
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E}"
 	ProjectSection(SolutionItems) = preProject
+		nuget\runners\nunit.agent.addins = nuget\runners\nunit.agent.addins
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
 		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
+		nuget\runners\nunit.console.nuget.addins = nuget\runners\nunit.console.nuget.addins
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\NUnitEngine\mock-assembly\mock-assembly.csproj", "{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}"
@@ -77,6 +81,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA
 		choco\nunit-agent.exe.ignore = choco\nunit-agent.exe.ignore
 		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
 		choco\nunit-console-with-extensions.nuspec = choco\nunit-console-with-extensions.nuspec
+		choco\nunit.agent.addins = choco\nunit.agent.addins
+		choco\nunit.choco.addins = choco\nunit.choco.addins
+		choco\VERIFICATION.txt = choco\VERIFICATION.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", "{9A7C8370-ED1F-486F-A8F5-C5BF4221464E}"

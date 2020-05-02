@@ -134,13 +134,11 @@ namespace NUnit.Engine.Services
                     string.Format("The {0} framework is not available", targetRuntime),
                     "framework");
 
-            string agentExePath = GetTestAgentExePath(useX86Agent);
+            string agentExePath = GetTestAgentExePath(targetRuntime, useX86Agent);
+            log.Debug("Using nunit-agent at " + agentExePath);
 
             if (!File.Exists(agentExePath))
-                throw new FileNotFoundException(
-                    $"{Path.GetFileName(agentExePath)} could not be found.", agentExePath);
-
-            log.Debug("Using nunit-agent at " + agentExePath);
+                throw new FileNotFoundException($"Agent {agentExePath} could not be found.");
 
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
@@ -148,8 +146,6 @@ namespace NUnit.Engine.Services
             p.EnableRaisingEvents = true;
             p.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
             string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
-
-            targetRuntime = ServiceContext.GetService<RuntimeFrameworkService>().GetBestAvailableFramework(targetRuntime);
 
             switch( targetRuntime.Runtime )
             {
@@ -162,12 +158,6 @@ namespace NUnit.Engine.Services
 
                 case RuntimeType.Net:
                     p.StartInfo.FileName = agentExePath;
-                    // Override the COMPLUS_Version env variable, this would cause CLR meta host to run a CLR of the specific version
-                    string envVar = "v" + targetRuntime.ClrVersion.ToString(3);
-                    p.StartInfo.EnvironmentVariables["COMPLUS_Version"] = envVar;
-                    // Leave a marker that we have changed this variable, so that the agent could restore it for any code or child processes running within the agent
-                    string cpvOriginal = Environment.GetEnvironmentVariable("COMPLUS_Version");
-                    p.StartInfo.EnvironmentVariables["TestAgency_COMPLUS_Version_Original"] = string.IsNullOrEmpty(cpvOriginal) ? "NULL" : cpvOriginal;
                     p.StartInfo.Arguments = arglist;
                     p.StartInfo.LoadUserProfile = loadUserProfile;
                     break;
@@ -211,16 +201,32 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        private static string GetTestAgentExePath(bool requires32Bit)
+        private static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
         {
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
+
+            // If running out of a package "agents" is a subdirectory
+            string agentsDir = Path.Combine(engineDir, "agents");
+            log.Debug($"Checking for agents at {agentsDir}");
+
+            if (!Directory.Exists(agentsDir))
+            {
+                // When developing and running in the output directory, "agents" is a 
+                // sibling directory the one holding the agent (e.g. net20). This is a
+                // bit of a kluge, but it's necessary unless we change the binary 
+                // output directory to match the distribution structure.
+                agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
+                log.Debug($"Directory not found! Using {agentsDir}");
+            }
+
+            string runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
 
             string agentName = requires32Bit
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
 
-            return Path.Combine(engineDir, agentName);
+            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName);
         }
 
         private void OnAgentExit(Process process, Guid agentId)

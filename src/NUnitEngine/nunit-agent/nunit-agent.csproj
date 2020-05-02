@@ -2,12 +2,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
-    <TargetFrameworks>net20</TargetFrameworks>
+    <TargetFrameworks>net20;net40</TargetFrameworks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
     <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
   <ItemGroup>
