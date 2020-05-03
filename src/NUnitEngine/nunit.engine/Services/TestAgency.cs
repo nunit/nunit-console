@@ -45,7 +45,7 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
-        private readonly AgentStore _agents = new AgentStore();
+        private readonly AgentStore _agentStore = new AgentStore();
 
         public TestAgency() : this( "TestAgency", 0 ) { }
 
@@ -77,7 +77,7 @@ namespace NUnit.Engine.Services
 
         public void Register(ITestAgent agent)
         {
-            _agents.Register(agent);
+            _agentStore.Register(agent);
         }
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
@@ -88,98 +88,22 @@ namespace NUnit.Engine.Services
 
         internal bool IsAgentProcessActive(Guid agentId, out Process process)
         {
-            return _agents.IsAgentProcessActive(agentId, out process);
-        }
-
-        private Process LaunchAgentProcess(TestPackage package, Guid agentId)
-        {
-            RuntimeFramework targetRuntime;
-            string runtimeSetting = package.GetSetting(EnginePackageSettings.RuntimeFramework, "");
-            if (runtimeSetting.Length > 0)
-            {
-                if (!RuntimeFramework.TryParse(runtimeSetting, out targetRuntime))
-                    throw new NUnitEngineException("Invalid or unknown framework requested: " + runtimeSetting);
-            }
-            else
-            {
-                targetRuntime = RuntimeFramework.CurrentFramework;
-            }
-
-            if (targetRuntime.Runtime == RuntimeType.Any)
-                targetRuntime = new RuntimeFramework(RuntimeFramework.CurrentFramework.Runtime, targetRuntime.ClrVersion);
-
-            bool useX86Agent = package.GetSetting(EnginePackageSettings.RunAsX86, false);
-            bool debugTests = package.GetSetting(EnginePackageSettings.DebugTests, false);
-            bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
-            string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
-            bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
-            string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
-
-            var agentArgs = new StringBuilder();
-
-            // Set options that need to be in effect before the package
-            // is loaded by using the command line.
-            agentArgs.Append("--pid=").Append(Process.GetCurrentProcess().Id);
-            if (traceLevel != "Off")
-                agentArgs.Append(" --trace:").EscapeProcessArgument(traceLevel);
-            if (debugAgent)
-                agentArgs.Append(" --debug-agent");
-            if (workDirectory != string.Empty)
-                agentArgs.Append(" --work=").EscapeProcessArgument(workDirectory);
-
-            log.Info("Getting {0} agent for use under {1}", useX86Agent ? "x86" : "standard", targetRuntime);
-
-            if (!targetRuntime.IsAvailable)
-                throw new ArgumentException(
-                    string.Format("The {0} framework is not available", targetRuntime),
-                    "framework");
-
-            string agentExePath = GetTestAgentExePath(targetRuntime, useX86Agent);
-            log.Debug("Using nunit-agent at " + agentExePath);
-
-            if (!File.Exists(agentExePath))
-                throw new FileNotFoundException($"Agent {agentExePath} could not be found.");
-
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
-            p.EnableRaisingEvents = true;
-            p.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
-            string arglist = agentId.ToString() + " " + ServerUrl + " " + agentArgs;
-
-            switch( targetRuntime.Runtime )
-            {
-                case RuntimeType.Mono:
-                    p.StartInfo.FileName = RuntimeFramework.MonoExePath;
-                    string monoOptions = "--runtime=v" + targetRuntime.ClrVersion.ToString(3);
-                    if (debugTests || debugAgent) monoOptions += " --debug";
-                    p.StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monoOptions, agentExePath, arglist);
-                    break;
-
-                case RuntimeType.Net:
-                    p.StartInfo.FileName = agentExePath;
-                    p.StartInfo.Arguments = arglist;
-                    p.StartInfo.LoadUserProfile = loadUserProfile;
-                    break;
-
-                default:
-                    p.StartInfo.FileName = agentExePath;
-                    p.StartInfo.Arguments = arglist;
-                    break;
-            }
-
-            p.Start();
-            log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", p.Id);
-            log.Debug("Command line: \"{0}\" {1}", p.StartInfo.FileName, p.StartInfo.Arguments);
-
-            _agents.Start(agentId, p);
-            return p;
+            return _agentStore.IsAgentProcessActive(agentId, out process);
         }
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
             var agentId = Guid.NewGuid();
-            var process = LaunchAgentProcess(package, agentId);
+            //var process = LaunchAgentProcess(package, agentId);
+            var process = new AgentProcess(this, package, agentId);
+
+            process.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
+
+            process.Start();
+            log.Debug("Launched Agent process {0} - see testcentric-agent_{0}.log", process.Id);
+            log.Debug("Command line: \"{0}\" {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
+
+            _agentStore.AddAgent(agentId, process);
 
             log.Debug($"Waiting for agent {agentId:B} to register");
 
@@ -191,7 +115,7 @@ namespace NUnit.Engine.Services
             {
                 Thread.Sleep(pollTime);
 
-                if (_agents.IsReady(agentId, out var agent))
+                if (_agentStore.IsReady(agentId, out var agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
                     return new RemoteTestAgentProxy(agent, agentId);
@@ -201,37 +125,9 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        private static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
-        {
-            string engineDir = NUnitConfiguration.EngineDirectory;
-            if (engineDir == null) return null;
-
-            // If running out of a package "agents" is a subdirectory
-            string agentsDir = Path.Combine(engineDir, "agents");
-            log.Debug($"Checking for agents at {agentsDir}");
-
-            if (!Directory.Exists(agentsDir))
-            {
-                // When developing and running in the output directory, "agents" is a 
-                // sibling directory the one holding the agent (e.g. net20). This is a
-                // bit of a kluge, but it's necessary unless we change the binary 
-                // output directory to match the distribution structure.
-                agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
-                log.Debug($"Directory not found! Using {agentsDir}");
-            }
-
-            string runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
-
-            string agentName = requires32Bit
-                ? "nunit-agent-x86.exe"
-                : "nunit-agent.exe";
-
-            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName);
-        }
-
         private void OnAgentExit(Process process, Guid agentId)
         {
-            _agents.MarkTerminated(agentId);
+            _agentStore.MarkTerminated(agentId);
 
             string errorMsg;
 
