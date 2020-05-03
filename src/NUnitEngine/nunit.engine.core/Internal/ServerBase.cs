@@ -54,7 +54,7 @@ namespace NUnit.Engine.Internal
         }
         
         // Currently virtual to allow NSubstitute to mock it. In fact, it will
-        // probably be virtual or abstract at some point, if we implemment
+        // probably be virtual or abstract at some point, if we implement
         // alternate transports for different runtime targets
         public virtual string ServerUrl
         {
