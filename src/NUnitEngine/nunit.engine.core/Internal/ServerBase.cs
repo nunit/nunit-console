@@ -52,8 +52,11 @@ namespace NUnit.Engine.Internal
             this.uri = uri;
             this.port = port;
         }
-
-        public string ServerUrl
+        
+        // Currently virtual to allow NSubstitute to mock it. In fact, it will
+        // probably be virtual or abstract at some point, if we implement
+        // alternate transports for different runtime targets
+        public virtual string ServerUrl
         {
             get { return string.Format("tcp://127.0.0.1:{0}/{1}", port, uri); }
         }
