@@ -48,6 +48,7 @@ namespace NUnit.Engine.Services
 
             StartInfo.UseShellExecute = false;
             StartInfo.CreateNoWindow = true;
+            StartInfo.WorkingDirectory = Environment.CurrentDirectory;
             EnableRaisingEvents = true;
 
             if (TargetRuntime.Runtime == RuntimeType.Mono)

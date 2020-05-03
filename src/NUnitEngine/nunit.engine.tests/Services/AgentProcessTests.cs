@@ -134,6 +134,12 @@ namespace NUnit.Engine.Services
             Assert.That(agentProcess.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS + " --work=WORKDIRECTORY"));
         }
 
+        [Test]
+        public void WorkingDirectory()
+        {
+            Assert.That(GetAgentProcess().StartInfo.WorkingDirectory, Is.EqualTo(Environment.CurrentDirectory));
+        }
+
         private AgentProcess GetAgentProcess()
         {
             return new AgentProcess(_agency, _package, AGENT_ID);
