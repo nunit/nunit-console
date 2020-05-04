@@ -349,7 +349,7 @@ namespace NUnit.Engine.Runners
 #if NETFRAMEWORK  // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
             var runningInProcess = processModel == "single" || processModel == "inprocess";
-            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
+            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
             var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             if (frameworkSetting.Length > 0)

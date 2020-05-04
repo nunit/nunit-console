@@ -27,7 +27,7 @@ namespace NUnit.Engine.Services
             _agency.ServerUrl.ReturnsForAnyArgs(REMOTING_URL);
             _package = new TestPackage("junk.dll");
             // Only required setting, some tests may change this
-            _package.Settings[EnginePackageSettings.RuntimeFramework] = "net-4.5";
+            _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = "net-4.5";
         }
 
         [TestCase("net-4.5", false, "../agents/net40/nunit-agent.exe")]
@@ -44,7 +44,7 @@ namespace NUnit.Engine.Services
         //[TestCase("netcore-1.1", true, "agents/netcoreapp1.1/testcentric-agent-x86.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)
         {
-            _package.Settings[EnginePackageSettings.RuntimeFramework] = runtime;
+            _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = runtime;
             _package.Settings[EnginePackageSettings.RunAsX86] = x86;
 
             var agentProcess = GetAgentProcess();
@@ -64,7 +64,7 @@ namespace NUnit.Engine.Services
         [TestCase("mono-2.0")]
         public void DefaultValues(string framework)
         {
-            _package.Settings[EnginePackageSettings.RuntimeFramework] = framework;
+            _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = framework;
             var process = GetAgentProcess();
 
             Assert.That(process.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS));

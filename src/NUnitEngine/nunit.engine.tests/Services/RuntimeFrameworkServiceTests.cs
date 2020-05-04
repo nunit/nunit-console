@@ -65,7 +65,7 @@ namespace NUnit.Engine.Services.Tests
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
 
-            Assert.That(package.GetSetting("RuntimeFramework", ""), Is.EqualTo(returnValue));
+            Assert.That(package.GetSetting("TargetRuntimeFramework", ""), Is.EqualTo(returnValue));
             Assert.That(package.GetSetting("RunAsX86", false), Is.EqualTo(runAsX86));
         }
 
@@ -87,10 +87,10 @@ namespace NUnit.Engine.Services.Tests
             var package = new TestPackage("test");
             package.AddSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, framework);
             package.AddSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(majorVersion, minorVersion));
-            package.AddSetting(EnginePackageSettings.RuntimeFramework, requested);
+            package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, requested);
 
             _runtimeService.SelectRuntimeFramework(package);
-            Assert.That(package.GetSetting<string>(EnginePackageSettings.RuntimeFramework, null), Is.EqualTo(requested));
+            Assert.That(package.GetSetting<string>(EnginePackageSettings.RequestedRuntimeFramework, null), Is.EqualTo(requested));
         }
 
         [Test]
@@ -111,9 +111,9 @@ namespace NUnit.Engine.Services.Tests
 
             Assert.Multiple(() =>
             {
-                Assert.That(net20Package.Settings[EnginePackageSettings.RuntimeFramework], Is.EqualTo("net-2.0"));
-                Assert.That(net40Package.Settings[EnginePackageSettings.RuntimeFramework], Is.EqualTo("net-4.0"));
-                Assert.That(topLevelPackage.Settings[EnginePackageSettings.RuntimeFramework], Is.EqualTo("net-4.0"));
+                Assert.That(net20Package.Settings[EnginePackageSettings.TargetRuntimeFramework], Is.EqualTo("net-2.0"));
+                Assert.That(net40Package.Settings[EnginePackageSettings.TargetRuntimeFramework], Is.EqualTo("net-4.0"));
+                Assert.That(topLevelPackage.Settings[EnginePackageSettings.TargetRuntimeFramework], Is.EqualTo("net-4.0"));
             });
         }
     }
