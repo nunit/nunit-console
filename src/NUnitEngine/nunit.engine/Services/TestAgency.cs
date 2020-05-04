@@ -100,7 +100,7 @@ namespace NUnit.Engine.Services
             process.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
 
             process.Start();
-            log.Debug("Launched Agent process {0} - see testcentric-agent_{0}.log", process.Id);
+            log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", process.Id);
             log.Debug("Command line: \"{0}\" {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
 
             _agentStore.AddAgent(agentId, process);
