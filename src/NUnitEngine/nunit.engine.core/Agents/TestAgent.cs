@@ -65,12 +65,6 @@ namespace NUnit.Engine.Agents
         }
 
         /// <summary>
-        /// Starts the agent, performing any required initialization
-        /// </summary>
-        /// <returns><c>true</c> if the agent was started successfully.</returns>
-        public abstract bool Start();
-
-        /// <summary>
         /// Stops the agent, releasing any resources
         /// </summary>
         public abstract void Stop();

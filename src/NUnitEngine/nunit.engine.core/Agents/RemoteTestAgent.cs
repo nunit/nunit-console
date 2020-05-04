@@ -73,7 +73,7 @@ namespace NUnit.Engine.Agents
             return this;
         }
 
-        public override bool Start()
+        public bool Start()
         {
             log.Info("Agent starting");
 

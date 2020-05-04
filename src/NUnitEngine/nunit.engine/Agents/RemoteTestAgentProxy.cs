@@ -50,11 +50,6 @@ namespace NUnit.Engine.Agents
             return _remoteAgent.CreateRunner(package);
         }
 
-        public bool Start()
-        {
-            return _remoteAgent.Start();
-        }
-
         public void Stop()
         {
             _remoteAgent.Stop();
