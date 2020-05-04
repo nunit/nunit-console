@@ -216,7 +216,7 @@ namespace NUnit.Engine.Services
                         exitCode = null;
                     }
 
-                    if (exitCode.HasValue && exitCode == 0)
+                    if (exitCode == 0)
                     {
                         log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
                     }
