@@ -23,12 +23,9 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.IO;
 using System.Threading;
 using System.Diagnostics;
-using System.Text;
 using NUnit.Common;
-using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -41,7 +38,7 @@ namespace NUnit.Engine.Services
     /// but only one, ProcessAgent is implemented
     /// at this time.
     /// </summary>
-    public class TestAgency : ServerBase, ITestAgency, IService
+    public partial class TestAgency : ServerBase, ITestAgency, IService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
@@ -88,7 +85,7 @@ namespace NUnit.Engine.Services
 
         internal bool IsAgentProcessActive(ITestAgent agent, out Process process)
         {
-            return _agentStore.IsAgentProcessActive(((RemoteTestAgentProxy)agent).Id, out process);
+            return _agentStore.IsAgentProcessActive(((AgencyTestAgent)agent).Id, out process);
         }
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
@@ -118,7 +115,7 @@ namespace NUnit.Engine.Services
                 if (_agentStore.IsReady(agentId, out var agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
-                    return new RemoteTestAgentProxy(agent, agentId);
+                    return new AgencyTestAgent(agentId, agent);
                 }
             }
 

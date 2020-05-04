@@ -23,36 +23,32 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace NUnit.Engine.Agents
+namespace NUnit.Engine.Services
 {
-    /// <summary>
-    /// RemoteTestAgentProxy wraps a RemoteTestAgent so that certain
-    /// of its properties may be accessed without remoting.
-    /// </summary>
-    internal class RemoteTestAgentProxy : ITestAgent
+    public partial class TestAgency
     {
-        private ITestAgent _remoteAgent;
-
-        public RemoteTestAgentProxy(ITestAgent remoteAgent, Guid id)
+        private sealed class AgencyTestAgent : ITestAgent
         {
-            _remoteAgent = remoteAgent;
+            private readonly ITestAgent _remoteAgent;
 
-            Id = id;
-        }
+            public AgencyTestAgent(Guid id, ITestAgent remoteAgent)
+            {
+                Id = id;
+                _remoteAgent = remoteAgent;
+            }
 
-        public Guid Id { get; private set; }
+            public Guid Id { get; }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
-        {
-            return _remoteAgent.CreateRunner(package);
-        }
+            public ITestEngineRunner CreateRunner(TestPackage package)
+            {
+                return _remoteAgent.CreateRunner(package);
+            }
 
-        public void Stop()
-        {
-            _remoteAgent.Stop();
+            public void Stop()
+            {
+                _remoteAgent.Stop();
+            }
         }
     }
 }
