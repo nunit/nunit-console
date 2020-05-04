@@ -27,6 +27,7 @@ using System.Threading;
 using System.Diagnostics;
 using NUnit.Common;
 using NUnit.Engine.Internal;
+using System.Net.Sockets;
 
 namespace NUnit.Engine.Services
 {
@@ -196,6 +197,47 @@ namespace NUnit.Engine.Services
             {
                 Status = ServiceStatus.Error;
                 throw;
+            }
+        }
+
+        public void Release(ITestAgent agent)
+        {
+            if (IsAgentProcessActive(agent, out Process process))
+            {
+                try
+                {
+                    log.Debug("Stopping remote agent");
+                    agent.Stop();
+                }
+                catch (SocketException ex)
+                {
+                    int? exitCode;
+                    try
+                    {
+                        exitCode = process.ExitCode;
+                    }
+                    catch (NotSupportedException)
+                    {
+                        exitCode = null;
+                    }
+
+                    if (exitCode.HasValue && exitCode == 0)
+                    {
+                        log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
+                    }
+                    else
+                    {
+                        var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(ex)}";
+                        log.Error(stopError);
+                        throw new Exception(stopError, ex);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
+                    log.Error(stopError);
+                    throw new Exception(stopError, ex);
+                }
             }
         }
     }
