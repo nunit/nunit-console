@@ -42,6 +42,7 @@ namespace NUnit.Engine.Agents
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
 
+        private readonly Guid _agentId;
         private readonly string _agencyUrl;
 
         private ITestEngineRunner _runner;
@@ -56,8 +57,9 @@ namespace NUnit.Engine.Agents
         /// Construct a RemoteTestAgent
         /// </summary>
         public RemoteTestAgent(Guid agentId, string agencyUrl, IServiceLocator services)
-            : base(agentId, services)
+            : base(services)
         {
+            _agentId = agentId;
             _agencyUrl = agencyUrl;
         }
 
@@ -93,7 +95,7 @@ namespace NUnit.Engine.Agents
 
             try
             {
-                _agency.Register(this);
+                _agency.Register(_agentId, this);
                 log.Debug("Registered with TestAgency");
             }
             catch (Exception ex)

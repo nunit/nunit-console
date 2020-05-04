@@ -33,21 +33,22 @@ namespace NUnit.Engine.Services.Tests
     public static partial class AgentStoreTests
     {
         private static readonly Process DummyProcess = new Process();
-        private static readonly ITestAgent DummyAgent = new DummyTestAgent(Guid.NewGuid());
+        private static readonly Guid DummyAgentId = Guid.NewGuid();
+        private static readonly ITestAgent DummyAgent = new DummyTestAgent();
 
         [Test]
         public static void IdCannotBeReused()
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            Assert.That(() => database.AddAgent(DummyAgent.Id, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
+            database.AddAgent(DummyAgentId, DummyProcess);
+            Assert.That(() => database.AddAgent(DummyAgentId, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
 
-            database.Register(DummyAgent);
-            Assert.That(() => database.AddAgent(DummyAgent.Id, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
+            database.Register(DummyAgentId, DummyAgent);
+            Assert.That(() => database.AddAgent(DummyAgentId, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
 
-            database.MarkTerminated(DummyAgent.Id);
-            Assert.That(() => database.AddAgent(DummyAgent.Id, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
+            database.MarkTerminated(DummyAgentId);
+            Assert.That(() => database.AddAgent(DummyAgentId, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            Assert.That(() => database.Register(DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
+            Assert.That(() => database.Register(DummyAgentId, DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
         }
 
         [Test]
@@ -63,9 +64,9 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            database.Register(DummyAgent);
-            Assert.That(() => database.Register(DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
+            database.AddAgent(DummyAgentId, DummyProcess);
+            database.Register(DummyAgentId, DummyAgent);
+            Assert.That(() => database.Register(DummyAgentId, DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
         }
 
         [Test]
@@ -73,9 +74,9 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            database.MarkTerminated(DummyAgent.Id);
-            Assert.That(() => database.Register(DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
+            database.AddAgent(DummyAgentId, DummyProcess);
+            database.MarkTerminated(DummyAgentId);
+            Assert.That(() => database.Register(DummyAgentId, DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
         }
 
         [Test]
@@ -83,7 +84,7 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            Assert.That(() => database.MarkTerminated(DummyAgent.Id), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
+            Assert.That(() => database.MarkTerminated(DummyAgentId), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
         }
 
         [Test]
@@ -91,7 +92,7 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            Assert.That(database.IsReady(DummyAgent.Id, out _), Is.False);
+            Assert.That(database.IsReady(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -99,8 +100,8 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            Assert.That(database.IsReady(DummyAgent.Id, out _), Is.False);
+            database.AddAgent(DummyAgentId, DummyProcess);
+            Assert.That(database.IsReady(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -108,9 +109,9 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            database.Register(DummyAgent);
-            Assert.That(database.IsReady(DummyAgent.Id, out var registeredAgent), Is.True);
+            database.AddAgent(DummyAgentId, DummyProcess);
+            database.Register(DummyAgentId, DummyAgent);
+            Assert.That(database.IsReady(DummyAgentId, out var registeredAgent), Is.True);
             Assert.That(registeredAgent, Is.SameAs(DummyAgent));
         }
 
@@ -119,10 +120,10 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            database.Register(DummyAgent);
-            database.MarkTerminated(DummyAgent.Id);
-            Assert.That(database.IsReady(DummyAgent.Id, out _), Is.False);
+            database.AddAgent(DummyAgentId, DummyProcess);
+            database.Register(DummyAgentId, DummyAgent);
+            database.MarkTerminated(DummyAgentId);
+            Assert.That(database.IsReady(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -130,7 +131,7 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out _), Is.False);
+            Assert.That(database.IsAgentProcessActive(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -138,8 +139,8 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out var process), Is.True);
+            database.AddAgent(DummyAgentId, DummyProcess);
+            Assert.That(database.IsAgentProcessActive(DummyAgentId, out var process), Is.True);
             Assert.That(process, Is.SameAs(DummyProcess));
         }
 
@@ -148,9 +149,9 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            database.Register(DummyAgent);
-            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out var process), Is.True);
+            database.AddAgent(DummyAgentId, DummyProcess);
+            database.Register(DummyAgentId, DummyAgent);
+            Assert.That(database.IsAgentProcessActive(DummyAgentId, out var process), Is.True);
             Assert.That(process, Is.SameAs(DummyProcess));
         }
 
@@ -159,10 +160,10 @@ namespace NUnit.Engine.Services.Tests
         {
             var database = new AgentStore();
 
-            database.AddAgent(DummyAgent.Id, DummyProcess);
-            database.Register(DummyAgent);
-            database.MarkTerminated(DummyAgent.Id);
-            Assert.That(database.IsAgentProcessActive(DummyAgent.Id, out _), Is.False);
+            database.AddAgent(DummyAgentId, DummyProcess);
+            database.Register(DummyAgentId, DummyAgent);
+            database.MarkTerminated(DummyAgentId);
+            Assert.That(database.IsAgentProcessActive(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -183,7 +184,7 @@ namespace NUnit.Engine.Services.Tests
                     Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.False);
 
-                    database.Register(new DummyTestAgent(id));
+                    database.Register(id, new DummyTestAgent());
                     Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.True);
 

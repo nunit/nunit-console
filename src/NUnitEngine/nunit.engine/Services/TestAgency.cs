@@ -75,9 +75,9 @@ namespace NUnit.Engine.Services
         //    base.Stop ();
         //}
 
-        public void Register(ITestAgent agent)
+        public void Register(Guid agentId, ITestAgent agent)
         {
-            _agentStore.Register(agent);
+            _agentStore.Register(agentId, agent);
         }
 
         public ITestAgent GetAgent(TestPackage package, int waitTime)
@@ -86,9 +86,9 @@ namespace NUnit.Engine.Services
             return CreateRemoteAgent(package, waitTime);
         }
 
-        internal bool IsAgentProcessActive(Guid agentId, out Process process)
+        internal bool IsAgentProcessActive(ITestAgent agent, out Process process)
         {
-            return _agentStore.IsAgentProcessActive(agentId, out process);
+            return _agentStore.IsAgentProcessActive(((RemoteTestAgentProxy)agent).Id, out process);
         }
 
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)

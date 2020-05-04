@@ -30,13 +30,6 @@ namespace NUnit.Engine.Services.Tests
     {
         private sealed class DummyTestAgent : ITestAgent
         {
-            public DummyTestAgent(Guid id)
-            {
-                Id = id;
-            }
-
-            public Guid Id { get; }
-
             public ITestEngineRunner CreateRunner(TestPackage package)
             {
                 throw new NotImplementedException();
