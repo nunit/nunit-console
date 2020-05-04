@@ -84,11 +84,6 @@ namespace NUnit.Engine.Services
             return CreateRemoteAgent(package, waitTime);
         }
 
-        internal bool IsAgentProcessActive(ITestAgent agent, out Process process)
-        {
-            return _agentStore.IsAgentProcessActive(((AgencyTestAgent)agent).Id, out process);
-        }
-
         private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
         {
             var agentId = Guid.NewGuid();
@@ -202,7 +197,7 @@ namespace NUnit.Engine.Services
 
         public void Release(ITestAgent agent)
         {
-            if (IsAgentProcessActive(agent, out Process process))
+            if (_agentStore.IsAgentProcessActive(((AgencyTestAgent)agent).Id, out var process))
             {
                 try
                 {
