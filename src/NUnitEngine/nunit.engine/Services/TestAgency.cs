@@ -78,13 +78,13 @@ namespace NUnit.Engine.Services
             _agentStore.Register(agentId, agent);
         }
 
-        public ITestAgent GetAgent(TestPackage package, int waitTime)
+        public IAgentLease GetAgent(TestPackage package, int waitTime)
         {
             // TODO: Decide if we should reuse agents
             return CreateRemoteAgent(package, waitTime);
         }
 
-        private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
+        private IAgentLease CreateRemoteAgent(TestPackage package, int waitTime)
         {
             var agentId = Guid.NewGuid();
             //var process = LaunchAgentProcess(package, agentId);
@@ -111,7 +111,7 @@ namespace NUnit.Engine.Services
                 if (_agentStore.IsReady(agentId, out var agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
-                    return new AgencyTestAgent(agentId, agent);
+                    return new AgentLease(this, agentId, agent);
                 }
             }
 
@@ -195,9 +195,9 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public void Release(ITestAgent agent)
+        private void Release(Guid agentId, ITestAgent agent)
         {
-            if (_agentStore.IsAgentProcessActive(((AgencyTestAgent)agent).Id, out var process))
+            if (_agentStore.IsAgentProcessActive(agentId, out var process))
             {
                 try
                 {
@@ -224,14 +224,14 @@ namespace NUnit.Engine.Services
                     {
                         var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(ex)}";
                         log.Error(stopError);
-                        throw new Exception(stopError, ex);
+                        throw new NUnitEngineUnloadException(stopError, ex);
                     }
                 }
                 catch (Exception ex)
                 {
                     var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
                     log.Error(stopError);
-                    throw new Exception(stopError, ex);
+                    throw new NUnitEngineUnloadException(stopError, ex);
                 }
             }
         }

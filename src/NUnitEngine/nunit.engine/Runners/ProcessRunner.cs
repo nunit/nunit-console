@@ -47,7 +47,7 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private ITestAgent _agent;
+        private IAgentLease _agentLease;
         private ITestEngineRunner _remoteRunner;
         private TestAgency _agency;
 
@@ -239,20 +239,20 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent != null)
+                if (_agentLease != null)
                 {
                     try
                     {
-                        _agency.Release(_agent);
+                        _agentLease.Dispose();
                     }
-                    catch (Exception ex) when (unloadException != null)
+                    catch (NUnitEngineUnloadException ex) when (unloadException != null)
                     {
                         // Both kinds of errors, throw exception with combined message
                         throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + ex.Message);
                     }
                     finally
                     {
-                        _agent = null;
+                        _agentLease = null;
                     }
                 }
 
@@ -263,20 +263,20 @@ namespace NUnit.Engine.Runners
 
         private void CreateAgentAndRunner()
         {
-            if (_agent == null)
+            if (_agentLease == null)
             {
                 // Increase the timeout to give time to attach a debugger
                 bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
                              TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
 
-                _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
+                _agentLease = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
 
-                if (_agent == null)
+                if (_agentLease == null)
                     throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
             if (_remoteRunner == null)
-                _remoteRunner = _agent.CreateRunner(TestPackage);
+                _remoteRunner = _agentLease.CreateRunner(TestPackage);
         }
 
         TestEngineResult CreateFailedResult(Exception e)

@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2018 Charlie Poole, Rob Prouse
+// Copyright (c) 2020 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,35 +21,18 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
 
 namespace NUnit.Engine.Services
 {
-    public partial class TestAgency
+    /// <summary>
+    /// Disposing releases the agent back to the agency, allowing the agency it to shut it down or pool it.
+    /// </summary>
+    public interface IAgentLease : IDisposable
     {
-        private sealed class AgencyTestAgent : ITestAgent
-        {
-            private readonly ITestAgent _remoteAgent;
-
-            public AgencyTestAgent(Guid id, ITestAgent remoteAgent)
-            {
-                Id = id;
-                _remoteAgent = remoteAgent;
-            }
-
-            public Guid Id { get; }
-
-            public ITestEngineRunner CreateRunner(TestPackage package)
-            {
-                return _remoteAgent.CreateRunner(package);
-            }
-
-            public void Stop()
-            {
-                _remoteAgent.Stop();
-            }
-        }
+        /// <summary>
+        /// Creates a test runner on the acquired agent.
+        /// </summary>
+        ITestEngineRunner CreateRunner(TestPackage package);
     }
 }
-#endif
