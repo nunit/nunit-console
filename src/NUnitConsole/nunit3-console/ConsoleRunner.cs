@@ -40,6 +40,11 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ConsoleRunner
     {
+        // Some operating systems truncate the return code to 8 bits, which
+        // only allows us a maximum of 127 in the positive range. We limit
+        // ourselves so as to stay in that range.
+        private const int MAXIMUM_RETURN_CODE_ALLOWED = 100; // In case we are running on Unix
+
         public static readonly int OK = 0;
         public static readonly int INVALID_ARG = -1;
         public static readonly int INVALID_ASSEMBLY = -2;
@@ -251,9 +256,11 @@ namespace NUnit.ConsoleRunner
                 if (reporter.Summary.InvalidAssemblies > 0)
                     return ConsoleRunner.INVALID_ASSEMBLY;
 
-                return reporter.Summary.InvalidTestFixtures > 0
-                    ? ConsoleRunner.INVALID_TEST_FIXTURE
-                    : reporter.Summary.FailureCount + reporter.Summary.ErrorCount + reporter.Summary.InvalidCount;
+                if (reporter.Summary.InvalidTestFixtures > 0)
+                    return ConsoleRunner.INVALID_TEST_FIXTURE;
+
+                var failureCount = reporter.Summary.FailureCount + reporter.Summary.ErrorCount + reporter.Summary.InvalidCount;
+                return Math.Min(failureCount, MAXIMUM_RETURN_CODE_ALLOWED);
             }
 
             // If we got here, it's because we had an exception, but check anyway
