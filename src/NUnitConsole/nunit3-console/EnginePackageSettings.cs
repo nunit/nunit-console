@@ -21,6 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
+
 namespace NUnit
 {
     /// <summary>
@@ -95,6 +97,14 @@ namespace NUnit
         /// for more than one assembly, "Separate" for a single assembly.
         /// </summary>
         public const string ProcessModel = "ProcessModel";
+
+        /// <summary>
+        /// Indicates the desired runtime to use for the tests. Values 
+        /// are strings like "net-4.5", "mono-4.0", etc. Default is to
+        /// use the target framework for which an assembly was built.
+        /// </summary>
+        [Obsolete("Use 'RuntimeFramework.RequestedRuntimeFramework' instead.")]
+        public const string RuntimeFramework = "RequestedRuntimeFramework";
 
         /// <summary>
         /// Indicates the desired runtime to use for the tests. Values 
