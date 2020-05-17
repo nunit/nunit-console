@@ -23,7 +23,6 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.ComponentModel;
 using System.Threading;
 
 namespace NUnit.Engine.Services
@@ -89,19 +88,7 @@ namespace NUnit.Engine.Services
 
             public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
             {
-                var testRun = new AsyncTestEngineResult();
-
-                using (var worker = new BackgroundWorker())
-                {
-                    worker.DoWork += (s, ea) =>
-                    {
-                        var result = Run(listener, filter);
-                        testRun.SetResult(result);
-                    };
-                    worker.RunWorkerAsync();
-                }
-
-                return testRun;
+                return AsyncTestEngineResult.RunAsync(() => Run(listener, filter));
             }
 
             public void StopRun(bool force)

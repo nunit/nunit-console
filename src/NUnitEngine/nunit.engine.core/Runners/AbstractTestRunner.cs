@@ -22,8 +22,6 @@
 // ***********************************************************************
 
 using System;
-using System.ComponentModel;
-using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Runners
 {
@@ -110,19 +108,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An <see cref="AsyncTestEngineResult"/> that will provide the result of the test execution</returns>
         protected virtual AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
         {
-            var testRun = new AsyncTestEngineResult();
-
-            using (var worker = new BackgroundWorker())
-            {
-                worker.DoWork += (s, ea) =>
-                {
-                    var result = RunTests(listener, filter);
-                    testRun.SetResult(result);
-                };
-                worker.RunWorkerAsync();
-            }
-
-            return testRun;
+            return AsyncTestEngineResult.RunAsync(() => RunTests(listener, filter));
         }
 #endif
 

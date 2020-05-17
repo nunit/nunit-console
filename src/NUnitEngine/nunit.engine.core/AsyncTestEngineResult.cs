@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Xml;
 using NUnit.Common;
@@ -38,6 +39,21 @@ namespace NUnit.Engine
     {
         private volatile TestEngineResult _result;
         private readonly ManualResetEvent _waitHandle = new ManualResetEvent(false);
+
+#if !NETSTANDARD1_6
+        public static AsyncTestEngineResult RunAsync(Func<TestEngineResult> func)
+        {
+            var testRun = new AsyncTestEngineResult();
+
+            using (var worker = new BackgroundWorker())
+            {
+                worker.DoWork += (sender, e) => testRun.SetResult(func.Invoke());
+                worker.RunWorkerAsync();
+            }
+
+            return testRun;
+        }
+#endif
 
         /// <summary>
         /// Get the result of this run.
