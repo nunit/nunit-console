@@ -22,7 +22,6 @@
 // ***********************************************************************
 
 using System;
-using System.ComponentModel;
 using System.Threading;
 using System.Xml;
 using NUnit.Common;
@@ -44,13 +43,7 @@ namespace NUnit.Engine
         public static AsyncTestEngineResult RunAsync(Func<TestEngineResult> func)
         {
             var testRun = new AsyncTestEngineResult();
-
-            using (var worker = new BackgroundWorker())
-            {
-                worker.DoWork += (sender, e) => testRun.SetResult(func.Invoke());
-                worker.RunWorkerAsync();
-            }
-
+            ThreadPool.QueueUserWorkItem(_ => testRun.SetResult(func.Invoke()));
             return testRun;
         }
 #endif
