@@ -38,12 +38,13 @@ namespace NUnit.Engine.Agents
     /// to it. Rather, it reports back to the sponsoring TestAgency upon
     /// startup so that the agency may in turn provide it to clients for use.
     /// </summary>
-    public class RemoteTestAgent : TestAgent, ITestEngineRunner
+    public class RemoteTestAgent : MarshalByRefObject, ITestAgent, IDisposable, ITestEngineRunner
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
 
         private readonly Guid _agentId;
         private readonly string _agencyUrl;
+        private readonly IServiceLocator _services;
 
         private ITestEngineRunner _runner;
         private TestPackage _package;
@@ -57,10 +58,23 @@ namespace NUnit.Engine.Agents
         /// Construct a RemoteTestAgent
         /// </summary>
         public RemoteTestAgent(Guid agentId, string agencyUrl, IServiceLocator services)
-            : base(services)
         {
             _agentId = agentId;
             _agencyUrl = agencyUrl;
+            _services = services;
+        }
+
+        /// <summary>
+        /// Overridden to cause object to live indefinitely
+        /// </summary>
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
+
+        public void Dispose()
+        {
+            ShutDown();
         }
 
         public int ProcessId
@@ -68,10 +82,10 @@ namespace NUnit.Engine.Agents
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }
         }
 
-        public override ITestEngineRunner CreateRunner(TestPackage package)
+        public ITestEngineRunner CreateRunner(TestPackage package)
         {
             _package = package;
-            _runner = Services.GetService<ITestRunnerFactory>().MakeTestRunner(_package);
+            _runner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(_package);
             return this;
         }
 
@@ -107,7 +121,7 @@ namespace NUnit.Engine.Agents
             return true;
         }
 
-        public override void ShutDown()
+        public void ShutDown()
         {
             log.Info("Stopping");
 
