@@ -202,7 +202,7 @@ namespace NUnit.Engine.Services
                 try
                 {
                     log.Debug("Stopping remote agent");
-                    agent.Stop();
+                    agent.ShutDown();
                 }
                 catch (SocketException ex)
                 {

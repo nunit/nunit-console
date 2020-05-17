@@ -31,7 +31,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Stops the agent, releasing any resources
         /// </summary>
-        void Stop();
+        void ShutDown();
 
         /// <summary>
         ///  Creates a test runner

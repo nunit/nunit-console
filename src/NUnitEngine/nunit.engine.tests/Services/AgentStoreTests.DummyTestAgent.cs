@@ -40,7 +40,7 @@ namespace NUnit.Engine.Services.Tests
                 throw new NotImplementedException();
             }
 
-            public void Stop()
+            public void ShutDown()
             {
                 throw new NotImplementedException();
             }

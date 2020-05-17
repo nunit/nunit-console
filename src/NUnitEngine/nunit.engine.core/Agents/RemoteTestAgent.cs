@@ -107,7 +107,7 @@ namespace NUnit.Engine.Agents
             return true;
         }
 
-        public override void Stop()
+        public override void ShutDown()
         {
             log.Info("Stopping");
 

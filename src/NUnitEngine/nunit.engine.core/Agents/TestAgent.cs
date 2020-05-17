@@ -57,7 +57,7 @@ namespace NUnit.Engine.Agents
         /// <summary>
         /// Stops the agent, releasing any resources
         /// </summary>
-        public abstract void Stop();
+        public abstract void ShutDown();
 
         /// <summary>
         ///  Creates a test runner
@@ -80,7 +80,7 @@ namespace NUnit.Engine.Agents
             if (!_disposed)
             {
                 if (disposing)
-                    Stop();
+                    ShutDown();
 
                 _disposed = true;
             }
