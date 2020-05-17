@@ -21,8 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-
 namespace NUnit.Engine
 {
     /// <summary>
@@ -30,17 +28,6 @@ namespace NUnit.Engine
     /// </summary>
     public interface ITestAgent
     {
-        /// <summary>
-        /// Gets a Guid that uniquely identifies this agent.
-        /// </summary>
-        Guid Id { get; }
-
-        /// <summary>
-        /// Starts the agent, performing any required initialization
-        /// </summary>
-        /// <returns>True if successful, otherwise false</returns>
-        bool Start();
-
         /// <summary>
         /// Stops the agent, releasing any resources
         /// </summary>

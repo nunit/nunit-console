@@ -34,7 +34,6 @@ namespace NUnit.Engine.Agents
     /// </summary>
     public abstract class TestAgent : MarshalByRefObject, ITestAgent, IDisposable
     {
-        private readonly Guid agentId;
         private readonly IServiceLocator services;
 
         /// <summary>
@@ -42,9 +41,8 @@ namespace NUnit.Engine.Agents
         /// </summary>
         /// <param name="agentId">The identifier of the agent.</param>
         /// <param name="services">The services available to the agent.</param>
-        public TestAgent(Guid agentId, IServiceLocator services)
+        public TestAgent(IServiceLocator services)
         {
-            this.agentId = agentId;
             this.services = services;
         }
 
@@ -55,20 +53,6 @@ namespace NUnit.Engine.Agents
         {
             get { return services; }
         }
-
-        /// <summary>
-        /// Gets a Guid that uniquely identifies this agent.
-        /// </summary>
-        public Guid Id
-        {
-            get { return agentId; }
-        }
-
-        /// <summary>
-        /// Starts the agent, performing any required initialization
-        /// </summary>
-        /// <returns><c>true</c> if the agent was started successfully.</returns>
-        public abstract bool Start();
 
         /// <summary>
         /// Stops the agent, releasing any resources

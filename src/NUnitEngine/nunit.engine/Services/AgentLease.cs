@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2018 Charlie Poole, Rob Prouse
+// Copyright (c) 2020 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,44 +21,18 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace NUnit.Engine.Agents
+namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// RemoteTestAgentProxy wraps a RemoteTestAgent so that certain
-    /// of its properties may be accessed without remoting.
+    /// Disposing releases the agent back to the agency, allowing the agency it to shut it down or pool it.
     /// </summary>
-    internal class RemoteTestAgentProxy : ITestAgent
+    public interface IAgentLease : IDisposable
     {
-        private ITestAgent _remoteAgent;
-
-        public RemoteTestAgentProxy(ITestAgent remoteAgent, Guid id)
-        {
-            _remoteAgent = remoteAgent;
-
-            Id = id;
-        }
-
-        public Guid Id { get; private set; }
-
-        public ITestEngineRunner CreateRunner(TestPackage package)
-        {
-            return _remoteAgent.CreateRunner(package);
-        }
-
-        public bool Start()
-        {
-            return _remoteAgent.Start();
-        }
-
-        public void Stop()
-        {
-            _remoteAgent.Stop();
-        }
+        /// <summary>
+        /// Creates a test runner on the acquired agent.
+        /// </summary>
+        ITestEngineRunner CreateRunner(TestPackage package);
     }
 }
-#endif

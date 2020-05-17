@@ -23,13 +23,11 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.IO;
 using System.Threading;
 using System.Diagnostics;
-using System.Text;
 using NUnit.Common;
-using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
+using System.Net.Sockets;
 
 namespace NUnit.Engine.Services
 {
@@ -41,7 +39,7 @@ namespace NUnit.Engine.Services
     /// but only one, ProcessAgent is implemented
     /// at this time.
     /// </summary>
-    public class TestAgency : ServerBase, ITestAgency, IService
+    public partial class TestAgency : ServerBase, ITestAgency, IService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
@@ -75,23 +73,18 @@ namespace NUnit.Engine.Services
         //    base.Stop ();
         //}
 
-        public void Register(ITestAgent agent)
+        public void Register(Guid agentId, ITestAgent agent)
         {
-            _agentStore.Register(agent);
+            _agentStore.Register(agentId, agent);
         }
 
-        public ITestAgent GetAgent(TestPackage package, int waitTime)
+        public IAgentLease GetAgent(TestPackage package, int waitTime)
         {
             // TODO: Decide if we should reuse agents
             return CreateRemoteAgent(package, waitTime);
         }
 
-        internal bool IsAgentProcessActive(Guid agentId, out Process process)
-        {
-            return _agentStore.IsAgentProcessActive(agentId, out process);
-        }
-
-        private ITestAgent CreateRemoteAgent(TestPackage package, int waitTime)
+        private IAgentLease CreateRemoteAgent(TestPackage package, int waitTime)
         {
             var agentId = Guid.NewGuid();
             //var process = LaunchAgentProcess(package, agentId);
@@ -118,7 +111,7 @@ namespace NUnit.Engine.Services
                 if (_agentStore.IsReady(agentId, out var agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
-                    return new RemoteTestAgentProxy(agent, agentId);
+                    return new AgentLease(this, agentId, agent);
                 }
             }
 
@@ -199,6 +192,47 @@ namespace NUnit.Engine.Services
             {
                 Status = ServiceStatus.Error;
                 throw;
+            }
+        }
+
+        private void Release(Guid agentId, ITestAgent agent)
+        {
+            if (_agentStore.IsAgentProcessActive(agentId, out var process))
+            {
+                try
+                {
+                    log.Debug("Stopping remote agent");
+                    agent.Stop();
+                }
+                catch (SocketException ex)
+                {
+                    int? exitCode;
+                    try
+                    {
+                        exitCode = process.ExitCode;
+                    }
+                    catch (NotSupportedException)
+                    {
+                        exitCode = null;
+                    }
+
+                    if (exitCode == 0)
+                    {
+                        log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
+                    }
+                    else
+                    {
+                        var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(ex)}";
+                        log.Error(stopError);
+                        throw new NUnitEngineUnloadException(stopError, ex);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
+                    log.Error(stopError);
+                    throw new NUnitEngineUnloadException(stopError, ex);
+                }
             }
         }
     }

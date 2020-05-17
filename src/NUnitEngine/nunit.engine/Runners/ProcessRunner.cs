@@ -23,8 +23,6 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
-using System.Diagnostics;
-using System.Net.Sockets;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
@@ -49,7 +47,7 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private ITestAgent _agent;
+        private IAgentLease _agentLease;
         private ITestEngineRunner _remoteRunner;
         private TestAgency _agency;
 
@@ -241,58 +239,20 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent != null && _agency.IsAgentProcessActive(_agent.Id, out Process process))
+                if (_agentLease != null)
                 {
                     try
                     {
-                        log.Debug("Stopping remote agent");
-                        _agent.Stop();
+                        _agentLease.Dispose();
                     }
-                    catch (SocketException se)
+                    catch (NUnitEngineUnloadException ex) when (unloadException != null)
                     {
-                        int? exitCode;
-                        try
-                        {
-                            exitCode = process.ExitCode;
-                        }
-                        catch (NotSupportedException)
-                        {
-                            exitCode = null;
-                        }
-
-                        if (exitCode.HasValue && exitCode == 0)
-                        {
-                            log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
-                        }
-                        else
-                        {
-
-                            var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
-                            log.Error(stopError);
-
-                            // Stop error with no unload error, just rethrow
-                            if (unloadException == null)
-                                throw;
-
-                            // Both kinds of errors, throw exception with combined message
-                            throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e);
-                        log.Error(stopError);
-
-                        // Stop error with no unload error, just rethrow
-                        if (unloadException == null)
-                            throw;
-
                         // Both kinds of errors, throw exception with combined message
-                        throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + stopError);
+                        throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + ex.Message);
                     }
                     finally
                     {
-                        _agent = null;
+                        _agentLease = null;
                     }
                 }
 
@@ -303,20 +263,20 @@ namespace NUnit.Engine.Runners
 
         private void CreateAgentAndRunner()
         {
-            if (_agent == null)
+            if (_agentLease == null)
             {
                 // Increase the timeout to give time to attach a debugger
                 bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
                              TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
 
-                _agent = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
+                _agentLease = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
 
-                if (_agent == null)
+                if (_agentLease == null)
                     throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
             if (_remoteRunner == null)
-                _remoteRunner = _agent.CreateRunner(TestPackage);
+                _remoteRunner = _agentLease.CreateRunner(TestPackage);
         }
 
         TestEngineResult CreateFailedResult(Exception e)

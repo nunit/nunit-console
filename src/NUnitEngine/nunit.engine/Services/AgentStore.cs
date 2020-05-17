@@ -48,17 +48,17 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public void Register(ITestAgent agent)
+        public void Register(Guid agentId, ITestAgent agent)
         {
             lock (_agentsById)
             {
-                if (!_agentsById.TryGetValue(agent.Id, out var record)
+                if (!_agentsById.TryGetValue(agentId, out var record)
                     || record.Status != AgentStatus.Starting)
                 {
-                    throw new ArgumentException($"Agent {agent.Id} must have a status of {AgentStatus.Starting} in order to register, but the status was {record.Status}.", nameof(agent));
+                    throw new ArgumentException($"Agent {agentId} must have a status of {AgentStatus.Starting} in order to register, but the status was {record.Status}.", nameof(agent));
                 }
 
-                _agentsById[agent.Id] = record.Ready(agent);
+                _agentsById[agentId] = record.Ready(agent);
             }
         }
 
