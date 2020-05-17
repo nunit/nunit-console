@@ -35,6 +35,8 @@ namespace NUnit.Engine.Communication
             _reader = new BinaryReader(stream);
         }
 
+        public Stream BaseStream => _reader.BaseStream;
+
         public void Dispose()
         {
 #if NET20
@@ -55,11 +57,6 @@ namespace NUnit.Engine.Communication
 
             value = 0;
             return false;
-        }
-
-        public Stream ReadStream(long length)
-        {
-            return new MaxLengthStream(_reader.BaseStream, length);
         }
 
         public bool TryRead7BitEncodedInt32(out int value)
@@ -112,29 +109,6 @@ namespace NUnit.Engine.Communication
             {
                 return Result.Error("Error parsing length-prefixed string: " + ex.Message);
             }
-        }
-
-        public Result Skip(uint byteCount)
-        {
-            if (_reader.BaseStream.CanSeek)
-            {
-                _reader.BaseStream.Seek(byteCount, SeekOrigin.Current);
-            }
-            else
-            {
-                var skipBuffer = new byte[Math.Min(byteCount, 81920)];
-
-                while (byteCount > 0)
-                {
-                    var bytesRead = (uint)_reader.BaseStream.Read(skipBuffer, 0, Math.Min((int)byteCount, skipBuffer.Length));
-                    if (bytesRead == 0)
-                        return Result.Error("Unexpected end of stream");
-
-                    byteCount -= bytesRead;
-                }
-            }
-
-            return Result.Success();
         }
     }
 }

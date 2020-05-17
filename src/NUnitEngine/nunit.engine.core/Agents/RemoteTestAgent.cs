@@ -126,42 +126,49 @@ namespace NUnit.Engine.Agents
 
         byte[] ITestAgent.SendMessage(byte[] message)
         {
-            using (var reader = new ProtocolReader(new MemoryStream(message, writable: false)))
+            using (var stream = new MemoryStream(message, writable: false))
             {
-                return CommunicationUtils.CreateMessage(writer => HandleMessage(reader, writer));
+                return CommunicationUtils.CreateMessage(writer => HandleMessage(stream, writer));
             }
         }
 
-        private void HandleMessage(ProtocolReader reader, BinaryWriter writer)
+        private void HandleMessage(Stream requestStream, BinaryWriter writer)
         {
-            var headerResult = RequestHeader.Read(reader);
-            if (headerResult.IsError(out var message))
+            using (var frameableStream = new FrameableStream(requestStream))
+            using (var reader = new ProtocolReader(frameableStream))
             {
-                RequestStatus.Error(RequestStatusCode.ProtocolError, message).Write(writer);
+                var headerResult = RequestHeader.Read(reader);
+                if (headerResult.IsError(out var message))
+                {
+                    RequestStatus.Error(RequestStatusCode.ProtocolError, message).Write(writer);
 
-                // When a TCP connection is used instead of remoting byte[] framing, log and abort connection due to
-                // unrecoverable protocol error.
-                return;
-            }
+                    // When a TCP connection is used instead of remoting byte[] framing, log and abort connection due to
+                    // unrecoverable protocol error.
+                    return;
+                }
 
-            switch (headerResult.Value.RequestType)
-            {
-                case AgentWorkerRequestType.ShutDown:
-                    ShutDown();
-                    RequestStatus.Success.Write(writer);
-                    break;
+                var frameReader = new ProtocolReader(frameableStream.BeginFrame(headerResult.Value.RequestLength));
 
-                case AgentWorkerRequestType.Load:
-                    HandleRequest(
-                        LoadRequest.ReadBody(headerResult.Value.RequestLength, reader),
-                        request => new LoadResponse(Load(request.Package)).Write,
-                        writer);
-                    break;
+                switch (headerResult.Value.RequestType)
+                {
+                    case AgentWorkerRequestType.ShutDown:
+                        ShutDown();
+                        RequestStatus.Success.Write(writer);
+                        break;
 
-                default:
-                    reader.Skip(headerResult.Value.RequestLength);
-                    RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
-                    break;
+                    case AgentWorkerRequestType.Load:
+                        HandleRequest(
+                            LoadRequest.ReadBody(frameReader),
+                            request => new LoadResponse(Load(request.Package)).Write,
+                            writer);
+                        break;
+
+                    default:
+                        RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
+                        break;
+                }
+
+                frameableStream.SkipCurrentFrame();
             }
         }
 
@@ -170,8 +177,6 @@ namespace NUnit.Engine.Agents
             if (requestParseResult.IsError(out var message))
             {
                 RequestStatus.Error(RequestStatusCode.ProtocolError, message).Write(writer);
-
-                // When a TCP connection is used instead of remoting byte[] framing, skip the rest of the frame.
             }
             else
             {

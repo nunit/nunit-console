@@ -36,10 +36,10 @@ namespace NUnit.Engine.Communication.Model
         public TestPackage Package { get; }
 
 #if !NETSTANDARD1_6
-        public static Result<LoadRequest> ReadBody(uint length, ProtocolReader reader)
+        public static Result<LoadRequest> ReadBody(ProtocolReader reader)
         {
             return Result.Success(new LoadRequest(
-                CommunicationUtils.ReadTestPackage(reader.ReadStream(length))));
+                CommunicationUtils.ReadTestPackage(reader.BaseStream)));
         }
 
         public void Write(BinaryWriter writer)
