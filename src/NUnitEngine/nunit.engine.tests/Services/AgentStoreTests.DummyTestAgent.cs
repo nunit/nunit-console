@@ -30,6 +30,11 @@ namespace NUnit.Engine.Services.Tests
     {
         private sealed class DummyTestAgent : ITestAgent
         {
+            public byte[] SendMessage(byte[] message)
+            {
+                throw new NotImplementedException();
+            }
+
             public int CountTestCases(TestFilter filter)
             {
                 throw new NotImplementedException();

@@ -23,10 +23,13 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using System.IO;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
 using NUnit.Common;
+using NUnit.Engine.Communication;
+using NUnit.Engine.Communication.Model;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Agents
@@ -121,7 +124,41 @@ namespace NUnit.Engine.Agents
             return true;
         }
 
-        public void ShutDown()
+        byte[] ITestAgent.SendMessage(byte[] message)
+        {
+            using (var reader = new ProtocolReader(new MemoryStream(message, writable: false)))
+            {
+                return CommunicationUtils.CreateMessage(writer => HandleMessage(reader, writer));
+            }
+        }
+
+        private void HandleMessage(ProtocolReader reader, BinaryWriter writer)
+        {
+            var headerResult = RequestHeader.Read(reader);
+            if (headerResult.IsError(out var errorReadingHeader))
+            {
+                RequestStatus.Error(RequestStatusCode.ProtocolError, errorReadingHeader).Write(writer);
+
+                // When a TCP connection is used instead of remoting byte[] framing, log and abort connection due to
+                // unrecoverable protocol error.
+                return;
+            }
+
+            switch (headerResult.Value.RequestType)
+            {
+                case AgentWorkerRequestType.ShutDown:
+                    ShutDown();
+                    RequestStatus.Success.Write(writer);
+                    break;
+
+                default:
+                    reader.Skip(headerResult.Value.RequestLength);
+                    RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
+                    break;
+            }
+        }
+
+        private void ShutDown()
         {
             log.Info("Stopping");
 

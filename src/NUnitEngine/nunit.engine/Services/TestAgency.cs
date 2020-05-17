@@ -22,12 +22,14 @@
 // ***********************************************************************
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
-using System;
-using System.Threading;
-using System.Diagnostics;
 using NUnit.Common;
+using NUnit.Engine.Communication;
+using NUnit.Engine.Communication.Model;
 using NUnit.Engine.Internal;
+using System;
+using System.Diagnostics;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace NUnit.Engine.Services
 {
@@ -202,7 +204,15 @@ namespace NUnit.Engine.Services
                 try
                 {
                     log.Debug("Stopping remote agent");
-                    agent.ShutDown();
+
+                    using (var reader = CommunicationUtils.SendMessage(agent, new ShutDownRequest().Write))
+                    {
+                        var response = RequestStatus.Read(reader);
+                        if (response.IsError(out var errorReadingResponse))
+                            log.Error("Error reading shutdown acknowledgment.");
+                        else if (response.Value.Code != RequestStatusCode.Success)
+                            log.Error("Error from agent: " + response.Value);
+                    }
                 }
                 catch (SocketException ex)
                 {

@@ -29,10 +29,9 @@ namespace NUnit.Engine
     /// </summary>
     public interface ITestAgent
     {
-        /// <summary>
-        /// Stops the agent, releasing any resources
-        /// </summary>
-        void ShutDown();
+        // Once this is the last member of ITestAgent and the same is done for ITestAgency, remoting can be trivially
+        // replaced.
+        byte[] SendMessage(byte[] message);
 
         /// <summary>
         /// Loads a package which will be used for all subsequent calls to the other methods (except
