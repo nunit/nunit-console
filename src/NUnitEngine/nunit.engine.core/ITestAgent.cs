@@ -34,13 +34,6 @@ namespace NUnit.Engine
         byte[] SendMessage(byte[] message);
 
         /// <summary>
-        /// Loads a package which will be used for all subsequent calls to the other methods (except
-        /// <see cref="ShutDown"/>). This method must be called at least once before calling methods that operate on a
-        /// test package. It may be called any number of times after those methods.
-        /// </summary>
-        TestEngineResult Load(TestPackage package);
-
-        /// <summary>
         /// Unloads any loaded package. If none is loaded, the call is ignored.
         /// </summary>
         void Unload();

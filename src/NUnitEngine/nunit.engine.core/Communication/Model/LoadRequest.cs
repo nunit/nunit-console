@@ -21,50 +21,36 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.IO;
 
-namespace NUnit.Engine.Communication
+namespace NUnit.Engine.Communication.Model
 {
-    internal static class BinaryWriterExtensions
+    public struct LoadRequest
     {
-        public static void Write7BitEncodedInt(this BinaryWriter writer, int value)
+        public LoadRequest(TestPackage package)
         {
-            Write7BitEncodedInt(writer, (uint)value);
+            Package = package ?? throw new ArgumentNullException(nameof(package));
         }
 
-        public static void Write7BitEncodedInt(this BinaryWriter writer, uint value)
-        {
-            while (value >= 0x80)
-            {
-                writer.Write((byte)(value | 0x80));
-                value >>= 7;
-            }
+        public TestPackage Package { get; }
 
-            writer.Write((byte)value);
+#if !NETSTANDARD1_6
+        public static Result<LoadRequest> ReadBody(uint length, ProtocolReader reader)
+        {
+            return Result.Success(new LoadRequest(
+                CommunicationUtils.ReadTestPackage(reader.ReadStream(length))));
         }
 
-        public static void Write7BitEncodedInt(this BinaryWriter writer, ulong value)
+        public void Write(BinaryWriter writer)
         {
-            while (value >= 0x80)
-            {
-                writer.Write((byte)(value | 0x80));
-                value >>= 7;
-            }
+            var stream = CommunicationUtils.CreateStream(Package);
 
-            writer.Write((byte)value);
+            new RequestHeader(AgentWorkerRequestType.Load, requestLength: checked((uint)stream.Length))
+                .Write(writer);
+
+            writer.Write(stream);
         }
-
-        public static void Write(this BinaryWriter writer, Stream stream)
-        {
-            var buffer = new byte[81920];
-
-            while (true)
-            {
-                var byteCount = stream.Read(buffer, 0, buffer.Length);
-                if (byteCount == 0) break;
-
-                writer.Write(buffer, 0, byteCount);
-            }
-        }
+#endif
     }
 }

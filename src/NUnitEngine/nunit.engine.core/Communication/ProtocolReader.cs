@@ -57,6 +57,11 @@ namespace NUnit.Engine.Communication
             return false;
         }
 
+        public Stream ReadStream(long length)
+        {
+            return new MaxLengthStream(_reader.BaseStream, length);
+        }
+
         public bool TryRead7BitEncodedInt32(out int value)
         {
             if (TryRead7BitEncodedUInt32(out var unsigned))
@@ -117,7 +122,7 @@ namespace NUnit.Engine.Communication
             }
             else
             {
-                var skipBuffer = new byte[4096];
+                var skipBuffer = new byte[Math.Min(byteCount, 81920)];
 
                 while (byteCount > 0)
                 {

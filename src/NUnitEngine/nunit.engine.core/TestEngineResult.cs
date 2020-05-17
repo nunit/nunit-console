@@ -23,8 +23,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Xml;
+using NUnit.Engine.Communication;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine
@@ -143,6 +145,33 @@ namespace NUnit.Engine
         {
             this._xmlText.Add(xml.OuterXml);
             this._xmlNodes.Add(xml);
+        }
+
+        internal static Result<TestEngineResult> Read(ProtocolReader reader)
+        {
+            if (!reader.TryRead7BitEncodedInt32(out var count))
+                return Result.Error("Unexpected end of stream.");
+
+            var result = new TestEngineResult();
+
+            for (var i = 0; i < count; i++)
+            {
+                var readResult = reader.ReadString();
+                if (readResult.IsError(out var message))
+                    return Result.Error(message);
+
+                result.Add(readResult.Value);
+            }
+
+            return Result.Success(result);
+        }
+
+        internal void Write(BinaryWriter writer)
+        {
+            writer.Write7BitEncodedInt(_xmlText.Count);
+
+            foreach (var text in _xmlText)
+                writer.Write(text);
         }
     }
 }

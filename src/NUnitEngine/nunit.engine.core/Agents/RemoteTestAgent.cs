@@ -85,7 +85,7 @@ namespace NUnit.Engine.Agents
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }
         }
 
-        public TestEngineResult Load(TestPackage package)
+        private TestEngineResult Load(TestPackage package)
         {
             _package = package;
             _runner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(_package);
@@ -135,9 +135,9 @@ namespace NUnit.Engine.Agents
         private void HandleMessage(ProtocolReader reader, BinaryWriter writer)
         {
             var headerResult = RequestHeader.Read(reader);
-            if (headerResult.IsError(out var errorReadingHeader))
+            if (headerResult.IsError(out var message))
             {
-                RequestStatus.Error(RequestStatusCode.ProtocolError, errorReadingHeader).Write(writer);
+                RequestStatus.Error(RequestStatusCode.ProtocolError, message).Write(writer);
 
                 // When a TCP connection is used instead of remoting byte[] framing, log and abort connection due to
                 // unrecoverable protocol error.
@@ -151,10 +151,33 @@ namespace NUnit.Engine.Agents
                     RequestStatus.Success.Write(writer);
                     break;
 
+                case AgentWorkerRequestType.Load:
+                    HandleRequest(
+                        LoadRequest.ReadBody(headerResult.Value.RequestLength, reader),
+                        request => new LoadResponse(Load(request.Package)).Write,
+                        writer);
+                    break;
+
                 default:
                     reader.Skip(headerResult.Value.RequestLength);
                     RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
                     break;
+            }
+        }
+
+        private static void HandleRequest<TRequest>(Result<TRequest> requestParseResult, Func<TRequest, Action<BinaryWriter>> getResponseWriter, BinaryWriter writer)
+        {
+            if (requestParseResult.IsError(out var message))
+            {
+                RequestStatus.Error(RequestStatusCode.ProtocolError, message).Write(writer);
+
+                // When a TCP connection is used instead of remoting byte[] framing, skip the rest of the frame.
+            }
+            else
+            {
+                var writeResponse = getResponseWriter.Invoke(requestParseResult.Value);
+                RequestStatus.Success.Write(writer);
+                writeResponse.Invoke(writer);
             }
         }
 

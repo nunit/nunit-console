@@ -21,50 +21,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using System.IO;
 
-namespace NUnit.Engine.Communication
+namespace NUnit.Engine.Communication.Model
 {
-    internal static class BinaryWriterExtensions
+    public struct LoadResponse
     {
-        public static void Write7BitEncodedInt(this BinaryWriter writer, int value)
+        public LoadResponse(TestEngineResult result)
         {
-            Write7BitEncodedInt(writer, (uint)value);
+            EngineResult = result ?? throw new ArgumentNullException(nameof(result));
         }
 
-        public static void Write7BitEncodedInt(this BinaryWriter writer, uint value)
-        {
-            while (value >= 0x80)
-            {
-                writer.Write((byte)(value | 0x80));
-                value >>= 7;
-            }
+        public TestEngineResult EngineResult { get; }
 
-            writer.Write((byte)value);
+        public static Result<LoadResponse> ReadBody(ProtocolReader reader)
+        {
+            return TestEngineResult.Read(reader)
+                .Select(testEngineResult => new LoadResponse(testEngineResult));
         }
 
-        public static void Write7BitEncodedInt(this BinaryWriter writer, ulong value)
+        public void Write(BinaryWriter writer)
         {
-            while (value >= 0x80)
-            {
-                writer.Write((byte)(value | 0x80));
-                value >>= 7;
-            }
-
-            writer.Write((byte)value);
-        }
-
-        public static void Write(this BinaryWriter writer, Stream stream)
-        {
-            var buffer = new byte[81920];
-
-            while (true)
-            {
-                var byteCount = stream.Read(buffer, 0, buffer.Length);
-                if (byteCount == 0) break;
-
-                writer.Write(buffer, 0, byteCount);
-            }
+            RequestStatus.Success.Write(writer);
+            EngineResult.Write(writer);
         }
     }
 }

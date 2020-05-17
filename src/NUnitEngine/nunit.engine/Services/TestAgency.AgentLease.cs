@@ -22,6 +22,8 @@
 // ***********************************************************************
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
+using NUnit.Engine.Communication;
+using NUnit.Engine.Communication.Model;
 using System;
 using System.Threading;
 
@@ -51,7 +53,11 @@ namespace NUnit.Engine.Services
 
             public ITestEngineRunner CreateRunner(TestPackage package)
             {
-                _createRunnerLoadResult = _remoteAgent.Load(package);
+                var response = CommunicationUtils.HandleMessageResponse(
+                    CommunicationUtils.SendMessage(_remoteAgent, new LoadRequest(package).Write),
+                    LoadResponse.ReadBody);
+
+                _createRunnerLoadResult = response.EngineResult;
                 return this;
             }
 

@@ -100,5 +100,12 @@ namespace NUnit.Engine
                 ? $"Success({value})"
                 : $"Error({errorMessage})";
         }
+
+        public Result<TResult> Select<TResult>(Func<T, TResult> selector)
+        {
+            return errorMessage is null
+                ? Result.Success(selector.Invoke(value))
+                : Result.Error(errorMessage);
+        }
     }
 }
