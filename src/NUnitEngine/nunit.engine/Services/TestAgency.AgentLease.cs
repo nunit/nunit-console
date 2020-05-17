@@ -23,15 +23,17 @@
 
 #if !NETSTANDARD1_6 && !NETSTANDARD2_0
 using System;
+using System.Threading;
 
 namespace NUnit.Engine.Services
 {
     public partial class TestAgency
     {
-        private sealed class AgentLease : IAgentLease
+        private sealed class AgentLease : IAgentLease, ITestEngineRunner
         {
             private readonly TestAgency _agency;
             private readonly ITestAgent _remoteAgent;
+            private TestEngineResult _createRunnerLoadResult;
 
             public AgentLease(TestAgency agency, Guid id, ITestAgent remoteAgent)
             {
@@ -42,14 +44,56 @@ namespace NUnit.Engine.Services
 
             public Guid Id { get; }
 
-            public ITestEngineRunner CreateRunner(TestPackage package)
-            {
-                return _remoteAgent.CreateRunner(package);
-            }
-
             public void Dispose()
             {
                 _agency.Release(Id, _remoteAgent);
+            }
+
+            public ITestEngineRunner CreateRunner(TestPackage package)
+            {
+                _createRunnerLoadResult = _remoteAgent.Load(package);
+                return this;
+            }
+
+            public int CountTestCases(TestFilter filter)
+            {
+                return _remoteAgent.CountTestCases(filter);
+            }
+
+            public TestEngineResult Explore(TestFilter filter)
+            {
+                return _remoteAgent.Explore(filter);
+            }
+
+            public TestEngineResult Load()
+            {
+                return Interlocked.Exchange(ref _createRunnerLoadResult, null)
+                    ?? _remoteAgent.Reload();
+            }
+
+            public void Unload()
+            {
+                _remoteAgent.Unload();
+            }
+
+            public TestEngineResult Reload()
+            {
+                return _remoteAgent.Reload();
+            }
+
+            public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
+            {
+                return _remoteAgent.Run(listener, filter);
+            }
+
+            public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
+            {
+                return _remoteAgent.RunAsync(listener, filter);
+            }
+
+            public void StopRun(bool force)
+            {
+                _remoteAgent.StopRun(force);
             }
         }
     }

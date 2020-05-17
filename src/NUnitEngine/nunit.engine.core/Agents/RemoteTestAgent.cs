@@ -38,7 +38,7 @@ namespace NUnit.Engine.Agents
     /// to it. Rather, it reports back to the sponsoring TestAgency upon
     /// startup so that the agency may in turn provide it to clients for use.
     /// </summary>
-    public class RemoteTestAgent : MarshalByRefObject, ITestAgent, IDisposable, ITestEngineRunner
+    public class RemoteTestAgent : MarshalByRefObject, ITestAgent, IDisposable
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteTestAgent));
 
@@ -82,11 +82,11 @@ namespace NUnit.Engine.Agents
             get { return System.Diagnostics.Process.GetCurrentProcess().Id; }
         }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
+        public TestEngineResult Load(TestPackage package)
         {
             _package = package;
             _runner = _services.GetService<ITestRunnerFactory>().MakeTestRunner(_package);
-            return this;
+            return _runner.Load();
         }
 
         public bool Start()

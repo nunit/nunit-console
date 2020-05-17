@@ -24,7 +24,8 @@
 namespace NUnit.Engine
 {
     /// <summary>
-    /// The ITestAgent interface is implemented by remote test agents.
+    /// Defines the current communication protocol between the engine and the agent. This is an implementation detail
+    /// which is in the process of changing as the dependency on .NET Framework's remoting is removed.
     /// </summary>
     public interface ITestAgent
     {
@@ -34,8 +35,51 @@ namespace NUnit.Engine
         void ShutDown();
 
         /// <summary>
-        ///  Creates a test runner
+        /// Loads a package which will be used for all subsequent calls to the other methods (except
+        /// <see cref="ShutDown"/>). This method must be called at least once before calling methods that operate on a
+        /// test package. It may be called any number of times after those methods.
         /// </summary>
-        ITestEngineRunner CreateRunner(TestPackage package);
+        TestEngineResult Load(TestPackage package);
+
+        /// <summary>
+        /// Unloads any loaded package. If none is loaded, the call is ignored.
+        /// </summary>
+        void Unload();
+
+        /// <summary>
+        /// Reloads the loaded package.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if no package is loaded.</exception>
+        TestEngineResult Reload();
+
+        /// <summary>
+        /// Counts the test cases in the loaded package that would be run under the specified filter.
+        /// </summary>
+        int CountTestCases(TestFilter filter);
+
+        /// <summary>
+        /// Runs the tests in the loaded package synchronously. The listener interface is notified as the run
+        /// progresses.
+        /// </summary>
+        TestEngineResult Run(ITestEventListener listener, TestFilter filter);
+
+#if !NETSTANDARD1_6
+        /// <summary>
+        /// Start an asynchronous run of the tests in the loaded package. The listener interface is notified as the run
+        /// progresses.
+        /// </summary>
+        AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter);
+#endif
+
+        /// <summary>
+        /// Cancel the current test run. If no test is running, the call is ignored.
+        /// </summary>
+        /// <param name="force">Indicates whether tests that have not completed should be killed.</param>
+        void StopRun(bool force);
+
+        /// <summary>
+        /// Returns information about the test cases in the loaded package that would be run under the specified filter.
+        /// </summary>
+        TestEngineResult Explore(TestFilter filter);
     }
 }

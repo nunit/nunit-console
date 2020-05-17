@@ -30,17 +30,47 @@ namespace NUnit.Engine.Services.Tests
     {
         private sealed class DummyTestAgent : ITestAgent
         {
-            public ITestEngineRunner CreateRunner(TestPackage package)
+            public int CountTestCases(TestFilter filter)
             {
                 throw new NotImplementedException();
             }
 
-            public bool Start()
+            public TestEngineResult Explore(TestFilter filter)
+            {
+                throw new NotImplementedException();
+            }
+
+            public TestEngineResult Load(TestPackage package)
+            {
+                throw new NotImplementedException();
+            }
+
+            public TestEngineResult Reload()
+            {
+                throw new NotImplementedException();
+            }
+
+            public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
+            {
+                throw new NotImplementedException();
+            }
+
+            public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
             {
                 throw new NotImplementedException();
             }
 
             public void ShutDown()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void StopRun(bool force)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Unload()
             {
                 throw new NotImplementedException();
             }
