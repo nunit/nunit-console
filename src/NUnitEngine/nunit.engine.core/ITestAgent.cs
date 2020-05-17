@@ -58,18 +58,9 @@ namespace NUnit.Engine
         int CountTestCases(TestFilter filter);
 
         /// <summary>
-        /// Runs the tests in the loaded package synchronously. The listener interface is notified as the run
-        /// progresses.
+        /// Runs the tests in the loaded package. The listener interface is notified as the run progresses.
         /// </summary>
         TestEngineResult Run(ITestEventListener listener, TestFilter filter);
-
-#if !NETSTANDARD1_6
-        /// <summary>
-        /// Start an asynchronous run of the tests in the loaded package. The listener interface is notified as the run
-        /// progresses.
-        /// </summary>
-        AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter);
-#endif
 
         /// <summary>
         /// Cancel the current test run. If no test is running, the call is ignored.

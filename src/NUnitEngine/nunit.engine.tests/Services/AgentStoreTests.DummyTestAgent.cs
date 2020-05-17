@@ -55,11 +55,6 @@ namespace NUnit.Engine.Services.Tests
                 throw new NotImplementedException();
             }
 
-            public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
-            {
-                throw new NotImplementedException();
-            }
-
             public void ShutDown()
             {
                 throw new NotImplementedException();
