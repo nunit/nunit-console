@@ -191,6 +191,13 @@ namespace NUnit.Engine.Agents
                             writer);
                         break;
 
+                    case AgentWorkerRequestType.Explore:
+                        HandleRequest(
+                            ExploreRequest.ReadBody(headerResult.Value.RequestLength, frameReader),
+                            request => new ExploreResponse(Explore(request.Filter)).Write,
+                            writer);
+                        break;
+
                     default:
                         RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
                         break;

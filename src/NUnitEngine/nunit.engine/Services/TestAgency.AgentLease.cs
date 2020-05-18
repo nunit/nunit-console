@@ -72,7 +72,11 @@ namespace NUnit.Engine.Services
 
             public TestEngineResult Explore(TestFilter filter)
             {
-                return _remoteAgent.Explore(filter);
+                var response = CommunicationUtils.HandleMessageResponse(
+                    CommunicationUtils.SendMessage(_remoteAgent, new ExploreRequest(filter).Write),
+                    ExploreResponse.ReadBody);
+
+                return response.EngineResult;
             }
 
             public TestEngineResult Load()

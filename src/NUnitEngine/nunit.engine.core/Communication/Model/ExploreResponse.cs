@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole, Rob Prouse
+// Copyright (c) 2020 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,27 +21,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-namespace NUnit.Engine
+using System;
+using System.IO;
+
+namespace NUnit.Engine.Communication.Model
 {
-    /// <summary>
-    /// Defines the current communication protocol between the engine and the agent. This is an implementation detail
-    /// which is in the process of changing as the dependency on .NET Framework's remoting is removed.
-    /// </summary>
-    public interface ITestAgent
+    public struct ExploreResponse
     {
-        // Once this is the last member of ITestAgent and the same is done for ITestAgency, remoting can be trivially
-        // replaced.
-        byte[] SendMessage(byte[] message);
+        public ExploreResponse(TestEngineResult result)
+        {
+            EngineResult = result ?? throw new ArgumentNullException(nameof(result));
+        }
 
-        /// <summary>
-        /// Runs the tests in the loaded package. The listener interface is notified as the run progresses.
-        /// </summary>
-        TestEngineResult Run(ITestEventListener listener, TestFilter filter);
+        public TestEngineResult EngineResult { get; }
 
-        /// <summary>
-        /// Cancel the current test run. If no test is running, the call is ignored.
-        /// </summary>
-        /// <param name="force">Indicates whether tests that have not completed should be killed.</param>
-        void StopRun(bool force);
+        public static Result<ExploreResponse> ReadBody(ProtocolReader reader)
+        {
+            return TestEngineResult.Read(reader)
+                .Select(testEngineResult => new ExploreResponse(testEngineResult));
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            RequestStatus.Success.Write(writer);
+            EngineResult.Write(writer);
+        }
     }
 }
