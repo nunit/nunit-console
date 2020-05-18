@@ -34,8 +34,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b0_0000000 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0u)));
             }
         }
 
@@ -44,8 +43,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b0_1111111 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1111111));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1111111u)));
             }
         }
 
@@ -54,8 +52,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b0_0000001 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1_0000000));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1_0000000u)));
             }
         }
 
@@ -64,8 +61,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_1111111, 0b0_1111111 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1111111_1111111));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1111111_1111111u)));
             }
         }
 
@@ -74,8 +70,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b0_0000001 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1_0000000_0000000));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1_0000000_0000000u)));
             }
         }
 
@@ -84,8 +79,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_1111111, 0b1_1111111, 0b0_1111111 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1111111_1111111_1111111));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1111111_1111111_1111111u)));
             }
         }
 
@@ -94,8 +88,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b0_0000001 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1_0000000_0000000_0000000));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1_0000000_0000000_0000000u)));
             }
         }
 
@@ -104,8 +97,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_1111111, 0b1_1111111, 0b1_1111111, 0b0_1111111 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1111111_1111111_1111111_1111111));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1111111_1111111_1111111_1111111u)));
             }
         }
 
@@ -114,8 +106,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b0_0000001 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0b1_0000000_0000000_0000000_0000000));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0b1_0000000_0000000_0000000_0000000u)));
             }
         }
 
@@ -124,8 +115,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_1111111, 0b1_1111111, 0b1_1111111, 0b1_1111111, 0b0_0001111 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(uint.MaxValue));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(uint.MaxValue)));
             }
         }
 
@@ -134,7 +124,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b0_0010000 })))
             {
-                Assert.False(reader.TryRead7BitEncodedUInt32(out _));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result<uint>.Error("The value is too large to be represented in 32 bits.")));
             }
         }
 
@@ -143,8 +133,7 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b0_0000000 })))
             {
-                Assert.True(reader.TryRead7BitEncodedUInt32(out var result));
-                Assert.That(result, Is.EqualTo(0));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result.Success(0u)));
             }
         }
 
@@ -153,7 +142,16 @@ namespace NUnit.Engine.Tests.Communication.ProtocolReaderTests
         {
             using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b0_0000000 })))
             {
-                Assert.False(reader.TryRead7BitEncodedUInt32(out _));
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result<uint>.Error("The value is too large to be represented in 32 bits.")));
+            }
+        }
+
+        [Test]
+        public static void End_of_stream()
+        {
+            using (var reader = new ProtocolReader(new MemoryStream(new byte[] { 0b1_0000000, 0b1_0000000, 0b1_0000000, 0b1_0000000 })))
+            {
+                Assert.That(reader.Read7BitEncodedUInt32(), Is.EqualTo(Result<uint>.Error("The stream ended unexpectedly.")));
             }
         }
     }

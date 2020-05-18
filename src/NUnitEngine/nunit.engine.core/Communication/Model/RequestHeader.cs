@@ -41,10 +41,8 @@ namespace NUnit.Engine.Communication.Model
             if (!reader.TryReadByte(out var requestType))
                 return Result.Error("Unexpected end of stream.");
 
-            if (!reader.TryRead7BitEncodedUInt32(out var requestLength))
-                return Result.Error("Stream ended or request length was invalid.");
-
-            return Result.Success(new RequestHeader((AgentWorkerRequestType)requestType, requestLength));
+            return reader.Read7BitEncodedUInt32()
+                .Select(requestLength => new RequestHeader((AgentWorkerRequestType)requestType, requestLength));
         }
 
         public void Write(BinaryWriter writer)

@@ -59,44 +59,31 @@ namespace NUnit.Engine.Communication
             return false;
         }
 
-        public bool TryRead7BitEncodedInt32(out int value)
+        public Result<int> Read7BitEncodedInt32()
         {
-            if (TryRead7BitEncodedUInt32(out var unsigned))
-            {
-                value = (int)unsigned;
-                return true;
-            }
-
-            value = 0;
-            return false;
+            return Read7BitEncodedUInt32().Select(unsigned => (int)unsigned);
         }
 
-        public bool TryRead7BitEncodedUInt32(out uint value)
+        public Result<uint> Read7BitEncodedUInt32()
         {
             var result = 0U;
             var shift = 0;
 
-            while (TryReadByte(out var nextByte))
+            while (true)
             {
+                if (!TryReadByte(out var nextByte))
+                    return Result.Error("The stream ended unexpectedly.");
+
                 if (shift == 28 && nextByte > 0b1111u)
-                {
-                    // Prevent overflow
-                    break;
-                }
+                    return Result.Error("The value is too large to be represented in 32 bits.");
 
                 result |= (nextByte & 0b0_1111111u) << shift;
 
                 if ((nextByte & 0b1_0000000u) == 0)
-                {
-                    value = result;
-                    return true;
-                }
+                    return Result.Success(result);
 
                 shift += 7;
             }
-
-            value = 0;
-            return false;
         }
 
         public Result<string> ReadString()

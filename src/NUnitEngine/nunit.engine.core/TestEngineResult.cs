@@ -149,15 +149,16 @@ namespace NUnit.Engine
 
         internal static Result<TestEngineResult> Read(ProtocolReader reader)
         {
-            if (!reader.TryRead7BitEncodedInt32(out var count))
-                return Result.Error("Unexpected end of stream.");
+            var count = reader.Read7BitEncodedInt32();
+            if (count.IsError(out var message))
+                return Result.Error(message);
 
             var result = new TestEngineResult();
 
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < count.Value; i++)
             {
                 var readResult = reader.ReadString();
-                if (readResult.IsError(out var message))
+                if (readResult.IsError(out message))
                     return Result.Error(message);
 
                 result.Add(readResult.Value);
