@@ -63,7 +63,11 @@ namespace NUnit.Engine.Services
 
             public int CountTestCases(TestFilter filter)
             {
-                return _remoteAgent.CountTestCases(filter);
+                var response = CommunicationUtils.HandleMessageResponse(
+                    CommunicationUtils.SendMessage(_remoteAgent, new CountTestCasesRequest(filter).Write),
+                    CountTestCasesResponse.ReadBody);
+
+                return response.Count;
             }
 
             public TestEngineResult Explore(TestFilter filter)

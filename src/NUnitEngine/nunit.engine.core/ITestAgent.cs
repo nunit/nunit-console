@@ -34,11 +34,6 @@ namespace NUnit.Engine
         byte[] SendMessage(byte[] message);
 
         /// <summary>
-        /// Counts the test cases in the loaded package that would be run under the specified filter.
-        /// </summary>
-        int CountTestCases(TestFilter filter);
-
-        /// <summary>
         /// Runs the tests in the loaded package. The listener interface is notified as the run progresses.
         /// </summary>
         TestEngineResult Run(ITestEventListener listener, TestFilter filter);

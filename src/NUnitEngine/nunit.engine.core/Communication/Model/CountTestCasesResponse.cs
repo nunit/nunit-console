@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole, Rob Prouse
+// Copyright (c) 2020 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,40 +21,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
 using System.IO;
-using System.Xml;
 
-namespace NUnit.Engine
+namespace NUnit.Engine.Communication.Model
 {
-    /// <summary>
-    /// Abstract base for all test filters. A filter is represented
-    /// by an XmlNode with &lt;filter&gt; as its topmost element.
-    /// In the console runner, filters serve only to carry this
-    /// XML representation, as all filtering is done by the engine.
-    /// </summary>
-#if !NETSTANDARD1_6
-    [Serializable]
-#endif
-    public class TestFilter
+    public struct CountTestCasesResponse
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestFilter"/> class.
-        /// </summary>
-        /// <param name="xmlText">The XML text that specifies the filter.</param>
-        public TestFilter(string xmlText)
+        public CountTestCasesResponse(int count)
         {
-            Text = xmlText;
+            Count = count;
         }
 
-        /// <summary>
-        /// The empty filter - one that always passes.
-        /// </summary>
-        public static readonly TestFilter Empty = new TestFilter("<filter/>");
+        public int Count { get; }
 
-        /// <summary>
-        /// Gets the XML representation of this filter as a string.
-        /// </summary>
-        public string Text { get; private set; }
+        public static Result<CountTestCasesResponse> ReadBody(ProtocolReader reader)
+        {
+            return Result.Success(new CountTestCasesResponse(reader.ReadInt32()));
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            new RequestHeader(AgentWorkerRequestType.CountTestCases, requestLength: 4)
+                .Write(writer);
+
+            writer.Write(Count);
+        }
     }
 }

@@ -184,6 +184,13 @@ namespace NUnit.Engine.Agents
                         new ReloadResponse(engineResult).Write(writer);
                         break;
 
+                    case AgentWorkerRequestType.CountTestCases:
+                        HandleRequest(
+                            CountTestCasesRequest.ReadBody(headerResult.Value.RequestLength, frameReader),
+                            request => new CountTestCasesResponse(CountTestCases(request.Filter)).Write,
+                            writer);
+                        break;
+
                     default:
                         RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
                         break;

@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using System.IO;
+using System.Text;
 
 namespace NUnit.Engine.Communication
 {

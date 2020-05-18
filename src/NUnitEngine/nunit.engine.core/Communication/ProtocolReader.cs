@@ -97,5 +97,24 @@ namespace NUnit.Engine.Communication
                 return Result.Error("Error parsing length-prefixed string: " + ex.Message);
             }
         }
+
+        public Result<byte[]> ReadBytes(int count)
+        {
+            var result = new byte[count];
+            var position = 0;
+
+            while (position < count)
+            {
+                var byteCount = _reader.BaseStream.Read(result, position, count - position);
+                if (byteCount == 0)
+                    return Result.Error("Unexpected end of stream");
+
+                position += byteCount;
+            }
+
+            return Result.Success(result);
+        }
+
+        public int ReadInt32() => _reader.ReadInt32();
     }
 }
