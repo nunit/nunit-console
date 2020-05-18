@@ -21,14 +21,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System.IO;
+
 namespace NUnit.Engine.Communication.Model
 {
-    public enum RequestStatusCode : byte
+    public struct ReloadRequest
     {
-        Success = 0,
-        UnsupportedProtocolVersion,
-        ProtocolError,
-        UnsupportedRequestType,
-        InvalidOperation,
+        public void Write(BinaryWriter writer)
+        {
+            new RequestHeader(AgentWorkerRequestType.Reload, requestLength: 0)
+                .Write(writer);
+        }
     }
 }

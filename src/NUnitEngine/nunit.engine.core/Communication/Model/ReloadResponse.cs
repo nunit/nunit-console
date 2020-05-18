@@ -21,14 +21,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
+using System.IO;
+
 namespace NUnit.Engine.Communication.Model
 {
-    public enum RequestStatusCode : byte
+    public struct ReloadResponse
     {
-        Success = 0,
-        UnsupportedProtocolVersion,
-        ProtocolError,
-        UnsupportedRequestType,
-        InvalidOperation,
+        public ReloadResponse(TestEngineResult result)
+        {
+            EngineResult = result ?? throw new ArgumentNullException(nameof(result));
+        }
+
+        public TestEngineResult EngineResult { get; }
+
+        public static Result<ReloadResponse> ReadBody(ProtocolReader reader)
+        {
+            return TestEngineResult.Read(reader)
+                .Select(testEngineResult => new ReloadResponse(testEngineResult));
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            RequestStatus.Success.Write(writer);
+            EngineResult.Write(writer);
+        }
     }
 }

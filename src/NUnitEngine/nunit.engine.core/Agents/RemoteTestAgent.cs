@@ -168,6 +168,22 @@ namespace NUnit.Engine.Agents
                         RequestStatus.Success.Write(writer);
                         break;
 
+                    case AgentWorkerRequestType.Reload:
+                        TestEngineResult engineResult;
+                        try
+                        {
+                            engineResult = Reload();
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            RequestStatus.Error(RequestStatusCode.InvalidOperation, ex.Message).Write(writer);
+                            break;
+                        }
+
+                        RequestStatus.Success.Write(writer);
+                        new ReloadResponse(engineResult).Write(writer);
+                        break;
+
                     default:
                         RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
                         break;

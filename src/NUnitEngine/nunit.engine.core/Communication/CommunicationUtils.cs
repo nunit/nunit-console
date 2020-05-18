@@ -75,6 +75,9 @@ namespace NUnit.Engine.Communication
                 if (statusResult.IsError(out var message))
                     throw new NUnitEngineException("Error reading request status: " + message);
 
+                if (statusResult.Value.Code == RequestStatusCode.InvalidOperation)
+                    throw new InvalidOperationException(statusResult.Value.ErrorMessage);
+
                 if (statusResult.Value.ErrorMessage is object)
                     throw new NUnitEngineException("Error message from agent: " + statusResult.Value.ErrorMessage);
             }

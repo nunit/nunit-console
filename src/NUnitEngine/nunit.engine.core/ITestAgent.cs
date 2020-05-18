@@ -34,12 +34,6 @@ namespace NUnit.Engine
         byte[] SendMessage(byte[] message);
 
         /// <summary>
-        /// Reloads the loaded package.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if no package is loaded.</exception>
-        TestEngineResult Reload();
-
-        /// <summary>
         /// Counts the test cases in the loaded package that would be run under the specified filter.
         /// </summary>
         int CountTestCases(TestFilter filter);

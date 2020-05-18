@@ -74,7 +74,7 @@ namespace NUnit.Engine.Services
             public TestEngineResult Load()
             {
                 return Interlocked.Exchange(ref _createRunnerLoadResult, null)
-                    ?? _remoteAgent.Reload();
+                    ?? Reload();
             }
 
             public void Unload()
@@ -85,7 +85,11 @@ namespace NUnit.Engine.Services
 
             public TestEngineResult Reload()
             {
-                return _remoteAgent.Reload();
+                var response = CommunicationUtils.HandleMessageResponse(
+                    CommunicationUtils.SendMessage(_remoteAgent, new ReloadRequest().Write),
+                    ReloadResponse.ReadBody);
+
+                return response.EngineResult;
             }
 
             public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
