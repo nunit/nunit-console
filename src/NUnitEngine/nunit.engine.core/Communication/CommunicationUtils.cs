@@ -67,6 +67,22 @@ namespace NUnit.Engine.Communication
         /// <summary>
         /// Temporary remoting go-between.
         /// </summary>
+        public static void HandleMessageResponse(ProtocolReader reader)
+        {
+            using (reader)
+            {
+                var statusResult = RequestStatus.Read(reader);
+                if (statusResult.IsError(out var message))
+                    throw new NUnitEngineException("Error reading request status: " + message);
+
+                if (statusResult.Value.ErrorMessage is object)
+                    throw new NUnitEngineException("Error message from agent: " + statusResult.Value.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Temporary remoting go-between.
+        /// </summary>
         public static byte[] CreateMessage(Action<BinaryWriter> writeMessage)
         {
             using (var stream = new MemoryStream())

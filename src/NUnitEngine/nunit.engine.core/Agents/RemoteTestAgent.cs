@@ -163,6 +163,11 @@ namespace NUnit.Engine.Agents
                             writer);
                         break;
 
+                    case AgentWorkerRequestType.Unload:
+                        Unload();
+                        RequestStatus.Success.Write(writer);
+                        break;
+
                     default:
                         RequestStatus.Error(RequestStatusCode.UnsupportedRequestType, "Unrecognized request type").Write(writer);
                         break;

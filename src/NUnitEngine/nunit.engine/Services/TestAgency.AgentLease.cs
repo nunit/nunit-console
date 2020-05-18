@@ -79,7 +79,8 @@ namespace NUnit.Engine.Services
 
             public void Unload()
             {
-                _remoteAgent.Unload();
+                CommunicationUtils.HandleMessageResponse(
+                    CommunicationUtils.SendMessage(_remoteAgent, new UnloadRequest().Write));
             }
 
             public TestEngineResult Reload()

@@ -34,11 +34,6 @@ namespace NUnit.Engine
         byte[] SendMessage(byte[] message);
 
         /// <summary>
-        /// Unloads any loaded package. If none is loaded, the call is ignored.
-        /// </summary>
-        void Unload();
-
-        /// <summary>
         /// Reloads the loaded package.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if no package is loaded.</exception>
