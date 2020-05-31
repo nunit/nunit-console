@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Microsoft.Win32;
 
 namespace NUnit.Engine
 {
@@ -152,37 +151,6 @@ namespace NUnit.Engine
             }
             catch (Exception){}
             return newestAssemblyFound;
-        }
-
-        private static string FindEngineInRegistry(RegistryKey rootKey, string subKey)
-        {
-            try
-            {
-                using (var key = rootKey.OpenSubKey(subKey, false))
-                {
-                    if (key != null)
-                    {
-                        Version newest = null;
-                        string[] subkeys = key.GetValueNames();
-                        foreach (string name in subkeys)
-                        {
-                            try
-                            {
-                                var current = new Version(name);
-                                if (newest == null || current.CompareTo(newest) > 0)
-                                {
-                                    newest = current;
-                                }
-                            }
-                            catch (Exception){}
-                        }
-                        if(newest != null)
-                            return key.GetValue(newest.ToString()) as string;
-                    }
-                }
-            }
-            catch (Exception) { }
-            return null;
         }
 #endif
     }
