@@ -318,9 +318,8 @@ Task("TestNetStandard16Engine")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCORE21_CONSOLE,
+                NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
                 NETCOREAPP11_BIN_DIR,
-                ENGINE_TESTS,
                 "netcoreapp1.1",
                 ref ErrorDetail);
         }
@@ -343,9 +342,8 @@ Task("TestNetStandard20Engine")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCORE21_CONSOLE,
+                NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
                 NETCOREAPP21_BIN_DIR,
-                ENGINE_TESTS,
                 "netcoreapp2.1",
                 ref ErrorDetail);
         }
@@ -692,6 +690,11 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, st
         errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
     else if (rc < 0)
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
+}
+
+void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
+{
+    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
 }
 
 void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
