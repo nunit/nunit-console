@@ -61,14 +61,16 @@ namespace NUnit.Engine.Drivers
         /// Gets a driver for a given test assembly and a framework
         /// which the assembly is already known to reference.
         /// </summary>
-        /// <param name="domain">The domain in which the assembly will be loaded</param>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
         /// <returns></returns>
         public IFrameworkDriver GetDriver(AssemblyName reference)
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
-
+#if NETSTANDARD
             return new NUnitNetStandardDriver();
+#elif NETCOREAPP3_1
+            return new NUnitNetCore31Driver();
+#endif
         }
 #endif
     }
