@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if NETSTANDARD || NETCOREAPP3_1
+#if NETSTANDARD
 using System;
 using System.Linq;
 using System.Collections.Generic;

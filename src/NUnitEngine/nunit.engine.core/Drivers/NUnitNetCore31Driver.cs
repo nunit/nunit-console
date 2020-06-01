@@ -28,9 +28,7 @@ using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Internal;
 using System.Reflection;
-using System.Runtime.Loader;
 using NUnit.Engine.Extensibility;
-using Mono.Cecil;
 
 namespace NUnit.Engine.Drivers
 {
@@ -55,7 +53,7 @@ namespace NUnit.Engine.Drivers
         static readonly string RUN_ASYNC_METHOD = "RunTests";
         static readonly string STOP_RUN_METHOD = "StopRun";
 
-        static ILogger log = InternalTrace.GetLogger(nameof(NUnitNetStandardDriver));
+        static ILogger log = InternalTrace.GetLogger(nameof(NUnitNetCore31Driver));
 
         Assembly _testAssembly;
         Assembly _frameworkAssembly;
