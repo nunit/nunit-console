@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2015 Charlie Poole, Rob Prouse
+// Copyright (c) 2020 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,18 +21,35 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-namespace NUnit.Engine.Services.Tests.Fakes
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Engine.Extensibility;
+using NUnit.Engine.Services.Tests.Fakes;
+
+namespace NUnit.Engine.Tests.Services.Fakes
 {
-    public class FakeRuntimeService : FakeService, IRuntimeFrameworkService
+    class FakeExtensionService : FakeService, IExtensionService
     {
-        bool IRuntimeFrameworkService.IsAvailable(string framework)
+        public IEnumerable<IExtensionPoint> ExtensionPoints { get; } = Enumerable.Empty<IExtensionPoint>();
+        public IEnumerable<IExtensionNode> Extensions { get; } = Enumerable.Empty<IExtensionNode>();
+        public IExtensionPoint GetExtensionPoint(string path)
         {
-            return true;
+            throw new NotImplementedException();
         }
 
-        string IRuntimeFrameworkService.SelectRuntimeFramework(TestPackage package)
+        public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
         {
-            return string.Empty;
+            return Enumerable.Empty<IExtensionNode>();
+        }
+
+        public void EnableExtension(string typeName, bool enabled)
+        {
+        }
+
+        public IEnumerable<T> GetExtensions<T>()
+        {
+            return Enumerable.Empty<T>();
         }
     }
 }

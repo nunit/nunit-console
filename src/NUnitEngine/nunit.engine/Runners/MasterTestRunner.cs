@@ -49,17 +49,17 @@ namespace NUnit.Engine.Runners
         // returned as XmlNodes, created from the internal 
         // TestEngineResult representation.
         // 
-        // MasterTestRUnner is responsible for creating the test-run
+        // MasterTestRunner is responsible for creating the test-run
         // element, which wraps all the individual assembly and project
         // results.
 
         private ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
 #if !NETSTANDARD1_6
-        private readonly ExtensionService _extensionService;
-#if !NETSTANDARD2_0
-        private readonly IRuntimeFrameworkService _runtimeService;
+        private readonly IExtensionService _extensionService;
 #endif
+#if NETFRAMEWORK
+        private readonly IRuntimeFrameworkService _runtimeService;
 #endif
         private readonly IProjectService _projectService;
         private ITestRunnerFactory _testRunnerFactory;
@@ -81,7 +81,7 @@ namespace NUnit.Engine.Runners
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
 #if !NETSTANDARD1_6
-            _extensionService = _services.GetService<ExtensionService>();
+            _extensionService = _services.GetService<IExtensionService>();
 #endif
 
             // Last chance to catch invalid settings in package,

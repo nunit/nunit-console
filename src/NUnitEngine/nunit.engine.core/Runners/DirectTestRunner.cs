@@ -52,11 +52,11 @@ namespace NUnit.Engine.Runners
         // the caller to specify that all projects and assemblies should be loaded 
         // in the same AppDomain.
         //
-        // TODO: When there are projects included in the TestPackage, DirectTestRUnner
+        // TODO: When there are projects included in the TestPackage, DirectTestRunner
         // should create intermediate result nodes for each project.
         //
         // TODO: We really should detect and give a meaningful message if the user 
-        // tries to load incopatible frameworks in the same AppDomain.
+        // tries to load incompatible frameworks in the same AppDomain.
 
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
 
