@@ -60,7 +60,7 @@ namespace NUnit.Engine.Extensibility
             get { return Assembly.MainModule; }
         }
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         public RuntimeFramework TargetFramework
         {
             get { return new RuntimeFramework(RuntimeType.Any, _targetFrameworkHelper.TargetRuntimeVersion); }

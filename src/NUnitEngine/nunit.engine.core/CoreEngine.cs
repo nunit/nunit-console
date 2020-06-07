@@ -103,9 +103,9 @@ namespace NUnit.Engine
                 Services.Add(new DriverService());
 #if !NETSTANDARD1_6
                 Services.Add(new ExtensionService());
-#if !NETSTANDARD2_0
-                Services.Add(new DomainManager());
 #endif
+#if NETFRAMEWORK
+                Services.Add(new DomainManager());
 #endif
                 Services.Add(new InProcessTestRunnerFactory());
             }

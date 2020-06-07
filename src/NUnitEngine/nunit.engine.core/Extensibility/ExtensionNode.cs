@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-#if NETSTANDARD2_0
+#if !NETFRAMEWORK
 using System.Linq;
 #endif
 
@@ -141,7 +141,7 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         public object CreateExtensionObject(params object[] args)
         {
-#if NETSTANDARD2_0
+#if !NETFRAMEWORK
             var assembly = Assembly.LoadFrom(AssemblyPath);
             var typeinfo = assembly.DefinedTypes.FirstOrDefault(t => t.FullName == TypeName);
             if (typeinfo == null)

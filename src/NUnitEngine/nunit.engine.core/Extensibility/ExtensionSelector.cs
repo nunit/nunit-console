@@ -61,7 +61,7 @@ namespace NUnit.Engine.Extensibility
             if (firstVersion < secondVersion)
                 return false;
 
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
             //Look at target runtime
             var firstTargetRuntime = first.TargetFramework.FrameworkVersion;
             var secondTargetRuntime = second.TargetFramework.FrameworkVersion;
