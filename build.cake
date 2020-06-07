@@ -311,6 +311,7 @@ Task("TestNetCore31Console")
 Task("TestNetStandard16Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
+    .WithCriteria(!BuildSystem.IsRunningOnAzurePipelines)   //Unable to find Azure build supporting both .NET Core 1.1 and .NET Core 3.1
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
@@ -658,10 +659,10 @@ bool CheckIfDotNetCoreInstalled()
 {
     try
     {
-        Information("Checking if .NET Core SDK is installed");
+        Information("Checking if .NET Core SDK is installed...");
         StartProcess("dotnet", new ProcessSettings
         {
-            Arguments = "--version"
+            Arguments = "--info"
         });
     }
     catch(Exception)
@@ -692,7 +693,7 @@ FilePath GetResultXmlPath(string testAssembly, string framework)
 {
     var assemblyName = System.IO.Path.GetFileNameWithoutExtension(testAssembly);
 
-    // Required for Test suites running under NUnitLite
+    // Required for test suites running under NUnitLite
     CreateDirectory($@"test-results\{framework}");
 
     return MakeAbsolute(new FilePath($@"test-results\{framework}\{assemblyName}.xml"));

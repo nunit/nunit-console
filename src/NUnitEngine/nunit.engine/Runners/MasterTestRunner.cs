@@ -57,9 +57,9 @@ namespace NUnit.Engine.Runners
         private readonly IServiceLocator _services;
 #if !NETSTANDARD1_6
         private readonly ExtensionService _extensionService;
-#if !NETSTANDARD2_0
-        private readonly IRuntimeFrameworkService _runtimeService;
 #endif
+#if NETFRAMEWORK
+        private readonly IRuntimeFrameworkService _runtimeService;
 #endif
         private readonly IProjectService _projectService;
         private ITestRunnerFactory _testRunnerFactory;
