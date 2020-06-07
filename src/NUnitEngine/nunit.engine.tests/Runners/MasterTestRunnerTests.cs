@@ -265,18 +265,31 @@ namespace NUnit.Engine.Runners.Tests
 
         private void CheckThatIdsAreUnique(XmlNode test)
         {
-            CheckThatIdsAreUnique(test, new Dictionary<string, bool>());
+            CheckTestIdsAreUnique(test, new HashSet<string>(), new HashSet<string>());
         }
 
-        private void CheckThatIdsAreUnique(XmlNode test, Dictionary<string, bool> dict)
+        /// Tests both that individual test IDs are unique, 
+        private void CheckTestIdsAreUnique(XmlNode test, HashSet<string> testIDs, HashSet<string> testAssemblyPrefixes)
         {
             foreach (XmlNode child in test.SelectNodes("test-suite"))
-                CheckThatIdsAreUnique(child, dict);
+                CheckTestIdsAreUnique(child, testIDs, testAssemblyPrefixes);
 
-            string id = test.GetAttribute("id");
-            Assert.That(dict, Does.Not.ContainKey(id));
+            var id = test.GetAttribute("id");
+            Assert.That(testIDs, Does.Not.Contain(id));
+            testIDs.Add(id);
 
-            dict.Add(id, true);
+            var testType = test.GetAttribute("type");
+            if (testType != null && testType.Equals("assembly", StringComparison.OrdinalIgnoreCase))
+            {
+                CheckTestAssemblyPrefixIsUnique(test, testAssemblyPrefixes);
+            }
+        }
+
+        private static void CheckTestAssemblyPrefixIsUnique(XmlNode test, HashSet<string> testAssemblyPrefixes)
+        {
+            var prefix = test.GetAttribute("id").Split('-')[0];
+            Assert.That(testAssemblyPrefixes, Does.Not.Contain(prefix));
+            testAssemblyPrefixes.Add(prefix);
         }
 
         private void CheckTestRunEvents()
