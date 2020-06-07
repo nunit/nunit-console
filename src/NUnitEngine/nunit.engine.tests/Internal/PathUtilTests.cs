@@ -87,7 +87,7 @@ namespace NUnit.Engine.Internal.Tests
 		{
             bool windows = false;
 
-#if NETCOREAPP1_1 || NETCOREAPP2_1
+#if NETCOREAPP
             windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #else
             var platform = Environment.OSVersion.Platform;
