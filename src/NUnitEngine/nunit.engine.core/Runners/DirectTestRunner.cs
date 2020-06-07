@@ -148,7 +148,7 @@ namespace NUnit.Engine.Runners
 #else
                 IFrameworkDriver driver = driverService.GetDriver(testFile, skipNonTestAssemblies);
 #endif
-                driver.ID = TestPackage.ID;
+                driver.ID = subPackage.ID;
                 result.Add(LoadDriver(driver, testFile, subPackage));
                 _drivers.Add(driver);
             }
