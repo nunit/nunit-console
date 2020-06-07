@@ -84,11 +84,11 @@ namespace NUnit.Engine
 #if !NETSTANDARD1_6
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
-#if !NETSTANDARD2_0
+#endif
+#if NETFRAMEWORK
                 Services.Add(new DomainManager());
                 Services.Add(new RuntimeFrameworkService());
                 Services.Add(new TestAgency());
-#endif
 #endif
                 Services.Add(new DriverService());
                 Services.Add(new ResultService());
