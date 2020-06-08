@@ -58,6 +58,11 @@ namespace NUnit.Engine
         /// <param name="typeName"></param>
         /// <param name="enabled"></param>
         void EnableExtension(string typeName, bool enabled);
+
+        /// <summary>
+        /// Get an enumeration of all registered extensions of a specific type.
+        /// </summary>
+        IEnumerable<T> GetExtensions<T>();
     }
 }
 
