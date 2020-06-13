@@ -69,7 +69,7 @@ namespace NUnit.Engine.Tests.Extensibility
             Assert.That(_ea.AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
         }
 
-#if !NETCOREAPP2_1
+#if NETFRAMEWORK
         [Test]
         public void TargetFramework()
         {

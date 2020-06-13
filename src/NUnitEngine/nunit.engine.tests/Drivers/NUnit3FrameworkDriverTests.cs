@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1 &&!NETCOREAPP2_1
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -49,21 +49,6 @@ namespace NUnit.Engine.Drivers.Tests
             var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
             _mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
             _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName);
-        }
-
-        //[Test]
-        //public void ConstructController()
-        //{
-        //    Assert.That(_controller..Builder, Is.TypeOf<DefaultTestAssemblyBuilder>());
-        //    Assert.That(_controller.Runner, Is.TypeOf<DefaultTestAssemblyRunner>());
-        //    Assert.That(_controller.AssemblyPath, Is.EqualTo(MOCK_ASSEMBLY));
-        //    Assert.That(_controller.Settings, Is.SameAs(_settings));
-        //}
-
-        public void ConstructController_MissingFile_ThrowsArgumentInvalid()
-        {
-            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
-            Assert.That(new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName), Throws.ArgumentException);
         }
 
         [Test]

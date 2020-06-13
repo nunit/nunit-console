@@ -54,7 +54,7 @@ namespace NUnit.Engine.Services.Tests
         }
 
 
-#if NETCOREAPP1_1 || NETCOREAPP2_1
+#if NETCOREAPP
         [TestCase("mock-assembly.dll", false, typeof(NUnitNetStandardDriver))]
         [TestCase("mock-assembly.dll", true, typeof(NUnitNetStandardDriver))]
         [TestCase("notest-assembly.dll", false, typeof(NUnitNetStandardDriver))]
@@ -72,16 +72,11 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
-            var driver = _driverService.GetDriver(
-#if !NETCOREAPP1_1
-                AppDomain.CurrentDomain,
+#if NETCOREAPP1_1
+            var driver = _driverService.GetDriver(Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), skipNonTestAssemblies);
+#else
+            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), null, skipNonTestAssemblies);
 #endif
-                Path.Combine(TestContext.CurrentContext.TestDirectory, fileName),
-#if !NETCOREAPP1_1
-                null,
-#endif
-                skipNonTestAssemblies);
-
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
     }

@@ -42,7 +42,7 @@ namespace NUnit.Engine.Services
         /// <returns>An ITestEngineRunner</returns>
         public virtual ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if !NETFRAMEWORK
             return new LocalTestRunner(ServiceContext, package);
 #else
             DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(

@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services.Tests
             return writer.GetType().Name;
         }
 
-#if !NETCOREAPP1_1 && !NETCOREAPP2_1
+#if NETFRAMEWORK
         [Test]
         public void CanGetWriterUser()
         {

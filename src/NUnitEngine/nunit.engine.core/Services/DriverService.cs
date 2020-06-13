@@ -61,7 +61,7 @@ namespace NUnit.Engine.Services
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, "File type is not supported");
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if NETFRAMEWORK
             if (targetFramework != null)
             {
                 // This takes care of an issue with Roslyn. It may get fixed, but we still
@@ -95,7 +95,7 @@ namespace NUnit.Engine.Services
                     foreach (var reference in references)
                     {
                         if (factory.IsSupportedTestFramework(reference))
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if !NETFRAMEWORK
                             return factory.GetDriver(reference);
 #else
                             return factory.GetDriver(domain, reference);
@@ -121,7 +121,7 @@ namespace NUnit.Engine.Services
 
             try
             {
-#if NET20 || NETSTANDARD2_0
+#if !NETSTANDARD1_6
                 var extensionService = ServiceContext.GetService<ExtensionService>();
                 if (extensionService != null)
                 {

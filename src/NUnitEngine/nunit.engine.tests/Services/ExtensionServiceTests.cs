@@ -157,7 +157,7 @@ namespace NUnit.Engine.Services.Tests
             //May be null on mono
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
             string other = "net35"; // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
 #elif NET35
             string other = "netcoreapp2.1"; // Attempt to load the .NET Core 2.1 version of the extensions from the .NET 3.5 tests
@@ -212,8 +212,9 @@ namespace NUnit.Engine.Services.Tests
 
         public static IEnumerable<TestCaseData> ValidCombos()
         {
-#if NETCOREAPP2_1
-            Assembly netstandard = typeof(ExtensionService).Assembly;
+#if NETCOREAPP
+            Assembly netstandard =
+                Assembly.LoadFile(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"));
             Assembly netcore = Assembly.GetExecutingAssembly();
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
@@ -234,8 +235,9 @@ namespace NUnit.Engine.Services.Tests
 
         public static IEnumerable<TestCaseData> InvalidTargetFrameworkCombos()
         {
-#if NETCOREAPP2_1
-            Assembly netstandard = typeof(ExtensionService).Assembly;
+#if NETCOREAPP
+            Assembly netstandard =
+                Assembly.LoadFile(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"));
             Assembly netcore = Assembly.GetExecutingAssembly();
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
@@ -256,8 +258,8 @@ namespace NUnit.Engine.Services.Tests
 
         public static IEnumerable<TestCaseData> InvalidRunnerCombos()
         {
-#if NETCOREAPP2_1
-            Assembly netstandard = typeof(ExtensionService).Assembly;
+#if NETCOREAPP
+            Assembly netstandard = Assembly.LoadFile(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"));
             Assembly netcore = Assembly.GetExecutingAssembly();
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);

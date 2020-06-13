@@ -31,7 +31,7 @@ namespace NUnit.Engine.Extensibility
         bool FromWildCard { get; }
         string AssemblyName { get; }
         Version AssemblyVersion { get; }
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
         RuntimeFramework TargetFramework { get; }
 #endif
     }

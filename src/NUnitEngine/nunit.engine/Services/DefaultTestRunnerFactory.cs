@@ -62,7 +62,7 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public override ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-#if NETSTANDARD1_6 || NETSTANDARD2_0
+#if !NETFRAMEWORK
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
 
@@ -122,7 +122,7 @@ namespace NUnit.Engine.Services
         }
 #endif
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if NETFRAMEWORK
         /// <summary>
         /// Get the specified target process model for the package.
         /// </summary>

@@ -36,6 +36,7 @@ var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NET35_BIN_DIR = BIN_DIR + "net35/";
 var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
 var NETCOREAPP21_BIN_DIR = BIN_DIR + "netcoreapp2.1/";
+var NETCOREAPP31_BIN_DIR = BIN_DIR + "netcoreapp3.1/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
@@ -54,12 +55,10 @@ var CONSOLE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console.tests/
 var MOCK_ASSEMBLY_CSPROJ = PROJECT_DIR + "src/NUnitEngine/mock-assembly/mock-assembly.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
-var NETSTANDARD_FRAMEWORKS = new [] { "netstandard1.6", "netstandard2.0" };
-var NETCORE_FRAMEWORKS = new [] { "netcoreapp1.1", "netcoreapp2.1" };
 
 // Test Runners
 var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
-var NETCORE21_CONSOLE = BIN_DIR + "netcoreapp2.1/" + "nunit3-console.dll";
+var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/" + "nunit3-console.dll";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
@@ -202,28 +201,28 @@ Task("Build")
 
         Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
-        foreach(var framework in NETSTANDARD_FRAMEWORKS)
+        foreach(var framework in new [] { "netstandard1.6", "netstandard2.0", "netcoreapp3.1" })
              MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach(var framework in NETSTANDARD_FRAMEWORKS)
+        foreach(var framework in new [] { "netstandard1.6", "netstandard2.0" })
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach(var framework in NETCORE_FRAMEWORKS)
+        foreach(var framework in new [] { "netcoreapp1.1", "netcoreapp2.1", "netcoreapp3.1" })
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
         MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", "netcoreapp2.1")
-            .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+            .WithProperty("TargetFramework", "netcoreapp3.1")
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 
          MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", "netcoreapp2.1")
-            .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+            .WithProperty("TargetFramework", "netcoreapp3.1")
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 
     });
 
@@ -280,11 +279,11 @@ Task("TestNet20Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET CORE 2.1 CONSOLE
+// TEST .NET CORE 3.1 CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNetCore21Console")
-    .Description("Tests the .NET Core 2.1 console runner")
+Task("TestNetCore31Console")
+    .Description("Tests the .NET Core 3.1 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
@@ -292,8 +291,8 @@ Task("TestNetCore21Console")
         if (IsDotNetCoreInstalled)
         {
             RunDotnetCoreTests(
-                NETCORE21_CONSOLE,
-                NETCOREAPP21_BIN_DIR,
+                NETCORE31_CONSOLE,
+                NETCOREAPP31_BIN_DIR,
                 CONSOLE_TESTS,
                 "netcoreapp2.1",
                 ref ErrorDetail);
@@ -312,6 +311,7 @@ Task("TestNetCore21Console")
 Task("TestNetStandard16Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
+    .WithCriteria(!BuildSystem.IsRunningOnAzurePipelines)   //Unable to find Azure build supporting both .NET Core 1.1 and .NET Core 3.1
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
@@ -350,6 +350,32 @@ Task("TestNetStandard20Engine")
         else
         {
             Warning("Skipping .NET Standard tests because .NET Core is not installed");
+        }
+    });
+
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETCORE 3.1 ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore31Engine")
+    .Description("Tests the .NET Core 3.1 Engine")
+    .IsDependentOn("Build")
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        if (IsDotNetCoreInstalled)
+        {
+            RunDotnetCoreTests(
+                NETCORE31_CONSOLE,
+                NETCOREAPP31_BIN_DIR,
+                ENGINE_TESTS,
+                "netcoreapp3.1",
+                ref ErrorDetail);
+        }
+        else
+        {
+            Warning("Skipping .NET Core 3.1 engine tests because .NET Core is not installed");
         }
     });
 
@@ -633,10 +659,10 @@ bool CheckIfDotNetCoreInstalled()
 {
     try
     {
-        Information("Checking if .NET Core SDK is installed");
+        Information("Checking if .NET Core SDK is installed...");
         StartProcess("dotnet", new ProcessSettings
         {
-            Arguments = "--version"
+            Arguments = "--info"
         });
     }
     catch(Exception)
@@ -667,7 +693,7 @@ FilePath GetResultXmlPath(string testAssembly, string framework)
 {
     var assemblyName = System.IO.Path.GetFileNameWithoutExtension(testAssembly);
 
-    // Workaround for https://github.com/nunit/nunit-console/issues/501
+    // Required for test suites running under NUnitLite
     CreateDirectory($@"test-results\{framework}");
 
     return MakeAbsolute(new FilePath($@"test-results\{framework}\{assemblyName}.xml"));
@@ -744,13 +770,14 @@ Task("Rebuild")
 Task("TestConsole")
     .Description("Builds and tests the console runner")
     .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNetCore21Console");
+    .IsDependentOn("TestNetCore31Console");
 
 Task("TestEngine")
     .Description("Builds and tests the engine")
     .IsDependentOn("TestNet20Engine")
     .IsDependentOn("TestNetStandard16Engine")
-    .IsDependentOn("TestNetStandard20Engine");
+    .IsDependentOn("TestNetStandard20Engine")
+    .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")
     .Description("Builds and tests the engine")
@@ -779,7 +806,7 @@ Task("Travis")
 
 Task("Default")
     .Description("Builds the engine and console runner")
-    .IsDependentOn("Build"); // Rebuild?
+    .IsDependentOn("Build");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

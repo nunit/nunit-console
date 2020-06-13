@@ -256,7 +256,7 @@ namespace NUnit.Engine.Services
             TypeDefinition typeDef = typeRef.Resolve();
 
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETCOREAPP3_1
             foreach (InterfaceImplementation iface in typeDef.Interfaces)
             {
                 ep = DeduceExtensionPointFromType(iface.InterfaceType);
@@ -417,7 +417,7 @@ namespace NUnit.Engine.Services
             {
 
                 IRuntimeFramework assemblyTargetFramework = null;
-#if !NETSTANDARD2_0
+#if NETFRAMEWORK
                 var currentFramework = RuntimeFramework.CurrentFramework;
                 assemblyTargetFramework = assembly.TargetFramework;
                 if (!currentFramework.CanLoad(assemblyTargetFramework))

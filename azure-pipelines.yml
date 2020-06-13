@@ -7,8 +7,16 @@ jobs:
 
 - job: Windows
   pool:
-    vmImage: vs2017-win2016
+    vmImage: windows-2019
+  
   steps:
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core 1.1.2'
+    inputs:
+      packageType: runtime
+      version: 1.1.2
+      installationPath: C:/Program Files/dotnet
 
   - powershell: .\build.ps1 -Target Test -Configuration Release
     displayName: Build and test

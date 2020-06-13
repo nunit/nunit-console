@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Copyright (c) 2011-2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -77,7 +77,7 @@ namespace NUnit.Engine.Runners
             _projectService = _services.GetService<IProjectService>();
             _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if NETFRAMEWORK
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
 #if !NETSTANDARD1_6
@@ -242,7 +242,7 @@ namespace NUnit.Engine.Runners
                 // Info will be left behind in the package about
                 // each contained assembly, which will subsequently
                 // be used to determine how to run the assembly.
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if NETFRAMEWORK
                 _runtimeService.SelectRuntimeFramework(TestPackage);
 #endif
 
@@ -346,7 +346,7 @@ namespace NUnit.Engine.Runners
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings()
         {
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0  // TODO: How do we validate runtime framework for .NET Standard 2.0?
+#if NETFRAMEWORK  // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
             var runningInProcess = processModel == "single" || processModel == "inprocess";
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
