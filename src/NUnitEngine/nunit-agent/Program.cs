@@ -67,7 +67,7 @@ namespace NUnit.Agent
                 {
                     debugArgPassed = true;
                 }
-                else if (arg.StartsWith("--trace:"))
+                else if (arg.StartsWith("--trace="))
                 {
                     traceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), arg.Substring(8));
                 }
