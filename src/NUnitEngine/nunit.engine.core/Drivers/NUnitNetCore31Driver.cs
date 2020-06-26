@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2016 Charlie Poole, Rob Prouse
+// Copyright (c) 2020 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -21,28 +21,24 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if NETSTANDARD
+#if NETCOREAPP3_1
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Engine.Internal;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
-using Mono.Cecil;
 
 namespace NUnit.Engine.Drivers
 {
     /// <summary>
-    /// NUnitNetStandardDriver is used by the test-runner to load and run
-    /// tests using the NUnit framework assembly.
-    ///
-    /// NUnitNetStandardDriver was the original driver for the .NET Standard builds
-    /// of the engine, however has an issue with loading .NET Core assemblies
-    /// (https://github.com/nunit/nunit-console/issues/710)
-    /// <see cref="NUnitNetCore31Driver" /> is the replacement driver for running .NET Core tests,
-    /// and should be preferred for use with .NET Core 3.1 and later.
+    /// NUnitNetCore31Driver is used by the test-runner to load and run
+    /// tests using the NUnit framework assembly. It contains functionality to
+    /// correctly load assemblies from other directories, using APIs first available in
+    /// .NET Core 3.1.
     /// </summary>
-    public class NUnitNetStandardDriver : IFrameworkDriver
+    public class NUnitNetCore31Driver : IFrameworkDriver
     {
         const string LOAD_MESSAGE = "Method called without calling Load first";
         const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
@@ -57,7 +53,7 @@ namespace NUnit.Engine.Drivers
         static readonly string RUN_ASYNC_METHOD = "RunTests";
         static readonly string STOP_RUN_METHOD = "StopRun";
 
-        static ILogger log = InternalTrace.GetLogger(nameof(NUnitNetStandardDriver));
+        static ILogger log = InternalTrace.GetLogger(nameof(NUnitNetCore31Driver));
 
         Assembly _testAssembly;
         Assembly _frameworkAssembly;
@@ -73,28 +69,33 @@ namespace NUnit.Engine.Drivers
         /// <summary>
         /// Loads the tests in an assembly.
         /// </summary>
-        /// <param name="frameworkAssembly">The NUnit Framework that the tests reference</param>
-        /// <param name="testAssembly">The test assembly</param>
+        /// <param name="assemblyPath">The path to the test assembly</param>
         /// <param name="settings">The test settings</param>
-        /// <returns>An Xml string representing the loaded test</returns>
-        public string Load(string testAssembly, IDictionary<string, object> settings)
+        /// <returns>An XML string representing the loaded test</returns>
+        public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
-            var assemblyRef = AssemblyDefinition.ReadAssembly(testAssembly);
-            _testAssembly = Assembly.Load(new AssemblyName(assemblyRef.FullName));
-            if(_testAssembly == null)
-                throw new NUnitEngineException(string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyRef.FullName));
+            assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
+            var assemblyLoadContext = new CustomAssemblyLoadContext(assemblyPath);
 
-            var nunitRef = assemblyRef.MainModule.AssemblyReferences.Where(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            try
+            {
+                _testAssembly = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+            }
+            catch (Exception e)
+            {
+                throw new NUnitEngineException(string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyPath), e);
+            }
+
+            var nunitRef = _testAssembly.GetReferencedAssemblies().FirstOrDefault(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase));
+            
             if (nunitRef == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
 
-            var nunit = Assembly.Load(new AssemblyName(nunitRef.FullName));
-            if (nunit == null)
+            _frameworkAssembly = assemblyLoadContext.LoadFromAssemblyName(nunitRef);
+            if (_frameworkAssembly == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
-
-            _frameworkAssembly = nunit;
 
             _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
             if (_frameworkController == null)
