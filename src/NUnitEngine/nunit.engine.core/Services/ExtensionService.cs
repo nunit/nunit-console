@@ -40,6 +40,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
+        private readonly bool _isRunningOnAgent;
         static Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
         static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
 
@@ -50,6 +51,11 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
         public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
+
+        public ExtensionService(bool isRunningOnAgent = false)
+        {
+            _isRunningOnAgent = isRunningOnAgent;
+        }
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -422,6 +428,14 @@ namespace NUnit.Engine.Services
                 assemblyTargetFramework = assembly.TargetFramework;
                 if (!currentFramework.CanLoad(assemblyTargetFramework))
                 {
+                    //Temp fix: Prevent crash in agent if an extension is used by the main engine, which targets a framework that can not be loaded on a particular agent
+                    // https://github.com/nunit/nunit-console/issues/757
+                    //Long-term fix is to not search for extensions within the agent, see https://github.com/nunit/nunit-console/issues/760
+                    if (_isRunningOnAgent)
+                    {
+                        return;
+                    }
+
                     if (!assembly.FromWildCard)
                     {
                         throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");

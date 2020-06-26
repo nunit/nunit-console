@@ -103,7 +103,7 @@ namespace NUnit.Agent
             };
 
             // Custom Service Initialization
-            engine.Services.Add(new ExtensionService());
+            engine.Services.Add(new ExtensionService(isRunningOnAgent: true));
             engine.Services.Add(new DomainManager());
             engine.Services.Add(new InProcessTestRunnerFactory());
             engine.Services.Add(new DriverService());
