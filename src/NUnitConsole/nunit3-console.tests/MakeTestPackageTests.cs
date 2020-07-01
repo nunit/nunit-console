@@ -71,7 +71,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--inprocess", "ProcessModel", "InProcess")]
         [TestCase("--domain=Multiple", "DomainUsage", "Multiple")]
         [TestCase("--domain=multiple", "DomainUsage", "Multiple")]
-        [TestCase("--framework=net-4.0", "RuntimeFramework", "net-4.0")]
+        [TestCase("--framework=net-4.0", "RequestedRuntimeFramework", "net-4.0")]
         [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
         [TestCase("--agents=5", "MaxAgents", 5)]
         [TestCase("--debug", "DebugTests", true)]

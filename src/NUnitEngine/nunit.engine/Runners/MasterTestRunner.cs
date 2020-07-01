@@ -342,6 +342,17 @@ namespace NUnit.Engine.Runners
                 && _projectService.CanLoadFrom(package.FullName);
         }
 
+        private struct ObsoletePackageSetting
+        {
+            public string OldKey;
+            public string NewKey;
+        }
+
+        private static ObsoletePackageSetting[] ObsoleteSettings = new ObsoletePackageSetting[]
+        {
+            new ObsoletePackageSetting() { OldKey = "RuntimeFramework", NewKey = "RequestedRuntimeFramework"}
+        };
+
         // Any Errors thrown from this method indicate that the client
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings()
@@ -349,7 +360,7 @@ namespace NUnit.Engine.Runners
 #if NETFRAMEWORK  // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var processModel = TestPackage.GetSetting(EnginePackageSettings.ProcessModel, "Default").ToLower();
             var runningInProcess = processModel == "single" || processModel == "inprocess";
-            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RuntimeFramework, "");
+            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
             var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             if (frameworkSetting.Length > 0)
@@ -376,6 +387,14 @@ namespace NUnit.Engine.Runners
 
             if (runningInProcess && runAsX86 && IntPtr.Size == 8)
                 throw new NUnitEngineException("Cannot run tests in process - a 32 bit process is required.");
+
+            foreach (var entry in ObsoleteSettings)
+            {
+                var oldKey = entry.OldKey;
+                var newKey = entry.NewKey;
+                if (TestPackage.Settings.ContainsKey(oldKey) && !TestPackage.Settings.ContainsKey(newKey))
+                    TestPackage.Settings[newKey] = TestPackage.Settings[oldKey];
+            }
 #endif
         }
 

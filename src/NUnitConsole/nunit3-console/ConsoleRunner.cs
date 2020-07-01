@@ -396,7 +396,7 @@ namespace NUnit.ConsoleRunner
                 package.AddSetting(EnginePackageSettings.DomainUsage, options.DomainUsage);
 
             if (options.FrameworkSpecified)
-                package.AddSetting(EnginePackageSettings.RuntimeFramework, options.Framework);
+                package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, options.Framework);
 
             if (options.RunAsX86)
                 package.AddSetting(EnginePackageSettings.RunAsX86, true);

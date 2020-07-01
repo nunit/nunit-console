@@ -21,6 +21,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
+
 namespace NUnit
 {
     /// <summary>
@@ -106,7 +108,21 @@ namespace NUnit
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
-        public const string RuntimeFramework = "RuntimeFramework";
+        [Obsolete("Use 'RequestedRuntimeFramework' instead.")]
+        public const string RuntimeFramework = "RequestedRuntimeFramework";
+
+        /// <summary>
+        /// Indicates the desired runtime to use for the tests. Values 
+        /// are strings like "net-4.5", "mono-4.0", etc. Default is to
+        /// use the target framework for which an assembly was built.
+        /// </summary>
+        public const string RequestedRuntimeFramework = "RequestedRuntimeFramework";
+
+        /// <summary>
+        /// Indicates the Target runtime selected for use by the engine,
+        /// based on the requested runtime and assembly metadata.
+        /// </summary>
+        public const string TargetRuntimeFramework = "TargetRuntimeFramework";
 
         /// <summary>
         /// Bool flag indicating that the test should be run in a 32-bit process 
