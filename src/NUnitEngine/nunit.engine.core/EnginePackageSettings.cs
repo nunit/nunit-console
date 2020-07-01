@@ -108,7 +108,7 @@ namespace NUnit
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
-        [Obsolete("Use 'RuntimeFramework.RequestedRuntimeFramework' instead.")]
+        [Obsolete("Use 'RequestedRuntimeFramework' instead.")]
         public const string RuntimeFramework = "RequestedRuntimeFramework";
 
         /// <summary>
