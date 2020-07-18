@@ -440,6 +440,14 @@ Task("PackageNuGet")
             NoPackageAnalysis = true
         });
 
+        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", new NuGetPackSettings()
+        {
+            Version = productVersion,
+            BasePath = CURRENT_IMG_DIR,
+            OutputDirectory = PACKAGE_DIR,
+            NoPackageAnalysis = true
+        });
+
         NuGetPack("nuget/deprecated/nunit.runners.nuspec", new NuGetPackSettings()
         {
             Version = productVersion,
