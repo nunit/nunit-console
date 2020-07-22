@@ -27,6 +27,7 @@ namespace NUnit.Engine.Services
             bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
             bool debugTests = package.GetSetting(EnginePackageSettings.DebugTests, false);
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
+            bool debugMono = package.GetSetting(EnginePackageSettings.DebugMono, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
@@ -55,7 +56,7 @@ namespace NUnit.Engine.Services
             {
                 StartInfo.FileName = RuntimeFramework.MonoExePath;
                 string monoOptions = "--runtime=v" + TargetRuntime.ClrVersion.ToString(3);
-                if (debugTests || debugAgent) monoOptions += " --debug";
+                if (debugTests || debugAgent || debugMono) monoOptions += " --debug";
                 StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monoOptions, AgentExePath, AgentArgs);
             }
             else if (TargetRuntime.Runtime == RuntimeType.Net)

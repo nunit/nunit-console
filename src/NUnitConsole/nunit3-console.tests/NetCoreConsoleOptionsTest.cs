@@ -93,6 +93,7 @@ namespace NUnit.ConsoleRunner.Tests
             "-loaduserprofile",
             "-agents=1",
             "-debug",
+            "-debugmono",
             "-pause",
             "-set-principal-policy=NoPrincipal",
 #if DEBUG
