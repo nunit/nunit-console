@@ -71,13 +71,6 @@ namespace NUnit
         public const string DebugAgent = "DebugAgent";
 
         /// <summary>
-        /// Bool flag indicating whether an agent started under using mono should
-        /// be started with --debug or not. This allows filenames and line numbers in
-        /// stacktraces when portable pdb files exists. Default is disabled.
-        /// </summary>
-        public const string MonoUseDebugOption = "MonoUseDebugOption";
-
-        /// <summary>
         /// Indicates how to load tests across application domains. Values are:
         /// "Default", "None", "Single", "Multiple". Default is "Multiple"
         /// if more than one assembly is loaded in a process. Otherwise,

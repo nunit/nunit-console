@@ -173,8 +173,6 @@ namespace NUnit.Common
 
         public bool DebugAgent { get; private set; }
 
-        public bool MonoUseDebugOption { get; private set; }
-
         public bool ListExtensions { get; private set; }
 
         public bool PauseBeforeRun { get; private set; }
@@ -398,9 +396,6 @@ namespace NUnit.Common
 
             this.AddNetFxOnlyOption("debug", "Launch debugger to debug tests.",
                 NetFxOnlyOption("debug", v => DebugTests = v != null));
-
-            this.AddNetFxOnlyOption("monodebug", "Agents launched using mono is launched with --debug",
-                NetFxOnlyOption("monodebug", v => MonoUseDebugOption = v != null));
 
             this.AddNetFxOnlyOption("pause", "Pause before running to allow attaching a debugger.",
                 NetFxOnlyOption("pause", v => PauseBeforeRun = v != null));
