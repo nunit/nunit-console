@@ -8,7 +8,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using NUnit.Engine;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
@@ -25,7 +24,6 @@ namespace NUnit.Engine.Services
 
             // Access other package settings
             bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
-            bool debugTests = package.GetSetting(EnginePackageSettings.DebugTests, false);
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
@@ -55,7 +53,7 @@ namespace NUnit.Engine.Services
             {
                 StartInfo.FileName = RuntimeFramework.MonoExePath;
                 string monoOptions = "--runtime=v" + TargetRuntime.ClrVersion.ToString(3);
-                if (debugTests || debugAgent) monoOptions += " --debug";
+                monoOptions += " --debug";
                 StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monoOptions, AgentExePath, AgentArgs);
             }
             else if (TargetRuntime.Runtime == RuntimeType.Net)
