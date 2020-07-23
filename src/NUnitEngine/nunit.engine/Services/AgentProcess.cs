@@ -24,7 +24,6 @@ namespace NUnit.Engine.Services
 
             // Access other package settings
             bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
-            bool debugTests = package.GetSetting(EnginePackageSettings.DebugTests, false);
             bool debugAgent = package.GetSetting(EnginePackageSettings.DebugAgent, false);
             string traceLevel = package.GetSetting(EnginePackageSettings.InternalTraceLevel, "Off");
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
