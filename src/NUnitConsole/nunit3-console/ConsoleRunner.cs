@@ -447,8 +447,8 @@ namespace NUnit.ConsoleRunner
                     package.AddSetting(FrameworkPackageSettings.NumberOfTestWorkers, 0);
             }
 
-            if (options.DebugMono)
-                package.AddSetting(EnginePackageSettings.DebugMono, true);
+            if (options.MonoUseDebugOption)
+                package.AddSetting(EnginePackageSettings.MonoUseDebugOption, true);
 
             if (options.PauseBeforeRun)
                 package.AddSetting(FrameworkPackageSettings.PauseBeforeRun, true);

@@ -80,7 +80,7 @@ namespace NUnit
         /// be started with --debug or not. This allows filenames and line numbers in
         /// stacktraces when portable pdb files exists. Default is disabled.
         /// </summary>
-        public const string DebugMono = "DebugMono";
+        public const string MonoUseDebugOption = "MonoUseDebugOption";
 
         /// <summary>
         /// Indicates how to load tests across application domains. Values are:
