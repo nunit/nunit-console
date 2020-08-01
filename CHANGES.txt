@@ -1,3 +1,47 @@
+## NUnit Console & Engine 3.12 Beta 1 - August 1, 2020
+
+This is the first beta release of the NUnit Console able to run .NET Core Tests. 
+In addition to this, this release also contains a number of bug fixes, improvements 
+when running on Mono and significant refactoring work towards the goal of creating an 
+engine able to run tests on a wider range of .NET platforms.
+
+We're particularly interested in this beta release being tested by users of the .NET Core 
+console and users running tests on Mono. Please feedback any issues to the nunit-console repository.
+
+The .NET Core Console is a separate executable to the original version, and can be found in either 
+the .zip file download, or the new NUnit.Console-Runner.NetCore NuGet package. Our longer-term aim 
+is to create a single console which is able to run both .NET Core and .NET Framework tests.
+
+Code contributions in this release were included from Charlie Poole, Chris Maddock, Christian Bay, 
+Eberhard Beilharz, Joseph Musser, Manohar Singh and Mikkel Nylander Bundgaard. Thank you to all 
+those who contributed both in code, and other ways!
+
+ * 391 Provide useful error message when agent crashes with a stack overflow exception
+ * 475 Create .NET Core Console Runner
+ * 662 Mono: Stacktrace missing files and line numbers
+ * 710 .NET Core engine only works when located in same directory as test assembly
+ * 733 iconUrl is deprecated in NuGet packages
+ * 740 Create separate agents for .NET 2.0-3.5 and .NET 4.x
+ * 747 [CI] Change macOS image version
+ * 748 Make Project config information available to runners
+ * 750 .NET Core Console Packaging
+ * 751 Minor updates to Contributing.MD
+ * 757 Unable to test net 3.5 assembly if there's incompatible extension installed
+ * 758 Carry CurrentDirectory over to agent Processes
+ * 761 Revert accidental debug message change
+ * 762 Simplify agent communication in preparation for new wire protocol
+ * 765 Split RuntimeFramework package setting into two: Requested and Target
+ * 768 Test run exits with an exit code of 0 if a multiple of 256 tests fail
+ * 775 Extension loading broken on Linux when installed from NuGet package
+ * 777 Remove unused code to locate engine from registry keys
+ * 778 Add .NET Core 3.1 build of engine to access APIs for loading .NET Core assemblies correctly
+ * 779 [CI] Revert to running .NET Standard Engine Tests via NUnitLite
+ * 783 Refactor XMLTransformResultWriterTests to avoid initialising entire engine
+ * 784 Fix DirectTestRunner to not give all drivers the same ID.
+ * 790 Fix agent debug logging
+ * 800 TypeLoadException thrown when changes are made to the API assembly, with multiple versions of the engine available
+ * 801 Begin incrementing EngineApiVersion with every release, as per Engine version
+
 NUnit Console & Engine 3.11.1 - February 15, 2020
 This hotfix fixes a problem with NUnit Project file settings being ignored.
 
