@@ -9,7 +9,7 @@ We're particularly interested in this beta release being tested by users of the 
 console and users running tests on Mono. Please feedback any issues to the nunit-console repository.
 
 The .NET Core Console is a separate executable to the original version, and can be found in either 
-the .zip file download, or the new NUnit.Console-Runner.NetCore NuGet package. Our longer-term aim 
+the .zip file download, or the new NUnit.ConsoleRunner.NetCore NuGet package. Our longer-term aim 
 is to create a single console which is able to run both .NET Core and .NET Framework tests.
 
 Code contributions in this release were included from Charlie Poole, Chris Maddock, Christian Bay, 
