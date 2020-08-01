@@ -10,7 +10,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.12.0");
+var productVersion = Argument("productVersion", "3.12.0-beta1");
 
 var ErrorDetail = new List<string>();
 bool IsDotNetCoreInstalled = false;
@@ -592,7 +592,7 @@ Task("PackageZip")
         CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", netfxZipImg + "nunit.bundle.addins");
     }
 
-    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, version);
+    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, productVersion);
     Zip(ZIP_IMG, zipPath);
 });
 
