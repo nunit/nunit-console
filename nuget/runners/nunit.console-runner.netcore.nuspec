@@ -22,32 +22,36 @@
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2020 Charlie Poole, Rob Prouse</copyright>
+    <packageTypes>
+        <packageType name="DotnetTool" />
+    </packageTypes>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
     <file src="NOTICES.txt" />
     <file src="CHANGES.txt" />
-    <file src="bin/netcoreapp3.1/nunit3-console.exe" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit3-console.pdb" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit3-console.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit3-console.dll.config" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit3-console.deps.json" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit3-console.runtimeconfig.json" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.core.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.core.pdb" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.pdb" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.deps.json" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.api.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.api.pdb" target="tools" />
-    <file src="bin/netcoreapp3.1/nunit.engine.api.xml" target="tools" />
-    <file src="bin/netcoreapp3.1/Microsoft.DotNet.InternalAbstractions.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.Mdb.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.Pdb.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.Rocks.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/System.Xml.XPath.XmlDocument.dll" target="tools" />
-    <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
+    <file src="bin/netcoreapp3.1/nunit3-console.exe" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit3-console.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit3-console.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit3-console.dll.config" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit3-console.deps.json" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit3-console.runtimeconfig.json" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.core.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.core.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.deps.json" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.api.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.api.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/nunit.engine.api.xml" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/Microsoft.DotNet.InternalAbstractions.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/Mono.Cecil.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/Mono.Cecil.Mdb.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/Mono.Cecil.Pdb.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/Mono.Cecil.Rocks.dll" target="tools/netcoreapp3.1/any" />
+    <file src="bin/netcoreapp3.1/System.Xml.XPath.XmlDocument.dll" target="tools/netcoreapp3.1/any" />
+    <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools/netcoreapp3.1/any"/>
+    <file src="../../nuget/runners/DotnetToolSettings.xml" target="tools/netcoreapp3.1/any"/>
     <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>
