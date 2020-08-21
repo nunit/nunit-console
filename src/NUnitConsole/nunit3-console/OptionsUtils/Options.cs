@@ -275,9 +275,8 @@ namespace NUnit.Options
 
     public class OptionValueCollection : IList, IList<string>
     {
-
-        List<string> values = new List<string>();
-        OptionContext c;
+        readonly List<string> values = new List<string>();
+        readonly OptionContext c;
 
         internal OptionValueCollection(OptionContext c)
         {
@@ -372,8 +371,8 @@ namespace NUnit.Options
         private Option option;
         private string name;
         private int index;
-        private OptionSet set;
-        private OptionValueCollection c;
+        private readonly OptionSet set;
+        private readonly OptionValueCollection c;
 
         public OptionContext(OptionSet set)
         {
@@ -419,12 +418,13 @@ namespace NUnit.Options
 
     public abstract class Option
     {
-        string prototype, description;
-        string[] names;
-        OptionValueType type;
-        int count;
+        readonly string prototype;
+        readonly string description;
+        readonly string[] names;
+        readonly OptionValueType type;
+        readonly int count;
         string[] separators;
-        bool hidden;
+        readonly bool hidden;
 
         protected Option(string prototype, string description)
             : this(prototype, description, 1, false)
@@ -825,8 +825,8 @@ namespace NUnit.Options
             internal set { localizer = value; }
         }
 
-        List<ArgumentSource> sources = new List<ArgumentSource>();
-        ReadOnlyCollection<ArgumentSource> roSources;
+        readonly List<ArgumentSource> sources = new List<ArgumentSource>();
+        readonly ReadOnlyCollection<ArgumentSource> roSources;
 
         public ReadOnlyCollection<ArgumentSource> ArgumentSources
         {
@@ -939,7 +939,7 @@ namespace NUnit.Options
 
         sealed class ActionOption : Option
         {
-            Action<OptionValueCollection> action;
+            readonly Action<OptionValueCollection> action;
 
             public ActionOption(string prototype, string description, int count, Action<OptionValueCollection> action)
                 : this(prototype, description, count, action, false)
@@ -1002,7 +1002,7 @@ namespace NUnit.Options
 
         sealed class ActionOption<T> : Option
         {
-            Action<T> action;
+            readonly Action<T> action;
 
             public ActionOption(string prototype, string description, Action<T> action)
                 : base(prototype, description, 1)
@@ -1020,7 +1020,7 @@ namespace NUnit.Options
 
         sealed class ActionOption<TKey, TValue> : Option
         {
-            OptionAction<TKey, TValue> action;
+            readonly OptionAction<TKey, TValue> action;
 
             public ActionOption(string prototype, string description, OptionAction<TKey, TValue> action)
                 : base(prototype, description, 2)
@@ -1106,7 +1106,7 @@ namespace NUnit.Options
 
         class ArgumentEnumerator : IEnumerable<string>
         {
-            List<IEnumerator<string>> sources = new List<IEnumerator<string>>();
+            readonly List<IEnumerator<string>> sources = new List<IEnumerator<string>>();
 
             public ArgumentEnumerator(IEnumerable<string> arguments)
             {
@@ -1631,8 +1631,8 @@ namespace NUnit.Options
 
     class HelpOption : Option
     {
-        Option option;
-        CommandSet commands;
+        readonly Option option;
+        readonly CommandSet commands;
 
         public HelpOption(CommandSet commands, Option d)
             : base(d.Prototype, d.Description, d.MaxValueCount, d.Hidden)
@@ -1651,7 +1651,7 @@ namespace NUnit.Options
 
     class CommandOptionSet : OptionSet
     {
-        CommandSet commands;
+        readonly CommandSet commands;
 
         public CommandOptionSet(CommandSet commands, MessageLocalizerConverter localizer)
             : base(localizer)
