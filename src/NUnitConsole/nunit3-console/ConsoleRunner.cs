@@ -53,15 +53,15 @@ namespace NUnit.ConsoleRunner
         //public static readonly int UNLOAD_ERROR = -5;         //No longer in use
         public static readonly int UNEXPECTED_ERROR = -100;
 
-        private ITestEngine _engine;
-        private ConsoleOptions _options;
-        private IResultService _resultService;
-        private ITestFilterService _filterService;
-        private IExtensionService _extensionService;
+        private readonly ITestEngine _engine;
+        private readonly ConsoleOptions _options;
+        private readonly IResultService _resultService;
+        private readonly ITestFilterService _filterService;
+        private readonly IExtensionService _extensionService;
 
-        private ExtendedTextWriter _outWriter;
+        private readonly ExtendedTextWriter _outWriter;
 
-        private string _workDirectory;
+        private readonly string _workDirectory;
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {

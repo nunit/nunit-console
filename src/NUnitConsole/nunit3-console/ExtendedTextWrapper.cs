@@ -34,7 +34,7 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ExtendedTextWrapper : ExtendedTextWriter
     {
-        private TextWriter _writer;
+        private readonly TextWriter _writer;
 
         public ExtendedTextWrapper(TextWriter writer)
         {
