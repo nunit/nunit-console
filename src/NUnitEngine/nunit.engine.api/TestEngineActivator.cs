@@ -89,6 +89,11 @@ namespace NUnit.Engine
         /// <returns>An <see cref="ITestEngine"/></returns>
         public static ITestEngine CreateInstance(Version minVersion, bool unused = false)
         {
+            //Workaround for to support loading extensions referencing the original 3.0.0 version of this API, the version of which was
+            //not incremented from Engine versions 3.0-3.11. 
+            //See https://github.com/nunit/nunit-console/pull/813 for further details.
+            AppDomain.CurrentDomain.AssemblyResolve += EmbeddedAssemblyResolver;
+
             try
             {
                 Assembly engine = FindNewestEngine(minVersion);
@@ -151,6 +156,15 @@ namespace NUnit.Engine
             }
             catch (Exception){}
             return newestAssemblyFound;
+        }
+
+        private static Assembly EmbeddedAssemblyResolver(object sender, ResolveEventArgs args)
+        {
+            if (args.Name.StartsWith("nunit.engine.api, Version=3.0.0.0", StringComparison.Ordinal))
+            {
+                return Assembly.GetAssembly(typeof(TestEngineActivator));
+            }
+            return null;
         }
 #endif
     }
