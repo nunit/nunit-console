@@ -230,21 +230,21 @@ namespace NUnit.Engine.Services
             }
             else if (File.Exists(packageName) && PathUtils.IsAssemblyFileType(packageName))
             {
-                var assembly = new TargetFrameworkHelper(packageName);
+                var assembly = AssemblyDefinition.ReadAssembly(packageName);
 
-                targetVersion = assembly.TargetRuntimeVersion;
+                targetVersion = assembly.GetRuntimeVersion();
                 log.Debug($"Assembly {packageName} uses version {targetVersion}");
 
-                frameworkName = assembly.FrameworkName;
+                frameworkName = assembly.GetFrameworkName();
                 log.Debug($"Assembly {packageName} targets {frameworkName}");
 
-                if (assembly.RequiresX86)
+                if (assembly.RequiresX86())
                 {
                     requiresX86 = true;
                     log.Debug($"Assembly {packageName} will be run x86");
                 }
 
-                if (assembly.RequiresAssemblyResolver)
+                if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
                 {
                     requiresAssemblyResolver = true;
                     log.Debug($"Assembly {packageName} requires default app domain assembly resolver");

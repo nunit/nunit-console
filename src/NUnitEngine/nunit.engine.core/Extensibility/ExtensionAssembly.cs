@@ -31,14 +31,11 @@ namespace NUnit.Engine.Extensibility
 {
     internal class ExtensionAssembly : IExtensionAssembly
     {
-        private readonly TargetFrameworkHelper _targetFrameworkHelper;
-
         public ExtensionAssembly(string filePath, bool fromWildCard)
         {
             FilePath = filePath;
             FromWildCard = fromWildCard;
             Assembly = GetAssemblyDefinition();
-            _targetFrameworkHelper = new TargetFrameworkHelper(Assembly);
         }
 
         public string FilePath { get; }
@@ -63,7 +60,7 @@ namespace NUnit.Engine.Extensibility
 #if NETFRAMEWORK
         public RuntimeFramework TargetFramework
         {
-            get { return new RuntimeFramework(RuntimeType.Any, _targetFrameworkHelper.TargetRuntimeVersion); }
+            get { return new RuntimeFramework(RuntimeType.Any, Assembly.GetRuntimeVersion()); }
         }
 #endif
 

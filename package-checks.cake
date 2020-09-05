@@ -9,9 +9,9 @@
 
 public void CheckAllPackages()
 {
-    string[] ENGINE_FILES = { "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "Mono.Cecil.dll" };
+    string[] ENGINE_FILES = { "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
     string[] AGENT_FILES = { 
-        "nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.engine.core.dll", "nunit.engine.api.dll", "Mono.Cecil.dll" };
+        "nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
     string[] CONSOLE_FILES = { "nunit3-console.exe", "nunit3-console.exe.config" };
 
     bool isOK =
