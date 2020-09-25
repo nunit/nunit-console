@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <DotNetCliTool>
   <Commands>
-    <Command Name="nunit3-console" EntryPoint="nunit3-console.dll" Runner="dotnet" />
+    <Command Name="nunit3" EntryPoint="nunit3-console.dll" Runner="dotnet" />
   </Commands>
 </DotNetCliTool>
