@@ -32,7 +32,7 @@
                     <CopyFile Id="nunit.agent.net40.engine.api.xml" DestinationDirectory="NET40_AGENT_DIR" />
                 </File>
             </Component>
-            <Component Id="NUNIT.ENGINE.METADATA" Location="local" Guid="D4A15752-6685-3494-9346-F623175CEFFA">
+            <Component Id="NUNIT.ENGINE.METADATA" Location="local" Guid="B3C60328-0486-4297-A3DB-39B5EFB497FE">
                 <File Id="nunit.engine.metadata.dll"
                       Source="$(var.InstallImage)bin/net20/testcentric.engine.metadata.dll">
                     <CopyFile Id="nunit.agent.net20.testcentric.engine.metadata.dll" DestinationDirectory="NET20_AGENT_DIR" />
