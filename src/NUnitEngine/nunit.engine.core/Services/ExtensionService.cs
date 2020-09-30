@@ -261,22 +261,12 @@ namespace NUnit.Engine.Services
 
             TypeDefinition typeDef = typeRef.Resolve();
 
-
-#if NETSTANDARD2_0 || NETCOREAPP3_1
             foreach (InterfaceImplementation iface in typeDef.Interfaces)
             {
                 ep = DeduceExtensionPointFromType(iface.InterfaceType);
                 if (ep != null)
                     return ep;
             }
-#else
-            foreach (TypeReference iface in typeDef.Interfaces)
-            {
-                ep = DeduceExtensionPointFromType(iface);
-                if (ep != null)
-                    return ep;
-            }
-#endif
 
             TypeReference baseType = typeDef.BaseType;
             return baseType != null && baseType.FullName != "System.Object"
@@ -526,21 +516,21 @@ namespace NUnit.Engine.Services
             if (runnerAsm == null)
                 return true;
 
-            var extHelper = new TargetFrameworkHelper(extensionAsm.FilePath);
-            var runnerHelper = new TargetFrameworkHelper(runnerAsm.Location);
-            if (runnerHelper.FrameworkName?.StartsWith(".NETStandard") == true)
+            string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
+            string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
+            if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
             {
                 throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
             }
-            else if (runnerHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
+            else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
             {
-                if (extHelper.FrameworkName?.StartsWith(".NETStandard") != true && extHelper.FrameworkName?.StartsWith(".NETCoreApp") != true)
+                if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
                 {
                     log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
                     return false;
                 }
             }
-            else if (extHelper.FrameworkName?.StartsWith(".NETCoreApp") == true)
+            else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
             {
                 log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
                 return false;

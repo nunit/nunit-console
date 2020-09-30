@@ -42,10 +42,7 @@
     <file src="bin/netcoreapp3.1/nunit.engine.api.pdb" target="tools" />
     <file src="bin/netcoreapp3.1/nunit.engine.api.xml" target="tools" />
     <file src="bin/netcoreapp3.1/Microsoft.DotNet.InternalAbstractions.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.Mdb.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.Pdb.dll" target="tools" />
-    <file src="bin/netcoreapp3.1/Mono.Cecil.Rocks.dll" target="tools" />
+    <file src="bin/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools" />
     <file src="bin/netcoreapp3.1/System.Xml.XPath.XmlDocument.dll" target="tools" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
     <file src="../../nunit_256.png" target="images"/>
