@@ -152,6 +152,7 @@ Task("UpdateAssemblyInfo")
     .Does(() =>
     {
         PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
+        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
         PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
     });
 
