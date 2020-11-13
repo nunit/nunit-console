@@ -30,7 +30,6 @@
       </group>
       <group targetFramework="netstandard2.0">
         <dependency id="NETStandard.Library" version="2.0.0" />
-        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
         <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
         <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
         <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
@@ -38,7 +37,6 @@
       </group>
       <group targetFramework="netcoreapp3.1">
         <dependency id="NETStandard.Library" version="2.0.0" />
-        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
         <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
         <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
         <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
