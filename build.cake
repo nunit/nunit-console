@@ -738,7 +738,7 @@ void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string argum
         var msg = $"No suitable runtime found to run tests under {framework}";
         if (BuildSystem.IsLocalBuild)
             Warning(msg);
-        else Error(msg);
+        else throw new Exception(msg);
     }
     else
     {
