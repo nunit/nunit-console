@@ -26,7 +26,6 @@ using System.IO;
 using System.Xml;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services.Tests.Fakes;
-using NUnit.Engine.Tests.Services.Fakes;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services.ResultWriters.Tests
@@ -44,7 +43,7 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
             var serviceContext = new ServiceContext();
             serviceContext.Add(new DriverService());
             serviceContext.Add(new InProcessTestRunnerFactory());
-            serviceContext.Add(new FakeExtensionService());
+            serviceContext.Add(new ExtensionService());
             serviceContext.Add(new FakeRuntimeService());
 #if NETFRAMEWORK
             serviceContext.Add(new DomainManager());
