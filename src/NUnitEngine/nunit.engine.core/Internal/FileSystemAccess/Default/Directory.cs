@@ -6,6 +6,7 @@
 namespace NUnit.Engine.Internal.FileSystemAccess.Default
 {
     using System;
+    using System.Collections.Generic;
     using SIO = System.IO;
 
     /// <summary>
@@ -13,6 +14,8 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
     /// </summary>
     internal sealed class Directory : IDirectory
     {
+        private readonly SIO.DirectoryInfo directory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Directory"/> class.
         /// </summary>
@@ -33,16 +36,27 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
                 throw new ArgumentException("Path contains invalid characters.", nameof(path));
             }
 
-            var directory = new SIO.DirectoryInfo(path);
+            this.directory = new SIO.DirectoryInfo(path);
 
-            this.Parent = directory.Parent == null ? null : new Directory(directory.Parent.FullName);
-            this.FullName = directory.FullName;
+            this.Parent = this.directory.Parent == null ? null : new Directory(directory.Parent.FullName);
         }
 
         /// <inheritdoc/>
         public IDirectory Parent { get; private set; }
 
         /// <inheritdoc/>
-        public string FullName { get; private set; }
+        public string FullName => this.directory.FullName;
+
+        /// <inheritdoc/>
+        public IEnumerable<IFile> GetFiles(string searchPattern)
+        {
+            List<IFile> files = new List<IFile>();
+            foreach (var fileInfo in this.directory.GetFiles(searchPattern))
+            {
+                files.Add(new File(fileInfo.FullName));
+            }
+
+            return files;
+        }
     }
 }

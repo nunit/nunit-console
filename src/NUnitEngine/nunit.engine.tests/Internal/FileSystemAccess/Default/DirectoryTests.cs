@@ -7,6 +7,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 {
     using NUnit.Engine.Internal.FileSystemAccess.Default;
     using NUnit.Framework;
+    using System.Linq;
     using SIO = System.IO;
 
     [TestFixture]
@@ -57,7 +58,6 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NoParent_SMB()
         {
-
             var path = "\\\\server\\share";
 
             var directory = new Directory(path);
@@ -69,7 +69,6 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NoParent_Drive()
         {
-
             var path = "x:\\";
 
             var directory = new Directory(path);
@@ -81,7 +80,6 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NoParent_Root()
         {
-
             var path = "/";
             var expected = new SIO.DirectoryInfo(path).FullName;
 
@@ -89,6 +87,54 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             Assert.AreEqual(expected, directory.FullName);
             Assert.IsNull(directory.Parent);
+        }
+
+        [Test]
+        public void GetFiles()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            var expected = new SIO.DirectoryInfo(path).GetFiles().Select(x => x.FullName);
+            var directory = new Directory(path);
+
+            var actualFiles = directory.GetFiles("*");
+
+            var actual = actualFiles.Select(x => x.FullName);
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
+
+        [Test]
+        public void GetFiles_NonExistingDirectory()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            while (SIO.Directory.Exists(path))
+            {
+                path += "a";
+            }
+            var directory = new Directory(path);
+
+            Assert.That(() => directory.GetFiles("*"), Throws.InstanceOf<SIO.DirectoryNotFoundException>());
+        }
+
+        [Test]
+        public void GetFiles_WithPattern()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            var expected = new SIO.DirectoryInfo(path).GetFiles("*.dll").Select(x => x.FullName);
+            var directory = new Directory(path);
+
+            var actualFiles = directory.GetFiles("*.dll");
+
+            var actual = actualFiles.Select(x => x.FullName);
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
+
+        [Test]
+        public void GetFiles_SearchPatternIsNull()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            var directory = new Directory(path);
+
+            Assert.That(() => directory.GetFiles(null), Throws.ArgumentNullException);
         }
     }
 }
