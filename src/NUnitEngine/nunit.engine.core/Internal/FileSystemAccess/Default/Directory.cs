@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------
 namespace NUnit.Engine.Internal.FileSystemAccess.Default
 {
+    using System;
     using SIO = System.IO;
 
     /// <summary>
@@ -18,10 +19,20 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
         /// <param name="path">Path of the directory.</param>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission to access <paramref name="path"/>.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
-        /// <exception cref="System.ArgumentException"><paramref name="path"/> contains invalid characters.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="path"/> contains invalid characters (see <see cref="SIO.Path.GetInvalidPathChars"/> for details).</exception>
         /// <exception cref="SIO.PathTooLongException"><paramref name="path"/> exceeds the system-defined maximum length.</exception>
         public Directory(string path)
         {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (path.IndexOfAny(SIO.Path.GetInvalidPathChars()) > -1)
+            {
+                throw new ArgumentException("String contains invalid characters.", nameof(path));
+            }
+
             var directory = new SIO.DirectoryInfo(path);
 
             this.Parent = directory.Parent == null ? null : new Directory(directory.Parent.FullName);

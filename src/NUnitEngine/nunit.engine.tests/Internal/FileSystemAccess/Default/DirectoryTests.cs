@@ -31,6 +31,18 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         }
 
         [Test]
+        public void Init_InvalidPath()
+        {
+            Assert.That(() => new Directory("c:\\this\\is\\an\\invalid" + SIO.Path.GetInvalidPathChars()[2] + "path"), Throws.ArgumentException);
+        }
+
+        [Test]
+        public void Init_EmptyPath()
+        {
+            Assert.That(() => new Directory(string.Empty), Throws.ArgumentException);
+        }
+
+        [Test]
         public void Init_TrailingDirectorySeparator()
         {
             var path = SIO.Directory.GetCurrentDirectory() + new string(SIO.Path.DirectorySeparatorChar, 1);
