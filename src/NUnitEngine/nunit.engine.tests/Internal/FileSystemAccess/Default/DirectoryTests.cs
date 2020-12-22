@@ -136,5 +136,36 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             Assert.That(() => directory.GetFiles(null), Throws.ArgumentNullException);
         }
+
+        [Test]
+        public void GetDirectories_NonExistingDirectory()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            while (SIO.Directory.Exists(path))
+            {
+                path += "a";
+            }
+            var directory = new Directory(path);
+
+            Assert.That(() => directory.GetDirectories("*", SIO.SearchOption.TopDirectoryOnly), Throws.InstanceOf<SIO.DirectoryNotFoundException>());
+        }
+
+        [Test]
+        public void GetDirectories_SearchPatternIsNull()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            var directory = new Directory(path);
+
+            Assert.That(() => directory.GetDirectories(null, SIO.SearchOption.TopDirectoryOnly), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void GetDirectories_SearchOptionIsInvalid()
+        {
+            var path = SIO.Directory.GetCurrentDirectory();
+            var directory = new Directory(path);
+
+            Assert.That(() => directory.GetDirectories("*", (SIO.SearchOption)5), Throws.InstanceOf<System.ArgumentOutOfRangeException>());
+        }
     }
 }

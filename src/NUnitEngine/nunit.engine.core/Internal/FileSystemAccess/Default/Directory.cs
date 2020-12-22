@@ -48,12 +48,24 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
         public string FullName => this.directory.FullName;
 
         /// <inheritdoc/>
+        public IEnumerable<IDirectory> GetDirectories(string searchPattern, SIO.SearchOption searchOption)
+        {
+            List<IDirectory> directories = new List<IDirectory>();
+            foreach (var currentDirectory in this.directory.GetDirectories(searchPattern, searchOption))
+            {
+                directories.Add(new Directory(currentDirectory.FullName));
+            }
+
+            return directories;
+        }
+
+        /// <inheritdoc/>
         public IEnumerable<IFile> GetFiles(string searchPattern)
         {
             List<IFile> files = new List<IFile>();
-            foreach (var fileInfo in this.directory.GetFiles(searchPattern))
+            foreach (var currentFile in this.directory.GetFiles(searchPattern))
             {
-                files.Add(new File(fileInfo.FullName));
+                files.Add(new File(currentFile.FullName));
             }
 
             return files;
