@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Directory.cs" company="TillW">
+// <copyright file="DirectoryTests.cs" company="TillW">
 //   Copyright 2020 TillW. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
