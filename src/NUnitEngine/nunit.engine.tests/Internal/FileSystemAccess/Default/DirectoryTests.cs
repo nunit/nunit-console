@@ -1,4 +1,9 @@
-﻿namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
+﻿//-----------------------------------------------------------------------
+// <copyright file="Directory.cs" company="TillW">
+//   Copyright 2020 TillW. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 {
     using NUnit.Engine.Internal.FileSystemAccess.Default;
     using NUnit.Framework;
