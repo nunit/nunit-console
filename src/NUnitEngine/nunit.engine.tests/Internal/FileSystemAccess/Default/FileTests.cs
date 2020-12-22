@@ -14,10 +14,19 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
     [TestFixture]
     public sealed class FileTests
     {
+        private string GetTestFileLocation()
+        {
+#if NETCOREAPP1_1
+            return Assembly.GetEntryAssembly().Location;
+#else
+            return Assembly.GetAssembly(typeof(FileTests)).Location;
+#endif
+        }
+
         [Test]
         public void Init()
         {
-            var path = Assembly.GetEntryAssembly().Location;
+            var path = this.GetTestFileLocation();
             var parent = SIO.Path.GetDirectoryName(path);
 
             var file = new File(path);
@@ -35,7 +44,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_InvalidPath_InvalidDirectory()
         {
-            var path = SIO.Path.GetInvalidPathChars()[1] + Assembly.GetEntryAssembly().Location;
+            var path = SIO.Path.GetInvalidPathChars()[1] + this.GetTestFileLocation();
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -44,7 +53,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         public void Init_InvalidPath_InvalidFileName()
         {
             char invalidCharThatIsNotInInvalidPathChars = SIO.Path.GetInvalidFileNameChars().Except(SIO.Path.GetInvalidPathChars()).FirstOrDefault();
-            var path = Assembly.GetEntryAssembly().Location + invalidCharThatIsNotInInvalidPathChars;
+            var path = this.GetTestFileLocation() + invalidCharThatIsNotInInvalidPathChars;
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -58,7 +67,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NonExistingFile()
         {
-            var path = Assembly.GetEntryAssembly().Location;
+            var path = this.GetTestFileLocation();
             while (SIO.File.Exists(path))
             {
                 path += "a";
