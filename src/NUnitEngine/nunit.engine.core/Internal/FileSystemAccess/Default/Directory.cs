@@ -9,7 +9,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
     using SIO = System.IO;
 
     /// <summary>
-    /// Default implementation of <see cref="IDirectory"/> that uses classes from <see cref="System.IO"/>.
+    /// Default implementation of <see cref="IDirectory"/> that relies on <see cref="System.IO"/>.
     /// </summary>
     internal sealed class Directory : IDirectory
     {
@@ -30,7 +30,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
 
             if (path.IndexOfAny(SIO.Path.GetInvalidPathChars()) > -1)
             {
-                throw new ArgumentException("String contains invalid characters.", nameof(path));
+                throw new ArgumentException("Path contains invalid characters.", nameof(path));
             }
 
             var directory = new SIO.DirectoryInfo(path);

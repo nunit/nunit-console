@@ -31,7 +31,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess
         /// <returns>An object representing the file-system entry located at <paramref name="path"/></returns>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
-        /// <exception cref="System.ArgumentException"><paramref name="path"/> contains invalid characters.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="path"/> is empty or contains invalid characters (see <see cref="SIO.Path.InvalidPathChars"/> for details).</exception>
         /// <exception cref="System.IO.DirectoryNotFoundException"><paramref name="path"/> points to a non-existing directory.</exception>
         /// <exception cref="System.IO.PathTooLongException">The specified path exceeds the system-defined maximum length.</exception>
         IDirectory GetDirectory(string path);
@@ -43,7 +43,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess
         /// <returns>An object representing the file-system entry located at <paramref name="path"/></returns>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
-        /// <exception cref="System.ArgumentException"><paramref name="path"/> contains invalid characters.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="path"/> is empty, contains no file-name or contains invalid characters (see <see cref="SIO.Path.GetInvalidFileNameChars"/> for details).</exception>
         /// <exception cref="System.IO.PathTooLongException">The specified path exceeds the system-defined maximum length.</exception>
         /// <exception cref="System.UnauthorizedAccessException">Access to <paramref name="path"/> is denied.</exception>
         /// <exception cref="System.NotSupportedException"><paramref name="path"/> contains a colon (:) in the middle of the string.</exception>
