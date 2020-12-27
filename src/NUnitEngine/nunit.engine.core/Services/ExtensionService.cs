@@ -1,4 +1,4 @@
-// ***********************************************************************
+﻿// ***********************************************************************
 // Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -352,46 +352,46 @@ namespace NUnit.Engine.Services
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
-            if (!Visited(filePath))
-            {
-                Visit(filePath);
+            if (Visited(filePath)) 
+                return;
 
-                try
-                {
-                    var candidate = new ExtensionAssembly(filePath, fromWildCard);
+            Visit(filePath);
+
+            try
+            {
+                var candidate = new ExtensionAssembly(filePath, fromWildCard);
 
                 if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidate))
                     return;
 
                 for (var i = 0; i < _assemblies.Count; i++)
+                {
+                    var assembly = _assemblies[i];
+
+                    if (candidate.IsDuplicateOf(assembly))
                     {
-                        var assembly = _assemblies[i];
+                        if (candidate.IsBetterVersionOf(assembly))
+                            _assemblies[i] = candidate;
 
-                        if (candidate.IsDuplicateOf(assembly))
-                        {
-                            if (candidate.IsBetterVersionOf(assembly))
-                                _assemblies[i] = candidate;
-
-                            return;
-                        }
+                        return;
                     }
+                }
 
-                    _assemblies.Add(candidate);
-                }
-                catch (BadImageFormatException e)
-                {
-                    if (!fromWildCard)
-                        throw new NUnitEngineException(String.Format("Specified extension {0} could not be read", filePath), e);
-                }
-                catch (NUnitEngineException)
-                {
-                    if (!fromWildCard)
-                        throw;
-                }
+                _assemblies.Add(candidate);
+            }
+            catch (BadImageFormatException e)
+            {
+                if (!fromWildCard)
+                    throw new NUnitEngineException($"Specified extension {filePath} could not be read", e);
+            }
+            catch (NUnitEngineException)
+            {
+                if (!fromWildCard)
+                    throw;
             }
         }
 
-        private Dictionary<string, object> _visited = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
 
         private bool Visited(string filePath)
         {
@@ -412,99 +412,95 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
 
-            if (CanLoadTargetFramework(Assembly.GetEntryAssembly(), assembly))
-            {
-
-                IRuntimeFramework assemblyTargetFramework = null;
+            IRuntimeFramework assemblyTargetFramework = null;
 #if NETFRAMEWORK
-                var currentFramework = RuntimeFramework.CurrentFramework;
-                assemblyTargetFramework = assembly.TargetFramework;
-                if (!currentFramework.CanLoad(assemblyTargetFramework))
+            var currentFramework = RuntimeFramework.CurrentFramework;
+            assemblyTargetFramework = assembly.TargetFramework;
+            if (!currentFramework.CanLoad(assemblyTargetFramework))
+            {
+                //Temp fix: Prevent crash in agent if an extension is used by the main engine, which targets a framework that can not be loaded on a particular agent
+                // https://github.com/nunit/nunit-console/issues/757
+                //Long-term fix is to not search for extensions within the agent, see https://github.com/nunit/nunit-console/issues/760
+                if (_isRunningOnAgent)
                 {
-                    //Temp fix: Prevent crash in agent if an extension is used by the main engine, which targets a framework that can not be loaded on a particular agent
-                    // https://github.com/nunit/nunit-console/issues/757
-                    //Long-term fix is to not search for extensions within the agent, see https://github.com/nunit/nunit-console/issues/760
-                    if (_isRunningOnAgent)
-                    {
-                        return;
-                    }
-
-                    if (!assembly.FromWildCard)
-                    {
-                        throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
-                    }
-                    else
-                    {
-                        log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
-                        return;
-                    }
+                    return;
                 }
+
+                if (!assembly.FromWildCard)
+                {
+                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                }
+                else
+                {
+                    log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                    return;
+                }
+            }
 #endif
 
-                foreach (var type in assembly.MainModule.GetTypes())
+            foreach (var type in assembly.MainModule.GetTypes())
+            {
+                CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
+
+                if (extensionAttr == null)
+                    continue;
+
+                object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
+                if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
+                    continue;
+
+                var node = new ExtensionNode(assembly.FilePath, assembly.AssemblyVersion, type.FullName, assemblyTargetFramework);
+                node.Path = extensionAttr.GetNamedArgument("Path") as string;
+                node.Description = extensionAttr.GetNamedArgument("Description") as string;
+
+                object enabledArg = extensionAttr.GetNamedArgument("Enabled");
+                node.Enabled = enabledArg != null
+                    ? (bool)enabledArg : true;
+
+                log.Info("  Found ExtensionAttribute on Type " + type.Name);
+
+                foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
                 {
-                    CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
+                    string name = attr.ConstructorArguments[0].Value as string;
+                    string value = attr.ConstructorArguments[1].Value as string;
 
-                    if (extensionAttr == null)
-                        continue;
-
-                    object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
-                    if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
-                        continue;
-
-                    var node = new ExtensionNode(assembly.FilePath, assembly.AssemblyVersion, type.FullName, assemblyTargetFramework);
-                    node.Path = extensionAttr.GetNamedArgument("Path") as string;
-                    node.Description = extensionAttr.GetNamedArgument("Description") as string;
-
-                    object enabledArg = extensionAttr.GetNamedArgument("Enabled");
-                    node.Enabled = enabledArg != null
-                        ? (bool)enabledArg : true;
-
-                    log.Info("  Found ExtensionAttribute on Type " + type.Name);
-
-                    foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
+                    if (name != null && value != null)
                     {
-                        string name = attr.ConstructorArguments[0].Value as string;
-                        string value = attr.ConstructorArguments[1].Value as string;
-
-                        if (name != null && value != null)
-                        {
-                            node.AddProperty(name, value);
-                            log.Info("        ExtensionProperty {0} = {1}", name, value);
-                        }
+                        node.AddProperty(name, value);
+                        log.Info("        ExtensionProperty {0} = {1}", name, value);
                     }
-
-                    _extensions.Add(node);
-
-                    ExtensionPoint ep;
-                    if (node.Path == null)
-                    {
-                        ep = DeduceExtensionPointFromType(type);
-                        if (ep == null)
-                        {
-                            string msg = string.Format(
-                                "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
-                                type.FullName);
-                            throw new NUnitEngineException(msg);
-                        }
-
-                        node.Path = ep.Path;
-                    }
-                    else
-                    {
-                        ep = GetExtensionPoint(node.Path);
-                        if (ep == null)
-                        {
-                            string msg = string.Format(
-                                "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
-                                type.FullName,
-                                node.Path);
-                            throw new NUnitEngineException(msg);
-                        }
-                    }
-
-                    ep.Install(node);
                 }
+
+                _extensions.Add(node);
+
+                ExtensionPoint ep;
+                if (node.Path == null)
+                {
+                    ep = DeduceExtensionPointFromType(type);
+                    if (ep == null)
+                    {
+                        string msg = string.Format(
+                            "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
+                            type.FullName);
+                        throw new NUnitEngineException(msg);
+                    }
+
+                    node.Path = ep.Path;
+                }
+                else
+                {
+                    ep = GetExtensionPoint(node.Path);
+                    if (ep == null)
+                    {
+                        string msg = string.Format(
+                            "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
+                            type.FullName,
+                            node.Path);
+                        throw new NUnitEngineException(msg);
+                    }
+                }
+
+                ep.Install(node);
             }
         }
 
