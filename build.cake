@@ -725,7 +725,7 @@ void RunDotnetCoreNUnitLiteTests(FilePath exePath, DirectoryPath workingDir, str
 
 void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
 {
-    //Filename is first arg if running on NUnit Console of exePath if running NUnitLite tests
+    //Filename is first arg if running on NUnit Console, or exePath if running NUnitLite tests
     var fileName = arguments ?? exePath.GetFilename();
 
     //Find most suitable runtime

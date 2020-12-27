@@ -11,7 +11,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
-    <PackageReference Include="NUnitLite" Version="3.13.0-dev-06899" />
     <PackageReference Include="NUnit" Version="3.13.0-dev-06899" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
   </ItemGroup>
