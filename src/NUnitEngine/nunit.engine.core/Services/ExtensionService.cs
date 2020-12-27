@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Copyright (c) 2015 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -360,7 +360,10 @@ namespace NUnit.Engine.Services
                 {
                     var candidate = new ExtensionAssembly(filePath, fromWildCard);
 
-                    for (int i = 0; i < _assemblies.Count; i++)
+                if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidate))
+                    return;
+
+                for (var i = 0; i < _assemblies.Count; i++)
                     {
                         var assembly = _assemblies[i];
 
