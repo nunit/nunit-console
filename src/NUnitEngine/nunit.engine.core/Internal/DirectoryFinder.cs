@@ -21,11 +21,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
+using NUnit.Common;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
@@ -34,7 +32,7 @@ namespace NUnit.Engine.Internal
     /// selection of directories and files. It's less than a full-fledged
     /// Linux-style globbing utility and more than standard wildcard use.
     /// </summary>
-    public static class DirectoryFinder
+    internal sealed class DirectoryFinder
     {
         /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
