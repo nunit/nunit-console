@@ -13,16 +13,18 @@ namespace NUnit.Engine.Internal.FileSystemAccess
         /// <summary>
         /// Checks whether a directory exists or not.
         /// </summary>
-        /// <param name="pathToCheck">Path to check.</param>
-        /// <returns><see langword="true"/> if <paramref name="pathToCheck"/> points to an existing directory; <see langword="false"/> otherwhise.</returns>
-        bool Exists(IDirectory pathToCheck);
+        /// <param name="directory">Directory to check.</param>
+        /// <returns><see langword="true"/> if <paramref name="directory"/> points to an existing directory; <see langword="false"/> otherwhise.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="directory"/> is <see langword="null"/>.</exception>
+        bool Exists(IDirectory directory);
 
         /// <summary>
         /// Checks whether a file exists or not.
         /// </summary>
-        /// <param name="pathToCheck">Path to check.</param>
-        /// <returns><see langword="true"/> if <paramref name="pathToCheck"/> points to an existing file; <see langword="false"/> otherwhise.</returns>
-        bool Exists(IFile pathToCheck);
+        /// <param name="file">File to check.</param>
+        /// <returns><see langword="true"/> if <paramref name="file"/> points to an existing file; <see langword="false"/> otherwhise.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="file"/> is <see langword="null"/>.</exception>
+        bool Exists(IFile file);
 
         /// <summary>
         /// Creates a <see cref="IDirectory"/> that points to an existing directory.
