@@ -1,5 +1,5 @@
-﻿// ***********************************************************************
-// Copyright (c) 2020 Charlie Poole, Rob Prouse
+// ***********************************************************************
+// Copyright (c) 2014 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -8,10 +8,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -21,35 +21,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Engine.Extensibility;
-using NUnit.Engine.Services.Tests.Fakes;
+using System.Reflection;
 
-namespace NUnit.Engine.Tests.Services.Fakes
-{
-    class FakeExtensionService : FakeService, IExtensionService
-    {
-        public IEnumerable<IExtensionPoint> ExtensionPoints { get; } = Enumerable.Empty<IExtensionPoint>();
-        public IEnumerable<IExtensionNode> Extensions { get; } = Enumerable.Empty<IExtensionNode>();
-        public IExtensionPoint GetExtensionPoint(string path)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
-        {
-            return Enumerable.Empty<IExtensionNode>();
-        }
-
-        public void EnableExtension(string typeName, bool enabled)
-        {
-        }
-
-        public IEnumerable<T> GetExtensions<T>()
-        {
-            return Enumerable.Empty<T>();
-        }
-    }
-}
+[assembly: AssemblyProduct("NUnit Engine API")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyInformationalVersion("3.12.0")]
+[assembly: AssemblyFileVersion("3.12.0")]

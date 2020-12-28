@@ -56,7 +56,7 @@ namespace NUnit.Engine.Runners
         private ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
 #if !NETSTANDARD1_6
-        private readonly IExtensionService _extensionService;
+        private readonly ExtensionService _extensionService;
 #endif
 #if NETFRAMEWORK
         private readonly IRuntimeFrameworkService _runtimeService;
@@ -81,7 +81,7 @@ namespace NUnit.Engine.Runners
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
 #if !NETSTANDARD1_6
-            _extensionService = _services.GetService<IExtensionService>();
+            _extensionService = _services.GetService<ExtensionService>();
 #endif
 
             // Last chance to catch invalid settings in package,

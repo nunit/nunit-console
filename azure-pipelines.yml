@@ -68,6 +68,7 @@ jobs:
       sudo apt-get update
       sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.2
       sudo apt-get install dotnet-sdk-2.2
+      sudo apt-get install dotnet-runtime-5.0
       ./build.sh --target=Test --configuration=Release
     displayName: Build and test
 
@@ -101,6 +102,12 @@ jobs:
   pool:
     vmImage: macOS-latest
   steps:
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 5.0'
+    inputs:
+      packageType: runtime
+      version: 5.x
 
   - task: UseDotNet@2
     displayName: 'Install .NET Core SDK'

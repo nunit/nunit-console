@@ -13,7 +13,7 @@ var configuration = Argument("configuration", "Release");
 var productVersion = Argument("productVersion", "3.12.0-beta1");
 
 var ErrorDetail = new List<string>();
-bool IsDotNetCoreInstalled = false;
+var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 
 //////////////////////////////////////////////////////////////////////
 // SET PACKAGE VERSION
@@ -118,7 +118,6 @@ Setup(context =>
 
     // Executed BEFORE the first task.
     Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
-    IsDotNetCoreInstalled = CheckIfDotNetCoreInstalled();
 });
 
 Teardown(context =>
@@ -152,6 +151,7 @@ Task("UpdateAssemblyInfo")
     .Does(() =>
     {
         PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
+        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
         PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
     });
 
@@ -287,21 +287,18 @@ Task("TestNetCore31Console")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        if (IsDotNetCoreInstalled)
+        var runtimes = new[] { "3.1", "5.0" };
+
+        foreach (var runtime in runtimes)
         {
             RunDotnetCoreTests(
                 NETCORE31_CONSOLE,
                 NETCOREAPP31_BIN_DIR,
                 CONSOLE_TESTS,
-                "netcoreapp2.1",
+                runtime,
                 ref ErrorDetail);
         }
-        else
-        {
-            Warning("Skipping .NET Core Console tests because .NET Core is not installed");
-        }
     });
-
 
 //////////////////////////////////////////////////////////////////////
 // TEST NETSTANDARD 1.6 ENGINE
@@ -314,18 +311,11 @@ Task("TestNetStandard16Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        if (IsDotNetCoreInstalled)
-        {
-            RunDotnetCoreTests(
-                NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
-                NETCOREAPP11_BIN_DIR,
-                "netcoreapp1.1",
-                ref ErrorDetail);
-        }
-        else
-        {
-            Warning("Skipping .NET Standard tests because .NET Core is not installed");
-        }
+        RunDotnetCoreNUnitLiteTests(
+            NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
+            NETCOREAPP11_BIN_DIR,
+            "netcoreapp1.1",
+            ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -338,18 +328,11 @@ Task("TestNetStandard20Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        if (IsDotNetCoreInstalled)
-        {
-            RunDotnetCoreTests(
-                NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
-                NETCOREAPP21_BIN_DIR,
-                "netcoreapp2.1",
-                ref ErrorDetail);
-        }
-        else
-        {
-            Warning("Skipping .NET Standard tests because .NET Core is not installed");
-        }
+        RunDotnetCoreNUnitLiteTests(
+            NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
+            NETCOREAPP21_BIN_DIR,
+            "netcoreapp2.1",
+            ref ErrorDetail);
     });
 
 
@@ -363,18 +346,16 @@ Task("TestNetCore31Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        if (IsDotNetCoreInstalled)
+        var runtimes = new[] { "3.1", "5.0" };
+
+        foreach (var runtime in runtimes)
         {
             RunDotnetCoreTests(
                 NETCORE31_CONSOLE,
                 NETCOREAPP31_BIN_DIR,
                 ENGINE_TESTS,
-                "netcoreapp3.1",
+                runtime,
                 ref ErrorDetail);
-        }
-        else
-        {
-            Warning("Skipping .NET Core 3.1 engine tests because .NET Core is not installed");
         }
     });
 
@@ -545,6 +526,7 @@ Task("FetchExtensions")
 });
 
 Task("CreateCombinedImage")
+.IsDependentOn("CreateImage")
 .IsDependentOn("FetchExtensions")
 .Does(() =>
 {
@@ -658,6 +640,17 @@ Task("CheckPackages")
         CheckAllPackages();
     });
 
+Task("ListInstalledNetCoreRuntimes")
+    .Description("Lists all installed .NET Core Runtimes")
+    .Does(() => 
+    {
+        var runtimes = GetInstalledNetCoreRuntimes();
+        foreach (var runtime in runtimes)
+        {
+            Information(runtime);            
+        }
+    });
+
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
@@ -725,22 +718,47 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, st
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
 
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
+void RunDotnetCoreNUnitLiteTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
 {
     RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
 }
 
 void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
 {
+    //Filename is first arg if running on NUnit Console, or exePath if running NUnitLite tests
+    var fileName = arguments ?? exePath.GetFilename();
+
+    //Find most suitable runtime
+    var fxVersion = new string(framework.SkipWhile(c => !char.IsDigit(c)).ToArray());
+    //Select latest runtime matching requested major/minor version
+    var selectedFramework = installedNetCoreRuntimes.Where(v => v.StartsWith(fxVersion)).OrderByDescending(Version.Parse).FirstOrDefault();
+
+    if (selectedFramework == null)
+    {
+        var msg = $"No suitable runtime found to run tests under {framework}";
+        if (BuildSystem.IsLocalBuild)
+            Warning(msg);
+        else throw new Exception(msg);
+    }
+    else
+    {
+        Information($"Runtime framework version {selectedFramework} selected to run {fileName} for {framework}.");
+    }
+
+    //Run Tests
+
+    var args = new ProcessArgumentBuilder()
+                .AppendSwitch("--fx-version", " ", selectedFramework)
+                .AppendQuoted(exePath.FullPath)
+                .Append(arguments)
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, framework).FullPath)
+                .Render();
+
     int rc = StartProcess(
         "dotnet",
         new ProcessSettings
         {
-            Arguments = new ProcessArgumentBuilder()
-                .AppendQuoted(exePath.FullPath)
-                .Append(arguments)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, framework).FullPath)
-                .Render(),
+            Arguments = args,
             WorkingDirectory = workingDir
         });
 
@@ -749,6 +767,30 @@ void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string argum
     else if (rc < 0)
         errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
 }
+
+public List<string> GetInstalledNetCoreRuntimes()
+{
+    var list = new List<string>();
+
+    var process = StartProcess("dotnet", 
+            new ProcessSettings 
+            { 
+                Arguments = "--list-runtimes",
+                RedirectStandardOutput = true,
+                RedirectedStandardOutputHandler = 
+                s => {
+                    if (s == null || !s.StartsWith("Microsoft.NETCore.App"))
+                        return s;
+
+                    var version = s.Split(' ')[1];                    
+
+                    list.Add(version);
+                    return s;
+                }
+            });
+    return list;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - PACKAGE
@@ -761,7 +803,7 @@ public string[] GetAllDirectories(string dirPath)
 
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
-    var files = GetFiles(packageDir + "/tools/*");
+    var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));
     CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
 }
 
