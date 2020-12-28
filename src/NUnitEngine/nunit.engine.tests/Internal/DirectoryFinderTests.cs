@@ -52,7 +52,8 @@ namespace NUnit.Engine.Internal.Tests
         //[TestCase("addins/./v2-tests/", 1)]
         public void GetDirectories(string pattern, int count)
         {
-            var dirList = DirectoryFinder.GetDirectories(_baseDir, pattern);
+            var finder = new DirectoryFinder();
+            var dirList = finder.GetDirectories(_baseDir, pattern);
             Assert.That(dirList.Count, Is.EqualTo(count));
         }
 
@@ -66,7 +67,8 @@ namespace NUnit.Engine.Internal.Tests
         //[TestCase("addins/../net-*/nunit.framework.dll", 4)]
         public void GetFiles(string pattern, int count)
         {
-            var files = DirectoryFinder.GetFiles(_baseDir, pattern);
+            var finder = new DirectoryFinder();
+            var files = finder.GetFiles(_baseDir, pattern);
             Assert.That(files.Count, Is.EqualTo(count));
         }
     }

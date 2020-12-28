@@ -42,7 +42,7 @@ namespace NUnit.Engine.Internal
         /// <param name="baseDir">A DirectoryInfo from which the matching starts</param>
         /// <param name="pattern">The pattern to match</param>
         /// <returns>A list of DirectoryInfos</returns>
-        public static IList<DirectoryInfo> GetDirectories(DirectoryInfo baseDir, string pattern)
+        public IList<DirectoryInfo> GetDirectories(DirectoryInfo baseDir, string pattern)
         {
             Guard.ArgumentNotNullOrEmpty(pattern, "pattern");
 
@@ -84,7 +84,7 @@ namespace NUnit.Engine.Internal
         /// <param name="baseDir">A DirectoryInfo from which the matching starts</param>
         /// <param name="pattern">The pattern to match</param>
         /// <returns>A list of FileInfos</returns>
-        public static IList<FileInfo> GetFiles(DirectoryInfo baseDir, string pattern)
+        public IList<FileInfo> GetFiles(DirectoryInfo baseDir, string pattern)
         {
             // If there is no directory path in pattern, delegate to DirectoryInfo
             int lastSep = pattern.LastIndexOf('/');
@@ -97,13 +97,14 @@ namespace NUnit.Engine.Internal
 
             var fileList = new List<FileInfo>();
 
-            foreach (var dir in DirectoryFinder.GetDirectories(baseDir, pattern1))
+            var finder = new DirectoryFinder();
+            foreach (var dir in finder.GetDirectories(baseDir, pattern1))
                 fileList.AddRange(dir.GetFiles(pattern2));
 
             return fileList;
         }
 
-        private static List<DirectoryInfo> ExpandOneStep(IList<DirectoryInfo> dirList, string pattern)
+        private List<DirectoryInfo> ExpandOneStep(IList<DirectoryInfo> dirList, string pattern)
         {
             var newList = new List<DirectoryInfo>();
 

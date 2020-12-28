@@ -339,12 +339,13 @@ namespace NUnit.Engine.Services
                     if (Path.DirectorySeparatorChar == '\\')
                         line = line.Replace(Path.DirectorySeparatorChar, '/');
 
+                    var finder = new DirectoryFinder(); 
                     bool isWild = fromWildCard || line.Contains("*");
                     if (line.EndsWith("/"))
-                        foreach (var dir in DirectoryFinder.GetDirectories(baseDir, line))
+                        foreach (var dir in finder.GetDirectories(baseDir, line))
                             ProcessDirectory(dir, isWild);
                     else
-                        foreach (var file in DirectoryFinder.GetFiles(baseDir, line))
+                        foreach (var file in finder.GetFiles(baseDir, line))
                             ProcessCandidateAssembly(file.FullName, isWild);
                 }
             }
