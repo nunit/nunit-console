@@ -103,22 +103,6 @@ namespace NUnit.Engine.Internal
             return fileList;
         }
 
-        public static DirectoryInfo GetPackageDirectory(DirectoryInfo startDir)
-        {
-            var dir = new DirectoryInfo(startDir.FullName).Parent;
-
-            while (dir != null)
-            {
-                string tryPath = Path.Combine(dir.FullName, "packages");
-                if (Directory.Exists(tryPath))
-                    return new DirectoryInfo(tryPath);
-
-                dir = dir.Parent;
-            }
-
-            return null;
-        }
-
         private static List<DirectoryInfo> ExpandOneStep(IList<DirectoryInfo> dirList, string pattern)
         {
             var newList = new List<DirectoryInfo>();
