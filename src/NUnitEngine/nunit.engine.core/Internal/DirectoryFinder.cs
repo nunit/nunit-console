@@ -22,6 +22,7 @@
 // ***********************************************************************
 
 using NUnit.Common;
+using NUnit.Engine.Internal.FileSystemAccess;
 using System.Collections.Generic;
 using System.IO;
 
@@ -34,6 +35,17 @@ namespace NUnit.Engine.Internal
     /// </summary>
     internal sealed class DirectoryFinder
     {
+        private readonly IFileSystem fileSystem;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DirectoryFinder"/> class.
+        /// </summary>
+        /// <param name="fileSystem">File-system to use.</param>
+        public DirectoryFinder(IFileSystem fileSystem)
+        {
+            this.fileSystem = fileSystem;
+        }
+
         /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
         /// Each path component may have wildcard characters and a component
@@ -97,8 +109,7 @@ namespace NUnit.Engine.Internal
 
             var fileList = new List<FileInfo>();
 
-            var finder = new DirectoryFinder();
-            foreach (var dir in finder.GetDirectories(baseDir, pattern1))
+            foreach (var dir in this.GetDirectories(baseDir, pattern1))
                 fileList.AddRange(dir.GetFiles(pattern2));
 
             return fileList;

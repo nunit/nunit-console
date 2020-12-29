@@ -30,6 +30,8 @@ using System.Xml;
 using Mono.Cecil;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Engine.Internal.FileSystemAccess.Default;
 
 namespace NUnit.Engine.Services
 {
@@ -50,10 +52,18 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
+        private readonly DirectoryFinder _directoryFinder;
+
         public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
 
         public ExtensionService(bool isRunningOnAgent = false)
+            : this(isRunningOnAgent, new FileSystem())
         {
+        }
+
+        internal ExtensionService(bool isRunningOnAgent, IFileSystem fileSystem)
+        {
+            _directoryFinder = new DirectoryFinder(fileSystem);
             _isRunningOnAgent = isRunningOnAgent;
         }
 
@@ -339,13 +349,12 @@ namespace NUnit.Engine.Services
                     if (Path.DirectorySeparatorChar == '\\')
                         line = line.Replace(Path.DirectorySeparatorChar, '/');
 
-                    var finder = new DirectoryFinder(); 
                     bool isWild = fromWildCard || line.Contains("*");
                     if (line.EndsWith("/"))
-                        foreach (var dir in finder.GetDirectories(baseDir, line))
+                        foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
                             ProcessDirectory(dir, isWild);
                     else
-                        foreach (var file in finder.GetFiles(baseDir, line))
+                        foreach (var file in _directoryFinder.GetFiles(baseDir, line))
                             ProcessCandidateAssembly(file.FullName, isWild);
                 }
             }

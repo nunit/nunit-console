@@ -23,6 +23,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using NSubstitute;
+using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Internal.Tests
@@ -52,7 +54,7 @@ namespace NUnit.Engine.Internal.Tests
         //[TestCase("addins/./v2-tests/", 1)]
         public void GetDirectories(string pattern, int count)
         {
-            var finder = new DirectoryFinder();
+            var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
             var dirList = finder.GetDirectories(_baseDir, pattern);
             Assert.That(dirList.Count, Is.EqualTo(count));
         }
@@ -67,7 +69,7 @@ namespace NUnit.Engine.Internal.Tests
         //[TestCase("addins/../net-*/nunit.framework.dll", 4)]
         public void GetFiles(string pattern, int count)
         {
-            var finder = new DirectoryFinder();
+            var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
             var files = finder.GetFiles(_baseDir, pattern);
             Assert.That(files.Count, Is.EqualTo(count));
         }
