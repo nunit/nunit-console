@@ -47,6 +47,81 @@ namespace NUnit.Engine.Internal
         }
 
         /// <summary>
+        /// Gets all sub-directories recursively that match a pattern.
+        /// </summary>
+        /// <param name="startDirectory">Start point of the search.</param>
+        /// <param name="pattern">Search pattern, whereas each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
+        /// <returns>All found sub-directories.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>
+        public IEnumerable<IDirectory> GetDirectories(IDirectory startDirectory, string pattern)
+        {
+            Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
+            Guard.ArgumentNotNullOrEmpty(pattern, nameof(pattern));
+
+            if (Path.DirectorySeparatorChar == '\\')
+                pattern = pattern.Replace(Path.DirectorySeparatorChar, '/');
+
+            var dirList = new List<IDirectory>();
+            dirList.Add(startDirectory);
+
+            while (pattern.Length > 0)
+            {
+                string range;
+                int sep = pattern.IndexOf('/');
+
+                if (sep >= 0)
+                {
+                    range = pattern.Substring(0, sep);
+                    pattern = pattern.Substring(sep + 1);
+                }
+                else
+                {
+                    range = pattern;
+                    pattern = "";
+                }
+
+                if (range == "." || range == "")
+                    continue;
+
+                dirList = ExpandOneStep(dirList, range);
+            }
+
+            return dirList;
+        }
+
+        private List<IDirectory> ExpandOneStep(IList<IDirectory> dirList, string pattern)
+        {
+            var newList = new List<IDirectory>();
+
+            foreach (var dir in dirList)
+            {
+                if (pattern == "." || pattern == "")
+                    newList.Add(dir);
+                else if (pattern == "..")
+                {
+                    if (dir.Parent != null)
+                        newList.Add(dir.Parent);
+                }
+                else if (pattern == "**")
+                {
+                    // ** means zero or more intervening directories, so we
+                    // add the directory itself to start out.
+                    newList.Add(dir);
+                    var subDirs = dir.GetDirectories("*", SearchOption.AllDirectories);
+                    if (!subDirs.Any()) newList.AddRange(subDirs);
+                }
+                else
+                {
+                    var subDirs = dir.GetDirectories(pattern, SearchOption.TopDirectoryOnly);
+                    if (!subDirs.Any()) newList.AddRange(subDirs);
+                }
+            }
+
+            return newList;
+        }
+
+        /// <summary>
         /// Get a list of diretories matching and extended wildcard pattern.
         /// Each path component may have wildcard characters and a component
         /// of "**" may be used to represent all directories, recursively.
