@@ -200,12 +200,12 @@ Task("Build")
 
         Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
-        foreach(var framework in new [] { "netstandard1.6", "netstandard2.0", "netcoreapp3.1" })
+        foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
              MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach(var framework in new [] { "netstandard1.6", "netstandard2.0" })
+        foreach(var framework in new [] { "netstandard2.0" })
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
@@ -298,24 +298,6 @@ Task("TestNetCore31Console")
                 runtime,
                 ref ErrorDetail);
         }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 1.6 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetStandard16Engine")
-    .Description("Tests the .NET Standard Engine")
-    .IsDependentOn("Build")
-    .WithCriteria(!BuildSystem.IsRunningOnAzurePipelines)   //Unable to find Azure build supporting both .NET Core 1.1 and .NET Core 3.1
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetCoreNUnitLiteTests(
-            NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
-            NETCOREAPP11_BIN_DIR,
-            "netcoreapp1.1",
-            ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////

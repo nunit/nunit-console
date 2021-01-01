@@ -81,10 +81,8 @@ namespace NUnit.Engine
                 Services.Add(new SettingsService(true));
                 Services.Add(new RecentFilesService());
                 Services.Add(new TestFilterService());
-#if !NETSTANDARD1_6
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
-#endif
 #if NETFRAMEWORK
                 Services.Add(new DomainManager());
                 Services.Add(new RuntimeFrameworkService());

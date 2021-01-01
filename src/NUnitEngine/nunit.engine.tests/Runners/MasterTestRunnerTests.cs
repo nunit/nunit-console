@@ -300,7 +300,7 @@ namespace NUnit.Engine.Runners.Tests
             Assert.That(startRun.GetAttribute("clr-version"), Is.Not.Null, "Incorrect clr-version in start-run event");
             Assert.That(startRun.GetAttribute("start-time", DateTime.Now.AddDays(-2)), Is.GreaterThan(DateTime.Now.AddDays(-1)), "Incorrect start-time in start-run event");
             Assert.That(startRun.GetAttribute("count", -1), Is.EqualTo(_testRunData.Tests), "Incorrect count in start-run event");
-#if !NETSTANDARD1_6 && !NETCOREAPP1_1
+#if !NETCOREAPP1_1
             Assert.That(startRun.FirstChild.Name, Is.EqualTo("command-line"), "First child of start-run should be command-line");
 #endif
             Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"), "Last event should be test-run");
