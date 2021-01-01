@@ -808,7 +808,6 @@ Task("TestConsole")
 Task("TestEngine")
     .Description("Builds and tests the engine")
     .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNetStandard16Engine")
     .IsDependentOn("TestNetStandard20Engine")
     .IsDependentOn("TestNetCore31Engine");
 
