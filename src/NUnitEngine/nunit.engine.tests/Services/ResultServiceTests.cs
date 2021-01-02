@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System;
 using System.IO;
 using System.Reflection;
@@ -93,4 +92,3 @@ namespace NUnit.Engine.Services.Tests
 #endif
     }
 }
-#endif

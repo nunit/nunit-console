@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System;
 using NUnit.Engine.Internal;
 
@@ -56,4 +55,3 @@ namespace NUnit.Engine.Services.Tests.Fakes
         public bool FailedToStop { get; set; }
     }
 }
-#endif

@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Engine.Runners;
@@ -91,4 +90,4 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #endif
     }
 }
-#endif
+

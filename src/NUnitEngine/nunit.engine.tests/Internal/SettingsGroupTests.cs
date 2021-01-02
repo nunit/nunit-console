@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System;
 using System.ComponentModel;
 using NUnit.Framework;
@@ -119,4 +118,3 @@ namespace NUnit.Engine.Internal.Tests
 #endif
     }
 }
-#endif
