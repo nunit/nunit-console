@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <OutputType Condition="'$(TargetFramework)'!='net35'">Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
@@ -33,6 +33,8 @@
     <ProjectReference Include="..\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp1.1'">
     <ProjectReference Include="..\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>
   <ItemGroup>

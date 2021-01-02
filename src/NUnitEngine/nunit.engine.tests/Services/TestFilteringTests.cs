@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,7 +36,7 @@ namespace NUnit.Engine.Services.Tests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
 
-#if NETCOREAPP1_1 || NETCOREAPP2_1
+#if NETCOREAPP2_1
         private NUnitNetStandardDriver _driver;
 #elif NETCOREAPP3_1
         private NUnitNetCore31Driver _driver;
@@ -47,7 +48,7 @@ namespace NUnit.Engine.Services.Tests
         public void LoadAssembly()
         {
             var mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
-#if NETCOREAPP1_1 || NETCOREAPP2_1
+#if NETCOREAPP2_1
             _driver = new NUnitNetStandardDriver();
 #elif NETCOREAPP3_1
             _driver = new NUnitNetCore31Driver();
@@ -103,3 +104,4 @@ namespace NUnit.Engine.Services.Tests
         }
     }
 }
+#endif

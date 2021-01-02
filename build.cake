@@ -142,6 +142,17 @@ Task("Clean")
         CleanDirectory(PACKAGE_DIR);
     });
 
+// Not currently used in CI but useful for cleaning your local obj
+// directories, particularly after changing the target of a project.
+Task("CleanAll")
+    .Description("Cleans obj directories in additon to standard clean")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+        foreach (var dir in GetDirectories(PROJECT_DIR + "src/**/obj/"))
+            DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });
+    });
+
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
 //////////////////////////////////////////////////////////////////////
