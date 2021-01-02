@@ -34,7 +34,6 @@ var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NET35_BIN_DIR = BIN_DIR + "net35/";
-var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
 var NETCOREAPP21_BIN_DIR = BIN_DIR + "netcoreapp2.1/";
 var NETCOREAPP31_BIN_DIR = BIN_DIR + "netcoreapp3.1/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
@@ -217,16 +216,12 @@ Task("Build")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + framework));
 
-        MSBuild(ENGINE_CORE_CSPROJ, CreateMSBuildSettings("Publish")
-           .WithProperty("TargetFramework", "netstandard1.6")
-           .WithProperty("PublishDir", BIN_DIR + "netstandard1.6"));
-
-        foreach (var framework in new [] { "netstandard1.6", "netstandard2.0" })
+        foreach (var framework in new [] { "netstandard2.0" })
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach(var framework in new [] { "netcoreapp1.1", "netcoreapp2.1", "netcoreapp3.1" })
+        foreach(var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
