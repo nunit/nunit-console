@@ -27,7 +27,7 @@ public void CheckAllPackages()
         CheckNuGetPackage("NUnit.Engine",
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
-            HasDirectory("lib/netstandard1.6").WithFiles(ENGINE_FILES),
+            HasDirectory("lib/netstandard1.6").WithFiles("nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
             HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/netstandard1.6").WithFile("nunit.engine.nuget.addins"),
