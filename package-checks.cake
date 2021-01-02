@@ -56,10 +56,10 @@ public void CheckAllPackages()
             HasFiles("LICENSE.txt", "license.rtf", "NOTICES.txt", "CHANGES.txt"),
             HasDirectory("bin/net20").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
             HasDirectory("bin/net35").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
-            HasDirectory("bin/netstandard1.6").WithFiles(ENGINE_FILES),
+            HasDirectory("bin/netstandard1.6").WithFiles("nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
             HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES),
-            HasDirectory("bin/netcoreapp1.1").WithFiles(ENGINE_FILES),
-            HasDirectory("bin/netcoreapp1.1").WithFiles(ENGINE_FILES),
+            HasDirectory("bin/netcoreapp1.1").WithFiles("nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
+            HasDirectory("bin/netcoreapp2.1").WithFiles(ENGINE_FILES),
             HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES),
             HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES)) &
         CheckMsiPackage("NUnit.Console", 
