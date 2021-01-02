@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1
 using System;
 using NUnit.Framework;
 
@@ -73,7 +74,6 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Error));
         }
 
-#if !NETCOREAPP1_1
         [Test]
         public void DefaultTestRunnerFactory_ProjectServiceMissing()
         {
@@ -82,6 +82,6 @@ namespace NUnit.Engine.Services.Tests
             service.StartService();
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Error));
         }
-#endif
     }
 }
+#endif

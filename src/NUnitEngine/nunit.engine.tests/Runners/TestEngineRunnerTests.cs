@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETCOREAPP1_1
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,10 +68,8 @@ namespace NUnit.Engine.Runners.Tests
         {
             // Add all services needed by any of our TestEngineRunners
             _services = new ServiceContext();
-#if !NETCOREAPP1_1
             _services.Add(new Services.ExtensionService());
             _services.Add(new Services.ProjectService());
-#endif
 #if NETFRAMEWORK
             _services.Add(new Services.DomainManager());
             _services.Add(new Services.RuntimeFrameworkService());
@@ -135,7 +134,6 @@ namespace NUnit.Engine.Runners.Tests
             CheckPackageLoading();
         }
 
-#if !NETCOREAPP1_1
         [Test]
         public void RunAsync()
         {
@@ -151,7 +149,6 @@ namespace NUnit.Engine.Runners.Tests
             CheckRunResult(asyncResult.EngineResult);
             CheckPackageLoading();
         }
-#endif
 
         private void CheckPackageLoading()
         {
@@ -193,3 +190,4 @@ namespace NUnit.Engine.Runners.Tests
         }
     }
 }
+#endif
