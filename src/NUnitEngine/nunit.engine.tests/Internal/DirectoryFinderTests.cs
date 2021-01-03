@@ -358,10 +358,9 @@ namespace NUnit.Engine.Internal.Tests
         {
             var finder = new DirectoryFinder(this.fileSystem);
             var baseDir = this.fakedDirectories[GetRoot()];
-            var expected = this.fakedDirectories.Values.Select(x => x.FullName).Where(x => x != GetRoot());
+            var expected = this.fakedDirectories.Values.Where(x => x != baseDir);
 
-            var result = finder.GetDirectories(baseDir, pattern);
-            var actual = result.Select(x => x.FullName);
+            var actual = finder.GetDirectories(baseDir, pattern);
 
             CollectionAssert.AreEquivalent(expected, actual);
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
