@@ -90,6 +90,36 @@ namespace NUnit.Engine.Internal
             return dirList;
         }
 
+        /// <summary>
+        /// Gets all files that match a pattern.
+        /// </summary>
+        /// <param name="startDirectory">Start point of the search.</param>
+        /// <param name="pattern">Search pattern, whereas each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
+        /// <returns>All found files.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>
+        public IEnumerable<IFile> GetFiles(IDirectory startDirectory, string pattern)
+        {
+            Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
+            Guard.ArgumentNotNullOrEmpty(pattern, nameof(pattern));
+
+            // If there is no directory path in pattern, delegate to DirectoryInfo
+            int lastSep = pattern.LastIndexOf('/');
+            if (lastSep < 0) // Simple file name entry, no path
+                return startDirectory.GetFiles(pattern);
+
+            // Otherwise split pattern into two parts around last separator
+            var pattern1 = pattern.Substring(0, lastSep);
+            var pattern2 = pattern.Substring(lastSep + 1);
+
+            var fileList = new List<IFile>();
+
+            foreach (var dir in this.GetDirectories(startDirectory, pattern1))
+                fileList.AddRange(dir.GetFiles(pattern2));
+
+            return fileList;
+        }
+
         private List<IDirectory> ExpandOneStep(IList<IDirectory> dirList, string pattern)
         {
             var newList = new List<IDirectory>();

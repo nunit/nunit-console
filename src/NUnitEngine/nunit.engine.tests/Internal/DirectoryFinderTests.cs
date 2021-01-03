@@ -33,6 +33,7 @@ namespace NUnit.Engine.Internal.Tests
     public class DirectoryFinderTests
     {
         private Dictionary<string, IDirectory> fakedDirectories;
+        private Dictionary<string, IFile> fakedFiles;
         
         private IFileSystem fileSystem;
 
@@ -50,8 +51,26 @@ namespace NUnit.Engine.Internal.Tests
                 "tools/metamorphosator/tests/v2"
             };
 
-            this.fakedDirectories = new Dictionary<string, IDirectory>();
+            var files = new[]
+            {
+                "tools/frobuscator/tests/config.cfg",
+                "tools/frobuscator/tests/abc/tests.abc.dll",
+                "tools/frobuscator/tests/abc/tests.123.dll",
+                "tools/frobuscator/tests/def/tests.def.dll",
+                "tools/metamorphosator/addins/readme.txt",
+                "tools/metamorphosator/addins/morph/setup.ini",
+                "tools/metamorphosator/addins/morph/code.cs",
+                "tools/metamorphosator/tests/v1/test-assembly.dll",
+                "tools/metamorphosator/tests/v1/test-assembly.pdb",
+                "tools/metamorphosator/tests/v1/result.xml",
+                "tools/metamorphosator/tests/v1/tmp/tmp.dat",
+                "tools/metamorphosator/tests/v2/test-assembly.dll",
+                "tools/metamorphosator/tests/v2/test-assembly.pdb",
+                "tools/metamorphosator/tests/v2/result.xml",
+            };
+
             this.fileSystem = Substitute.For<IFileSystem>();
+            this.fakedDirectories = new Dictionary<string, IDirectory>();
 
             // Create fakes and configure their properties.
             this.fakedDirectories[GetRoot()] = Substitute.For<IDirectory>();
@@ -73,14 +92,31 @@ namespace NUnit.Engine.Internal.Tests
                 }
             }
 
-            foreach (var fake in this.fakedDirectories.Values)
+            foreach (var directory in this.fakedDirectories.Values)
             {
-                fake.GetDirectories("*", SIO.SearchOption.AllDirectories).Returns(this.fakedDirectories.Where(kvp => kvp.Key.StartsWith(fake.FullName + SIO.Path.DirectorySeparatorChar)).Select(kvp => kvp.Value));
-                fake.GetDirectories("*", SIO.SearchOption.TopDirectoryOnly)
+                directory.GetDirectories("*", SIO.SearchOption.AllDirectories).Returns(this.fakedDirectories.Where(kvp => kvp.Key.StartsWith(directory.FullName + SIO.Path.DirectorySeparatorChar)).Select(kvp => kvp.Value));
+                directory.GetDirectories("*", SIO.SearchOption.TopDirectoryOnly)
                     .Returns(this.fakedDirectories
-                                    .Where(kvp => kvp.Key.StartsWith(fake.FullName + SIO.Path.DirectorySeparatorChar) && kvp.Key.LastIndexOf(SIO.Path.DirectorySeparatorChar) <= fake.FullName.Length)
+                                    .Where(kvp => kvp.Key.StartsWith(directory.FullName + SIO.Path.DirectorySeparatorChar) && kvp.Key.LastIndexOf(SIO.Path.DirectorySeparatorChar) <= directory.FullName.Length)
                                     .Select(kvp => kvp.Value));
                 // NSubstitute will automatically return empty enumerables for calls that were not set up.
+            }
+
+            this.fakedFiles = new Dictionary<string, IFile>();
+            foreach (var filePath in files)
+            {
+                var fileName = filePath.Split('/').Reverse().Take(1);
+                var directory = GetFakeDirectory(filePath.Split('/').Reverse().Skip(1).Reverse().ToArray());
+                var file = Substitute.For<IFile>();
+                file.FullName.Returns(CreateAbsolutePath(filePath.Split('/')));
+                file.Parent.Returns(directory);
+                this.fakedFiles.Add(file.FullName, file);
+            }
+
+            foreach (var directory in this.fakedDirectories.Values)
+            {
+                var directoryContent = this.fakedFiles.Values.Where(x => x.Parent == directory).ToArray();
+                directory.GetFiles("*").Returns(directoryContent);
             }
         }
 
@@ -438,20 +474,151 @@ namespace NUnit.Engine.Internal.Tests
             Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), string.Empty), Throws.ArgumentException.With.Message.Contains(" pattern "));
         }
 
-        ////[TestCase("net-4.0/nunit.framework.dll", 1)]
-        ////[TestCase("net-*/nunit.framework.dll", 4)]
-        ////[TestCase("net-*/*.framework.dll", 4)]
-        ////[TestCase("*/v2-tests/*.dll", 2)]
-        ////[TestCase("add*/v?-*/*.dll", 2)]
-        ////[TestCase("**/v2-tests/*.dll", 2)]
-        ////[TestCase("addins/**/*.dll", 10)]
-        ////[TestCase("addins/../net-*/nunit.framework.dll", 4)]
-        //public void GetFiles(string pattern, int count)
-        //{
-        //    var finder = new DirectoryFinder();
-        //    var files = finder.GetFiles(_baseDir, pattern);
-        //    Assert.That(files.Count, Is.EqualTo(count));
-        //}
+        [TestCase("tests.*.dll")]
+        [TestCase("tests.???.dll")]
+        [TestCase("t*.???.dll")]
+        public void GetFiles_WordWithWildcard(string pattern)
+        {
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools", "frobuscator", "tests", "abc");
+            baseDir.GetFiles(pattern).Returns(new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"), this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll") });
+            var expected = new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"), this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll") };
+
+            var actual = finder.GetFiles(baseDir, pattern);
+
+            CollectionAssert.AreEquivalent(expected, actual);
+            baseDir.Received().GetFiles(pattern);
+            baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
+        }
+
+        [TestCase("*/tests.*.dll")]
+        [TestCase("*/tests.???.dll")]
+        [TestCase("*/t*.???.dll")]
+        public void GetFiles_AsteriskThenWordWithWildcard(string pattern)
+        {
+            var filePattern = pattern.Split('/')[1];
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools", "frobuscator", "tests");
+            var abcDir = this.GetFakeDirectory("tools", "frobuscator", "tests", "abc");
+            var defDir = this.GetFakeDirectory("tools", "frobuscator", "tests", "def");
+            abcDir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"), this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll") });
+            defDir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll") });
+            var expected = new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"), this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll"), this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll") };
+
+            var actual = finder.GetFiles(baseDir, pattern);
+
+            CollectionAssert.AreEquivalent(expected, actual);
+            abcDir.Received().GetFiles(filePattern);
+            defDir.Received().GetFiles(filePattern);
+            baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
+            baseDir.DidNotReceive().GetFiles(Arg.Any<string>());
+            abcDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+            defDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+        }
+
+        [TestCase("**/test*.dll")]
+        [TestCase("**/t*.???")]
+        public void GetFiles_GreedyThenWordWithWildcard(string pattern)
+        {
+            var filePattern = pattern.Split('/')[1];
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools");
+            var abcDir = this.GetFakeDirectory("tools", "frobuscator", "tests", "abc");
+            var defDir = this.GetFakeDirectory("tools", "frobuscator", "tests", "def");
+            var v1Dir = this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1");
+            var v2Dir = this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2");
+            abcDir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"), this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll") });
+            defDir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll") });
+            v1Dir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.dll"), this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.pdb") });
+            v2Dir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.dll"), this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.pdb") });
+            var expected = new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"),
+                                   this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll"),
+                                   this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll"),
+                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.dll"),
+                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.pdb"),
+                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.dll"),
+                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.pdb") };
+
+            var actual = finder.GetFiles(baseDir, pattern);
+
+            CollectionAssert.AreEquivalent(expected, actual);
+            foreach (var dir in this.fakedDirectories.Values.Where(x => x.FullName != GetRoot()))
+            {
+                dir.Received().GetFiles(filePattern);
+            }
+            baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
+            abcDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+            defDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+            v1Dir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+            v2Dir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+        }
+
+        [Test]
+        public void GetFiles_WordThenParentThenWordWithWildcardThenWord()
+        {
+            var filename = "readme.txt";
+            var pattern = "tests/../addin?/" + filename;
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools", "metamorphosator");
+            var targetDir = this.GetFakeDirectory("tools", "metamorphosator", "addins");
+            baseDir.GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(new[] { this.GetFakeDirectory("tools", "metamorphosator", "tests") });
+            this.GetFakeDirectory("tools", "metamorphosator").GetDirectories("addin?", SIO.SearchOption.TopDirectoryOnly).Returns(new[] { targetDir });
+            targetDir.GetFiles(filename).Returns(new[] { this.GetFakeFile("tools", "metamorphosator", "addins", filename) });
+            var expected = new[] { this.GetFakeFile("tools", "metamorphosator", "addins", filename) };
+
+            var actual = finder.GetFiles(baseDir, pattern);
+
+            CollectionAssert.AreEquivalent(expected, actual);
+            targetDir.Received().GetFiles(filename);
+            foreach (var dir in this.fakedDirectories.Values.Where(x => x != targetDir))
+            {
+                dir.DidNotReceive().GetFiles(Arg.Any<string>());
+            }
+            targetDir.Received().GetFiles(filename);
+            targetDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+            GetFakeDirectory("tools", "frobuscator").DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+        }
+
+        [Test]
+        public void GetFiles_CurrentDirThenAsterisk()
+        {
+            var pattern = "./*";
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools", "metamorphosator", "addins", "morph");
+            var expected = new[] { this.GetFakeFile("tools", "metamorphosator", "addins", "morph", "setup.ini"), this.GetFakeFile("tools", "metamorphosator", "addins", "morph", "code.cs") };
+            baseDir.GetFiles("*").Returns(expected);
+
+            var actual = finder.GetFiles(baseDir, pattern);
+
+            CollectionAssert.AreEquivalent(expected, actual);
+            baseDir.Received().GetFiles("*");
+            baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
+            baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
+        }
+
+        [Test]
+        public void GetFiles_StartDirectoryIsNull()
+        {
+            var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
+
+            Assert.That(() => finder.GetFiles((IDirectory)null, "notused"), Throws.ArgumentNullException.With.Message.Contains(" startDirectory "));
+        }
+
+        [Test]
+        public void GetFiles_PatternIsNull()
+        {
+            var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
+
+            Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), null), Throws.ArgumentNullException.With.Message.Contains(" pattern "));
+        }
+
+        [Test]
+        public void GetFiles_PatternIsEmpty()
+        {
+            var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
+
+            Assert.That(() => finder.GetFiles(Substitute.For<IDirectory>(), string.Empty), Throws.ArgumentException.With.Message.Contains(" pattern "));
+        }
 
         private static string CreateAbsolutePath(IEnumerable<string> parts)
         {
@@ -467,6 +634,11 @@ namespace NUnit.Engine.Internal.Tests
         private IDirectory GetFakeDirectory(params string[] parts)
         {
             return this.fakedDirectories[CreateAbsolutePath(parts)];
+        }
+
+        private IFile GetFakeFile(params string[] parts)
+        {
+            return this.fakedFiles[CreateAbsolutePath(parts)];
         }
 
         private static string CombinePath(params string[] parts)
