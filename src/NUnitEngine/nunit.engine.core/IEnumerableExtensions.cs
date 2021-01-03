@@ -22,10 +22,10 @@ namespace NUnit.Engine
         {
             foreach (var _ in enumeration)
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

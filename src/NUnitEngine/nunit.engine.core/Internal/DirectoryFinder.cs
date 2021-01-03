@@ -139,12 +139,12 @@ namespace NUnit.Engine.Internal
                     // add the directory itself to start out.
                     newList.Add(dir);
                     var subDirs = dir.GetDirectories("*", SearchOption.AllDirectories);
-                    if (!subDirs.Any()) newList.AddRange(subDirs);
+                    if (subDirs.Any()) newList.AddRange(subDirs);
                 }
                 else
                 {
                     var subDirs = dir.GetDirectories(pattern, SearchOption.TopDirectoryOnly);
-                    if (!subDirs.Any()) newList.AddRange(subDirs);
+                    if (subDirs.Any()) newList.AddRange(subDirs);
                 }
             }
 
