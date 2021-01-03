@@ -51,7 +51,12 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_InvalidPath()
         {
-            Assert.That(() => new Directory("c:\\this\\is\\an\\invalid" + SIO.Path.GetInvalidPathChars()[2] + "path"), Throws.ArgumentException);
+            if (SIO.Path.GetInvalidPathChars().Length == 0)
+            {
+                Assert.Ignore("This test does not make sense on systems where System.IO.Path.GetInvalidPathChars() returns an empty array.");
+            }
+
+            Assert.That(() => new Directory("c:\\this\\is\\an\\invalid" + SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length - 1] + "path"), Throws.ArgumentException);
         }
 
         [Test]
@@ -75,8 +80,10 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NoParent_SMB()
         {
-            var path = "\\\\server\\share";
+            // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends '\\server\share' to the current working-directory, making this test useless.
+            SkipOnNonWindowsSystems();
 
+            var path = "\\\\server\\share";
             var directory = new Directory(path);
 
             Assert.AreEqual(path, directory.FullName);
@@ -86,8 +93,10 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NoParent_Drive()
         {
-            var path = "x:\\";
+            // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends 'x:\' to the current working-directory, making this test useless.
+            SkipOnNonWindowsSystems();
 
+            var path = "x:\\";
             var directory = new Directory(path);
 
             Assert.AreEqual(path, directory.FullName);
@@ -183,6 +192,14 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var directory = new Directory(path);
 
             Assert.That(() => directory.GetDirectories("*", (SIO.SearchOption)5), Throws.InstanceOf<System.ArgumentOutOfRangeException>());
+        }
+
+        private void SkipOnNonWindowsSystems()
+        {
+            if (SIO.Path.DirectorySeparatorChar != '\\')
+            {
+                Assert.Ignore("This test is not compatible with the current operating system.");
+            }
         }
     }
 }
