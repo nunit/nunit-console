@@ -658,7 +658,7 @@ namespace NUnit.Engine.Internal.Tests
             }
             else
             {
-                return "/";
+                return string.Empty;
             }
         }
     }
