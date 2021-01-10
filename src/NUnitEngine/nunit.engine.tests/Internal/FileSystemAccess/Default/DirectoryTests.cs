@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -20,13 +20,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using NUnit.Engine.Internal.FileSystemAccess.Default;
+using NUnit.Framework;
+using System.Linq;
+using SIO = System.IO;
+
 namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 {
-    using NUnit.Engine.Internal.FileSystemAccess.Default;
-    using NUnit.Framework;
-    using System.Linq;
-    using SIO = System.IO;
-
     [TestFixture]
     public sealed class DirectoryTests
     {
@@ -68,7 +68,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_TrailingDirectorySeparator()
         {
-            var path = SIO.Directory.GetCurrentDirectory() + new string(SIO.Path.DirectorySeparatorChar, 1);
+            var path = SIO.Directory.GetCurrentDirectory() + SIO.Path.DirectorySeparatorChar;
             var parent = new SIO.DirectoryInfo(SIO.Directory.GetCurrentDirectory()).Parent.FullName;
 
             var directory = new Directory(path);

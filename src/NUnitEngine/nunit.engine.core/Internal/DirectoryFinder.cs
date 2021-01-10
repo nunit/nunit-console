@@ -50,7 +50,7 @@ namespace NUnit.Engine.Internal
         /// Gets all sub-directories recursively that match a pattern.
         /// </summary>
         /// <param name="startDirectory">Start point of the search.</param>
-        /// <param name="pattern">Search pattern, whereas each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
+        /// <param name="pattern">Search pattern, where each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
         /// <returns>All found sub-directories.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>
@@ -94,7 +94,7 @@ namespace NUnit.Engine.Internal
         /// Gets all files that match a pattern.
         /// </summary>
         /// <param name="startDirectory">Start point of the search.</param>
-        /// <param name="pattern">Search pattern, whereas each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
+        /// <param name="pattern">Search pattern, where each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
         /// <returns>All found files.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>

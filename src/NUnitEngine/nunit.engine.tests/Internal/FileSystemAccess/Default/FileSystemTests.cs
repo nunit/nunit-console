@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -20,14 +20,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Engine.Internal.FileSystemAccess.Default;
+using NUnit.Framework;
+using System.Reflection;
+using SIO = System.IO;
+
 namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 {
-    using NUnit.Engine.Internal.FileSystemAccess;
-    using NUnit.Engine.Internal.FileSystemAccess.Default;
-    using NUnit.Framework;
-    using System.Reflection;
-    using SIO = System.IO;
-
     [TestFixture]
     public sealed class FileSystemTests
     {
@@ -53,13 +53,13 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var fileSystem = new FileSystem();
 
-            Assert.That(()=>fileSystem.GetDirectory(path), Throws.InstanceOf<System.IO.DirectoryNotFoundException>());
+            Assert.That(() => fileSystem.GetDirectory(path), Throws.InstanceOf<System.IO.DirectoryNotFoundException>());
         }
 
         [Test]
         public void GetFile()
         {
-            var path = this.GetTestFileLocation();
+            var path = TestContext.CurrentContext.TestDirectory;
             var parent = SIO.Path.GetDirectoryName(path);
             var fileSystem = new FileSystem();
 
@@ -87,7 +87,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Exists_FileExists()
         {
-            var path = this.GetTestFileLocation();
+            var path = TestContext.CurrentContext.TestDirectory;
             var file = new File(path);
             var fileSystem = new FileSystem();
 
@@ -97,9 +97,9 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         }
 
         [Test]
-        public void Exists_FileDoesnotExist()
+        public void Exists_FileDoesNotExist()
         {
-            var path = this.GetTestFileLocation();
+            var path = TestContext.CurrentContext.TestDirectory;
             while (SIO.File.Exists(path))
             {
                 path += "x";
@@ -134,7 +134,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         }
 
         [Test]
-        public void Exists_DirectoryDoesnotExist()
+        public void Exists_DirectoryDoesNotExist()
         {
             var path = SIO.Directory.GetCurrentDirectory();
             while (SIO.Directory.Exists(path))
@@ -156,15 +156,6 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var fileSystem = new FileSystem();
 
             Assert.That(() => fileSystem.Exists((IDirectory)null), Throws.ArgumentNullException);
-        }
-
-        private string GetTestFileLocation()
-        {
-#if NETCOREAPP1_1
-            return Assembly.GetEntryAssembly().Location;
-#else
-            return Assembly.GetAssembly(typeof(FileTests)).Location;
-#endif
         }
     }
 }

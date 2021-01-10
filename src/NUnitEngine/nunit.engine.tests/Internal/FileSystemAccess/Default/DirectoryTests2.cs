@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -20,15 +20,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using NUnit.Engine.Internal.FileSystemAccess.Default;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using SIO = System.IO;
+
 namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 {
-    using NUnit.Engine.Internal.FileSystemAccess.Default;
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using SIO = System.IO;
-
     /// <summary>
     /// Tests the implementation of <see cref="Directory"/>.
     /// </summary>
@@ -100,7 +100,6 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var actual = actualDirectories.Select(x => x.FullName);
             CollectionAssert.AreEquivalent(this.subDirectories, actual);
-            Assert.That(actual.Count(), Is.EqualTo(this.subDirectories.Count()));
         }
 
         [Test]

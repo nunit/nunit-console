@@ -177,14 +177,17 @@ namespace NUnit.Engine.Internal.Tests
         {
             var finder = new DirectoryFinder(this.fileSystem);
             var baseDir = this.GetFakeDirectory("tools", "metamorphosator");
-            var expected = new[] { CombinePath(baseDir.FullName),
-                                          CombinePath(baseDir.FullName, "addins"),
-                                          CombinePath(baseDir.FullName, "tests"),
-                                          CombinePath(baseDir.FullName, "tests", "v1"),
-                                          CombinePath(baseDir.FullName, "tests", "v1", "tmp"),
-                                          CombinePath(baseDir.FullName, "tests", "v2"),
-                                          CombinePath(baseDir.FullName, "addins", "morph"),
-                                          CombinePath(baseDir.FullName, "addins", "empty") };
+            var expected = new[]
+            {
+                CombinePath(baseDir.FullName),
+                CombinePath(baseDir.FullName, "addins"),
+                CombinePath(baseDir.FullName, "tests"),
+                CombinePath(baseDir.FullName, "tests", "v1"),
+                CombinePath(baseDir.FullName, "tests", "v1", "tmp"),
+                CombinePath(baseDir.FullName, "tests", "v2"),
+                CombinePath(baseDir.FullName, "addins", "morph"),
+                CombinePath(baseDir.FullName, "addins", "empty")
+            };
 
             var result = finder.GetDirectories(baseDir, "**");
             var actual = result.Select(x => x.FullName);
@@ -290,12 +293,14 @@ namespace NUnit.Engine.Internal.Tests
             var finder = new DirectoryFinder(this.fileSystem);
             var baseDir = this.GetFakeDirectory("tools", "metamorphosator");
             var testsDir = this.GetFakeDirectory("tools", "metamorphosator", "tests");
-            baseDir.GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(new IDirectory[] { testsDir });
-            baseDir.GetDirectories("te*", SIO.SearchOption.TopDirectoryOnly).Returns(new IDirectory[] { testsDir });
-            baseDir.GetDirectories("t?sts", SIO.SearchOption.TopDirectoryOnly).Returns(new IDirectory[] { testsDir });
-            testsDir.GetDirectories("v*", SIO.SearchOption.TopDirectoryOnly).Returns(new IDirectory[] { this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1"), this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2") });
-            testsDir.GetDirectories("*", SIO.SearchOption.TopDirectoryOnly).Returns(new IDirectory[] { this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1"), this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2") });
-            testsDir.GetDirectories("v?", SIO.SearchOption.TopDirectoryOnly).Returns(new IDirectory[] { this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1"), this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2") });
+            var baseDirContent = new[] { testsDir };
+            var testsDirContent = new[] { this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1"), this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2") };
+            baseDir.GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(baseDirContent);
+            baseDir.GetDirectories("te*", SIO.SearchOption.TopDirectoryOnly).Returns(baseDirContent);
+            baseDir.GetDirectories("t?sts", SIO.SearchOption.TopDirectoryOnly).Returns(baseDirContent);
+            testsDir.GetDirectories("v*", SIO.SearchOption.TopDirectoryOnly).Returns(testsDirContent);
+            testsDir.GetDirectories("*", SIO.SearchOption.TopDirectoryOnly).Returns(testsDirContent);
+            testsDir.GetDirectories("v?", SIO.SearchOption.TopDirectoryOnly).Returns(testsDirContent);
             var expected = new[] { CombinePath(baseDir.FullName, "tests", "v1"), CombinePath(baseDir.FullName, "tests", "v2") };
 
             var result = finder.GetDirectories(baseDir, pattern);
@@ -378,13 +383,16 @@ namespace NUnit.Engine.Internal.Tests
             var baseDir = this.GetFakeDirectory("tools");
             this.GetFakeDirectory("tools", "frobuscator").GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(new[] { this.GetFakeDirectory("tools", "frobuscator", "tests") });
             this.GetFakeDirectory("tools", "metamorphosator").GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(new[] { this.GetFakeDirectory("tools", "metamorphosator", "tests") });
-            var expected = new[] { this.GetFakeDirectory("tools", "frobuscator", "tests"),
-                                   this.GetFakeDirectory("tools", "frobuscator", "tests", "abc"),
-                                   this.GetFakeDirectory("tools", "frobuscator", "tests", "def"),
-                                   this.GetFakeDirectory("tools", "metamorphosator", "tests"),
-                                   this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1"),
-                                   this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1", "tmp"),
-                                   this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2")};
+            var expected = new[]
+            {
+                this.GetFakeDirectory("tools", "frobuscator", "tests"),
+                this.GetFakeDirectory("tools", "frobuscator", "tests", "abc"),
+                this.GetFakeDirectory("tools", "frobuscator", "tests", "def"),
+                this.GetFakeDirectory("tools", "metamorphosator", "tests"),
+                this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1"),
+                this.GetFakeDirectory("tools", "metamorphosator", "tests", "v1", "tmp"),
+                this.GetFakeDirectory("tools", "metamorphosator", "tests", "v2")
+            };
 
             var actual = finder.GetDirectories(baseDir, "**/tests/**");
 
@@ -530,13 +538,16 @@ namespace NUnit.Engine.Internal.Tests
             defDir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll") });
             v1Dir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.dll"), this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.pdb") });
             v2Dir.GetFiles(filePattern).Returns(new[] { this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.dll"), this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.pdb") });
-            var expected = new[] { this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"),
-                                   this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll"),
-                                   this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll"),
-                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.dll"),
-                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.pdb"),
-                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.dll"),
-                                   this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.pdb") };
+            var expected = new[]
+            {
+                this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.abc.dll"),
+                this.GetFakeFile("tools", "frobuscator", "tests", "abc", "tests.123.dll"),
+                this.GetFakeFile("tools", "frobuscator", "tests", "def", "tests.def.dll"),
+                this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.dll"),
+                this.GetFakeFile("tools", "metamorphosator", "tests", "v1", "test-assembly.pdb"),
+                this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.dll"),
+                this.GetFakeFile("tools", "metamorphosator", "tests", "v2", "test-assembly.pdb")
+            };
 
             var actual = finder.GetFiles(baseDir, pattern);
 

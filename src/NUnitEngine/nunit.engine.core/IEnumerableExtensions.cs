@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -20,10 +20,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using System.Collections.Generic;
 namespace NUnit.Engine
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Extension methods to get some Linq-feeling in .NET 2.0 projects.
     /// </summary>

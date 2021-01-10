@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -47,7 +47,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess
         /// Creates a <see cref="IDirectory"/> that points to an existing directory.
         /// </summary>
         /// <param name="path">Path of the directory.</param>
-        /// <returns>An object representing the file-system entry located at <paramref name="path"/></returns>
+        /// <returns>An object representing the file-system entry located at <paramref name="path"/>.</returns>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="path"/> is empty or contains invalid characters (see <see cref="SIO.Path.InvalidPathChars"/> for details).</exception>
@@ -59,7 +59,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess
         /// Creates a <see cref="IFile"/> that points to an existing file.
         /// </summary>
         /// <param name="path">Path of the file.</param>
-        /// <returns>An object representing the file-system entry located at <paramref name="path"/></returns>
+        /// <returns>An object representing the file-system entry located at <paramref name="path"/>.</returns>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="path"/> is empty, contains no file-name or contains invalid characters (see <see cref="SIO.Path.GetInvalidFileNameChars"/> for details).</exception>

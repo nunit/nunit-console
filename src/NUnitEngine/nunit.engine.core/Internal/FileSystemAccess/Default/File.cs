@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -20,11 +20,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using System;
+using SIO = System.IO;
+
 namespace NUnit.Engine.Internal.FileSystemAccess.Default
 {
-    using System;
-    using SIO = System.IO;
-
     /// <summary>
     /// Default implementation of <see cref="IFile"/> that relies on <see cref="System.IO"/>.
     /// </summary>
@@ -34,7 +34,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
         /// Initializes a new instance of the <see cref="File"/> class.
         /// </summary>
         /// <param name="path">Path of the file.</param>
-        /// <returns>An object representing the file-system entry located at <paramref name="path"/></returns>
+        /// <returns>An object representing the file-system entry located at <paramref name="path"/>.</returns>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="path"/> contains no file-name or contains invalid characters (see <see cref="SIO.Path.GetInvalidFileNameChars"/> for details).</exception>

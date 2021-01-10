@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2021 NUnit Contributors
+// Copyright (c) 2021 Charlie Poole, Rob Prouse
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -20,30 +20,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using NUnit.Engine.Internal.FileSystemAccess.Default;
+using NUnit.Framework;
+using System.Linq;
+using System.Reflection;
+using SIO = System.IO;
+
 namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 {
-    using NUnit.Engine.Internal.FileSystemAccess.Default;
-    using NUnit.Framework;
-    using System.Linq;
-    using System.Reflection;
-    using SIO = System.IO;
-
     [TestFixture]
     public sealed class FileTests
     {
-        private string GetTestFileLocation()
-        {
-#if NETCOREAPP1_1
-            return Assembly.GetEntryAssembly().Location;
-#else
-            return Assembly.GetAssembly(typeof(FileTests)).Location;
-#endif
-        }
-
         [Test]
         public void Init()
         {
-            var path = this.GetTestFileLocation();
+            var path = TestContext.CurrentContext.TestDirectory;
             var parent = SIO.Path.GetDirectoryName(path);
 
             var file = new File(path);
@@ -66,7 +57,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
                 Assert.Ignore("This test does not make sense on systems where System.IO.Path.GetInvalidPathChars() returns an empty array.");
             }
 
-            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length-1] + this.GetTestFileLocation();
+            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length-1] + TestContext.CurrentContext.TestDirectory;
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -74,8 +65,13 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_InvalidPath_InvalidFileName()
         {
-            char invalidCharThatIsNotInInvalidPathChars = SIO.Path.GetInvalidFileNameChars().Except(SIO.Path.GetInvalidPathChars()).FirstOrDefault();
-            var path = this.GetTestFileLocation() + invalidCharThatIsNotInInvalidPathChars;
+            if (!SIO.Path.GetInvalidFileNameChars().Except(SIO.Path.GetInvalidPathChars()).Any())
+            {
+                Assert.Ignore("This test does not make sense on systems where all characters returned by System.IO.Path.GetInvalidFileNameChars() are contained in System.IO.System.Path.GetInvalidPathChars().");
+            }
+
+            char invalidCharThatIsNotInInvalidPathChars = SIO.Path.GetInvalidFileNameChars().Except(SIO.Path.GetInvalidPathChars()).First();
+            var path = TestContext.CurrentContext.TestDirectory + invalidCharThatIsNotInInvalidPathChars;
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -89,7 +85,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NonExistingFile()
         {
-            var path = this.GetTestFileLocation();
+            var path = TestContext.CurrentContext.TestDirectory;
             while (SIO.File.Exists(path))
             {
                 path += "a";
