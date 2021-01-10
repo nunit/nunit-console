@@ -34,7 +34,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init()
         {
-            var path = TestContext.CurrentContext.TestDirectory;
+            var path = this.GetTestFileLocation();
             var parent = SIO.Path.GetDirectoryName(path);
 
             var file = new File(path);
@@ -57,7 +57,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
                 Assert.Ignore("This test does not make sense on systems where System.IO.Path.GetInvalidPathChars() returns an empty array.");
             }
 
-            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length-1] + TestContext.CurrentContext.TestDirectory;
+            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length-1] + this.GetTestFileLocation();
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -71,7 +71,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             }
 
             char invalidCharThatIsNotInInvalidPathChars = SIO.Path.GetInvalidFileNameChars().Except(SIO.Path.GetInvalidPathChars()).First();
-            var path = TestContext.CurrentContext.TestDirectory + invalidCharThatIsNotInInvalidPathChars;
+            var path = this.GetTestFileLocation() + invalidCharThatIsNotInInvalidPathChars;
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -85,7 +85,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NonExistingFile()
         {
-            var path = TestContext.CurrentContext.TestDirectory;
+            var path = this.GetTestFileLocation();
             while (SIO.File.Exists(path))
             {
                 path += "a";
@@ -107,5 +107,13 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
 
+        private string GetTestFileLocation()
+        {
+#if NETCOREAPP1_1
+            return Assembly.GetEntryAssembly().Location;
+#else
+            return Assembly.GetAssembly(typeof(FileTests)).Location;
+#endif
+        }
     }
 }
