@@ -410,7 +410,13 @@ namespace NUnit.Engine.Services
         /// </summary>
         internal void FindExtensionsInAssembly(ExtensionAssembly assembly)
         {
-            log.Info("Scanning {0} assembly for Extensions", assembly.FilePath);
+            log.Info($"Scanning {assembly.FilePath} for Extensions");
+
+            if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), assembly))
+            {
+                log.Info($"{assembly.FilePath} cannot be loaded on this runtime");
+                return;
+            }
 
             IRuntimeFramework assemblyTargetFramework = null;
 #if NETFRAMEWORK
