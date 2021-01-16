@@ -20,16 +20,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
+using NSubstitute;
+using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
+using SIO = System.IO;
 
 namespace NUnit.Engine.Internal.Tests
 {
-    using NSubstitute;
-    using NUnit.Engine.Internal.FileSystemAccess;
-    using NUnit.Framework;
-    using System.Collections.Generic;
-    using System.Linq;
-    using SIO = System.IO;
-
     public class DirectoryFinderTests
     {
         private Dictionary<string, IDirectory> fakedDirectories;
