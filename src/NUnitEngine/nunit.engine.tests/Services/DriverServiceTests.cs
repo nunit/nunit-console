@@ -39,9 +39,7 @@ namespace NUnit.Engine.Services.Tests
         public void CreateDriverFactory()
         {
             var serviceContext = new ServiceContext();
-#if !NETCOREAPP1_1
             serviceContext.Add(new ExtensionService());
-#endif
             _driverService = new DriverService();
             serviceContext.Add(_driverService);
             serviceContext.ServiceManager.StartServices();
@@ -58,7 +56,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("mock-assembly.dll", false, typeof(NUnitNetCore31Driver))]
         [TestCase("mock-assembly.dll", true, typeof(NUnitNetCore31Driver))]
         [TestCase("notest-assembly.dll", false, typeof(NUnitNetCore31Driver))]
-#elif NETCOREAPP1_1 || NETCOREAPP2_1
+#elif NETCOREAPP2_1
         [TestCase("mock-assembly.dll", false, typeof(NUnitNetStandardDriver))]
         [TestCase("mock-assembly.dll", true, typeof(NUnitNetStandardDriver))]
         [TestCase("notest-assembly.dll", false, typeof(NUnitNetStandardDriver))]
@@ -76,11 +74,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
-#if NETCOREAPP1_1
-            var driver = _driverService.GetDriver(Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), skipNonTestAssemblies);
-#else
             var driver = _driverService.GetDriver(AppDomain.CurrentDomain, Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), null, skipNonTestAssemblies);
-#endif
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
     }

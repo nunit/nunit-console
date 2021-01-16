@@ -43,9 +43,7 @@ namespace NUnit.Engine
     /// package, changing settings as needed. This gives the best chance for the
     /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
-#if !NETSTANDARD1_6
     [Serializable]
-#endif
     public class TestPackage
     {
         /// <summary>
