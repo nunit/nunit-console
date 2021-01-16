@@ -23,6 +23,6 @@
     <owners>Charlie Poole, Rob Prouse</owners>
     <language>en-US</language>
     <tags>nunit console runner test testing tdd</tags>
-    <copyright>Copyright (c) 2020 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
   </metadata>
 </package>

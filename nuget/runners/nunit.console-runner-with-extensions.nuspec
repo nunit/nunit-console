@@ -28,7 +28,7 @@
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2020 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group>
         <dependency id="NUnit.ConsoleRunner" version="$version$" />

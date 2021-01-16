@@ -1,3 +1,35 @@
+## NUnit Console & Engine 3.12 - January 17, 2021
+## .NET Core NUnit Console 3.12 Beta 2  - January 17, 2021
+
+This release contains various improvements to running tests on .NET Core and Mono, and changes to 
+extension loading logic to allow the Engine to better support extensions which target multiple platforms. There are additionally 
+a number of fixes to issues that were identified with 3.12 Beta 1. Please also be aware that this will be the last version of 
+the NUnit Engine to support .NET Standard 1.6.
+
+The .NET Core Console remains in Beta due to some unresolved dependency loading and framework targeting issues - contributions to 
+fix these issues would be very welcome!
+
+Code contributions in this release were included from Charlie Poole, Chris Maddock, Christian Bay, 
+Eberhard Beilharz, Ed Ball, Joseph Musser, Manohar Singh Mattias Cavigelli and Mikkel Nylander Bundgaard. Thank you to all 
+those who contributed both in code, and otherwise.
+
+Please note the below list includes only issues resolved between 3.12.0 Beta 1 and the final release. For those upgrading from 3.11.1
+or earlier, please also see the Beta release notes.
+
+ * 511 [Build] Improve detection of installed .NET Core Runtimes
+ * 718 Eliminate use of Mono.Cecil
+ * 810 Build NUnit.ConsoleRunner.NetCore as a .NET Core Tool.
+ * 811 Use readonly modifier where possible
+ * 818 Remove redundant dependency on Microsoft.DotNet.InternalAbstractions for platforms other than .NET Standard 1.6
+ * 825 Revert change to increment nunit.engine.api assembly version
+ * 829 Revert change made to IExtensionService in nunit.engine.api
+ * 830 [CI] Test on .NET 5.0
+ * 837 Fully remove Microsoft.Dotnet.InternalAbstractions dependency
+ * 844 .NET Core console runner fails to load extensions when netfx and netstandard versions conflict
+ * 847 [Build] Specify .NET 2.0 version of extensions for msi
+ * 853 [Build] Allow local build to succeed even if all runtimes are not installed
+ * 863 [Build] Use released version of NUnit Framework 3.13.0
+
 ## NUnit Console & Engine 3.12 Beta 1 - August 1, 2020
 
 This is the first beta release of the NUnit Console able to run .NET Core Tests. 
