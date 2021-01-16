@@ -40,8 +40,6 @@ namespace NUnit.Engine.Services
         [TestCase("net-2.0", true, "../agents/net20/nunit-agent-x86.exe")]
         //[TestCase("netcore-2.1", false, "agents/netcoreapp2.1/testcentric-agent.dll")]
         //[TestCase("netcore-2.1", true, "agents/netcoreapp2.1/testcentric-agent-x86.dll")]
-        //[TestCase("netcore-1.1", false, "agents/netcoreapp1.1/testcentric-agent.dll")]
-        //[TestCase("netcore-1.1", true, "agents/netcoreapp1.1/testcentric-agent-x86.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)
         {
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = runtime;
