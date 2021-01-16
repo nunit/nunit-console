@@ -36,7 +36,9 @@ namespace NUnit.Engine.Services.Tests
         public void CreateService()
         {
             var services = new ServiceContext();
+#if !NETCOREAPP1_1
             services.Add(new ExtensionService());
+#endif
             _resultService = new ResultService();
             services.Add(_resultService);
             services.ServiceManager.StartServices();
@@ -51,7 +53,11 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AvailableFormats()
         {
+#if NETCOREAPP1_1
+            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases" }));
+#else
             Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
+#endif
         }
 
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]

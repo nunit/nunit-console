@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 using System.IO;
 using System.Text;
@@ -95,3 +96,4 @@ namespace NUnit.Engine.Services
         }
     }
 }
+#endif

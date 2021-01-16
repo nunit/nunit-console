@@ -5,8 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
+#if NETSTANDARD1_6
+[assembly: AssemblyTitle("NUnit .NET Standard Engine")]
+[assembly: AssemblyDescription("Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard")]
+#else
 [assembly: AssemblyTitle("NUnit Engine")]
 [assembly: AssemblyDescription("Provides a common interface for loading, exploring and running NUnit tests")]
+#endif
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

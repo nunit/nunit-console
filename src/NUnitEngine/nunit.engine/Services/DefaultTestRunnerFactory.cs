@@ -33,10 +33,13 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class DefaultTestRunnerFactory : InProcessTestRunnerFactory, ITestRunnerFactory
     {
+#if !NETSTANDARD1_6
         private IProjectService _projectService;
+#endif
 
         public override void StartService()
         {
+#if !NETSTANDARD1_6
             // TestRunnerFactory requires the ProjectService
             _projectService = ServiceContext.GetService<IProjectService>();
 
@@ -44,6 +47,9 @@ namespace NUnit.Engine.Services
             Status = _projectService != null && ((IService)_projectService).Status == ServiceStatus.Started
                 ? ServiceStatus.Started
                 : ServiceStatus.Error;
+#else
+            Status = ServiceStatus.Started;
+#endif
         }
 
         /// <summary>

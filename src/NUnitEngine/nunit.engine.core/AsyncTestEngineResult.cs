@@ -31,7 +31,9 @@ namespace NUnit.Engine
     /// <summary>
     /// The TestRun class encapsulates an ongoing test run.
     /// </summary>
+#if !NETSTANDARD1_6
     [Serializable]
+#endif
     public class AsyncTestEngineResult : ITestRun
     {
         private volatile TestEngineResult _result;

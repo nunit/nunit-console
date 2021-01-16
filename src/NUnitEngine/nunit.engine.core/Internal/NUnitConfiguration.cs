@@ -34,6 +34,8 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class NUnitConfiguration
     {
+#if !NETSTANDARD1_6
+
         private static string _engineDirectory;
         public static string EngineDirectory
         {
@@ -47,6 +49,8 @@ namespace NUnit.Engine.Internal
             }
         }
 
+#endif
+
         private static string _applicationDirectory;
         public static string ApplicationDirectory
         {
@@ -55,7 +59,11 @@ namespace NUnit.Engine.Internal
                 if (_applicationDirectory == null)
                 {
                     _applicationDirectory = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+#if NETSTANDARD1_6
+                    Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LocalAppData" : "HOME"),
+#else
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+#endif
                         "NUnit");
                 }
 
