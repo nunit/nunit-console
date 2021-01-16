@@ -68,6 +68,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         }
                     });
 
+#if !NETCOREAPP1_1
                 yield return new TestRunnerFactoryData(
                     "SingleProject (list ctor)",
                     new TestPackage(new[] { "a.nunit" }),
@@ -220,6 +221,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         }
                     }
                 );
+#endif
             }
         }
     }

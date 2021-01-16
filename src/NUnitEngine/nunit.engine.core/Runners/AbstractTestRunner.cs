@@ -99,6 +99,7 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         protected abstract TestEngineResult RunTests(ITestEventListener listener, TestFilter filter);
 
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage, returning immediately.
         /// The tests are run asynchronously and the listener interface is notified
@@ -123,6 +124,7 @@ namespace NUnit.Engine.Runners
 
             return testRun;
         }
+#endif
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
@@ -189,6 +191,7 @@ namespace NUnit.Engine.Runners
             return RunTests(listener, filter);
         }
 
+#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.
@@ -200,6 +203,7 @@ namespace NUnit.Engine.Runners
         {
             return RunTestsAsync(listener, filter);
         }
+#endif
 
         public void Dispose()
         {

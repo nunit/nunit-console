@@ -5,7 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
+#if NETSTANDARD1_6
+[assembly: AssemblyTitle("NUnit .NET Standard Engine Core")]
+#else
 [assembly: AssemblyTitle("NUnit Engine Core")]
+#endif
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

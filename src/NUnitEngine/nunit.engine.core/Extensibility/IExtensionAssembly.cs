@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+#if !NETSTANDARD1_6
 using System;
 
 namespace NUnit.Engine.Extensibility
@@ -35,3 +36,4 @@ namespace NUnit.Engine.Extensibility
 #endif
     }
 }
+#endif

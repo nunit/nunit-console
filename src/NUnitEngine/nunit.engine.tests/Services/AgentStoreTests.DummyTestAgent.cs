@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP2_0
+#if !NETCOREAPP1_1 && !NETCOREAPP2_0
 using System;
 
 namespace NUnit.Engine.Services.Tests

@@ -20,6 +20,14 @@
     <copyright>Copyright (c) 2020 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group targetFramework="net20" />
+      <group targetFramework="netstandard1.6">
+        <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" exclude="compile" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
+        <dependency id="System.Reflection" version="4.3.0" exclude="compile" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="compile" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
+      </group>
       <group targetFramework="netstandard2.0">
         <dependency id="NETStandard.Library" version="2.0.0" />
         <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" exclude="compile" />
@@ -64,6 +72,11 @@
     <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/net20"/>
     <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/net20"/>
     <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/net40"/>
+    <file src="bin/netstandard1.6/nunit.engine.dll" target="lib/netstandard1.6" />
+    <file src="bin/netstandard1.6/nunit.engine.core.dll" target="lib/netstandard1.6" />
+    <file src="bin/netstandard1.6/nunit.engine.api.dll" target="lib/netstandard1.6" />
+    <file src="bin/netstandard1.6/testcentric.engine.metadata.dll" target="lib/netstandard1.6" />
+    <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/netstandard1.6"/>
     <file src="bin/netstandard2.0/nunit.engine.dll" target="lib/netstandard2.0" />
     <file src="bin/netstandard2.0/nunit.engine.core.dll" target="lib/netstandard2.0" />
     <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netstandard2.0" />

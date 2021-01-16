@@ -40,7 +40,11 @@ namespace NUnit.Engine
         public CoreEngine()
         {
             Services = new ServiceContext();
+#if NETSTANDARD1_6
+            WorkDirectory = NUnitConfiguration.ApplicationDirectory;
+#else
             WorkDirectory = Environment.CurrentDirectory;
+#endif
             InternalTraceLevel = InternalTraceLevel.Default;
         }
 
@@ -97,7 +101,9 @@ namespace NUnit.Engine
                 // For example, ResultService uses ExtensionService, so ExtensionService is added
                 // later.
                 Services.Add(new DriverService());
+#if !NETSTANDARD1_6
                 Services.Add(new ExtensionService());
+#endif
 #if NETFRAMEWORK
                 Services.Add(new DomainManager());
 #endif

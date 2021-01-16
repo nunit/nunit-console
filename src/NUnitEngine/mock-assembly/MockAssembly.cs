@@ -112,7 +112,9 @@ namespace NUnit.Tests
 
             public const int Inconclusive = MockTestFixture.Inconclusive;
 
+#if !NETCOREAPP1_1
             public static readonly string AssemblyPath = AssemblyHelper.GetAssemblyPath(typeof(MockAssembly).Assembly);
+#endif
         }
 
         [TestFixture(Description="Fake Test Fixture")]

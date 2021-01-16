@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD2_0
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
 namespace NUnit.Engine.Services
 {
     /// <summary>
