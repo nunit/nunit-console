@@ -10,7 +10,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.12.0-beta1");
+var productVersion = Argument("productVersion", "3.12.0-beta2");
 
 var ErrorDetail = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();

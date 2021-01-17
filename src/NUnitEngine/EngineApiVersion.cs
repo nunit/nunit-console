@@ -25,5 +25,5 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("NUnit Engine API")]
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyInformationalVersion("3.12.0")]
+[assembly: AssemblyInformationalVersion("3.12.0-beta2")]
 [assembly: AssemblyFileVersion("3.12.0")]

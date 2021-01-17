@@ -25,4 +25,4 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("NUnit Console Runner")]
 [assembly: AssemblyVersion("3.12.0")]
-[assembly: AssemblyInformationalVersion("3.12.0-beta1")]
+[assembly: AssemblyInformationalVersion("3.12.0-beta2")]
