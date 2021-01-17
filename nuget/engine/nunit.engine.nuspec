@@ -14,7 +14,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine is used by runners to discover and execute tests.</summary>
     <description>This package includes nunit.engine and related assemblies, for use by runner programs. It is not intended for direct use by users who simply want to run tests.</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
@@ -50,7 +50,6 @@
   <files>
     <file src="LICENSE.txt" />
     <file src="NOTICES.txt" />
-    <file src="CHANGES.txt" />
     <file src="bin/net20/nunit.engine.dll" target="lib/net20" />
     <file src="bin/net20/nunit.engine.core.dll" target="lib/net20" />
     <file src="bin/net20/nunit.engine.api.dll" target="lib/net20" />
