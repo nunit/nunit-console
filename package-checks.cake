@@ -20,12 +20,12 @@ public void CheckAllPackages()
             HasFile("LICENSE.txt")) &
         CheckNuGetPackage(
             "NUnit.ConsoleRunner",
-            HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckNuGetPackage("NUnit.Engine",
-            HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard1.6").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
@@ -45,7 +45,7 @@ public void CheckAllPackages()
             HasFile("LICENSE.txt")) &
         CheckChocolateyPackage(
             "nunit-console-runner",
-            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
+            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckChocolateyPackage(

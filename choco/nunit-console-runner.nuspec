@@ -15,7 +15,7 @@
     <bugTrackerUrl>https://github.com/nunit/nunit-console/issues</bugTrackerUrl>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <packageSourceUrl>https://github.com/nunit/nunit-console</packageSourceUrl>
-    <releaseNotes>https://raw.githubusercontent.com/nunit/nunit-console/master/CHANGES.txt</releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
     <mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
     <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-console/master/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
