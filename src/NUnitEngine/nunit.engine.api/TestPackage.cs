@@ -90,8 +90,8 @@ namespace NUnit.Engine
         /// Every test package gets a unique ID used to prefix test IDs within that package.
         /// </summary>
         /// <remarks>
-        /// The generated ID is only unique for packages created within the same application domain.
-        /// For that reason, NUnit pre-creates all test packages that will be needed.
+        /// <para>The generated ID is only unique for packages created within the same application domain.
+        /// For that reason, NUnit pre-creates all test packages that will be needed.</para>
         /// </remarks>
         public string ID { get; private set; }
 
@@ -137,11 +137,11 @@ namespace NUnit.Engine
         /// <param name="name">The name of the setting</param>
         /// <param name="value">The value of the setting</param>
         /// <remarks>
-        /// Once a package is created, subpackages may have been created
+        /// <para>Once a package is created, subpackages may have been created
         /// as well. If you add a setting directly to the Settings dictionary
         /// of the package, the subpackages are not updated. This method is
         /// used when the settings are intended to be reflected to all the
-        /// subpackages under the package.
+        /// subpackages under the package.</para>
         /// </remarks>
         public void AddSetting(string name, object value)
         {

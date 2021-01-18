@@ -97,7 +97,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         /// <param name="results">A collection of <see cref="TestEngineResult"/> to merge.</param>
         /// <returns>A TestEngineResult merging all the input results.</returns>
-        /// <remarks>Used by AbstractTestRunner MakePackageResult method.</remarks>
+        /// <remarks><para>Used by AbstractTestRunner MakePackageResult method.</para></remarks>
         public static TestEngineResult Merge(IList<TestEngineResult> results) 
         {
             var mergedResult = new TestEngineResult();
