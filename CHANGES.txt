@@ -1,3 +1,1 @@
-This file is no longer used to capture changes in this repository.
-
-Instead, please see the [NUnit docs](https://docs.nunit.org), and specifically the [Console and Engine Release Notes](https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html) page there.
+Please see the [NUnit docs](https://docs.nunit.org), and specifically the [Console and Engine Release Notes](https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html) page, for the latest list of changes to the NUnit Console.
