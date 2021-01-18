@@ -10,7 +10,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.12.0-beta1");
+var productVersion = Argument("productVersion", "3.13.0");
 
 var ErrorDetail = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -459,7 +459,6 @@ Task("PackageChocolatey")
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/net20" },

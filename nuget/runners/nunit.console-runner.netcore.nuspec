@@ -18,10 +18,10 @@
 
       Any extensions, if needed, may be installed as separate packages.
     </description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2020 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <packageTypes>
         <packageType name="DotnetTool" />
     </packageTypes>
@@ -29,7 +29,6 @@
   <files>
     <file src="LICENSE.txt" />
     <file src="NOTICES.txt" />
-    <file src="CHANGES.txt" />
     <file src="bin/netcoreapp3.1/nunit3-console.exe" target="tools/netcoreapp3.1/any" />
     <file src="bin/netcoreapp3.1/nunit3-console.pdb" target="tools/netcoreapp3.1/any" />
     <file src="bin/netcoreapp3.1/nunit3-console.dll" target="tools/netcoreapp3.1/any" />

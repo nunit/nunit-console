@@ -36,7 +36,7 @@ Issues that need confirmation will have the **confirm** label or be unlabeled. Y
 
 Great documentation is essential for any open source project and NUnit is no exception. [Our documentation](https://github.com/nunit/docs/wiki/NUnit-Documentation) often lags behind the features that have been implemented or would benefit from better examples.
 
-A great place to start is by going through the [release notes](https://github.com/nunit/nunit-console/blob/master/CHANGES.txt) and ensuring that the documentation for new features is up to date.
+A great place to start is by going through the [release notes](https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html) and ensuring that the documentation for new features is up to date.
 
 ## Fixing Bugs and Adding Features 
 

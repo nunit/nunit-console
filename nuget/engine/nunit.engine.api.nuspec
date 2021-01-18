@@ -14,10 +14,10 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine Api is used by runners to interface with the NUnit Engine in order to discover and execute tests.</summary>
     <description>This package includes the nunit.engine.api, which is normally the only assembly referenced by runners as well as by engine extensions. It is not intended for direct use by users who simply want to run tests using NUnit.</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
-    <copyright>Copyright (c) 2020 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group targetFramework="net20" />
       <group targetFramework="netstandard1.6">
