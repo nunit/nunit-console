@@ -13,7 +13,9 @@ indent_size = 4
 
 # Default severity for analyzer diagnostics with category 'DocumentationAnalyzers.Refactorings'
 dotnet_analyzer_diagnostic.category-DocumentationAnalyzers.Refactorings.severity = suggestion
+dotnet_diagnostic.DOC100.severity = none # DOC100: Place text in paragraphs
 
 [*.{proj,csproj,vcxproj,xproj,json,config,nuspec,xml,yml}]
 indent_style = space
 indent_size = 2
+
