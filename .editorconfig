@@ -11,6 +11,9 @@ root = true
 indent_style = space
 indent_size = 4
 
+# Default severity for analyzer diagnostics with category 'DocumentationAnalyzers.Refactorings'
+dotnet_analyzer_diagnostic.category-DocumentationAnalyzers.Refactorings.severity = suggestion
+
 [*.{proj,csproj,vcxproj,xproj,json,config,nuspec,xml,yml}]
 indent_style = space
 indent_size = 2
