@@ -1,1 +1,1 @@
-Please see the [NUnit docs](https://docs.nunit.org), and specifically the [Console and Engine Release Notes](https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html) page, for the latest list of changes to the NUnit Console.
+For the latest list of changes to the NUnit Console Runner, please see the Console and Engine release notes on the NUnit Docs site at https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html
