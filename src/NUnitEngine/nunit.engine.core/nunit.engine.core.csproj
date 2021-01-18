@@ -22,6 +22,10 @@
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DotNetAnalyzers.DocumentationAnalyzers" Version="1.0.0-beta.59">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="TestCentric.Metadata" Version="1.4.1" />
   </ItemGroup>
   <ItemGroup>
