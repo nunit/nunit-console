@@ -45,14 +45,12 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         public void SetUp()
         {
             _services = new ServiceContext();
-#if !NETCOREAPP1_1
             _services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
             ((IService)projectService).StartService();
             projectService.Add(TestPackageFactory.FakeProject, "a.dll", "b.dll");
             _services.Add(projectService);
             Assert.That(((IService)projectService).Status, Is.EqualTo(ServiceStatus.Started));
-#endif
             _factory = new DefaultTestRunnerFactory();
             _services.Add(_factory);
             _factory.StartService();
@@ -92,3 +90,4 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #endif
     }
 }
+

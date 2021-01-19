@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
@@ -82,4 +81,3 @@ namespace NUnit.Engine.Tests.Extensibility
 #endif
     }
 }
-#endif

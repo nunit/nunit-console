@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System.IO;
 using System.Xml;
 using NUnit.Engine.Runners;
@@ -88,4 +87,3 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
         }
     }
 }
-#endif
