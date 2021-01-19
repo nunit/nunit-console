@@ -1,5 +1,4 @@
-﻿#if !NETCOREAPP1_1
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using NUnit.Framework;
@@ -38,4 +37,3 @@ namespace NUnit.Engine.Tests.Integration
         }
     }
 }
-#endif

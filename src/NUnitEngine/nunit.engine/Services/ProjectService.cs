@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETSTANDARD1_6
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Common;
@@ -167,4 +166,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif

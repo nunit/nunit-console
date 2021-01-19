@@ -75,13 +75,7 @@ namespace NUnit.Engine.Runners.Tests
             // 1. These tests document current behavior. In some cases we may want to change that behavior.
             // 2. The .NET Standard builds don't seem to handle notest-assembly correctly, so those entries are commented out.
             // 3. The .NET Standard 1.6 build is not intended to handle projects.
-#if NETCOREAPP1_1
-            new TestRunData( "mock-assembly.dll", MockAssemblyData ),
-            new TestRunData( "mock-assembly.dll,mock-assembly.dll", MockAssemblyData, MockAssemblyData ),
-            //new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),
-            //new TestRunData( "notest-assembly.dll,notest-assembly.dll", NoTestAssemblyData, NoTestAssemblyData ),
-            //new TestRunData( "mock-assembly.dll,notest-assembly.dll", MockAssemblyData, NoTestAssemblyData )
-#elif NETCOREAPP2_1 || NETCOREAPP3_1
+#if NETCOREAPP2_1 || NETCOREAPP3_1
             new TestRunData( "mock-assembly.dll", MockAssemblyData ),
             new TestRunData( "mock-assembly.dll,mock-assembly.dll", MockAssemblyData, MockAssemblyData ),
             //new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),
@@ -112,7 +106,6 @@ namespace NUnit.Engine.Runners.Tests
 
             // Add all services needed
             _services = new ServiceContext();
-#if !NETCOREAPP1_1
             _services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
             var mockPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
@@ -122,7 +115,6 @@ namespace NUnit.Engine.Runners.Tests
             projectService.Add("project3.nunit", notestsPath);
             projectService.Add("project4.nunit", notestsPath, notestsPath);
             _services.Add(projectService);
-#endif
 #if NETFRAMEWORK
             _services.Add(new DomainManager());
             _services.Add(new RuntimeFrameworkService());
@@ -200,7 +192,6 @@ namespace NUnit.Engine.Runners.Tests
             CheckTestRunEvents();
         }
 
-#if !NETCOREAPP1_1
         [Test]
         public void RunAsync()
         {
@@ -215,7 +206,6 @@ namespace NUnit.Engine.Runners.Tests
 
             CheckTestRunEvents();
         }
-#endif
 
         private void CheckResult(XmlNode result, ResultData expected)
         {
@@ -300,9 +290,7 @@ namespace NUnit.Engine.Runners.Tests
             Assert.That(startRun.GetAttribute("clr-version"), Is.Not.Null, "Incorrect clr-version in start-run event");
             Assert.That(startRun.GetAttribute("start-time", DateTime.Now.AddDays(-2)), Is.GreaterThan(DateTime.Now.AddDays(-1)), "Incorrect start-time in start-run event");
             Assert.That(startRun.GetAttribute("count", -1), Is.EqualTo(_testRunData.Tests), "Incorrect count in start-run event");
-#if !NETSTANDARD1_6 && !NETCOREAPP1_1
             Assert.That(startRun.FirstChild.Name, Is.EqualTo("command-line"), "First child of start-run should be command-line");
-#endif
             Assert.That(_events[_events.Count - 1].Name, Is.EqualTo("test-run"), "Last event should be test-run");
 
             Assert.That(_events.Count(x => x.Name == "start-run"), Is.EqualTo(1), "More than one start-run event");

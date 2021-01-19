@@ -55,9 +55,7 @@ namespace NUnit.Engine.Runners
 
         private ITestEngineRunner _engineRunner;
         private readonly IServiceLocator _services;
-#if !NETSTANDARD1_6
         private readonly ExtensionService _extensionService;
-#endif
 #if NETFRAMEWORK
         private readonly IRuntimeFrameworkService _runtimeService;
 #endif
@@ -80,9 +78,7 @@ namespace NUnit.Engine.Runners
 #if NETFRAMEWORK
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
-#if !NETSTANDARD1_6
             _extensionService = _services.GetService<ExtensionService>();
-#endif
 
             // Last chance to catch invalid settings in package,
             // in case the client runner missed them.
@@ -171,7 +167,6 @@ namespace NUnit.Engine.Runners
         }
 
 
-#if !NETSTANDARD1_6
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.
@@ -183,7 +178,6 @@ namespace NUnit.Engine.Runners
         {
             return RunTestsAsync(listener, filter);
         }
-#endif
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
@@ -434,23 +428,17 @@ namespace NUnit.Engine.Runners
             var eventDispatcher = new TestEventDispatcher();
             if (listener != null)
                 eventDispatcher.Listeners.Add(listener);
-#if !NETSTANDARD1_6
+
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
                 eventDispatcher.Listeners.Add(extension);
-#endif
 
             IsTestRunning = true;
             
             string clrVersion;
             string engineVersion;
 
-#if !NETSTANDARD1_6
             clrVersion = Environment.Version.ToString();
             engineVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-#else
-            clrVersion =  Microsoft.DotNet.InternalAbstractions.RuntimeEnvironment.GetRuntimeIdentifier();
-            engineVersion = typeof(MasterTestRunner).GetTypeInfo().Assembly.GetName().Version.ToString();
-#endif
 
             var startTime = DateTime.UtcNow;
             var startRunNode = XmlHelper.CreateTopLevelElement("start-run");
@@ -459,9 +447,7 @@ namespace NUnit.Engine.Runners
             startRunNode.AddAttribute("engine-version", engineVersion);
             startRunNode.AddAttribute("clr-version", clrVersion);
 
-#if !NETSTANDARD1_6
             InsertCommandLineElement(startRunNode);
-#endif
 
             eventDispatcher.OnTestEvent(startRunNode.OuterXml);
 
@@ -472,9 +458,7 @@ namespace NUnit.Engine.Runners
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);
 
-#if !NETSTANDARD1_6
             InsertCommandLineElement(result.Xml);
-#endif
 
             result.Xml.AddAttribute("engine-version", engineVersion);
             result.Xml.AddAttribute("clr-version", clrVersion);
@@ -490,7 +474,6 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
-#if !NETSTANDARD1_6
         private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
         {
             var testRun = new AsyncTestEngineResult();
@@ -524,7 +507,6 @@ namespace NUnit.Engine.Runners
             var cdata = doc.CreateCDataSection(Environment.CommandLine);
             cmd.AppendChild(cdata);
         }
-#endif
 
         private static void InsertFilterElement(XmlNode resultNode, TestFilter filter)
         {

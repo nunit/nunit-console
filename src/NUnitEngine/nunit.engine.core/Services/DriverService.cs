@@ -49,11 +49,7 @@ namespace NUnit.Engine.Services
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
-#if NETSTANDARD1_6
-        public IFrameworkDriver GetDriver(string assemblyPath, bool skipNonTestAssemblies)
-#else
         public IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies)
-#endif
         {
             if (!File.Exists(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, "File not found: " + assemblyPath);
@@ -121,7 +117,6 @@ namespace NUnit.Engine.Services
 
             try
             {
-#if !NETSTANDARD1_6
                 var extensionService = ServiceContext.GetService<ExtensionService>();
                 if (extensionService != null)
                 {
@@ -134,7 +129,6 @@ namespace NUnit.Engine.Services
                         _factories.Add(new NUnit2DriverFactory(node));
 #endif
                 }
-#endif
 
                 _factories.Add(new NUnit3DriverFactory());
 

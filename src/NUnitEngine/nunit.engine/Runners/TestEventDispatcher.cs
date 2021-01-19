@@ -29,11 +29,7 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// TestEventDispatcher is used to send test events to a number of listeners
     /// </summary>
-    public class TestEventDispatcher :
-#if !NETSTANDARD1_6
-        MarshalByRefObject, 
-#endif
-        ITestEventListener
+    public class TestEventDispatcher : MarshalByRefObject, ITestEventListener
     {
         private object _eventLock = new object();
 
@@ -53,11 +49,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if !NETSTANDARD1_6
         public override object InitializeLifetimeService()
         {
             return null;
         }
-#endif
     }
 }

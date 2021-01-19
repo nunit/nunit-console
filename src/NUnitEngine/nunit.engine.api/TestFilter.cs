@@ -32,9 +32,7 @@ namespace NUnit.Engine
     /// In the console runner, filters serve only to carry this
     /// XML representation, as all filtering is done by the engine.
     /// </summary>
-#if !NETSTANDARD1_6
     [Serializable]
-#endif
     public class TestFilter
     {
         /// <summary>

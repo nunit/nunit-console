@@ -21,7 +21,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
-#if !NETCOREAPP1_1
 using System;
 using System.Threading;
 using NUnit.Framework;
@@ -158,4 +157,3 @@ namespace NUnit.Engine.Runners.Tests
         }
     }
 }
-#endif
