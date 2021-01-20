@@ -79,9 +79,9 @@
             <Component Id="NUNIT_AGENT_NET40_X86" Location="local" Guid="8EB0C529-56D8-4746-804E-6679744699F6">
                 <File Id="nunit_agent_net40_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe" />
                 <File Id="nunit_agent_net40_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe.config" />
             </Component>
             <Component Id="NUNIT_AGENT_ADDINS_NET40" Location="local" Guid="">
                 <File Id="nunit.agent.net40.addins" Source="$(var.InstallImage)nunit.agent.addins" />
