@@ -4,10 +4,8 @@
 // each release. This might be automated at some future point. However, they do
 // provide some degree of regression testing, since changes in the package
 // organization will result in a failure. 
-//
-// Note that msi packages are not being checked at this time.
 
-public void CheckAllPackages()
+public void CheckAllPackages(string packageDir)
 {
     string[] ENGINE_FILES = { "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
     string[] AGENT_FILES = { 
@@ -16,15 +14,19 @@ public void CheckAllPackages()
 
     bool isOK =
         CheckNuGetPackage(
+            packageDir,
             "NUnit.Console",
             HasFile("LICENSE.txt")) &
         CheckNuGetPackage(
+            packageDir,
             "NUnit.ConsoleRunner",
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
-        CheckNuGetPackage("NUnit.Engine",
+        CheckNuGetPackage(
+            packageDir,
+            "NUnit.Engine",
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
@@ -35,22 +37,27 @@ public void CheckAllPackages()
             HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckNuGetPackage(
+            packageDir,
             "NUnit.Engine.Api",
             HasFile("LICENSE.txt"),
             HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll")) &
         CheckNuGetPackage(
+            packageDir,
             "NUnit.Runners",
             HasFile("LICENSE.txt")) &
         CheckChocolateyPackage(
+            packageDir,
             "nunit-console-runner",
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckChocolateyPackage(
+            packageDir,
             "nunit-console-with-extensions",
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt")) &
         CheckZipPackage(
+            packageDir,
             "NUnit.Console",
             HasFiles("LICENSE.txt", "license.rtf", "NOTICES.txt", "CHANGES.txt"),
             HasDirectory("bin/net20").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
@@ -60,7 +67,9 @@ public void CheckAllPackages()
             HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_FILES),
             HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES),
             HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES)) &
-        CheckMsiPackage("NUnit.Console", 
+        CheckMsiPackage(
+            packageDir,
+            "NUnit.Console",
             HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
             HasDirectory("NUnit.org/nunit-console").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
             HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
@@ -71,26 +80,26 @@ public void CheckAllPackages()
         throw new Exception("One or more package checks failed. See listing.");
 }
 
-private bool CheckNuGetPackage(string packageId, params ICheck[] checks)
+private bool CheckNuGetPackage(string packageDir, string packageId, params ICheck[] checks)
 {
-    return CheckPackage($"{PACKAGE_DIR}{packageId}.{productVersion}.nupkg", checks);
+    return CheckPackage($"{packageDir}{packageId}.{productVersion}.nupkg", checks);
 }
 
-private bool CheckChocolateyPackage(string packageId, params ICheck[] checks)
+private bool CheckChocolateyPackage(string packageDir, string packageId, params ICheck[] checks)
 {
-    return CheckPackage($"{PACKAGE_DIR}{packageId}.{productVersion}.nupkg", checks);
+    return CheckPackage($"{packageDir}{packageId}.{productVersion}.nupkg", checks);
 }
 
-private bool CheckZipPackage(string packageName, params ICheck[] checks)
+private bool CheckZipPackage(string packageDir, string packageName, params ICheck[] checks)
 {
-    return CheckPackage($"{PACKAGE_DIR}{packageName}-{productVersion}.zip", checks);
+    return CheckPackage($"{packageDir}{packageName}-{productVersion}.zip", checks);
 }
 
 // NOTE: Msi package currently uses "version" rather than "productVersion"
 
-private bool CheckMsiPackage(string packageName, params ICheck[] checks)
+private bool CheckMsiPackage(string packageDir, string packageName, params ICheck[] checks)
 {
-    return CheckPackage($"{PACKAGE_DIR}{packageName}-{version}.msi", checks);
+    return CheckPackage($"{packageDir}{packageName}-{version}.msi", checks);
 }
 
 private bool CheckPackage(string package, params ICheck[] checks)
