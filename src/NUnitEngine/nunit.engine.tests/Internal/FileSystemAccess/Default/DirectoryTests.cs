@@ -77,12 +77,10 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             Assert.AreEqual(parent, directory.Parent.FullName);
         }
 
-        [Test]
+        // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends '\\server\share' to the current working-directory, making this test useless.
+        [Test, Platform("Win")]
         public void Init_NoParent_SMB()
         {
-            // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends '\\server\share' to the current working-directory, making this test useless.
-            SkipOnNonWindowsSystems();
-
             var path = "\\\\server\\share";
             var directory = new Directory(path);
 
@@ -90,12 +88,10 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             Assert.IsNull(directory.Parent);
         }
 
-        [Test]
+        // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends 'x:\' to the current working-directory, making this test useless.
+        [Test, Platform("Win")]
         public void Init_NoParent_Drive()
         {
-            // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends 'x:\' to the current working-directory, making this test useless.
-            SkipOnNonWindowsSystems();
-
             var path = "x:\\";
             var directory = new Directory(path);
 
@@ -192,14 +188,6 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var directory = new Directory(path);
 
             Assert.That(() => directory.GetDirectories("*", (SIO.SearchOption)5), Throws.InstanceOf<System.ArgumentOutOfRangeException>());
-        }
-
-        private void SkipOnNonWindowsSystems()
-        {
-            if (SIO.Path.DirectorySeparatorChar != '\\')
-            {
-                Assert.Ignore("This test is not compatible with the current operating system.");
-            }
         }
     }
 }
