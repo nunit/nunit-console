@@ -21,7 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 using System.Collections.Generic;
-namespace NUnit.Engine
+namespace NUnit.Engine.Internal
 {
     /// <summary>
     /// Extension methods to get some Linq-feeling in .NET 2.0 projects.
