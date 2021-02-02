@@ -60,15 +60,12 @@ namespace NUnit.Engine.Runners
 
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
 
-#if !NETSTANDARD1_6
         private ProvidedPathsAssemblyResolver _assemblyResolver;
 
         protected AppDomain TestDomain { get; set; }
-#endif
 
         public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-#if !NETSTANDARD1_6
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
             if (AppDomain.CurrentDomain.IsDefaultAppDomain())
@@ -76,7 +73,6 @@ namespace NUnit.Engine.Runners
                 _assemblyResolver = new ProvidedPathsAssemblyResolver();
                 _assemblyResolver.Install();
             }
-#endif
         }
 
         /// <summary>
@@ -135,7 +131,6 @@ namespace NUnit.Engine.Runners
                 string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
                 bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
-#if !NETSTANDARD1_6
                 if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
                     && subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
                 {
@@ -145,9 +140,7 @@ namespace NUnit.Engine.Runners
                 }
 
                 IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
-#else
-                IFrameworkDriver driver = driverService.GetDriver(testFile, skipNonTestAssemblies);
-#endif
+
                 driver.ID = subPackage.ID;
                 result.Add(LoadDriver(driver, testFile, subPackage));
                 _drivers.Add(driver);
@@ -225,13 +218,12 @@ namespace NUnit.Engine.Runners
                 result.Add(driverResult);
             }
 
-#if !NETSTANDARD1_6
             if (_assemblyResolver != null)
             {
                 foreach (var package in TestPackage.Select(p => p.IsAssemblyPackage()))
                     _assemblyResolver.RemovePathFromFile(package.FullName);
             }
-#endif
+
             return result;
         }
 

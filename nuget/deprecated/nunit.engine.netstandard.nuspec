@@ -20,7 +20,7 @@
     </description>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (C) 2020 Charlie Poole, Rob Prouse</copyright>
+    <copyright>Copyright (C) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
       <group>
         <dependency id="NUnit.Engine" version="$version$" />

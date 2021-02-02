@@ -11,13 +11,6 @@ jobs:
   
   steps:
 
-  - task: UseDotNet@2
-    displayName: 'Install .NET Core 1.1.2'
-    inputs:
-      packageType: runtime
-      version: 1.1.2
-      installationPath: C:/Program Files/dotnet
-
   - powershell: .\build.ps1 -Target Test -Configuration Release
     displayName: Build and test
 
@@ -29,14 +22,6 @@ jobs:
       testResultsFiles: test-results\net35\*.xml
       mergeTestResults: true
       testRunTitle: net35/Windows
-    condition: succeededOrFailed()
-  - task: PublishTestResults@2
-    displayName: Publish netcoreapp1.1 test results
-    inputs:
-      testResultsFormat: NUnit
-      testResultsFiles: test-results\netcoreapp1.1\*.xml
-      mergeTestResults: true
-      testRunTitle: netcoreapp1.1/Windows
     condition: succeededOrFailed()
   - task: PublishTestResults@2
     displayName: Publish netcoreapp2.1 test results
@@ -66,7 +51,6 @@ jobs:
       sudo dpkg -i packages-microsoft-prod.deb
       sudo apt-get install apt-transport-https
       sudo apt-get update
-      sudo apt-get install dotnet-sharedframework-microsoft.netcore.app-1.1.2
       sudo apt-get install dotnet-sdk-2.2
       sudo apt-get install dotnet-runtime-5.0
       ./build.sh --target=Test --configuration=Release
@@ -80,14 +64,6 @@ jobs:
       testResultsFiles: test-results/net35/*.xml
       mergeTestResults: true
       testRunTitle: net35/Linux
-    condition: succeededOrFailed()
-  - task: PublishTestResults@2
-    displayName: Publish netcoreapp1.1 test results
-    inputs:
-      testResultsFormat: NUnit
-      testResultsFiles: test-results/netcoreapp1.1/*.xml
-      mergeTestResults: true
-      testRunTitle: netcoreapp1.1/Linux
     condition: succeededOrFailed()
   - task: PublishTestResults@2
     displayName: Publish netcoreapp2.1 test results
@@ -120,12 +96,6 @@ jobs:
       packageType: runtime
       version: 2.1.x
 
-  - task: UseDotNet@2
-    displayName: 'Install .NET Core runtime 1.1'
-    inputs:
-      packageType: runtime
-      version: 1.1.x
-
   - bash: |
      dotnet tool install --global Cake.Tool
      dotnet cake --target=Test --configuration=Release
@@ -139,14 +109,6 @@ jobs:
       testResultsFiles: test-results/net35/*.xml
       mergeTestResults: true
       testRunTitle: net35/macOS
-    condition: succeededOrFailed()
-  - task: PublishTestResults@2
-    displayName: Publish netcoreapp1.1 test results
-    inputs:
-      testResultsFormat: NUnit
-      testResultsFiles: test-results/netcoreapp1.1/*.xml
-      mergeTestResults: true
-      testRunTitle: netcoreapp1.1/macOS
     condition: succeededOrFailed()
   - task: PublishTestResults@2
     displayName: Publish netcoreapp2.1 test results

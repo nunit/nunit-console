@@ -27,9 +27,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Xml;
-#if NETSTANDARD1_6
-using System.Xml.Linq;
-#endif
 
 namespace NUnit.Engine.Internal
 {
@@ -104,29 +101,6 @@ namespace NUnit.Engine.Internal
                 if (!Directory.Exists(dirPath))
                     Directory.CreateDirectory(dirPath);
 
-#if NETSTANDARD1_6
-                var settings = new XElement("Settings");
-
-                List<string> keys = new List<string>(_settings.Keys);
-                keys.Sort();
-
-                foreach (string name in keys)
-                {
-                    object val = GetSetting(name);
-                    if (val != null)
-                    {
-                        settings.Add(new XElement("Setting",
-                                                    new XAttribute("name", name),
-                                                    new XAttribute("value", TypeDescriptor.GetConverter(val.GetType()).ConvertToInvariantString(val))
-                                                    ));
-                    }
-                }
-                var doc = new XDocument(new XElement("NUnitSettings", settings));
-                using (var file = new FileStream(_settingsFile, FileMode.Create, FileAccess.Write))
-                {
-                    doc.Save(file);
-                }
-#else
                 var stream = new MemoryStream();
                 using (var writer = new XmlTextWriter(stream, Encoding.UTF8))
                 {
@@ -161,7 +135,6 @@ namespace NUnit.Engine.Internal
                     var contents = reader.ReadToEnd();
                     File.WriteAllText(_settingsFile, contents, Encoding.UTF8);
                 }
-#endif
             }
             catch (Exception)
             {

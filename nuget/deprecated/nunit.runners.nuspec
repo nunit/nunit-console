@@ -27,10 +27,10 @@
 
       Other extensions, if needed, must be installed separately.
     </description>
-    <releaseNotes>This release uses the latest version of the TeamCityEventListener extension.</releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
-    <copyright>Copyright (c) 2020 Charlie Poole</copyright>
+    <copyright>Copyright (c) 2021 Charlie Poole</copyright>
     <dependencies>
       <group>
         <dependency id="NUnit.Console" version="$version$" />

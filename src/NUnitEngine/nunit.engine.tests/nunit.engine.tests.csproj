@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <TargetFrameworks>net35;netcoreapp1.1;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <OutputType Condition="'$(TargetFramework)'!='net35'">Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
@@ -11,20 +11,14 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
-    <PackageReference Include="NUnit" Version="3.13.0-dev-06899" />
+    <PackageReference Include="NUnit" Version="3.13.0" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp1.1'">
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="NUnitLite" Version="3.12.0" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1' OR '$(TargetFramework)'=='netcoreapp3.1'">
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="NUnitLite" Version="3.13.0-dev-06899" />
-    <PackageReference Include="NUnit" Version="3.13.0-dev-06899" />
+    <PackageReference Include="NUnitLite" Version="3.13.0" />
+    <PackageReference Include="NUnit" Version="3.13.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />

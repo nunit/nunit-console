@@ -10,7 +10,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.12.0-beta1");
+var productVersion = Argument("productVersion", "3.13.0");
 
 var ErrorDetail = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -34,7 +34,6 @@ var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NET35_BIN_DIR = BIN_DIR + "net35/";
-var NETCOREAPP11_BIN_DIR = BIN_DIR + "netcoreapp1.1/";
 var NETCOREAPP21_BIN_DIR = BIN_DIR + "netcoreapp2.1/";
 var NETCOREAPP31_BIN_DIR = BIN_DIR + "netcoreapp3.1/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
@@ -142,6 +141,17 @@ Task("Clean")
         CleanDirectory(PACKAGE_DIR);
     });
 
+// Not currently used in CI but useful for cleaning your local obj
+// directories, particularly after changing the target of a project.
+Task("CleanAll")
+    .Description("Cleans obj directories in additon to standard clean")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+        foreach (var dir in GetDirectories(PROJECT_DIR + "src/**/obj/"))
+            DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });
+    });
+
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
 //////////////////////////////////////////////////////////////////////
@@ -192,7 +202,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
 }
 
 Task("Build")
-    .Description("Builds the engine and console")
+    .Description("Builds the engine and console") 
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
@@ -200,17 +210,17 @@ Task("Build")
 
         Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
-        foreach(var framework in new [] { "netstandard1.6", "netstandard2.0", "netcoreapp3.1" })
-             MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
-                .WithProperty("TargetFramework", framework)
-                .WithProperty("PublishDir", BIN_DIR + framework));
+        foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
+            MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach(var framework in new [] { "netstandard1.6", "netstandard2.0" })
+        foreach (var framework in new [] { "netstandard2.0" })
              MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach(var framework in new [] { "netcoreapp1.1", "netcoreapp2.1", "netcoreapp3.1" })
+        foreach(var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
@@ -298,24 +308,6 @@ Task("TestNetCore31Console")
                 runtime,
                 ref ErrorDetail);
         }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 1.6 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetStandard16Engine")
-    .Description("Tests the .NET Standard Engine")
-    .IsDependentOn("Build")
-    .WithCriteria(!BuildSystem.IsRunningOnAzurePipelines)   //Unable to find Azure build supporting both .NET Core 1.1 and .NET Core 3.1
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetCoreNUnitLiteTests(
-            NETCOREAPP11_BIN_DIR + ENGINE_TESTS,
-            NETCOREAPP11_BIN_DIR,
-            "netcoreapp1.1",
-            ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -459,7 +451,6 @@ Task("PackageChocolatey")
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "CHANGES.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/net20" },
@@ -826,7 +817,6 @@ Task("TestConsole")
 Task("TestEngine")
     .Description("Builds and tests the engine")
     .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNetStandard16Engine")
     .IsDependentOn("TestNetStandard20Engine")
     .IsDependentOn("TestNetCore31Engine");
 
