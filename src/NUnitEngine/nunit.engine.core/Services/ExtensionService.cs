@@ -29,6 +29,8 @@ using System.Xml;
 using Mono.Cecil;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Engine.Internal.FileSystemAccess.Default;
 
 namespace NUnit.Engine.Services
 {
@@ -49,10 +51,20 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
+        private readonly IFileSystem _fileSystem;
+        private readonly DirectoryFinder _directoryFinder;
+
         public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
 
         public ExtensionService(bool isRunningOnAgent = false)
+            : this(isRunningOnAgent, new FileSystem())
         {
+        }
+
+        internal ExtensionService(bool isRunningOnAgent, IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+            _directoryFinder = new DirectoryFinder(_fileSystem);
             _isRunningOnAgent = isRunningOnAgent;
         }
 
@@ -175,7 +187,7 @@ namespace NUnit.Engine.Services
 
                 // Create the list of possible extension assemblies,
                 // eliminating duplicates. Start in Engine directory.
-                var startDir = new DirectoryInfo(AssemblyHelper.GetDirectoryName(thisAssembly));
+                var startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(thisAssembly));
                 FindExtensionAssemblies(startDir);
 
                 // Check each assembly to see if it contains extensions
@@ -278,7 +290,7 @@ namespace NUnit.Engine.Services
         /// given base directory.
         /// </summary>
         /// <param name="startDir"></param>
-        private void FindExtensionAssemblies(DirectoryInfo startDir)
+        private void FindExtensionAssemblies(IDirectory startDir)
         {
             // First check the directory itself
             ProcessAddinsFiles(startDir, false);
@@ -289,7 +301,7 @@ namespace NUnit.Engine.Services
         /// the directory are only scanned if no file of type .addins is found. If such
         /// a file is found, then those assemblies it references are scanned.
         /// </summary>
-        private void ProcessDirectory(DirectoryInfo startDir, bool fromWildCard)
+        private void ProcessDirectory(IDirectory startDir, bool fromWildCard)
         {
             log.Info("Scanning directory {0} for extensions", startDir.FullName);
 
@@ -301,15 +313,20 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Process all .addins files found in a directory
         /// </summary>
-        private int ProcessAddinsFiles(DirectoryInfo startDir, bool fromWildCard)
+        private int ProcessAddinsFiles(IDirectory startDir, bool fromWildCard)
         {
             var addinsFiles = startDir.GetFiles("*.addins");
+            var addinsFileCount = 0;
 
-            if (addinsFiles.Length > 0)
+            if (addinsFiles.Any())
+            {
                 foreach (var file in addinsFiles)
+                {
                     ProcessAddinsFile(startDir, file.FullName, fromWildCard);
-
-            return addinsFiles.Length;
+                    addinsFileCount += 1;
+                }
+            }
+            return addinsFileCount;
         }
 
         /// <summary>
@@ -318,7 +335,7 @@ namespace NUnit.Engine.Services
         /// path or a wildcard pattern used to find assemblies. Blank
         /// lines and comments started by # are ignored.
         /// </summary>
-        private void ProcessAddinsFile(DirectoryInfo baseDir, string fileName, bool fromWildCard)
+        private void ProcessAddinsFile(IDirectory baseDir, string fileName, bool fromWildCard)
         {
             log.Info("Processing file " + fileName);
 
@@ -340,10 +357,10 @@ namespace NUnit.Engine.Services
 
                     bool isWild = fromWildCard || line.Contains("*");
                     if (line.EndsWith("/"))
-                        foreach (var dir in DirectoryFinder.GetDirectories(baseDir, line))
+                        foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
                             ProcessDirectory(dir, isWild);
                     else
-                        foreach (var file in DirectoryFinder.GetFiles(baseDir, line))
+                        foreach (var file in _directoryFinder.GetFiles(baseDir, line))
                             ProcessCandidateAssembly(file.FullName, isWild);
                 }
             }

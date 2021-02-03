@@ -29,6 +29,8 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using NUnit.Engine.Internal;
+using NSubstitute;
+using NUnit.Engine.Internal.FileSystemAccess;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -72,6 +74,18 @@ namespace NUnit.Engine.Services.Tests
             _serviceClass.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
             _serviceClass.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
+        }
+
+        [Test]
+        public void StartService_UseFileSystemAbstraction()
+        {
+            var fileSystem = Substitute.For<IFileSystem>();
+            var service = new ExtensionService(false, fileSystem);
+            var workingDir = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+
+            service.StartService();
+
+            fileSystem.Received().GetDirectory(workingDir);
         }
 
         [Test]
