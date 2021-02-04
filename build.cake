@@ -8,8 +8,6 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
-var productVersion = Argument("productVersion", "3.13.0");
-
 var ErrorDetail = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 
@@ -48,7 +46,7 @@ Setup<BuildParameters>(context =>
         AppVeyor.UpdateBuildVersion(parameters.PackageVersion);
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit Console/Engine.", parameters.Configuration, productVersion);
+    Information("Building {0} version {1} of NUnit Console/Engine.", parameters.Configuration, parameters.PackageVersion);
 
     return parameters;
 });
@@ -108,12 +106,12 @@ Task("UpdateAssemblyInfo")
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings CreateMSBuildSettings(string target, string configuration)
+MSBuildSettings CreateMSBuildSettings(string target, string configuration, string packageVersion)
 {
     var settings = new MSBuildSettings()
         .SetConfiguration(configuration)
         .SetVerbosity(Verbosity.Minimal)
-        .WithProperty("PackageVersion", productVersion)
+        .WithProperty("PackageVersion", packageVersion)
         .WithTarget(target)
         // Workaround for https://github.com/Microsoft/msbuild/issues/3626
         .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
@@ -146,32 +144,33 @@ Task("Build")
     .Does<BuildParameters>((parms) =>
     {
         string configuration = parms.Configuration;
+        string version = parms.PackageVersion;
         string binDir = parms.OutputDirectory;
 
-        MSBuild(parms.SolutionFile, CreateMSBuildSettings("Build", configuration).WithRestore());
+        MSBuild(parms.SolutionFile, CreateMSBuildSettings("Build", configuration, version).WithRestore());
 
         Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
         foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
-            MSBuild(parms.EngineProject, CreateMSBuildSettings("Publish", configuration)
+            MSBuild(parms.EngineProject, CreateMSBuildSettings("Publish", configuration, version)
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", binDir + framework));
 
         foreach (var framework in new [] { "netstandard2.0" })
-             MSBuild(parms.EngineApiProject, CreateMSBuildSettings("Publish", configuration)
+             MSBuild(parms.EngineApiProject, CreateMSBuildSettings("Publish", configuration, version)
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", binDir + framework));
 
         foreach(var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
-             MSBuild(parms.EngineTestsProject, CreateMSBuildSettings("Publish", configuration)
+             MSBuild(parms.EngineTestsProject, CreateMSBuildSettings("Publish", configuration, version)
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", binDir + framework));
 
-        MSBuild(parms.ConsoleProject, CreateMSBuildSettings("Publish", configuration)
+        MSBuild(parms.ConsoleProject, CreateMSBuildSettings("Publish", configuration, version)
             .WithProperty("TargetFramework", "netcoreapp3.1")
             .WithProperty("PublishDir", binDir + "netcoreapp3.1"));
 
-         MSBuild(parms.ConsoleTestsProject, CreateMSBuildSettings("Publish", configuration)
+         MSBuild(parms.ConsoleTestsProject, CreateMSBuildSettings("Publish", configuration, version)
             .WithProperty("TargetFramework", "netcoreapp3.1")
             .WithProperty("PublishDir", binDir + "netcoreapp3.1"));
 
@@ -188,11 +187,11 @@ Task("BuildCppTestFiles")
     {
         MSBuild(
             parms.EngineDirectory + "mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-            CreateMSBuildSettings("Build", parms.Configuration).WithProperty("Platform", "x86"));
+            CreateMSBuildSettings("Build", parms.Configuration, parms.PackageVersion).WithProperty("Platform", "x86"));
 
         MSBuild(
             parms.EngineDirectory + "mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
-            CreateMSBuildSettings("Build", parms.Configuration).WithProperty("Platform", "x64"));
+            CreateMSBuildSettings("Build", parms.Configuration, parms.PackageVersion).WithProperty("Platform", "x64"));
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -335,7 +334,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -343,7 +342,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -351,7 +350,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -359,7 +358,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -367,7 +366,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -375,7 +374,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/deprecated/nunit.runners.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -383,7 +382,7 @@ Task("BuildNugetPackages")
 
         NuGetPack("nuget/deprecated/nunit.engine.netstandard.nuspec", new NuGetPackSettings()
         {
-            Version = productVersion,
+            Version = parms.PackageVersion,
             BasePath = parms.CurrentImageDirectory,
             OutputDirectory = parms.PackageDirectory,
             NoPackageAnalysis = true
@@ -409,7 +408,7 @@ Task("BuildChocolateyPackages")
         ChocolateyPack("choco/nunit-console-runner.nuspec",
             new ChocolateyPackSettings()
             {
-                Version = productVersion,
+                Version = parms.PackageVersion,
                 OutputDirectory = parms.PackageDirectory,
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = currentImageDir + "LICENSE.txt", Target = "tools" },
@@ -451,7 +450,7 @@ Task("BuildChocolateyPackages")
         ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
             new ChocolateyPackSettings()
             {
-                Version = productVersion,
+                Version = parms.PackageVersion,
                 OutputDirectory = parms.PackageDirectory,
                 Files = new [] {
                     new ChocolateyNuSpecContent { Source = currentImageDir + "LICENSE.txt", Target = "tools" },
@@ -540,7 +539,7 @@ Task("BuildZipPackage")
         CopyFile(parms.CurrentImageDirectory + "nunit.bundle.addins", netfxZipImg + "nunit.bundle.addins");
     }
 
-    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", parms.PackageDirectory, productVersion);
+    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", parms.PackageDirectory, parms.PackageVersion);
     Zip(parms.ZipImageDirectory, zipPath);
 });
 
@@ -607,9 +606,9 @@ Task("SignPackages")
 
 Task("CheckPackageContent")
     .Description("Checks package content and runs package tests")
-    .Does<BuildParameters>((parms) =>
+    .Does<BuildParameters>((parameters) =>
     {
-        CheckAllPackages(parms.PackageDirectory);
+        new PackageChecker(parameters).CheckAllPackages();
     });
 
 Task("ListInstalledNetCoreRuntimes")

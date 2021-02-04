@@ -338,7 +338,7 @@ public class MsiPackageTester : PackageTester
         string testDir = PackageTestDirectory.Replace("/", "\\");
         int rc = _context.StartProcess("msiexec", $"/a {package} TARGETDIR={testDir} /q");
         if (rc != 0)
-            WriteError($"Installer returned {rc.ToString()}");
+            Console.WriteLine($"  ERROR: Installer returned {rc.ToString()}");
         else
         {
             // Administrative install doesn't copy these files
