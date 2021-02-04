@@ -11,6 +11,7 @@ public void CheckAllPackages(string packageDir)
     string[] AGENT_FILES = { 
         "nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
     string[] CONSOLE_FILES = { "nunit3-console.exe", "nunit3-console.exe.config" };
+    string[] CONSOLE_FILES_NETCORE = { "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
 
     bool isOK =
         CheckNuGetPackage(
@@ -24,6 +25,11 @@ public void CheckAllPackages(string packageDir)
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
+        CheckNuGetPackage(
+            packageDir,
+            "NUnit.ConsoleRunner.NetCore",
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory("tools/netcoreapp3.1/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")) &
         CheckNuGetPackage(
             packageDir,
             "NUnit.Engine",
@@ -99,7 +105,7 @@ private bool CheckZipPackage(string packageDir, string packageName, params IChec
 
 private bool CheckMsiPackage(string packageDir, string packageName, params ICheck[] checks)
 {
-    return CheckPackage($"{packageDir}{packageName}-{version}.msi", checks);
+    return CheckPackage($"{packageDir}{packageName}-{productVersion}.msi", checks); // Should be version
 }
 
 private bool CheckPackage(string package, params ICheck[] checks)

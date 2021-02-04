@@ -101,7 +101,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-scripts", "build-scri
 		build-scripts\build-parameters.cake = build-scripts\build-parameters.cake
 		build-scripts\constants.cake = build-scripts\constants.cake
 		build-scripts\package-checks.cake = build-scripts\package-checks.cake
-		build-scripts\patch-assembly-info.cake = build-scripts\patch-assembly-info.cake
+		build-scripts\package-tests.cake = build-scripts\package-tests.cake
+		build-scripts\test-results.cake = build-scripts\test-results.cake
+		build-scripts\versioning.cake = build-scripts\versioning.cake
 	EndProjectSection
 EndProject
 Global

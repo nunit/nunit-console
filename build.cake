@@ -8,22 +8,10 @@
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Release");
 var productVersion = Argument("productVersion", "3.13.0");
 
 var ErrorDetail = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
-
-//////////////////////////////////////////////////////////////////////
-// SET PACKAGE VERSION
-//////////////////////////////////////////////////////////////////////
-
-var dash = productVersion.IndexOf('-');
-var version = dash > 0
-    ? productVersion.Substring(0, dash)
-    : productVersion;
-
-var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
@@ -57,38 +45,10 @@ Setup<BuildParameters>(context =>
     var parameters = BuildParameters.Create(context);
 
     if (BuildSystem.IsRunningOnAppVeyor)
-    {
-        var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
-        var branch = AppVeyor.Environment.Repository.Branch;
-        var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
-
-        if (branch == "master" && !isPullRequest)
-        {
-            productVersion = version + "-dev-" + buildNumber;
-        }
-        else
-        {
-            var suffix = "-ci-" + buildNumber;
-
-            if (isPullRequest)
-                suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
-            else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-                suffix += "-pre-" + buildNumber;
-            else
-                suffix += "-" + System.Text.RegularExpressions.Regex.Replace(branch, "[^0-9A-Za-z-]+", "-");
-
-            // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-            if (suffix.Length > 21)
-                suffix = suffix.Substring(0, 21);
-
-            productVersion = version + suffix;
-        }
-
-        AppVeyor.UpdateBuildVersion(productVersion);
-    }
+        AppVeyor.UpdateBuildVersion(parameters.PackageVersion);
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
+    Information("Building {0} version {1} of NUnit Console/Engine.", parameters.Configuration, productVersion);
 
     return parameters;
 });
@@ -137,18 +97,18 @@ Task("CleanAll")
 
 Task("UpdateAssemblyInfo")
     .Description("Sets the assembly versions to the calculated version.")
-    .Does(() =>
+    .Does<BuildParameters>((parms) =>
     {
-        PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
-        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
-        PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
+        PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", parms.AssemblyFileVersion, parms.AssemblyVersion);
+        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", parms.AssemblyFileVersion, assemblyVersion: null);
+        PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", parms.AssemblyFileVersion, parms.AssemblyVersion);
     });
 
 //////////////////////////////////////////////////////////////////////
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings CreateMSBuildSettings(string target)
+MSBuildSettings CreateMSBuildSettings(string target, string configuration)
 {
     var settings = new MSBuildSettings()
         .SetConfiguration(configuration)
@@ -185,32 +145,33 @@ Task("Build")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does<BuildParameters>((parms) =>
     {
-        MSBuild(parms.SolutionFile, CreateMSBuildSettings("Build").WithRestore());
+        string configuration = parms.Configuration;
+        string binDir = parms.OutputDirectory;
+
+        MSBuild(parms.SolutionFile, CreateMSBuildSettings("Build", configuration).WithRestore());
 
         Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
-        string binDir = parms.OutputDirectory;
-
         foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
-            MSBuild(parms.EngineProject, CreateMSBuildSettings("Publish")
+            MSBuild(parms.EngineProject, CreateMSBuildSettings("Publish", configuration)
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", binDir + framework));
 
         foreach (var framework in new [] { "netstandard2.0" })
-             MSBuild(parms.EngineApiProject, CreateMSBuildSettings("Publish")
+             MSBuild(parms.EngineApiProject, CreateMSBuildSettings("Publish", configuration)
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", binDir + framework));
 
         foreach(var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
-             MSBuild(parms.EngineTestsProject, CreateMSBuildSettings("Publish")
+             MSBuild(parms.EngineTestsProject, CreateMSBuildSettings("Publish", configuration)
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", binDir + framework));
 
-        MSBuild(parms.ConsoleProject, CreateMSBuildSettings("Publish")
+        MSBuild(parms.ConsoleProject, CreateMSBuildSettings("Publish", configuration)
             .WithProperty("TargetFramework", "netcoreapp3.1")
             .WithProperty("PublishDir", binDir + "netcoreapp3.1"));
 
-         MSBuild(parms.ConsoleTestsProject, CreateMSBuildSettings("Publish")
+         MSBuild(parms.ConsoleTestsProject, CreateMSBuildSettings("Publish", configuration)
             .WithProperty("TargetFramework", "netcoreapp3.1")
             .WithProperty("PublishDir", binDir + "netcoreapp3.1"));
 
@@ -227,11 +188,11 @@ Task("BuildCppTestFiles")
     {
         MSBuild(
             parms.EngineDirectory + "mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-            CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+            CreateMSBuildSettings("Build", parms.Configuration).WithProperty("Platform", "x86"));
 
         MSBuild(
             parms.EngineDirectory + "mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
-            CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
+            CreateMSBuildSettings("Build", parms.Configuration).WithProperty("Platform", "x64"));
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -429,6 +390,12 @@ Task("BuildNugetPackages")
         });
     });
 
+Task("TestNugetPackage")
+    .Does<BuildParameters>((parms) =>
+    {
+        new NuGetPackageTester(parms).RunAllTests(1);
+    });
+
 Task("BuildChocolateyPackages")
     .Description("Creates chocolatey packages of the console runner")
     .Does<BuildParameters>((parms) =>
@@ -494,6 +461,12 @@ Task("BuildChocolateyPackages")
             });
     });
 
+Task("TestChocolateyPackage")
+    .Does<BuildParameters>((parms) =>
+    {
+        new ChocolateyPackageTester(parms).RunAllTests(1);
+    });
+
 //////////////////////////////////////////////////////////////////////
 // PACKAGE COMBINED DISTRIBUTIONS
 //////////////////////////////////////////////////////////////////////
@@ -535,15 +508,21 @@ Task("BuildMsiPackage")
 {
     MSBuild(parms.MsiDirectory + "nunit/nunit.wixproj", new MSBuildSettings()
         .WithTarget("Rebuild")
-        .SetConfiguration(configuration)
-        .WithProperty("Version", version)
-        .WithProperty("DisplayVersion", version)
+        .SetConfiguration(parms.Configuration)
+        .WithProperty("Version", parms.MsiVersion)
+        .WithProperty("DisplayVersion", parms.MsiVersion)
         .WithProperty("OutDir", parms.PackageDirectory)
         .WithProperty("Image", parms.CurrentImageDirectory)
         .SetMSBuildPlatform(MSBuildPlatform.x86)
         .SetNodeReuse(false)
         );
 });
+
+Task("TestMsiPackage")
+    .Does<BuildParameters>((parms) =>
+    {
+        new MsiPackageTester(parms).RunAllTests(1);
+    });
 
 Task("BuildZipPackage")
 .IsDependentOn("CreateCombinedImage")
@@ -564,6 +543,12 @@ Task("BuildZipPackage")
     var zipPath = string.Format("{0}NUnit.Console-{1}.zip", parms.PackageDirectory, productVersion);
     Zip(parms.ZipImageDirectory, zipPath);
 });
+
+Task("TestZipPackage")
+    .Does<BuildParameters>((parms) =>
+    {
+        new ZipPackageTester(parms).RunAllTests(1);
+    });
 
 Task("InstallSigningTool")
     .Does(() =>
@@ -831,7 +816,11 @@ Task("BuildPackages")
 
 Task("TestPackages")
     .Description("Tests the packages")
-    .IsDependentOn("CheckPackageContent");
+    .IsDependentOn("CheckPackageContent")
+    .IsDependentOn("TestNugetPackage")
+    .IsDependentOn("TestChocolateyPackage")
+    .IsDependentOn("TestMsiPackage")
+    .IsDependentOn("TestZipPackage");
 
 Task("Package")
     .Description("Builds and tests all packages")
