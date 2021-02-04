@@ -49,6 +49,18 @@ public abstract class PackageTester
                 Skipped = 7
             }));
 
+        PackageTests.Add(new PackageTest(1, "Run 2 copies of mock-assembly.dll under .NET 3.5",
+            "net35/mock-assembly.dll net35/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 74,
+                Passed = 46,
+                Failed = 10,
+                Warnings = 0,
+                Inconclusive = 2,
+                Skipped = 14
+            }));
+
         // We don't have a net40 test-assembly... should we?
         //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 4.x",
         //    "net40/mock-assembly.dll",

@@ -1,39 +1,8 @@
 #load build-scripts/build-parameters.cake
-
-// Install Tools
 #tool NuGet.CommandLine&version=5.3.1
-
-//////////////////////////////////////////////////////////////////////
-// ARGUMENTS & INITIALISATION
-//////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
 var ErrorDetail = new List<string>();
-var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
-
-//////////////////////////////////////////////////////////////////////
-// DEFINE RUN CONSTANTS
-//////////////////////////////////////////////////////////////////////
-
-var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
-
-// Test Assemblies
-
-// Package sources for nuget restore
-var PACKAGE_SOURCE = new string[]
-{
-    "https://www.nuget.org/api/v2",
-    "https://www.myget.org/F/nunit/api/v2"
-};
-
-var EXTENSION_PACKAGES = new []
-{
-  "NUnit.Extension.VSProjectLoader",
-  "NUnit.Extension.NUnitProjectLoader",
-  "NUnit.Extension.NUnitV2Driver",
-  "NUnit.Extension.NUnitV2ResultWriter",
-  "NUnit.Extension.TeamCityEventListener"
-};
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
@@ -702,7 +671,7 @@ void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string argum
     //Find most suitable runtime
     var fxVersion = new string(framework.SkipWhile(c => !char.IsDigit(c)).ToArray());
     //Select latest runtime matching requested major/minor version
-    var selectedFramework = installedNetCoreRuntimes.Where(v => v.StartsWith(fxVersion)).OrderByDescending(Version.Parse).FirstOrDefault();
+    var selectedFramework = INSTALLED_NET_CORE_RUNTIMES.Where(v => v.StartsWith(fxVersion)).OrderByDescending(Version.Parse).FirstOrDefault();
 
     if (selectedFramework == null)
     {

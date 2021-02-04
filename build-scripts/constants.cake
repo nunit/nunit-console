@@ -1,4 +1,4 @@
-// This file contains both constants and static readonly values, which
+// This file contains constants as well as some readonly values, which
 // are used as constants. The latter must not depend in any way on the
 // contents of other cake files, which are loaded after this one.
 
@@ -7,12 +7,33 @@
 const string DEFAULT_PRODUCT_VERSION = "3.13.0";
 const string DEFAULT_CONFIGURATION = "Release";
 
+//Production code targets net20, tests target nets35
+static readonly string[] NETFX_FRAMEWORKS = new[] { "net20", "net35" };
+
+readonly List<string> INSTALLED_NET_CORE_RUNTIMES = GetInstalledNetCoreRuntimes();
+
 const string SOLUTION_FILE = "NUnitConsole.sln";
 
 const string ENGINE_TESTS = "nunit.engine.tests.dll";
 const string CONSOLE_TESTS = "nunit3-console.tests.dll";
 
 const string DEFAULT_TEST_RESULT_FILE = "TestResult.xml";
+
+// Package sources for nuget restore
+static readonly string[] PACKAGE_SOURCE = new string[]
+{
+    "https://www.nuget.org/api/v2",
+    "https://www.myget.org/F/nunit/api/v2"
+};
+
+static readonly string[] EXTENSION_PACKAGES = new[]
+{
+  "NUnit.Extension.VSProjectLoader",
+  "NUnit.Extension.NUnitProjectLoader",
+  "NUnit.Extension.NUnitV2Driver",
+  "NUnit.Extension.NUnitV2ResultWriter",
+  "NUnit.Extension.TeamCityEventListener"
+};
 
 //// URLs for uploading packages
 //private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
