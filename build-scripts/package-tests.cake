@@ -158,30 +158,29 @@ public abstract class NetFXPackageTester : PackageTester
                 Skipped = 7
             }));
 
-        PackageTests.Add(new PackageTest(1, "Run 2 copies of mock-assembly.dll under .NET 3.5",
-            "net35/mock-assembly.dll net35/mock-assembly.dll",
+        PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 4.x",
+            "net40/mock-assembly.dll",
             new ExpectedResult("Failed")
             {
-                Total = 74,
-                Passed = 46,
-                Failed = 10,
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
                 Warnings = 0,
-                Inconclusive = 2,
-                Skipped = 14
+                Inconclusive = 1,
+                Skipped = 7
             }));
 
-        // We don't have a net40 test-assembly... should we?
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 4.x",
-        //    "net40/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 37,
-        //        Passed = 23,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
+        PackageTests.Add(new PackageTest(1, "Run both copies of mock-assembly together",
+            "net35/mock-assembly.dll net40/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
+            }));
     }
 
     //// Level 2 tests are run for PRs and when packages will be published
@@ -228,18 +227,17 @@ public abstract class NetCorePackageTester : PackageTester
                 Skipped = 7
             }));
 
-        // TODO: We don't have a test assembly for .NET Core 1.1 - should we?
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly targeting .NET Core 1.1",
-        //    "netcoreapp1.1/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 36,
-        //        Passed = 23,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
+        PackageTests.Add(new PackageTest(1, "Run both copies of mock-assembly together",
+            "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
+            }));
 
         // TODO: Should we have a .NET 5.0 test?
         //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 5.0",
@@ -252,18 +250,6 @@ public abstract class NetCorePackageTester : PackageTester
         //        Warnings = 0,
         //        Inconclusive = 1,
         //        Skipped = 7
-        //    }));
-
-        //PackageTests.Add(new PackageTest(2, "Run different builds of mock-assembly.dll together",
-        //    "engine-tests/net35/mock-assembly.dll engine-tests/netcoreapp2.1/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 72,
-        //        Passed = 46,
-        //        Failed = 10,
-        //        Warnings = 0,
-        //        Inconclusive = 2,
-        //        Skipped = 14
         //    }));
     }
 }
