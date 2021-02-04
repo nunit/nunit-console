@@ -358,10 +358,12 @@ Task("BuildNugetPackages")
         });
     });
 
-Task("TestNugetPackage")
+Task("TestNugetPackages")
     .Does<BuildParameters>((parms) =>
     {
-        new NuGetPackageTester(parms).RunAllTests(1);
+        new NuGetNetFXPackageTester(parms).RunAllTests(1);
+
+        new NuGetNetCorePackageTester(parms).RunAllTests(1);
     });
 
 Task("BuildChocolateyPackages")
@@ -785,7 +787,7 @@ Task("BuildPackages")
 Task("TestPackages")
     .Description("Tests the packages")
     .IsDependentOn("CheckPackageContent")
-    .IsDependentOn("TestNugetPackage")
+    .IsDependentOn("TestNugetPackages")
     .IsDependentOn("TestChocolateyPackage")
     .IsDependentOn("TestMsiPackage")
     .IsDependentOn("TestZipPackage");

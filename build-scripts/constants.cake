@@ -14,6 +14,8 @@ readonly List<string> INSTALLED_NET_CORE_RUNTIMES = GetInstalledNetCoreRuntimes(
 
 const string SOLUTION_FILE = "NUnitConsole.sln";
 
+const string CONSOLE_EXE = "nunit3-console.exe";
+
 const string ENGINE_TESTS = "nunit.engine.tests.dll";
 const string CONSOLE_TESTS = "nunit3-console.tests.dll";
 

@@ -130,7 +130,8 @@ public class BuildParameters
     public string ExtensionsDirectory => ProjectDirectory + "extension-packages";
     public string TestDirectory => PackageDirectory + "test/";
     public string ZipTestDirectory => TestDirectory + "zip/";
-    public string NuGetTestDirectory => TestDirectory + "nuget/";
+    public string NuGetNetFXTestDirectory => TestDirectory + "nuget-netfx/";
+    public string NuGetNetCoreTestDirectory => TestDirectory + "nuget-netcore/";
     public string ChocolateyTestDirectory => TestDirectory + "choco/";
     public string MsiTestDirectory => TestDirectory + "msi/";
 
@@ -146,12 +147,14 @@ public class BuildParameters
     public string NetCore31ConsoleRunner => OutputDirectory + "netcoreapp3.1/nunit3-console.dll";
 
     public string ZipPackageName => $"NUnit.Console-{PackageVersion}.zip";
-    public string NuGetPackageName => $"NUnit.ConsoleRunner.{PackageVersion}.nupkg";
+    public string NuGetNetFXPackageName => $"NUnit.ConsoleRunner.{PackageVersion}.nupkg";
+    public string NuGetNetCorePackageName => $"NUnit.ConsoleRunner.NetCore.{PackageVersion}.nupkg";
     public string ChocolateyPackageName => $"nunit-console-runner.{PackageVersion}.nupkg";
     public string MsiPackageName => $"NUnit.Console-{MsiVersion}.msi";
 
     public FilePath ZipPackage => new FilePath(PackageDirectory + ZipPackageName);
-    public FilePath NuGetPackage => new FilePath(PackageDirectory + NuGetPackageName);
+    public FilePath NuGetNetFXPackage => new FilePath(PackageDirectory + NuGetNetFXPackageName);
+    public FilePath NuGetNetCorePackage => new FilePath(PackageDirectory + NuGetNetCorePackageName);
     public FilePath ChocolateyPackage => new FilePath(PackageDirectory + ChocolateyPackageName);
     public FilePath MsiPackage => new FilePath(PackageDirectory + MsiPackageName);
 

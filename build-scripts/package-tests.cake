@@ -35,119 +35,6 @@ public abstract class PackageTester
         _context = parameters.Context;
 
         PackageTests = new List<PackageTest>();
-
-        // Level 1 tests are run each time we build the packages
-        PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 3.5",
-            "net35/mock-assembly.dll",
-            new ExpectedResult("Failed")
-            {
-                Total = 37,
-                Passed = 23,
-                Failed = 5,
-                Warnings = 0,
-                Inconclusive = 1,
-                Skipped = 7
-            }));
-
-        PackageTests.Add(new PackageTest(1, "Run 2 copies of mock-assembly.dll under .NET 3.5",
-            "net35/mock-assembly.dll net35/mock-assembly.dll",
-            new ExpectedResult("Failed")
-            {
-                Total = 74,
-                Passed = 46,
-                Failed = 10,
-                Warnings = 0,
-                Inconclusive = 2,
-                Skipped = 14
-            }));
-
-        // We don't have a net40 test-assembly... should we?
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 4.x",
-        //    "net40/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 37,
-        //        Passed = 23,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
-
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET Core 2.1",
-        //    "engine-tests/netcoreapp2.1/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 36,
-        //        Passed = 23,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
-
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET Core 3.1",
-        //    "engine-tests/netcoreapp3.1/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 36,
-        //        Passed = 23,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
-
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll targeting .NET Core 1.1",
-        //    "engine-tests/netcoreapp1.1/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 36,
-        //        Passed = 23,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
-
-        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 5.0",
-        //    "engine-tests/net5.0/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 32,
-        //        Passed = 19,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 7
-        //    }));
-
-        //// Level 2 tests are run for PRs and when packages will be published
-
-        //PackageTests.Add(new PackageTest(2, "Run mock-assembly.dll built for NUnit V2",
-        //    "v2-tests/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 28,
-        //        Passed = 18,
-        //        Failed = 5,
-        //        Warnings = 0,
-        //        Inconclusive = 1,
-        //        Skipped = 4
-        //    },
-        //    NUnitV2Driver));
-
-        //PackageTests.Add(new PackageTest(2, "Run different builds of mock-assembly.dll together",
-        //    "engine-tests/net35/mock-assembly.dll engine-tests/netcoreapp2.1/mock-assembly.dll",
-        //    new ExpectedResult("Failed")
-        //    {
-        //        Total = 72,
-        //        Passed = 46,
-        //        Failed = 10,
-        //        Warnings = 0,
-        //        Inconclusive = 2,
-        //        Skipped = 14
-        //    }));
     }
 
     protected abstract string PackageName { get; }
@@ -159,17 +46,7 @@ public abstract class PackageTester
     protected virtual string NUnitV2Driver => "NUnit.Extension.NUnitV2Driver";
     protected virtual string NUnitProjectLoader => "NUnit.Extension.NUnitProjectLoader";
 
-    // NOTE: Currently, we use the same tests for all packages. There seems to be
-    // no reason for the three packages to differ in capability so the only reason
-    // to limit tests on some of them would be efficiency... so far not a problem.
-    private List<PackageTest> PackageTests { get; }
-
-    // Test Runners (from old build.cake)
-    //var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
-    //var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/" + "nunit3-console.dll";
-
-    protected string Net20Runner => "nunit3-console.exe";
-    protected string NetCore31Runner => "nunit3-console.dll";
+    protected List<PackageTest> PackageTests { get; }
 
     public void RunAllTests(int level)
     {
@@ -227,7 +104,7 @@ public abstract class PackageTester
                 DisplayTestEnvironment(packageTest);
 
                 int rc = _parameters.Context.StartProcess(
-                    PackageTestBinDirectory + Net20Runner,
+                    PackageTestBinDirectory + CONSOLE_EXE,
                     new ProcessSettings()
                     {
                         Arguments = packageTest.Arguments,
@@ -249,9 +126,9 @@ public abstract class PackageTester
 
     private void DisplayBanner(string message)
     {
-        Console.WriteLine("\n========================================"); ;
+        Console.WriteLine("\n============================================="); ;
         Console.WriteLine(message);
-        Console.WriteLine("========================================");
+        Console.WriteLine("=============================================");
     }
 
     private void DisplayTestEnvironment(PackageTest test)
@@ -264,7 +141,134 @@ public abstract class PackageTester
     }
 }
 
-public class ZipPackageTester : PackageTester
+public abstract class NetFXPackageTester : PackageTester
+{
+    public NetFXPackageTester(BuildParameters parameters) : base(parameters)
+    {
+        // Level 1 tests are run each time we build the packages
+        PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 3.5",
+            "net35/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(1, "Run 2 copies of mock-assembly.dll under .NET 3.5",
+            "net35/mock-assembly.dll net35/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 74,
+                Passed = 46,
+                Failed = 10,
+                Warnings = 0,
+                Inconclusive = 2,
+                Skipped = 14
+            }));
+
+        // We don't have a net40 test-assembly... should we?
+        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 4.x",
+        //    "net40/mock-assembly.dll",
+        //    new ExpectedResult("Failed")
+        //    {
+        //        Total = 37,
+        //        Passed = 23,
+        //        Failed = 5,
+        //        Warnings = 0,
+        //        Inconclusive = 1,
+        //        Skipped = 7
+        //    }));
+    }
+
+    //// Level 2 tests are run for PRs and when packages will be published
+
+    //PackageTests.Add(new PackageTest(2, "Run mock-assembly.dll built for NUnit V2",
+    //    "v2-tests/mock-assembly.dll",
+    //    new ExpectedResult("Failed")
+    //    {
+    //        Total = 28,
+    //        Passed = 18,
+    //        Failed = 5,
+    //        Warnings = 0,
+    //        Inconclusive = 1,
+    //        Skipped = 4
+    //    },
+    //    NUnitV2Driver));
+}
+
+public abstract class NetCorePackageTester : PackageTester
+{
+    public NetCorePackageTester(BuildParameters parameters) : base(parameters)
+    {
+        PackageTests.Add(new PackageTest(1, "Run mock-assembly targeting .NET Core 2.1",
+            "netcoreapp2.1/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(1, "Run mock-assembly targeting .NET Core 3.1",
+            "netcoreapp3.1/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        // TODO: We don't have a test assembly for .NET Core 1.1 - should we?
+        //PackageTests.Add(new PackageTest(1, "Run mock-assembly targeting .NET Core 1.1",
+        //    "netcoreapp1.1/mock-assembly.dll",
+        //    new ExpectedResult("Failed")
+        //    {
+        //        Total = 36,
+        //        Passed = 23,
+        //        Failed = 5,
+        //        Warnings = 0,
+        //        Inconclusive = 1,
+        //        Skipped = 7
+        //    }));
+
+        // TODO: Should we have a .NET 5.0 test?
+        //PackageTests.Add(new PackageTest(1, "Run mock-assembly.dll under .NET 5.0",
+        //    "net5.0/mock-assembly.dll",
+        //    new ExpectedResult("Failed")
+        //    {
+        //        Total = 32,
+        //        Passed = 19,
+        //        Failed = 5,
+        //        Warnings = 0,
+        //        Inconclusive = 1,
+        //        Skipped = 7
+        //    }));
+
+        //PackageTests.Add(new PackageTest(2, "Run different builds of mock-assembly.dll together",
+        //    "engine-tests/net35/mock-assembly.dll engine-tests/netcoreapp2.1/mock-assembly.dll",
+        //    new ExpectedResult("Failed")
+        //    {
+        //        Total = 72,
+        //        Passed = 46,
+        //        Failed = 10,
+        //        Warnings = 0,
+        //        Inconclusive = 2,
+        //        Skipped = 14
+        //    }));
+    }
+}
+
+public class ZipPackageTester : NetFXPackageTester
 {
     public ZipPackageTester(BuildParameters parameters) : base(parameters) { }
 
@@ -281,13 +285,13 @@ public class ZipPackageTester : PackageTester
     }
 }
 
-public class NuGetPackageTester : PackageTester
+public class NuGetNetFXPackageTester : NetFXPackageTester
 {
-    public NuGetPackageTester(BuildParameters parameters) : base(parameters) { }
+    public NuGetNetFXPackageTester(BuildParameters parameters) : base(parameters) { }
 
-    protected override string PackageName => _parameters.NuGetPackageName;
-    protected override FilePath PackageUnderTest => _parameters.NuGetPackage;
-    protected override string PackageTestDirectory => _parameters.NuGetTestDirectory;
+    protected override string PackageName => _parameters.NuGetNetFXPackageName;
+    protected override FilePath PackageUnderTest => _parameters.NuGetNetFXPackage;
+    protected override string PackageTestDirectory => _parameters.NuGetNetFXTestDirectory;
     protected override string PackageTestBinDirectory => PackageTestDirectory + "tools/";
     protected override string ExtensionInstallDirectory => _parameters.TestDirectory;
 
@@ -298,7 +302,24 @@ public class NuGetPackageTester : PackageTester
     }
 }
 
-public class ChocolateyPackageTester : PackageTester
+public class NuGetNetCorePackageTester : NetCorePackageTester
+{
+    public NuGetNetCorePackageTester(BuildParameters parameters) : base(parameters) { }
+
+    protected override string PackageName => _parameters.NuGetNetCorePackageName;
+    protected override FilePath PackageUnderTest => _parameters.NuGetNetCorePackage;
+    protected override string PackageTestDirectory => _parameters.NuGetNetCoreTestDirectory;
+    protected override string PackageTestBinDirectory => PackageTestDirectory + "tools/netcoreapp3.1/any/";
+    protected override string ExtensionInstallDirectory => _parameters.TestDirectory;
+
+    protected override void InstallEngineExtension(string extension)
+    {
+        _context.NuGetInstall(extension,
+            new NuGetInstallSettings() { OutputDirectory = ExtensionInstallDirectory });
+    }
+}
+
+public class ChocolateyPackageTester : NetFXPackageTester
 {
     public ChocolateyPackageTester(BuildParameters parameters) : base(parameters) { }
 
@@ -324,7 +345,7 @@ public class ChocolateyPackageTester : PackageTester
     }
 }
 
-public class MsiPackageTester : PackageTester
+public class MsiPackageTester : NetFXPackageTester
 {
     public MsiPackageTester(BuildParameters parameters) : base(parameters) { }
 

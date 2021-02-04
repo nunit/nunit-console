@@ -116,15 +116,19 @@ public class ResultReporter
 
 	public int Report(ExpectedResult expectedResult)
 	{
-		if (Summary.Failed + Summary.Warnings > 0)
-		{
-			int index = 0;
-			Console.WriteLine();
-			Console.WriteLine("Errors, Failures and Warnings");
+        //As the console itself is currently displaying any errors,
+        // we don't need to do it a second time. Hanging on to
+        // this code, for use as a separate report if needed.
 
-			foreach (XmlNode childResult in _testRun.ChildNodes)
-				WriteErrorsFailuresAndWarnings(childResult, ref index, 1);
-		}
+		//if (Summary.Failed + Summary.Warnings > 0)
+		//{
+		//	int index = 0;
+		//	Console.WriteLine();
+		//	Console.WriteLine("Errors, Failures and Warnings");
+
+		//	foreach (XmlNode childResult in _testRun.ChildNodes)
+		//		WriteErrorsFailuresAndWarnings(childResult, ref index, 1);
+		//}
 
 		Console.WriteLine("\nTest Run Summary");
 		Console.WriteLine("  Overall Result: " + Summary.OverallResult);
