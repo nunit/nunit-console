@@ -106,7 +106,7 @@ public class PackageChecker
 
     private bool CheckMsiPackage(string packageName, params ICheck[] checks)
     {
-        return CheckPackage($"{packageName}-{_parameters.PackageVersion}.msi", checks); // Should be version
+        return CheckPackage($"{packageName}-{_parameters.MsiVersion}.msi", checks);
     }
 
     private bool CheckPackage(string fileName, params ICheck[] checks)

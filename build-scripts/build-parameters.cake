@@ -148,7 +148,7 @@ public class BuildParameters
     public string ZipPackageName => $"NUnit.Console-{PackageVersion}.zip";
     public string NuGetPackageName => $"NUnit.ConsoleRunner.{PackageVersion}.nupkg";
     public string ChocolateyPackageName => $"nunit-console-runner.{PackageVersion}.nupkg";
-    public string MsiPackageName => $"NUnit.Console-{PackageVersion}.msi";
+    public string MsiPackageName => $"NUnit.Console-{MsiVersion}.msi";
 
     public FilePath ZipPackage => new FilePath(PackageDirectory + ZipPackageName);
     public FilePath NuGetPackage => new FilePath(PackageDirectory + NuGetPackageName);
