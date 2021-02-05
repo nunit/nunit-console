@@ -94,7 +94,7 @@ namespace NUnit.Engine.Services
 #if !NETFRAMEWORK
                             return factory.GetDriver(reference);
 #else
-                                return factory.GetDriver(domain, reference);
+                            return factory.GetDriver(domain, reference);
 #endif
                         }
                     }
