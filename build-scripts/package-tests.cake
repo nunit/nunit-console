@@ -183,7 +183,7 @@ public abstract class NetFXPackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(1, "Run project with both copies of mock-assembly",
-            "../../NetFXTests.nunit",
+            $"../../NetFXTests.nunit --config={_parameters.Configuration}",
             new ExpectedResult("Failed")
             {
                 Total = 2 * 37,
