@@ -181,6 +181,19 @@ public abstract class NetFXPackageTester : PackageTester
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
+
+        PackageTests.Add(new PackageTest(1, "Run project with both copies of mock-assembly",
+            "../../NetFXTests.nunit",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
+            },
+            NUnitProjectLoader));
     }
 
     //// Level 2 tests are run for PRs and when packages will be published
