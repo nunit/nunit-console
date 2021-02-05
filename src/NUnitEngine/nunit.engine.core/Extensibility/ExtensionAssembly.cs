@@ -28,7 +28,7 @@ using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Extensibility
 {
-    internal class ExtensionAssembly : IExtensionAssembly
+    internal class ExtensionAssembly : IExtensionAssembly, IDisposable
     {
         public ExtensionAssembly(string filePath, bool fromWildCard)
         {
@@ -71,6 +71,11 @@ namespace NUnit.Engine.Extensibility
             var parameters = new ReaderParameters { AssemblyResolver = resolver };
 
             return AssemblyDefinition.ReadAssembly(FilePath, parameters);
+        }
+
+        public void Dispose()
+        {
+            Assembly?.Dispose();
         }
     }
 }
