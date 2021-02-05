@@ -22,8 +22,7 @@ public struct PackageTest
 	}
 }
 
-// Abstract base for all package testers. Currently, we only
-// have one package of each type (Zip, NuGet, Chocolatey).
+// Abstract base for all package testers. 
 public abstract class PackageTester
 {
     protected BuildParameters _parameters;
@@ -51,7 +50,9 @@ public abstract class PackageTester
     public void RunAllTests(int level)
     {
         Console.WriteLine("Testing package " + PackageName);
+        Console.WriteLine($"Test Directory:\n  {PackageTestDirectory}");
 
+        _context.CleanDirectory(PackageTestDirectory);
         CreateTestDirectory();
 
         RunPackageTests(level);
@@ -59,10 +60,9 @@ public abstract class PackageTester
         //CheckTestErrors(ref ErrorDetail);
     }
 
+    // Default is to just unzip... individual packates may override
     protected virtual void CreateTestDirectory()
     {
-        Console.WriteLine("Unzipping package to directory\n  " + PackageTestDirectory);
-        _context.CleanDirectory(PackageTestDirectory);
         _context.Unzip(PackageUnderTest, PackageTestDirectory);
     }
 
@@ -362,9 +362,6 @@ public class MsiPackageTester : NetFXPackageTester
 
     protected override void CreateTestDirectory()
     {
-        Console.WriteLine("Installing msi to directory\n  " + PackageTestDirectory);
-        _context.CleanDirectory(PackageTestDirectory);
-
         // Msiexec does not tolerate forward slashes!
         string package = PackageUnderTest.ToString().Replace("/", "\\");
         string testDir = PackageTestDirectory.Replace("/", "\\");
