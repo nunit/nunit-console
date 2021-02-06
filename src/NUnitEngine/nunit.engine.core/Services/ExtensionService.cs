@@ -203,6 +203,17 @@ namespace NUnit.Engine.Services
             }
         }
 
+        public override void StopService()
+        {
+            // Make sure all assemblies release the underlying file streams. 
+            foreach (var assembly in _assemblies)
+            {
+                assembly.Dispose();
+            }
+
+            Status = ServiceStatus.Stopped;
+        }
+
         /// <summary>
         /// Find the extension points in a loaded assembly.
         /// Public for testing.
