@@ -629,6 +629,12 @@ namespace NUnit.Engine.Internal.Tests
             Assert.That(() => finder.GetFiles(Substitute.For<IDirectory>(), string.Empty), Throws.ArgumentException.With.Message.Contains(" pattern "));
         }
 
+        [Test]
+        public void Inheritance()
+        {
+            Assert.True(typeof(IDirectoryFinder).IsAssignableFrom(typeof(DirectoryFinder)));
+        }
+
         private static string CreateAbsolutePath(IEnumerable<string> parts)
         {
             return CreateAbsolutePath(parts.ToArray());

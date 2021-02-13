@@ -33,7 +33,7 @@ namespace NUnit.Engine.Internal
     /// selection of directories and files. It's less than a full-fledged
     /// Linux-style globbing utility and more than standard wildcard use.
     /// </summary>
-    internal sealed class DirectoryFinder
+    internal sealed class DirectoryFinder : IDirectoryFinder
     {
         private readonly IFileSystem fileSystem;
 
@@ -46,14 +46,7 @@ namespace NUnit.Engine.Internal
             this.fileSystem = fileSystem;
         }
 
-        /// <summary>
-        /// Gets all sub-directories recursively that match a pattern.
-        /// </summary>
-        /// <param name="startDirectory">Start point of the search.</param>
-        /// <param name="pattern">Search pattern, where each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
-        /// <returns>All found sub-directories.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>
+        /// <inheritdoc/>
         public IEnumerable<IDirectory> GetDirectories(IDirectory startDirectory, string pattern)
         {
             Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
@@ -90,14 +83,7 @@ namespace NUnit.Engine.Internal
             return dirList;
         }
 
-        /// <summary>
-        /// Gets all files that match a pattern.
-        /// </summary>
-        /// <param name="startDirectory">Start point of the search.</param>
-        /// <param name="pattern">Search pattern, where each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
-        /// <returns>All found files.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>
+        /// <inheritdoc/>
         public IEnumerable<IFile> GetFiles(IDirectory startDirectory, string pattern)
         {
             Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
