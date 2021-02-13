@@ -73,29 +73,30 @@ namespace NUnit.Engine.Services
 
             try
             {
-                var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath);
-
-                if (skipNonTestAssemblies)
+                using (var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath))
                 {
-                    foreach (var attr in assemblyDef.CustomAttributes)
-                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
-                            return new SkippedAssemblyFrameworkDriver(assemblyPath);
-                }
-
-                var references = new List<AssemblyName>();
-                foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
-                    references.Add(new AssemblyName(cecilRef.FullName));
-
-                foreach (var factory in _factories)
-                {
-                    foreach (var reference in references)
+                    if (skipNonTestAssemblies)
                     {
-                        if (factory.IsSupportedTestFramework(reference))
+                        foreach (var attr in assemblyDef.CustomAttributes)
+                            if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
+                                return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                    }
+
+                    var references = new List<AssemblyName>();
+                    foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
+                        references.Add(new AssemblyName(cecilRef.FullName));
+
+                    foreach (var factory in _factories)
+                    {
+                        foreach (var reference in references)
+                        {
+                            if (factory.IsSupportedTestFramework(reference))
 #if !NETFRAMEWORK
                             return factory.GetDriver(reference);
 #else
                             return factory.GetDriver(domain, reference);
 #endif
+                        }
                     }
                 }
             }
