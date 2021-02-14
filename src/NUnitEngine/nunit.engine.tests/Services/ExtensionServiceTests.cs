@@ -79,8 +79,9 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void StartService_UseFileSystemAbstraction()
         {
+            var addinsReader = Substitute.For<IAddinsFileReader>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var service = new ExtensionService(false, fileSystem);
+            var service = new ExtensionService(false, addinsReader, fileSystem);
             var workingDir = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
 
             service.StartService();
@@ -299,6 +300,68 @@ namespace NUnit.Engine.Services.Tests
         {
             var file = new FileInfo(typeof(ExtensionServiceTests).Assembly.Location);
             return Path.Combine(file.Directory.Parent.FullName, dir);
+        }
+
+        [Test]
+        public void StartService_ReadsAddinsFile()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            startDirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(addinsFile);
+        }
+
+        [Test]
+        public void StartService_ReadsAddinsFilesFromMultipleDirectories()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var subdirectoryPath = Path.Combine(startDirectoryPath, "subdirectory");
+            var subdirectory = Substitute.For<IDirectory>();
+            subdirectory.FullName.Returns(subdirectoryPath);
+            subdirectory.GetDirectories(Arg.Any<string>(), Arg.Any<SearchOption>()).Returns(new IDirectory[] { });
+            subdirectory.GetFiles(Arg.Any<string>()).Returns(new IFile[] { });
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            var addinsFile2 = Substitute.For<IFile>();
+            addinsFile2.Parent.Returns(subdirectory);
+            addinsFile2.FullName.Returns(Path.Combine(subdirectoryPath, "second.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            startDirectory.GetDirectories("subdirectory", SearchOption.TopDirectoryOnly).Returns(new[] { subdirectory });
+            subdirectory.GetFiles(Arg.Any<string>()).Returns(ci => (string)ci[0] == "*.addins" ? new[] { addinsFile2 } : new IFile[] { });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            fileSystem.GetDirectory(subdirectoryPath).Returns(subdirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { "subdirectory/" });
+            var sut = new ExtensionService(false, addinsReader, fileSystem);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            startDirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(addinsFile);
+            subdirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(addinsFile2);
         }
     }
 }

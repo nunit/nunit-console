@@ -52,17 +52,19 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
         private readonly IFileSystem _fileSystem;
+        private readonly IAddinsFileReader _addinsReader;
         private readonly DirectoryFinder _directoryFinder;
 
         public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
 
         public ExtensionService(bool isRunningOnAgent = false)
-            : this(isRunningOnAgent, new FileSystem())
+            : this(isRunningOnAgent, new AddinsFileReader(), new FileSystem())
         {
         }
 
-        internal ExtensionService(bool isRunningOnAgent, IFileSystem fileSystem)
+        internal ExtensionService(bool isRunningOnAgent, IAddinsFileReader addinsReader, IFileSystem fileSystem)
         {
+            _addinsReader = addinsReader;
             _fileSystem = fileSystem;
             _directoryFinder = new DirectoryFinder(_fileSystem);
             _isRunningOnAgent = isRunningOnAgent;
@@ -322,7 +324,7 @@ namespace NUnit.Engine.Services
             {
                 foreach (var file in addinsFiles)
                 {
-                    ProcessAddinsFile(startDir, file.FullName, fromWildCard);
+                    ProcessAddinsFile(startDir, file, fromWildCard);
                     addinsFileCount += 1;
                 }
             }
@@ -335,34 +337,23 @@ namespace NUnit.Engine.Services
         /// path or a wildcard pattern used to find assemblies. Blank
         /// lines and comments started by # are ignored.
         /// </summary>
-        private void ProcessAddinsFile(IDirectory baseDir, string fileName, bool fromWildCard)
+        private void ProcessAddinsFile(IDirectory baseDir, IFile addinsFile, bool fromWildCard)
         {
-            log.Info("Processing file " + fileName);
+            log.Info("Processing file " + addinsFile.FullName);
 
-            using (var rdr = new StreamReader(fileName))
+            foreach (var entry in _addinsReader.Read(addinsFile))
             {
-                while (!rdr.EndOfStream)
-                {
-                    var line = rdr.ReadLine();
-                    if (line == null)
-                        break;
+                var line = entry;
+                if (Path.DirectorySeparatorChar == '\\')
+                    line = line.Replace(Path.DirectorySeparatorChar, '/');
 
-                    line = line.Split(new char[] { '#' })[0].Trim();
-
-                    if (line == string.Empty)
-                        continue;
-
-                    if (Path.DirectorySeparatorChar == '\\')
-                        line = line.Replace(Path.DirectorySeparatorChar, '/');
-
-                    bool isWild = fromWildCard || line.Contains("*");
-                    if (line.EndsWith("/"))
-                        foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
-                            ProcessDirectory(dir, isWild);
-                    else
-                        foreach (var file in _directoryFinder.GetFiles(baseDir, line))
-                            ProcessCandidateAssembly(file.FullName, isWild);
-                }
+                bool isWild = fromWildCard || line.Contains("*");
+                if (line.EndsWith("/"))
+                    foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
+                        ProcessDirectory(dir, isWild);
+                else
+                    foreach (var file in _directoryFinder.GetFiles(baseDir, line))
+                        ProcessCandidateAssembly(file.FullName, isWild);
             }
         }
 
