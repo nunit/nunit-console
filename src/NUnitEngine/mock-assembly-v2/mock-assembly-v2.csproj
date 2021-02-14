@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<RootNamespace>NUnit.Tests</RootNamespace>
+		<TargetFramework>net20</TargetFramework>
+		<AssemblyName>mock-assembly</AssemblyName>
+		<OutputPath>..\..\..\bin\$(Configuration)\v2-tests\</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="NUnit" Version="2.6.4" />
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="Properties\" />
+	</ItemGroup>
+</Project>

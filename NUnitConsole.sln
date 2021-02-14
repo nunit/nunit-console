@@ -107,6 +107,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-scripts", "build-scri
 		build-scripts\versioning.cake = build-scripts\versioning.cake
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly-v2", "src\NUnitEngine\mock-assembly-v2\mock-assembly-v2.csproj", "{0DDB2D16-4612-475D-ABD1-58653833714F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,10 @@ Global
 		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DDB2D16-4612-475D-ABD1-58653833714F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DDB2D16-4612-475D-ABD1-58653833714F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DDB2D16-4612-475D-ABD1-58653833714F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DDB2D16-4612-475D-ABD1-58653833714F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +180,7 @@ Global
 		{9A7C8370-ED1F-486F-A8F5-C5BF4221464E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{2DA0963D-BD5E-41A6-8B27-FA312E1254C4} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{0DDB2D16-4612-475D-ABD1-58653833714F} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
