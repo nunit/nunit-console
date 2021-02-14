@@ -160,11 +160,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
         private string GetTestFileLocation()
         {
-#if NETCOREAPP1_1
-            return Assembly.GetEntryAssembly().Location;
-#else
             return Assembly.GetAssembly(typeof(FileTests)).Location;
-#endif
         }
     }
 }
