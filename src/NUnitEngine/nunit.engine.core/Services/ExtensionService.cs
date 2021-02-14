@@ -52,7 +52,7 @@ namespace NUnit.Engine.Services
 
         private readonly IFileSystem _fileSystem;
         private readonly IAddinsFileReader _addinsReader;
-        private readonly DirectoryFinder _directoryFinder;
+        private readonly IDirectoryFinder _directoryFinder;
 
         public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
 
@@ -62,10 +62,15 @@ namespace NUnit.Engine.Services
         }
 
         internal ExtensionService(bool isRunningOnAgent, IAddinsFileReader addinsReader, IFileSystem fileSystem)
+            : this(isRunningOnAgent, addinsReader, fileSystem, new DirectoryFinder(fileSystem))
+        {
+        }
+
+        internal ExtensionService(bool isRunningOnAgent, IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
             _addinsReader = addinsReader;
             _fileSystem = fileSystem;
-            _directoryFinder = new DirectoryFinder(_fileSystem);
+            _directoryFinder = directoryFinder;
             _isRunningOnAgent = isRunningOnAgent;
         }
 
