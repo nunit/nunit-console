@@ -31,6 +31,7 @@ namespace NUnit.Engine.Internal.Backports.Tests
         [Platform("unix")]
         [TestCase("/foo/bar", ExpectedResult = true)]
         [TestCase("/", ExpectedResult = true)]
+        [TestCase("/z", ExpectedResult = true)]
         [TestCase("c:\\foo\\bar\\", ExpectedResult = false)]
         [TestCase("c:/foo/bar/", ExpectedResult = false)]
         [TestCase("c:\\foo\\bar", ExpectedResult = false)]

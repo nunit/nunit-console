@@ -37,9 +37,9 @@ namespace NUnit.Engine.Internal.Backports
             }
             else
             {
-                if (path.Length >= 2)
+                if (path.Length > 0)
                 {
-                    return IsDirectorySeparator(path[0]) && !IsDirectorySeparator(path[1]);
+                    return IsDirectorySeparator(path[0]);
                 }
             }
 
