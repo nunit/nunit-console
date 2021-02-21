@@ -6,6 +6,7 @@ namespace NUnit.Engine.Internal.Backports.Tests
     public sealed class PathTests
     {
         [Platform("win")]
+        [TestCase("c:\\", ExpectedResult = true)]
         [TestCase("c:\\foo\\bar\\", ExpectedResult = true)]
         [TestCase("c:/foo/bar/", ExpectedResult = true)]
         [TestCase("c:\\foo\\bar", ExpectedResult = true)]
