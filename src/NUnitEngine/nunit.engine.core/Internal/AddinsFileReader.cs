@@ -49,7 +49,7 @@ namespace NUnit.Engine.Internal
                     line = line.Split(new char[] { '#' })[0].Trim();
                     if (line != string.Empty)
                     {
-                        result.Add(line);
+                        result.Add(line.Replace('\\', '/'));
                     }
                 }
             }

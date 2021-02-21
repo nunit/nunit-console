@@ -348,9 +348,6 @@ namespace NUnit.Engine.Services
             foreach (var entry in _addinsReader.Read(addinsFile))
             {
                 var line = entry;
-                if (Path.DirectorySeparatorChar == '\\')
-                    line = line.Replace(Path.DirectorySeparatorChar, '/');
-
                 bool isWild = fromWildCard || line.Contains("*");
                 if (line.EndsWith("/"))
                     foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
