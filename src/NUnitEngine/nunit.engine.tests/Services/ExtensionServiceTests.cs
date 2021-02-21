@@ -363,5 +363,45 @@ namespace NUnit.Engine.Services.Tests
             subdirectory.Received().GetFiles("*.addins");
             addinsReader.Received().Read(addinsFile2);
         }
+
+        [Test]
+        public void ProcessAddinsFile_RelativePaths()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(
+                new[]
+                { 
+                    "path/to/directory/",
+                    "directory2/",
+                    "**/wildcard-directory/",
+                    "path/to/file/file1.dll",
+                    "file2.dll",
+                    "**/wildcard-file.dll"
+                });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetDirectories(startDirectory, "path/to/directory/");
+            directoryFinder.Received().GetDirectories(startDirectory, "directory2/");
+            directoryFinder.Received().GetDirectories(startDirectory, "**/wildcard-directory/");
+            directoryFinder.Received().GetFiles(startDirectory, "path/to/file/file1.dll");
+            directoryFinder.Received().GetFiles(startDirectory, "file2.dll");
+            directoryFinder.Received().GetFiles(startDirectory, "**/wildcard-file.dll");
+        }
     }
 }
