@@ -50,7 +50,7 @@ namespace NUnit.Engine.Internal
         public IEnumerable<IDirectory> GetDirectories(IDirectory startDirectory, string pattern)
         {
             Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
-            Guard.ArgumentNotNullOrEmpty(pattern, nameof(pattern));
+            Guard.ArgumentNotNull(pattern, nameof(pattern));
 
             if (Path.DirectorySeparatorChar == '\\')
                 pattern = pattern.Replace(Path.DirectorySeparatorChar, '/');

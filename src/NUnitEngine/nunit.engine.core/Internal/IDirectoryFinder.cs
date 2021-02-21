@@ -21,7 +21,6 @@ namespace NUnit.Engine.Internal
         /// <param name="pattern">Search pattern, where each path component may have wildcard characters. The wildcard "**" may be used to represent "all directories". Components need to be separated with slashes ('/').</param>
         /// <returns>All found sub-directories.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="startDirectory"/> or <paramref name="pattern"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="pattern"/> is empty.</exception>
         IEnumerable<IDirectory> GetDirectories(IDirectory startDirectory, string pattern);
 
         /// <summary>

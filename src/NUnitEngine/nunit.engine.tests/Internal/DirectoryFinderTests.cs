@@ -475,9 +475,13 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void GetDirectories_PatternIsEmpty()
         {
-            var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
+            var directory = Substitute.For<IDirectory>();
+            var sut = new DirectoryFinder(Substitute.For<IFileSystem>());
 
-            Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), string.Empty), Throws.ArgumentException.With.Message.Contains(" pattern "));
+            var directories = sut.GetDirectories(directory, string.Empty);
+
+            Assert.That(directories, Has.Count.EqualTo(1));
+            Assert.That(directories.First(), Is.EqualTo(directory));
         }
 
         [TestCase("tests.*.dll")]
