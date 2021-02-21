@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace NUnit.Engine.Internal.Backports
 {
     /// <summary>
@@ -16,9 +18,15 @@ namespace NUnit.Engine.Internal.Backports
         /// </summary>
         /// <param name="path">Path to check</param>
         /// <returns><see langword="true"/> if <paramref name="path"/> is an absolute or UNC path; otherwhise, false.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
         /// <remarks>See https://docs.microsoft.com/en-us/dotnet/api/system.io.path.ispathfullyqualified for original implementation.</remarks>
         public static bool IsPathFullyQualified(string path)
         {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
             if (RunningOnWindows())
             {
                 if (path.Length > 2)
