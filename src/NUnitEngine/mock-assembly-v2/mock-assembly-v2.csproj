@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<RootNamespace>NUnit.Tests</RootNamespace>
 		<TargetFramework>net20</TargetFramework>
-		<AssemblyName>mock-assembly</AssemblyName>
+    <AssemblyName>mock-assembly-v2</AssemblyName>
 		<OutputPath>..\..\..\bin\$(Configuration)\v2-tests\</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
