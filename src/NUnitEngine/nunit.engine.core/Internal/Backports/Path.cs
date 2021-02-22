@@ -27,38 +27,12 @@ namespace NUnit.Engine.Internal.Backports
                 throw new ArgumentNullException(nameof(path));
             }
 
-            if (RunningOnWindows())
-            {
-                if (path.Length > 2)
-                {
-                    return (IsValidDriveSpecifier(path[0]) && path[1] == ':' && IsDirectorySeparator(path[2]))
-                        || (IsDirectorySeparator(path[0]) && IsDirectorySeparator(path[1]));
-                }
-            }
-            else
-            {
-                if (path.Length > 0)
-                {
-                    return IsDirectorySeparator(path[0]);
-                }
-            }
-
-            return false;
+            return RunningOnWindows() ? PathUtils.IsFullyQualifiedWindowsPath(path) : PathUtils.IsFullyQualifiedUnixPath(path);
         }
 
         private static bool RunningOnWindows()
         {
             return System.IO.Path.DirectorySeparatorChar == '\\';
-        }
-
-        private static bool IsDirectorySeparator(char c)
-        {
-            return c == System.IO.Path.DirectorySeparatorChar || c == System.IO.Path.AltDirectorySeparatorChar;
-        }
-
-        private static bool IsValidDriveSpecifier(char c)
-        {
-            return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'); 
         }
     }
 }
