@@ -23,13 +23,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using Mono.Cecil;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+
+#if NET20 || NETSTANDARD2_0
+using Path = NUnit.Engine.Internal.Backports.Path;
+#else
+using Path = System.IO.Path;
+#endif
 
 namespace NUnit.Engine.Services
 {
@@ -347,15 +353,51 @@ namespace NUnit.Engine.Services
 
             foreach (var entry in _addinsReader.Read(addinsFile))
             {
-                var line = entry;
-                bool isWild = fromWildCard || line.Contains("*");
-                if (line.EndsWith("/"))
-                    foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
+                bool isWild = fromWildCard || entry.Contains("*");
+                var args = GetBaseDirAndPattern(baseDir, entry);
+                if (entry.EndsWith("/"))
+                {
+                    foreach (var dir in _directoryFinder.GetDirectories(args.Item1, args.Item2))
+                    {
                         ProcessDirectory(dir, isWild);
+                    }
+                }
                 else
-                    foreach (var file in _directoryFinder.GetFiles(baseDir, line))
+                {
+                    foreach (var file in _directoryFinder.GetFiles(args.Item1, args.Item2))
+                    {
                         ProcessCandidateAssembly(file.FullName, isWild);
+                    }
+                }
             }
+        }
+
+        private Tuple<IDirectory, string> GetBaseDirAndPattern(IDirectory baseDir, string path)
+        {
+            if (Path.IsPathFullyQualified(path))
+            {
+                if (path.EndsWith("/"))
+                {
+                    return new Tuple<IDirectory, string>(_fileSystem.GetDirectory(path), string.Empty);
+                }
+                else
+                {
+                    return new Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
+                }
+            }
+            else if (!IsPathRelative(path))
+            {
+                throw new NUnitEngineException($"The path '{path}' is not relative.");
+            }
+            else
+            {
+                return new Tuple<IDirectory, string>(baseDir, path);
+            }
+        }
+
+        private static bool IsPathRelative(string path)
+        {
+            return !PathUtils.IsFullyQualifiedWindowsPath(path) && !PathUtils.IsFullyQualifiedUnixPath(path);
         }
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)

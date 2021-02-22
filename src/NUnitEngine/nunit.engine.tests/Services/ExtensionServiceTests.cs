@@ -403,5 +403,126 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.Received().GetFiles(startDirectory, "file2.dll");
             directoryFinder.Received().GetFiles(startDirectory, "**/wildcard-file.dll");
         }
+
+        [Test]
+        [Platform("win")]
+        public void ProcessAddinsFile_AbsolutePath_Windows()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var metamorphosatorDirectoryPath = "c:/tools/metamorphosator";
+            var metamorphosatorDirectory = Substitute.For<IDirectory>();
+            metamorphosatorDirectory.FullName.Returns(metamorphosatorDirectoryPath);
+            var toolsDirectoryPath = "d:/tools";
+            var toolsDirectory = Substitute.For<IDirectory>();
+            toolsDirectory.FullName.Returns(toolsDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            fileSystem.GetDirectory(metamorphosatorDirectoryPath + "/").Returns(metamorphosatorDirectory);
+            fileSystem.GetDirectory("d:\\tools").Returns(toolsDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { "c:/tools/metamorphosator/", "d:/tools/frobuscator.dll" });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetDirectories(metamorphosatorDirectory, string.Empty);
+            directoryFinder.Received().GetFiles(toolsDirectory, "frobuscator.dll");
+            directoryFinder.DidNotReceive().GetDirectories(toolsDirectory, Arg.Is<string>(s => s != "frobuscator.dll"));
+        }
+
+        [Test]
+        [Platform("linux,macosx,unix")]
+        public void ProcessAddinsFile_AbsolutePath_NonWindows()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var metamorphosatorDirectoryPath = "/tmp/tools/metamorphosator";
+            var metamorphosatorDirectory = Substitute.For<IDirectory>();
+            metamorphosatorDirectory.FullName.Returns(metamorphosatorDirectoryPath);
+            var usrDirectoryPath = "/usr";
+            var toolsDirectory = Substitute.For<IDirectory>();
+            toolsDirectory.FullName.Returns(usrDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            fileSystem.GetDirectory(metamorphosatorDirectoryPath + "/").Returns(metamorphosatorDirectory);
+            fileSystem.GetDirectory(usrDirectoryPath).Returns(toolsDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { "/tmp/tools/metamorphosator/", "/usr/frobuscator.dll" });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetDirectories(metamorphosatorDirectory, string.Empty);
+            directoryFinder.Received().GetFiles(toolsDirectory, "frobuscator.dll");
+            directoryFinder.DidNotReceive().GetDirectories(toolsDirectory, Arg.Is<string>(s => s != "frobuscator.dll"));
+            Assert.Fail();
+        }
+
+        [Test]
+        [Platform("win")]
+        public void ProcessAddinsFile_InvalidAbsolutePath_Windows()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { "/absolute/unix/path" });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act + Assert
+            Assert.That(() => sut.StartService(), Throws.InstanceOf<NUnitEngineException>());
+        }
+
+        [Test]
+        [Platform("linux,macosx,unix")]
+        public void ProcessAddinsFile_InvalidAbsolutePath_NonWindows()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { "c:/absolute/windows/path" });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act + Assert
+            Assert.That(() => sut.StartService(), Throws.InstanceOf<NUnitEngineException>());
+        }
     }
 }
