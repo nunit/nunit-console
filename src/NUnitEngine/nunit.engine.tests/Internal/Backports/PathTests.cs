@@ -27,9 +27,7 @@ namespace NUnit.Engine.Internal.Backports.Tests
             return Path.IsPathFullyQualified(path);
         }
 
-        [Platform("linux")]
-        [Platform("macos")]
-        [Platform("unix")]
+        [Platform("linux,macosx,unix")]
         [TestCase("/foo/bar", ExpectedResult = true)]
         [TestCase("/", ExpectedResult = true)]
         [TestCase("/z", ExpectedResult = true)]
