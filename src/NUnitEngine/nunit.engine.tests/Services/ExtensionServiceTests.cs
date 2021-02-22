@@ -476,7 +476,6 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.Received().GetDirectories(metamorphosatorDirectory, string.Empty);
             directoryFinder.Received().GetFiles(toolsDirectory, "frobuscator.dll");
             directoryFinder.DidNotReceive().GetDirectories(toolsDirectory, Arg.Is<string>(s => s != "frobuscator.dll"));
-            Assert.Fail();
         }
 
         [Test]
