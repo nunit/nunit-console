@@ -1,16 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<RootNamespace>NUnit.Tests</RootNamespace>
-		<TargetFramework>net20</TargetFramework>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>NUnit.Tests</RootNamespace>
+    <TargetFramework>net20</TargetFramework>
     <AssemblyName>mock-assembly-v2</AssemblyName>
-		<OutputPath>..\..\..\bin\$(Configuration)\v2-tests\</OutputPath>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="NUnit" Version="2.6.4" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Properties\" />
-	</ItemGroup>
+    <OutputPath>..\..\..\bin\$(Configuration)\v2-tests\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="2.6.4" />
+  </ItemGroup>
 </Project>
