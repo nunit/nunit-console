@@ -1,5 +1,6 @@
 #load ci.cake
 #load package-checks.cake
+#load test-results.cake
 #load package-tests.cake
 
 // Install Tools

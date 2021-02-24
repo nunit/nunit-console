@@ -3,11 +3,13 @@ public struct PackageTest
 {
     public string Description;
     public string Arguments;
+    public ExpectedResult ExpectedResult;
 
-    public PackageTest(string description, string arguments)
+    public PackageTest(string description, string arguments, ExpectedResult expectedResult)
     {
         Description = description;
         Arguments = arguments;
+        ExpectedResult = expectedResult;
     }
 }
 
@@ -56,8 +58,20 @@ public abstract class PackageTester
 
     private void RunPackageTests()
     {
+        bool anyErrors = false;
+        int testCount = 0;
+
         foreach (var packageTest in PackageTests)
         {
+            ++testCount;
+
+            var resultFile = _outputDir + "TestResult.xml";
+            // Delete result file ahead of time so we don't mistakenly
+            // read a left-over file from another test run. Leave the
+            // file after the run in case we need it to debug a failure.
+            if (_context.FileExists(resultFile))
+                _context.DeleteFile(resultFile);
+
             DisplayBanner(packageTest.Description);
             DisplayTestEnvironment(packageTest);
 
@@ -68,7 +82,17 @@ public abstract class PackageTester
                     Arguments = packageTest.Arguments,
                     WorkingDirectory = _outputDir
                 });
+
+            var reporter = new ResultReporter(resultFile);
+            anyErrors |= reporter.Report(packageTest.ExpectedResult) > 0;
         }
+
+        Console.WriteLine($"\nRan {testCount} package tests on {PackageName}");
+
+        // All package tests are run even if one of them fails. If there are
+        // any errors,  we stop the run at this point.
+        if (anyErrors)
+            throw new Exception("One or more package tests had errors!");
     }
 
     private void DisplayBanner(string message)
@@ -95,7 +119,16 @@ public abstract class NetFXPackageTester : PackageTester
     {
         PackageTests.Add(new PackageTest(
             "Run mock-assembly.dll under .NET 3.5",
-            "net35/mock-assembly.dll"));
+            "net35/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
     }
 }
 
@@ -106,7 +139,16 @@ public abstract class NetCorePackageTester : PackageTester
     {
         PackageTests.Add(new PackageTest(
             "Run mock-assembly.dll targeting .NET Core 2.1",
-            "netcoreapp2.1/mock-assembly.dll"));
+            "netcoreapp2.1/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
     }
 }
 
