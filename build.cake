@@ -1,5 +1,6 @@
 #load ci.cake
 #load package-checks.cake
+#load package-tests.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
@@ -440,7 +441,9 @@ Task("BuildNuGetPackages")
 Task("TestNugetPackages")
     .Does(() =>
     {
+        new NuGetNetFXPackageTester(Context, productVersion).RunTests();
 
+        new NuGetNetCorePackageTester(Context, productVersion).RunTests();
     });
 
 Task("BuildChocolateyPackages")
@@ -507,7 +510,7 @@ Task("BuildChocolateyPackages")
 Task("TestChocolateyPackage")
     .Does(() =>
     {
-
+        new ChocolateyPackageTester(Context, productVersion).RunTests();
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -564,7 +567,7 @@ Task("BuildMsiPackage")
 Task("TestMsiPackage")
     .Does(() =>
     {
-
+        new MsiPackageTester(Context, version).RunTests();
     });
 
 Task("BuildZipPackage")
@@ -590,7 +593,7 @@ Task("BuildZipPackage")
 Task("TestZipPackage")
     .Does(() =>
     {
-
+        new ZipPackageTester(Context, productVersion).RunTests();
     });
 
 Task("InstallSigningTool")
