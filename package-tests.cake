@@ -129,6 +129,32 @@ public abstract class NetFXPackageTester : PackageTester
                 Inconclusive = 1,
                 Skipped = 7
             }));
+
+        PackageTests.Add(new PackageTest(
+            "Run mock-assembly.dll under .NET 4.x",
+            "net40/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(
+            "Run both copies of mock-assembly together",
+            "net35/mock-assembly.dll net40/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
+            }));
     }
 }
 
@@ -148,6 +174,32 @@ public abstract class NetCorePackageTester : PackageTester
                 Warnings = 0,
                 Inconclusive = 1,
                 Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(
+            "Run mock-assembly targeting .NET Core 3.1",
+            "netcoreapp3.1/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(
+            "Run both copies of mock-assembly together",
+            "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
             }));
     }
 }
