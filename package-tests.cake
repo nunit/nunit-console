@@ -19,6 +19,7 @@ public abstract class PackageTester
     protected ICakeContext _context;
     protected string _packageVersion;
     protected string _packageDir;
+    protected string _config;
     protected string _outputDir;
 
     public PackageTester(ICakeContext context, string packageVersion)
@@ -26,7 +27,8 @@ public abstract class PackageTester
         _context = context;
         _packageVersion = packageVersion;
         _packageDir = System.IO.Path.GetFullPath(context.Argument("artifact-dir", "package")) + "/";
-        _outputDir = System.IO.Path.GetFullPath("bin/" + context.Argument("configuration", "Release")) + "/";
+        _config = context.Argument("configuration", "Release");
+        _outputDir = System.IO.Path.GetFullPath($"bin/{_config}/");
 
         PackageTests = new List<PackageTest>();
     }
@@ -240,7 +242,21 @@ public class ChocolateyPackageTester : NetFXPackageTester
 public class MsiPackageTester : NetFXPackageTester
 {
     public MsiPackageTester(ICakeContext context, string packageVersion)
-        : base(context, packageVersion) { }
+        : base(context, packageVersion)
+    {
+        PackageTests.Add(new PackageTest(
+            "Run project with both copies of mock-assembly",
+            $"../../NetFXTests.nunit --config={_config}",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
+            }));
+    }
 
     protected override string PackageName => $"NUnit.Console-{_packageVersion}.msi";
     protected override string PackageInstallDirectory => _packageDir + "test/msi/";
@@ -272,7 +288,21 @@ public class MsiPackageTester : NetFXPackageTester
 public class ZipPackageTester : NetFXPackageTester
 {
     public ZipPackageTester(ICakeContext context, string packageVersion)
-        : base(context, packageVersion) { }
+        : base(context, packageVersion)
+    {
+        PackageTests.Add(new PackageTest(
+            "Run project with both copies of mock-assembly",
+            $"../../NetFXTests.nunit --config={_config}",
+            new ExpectedResult("Failed")
+            {
+                Total = 2 * 37,
+                Passed = 2 * 23,
+                Failed = 2 * 5,
+                Warnings = 0,
+                Inconclusive = 2 * 1,
+                Skipped = 2 * 7
+            }));
+    }
 
     protected override string PackageName => $"NUnit.Console-{_packageVersion}.zip";
     protected override string PackageInstallDirectory => _packageDir + "test/zip/";
