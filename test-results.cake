@@ -18,45 +18,14 @@ public class ExpectedResult : ResultSummary
 {
 	public ExpectedResult(string overallResult)
 	{
+        if (string.IsNullOrEmpty(overallResult))
+            throw new ArgumentNullException(nameof(overallResult));
+
 		OverallResult = overallResult;
 		// Initialize counters to -1, indicating no expected value.
 		// Set properties of those items to be checked.
 		Total = Passed = Failed = Warnings = Inconclusive = Skipped = -1;
 	}
-
-    private int _errorCount;
-
-	public int CheckResult(ResultSummary actual)
-	{
-        _errorCount = 0;
-
-        if (OverallResult != actual.OverallResult)
-            ReportError($"   Expected: Overall Result = {OverallResult}\n    But was: {actual.OverallResult}");
-        CheckCounter("Test Count", Total, actual.Total);
-        CheckCounter("Passed", Passed, actual.Passed);
-        CheckCounter("Failed", Failed, actual.Failed);
-        CheckCounter("Warnings", Warnings, actual.Warnings);
-        CheckCounter("Inconclusive", Inconclusive, actual.Inconclusive);
-        CheckCounter("Skipped", Skipped, actual.Skipped);
-
-        Console.WriteLine(_errorCount == 0
-            ? "   SUCCESS: Test Result matches expected result!"
-            : "   ERROR: Test Result not as expected!\n");
-
-        return _errorCount;
-	}
-
-    private void CheckCounter(string label, int expected, int actual)
-    {
-        if (expected > 0 && expected != actual)
-            ReportError($"     Expected: {label} = {expected}\n      But was: {actual}");
-    }
-
-    private void ReportError(string message)
-    {
-        _errorCount++;
-        Console.WriteLine(message);
-    }
 }
 
 public class ActualResult : ResultSummary
@@ -66,26 +35,24 @@ public class ActualResult : ResultSummary
         var doc = new XmlDocument();
         doc.Load(resultFile);
 
-        var testRun = doc.DocumentElement;
-        if (testRun.Name != "test-run")
+        Xml = doc.DocumentElement;
+        if (Xml.Name != "test-run")
             throw new Exception("The test-run element was not found.");
 
-        OverallResult = GetAttribute(testRun, "result");
-        Total = IntAttribute(testRun, "total");
-        Passed = IntAttribute(testRun, "passed");
-        Failed = IntAttribute(testRun, "failed");
-        Warnings = IntAttribute(testRun, "warnings");
-        Inconclusive = IntAttribute(testRun, "inconclusive");
-        Skipped = IntAttribute(testRun, "skipped");
+        OverallResult = GetAttribute(Xml, "result");
+        Total = IntAttribute(Xml, "total");
+        Passed = IntAttribute(Xml, "passed");
+        Failed = IntAttribute(Xml, "failed");
+        Warnings = IntAttribute(Xml, "warnings");
+        Inconclusive = IntAttribute(Xml, "inconclusive");
+        Skipped = IntAttribute(Xml, "skipped");
     }
 
-    public XmlNode XmlResult { get; }
-    public List<string> Errors { get; }  = new List<string>();
-    public bool HasErrors => Errors.Count > 0;
+    public XmlNode Xml { get; }
 
-    private string GetAttribute(XmlNode testRun, string name)
+    private string GetAttribute(XmlNode node, string name)
     {
-        return testRun.Attributes[name]?.Value;
+        return node.Attributes[name]?.Value;
     }
 
     private int IntAttribute(XmlNode node, string name)
@@ -159,14 +126,9 @@ public class ResultReporter
         _packageName = packageName;
     }
 
-    public void AddResult(PackageTest test, ActualResult result)
+    public void AddReport(TestReport report)
     {
-        _reports.Add(new TestReport(test, result));
-    }
-
-    public void AddResult(PackageTest test, Exception ex)
-    {
-        _reports.Add(new TestReport(test, ex));
+        _reports.Add(report);
     }
 
     public bool ReportResults()

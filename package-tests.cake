@@ -10,6 +10,9 @@ public struct PackageTest
         Description = description;
         Arguments = arguments;
         ExpectedResult = expectedResult;
+
+        // Add Common tests here - currently there are none
+        // Derived classes may add more tests
     }
 }
 
@@ -83,15 +86,16 @@ public abstract class PackageTester
             try
             {
                 var result = new ActualResult(resultFile);
-                reporter.AddResult(packageTest, result);
+                var report = new TestReport(packageTest, result);
+                reporter.AddReport(report);
 
-                Console.WriteLine(result.Errors.Count == 0
+                Console.WriteLine(report.Errors.Count == 0
                     ? "\nSUCCESS: Test Result matches expected result!"
                     : "\nERROR: Test Result not as expected!");
             }
             catch (Exception ex)
             {
-                reporter.AddResult(packageTest, ex);
+                reporter.AddReport(new TestReport(packageTest, ex));
 
                 Console.WriteLine("\nERROR: No result found!");
             }
@@ -117,6 +121,7 @@ public abstract class NetFXPackageTester : PackageTester
     public NetFXPackageTester(ICakeContext context, string packageVersion)
         : base(context, packageVersion)
     {
+        // Add common tests for running under .NET Framework
         PackageTests.Add(new PackageTest(
             "Run mock-assembly.dll under .NET 3.5",
             "net35/mock-assembly.dll",
@@ -163,6 +168,7 @@ public abstract class NetCorePackageTester : PackageTester
     public NetCorePackageTester(ICakeContext context, string packageVersion)
         : base(context, packageVersion)
     {
+        // Add common tests for running under .NET Core (2.1 or higher)
         PackageTests.Add(new PackageTest(
             "Run mock-assembly.dll targeting .NET Core 2.1",
             "netcoreapp2.1/mock-assembly.dll",
@@ -239,6 +245,7 @@ public class MsiPackageTester : NetFXPackageTester
     public MsiPackageTester(ICakeContext context, string packageVersion)
         : base(context, packageVersion)
     {
+        // Add tests specific to the msi package
         PackageTests.Add(new PackageTest(
             "Run project with both copies of mock-assembly",
             $"../../NetFXTests.nunit --config={_config}",
@@ -284,6 +291,7 @@ public class ZipPackageTester : NetFXPackageTester
     public ZipPackageTester(ICakeContext context, string packageVersion)
         : base(context, packageVersion)
     {
+        // Add tests specific to the zip package
         PackageTests.Add(new PackageTest(
             "Run project with both copies of mock-assembly",
             $"../../NetFXTests.nunit --config={_config}",
