@@ -76,10 +76,12 @@ public class TestReport
 
         var expected = test.ExpectedResult;
 
+        ReportMissingFiles();
+
         if (result.OverallResult == null)
-            Errors.Add("The test-run element has no result attribute.");
+            Errors.Add("     The test-run element has no result attribute.");
         else if (expected.OverallResult != result.OverallResult)
-            Errors.Add($"   Expected: Overall Result = {expected.OverallResult}\n    But was: {result.OverallResult}");
+            Errors.Add($"     Expected: Overall Result = {expected.OverallResult}\n    But was: {result.OverallResult}");
         CheckCounter("Test Count", expected.Total, result.Total);
         CheckCounter("Passed", expected.Passed, result.Passed);
         CheckCounter("Failed", expected.Failed, result.Failed);
@@ -109,10 +111,35 @@ public class TestReport
             : "\n   ERROR: Test Result not as expected!");
     }
 
+    private void ReportMissingFiles()
+    {
+        var suites = Result.Xml.SelectNodes(
+            "//test-suite[@type='Unknown'] | //test-suite[@type='Project'] | //test-suite[@type='Assembly']");
+        if (suites.Count == 0)
+            Errors.Add("     No top-level suites! Possible empty command-line or misformed project.");
+
+        foreach (XmlNode suite in suites)
+        {
+            string suiteResult = GetAttribute(suite, "result");
+            string label = GetAttribute(suite, "label");
+            string site = suite.Attributes["site"]?.Value ?? "Test";
+            if (suiteResult == "Failed" && site == "Test" && label == "Invalid")
+            {
+                string message = suite.SelectSingleNode("reason/message")?.InnerText;
+                Errors.Add($"     {message}");
+            }
+        }
+    }
+
     private void CheckCounter(string label, int expected, int actual)
     {
         if (expected > 0 && expected != actual)
             Errors.Add($"     Expected: {label} = {expected}\n      But was: {actual}");
+    }
+
+    private string GetAttribute(XmlNode node, string name)
+    {
+        return node.Attributes[name]?.Value;
     }
 }
 
