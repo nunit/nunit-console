@@ -36,7 +36,6 @@ public abstract class PackageTester
     protected abstract string PackageName { get; }
     protected abstract string PackageInstallDirectory { get; }
     protected abstract string PackageBinDir { get; }
-    //protected abstract string ExtensionInstallDirectory { get; }
 
     protected string PackageUnderTest => _packageDir + PackageName;
     protected List<PackageTest> PackageTests { get; }
@@ -60,13 +59,10 @@ public abstract class PackageTester
 
     private void RunPackageTests()
     {
-        bool anyErrors = false;
-        int testCount = 0;
+        var reporter = new ResultReporter(PackageName);
 
         foreach (var packageTest in PackageTests)
         {
-            ++testCount;
-
             var resultFile = _outputDir + "TestResult.xml";
             // Delete result file ahead of time so we don't mistakenly
             // read a left-over file from another test run. Leave the
@@ -75,7 +71,6 @@ public abstract class PackageTester
                 _context.DeleteFile(resultFile);
 
             DisplayBanner(packageTest.Description);
-            DisplayTestEnvironment(packageTest);
 
             int rc = _context.StartProcess(
                 PackageBinDir + "nunit3-console.exe",
@@ -85,15 +80,27 @@ public abstract class PackageTester
                     WorkingDirectory = _outputDir
                 });
 
-            var reporter = new ResultReporter(resultFile);
-            anyErrors |= reporter.Report(packageTest.ExpectedResult) > 0;
+            try
+            {
+                var result = new ActualResult(resultFile);
+                reporter.AddResult(packageTest, result);
+
+                Console.WriteLine(result.Errors.Count == 0
+                    ? "\nSUCCESS: Test Result matches expected result!"
+                    : "\nERROR: Test Result not as expected!");
+            }
+            catch (Exception ex)
+            {
+                reporter.AddResult(packageTest, ex);
+
+                Console.WriteLine("\nERROR: No result found!");
+            }
         }
 
-        Console.WriteLine($"\nRan {testCount} package tests on {PackageName}");
+        bool hadErrors = reporter.ReportResults();
+        Console.WriteLine();
 
-        // All package tests are run even if one of them fails. If there are
-        // any errors,  we stop the run at this point.
-        if (anyErrors)
+        if (hadErrors)
             throw new Exception("One or more package tests had errors!");
     }
 
@@ -102,15 +109,6 @@ public abstract class PackageTester
         Console.WriteLine("\n=================================================="); ;
         Console.WriteLine(message);
         Console.WriteLine("==================================================");
-    }
-
-    private void DisplayTestEnvironment(PackageTest test)
-    {
-        Console.WriteLine("Test Environment");
-        Console.WriteLine($"   OS Version: {Environment.OSVersion.VersionString}");
-        Console.WriteLine($"  CLR Version: {Environment.Version}");
-        Console.WriteLine($"    Arguments: {test.Arguments}");
-        Console.WriteLine();
     }
 }
 
@@ -214,7 +212,6 @@ public class NuGetNetFXPackageTester : NetFXPackageTester
     protected override string PackageName => $"NUnit.ConsoleRunner.{_packageVersion}.nupkg";
     protected override string PackageInstallDirectory => _packageDir + "test/nuget-netfx/";
     protected override string PackageBinDir => PackageInstallDirectory + "tools/";
-    //protected override string ExtensionInstallDirectory => _parameters.PackageInstallDirectory;
 }
 
 public class NuGetNetCorePackageTester : NetCorePackageTester
@@ -225,7 +222,6 @@ public class NuGetNetCorePackageTester : NetCorePackageTester
     protected override string PackageName => $"NUnit.ConsoleRunner.NetCore.{_packageVersion}.nupkg";
     protected override string PackageInstallDirectory => _packageDir + "test/nuget-netcore/";
     protected override string PackageBinDir => PackageInstallDirectory + "tools/netcoreapp3.1/any/";
-    //protected override string ExtensionInstallDirectory => _parameters.PackageInstallDirectory;
 }
 
 public class ChocolateyPackageTester : NetFXPackageTester
@@ -236,7 +232,6 @@ public class ChocolateyPackageTester : NetFXPackageTester
     protected override string PackageName => $"nunit-console-runner.{_packageVersion}.nupkg";
     protected override string PackageInstallDirectory => _packageDir + "test/choco/";
     protected override string PackageBinDir => PackageInstallDirectory + "tools/";
-    //protected override string ExtensionInstallDirectory => _parameters.PackageInstallDirectory;
 }
 
 public class MsiPackageTester : NetFXPackageTester
@@ -261,7 +256,6 @@ public class MsiPackageTester : NetFXPackageTester
     protected override string PackageName => $"NUnit.Console-{_packageVersion}.msi";
     protected override string PackageInstallDirectory => _packageDir + "test/msi/";
     protected override string PackageBinDir => PackageInstallDirectory + "NUnit.org/nunit-console/";
-    //protected override string ExtensionInstallDirectory => _parameters.PackageInstallDirectory;
 
     protected override void CreatePackageInstallDirectory()
     {
@@ -307,5 +301,4 @@ public class ZipPackageTester : NetFXPackageTester
     protected override string PackageName => $"NUnit.Console-{_packageVersion}.zip";
     protected override string PackageInstallDirectory => _packageDir + "test/zip/";
     protected override string PackageBinDir => PackageInstallDirectory + "bin/net20/";
-    //protected override string ExtensionInstallDirectory => _parameters.PackageInstallDirectory;
 }
