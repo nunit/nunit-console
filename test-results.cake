@@ -58,6 +58,8 @@ public class ActualResult : ResultSummary
     private int IntAttribute(XmlNode node, string name)
     {
         string s = GetAttribute(node, name);
+        // TODO: We should replace 0 with -1, representing a missing counter
+        // attribute, after issue #904 is fixed.
         return s == null ? 0 : int.Parse(s);
     }
 }
@@ -111,15 +113,23 @@ public class TestReport
             : "\n   ERROR: Test Result not as expected!");
     }
 
+    // File level errors, like missing or mal-formatted files, need to be highlighted
+    // because otherwise it's hard to detect the cause of the problem without debugging.
+    // This method finds and reports that type of error.
     private void ReportMissingFiles()
     {
+        // Start with all the top-level test suites. Note that files that
+        // cannot be found show up as Unknown as do unsupported file types.
         var suites = Result.Xml.SelectNodes(
             "//test-suite[@type='Unknown'] | //test-suite[@type='Project'] | //test-suite[@type='Assembly']");
+
+        // If there is no top-level suite, it generally means the file format could not be interpreted
         if (suites.Count == 0)
             Errors.Add("     No top-level suites! Possible empty command-line or misformed project.");
 
         foreach (XmlNode suite in suites)
         {
+            // Narrow down to the specific failures we want
             string suiteResult = GetAttribute(suite, "result");
             string label = GetAttribute(suite, "label");
             string site = suite.Attributes["site"]?.Value ?? "Test";
@@ -133,7 +143,8 @@ public class TestReport
 
     private void CheckCounter(string label, int expected, int actual)
     {
-        if (expected > 0 && expected != actual)
+        // If expected value of counter is negative, it means no check is needed
+        if (expected >=0 && expected != actual)
             Errors.Add($"     Expected: {label} = {expected}\n      But was: {actual}");
     }
 

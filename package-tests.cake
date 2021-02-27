@@ -274,8 +274,10 @@ public class MsiPackageTester : NetFXPackageTester
             Console.WriteLine($"  ERROR: Installer returned {rc.ToString()}");
         else
         {
-            // Administrative install doesn't copy these files to
-            // their final destination, so we do it.
+            // Administrative install is used to create a file image, from which
+            // users may do their own installls. For security reasons, we can't
+            // do a full install so we simulate the user portion of the install,
+            // copying certain files to their final destination.
             _context.CopyFiles(
                 PackageBinDir + "*.dll",
                 PackageBinDir + "agents/net20/");

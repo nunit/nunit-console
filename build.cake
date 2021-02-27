@@ -107,7 +107,7 @@ Setup(context =>
             else
                 suffix += "-" + System.Text.RegularExpressions.Regex.Replace(branch, "[^0-9A-Za-z-]+", "-");
 
-            // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
+            // NuGet limits "special version part" to 20 chars. Add one for the hyphen.
             if (suffix.Length > 21)
                 suffix = suffix.Substring(0, 21);
 
@@ -439,7 +439,7 @@ Task("BuildNuGetPackages")
         });
     });
 
-Task("TestNugetPackages")
+Task("TestNuGetPackages")
     .Does(() =>
     {
         new NuGetNetFXPackageTester(Context, productVersion).RunTests();
@@ -862,7 +862,7 @@ Task("BuildPackages")
 
 Task("TestPackages")
     .Description("Tests the packages")
-    .IsDependentOn("TestNugetPackages")
+    .IsDependentOn("TestNuGetPackages")
     .IsDependentOn("TestChocolateyPackage")
     .IsDependentOn("TestMsiPackage")
     .IsDependentOn("TestZipPackage");
