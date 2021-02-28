@@ -39,34 +39,12 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void RecentFilesService_SettingsServiceError()
-        {
-            var fake = new FakeSettingsService();
-            fake.FailToStart = true;
-            _services.Add(fake);
-            var service = new RecentFilesService();
-            _services.Add(service);
-            ((IService)fake).StartService();
-            service.StartService();
-            Assert.That(service.Status, Is.EqualTo(ServiceStatus.Error));
-        }
-
-        [Test]
-        public void RecentFilesService_SettingsServiceMissing()
-        {
-            var service = new RecentFilesService();
-            _services.Add(service);
-            service.StartService();
-            Assert.That(service.Status, Is.EqualTo(ServiceStatus.Error));
-        }
-
-        [Test]
         public void DefaultTestRunnerFactory_ProjectServiceError()
         {
             var fake = new FakeProjectService();
             fake.FailToStart = true;
             _services.Add(fake);
-            var service = new RecentFilesService();
+            var service = new DefaultTestRunnerFactory();
             _services.Add(service);
             ((IService)fake).StartService();
             service.StartService();

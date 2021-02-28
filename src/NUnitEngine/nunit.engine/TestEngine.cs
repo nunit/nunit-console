@@ -79,7 +79,6 @@ namespace NUnit.Engine
                 // For example, ResultService uses ExtensionService, so ExtensionService is added
                 // later.
                 Services.Add(new SettingsService(true));
-                Services.Add(new RecentFilesService());
                 Services.Add(new TestFilterService());
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
