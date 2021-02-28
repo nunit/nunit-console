@@ -14,7 +14,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.13.0");
+var productVersion = Argument("productVersion", "4.0.0");
 
 var ErrorDetail = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
