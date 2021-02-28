@@ -2,6 +2,8 @@
 #load package-checks.cake
 #load test-results.cake
 #load package-tests.cake
+#load header-check.cake
+#load local-tasks.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
@@ -143,17 +145,6 @@ Task("Clean")
         CleanDirectory(PACKAGE_DIR);
     });
 
-// Not currently used in CI but useful for cleaning your local obj
-// directories, particularly after changing the target of a project.
-Task("CleanAll")
-    .Description("Cleans obj directories in additon to standard clean")
-    .IsDependentOn("Clean")
-    .Does(() =>
-    {
-        foreach (var dir in GetDirectories(PROJECT_DIR + "src/**/obj/"))
-            DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });
-    });
-
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
 //////////////////////////////////////////////////////////////////////
@@ -205,6 +196,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
 
 Task("Build")
     .Description("Builds the engine and console") 
+    .IsDependentOn("CheckHeaders")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
