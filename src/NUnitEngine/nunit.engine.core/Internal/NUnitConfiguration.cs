@@ -25,21 +25,5 @@ namespace NUnit.Engine.Internal
                 return _engineDirectory;
             }
         }
-
-        private static string _applicationDirectory;
-        public static string ApplicationDirectory
-        {
-            get
-            {
-                if (_applicationDirectory == null)
-                {
-                    _applicationDirectory = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "NUnit");
-                }
-
-                return _applicationDirectory;
-            }
-        }
     }
 }

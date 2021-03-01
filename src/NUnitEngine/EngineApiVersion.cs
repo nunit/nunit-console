@@ -4,5 +4,5 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("NUnit Engine API")]
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyInformationalVersion("3.13.0")]
-[assembly: AssemblyFileVersion("3.13.0")]
+[assembly: AssemblyInformationalVersion("4.0.0")]
+[assembly: AssemblyFileVersion("4.0.0")]

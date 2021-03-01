@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Api.Tests
@@ -18,8 +16,17 @@ namespace NUnit.Engine.Api.Tests
             _testEngine.InternalTraceLevel = InternalTraceLevel.Off;
         }
 
-        [TestCase(typeof(ISettings))]
+        [TestCase(typeof(ITestFilterService))]
+        [TestCase(typeof(IExtensionService))]
+        [TestCase(typeof(Services.ProjectService))]
+#if NETFRAMEWORK
+        [TestCase(typeof(Services.DomainManager))]
+        [TestCase(typeof(IRuntimeFrameworkService))]
+        [TestCase(typeof(ITestAgency))]
+#endif
         [TestCase(typeof(IDriverService))]
+        [TestCase(typeof(IResultService))]
+        [TestCase(typeof(ITestRunnerFactory))]
         public void CanAccessService(Type serviceType)
         {
             IService service = _testEngine.Services.GetService(serviceType) as IService;
