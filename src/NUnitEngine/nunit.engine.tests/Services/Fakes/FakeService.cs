@@ -21,11 +21,17 @@ namespace NUnit.Engine.Services.Tests.Fakes
 
         void IService.StopService()
         {
-            _status = ServiceStatus.Stopped;
+            _status = FailToStop
+                ? ServiceStatus.Error
+                : ServiceStatus.Stopped;
         }
 
         // Set to true to cause the service to give
         // an error result when started
         public bool FailToStart { get; set; }
+
+        // Set to true to cause the service to give
+        // an error result when stopped
+        public bool FailToStop { get; set; }
     }
 }
