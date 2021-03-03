@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using NUnit.Engine.Internal;
 
@@ -74,7 +75,7 @@ namespace NUnit.Engine.Services
 
         public static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
         {
-            string engineDir = NUnitConfiguration.EngineDirectory;
+            string engineDir = AssemblyHelper.GetDirectoryName(Assembly.GetExecutingAssembly());
             if (engineDir == null) return null;
 
             // If running out of a package "agents" is a subdirectory
