@@ -124,9 +124,6 @@ namespace NUnit.Common
         public string ProcessModel { get; private set; }
         public bool ProcessModelSpecified { get { return ProcessModel != null; } }
 
-        public string DomainUsage { get; private set; }
-        public bool DomainUsageSpecified { get { return DomainUsage != null; } }
-
         // How to Run Tests
 
         public string Framework { get; private set; }
@@ -347,9 +344,6 @@ namespace NUnit.Common
 
             this.AddNetFxOnlyOption("inprocess", "Synonym for --process:InProcess",
                 NetFxOnlyOption("inprocess", v => ProcessModel = "InProcess"));
-
-            this.AddNetFxOnlyOption("domain=", "{DOMAIN} isolation for test assemblies.\nValues: None, Single, Multiple. If not specified, defaults to Single for a single assembly or Multiple for more than one.",
-                NetFxOnlyOption("domain=", v => DomainUsage = parser.RequiredValue(v, "--domain", "None", "Single", "Multiple")));
 
             // How to Run Tests
             this.AddNetFxOnlyOption("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",

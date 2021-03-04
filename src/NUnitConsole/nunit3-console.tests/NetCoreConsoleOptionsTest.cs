@@ -65,7 +65,6 @@ namespace NUnit.ConsoleRunner.Tests
             "-configfile=app.config",
             "-process=Single",
             "-inprocess",
-            "-domain=Single",
             "-framework=net-3.5",
             "-x86",
             "-shadowcopy",

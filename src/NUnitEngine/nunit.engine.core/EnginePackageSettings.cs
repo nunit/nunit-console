@@ -55,14 +55,6 @@ namespace NUnit
         public const string DebugAgent = "DebugAgent";
 
         /// <summary>
-        /// Indicates how to load tests across application domains. Values are:
-        /// "Default", "None", "Single", "Multiple". Default is "Multiple"
-        /// if more than one assembly is loaded in a process. Otherwise,
-        /// it is "Single".
-        /// </summary>
-        public const string DomainUsage = "DomainUsage";
-
-        /// <summary>
         /// The private binpath used to locate assemblies. Directory paths
         /// is separated by a semicolon. It's an error to specify this and
         /// also set AutoBinPath to true.

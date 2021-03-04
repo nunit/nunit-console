@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
+
 using NUnit.Engine.Internal;
 using NUnit.Engine.Runners;
 
@@ -24,26 +25,13 @@ namespace NUnit.Engine.Services
 #if !NETFRAMEWORK
             return new LocalTestRunner(ServiceContext, package);
 #else
-            DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(
-                typeof(DomainUsage),
-                package.GetSetting(EnginePackageSettings.DomainUsage, "Default"));
-
-            switch (domainUsage)
-            {
-                default:
-                case DomainUsage.Default:
-                case DomainUsage.Multiple:
-                    if (package.SubPackages.Count > 1)
-                        return new MultipleTestDomainRunner(this.ServiceContext, package);
-                    else
-                        return new TestDomainRunner(this.ServiceContext, package);
-
-                case DomainUsage.None:
-                    return new LocalTestRunner(ServiceContext, package);
-
-                case DomainUsage.Single:
-                    return new TestDomainRunner(ServiceContext, package);
-            }
+            // TODO: Fix handling of unknown extensions and missing files
+            // so we can use...
+            //   if (package.Select(p => p.IsAssemblyPackage()).Count > 1)
+            if (package.SubPackages.Count > 1)
+                return new MultipleTestDomainRunner(ServiceContext, package);
+            else
+                return new TestDomainRunner(ServiceContext, package);
 #endif
         }
 
