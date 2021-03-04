@@ -23,14 +23,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                 case ProcessModel.Separate:
                     return RunnerResult.ProcessRunner;
                 case ProcessModel.Multiple:
-                    return new RunnerResult
-                    {
-                        TestRunner = typeof(MultipleTestProcessRunner),
-                        SubRunners = new[]
-                        {
-                            RunnerResult.ProcessRunner
-                        }
-                    };
+                    return RunnerResult.MultipleProcessRunner(1);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(processModel), processModel, ExceptionMessage);
             }

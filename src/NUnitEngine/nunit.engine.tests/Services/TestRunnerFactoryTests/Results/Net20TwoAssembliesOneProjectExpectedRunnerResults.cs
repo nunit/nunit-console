@@ -20,7 +20,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                     return new RunnerResult(typeof(AggregatingTestRunner),
                         RunnerResult.ProcessRunner,
                         RunnerResult.ProcessRunner,
-                        RunnerResult.MultiRunnerWithTwoSubRunners);
+                        RunnerResult.MultipleProcessRunner(2));
                 case ProcessModel.InProcess:
                     return new RunnerResult
                     {

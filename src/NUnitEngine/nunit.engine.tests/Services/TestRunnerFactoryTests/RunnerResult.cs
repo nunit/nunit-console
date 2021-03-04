@@ -12,10 +12,15 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if !NETCOREAPP
         public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
         public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
-        public static RunnerResult MultiRunnerWithTwoSubRunners => new RunnerResult(
-            typeof(MultipleTestProcessRunner),
-            ProcessRunner,
-            ProcessRunner);
+
+        public static RunnerResult MultipleProcessRunner(int numAssemblies)
+        {
+            return new RunnerResult()
+            {
+                TestRunner = typeof(MultipleTestProcessRunner),
+                SubRunners = GetSubRunners(ProcessRunner, numAssemblies)
+            };
+        }
 #endif
         public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
@@ -49,6 +54,15 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             }
             sb.AppendLine("]");
             return sb.ToString().Trim();
+        }
+
+        private static RunnerResult[] GetSubRunners(RunnerResult subRunner, int count)
+        {
+            var subRunners = new RunnerResult[count];
+            for (int i = 0; i < count; i++)
+                subRunners[i] = subRunner;
+
+            return subRunners;
         }
     }
 }
