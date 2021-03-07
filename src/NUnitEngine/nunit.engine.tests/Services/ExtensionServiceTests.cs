@@ -523,5 +523,34 @@ namespace NUnit.Engine.Services.Tests
             // Act + Assert
             Assert.That(() => sut.StartService(), Throws.InstanceOf<NUnitEngineException>());
         }
+
+        [Test]
+        public void StartService_ReadsMultipleAddinsFilesFromSingleDirectory()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile1 = Substitute.For<IFile>();
+            addinsFile1.Parent.Returns(startDirectory);
+            addinsFile1.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile1 });
+            var addinsFile2 = Substitute.For<IFile>();
+            addinsFile1.Parent.Returns(startDirectory);
+            addinsFile1.FullName.Returns(Path.Combine(startDirectoryPath, "test2.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile1, addinsFile2 });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            startDirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(addinsFile1);
+            addinsReader.Received().Read(addinsFile2);
+        }
     }
 }
