@@ -1,5 +1,9 @@
 #load ci.cake
 #load package-checks.cake
+#load test-results.cake
+#load package-tests.cake
+#load header-check.cake
+#load local-tasks.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
@@ -105,7 +109,7 @@ Setup(context =>
             else
                 suffix += "-" + System.Text.RegularExpressions.Regex.Replace(branch, "[^0-9A-Za-z-]+", "-");
 
-            // Nuget limits "special version part" to 20 chars. Add one for the hyphen.
+            // NuGet limits "special version part" to 20 chars. Add one for the hyphen.
             if (suffix.Length > 21)
                 suffix = suffix.Substring(0, 21);
 
@@ -139,17 +143,6 @@ Task("Clean")
         CleanDirectory(EXTENSION_PACKAGES_DIR);
         CleanDirectory(ZIP_IMG);
         CleanDirectory(PACKAGE_DIR);
-    });
-
-// Not currently used in CI but useful for cleaning your local obj
-// directories, particularly after changing the target of a project.
-Task("CleanAll")
-    .Description("Cleans obj directories in additon to standard clean")
-    .IsDependentOn("Clean")
-    .Does(() =>
-    {
-        foreach (var dir in GetDirectories(PROJECT_DIR + "src/**/obj/"))
-            DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -203,6 +196,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
 
 Task("Build")
     .Description("Builds the engine and console") 
+    .IsDependentOn("CheckHeaders")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
@@ -373,7 +367,7 @@ Task("CreateImage")
         CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
     });
 
-Task("PackageNuGet")
+Task("BuildNuGetPackages")
     .Description("Creates NuGet packages of the engine/console")
     .IsDependentOn("CreateImage")
     .Does(() =>
@@ -437,7 +431,15 @@ Task("PackageNuGet")
         });
     });
 
-Task("PackageChocolatey")
+Task("TestNuGetPackages")
+    .Does(() =>
+    {
+        new NuGetNetFXPackageTester(Context, productVersion).RunTests();
+
+        new NuGetNetCorePackageTester(Context, productVersion).RunTests();
+    });
+
+Task("BuildChocolateyPackages")
     .Description("Creates chocolatey packages of the console runner")
     .Does(() =>
     {
@@ -498,6 +500,12 @@ Task("PackageChocolatey")
             });
     });
 
+Task("TestChocolateyPackage")
+    .Does(() =>
+    {
+        new ChocolateyPackageTester(Context, productVersion).RunTests();
+    });
+
 //////////////////////////////////////////////////////////////////////
 // PACKAGE COMBINED DISTRIBUTIONS
 //////////////////////////////////////////////////////////////////////
@@ -533,7 +541,7 @@ Task("CreateCombinedImage")
     }
 });
 
-Task("PackageMsi")
+Task("BuildMsiPackage")
 .IsDependentOn("CreateCombinedImage")
 .Does(() =>
 {
@@ -549,7 +557,13 @@ Task("PackageMsi")
         );
 });
 
-Task("PackageZip")
+Task("TestMsiPackage")
+    .Does(() =>
+    {
+        new MsiPackageTester(Context, version).RunTests();
+    });
+
+Task("BuildZipPackage")
 .IsDependentOn("CreateCombinedImage")
 .Does(() =>
 {
@@ -568,6 +582,12 @@ Task("PackageZip")
     var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, productVersion);
     Zip(ZIP_IMG, zipPath);
 });
+
+Task("TestZipPackage")
+    .Does(() =>
+    {
+        new ZipPackageTester(Context, productVersion).RunTests();
+    });
 
 Task("InstallSigningTool")
     .Does(() =>
@@ -624,8 +644,8 @@ Task("SignPackages")
         }
     });
 
-Task("CheckPackages")
-    .Description("Check content of NuGet packages")
+Task("CheckPackageContent")
+    .Description("Check content of all the packages we build")
     .Does(() =>
     {
         CheckAllPackages();
@@ -825,14 +845,26 @@ Task("Test")
     .IsDependentOn("TestEngine")
     .IsDependentOn("TestConsole");
 
+Task("BuildPackages")
+    .Description("Builds all packages for distribution")
+    .IsDependentOn("BuildNuGetPackages")
+    .IsDependentOn("BuildChocolateyPackages")
+    .IsDependentOn("BuildMsiPackage")
+    .IsDependentOn("BuildZipPackage");
+
+Task("TestPackages")
+    .Description("Tests the packages")
+    .IsDependentOn("TestNuGetPackages")
+    .IsDependentOn("TestChocolateyPackage")
+    .IsDependentOn("TestMsiPackage")
+    .IsDependentOn("TestZipPackage");
+
 Task("Package")
-    .Description("Packages the engine and console runner")
+    .Description("Builds and tests all packages")
     .IsDependentOn("CheckForError")
-    .IsDependentOn("PackageNuGet")
-    .IsDependentOn("PackageChocolatey")
-    .IsDependentOn("PackageMsi")
-    .IsDependentOn("PackageZip")
-    .IsDependentOn("CheckPackages");
+    .IsDependentOn("BuildPackages")
+    .IsDependentOn("CheckPackageContent")
+    .IsDependentOn("TestPackages");
 
 Task("Appveyor")
     .Description("Builds, tests and packages on AppVeyor")

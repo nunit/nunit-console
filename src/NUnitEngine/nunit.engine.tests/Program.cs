@@ -1,4 +1,6 @@
-﻿#if !NET35
+﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
+
+#if !NET35
 using System.Reflection;
 using NUnitLite;
 

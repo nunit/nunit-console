@@ -1,4 +1,6 @@
-﻿#if NETFRAMEWORK
+﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
+
+#if NETFRAMEWORK
 using System.Diagnostics;
 using NUnit.Engine.Tests.Helpers;
 using NUnit.Framework;

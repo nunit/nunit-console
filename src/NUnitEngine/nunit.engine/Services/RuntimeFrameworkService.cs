@@ -1,25 +1,4 @@
-// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole, Rob Prouse
-//
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// ***********************************************************************
+// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
 using System;
@@ -230,24 +209,25 @@ namespace NUnit.Engine.Services
             }
             else if (File.Exists(packageName) && PathUtils.IsAssemblyFileType(packageName))
             {
-                var assembly = AssemblyDefinition.ReadAssembly(packageName);
-
-                targetVersion = assembly.GetRuntimeVersion();
-                log.Debug($"Assembly {packageName} uses version {targetVersion}");
-
-                frameworkName = assembly.GetFrameworkName();
-                log.Debug($"Assembly {packageName} targets {frameworkName}");
-
-                if (assembly.RequiresX86())
+                using (var assembly = AssemblyDefinition.ReadAssembly(packageName))
                 {
-                    requiresX86 = true;
-                    log.Debug($"Assembly {packageName} will be run x86");
-                }
+                    targetVersion = assembly.GetRuntimeVersion();
+                    log.Debug($"Assembly {packageName} uses version {targetVersion}");
 
-                if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
-                {
-                    requiresAssemblyResolver = true;
-                    log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
+                    frameworkName = assembly.GetFrameworkName();
+                    log.Debug($"Assembly {packageName} targets {frameworkName}");
+
+                    if (assembly.RequiresX86())
+                    {
+                        requiresX86 = true;
+                        log.Debug($"Assembly {packageName} will be run x86");
+                    }
+
+                    if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
+                    {
+                        requiresAssemblyResolver = true;
+                        log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
+                    }
                 }
             }
 
