@@ -1,8 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="Tuple.cs" company="TillW">
-//   Copyright 2021 TillW. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 namespace NUnit.Engine.Internal.Backports
 {

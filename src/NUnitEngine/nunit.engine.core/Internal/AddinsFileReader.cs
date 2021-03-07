@@ -1,8 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="AddinsFileReader.cs" company="TillW">
-//   Copyright 2021 TillW. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using NUnit.Engine.Internal.FileSystemAccess;
 using System;
