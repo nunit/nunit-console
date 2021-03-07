@@ -552,5 +552,43 @@ namespace NUnit.Engine.Services.Tests
             addinsReader.Received().Read(addinsFile1);
             addinsReader.Received().Read(addinsFile2);
         }
+
+        [Test]
+        public void ProcessAddinsFile_ReadsAddinsFileFromReferencedDirectory()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var referencedDirectoryPath = Path.Combine(startDirectoryPath, "metamorphosator");
+            var referencedDirectory = Substitute.For<IDirectory>();
+            referencedDirectory.FullName.Returns(referencedDirectoryPath);
+            referencedDirectory.Parent.Returns(startDirectory);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            var referencedAddinsFile = Substitute.For<IFile>();
+            referencedAddinsFile.Parent.Returns(referencedDirectory);
+            referencedAddinsFile.FullName.Returns(Path.Combine(referencedDirectoryPath, "test2.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            referencedDirectory.GetFiles("*.addins").Returns(new[] { referencedAddinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(referencedDirectoryPath).Returns(referencedDirectory);
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { "./metamorphosator/" });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            directoryFinder.GetDirectories(startDirectory, "./metamorphosator/").Returns(new[] { referencedDirectory });
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            startDirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(addinsFile);
+            referencedDirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(referencedAddinsFile);
+        }
     }
 }
