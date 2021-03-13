@@ -2,7 +2,7 @@
 
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/81uhucr7tlq2kwup/branch/master?svg=true)](https://ci.appveyor.com/project/CharliePoole/nunit-console/branch/master) [![Travis Build Status](https://travis-ci.org/nunit/nunit-console.svg?branch=master)](https://travis-ci.org/nunit/nunit-console) [![Azure Pipelines Build Status](https://nunit.visualstudio.com/NUnit/_apis/build/status/NUnit%20Engine%20&%20Console/NUnit%20Console%20CI?branchName=master)](https://nunit.visualstudio.com/NUnit/_build/latest?definitionId=13&branchName=master) [![NuGet Version and Downloads count](https://buildstats.info/nuget/NUnit.ConsoleRunner)](https://www.nuget.org/packages/NUnit.ConsoleRunner) 
 
-[![Follow NUnit](https://img.shields.io/twitter/follow/nunit.svg?style=social)](https://twitter.com/nunit) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/nunit/nunit) [![nunit-discuss Google Groups](https://img.shields.io/badge/mailing%20list-nunit--discuss-blue.svg)](https://groups.google.com/forum/#!forum/nunit-discuss)
+[![Follow NUnit](https://img.shields.io/twitter/follow/nunit.svg?style=social)](https://twitter.com/nunit) [![Slack](https://img.shields.io/badge/chat-on%20Slack-brightgreen)](https://join.slack.com/t/nunit/shared_invite/zt-jz58jw68-Led8y3WH4n2a~Y5WjuOpKA) [![nunit-discuss Google Groups](https://img.shields.io/badge/mailing%20list-nunit--discuss-blue.svg)](https://groups.google.com/forum/#!forum/nunit-discuss)
 
 NUnit is a unit-testing framework for all .NET languages. Initially ported from JUnit, the current production release, version 3, has been completely rewritten with many new features and support for a wide range of .NET platforms.
 
