@@ -30,28 +30,17 @@ namespace NUnit.Engine.Services.Tests
         }
 
 #if NETCOREAPP
-        [TestCase("x.dll", null, typeof(LocalTestRunner))]
-        [TestCase("x.dll y.dll", null, typeof(LocalTestRunner))]
-        [TestCase("x.dll y.dll z.dll", null, typeof(LocalTestRunner))]
+        [TestCase("x.dll", typeof(LocalTestRunner))]
+        [TestCase("x.dll y.dll", typeof(LocalTestRunner))]
+        [TestCase("x.dll y.dll z.dll", typeof(LocalTestRunner))]
 #else
-        // Single file
-        [TestCase("x.dll",  null,      typeof(TestDomainRunner))]
-        [TestCase("x.dll", "Single",   typeof(TestDomainRunner))]
-        [TestCase("x.dll", "Multiple", typeof(TestDomainRunner))]
-        // Two files
-        [TestCase("x.dll y.dll",  null,     typeof(MultipleTestDomainRunner))]
-        [TestCase("x.dll y.dll", "Single",   typeof(TestDomainRunner))]
-        [TestCase("x.dll y.dll", "Multiple", typeof(MultipleTestDomainRunner))]
-        // Three files
-        [TestCase("x.dll y.dll z.dll", null,       typeof(MultipleTestDomainRunner))]
-        [TestCase("x.dll y.dll z.dll", "Single",   typeof(TestDomainRunner))]
-        [TestCase("x.dll y.dll z.dll", "Multiple", typeof(MultipleTestDomainRunner))]
+        [TestCase("x.dll",  typeof(TestDomainRunner))]
+        [TestCase("x.dll y.dll",  typeof(MultipleTestDomainRunner))]
+        [TestCase("x.dll y.dll z.dll", typeof(MultipleTestDomainRunner))]
 #endif
-        public void CorrectRunnerIsUsed(string files, string domainUsage, Type expectedType)
+        public void CorrectRunnerIsUsed(string files, Type expectedType)
         {
             var package = new TestPackage(files.Split(new char[] { ' ' }));
-            if (domainUsage != null)
-                package.Settings["DomainUsage"] = domainUsage;
             Assert.That(_factory.MakeTestRunner(package), Is.TypeOf(expectedType));
         }
     }

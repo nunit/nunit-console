@@ -24,11 +24,11 @@ namespace NUnit.ConsoleRunner.Tests
             services.Add(new DriverService());
 #if NET35
             services.Add(new RuntimeFrameworkService());
+            services.Add(new DomainManager());
 #endif
 
             var package = new TestPackage(fullname);
             package.AddSetting("ProcessModel", "InProcess");
-            package.AddSetting("DomainUsage", "None");
 
             var runner = new MasterTestRunner(services, package);
 
