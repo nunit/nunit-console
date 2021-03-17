@@ -23,13 +23,13 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
             get
             {
                 yield return new TestRunnerFactoryData(
-                    "SingleAssembly (string ctor)",
+                    "SingleAssembly",
                     new TestPackage("a.dll"),
                     RunnerResult.LocalTestRunner
                 );
 
                 yield return new TestRunnerFactoryData(
-                    "Single assembly (list ctor)",
+                    "Single assembly",
                     new TestPackage(new[] { "a.dll" }),
                     RunnerResult.LocalTestRunner
                 );
@@ -48,27 +48,13 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     });
 
                 yield return new TestRunnerFactoryData(
-                    "SingleProject (list ctor)",
-                    new TestPackage(new[] { "a.nunit" }),
+                    "SingleProject",
+                    new TestPackage("a.nunit"),
                     RunnerResult.LocalTestRunner
                 );
 
                 yield return new TestRunnerFactoryData(
-                    "Single project (string ctor)",
-                    new TestPackage("a.nunit"),
-                    new RunnerResult
-                    {
-                        TestRunner = typeof(AggregatingTestRunner),
-                        SubRunners = new[]
-                        {
-                            RunnerResult.LocalTestRunner,
-                            RunnerResult.LocalTestRunner
-                        }
-                    }
-                );
-
-                yield return new TestRunnerFactoryData(
-                    "Single unknown extension (list ctor)",
+                    "Single unknown extension",
                     new TestPackage(new[] { "a.junk" }),
                     RunnerResult.LocalTestRunner
                 );

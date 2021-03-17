@@ -27,7 +27,7 @@ namespace NUnit.Engine.Services.Tests.Fakes
             if (_projects.ContainsKey(package.Name))
             {
                 foreach (string assembly in _projects[package.Name])
-                    package.AddSubPackage(new TestPackage(assembly));
+                    package.AddSubPackage(new TestPackage().Named(assembly));
             }
         }
 

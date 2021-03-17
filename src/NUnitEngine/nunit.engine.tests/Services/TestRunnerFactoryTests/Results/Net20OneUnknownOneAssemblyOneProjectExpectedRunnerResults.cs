@@ -17,10 +17,12 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
             switch (processModel)
             {
                 case ProcessModel.Default:
-                    return new RunnerResult(typeof(AggregatingTestRunner),
+                    return RunnerResult.AggregatingTestRunner.WithSubRunners(
                         RunnerResult.ProcessRunner,
                         RunnerResult.ProcessRunner,
-                        RunnerResult.MultipleProcessRunner(2));
+                        RunnerResult.MultipleProcessRunner.WithSubRunners(
+                            RunnerResult.ProcessRunner,
+                            RunnerResult.ProcessRunner));
                 case ProcessModel.InProcess:
                     return new RunnerResult
                     {

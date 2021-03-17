@@ -26,39 +26,40 @@ namespace NUnit.Engine
     public class TestPackage
     {
         /// <summary>
-        /// Construct a named TestPackage, specifying a file path for
-        /// the assembly or project to be used.
+        /// Construct an anonymous TestPackage that wraps test files.
+        /// Each file is added to the package as a subpackage.
         /// </summary>
-        /// <param name="filePath">The file path.</param>
-        public TestPackage(string filePath)
+        /// <param name="testFiles">Names of all the test files</param>
+        /// <remarks>
+        /// Semantically equivalent to the IList constructor.
+        /// </remarks>
+        public TestPackage(params string[] testFiles)
         {
-            ID = GetNextID();
-
-            if (filePath != null)
-            {
-                FullName = Path.GetFullPath(filePath);
-                Settings = new Dictionary<string,object>();
-                SubPackages = new List<TestPackage>();
-            }
+            InitializeSubPackages(testFiles);
         }
 
         /// <summary>
         /// Construct an anonymous TestPackage that wraps test files.
+        /// Each file is added to the package as a subpackage.
         /// </summary>
-        /// <param name="testFiles"></param>
+        /// <param name="testFiles">Names of all the test files.</param>
+        /// <remarks>
+        /// Semantically equivalent to the array constructor.
+        /// </remarks>
         public TestPackage(IList<string> testFiles)
         {
-            ID = GetNextID();
-            SubPackages = new List<TestPackage>();
-            Settings = new Dictionary<string,object>();
+            InitializeSubPackages(testFiles);
+        }
 
+        private void InitializeSubPackages(IList<string> testFiles)
+        {
             foreach (string testFile in testFiles)
-                SubPackages.Add(new TestPackage(testFile));
+                SubPackages.Add(new TestPackage().Named(testFile));
         }
 
         private static int _nextID = 0;
 
-        private string GetNextID()
+        private static string GetNextID()
         {
             return (_nextID++).ToString();
         }
@@ -70,7 +71,7 @@ namespace NUnit.Engine
         /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
-        public string ID { get; private set; }
+        public string ID { get; } = GetNextID();
 
         /// <summary>
         /// Gets the name of the package
@@ -87,14 +88,37 @@ namespace NUnit.Engine
         public string FullName { get; private set; }
 
         /// <summary>
+        /// Fluent modifier intended for use with the default
+        /// constructor to assign a name to a package. This
+        /// should be used for creating subpackages as it is
+        /// the only way to assign a name to the package.
+        /// </summary>
+        /// <param name="fileName">The name or path of the file.</param>
+        /// <returns>The current instance.</returns>
+        /// <example>
+        /// var subpackage = new TestPackage().Named("test.dll");
+        /// </example>
+        /// <remarks>
+        /// This is provided for use by engine extensions that manipulate
+        /// the package structure as well as for internal use. For general
+        /// programmatic use of the engine, either of the constructors
+        /// will create a TestPackage in the form that the runner expects.
+        /// </remarks>
+        public TestPackage Named(string fileName)
+        {
+            FullName = Path.GetFullPath(fileName);
+            return this;
+        }
+
+        /// <summary>
         /// Gets the list of SubPackages contained in this package
         /// </summary>
-        public IList<TestPackage> SubPackages { get; private set; }
+        public IList<TestPackage> SubPackages { get; } = new List<TestPackage>();
 
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string,object> Settings { get; private set; }
+        public IDictionary<string,object> Settings { get; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Add a subproject to the package.
@@ -128,7 +152,8 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Return the value of a setting or a default.
+        /// Return the value of a setting or a default, which
+        /// is specified by the caller.
         /// </summary>
         /// <param name="name">The name of the setting</param>
         /// <param name="defaultSetting">The default value</param>

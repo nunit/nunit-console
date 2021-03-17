@@ -26,7 +26,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
                     var expected =
-                        Net20OneAssemblyOneProjectExpectedRunnerResults.ResultFor(processModel);
+                        Net20OneProjectOneAssemblyExpectedRunnerResults.ResultFor(processModel);
                     yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
                     testName = "Two projects, one assembly - " +
