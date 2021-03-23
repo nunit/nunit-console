@@ -26,39 +26,40 @@ namespace NUnit.Engine
     public class TestPackage
     {
         /// <summary>
-        /// Construct a named TestPackage, specifying a file path for
-        /// the assembly or project to be used.
+        /// Construct a top-level TestPackage that wraps one or more
+        /// test files, contained as subpackages.
         /// </summary>
-        /// <param name="filePath">The file path.</param>
-        public TestPackage(string filePath)
+        /// <param name="testFiles">Names of all the test files</param>
+        /// <remarks>
+        /// Semantically equivalent to the IList constructor.
+        /// </remarks>
+        public TestPackage(params string[] testFiles)
         {
-            ID = GetNextID();
-
-            if (filePath != null)
-            {
-                FullName = Path.GetFullPath(filePath);
-                Settings = new Dictionary<string,object>();
-                SubPackages = new List<TestPackage>();
-            }
+            InitializeSubPackages(testFiles);
         }
 
         /// <summary>
-        /// Construct an anonymous TestPackage that wraps test files.
+        /// Construct a top-level TestPackage that wraps one or more
+        /// test files, contained as subpackages.
         /// </summary>
-        /// <param name="testFiles"></param>
+        /// <param name="testFiles">Names of all the test files.</param>
+        /// <remarks>
+        /// Semantically equivalent to the array constructor.
+        /// </remarks>
         public TestPackage(IList<string> testFiles)
         {
-            ID = GetNextID();
-            SubPackages = new List<TestPackage>();
-            Settings = new Dictionary<string,object>();
+            InitializeSubPackages(testFiles);
+        }
 
+        private void InitializeSubPackages(IList<string> testFiles)
+        {
             foreach (string testFile in testFiles)
-                SubPackages.Add(new TestPackage(testFile));
+                AddSubPackage(testFile);
         }
 
         private static int _nextID = 0;
 
-        private string GetNextID()
+        private static string GetNextID()
         {
             return (_nextID++).ToString();
         }
@@ -70,7 +71,7 @@ namespace NUnit.Engine
         /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
-        public string ID { get; private set; }
+        public string ID { get; } = GetNextID();
 
         /// <summary>
         /// Gets the name of the package
@@ -89,15 +90,15 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the list of SubPackages contained in this package
         /// </summary>
-        public IList<TestPackage> SubPackages { get; private set; }
+        public IList<TestPackage> SubPackages { get; } = new List<TestPackage>();
 
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string,object> Settings { get; private set; }
+        public IDictionary<string,object> Settings { get; } = new Dictionary<string, object>();
 
         /// <summary>
-        /// Add a subproject to the package.
+        /// Add a subpackage to the package.
         /// </summary>
         /// <param name="subPackage">The subpackage to be added</param>
         public void AddSubPackage(TestPackage subPackage)
@@ -106,6 +107,19 @@ namespace NUnit.Engine
 
             foreach (var key in Settings.Keys)
                 subPackage.Settings[key] = Settings[key];
+        }
+
+        /// <summary>
+        /// Add a subpackage to the package, specifying its name. This is
+        /// the only way to add a named subpackage to the top-level package.
+        /// </summary>
+        /// <param name="packageName">The name of the subpackage to be added</param>
+        public TestPackage AddSubPackage(string packageName)
+        {
+            var subPackage = new TestPackage() { FullName = Path.GetFullPath(packageName) };
+            SubPackages.Add(subPackage);
+
+            return subPackage;
         }
 
         /// <summary>
@@ -128,7 +142,8 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Return the value of a setting or a default.
+        /// Return the value of a setting or a default, which
+        /// is specified by the caller.
         /// </summary>
         /// <param name="name">The name of the setting</param>
         /// <param name="defaultSetting">The default value</param>

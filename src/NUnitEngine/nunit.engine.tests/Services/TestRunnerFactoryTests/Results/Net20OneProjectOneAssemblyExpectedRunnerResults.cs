@@ -7,7 +7,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
 {
 #if !NETCOREAPP
-    internal static class Net20OneAssemblyOneProjectExpectedRunnerResults
+    internal static class Net20OneProjectOneAssemblyExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
             $"No expected Test result provided for this {nameof(ProcessModel)}.";
@@ -17,8 +17,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
             switch (processModel)
             {
                 case ProcessModel.Default:
-                    return new RunnerResult(typeof(AggregatingTestRunner),
-                        RunnerResult.MultipleProcessRunner(2),
+                    return RunnerResult.AggregatingTestRunner.WithSubRunners(
+                        RunnerResult.MultipleProcessRunner.WithSubRunners(
+                            RunnerResult.ProcessRunner,
+                            RunnerResult.ProcessRunner),
                         RunnerResult.ProcessRunner);
                 case ProcessModel.InProcess:
                     return new RunnerResult

@@ -12,16 +12,11 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #if !NETCOREAPP
         public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
         public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
+        public static RunnerResult AggregatingTestRunner => new RunnerResult(typeof(AggregatingTestRunner));
 
-        public static RunnerResult MultipleProcessRunner(int numAssemblies)
-        {
-            return new RunnerResult()
-            {
-                TestRunner = typeof(MultipleTestProcessRunner),
-                SubRunners = GetSubRunners(ProcessRunner, numAssemblies)
-            };
-        }
+        public static RunnerResult MultipleProcessRunner => new RunnerResult(typeof(MultipleTestProcessRunner));
 #endif
+
         public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
         public RunnerResult()
@@ -30,7 +25,15 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         public RunnerResult(Type testRunner, params RunnerResult[] subRunners)
         {
             TestRunner = testRunner;
-            SubRunners = subRunners;
+            SubRunners = new List<RunnerResult>(subRunners);
+        }
+
+        public RunnerResult WithSubRunners(params RunnerResult[] subRunners)
+        {
+            foreach (var subRunner in subRunners)
+                SubRunners.Add(subRunner);
+
+            return this;
         }
 
         public Type TestRunner { get; set; }
@@ -40,19 +43,19 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         public override string ToString()
         {
             var sb = new StringBuilder();
+            var indent = "";
             sb.AppendLine($"TestRunner: {TestRunner.Name}");
 
             if (SubRunners.Count == 0)
                 return sb.ToString().Trim();
 
             sb.AppendLine("SubRunners:");
-            sb.AppendLine("[");
 
+            indent += "    ";
             foreach (var subRunner in SubRunners)
             {
-                sb.AppendLine($"\t{subRunner}");
+                sb.AppendLine($"{indent}{subRunner}");
             }
-            sb.AppendLine("]");
             return sb.ToString().Trim();
         }
 

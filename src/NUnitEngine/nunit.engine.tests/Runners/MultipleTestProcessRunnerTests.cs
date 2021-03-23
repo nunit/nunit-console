@@ -29,7 +29,7 @@ namespace NUnit.Engine.Runners.Tests
         public void CheckLevelOfParallelism_SingleAssembly()
         {
             var package = new TestPackage("junk.dll");
-            Assert.That(new MultipleTestProcessRunner(new ServiceContext(), package).LevelOfParallelism, Is.EqualTo(0));
+            Assert.That(new MultipleTestProcessRunner(new ServiceContext(), package).LevelOfParallelism, Is.EqualTo(1));
         }
 
         // Create a MultipleTestProcessRunner with a fake package consisting of
@@ -38,9 +38,13 @@ namespace NUnit.Engine.Runners.Tests
         MultipleTestProcessRunner CreateRunner(int assemblyCount, int? maxAgents)
         {
             // Currently, we can get away with null entries here
-            var package = new TestPackage(new string[assemblyCount]);
+            var package = new TestPackage();
+            for (int i = 1; i <= assemblyCount; i++)
+                package.AddSubPackage($"test{i}.dll");
+
             if (maxAgents != null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
+
             return new MultipleTestProcessRunner(new ServiceContext(), package);
         }
     }

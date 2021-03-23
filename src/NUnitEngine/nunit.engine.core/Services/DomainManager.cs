@@ -108,8 +108,6 @@ namespace NUnit.Engine.Services
                 setup.ShadowCopyFiles = "true";
                 setup.ShadowCopyDirectories = setup.ApplicationBase;
             }
-            else
-                setup.ShadowCopyFiles = "false";
 
             return setup;
         }
@@ -199,6 +197,8 @@ namespace NUnit.Engine.Services
                 if (lastChar != Path.DirectorySeparatorChar && lastChar != Path.AltDirectorySeparatorChar)
                     appBase += Path.DirectorySeparatorChar;
             }
+            else
+                throw new Exception("Appbase is null or empty");
 
             return appBase;
         }
@@ -296,13 +296,18 @@ namespace NUnit.Engine.Services
 
         public static string GetPrivateBinPath(string basePath, IList<string> assemblies)
         {
+            Guard.ArgumentNotNull(basePath, nameof(basePath));
+            Guard.ArgumentNotNull(assemblies, nameof(assemblies));
+
+            basePath = Path.GetFullPath(basePath);
+
             List<string> dirList = new List<string>();
             StringBuilder sb = new StringBuilder(200);
 
             foreach( string assembly in assemblies )
             {
                 string dir = PathUtils.RelativePath(
-                    Path.GetFullPath(basePath),
+                    basePath,
                     Path.GetDirectoryName( Path.GetFullPath(assembly) ) );
                 if ( dir != null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
                 {
