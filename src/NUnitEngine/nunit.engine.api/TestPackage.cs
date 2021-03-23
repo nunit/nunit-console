@@ -26,8 +26,8 @@ namespace NUnit.Engine
     public class TestPackage
     {
         /// <summary>
-        /// Construct an anonymous TestPackage that wraps test files.
-        /// Each file is added to the package as a subpackage.
+        /// Construct a top-level TestPackage that wraps one or more
+        /// test files, contained as subpackages.
         /// </summary>
         /// <param name="testFiles">Names of all the test files</param>
         /// <remarks>
@@ -39,8 +39,8 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Construct an anonymous TestPackage that wraps test files.
-        /// Each file is added to the package as a subpackage.
+        /// Construct a top-level TestPackage that wraps one or more
+        /// test files, contained as subpackages.
         /// </summary>
         /// <param name="testFiles">Names of all the test files.</param>
         /// <remarks>
@@ -98,7 +98,7 @@ namespace NUnit.Engine
         public IDictionary<string,object> Settings { get; } = new Dictionary<string, object>();
 
         /// <summary>
-        /// Add a subproject to the package.
+        /// Add a subpackage to the package.
         /// </summary>
         /// <param name="subPackage">The subpackage to be added</param>
         public void AddSubPackage(TestPackage subPackage)
@@ -110,7 +110,7 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Add a subproject to the package, specifying its name. This is
+        /// Add a subpackage to the package, specifying its name. This is
         /// the only way to add a named subpackage to the top-level package.
         /// </summary>
         /// <param name="packageName">The name of the subpackage to be added</param>
