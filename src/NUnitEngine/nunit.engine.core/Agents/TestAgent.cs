@@ -1,7 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETSTANDARD2_0
 using System;
+using System.Threading;
 
 namespace NUnit.Engine.Agents
 {
@@ -11,27 +11,36 @@ namespace NUnit.Engine.Agents
     /// loading and running tests in a particular
     /// context such as an application domain or process.
     /// </summary>
-    public abstract class TestAgent : MarshalByRefObject, ITestAgent, IDisposable
+    public abstract class TestAgent : ITestAgent, IDisposable
     {
-        private readonly IServiceLocator services;
+        internal readonly ManualResetEvent StopSignal = new ManualResetEvent(false);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestAgent"/> class.
         /// </summary>
         /// <param name="agentId">The identifier of the agent.</param>
         /// <param name="services">The services available to the agent.</param>
-        public TestAgent(IServiceLocator services)
+        public TestAgent(Guid agentId, IServiceLocator services)
         {
-            this.services = services;
+            Id = agentId;
+            Services = services;
         }
 
         /// <summary>
         /// The services available to the agent
         /// </summary>
-        protected IServiceLocator Services
-        {
-            get { return services; }
-        }
+        protected IServiceLocator Services { get; }
+
+        /// <summary>
+        /// Gets a Guid that uniquely identifies this agent.
+        /// </summary>
+        public Guid Id { get; }
+
+        /// <summary>
+        /// Starts the agent, performing any required initialization
+        /// </summary>
+        /// <returns><c>true</c> if the agent was started successfully.</returns>
+        public abstract bool Start();
 
         /// <summary>
         /// Stops the agent, releasing any resources
@@ -42,6 +51,11 @@ namespace NUnit.Engine.Agents
         ///  Creates a test runner
         /// </summary>
         public abstract ITestEngineRunner CreateRunner(TestPackage package);
+
+        public bool WaitForStop(int timeout)
+        {
+            return StopSignal.WaitOne(timeout);
+        }
 
         public void Dispose()
         {
@@ -64,14 +78,5 @@ namespace NUnit.Engine.Agents
                 _disposed = true;
             }
         }
-
-        /// <summary>
-        /// Overridden to cause object to live indefinitely
-        /// </summary>
-        public override object InitializeLifetimeService()
-        {
-            return null;
-        }
     }
 }
-#endif

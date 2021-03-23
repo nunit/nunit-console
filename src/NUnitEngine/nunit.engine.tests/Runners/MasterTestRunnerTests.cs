@@ -186,6 +186,12 @@ namespace NUnit.Engine.Runners.Tests
             CheckTestRunEvents();
         }
 
+        [Test]
+        public void StopRun()
+        {
+
+        }
+
         private void CheckResult(XmlNode result, ResultData expected)
         {
             if (expected.Name != null)

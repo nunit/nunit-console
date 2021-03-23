@@ -2,6 +2,7 @@
 
 #if NETFRAMEWORK
 using System;
+using System.Diagnostics;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
@@ -21,12 +22,9 @@ namespace NUnit.Engine.Runners
         // level, the ProcessRunner should create an XML node for the entire
         // project, aggregating the assembly results.
 
-        private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
-        private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
-
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private IAgentLease _agentLease;
+        private ITestAgent _agent;
         private ITestEngineRunner _remoteRunner;
         private TestAgency _agency;
 
@@ -45,7 +43,7 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                CreateAgentAndRunner();
+                CreateAgentAndRunnerIfNeeded();
                 return _remoteRunner.Explore(filter);
             }
             catch (Exception e)
@@ -66,7 +64,7 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                CreateAgentAndRunner();
+                CreateAgentAndRunnerIfNeeded();
 
                 return _remoteRunner.Load();
             }
@@ -112,7 +110,7 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                CreateAgentAndRunner();
+                CreateAgentAndRunnerIfNeeded();
 
                 return _remoteRunner.CountTestCases(filter);
             }
@@ -135,7 +133,7 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                CreateAgentAndRunner();
+                CreateAgentAndRunnerIfNeeded();
 
                 var result = _remoteRunner.Run(listener, filter);
                 log.Info("Done running " + TestPackage.Name);
@@ -162,7 +160,7 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                CreateAgentAndRunner();
+                CreateAgentAndRunnerIfNeeded();
 
                 return _remoteRunner.RunAsync(listener, filter);
             }
@@ -218,11 +216,12 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agentLease != null)
+                if (_agent != null && _agency.IsAgentProcessActive(_agent.Id, out _))
                 {
                     try
                     {
-                        _agentLease.Dispose();
+                        log.Debug("Stopping remote agent");
+                        _agent.Stop();
                     }
                     catch (NUnitEngineUnloadException ex) when (unloadException != null)
                     {
@@ -231,7 +230,7 @@ namespace NUnit.Engine.Runners
                     }
                     finally
                     {
-                        _agentLease = null;
+                        _agent = null;
                     }
                 }
 
@@ -240,22 +239,22 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        private void CreateAgentAndRunner()
+        private void CreateAgentAndRunnerIfNeeded()
         {
-            if (_agentLease == null)
+            if (_agent == null)
             {
                 // Increase the timeout to give time to attach a debugger
                 bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
                              TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
 
-                _agentLease = _agency.GetAgent(TestPackage, debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT);
+                _agent = _agency.GetAgent(TestPackage);
 
-                if (_agentLease == null)
+                if (_agent == null)
                     throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
             if (_remoteRunner == null)
-                _remoteRunner = _agentLease.CreateRunner(TestPackage);
+                _remoteRunner = _agent.CreateRunner(TestPackage);
         }
 
         TestEngineResult CreateFailedResult(Exception e)
