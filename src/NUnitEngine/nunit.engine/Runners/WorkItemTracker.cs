@@ -44,7 +44,7 @@ namespace NUnit.Engine.Runners
             return _allItemsComplete.WaitOne(millisecondsTimeout);
         }
 
-        public void IssuePendingNotifications(ITestEventListener listener)
+        public void SendPendingTestCompletionEvents(ITestEventListener listener)
         {
             lock (_trackerLock)
             {

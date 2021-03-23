@@ -185,7 +185,7 @@ namespace NUnit.Engine.Runners
 
                 if (!_workItemTracker.WaitForCompletion(WAIT_FOR_CANCEL_TO_COMPLETE))
                 {
-                    _workItemTracker.IssuePendingNotifications(_eventDispatcher);
+                    _workItemTracker.SendPendingTestCompletionEvents(_eventDispatcher);
 
                     // Indicate we are no longer running
                     IsTestRunning = false;
@@ -440,6 +440,10 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         private TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
         {
+            _workItemTracker.Clear();
+            _eventDispatcher.Listeners.Clear();
+            _eventDispatcher.Listeners.Add(_workItemTracker);
+
             if (listener != null)
                 _eventDispatcher.Listeners.Add(listener);
 

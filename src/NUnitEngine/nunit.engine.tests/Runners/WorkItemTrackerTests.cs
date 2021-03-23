@@ -26,7 +26,7 @@ namespace NUnit.Engine.Runners.Tests
         {
             reports.SendTo(_listener);
 
-            _tracker.IssuePendingNotifications(this);
+            _tracker.SendPendingTestCompletionEvents(this);
 
             Assert.That(_pendingNotices.Count, Is.EqualTo(0));
         }
@@ -36,7 +36,7 @@ namespace NUnit.Engine.Runners.Tests
         {
             reports.SendTo(_listener);
 
-            _tracker.IssuePendingNotifications(this);
+            _tracker.SendPendingTestCompletionEvents(this);
 
             Assert.That(_pendingNotices, Is.EqualTo(expectedNotices.Reports));
         }
