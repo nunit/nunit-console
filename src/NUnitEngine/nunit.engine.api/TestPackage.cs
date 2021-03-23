@@ -54,7 +54,7 @@ namespace NUnit.Engine
         private void InitializeSubPackages(IList<string> testFiles)
         {
             foreach (string testFile in testFiles)
-                SubPackages.Add(new TestPackage().Named(testFile));
+                AddSubPackage(testFile);
         }
 
         private static int _nextID = 0;
@@ -88,29 +88,6 @@ namespace NUnit.Engine
         public string FullName { get; private set; }
 
         /// <summary>
-        /// Fluent modifier intended for use with the default
-        /// constructor to assign a name to a package. This
-        /// should be used for creating subpackages as it is
-        /// the only way to assign a name to the package.
-        /// </summary>
-        /// <param name="fileName">The name or path of the file.</param>
-        /// <returns>The current instance.</returns>
-        /// <example>
-        /// var subpackage = new TestPackage().Named("test.dll");
-        /// </example>
-        /// <remarks>
-        /// This is provided for use by engine extensions that manipulate
-        /// the package structure as well as for internal use. For general
-        /// programmatic use of the engine, either of the constructors
-        /// will create a TestPackage in the form that the runner expects.
-        /// </remarks>
-        public TestPackage Named(string fileName)
-        {
-            FullName = Path.GetFullPath(fileName);
-            return this;
-        }
-
-        /// <summary>
         /// Gets the list of SubPackages contained in this package
         /// </summary>
         public IList<TestPackage> SubPackages { get; } = new List<TestPackage>();
@@ -130,6 +107,19 @@ namespace NUnit.Engine
 
             foreach (var key in Settings.Keys)
                 subPackage.Settings[key] = Settings[key];
+        }
+
+        /// <summary>
+        /// Add a subproject to the package, specifying its name. This is
+        /// the only way to add a named subpackage to the top-level package.
+        /// </summary>
+        /// <param name="packageName">The name of the subpackage to be added</param>
+        public TestPackage AddSubPackage(string packageName)
+        {
+            var subPackage = new TestPackage() { FullName = Path.GetFullPath(packageName) };
+            SubPackages.Add(subPackage);
+
+            return subPackage;
         }
 
         /// <summary>

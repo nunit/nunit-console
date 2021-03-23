@@ -40,7 +40,7 @@ namespace NUnit.Engine.Runners.Tests
             // Currently, we can get away with null entries here
             var package = new TestPackage();
             for (int i = 1; i <= assemblyCount; i++)
-                package.AddSubPackage(new TestPackage().Named($"test{i}.dll"));
+                package.AddSubPackage($"test{i}.dll");
 
             if (maxAgents != null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
