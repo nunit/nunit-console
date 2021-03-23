@@ -42,6 +42,11 @@ namespace NUnit.Engine.Runners
         private ITestRunnerFactory _testRunnerFactory;
         private bool _disposed;
 
+        private TestEventDispatcher _eventDispatcher = new TestEventDispatcher();
+        private WorkItemTracker _workItemTracker = new WorkItemTracker();
+
+        private const int WAIT_FOR_CANCEL_TO_COMPLETE = 5000;
+
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
             if (services == null) throw new ArgumentNullException("services");
@@ -165,6 +170,37 @@ namespace NUnit.Engine.Runners
         public void StopRun(bool force)
         {
             _engineRunner.StopRun(force);
+
+            if (force)
+            {
+                // Frameworks should handle StopRun(true) by cancelling all tests and notifying
+                // us of the completion of any tests that were running. However, this feature
+                // may be absent in some frameworks or may be broken and we may not pass on the
+                // notifications needed by some runners. In fact, such a bug is present in the
+                // NUnit framework through release 3.12 and motivated the following code.
+                //
+                // We try to make up for the potential problem here by notifying the listeners 
+                // of the completion of every pending WorkItem, that is, one that started but
+                // never sent a completion event.
+
+                if (!_workItemTracker.WaitForCompletion(WAIT_FOR_CANCEL_TO_COMPLETE))
+                {
+                    _workItemTracker.SendPendingTestCompletionEvents(_eventDispatcher);
+
+                    // Indicate we are no longer running
+                    IsTestRunning = false;
+
+                    // Signal completion of the run
+                    _eventDispatcher.OnTestEvent($"<test-run id='{TestPackage.ID}' result='Failed' label='Cancelled' />");
+
+                    // Since we were not notified of the completion of some items, we can't trust
+                    // that they were actually stopped by the framework. To make sure nothing is
+                    // left running, we unload the tests. By unloading only the lower-level engine
+                    // runner and not the MasterTestRunner itself, we allow the tests to be loaded
+
+                    _engineRunner.Unload();
+                }
+            }
         }
 
         /// <summary>
@@ -404,12 +440,15 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         private TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
         {
-            var eventDispatcher = new TestEventDispatcher();
+            _workItemTracker.Clear();
+            _eventDispatcher.Listeners.Clear();
+            _eventDispatcher.Listeners.Add(_workItemTracker);
+
             if (listener != null)
-                eventDispatcher.Listeners.Add(listener);
+                _eventDispatcher.Listeners.Add(listener);
 
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
-                eventDispatcher.Listeners.Add(extension);
+                _eventDispatcher.Listeners.Add(extension);
 
             IsTestRunning = true;
             
@@ -428,11 +467,11 @@ namespace NUnit.Engine.Runners
 
             InsertCommandLineElement(startRunNode);
 
-            eventDispatcher.OnTestEvent(startRunNode.OuterXml);
+            _eventDispatcher.OnTestEvent(startRunNode.OuterXml);
 
             long startTicks = Stopwatch.GetTimestamp();
 
-            TestEngineResult result = PrepareResult(GetEngineRunner().Run(eventDispatcher, filter)).MakeTestRunResult(TestPackage);
+            TestEngineResult result = PrepareResult(GetEngineRunner().Run(_eventDispatcher, filter)).MakeTestRunResult(TestPackage);
 
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);
@@ -448,7 +487,7 @@ namespace NUnit.Engine.Runners
 
             IsTestRunning = false;
 
-            eventDispatcher.OnTestEvent(result.Xml.OuterXml);
+            _eventDispatcher.OnTestEvent(result.Xml.OuterXml);
 
             return result;
         }
