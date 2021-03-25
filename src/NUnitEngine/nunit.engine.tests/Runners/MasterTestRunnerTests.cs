@@ -172,6 +172,36 @@ namespace NUnit.Engine.Runners.Tests
         }
 
         [Test]
+        public void RunAfterReload()
+        {
+            // Engine issue #609
+            _runner.Load();
+            _runner.Reload();
+            var result = _runner.Run(this, TestFilter.Empty);
+
+            Assert.That(result.Name, Is.EqualTo("test-run"));
+            CheckTestRunResult(result, _testRunData);
+
+            CheckThatIdsAreUnique(result);
+
+            CheckTestRunEvents();
+        }
+
+        [Test]
+        public void ExploreAfterReload()
+        {
+            // Engine issue #609
+            _runner.Load();
+            _runner.Reload();
+            var result = _runner.Explore(TestFilter.Empty);
+
+            Assert.That(result.Name, Is.EqualTo("test-run"));
+            CheckResult(result, _testRunData);
+
+            CheckThatIdsAreUnique(result);
+        }
+
+        [Test]
         public void RunAsync()
         {
             _runner.Load(); // Make sure it's pre-loaded so we get count in start-run
