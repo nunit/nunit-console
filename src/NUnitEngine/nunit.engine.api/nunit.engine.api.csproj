@@ -9,9 +9,6 @@
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Web" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineApiVersion.cs" LinkBase="Properties" />
   </ItemGroup>
