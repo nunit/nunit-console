@@ -616,7 +616,7 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void Inheritance()
         {
-            Assert.True(typeof(IDirectoryFinder).IsAssignableFrom(typeof(DirectoryFinder)));
+            Assert.That(typeof(IDirectoryFinder), Is.AssignableFrom(typeof(DirectoryFinder)));
         }
 
         private static string CreateAbsolutePath(IEnumerable<string> parts)

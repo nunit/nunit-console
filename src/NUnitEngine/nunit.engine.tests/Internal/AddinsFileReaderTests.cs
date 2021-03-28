@@ -33,7 +33,7 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void Inheritance()
         {
-            Assert.True(typeof(IAddinsFileReader).IsAssignableFrom(typeof(AddinsFileReader)));
+            Assert.That(typeof(IAddinsFileReader), Is.AssignableFrom(typeof(AddinsFileReader)));
         }
 
         [Test]
