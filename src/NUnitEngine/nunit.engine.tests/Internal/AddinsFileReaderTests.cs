@@ -3,7 +3,6 @@
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -57,14 +56,47 @@ namespace NUnit.Engine.Internal.Tests
                 result = reader.Read(stream);
             }
 
-            Assert.That(result, Has.Count.EqualTo(7));
+            Assert.That(result, Has.Count.EqualTo(6));
             Assert.That(result, Contains.Item("*.dll"));
             Assert.That(result, Contains.Item("addins/*.dll"));
             Assert.That(result, Contains.Item("special/myassembly.dll"));
             Assert.That(result, Contains.Item("some/other/directory/"));
             Assert.That(result, Contains.Item("c:/windows/absolute/directory"));
             Assert.That(result, Contains.Item("/unix/absolute/directory"));
-            Assert.That(result, Contains.Item("/transform/backslash/to/slash"));
+        }
+
+        [Test]
+        [Platform("win")]
+        public void Read_Stream_TransformBackslash_Windows()
+        {
+            var reader = new AddinsFileReader();
+            IEnumerable<string> result;
+
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes("transform\\backslash\\to\\slash")))
+            {
+                // Act
+                result = reader.Read(stream);
+            }
+
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result, Contains.Item("transform/backslash/to/slash"));
+        }
+
+        [Test]
+        [Platform("linux,macosx,unix")]
+        public void Read_Stream_TransformBackslash_NonWindows()
+        {
+            var reader = new AddinsFileReader();
+            IEnumerable<string> result;
+
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes("this/is/a\\ path\\ with\\ spaces/")))
+            {
+                // Act
+                result = reader.Read(stream);
+            }
+
+            Assert.That(result, Has.Count.EqualTo(1));
+            Assert.That(result, Contains.Item("this/is/a\\ path\\ with\\ spaces/"));
         }
     }
 }
