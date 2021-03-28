@@ -35,6 +35,7 @@ namespace NUnit.Engine.Internal
         /// <param name="stream">Input stream. Must be readable and positioned at the beginning of the file.</param>
         /// <returns>All entries contained in the file.</returns>
         /// <exception cref="System.IO.IOException"><paramref name="stream"/> cannot be read</exception>
+        /// <remarks>If the executing system uses backslashes ('\') to separate directories, these will be substituted with slashes ('/').</remarks>
         internal IEnumerable<string> Read(Stream stream)
         {
             var result = new List<string>();
@@ -45,7 +46,7 @@ namespace NUnit.Engine.Internal
                     line = line.Split(new char[] { '#' })[0].Trim();
                     if (line != string.Empty)
                     {
-                        result.Add(line.Replace('\\', '/'));
+                        result.Add(line.Replace(Path.DirectorySeparatorChar, '/'));
                     }
                 }
             }
