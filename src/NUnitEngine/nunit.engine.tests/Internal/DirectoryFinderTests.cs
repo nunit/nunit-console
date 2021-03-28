@@ -616,7 +616,7 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void Inheritance()
         {
-            Assert.That(typeof(IDirectoryFinder), Is.AssignableFrom(typeof(DirectoryFinder)));
+            Assert.True(typeof(IDirectoryFinder).IsAssignableFrom(typeof(DirectoryFinder)), "'DirectoryFinder' does not implement interface 'IDirectoryFinder'");
         }
 
         private static string CreateAbsolutePath(IEnumerable<string> parts)
