@@ -18,12 +18,6 @@
     <language>en-US</language>
     <tags>nunit test testing tdd engine</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
-    <dependencies>
-      <group targetFramework="net20" />
-      <group targetFramework="netstandard2.0">
-        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" exclude="compile" />
-      </group>
-    </dependencies>
   </metadata>
   <files>
     <file src="LICENSE.txt" />
