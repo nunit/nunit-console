@@ -171,7 +171,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         /// <param name="path">Path to check</param>
         /// <returns><see langword="true"/> if <paramref name="path"/> is an absolute or UNC path; otherwhise, false.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         public static bool IsFullyQualifiedWindowsPath(string path)
         {
             if (path == null)
