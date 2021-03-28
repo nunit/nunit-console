@@ -11,7 +11,7 @@ namespace NUnit.Engine.Internal.Tests
     /// Tests the implementation of <see cref="AddinsFileReader"/>.
     /// </summary>
     /// <remarks>All tests in this fixture modify the file-system. Therefore they need to be marked explicitly to run.</remarks>
-    [TestFixture, Explicit, Category("WritesToDisk"), NonParallelizable]
+    [TestFixture, Category("WritesToDisk"), NonParallelizable]
     public class AddinsFileReaderTests2
     {
         private readonly string tempFileLocation;
