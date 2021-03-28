@@ -15,26 +15,6 @@ namespace NUnit.Engine.Internal.Tests
     [TestFixture]
     public class AddinsFileReaderTests
     {
-        private readonly string[] content1 = new string[]
-        {
-            "# This line is a comment and is ignored. The next (blank) line is ignored as well.",
-            "",
-            "*.dll                   # include all dlls in the same directory",
-            "addins/*.dll            # include all dlls in the addins directory too",
-            "special/myassembly.dll  # include a specific dll in a special directory",
-            "some/other/directory/  # process another directory, which may contain its own addins file",
-            "# note that an absolute path is allowed, but is probably not a good idea in most cases",
-            "c:\\windows\\absolute\\directory",
-            "/unix/absolute/directory",
-            "\\transform\\backslash\\to\\slash"
-        };
-
-        [Test]
-        public void Inheritance()
-        {
-            Assert.True(typeof(IAddinsFileReader).IsAssignableFrom(typeof(AddinsFileReader)), "'AddinsFileReader' does not implement interface 'IAddinsReader'");
-        }
-
         [Test]
         public void Read_IFile_Null()
         {
@@ -46,7 +26,19 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void Read_Stream()
         {
-            var input = string.Join(Environment.NewLine, content1);
+            var input = string.Join(Environment.NewLine, new string[]
+            {
+                "# This line is a comment and is ignored. The next (blank) line is ignored as well.",
+                "",
+                "*.dll                   # include all dlls in the same directory",
+                "addins/*.dll            # include all dlls in the addins directory too",
+                "special/myassembly.dll  # include a specific dll in a special directory",
+                "some/other/directory/  # process another directory, which may contain its own addins file",
+                "# note that an absolute path is allowed, but is probably not a good idea in most cases",
+                "c:\\windows\\absolute\\directory",
+                "/unix/absolute/directory"
+            });
+
             var reader = new AddinsFileReader();
             IEnumerable<string> result;
 
