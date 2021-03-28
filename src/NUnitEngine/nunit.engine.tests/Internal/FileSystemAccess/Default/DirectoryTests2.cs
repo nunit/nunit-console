@@ -12,7 +12,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
     /// <summary>
     /// Tests the implementation of <see cref="Directory"/>.
     /// </summary>
-    /// <remarks>All tests in this fixture modify the file-system. Therefore they need to be marked explicitly to run.</remarks>
+    /// <remarks>All tests in this fixture modify the file-system.</remarks>
     [TestFixture, Category("WritesToDisk"), NonParallelizable]
     public sealed class DirectoryTests2
     {
