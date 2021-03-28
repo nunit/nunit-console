@@ -62,7 +62,7 @@ namespace NUnit.Engine.Internal.Tests
             Assert.That(result, Contains.Item("addins/*.dll"));
             Assert.That(result, Contains.Item("special/myassembly.dll"));
             Assert.That(result, Contains.Item("some/other/directory/"));
-            Assert.That(result, Contains.Item("c:\\windows\\absolute\\directory"));
+            Assert.That(result, Contains.Item("c:/windows/absolute/directory"));
             Assert.That(result, Contains.Item("/unix/absolute/directory"));
         }
     }
