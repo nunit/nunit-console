@@ -15,9 +15,6 @@ using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Communication.Transports.Remoting
 {
-    /// <summary>
-    /// Summary description for TestAgencyRemotingTransport.
-    /// </summary>
     public class TestAgencyRemotingTransport : MarshalByRefObject, ITestAgencyTransport, ITestAgency, IDisposable
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgencyRemotingTransport));
