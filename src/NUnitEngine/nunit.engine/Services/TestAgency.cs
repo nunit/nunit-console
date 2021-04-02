@@ -190,6 +190,50 @@ namespace NUnit.Engine.Services
                 throw;
             }
         }
+
+        // TODO: Need to figure out how to incorporate this in the
+        // new structure, if possible. Originally, Release was only
+        // called when the nested AgentLease class was disposed.
+        //public void Release(Guid agentId, ITestAgent agent)
+        //{
+        //    if (_agentStore.IsAgentProcessActive(agentId, out var process))
+        //    {
+        //        try
+        //        {
+        //            log.Debug("Stopping remote agent");
+        //            agent.Stop();
+        //        }
+        //        catch (SocketException ex)
+        //        {
+        //            int? exitCode;
+        //            try
+        //            {
+        //                exitCode = process.ExitCode;
+        //            }
+        //            catch (NotSupportedException)
+        //            {
+        //                exitCode = null;
+        //            }
+
+        //            if (exitCode == 0)
+        //            {
+        //                log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
+        //            }
+        //            else
+        //            {
+        //                var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(ex)}";
+        //                log.Error(stopError);
+        //                throw new NUnitEngineUnloadException(stopError, ex);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
+        //            log.Error(stopError);
+        //            throw new NUnitEngineUnloadException(stopError, ex);
+        //        }
+        //    }
+        //}
     }
 }
 #endif
