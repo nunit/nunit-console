@@ -7,7 +7,7 @@ using System.Diagnostics;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Communication.Transports.Remoting;
-//using NUnit.Engine.Communication.Transports.Tcp;
+using NUnit.Engine.Communication.Transports.Tcp;
 
 namespace NUnit.Engine.Services
 {
@@ -32,17 +32,17 @@ namespace NUnit.Engine.Services
 
         // Transports used for various target runtimes
         private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
-        //private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
+        private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
 
         internal virtual string RemotingUrl => _remotingTransport.ServerUrl;
-        //internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
+        internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
 
         public TestAgency() : this( "TestAgency", 0 ) { }
 
         public TestAgency( string uri, int port )
         {
             _remotingTransport = new TestAgencyRemotingTransport(this, uri, port);
-            //_tcpTransport = new TestAgencyTcpTransport(this, port);
+            _tcpTransport = new TestAgencyTcpTransport(this, port);
         }
 
         public void Register(ITestAgent agent)
@@ -164,7 +164,7 @@ namespace NUnit.Engine.Services
             try
             {
                 _remotingTransport.Stop();
-                //_tcpTransport.Stop();
+                _tcpTransport.Stop();
             }
             finally
             {
@@ -181,7 +181,7 @@ namespace NUnit.Engine.Services
                 try
                 {
                 _remotingTransport.Start();
-                //_tcpTransport.Start();
+                _tcpTransport.Start();
                 Status = ServiceStatus.Started;
             }
             catch
