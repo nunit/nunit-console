@@ -459,7 +459,7 @@ namespace NUnit.Engine.Services.Tests
 
         [Test]
         [Platform("win")]
-        public void ProcessAddinsFile_InvalidAbsolutePath_Windows()
+        public void ProcessAddinsFile_InvalidAbsolutePathToFile_Windows()
         {
             // Arrange
             var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
@@ -476,13 +476,17 @@ namespace NUnit.Engine.Services.Tests
             var directoryFinder = Substitute.For<IDirectoryFinder>();
             var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
 
-            // Act + Assert
-            Assert.That(() => sut.StartService(), Throws.InstanceOf<NUnitEngineException>());
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetFiles(startDirectory, "/absolute/unix/path");
         }
 
         [Test]
-        [Platform("linux,macosx,unix")]
-        public void ProcessAddinsFile_InvalidAbsolutePath_NonWindows()
+        [Platform("win")]
+        public void ProcessAddinsFile_InvalidAbsolutePathToDirectory_Windows()
         {
             // Arrange
             var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
@@ -495,12 +499,72 @@ namespace NUnit.Engine.Services.Tests
             var fileSystem = Substitute.For<IFileSystem>();
             fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
-            addinsReader.Read(addinsFile).Returns(new[] { "c:/absolute/windows/path" });
+            addinsReader.Read(addinsFile).Returns(new[] { "/absolute/unix/path/" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
             var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
 
-            // Act + Assert
-            Assert.That(() => sut.StartService(), Throws.InstanceOf<NUnitEngineException>());
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetDirectories(startDirectory, "/absolute/unix/path/");
+        }
+
+        [TestCase("c:/absolute/windows/path")]
+        [TestCase("c:\\absolute\\windows\\path")]
+        [Platform("linux,macosx,unix")]
+        public void ProcessAddinsFile_InvalidAbsolutePathToFile_NonWindows(string windowsPath)
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { windowsPath });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetFiles(startDirectory, windowsPath);
+        }
+
+        [TestCase("c:/absolute/windows/path/")]
+        [TestCase("c:\\absolute\\windows\\path\\")]
+        [Platform("linux,macosx,unix")]
+        public void ProcessAddinsFile_InvalidAbsolutePathToDirectory_NonWindows(string windowsPath)
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "test.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            addinsReader.Read(addinsFile).Returns(new[] { windowsPath });
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            addinsReader.Received().Read(addinsFile);
+            directoryFinder.Received().GetDirectories(startDirectory, windowsPath);
         }
 
         [Test]

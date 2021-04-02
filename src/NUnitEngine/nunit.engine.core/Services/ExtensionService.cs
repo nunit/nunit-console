@@ -376,10 +376,6 @@ namespace NUnit.Engine.Services
                     return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
                 }
             }
-            else if (!IsPathRelative(path))
-            {
-                throw new NUnitEngineException($"The path '{path}' is not relative.");
-            }
             else
             {
                 return new Backports.Tuple<IDirectory, string>(baseDir, path);
