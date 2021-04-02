@@ -513,6 +513,7 @@ namespace NUnit.Engine.Services.Tests
 
         [TestCase("c:/absolute/windows/path")]
         [TestCase("c:\\absolute\\windows\\path")]
+        [TestCase("c:\\absolute\\windows\\path\\")]
         [Platform("linux,macosx,unix")]
         public void ProcessAddinsFile_InvalidAbsolutePathToFile_NonWindows(string windowsPath)
         {
@@ -540,7 +541,6 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [TestCase("c:/absolute/windows/path/")]
-        [TestCase("c:\\absolute\\windows\\path\\")]
         [Platform("linux,macosx,unix")]
         public void ProcessAddinsFile_InvalidAbsolutePathToDirectory_NonWindows(string windowsPath)
         {
