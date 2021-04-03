@@ -1,13 +1,14 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
+#if NETFRAMEWORK
 using NUnit.Engine.Internal.RuntimeFrameworks;
+#endif
 
 namespace NUnit.Engine
 {
@@ -45,7 +46,9 @@ namespace NUnit.Engine
         public static readonly Version DefaultVersion = new Version(0, 0);
 
         private static RuntimeFramework _currentFramework;
+#if NETFRAMEWORK
         private static List<RuntimeFramework> _availableFrameworks;
+#endif
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
@@ -241,6 +244,7 @@ namespace NUnit.Engine
             }
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Gets an array of all available frameworks
         /// </summary>
@@ -254,6 +258,7 @@ namespace NUnit.Engine
                 return _availableFrameworks.ToArray();
             }
         }
+#endif
 
         /// <summary>
         /// The version of Mono in use or null if no Mono runtime
@@ -305,6 +310,7 @@ namespace NUnit.Engine
             }
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Returns true if the current RuntimeFramework is available.
         /// In the current implementation, only Mono and Microsoft .NET
@@ -322,6 +328,7 @@ namespace NUnit.Engine
                 return false;
             }
         }
+#endif
 
         /// <summary>
         /// The type of this runtime framework
@@ -494,6 +501,25 @@ namespace NUnit.Engine
                   (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision);
         }
 
+        private static string GetMonoPrefixFromAssembly(Assembly assembly)
+        {
+            string prefix = assembly.Location;
+
+            // In all normal mono installations, there will be sufficient
+            // levels to complete the four iterations. But just in case
+            // files have been copied to some non-standard place, we check.
+            for (int i = 0; i < 4; i++)
+            {
+                string dir = Path.GetDirectoryName(prefix);
+                if (string.IsNullOrEmpty(dir)) break;
+
+                prefix = dir;
+            }
+
+            return prefix;
+        }
+
+#if NETFRAMEWORK
         private static void FindAvailableFrameworks()
         {
             _availableFrameworks = new List<RuntimeFramework>();
@@ -523,24 +549,6 @@ namespace NUnit.Engine
 
             // If Mono 4.0+ or no profiles found, just use current runtime
             _availableFrameworks.Add(RuntimeFramework.CurrentFramework);
-        }
-
-        private static string GetMonoPrefixFromAssembly(Assembly assembly)
-        {
-            string prefix = assembly.Location;
-
-            // In all normal mono installations, there will be sufficient
-            // levels to complete the four iterations. But just in case
-            // files have been copied to some non-standard place, we check.
-            for (int i = 0; i < 4; i++)
-            {
-                string dir = Path.GetDirectoryName(prefix);
-                if (string.IsNullOrEmpty(dir)) break;
-
-                prefix = dir;
-            }
-
-            return prefix;
         }
 
         private static void FindBestMonoFrameworkOnWindows()
@@ -641,6 +649,6 @@ namespace NUnit.Engine
 
             _availableFrameworks.Add(framework);
         }
-    }
-}
 #endif
+        }
+}

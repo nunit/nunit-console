@@ -70,9 +70,11 @@ namespace NUnit.Agent
 
             log.Info("Agent process {0} starting", pid);
 
+#if NETFRAMEWORK
             log.Info("Running under version {0}, {1}",
                 Environment.Version,
                 RuntimeFramework.CurrentFramework.DisplayName);
+#endif
 
             // Create CoreEngine
             var engine = new CoreEngine
