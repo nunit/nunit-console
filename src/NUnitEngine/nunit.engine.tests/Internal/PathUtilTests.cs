@@ -7,8 +7,66 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Internal.Tests
 {
+    [TestFixture]
+    public class PathUtilsTests
+    {
+        [TestCase("c:\\", ExpectedResult = true)]
+        [TestCase("c:\\foo\\bar\\", ExpectedResult = true)]
+        [TestCase("c:/foo/bar/", ExpectedResult = true)]
+        [TestCase("c:\\foo\\bar", ExpectedResult = true)]
+        [TestCase("c:/foo/bar", ExpectedResult = true)]
+        [TestCase("c:bar\\", ExpectedResult = false)]
+        [TestCase("c:bar/", ExpectedResult = false)]
+        [TestCase("c:bar", ExpectedResult = false)]
+        [TestCase("ä:\\bar", ExpectedResult = false)]
+        [TestCase("ä://bar", ExpectedResult = false)]
+        [TestCase("\\\\server01\\foo", ExpectedResult = true)]
+        [TestCase("\\server01\\foo", ExpectedResult = false)]
+        [TestCase("c:", ExpectedResult = false)]
+        [TestCase("/foo/bar", ExpectedResult = false)]
+        [TestCase("/", ExpectedResult = false)]
+        [TestCase("\\a\\b", ExpectedResult = false)]
+        public bool IsFullyQualifiedWindowsPath(string path)
+        {
+            return PathUtils.IsFullyQualifiedWindowsPath(path);
+        }
+
+        [TestCase("/foo/bar", ExpectedResult = true)]
+        [TestCase("/", ExpectedResult = true)]
+        [TestCase("/z", ExpectedResult = true)]
+        [TestCase("c:\\foo\\bar\\", ExpectedResult = false)]
+        [TestCase("c:/foo/bar/", ExpectedResult = false)]
+        [TestCase("c:\\foo\\bar", ExpectedResult = false)]
+        [TestCase("c:/foo/bar", ExpectedResult = false)]
+        [TestCase("c:bar\\", ExpectedResult = false)]
+        [TestCase("c:bar/", ExpectedResult = false)]
+        [TestCase("c:bar", ExpectedResult = false)]
+        [TestCase("ä:\\bar", ExpectedResult = false)]
+        [TestCase("ä://bar", ExpectedResult = false)]
+        [TestCase("\\\\server01\\foo", ExpectedResult = false)]
+        [TestCase("\\server01\\foo", ExpectedResult = false)]
+        [TestCase("c:", ExpectedResult = false)]
+        [TestCase("\\a\\b", ExpectedResult = false)]
+        public bool IsFullyQualifiedUnixPath(string path)
+        {
+            return PathUtils.IsFullyQualifiedUnixPath(path);
+        }
+
+        [Test]
+        public void IsFullyQualifiedUnixPath_PathIsNull()
+        {
+            Assert.That(() => PathUtils.IsFullyQualifiedUnixPath(null), Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void IsFullyQualifiedWindowsPath_PathIsNull()
+        {
+            Assert.That(() => PathUtils.IsFullyQualifiedWindowsPath(null), Throws.ArgumentNullException);
+        }
+    }
+
 	[TestFixture]
-	public class PathUtilTests : PathUtils
+	public class PathUtilDefaultsTests : PathUtils
 	{
 		[Test]
 		public void CheckDefaults()
