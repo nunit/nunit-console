@@ -1,7 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -70,6 +69,7 @@ namespace NUnit.Agent
             LocateAgencyProcess(agencyPid);
 
             log.Info("Agent process {0} starting", pid);
+
             log.Info("Running under version {0}, {1}",
                 Environment.Version,
                 RuntimeFramework.CurrentFramework.DisplayName);
@@ -83,7 +83,9 @@ namespace NUnit.Agent
 
             // Custom Service Initialization
             engine.Services.Add(new ExtensionService(isRunningOnAgent: true));
+#if !NETCOREAPP
             engine.Services.Add(new DomainManager());
+#endif
             engine.Services.Add(new InProcessTestRunnerFactory());
             engine.Services.Add(new DriverService());
 
@@ -92,7 +94,13 @@ namespace NUnit.Agent
             engine.InitializeServices();
 
             log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(AgentId, AgencyUrl, engine.Services);
+            Agent = new RemoteTestAgent(AgentId, engine.Services);
+            Agent.Transport =
+#if NETFRAMEWORK
+                new Engine.Communication.Transports.Remoting.TestAgentRemotingTransport(Agent, AgencyUrl);
+#else
+                new Engine.Communication.Transports.Tcp.TestAgentTcpTransport(Agent, AgencyUrl);
+#endif
 
             try
             {

@@ -14,6 +14,6 @@ namespace NUnit.Engine
         /// Registers an agent with an agency
         /// </summary>
         /// <param name="agent"></param>
-        void Register(Guid agentId, ITestAgent agent);
+        void Register(ITestAgent agent);
     }
 }
