@@ -2,14 +2,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using System.Xml;
 using Mono.Cecil;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+
+using Backports = NUnit.Engine.Internal.Backports;
+#if NET20 || NETSTANDARD2_0
+using Path = NUnit.Engine.Internal.Backports.Path;
+#else
+using Path = System.IO.Path;
+#endif
 
 namespace NUnit.Engine.Services
 {
@@ -31,19 +37,26 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
         private readonly IFileSystem _fileSystem;
-        private readonly DirectoryFinder _directoryFinder;
+        private readonly IAddinsFileReader _addinsReader;
+        private readonly IDirectoryFinder _directoryFinder;
 
         public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
 
         public ExtensionService(bool isRunningOnAgent = false)
-            : this(isRunningOnAgent, new FileSystem())
+            : this(isRunningOnAgent, new AddinsFileReader(), new FileSystem())
         {
         }
 
-        internal ExtensionService(bool isRunningOnAgent, IFileSystem fileSystem)
+        internal ExtensionService(bool isRunningOnAgent, IAddinsFileReader addinsReader, IFileSystem fileSystem)
+            : this(isRunningOnAgent, addinsReader, fileSystem, new DirectoryFinder(fileSystem))
         {
+        }
+
+        internal ExtensionService(bool isRunningOnAgent, IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        {
+            _addinsReader = addinsReader;
             _fileSystem = fileSystem;
-            _directoryFinder = new DirectoryFinder(_fileSystem);
+            _directoryFinder = directoryFinder;
             _isRunningOnAgent = isRunningOnAgent;
         }
 
@@ -312,7 +325,7 @@ namespace NUnit.Engine.Services
             {
                 foreach (var file in addinsFiles)
                 {
-                    ProcessAddinsFile(startDir, file.FullName, fromWildCard);
+                    ProcessAddinsFile(startDir, file, fromWildCard);
                     addinsFileCount += 1;
                 }
             }
@@ -325,35 +338,53 @@ namespace NUnit.Engine.Services
         /// path or a wildcard pattern used to find assemblies. Blank
         /// lines and comments started by # are ignored.
         /// </summary>
-        private void ProcessAddinsFile(IDirectory baseDir, string fileName, bool fromWildCard)
+        private void ProcessAddinsFile(IDirectory baseDir, IFile addinsFile, bool fromWildCard)
         {
-            log.Info("Processing file " + fileName);
+            log.Info("Processing file " + addinsFile.FullName);
 
-            using (var rdr = new StreamReader(fileName))
+            foreach (var entry in _addinsReader.Read(addinsFile))
             {
-                while (!rdr.EndOfStream)
+                bool isWild = fromWildCard || entry.Contains("*");
+                var args = GetBaseDirAndPattern(baseDir, entry);
+                if (entry.EndsWith("/"))
                 {
-                    var line = rdr.ReadLine();
-                    if (line == null)
-                        break;
-
-                    line = line.Split(new char[] { '#' })[0].Trim();
-
-                    if (line == string.Empty)
-                        continue;
-
-                    if (Path.DirectorySeparatorChar == '\\')
-                        line = line.Replace(Path.DirectorySeparatorChar, '/');
-
-                    bool isWild = fromWildCard || line.Contains("*");
-                    if (line.EndsWith("/"))
-                        foreach (var dir in _directoryFinder.GetDirectories(baseDir, line))
-                            ProcessDirectory(dir, isWild);
-                    else
-                        foreach (var file in _directoryFinder.GetFiles(baseDir, line))
-                            ProcessCandidateAssembly(file.FullName, isWild);
+                    foreach (var dir in _directoryFinder.GetDirectories(args.Item1, args.Item2))
+                    {
+                        ProcessDirectory(dir, isWild);
+                    }
+                }
+                else
+                {
+                    foreach (var file in _directoryFinder.GetFiles(args.Item1, args.Item2))
+                    {
+                        ProcessCandidateAssembly(file.FullName, isWild);
+                    }
                 }
             }
+        }
+
+        private Backports.Tuple<IDirectory, string> GetBaseDirAndPattern(IDirectory baseDir, string path)
+        {
+            if (Path.IsPathFullyQualified(path))
+            {
+                if (path.EndsWith("/"))
+                {
+                    return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(path), string.Empty);
+                }
+                else
+                {
+                    return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
+                }
+            }
+            else
+            {
+                return new Backports.Tuple<IDirectory, string>(baseDir, path);
+            }
+        }
+
+        private static bool IsPathRelative(string path)
+        {
+            return !PathUtils.IsFullyQualifiedWindowsPath(path) && !PathUtils.IsFullyQualifiedUnixPath(path);
         }
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)

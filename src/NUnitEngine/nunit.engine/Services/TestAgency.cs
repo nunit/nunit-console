@@ -6,7 +6,8 @@ using System.Threading;
 using System.Diagnostics;
 using NUnit.Common;
 using NUnit.Engine.Internal;
-using System.Net.Sockets;
+using NUnit.Engine.Communication.Transports.Remoting;
+//using NUnit.Engine.Communication.Transports.Tcp;
 
 namespace NUnit.Engine.Services
 {
@@ -18,82 +19,91 @@ namespace NUnit.Engine.Services
     /// but only one, ProcessAgent is implemented
     /// at this time.
     /// </summary>
-    public partial class TestAgency : ServerBase, ITestAgency, IService
+    public partial class TestAgency : ITestAgency, IService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
+        private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
+        private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
+
         private readonly AgentStore _agentStore = new AgentStore();
+
+        private IRuntimeFrameworkService _runtimeService;
+
+        // Transports used for various target runtimes
+        private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
+        //private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
+
+        internal virtual string RemotingUrl => _remotingTransport.ServerUrl;
+        //internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
 
         public TestAgency() : this( "TestAgency", 0 ) { }
 
-        public TestAgency( string uri, int port ) : base( uri, port ) { }
-
-        //public override void Stop()
-        //{
-        //    foreach( KeyValuePair<Guid,AgentRecord> pair in agentData )
-        //    {
-        //        AgentRecord r = pair.Value;
-
-        //        if ( !r.Process.HasExited )
-        //        {
-        //            if ( r.Agent != null )
-        //            {
-        //                r.Agent.Stop();
-        //                r.Process.WaitForExit(10000);
-        //            }
-
-        //            if ( !r.Process.HasExited )
-        //                r.Process.Kill();
-        //        }
-        //    }
-
-        //    agentData.Clear();
-
-        //    base.Stop ();
-        //}
-
-        public void Register(Guid agentId, ITestAgent agent)
+        public TestAgency( string uri, int port )
         {
-            _agentStore.Register(agentId, agent);
+            _remotingTransport = new TestAgencyRemotingTransport(this, uri, port);
+            //_tcpTransport = new TestAgencyTcpTransport(this, port);
         }
 
-        public IAgentLease GetAgent(TestPackage package, int waitTime)
+        public void Register(ITestAgent agent)
         {
-            // TODO: Decide if we should reuse agents
-            return CreateRemoteAgent(package, waitTime);
+            _agentStore.Register(agent);
         }
 
-        private IAgentLease CreateRemoteAgent(TestPackage package, int waitTime)
+        public ITestAgent GetAgent(TestPackage package)
         {
+            // Target Runtime must be specified by this point
+            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
+            Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
+
+            // If target runtime is not available, something went wrong earlier
+            var targetRuntime = RuntimeFramework.Parse(runtimeSetting);
+            if (!_runtimeService.IsAvailable(targetRuntime.Id))
+                throw new ArgumentException(
+                    string.Format("The {0} framework is not available", targetRuntime),
+                    "framework");
+
             var agentId = Guid.NewGuid();
-            var process = new AgentProcess(this, package, agentId);
+            var agentProcess = new AgentProcess(this, package, agentId);
 
-            process.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
+            agentProcess.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
 
-            process.Start();
-            log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", process.Id);
-            log.Debug("Command line: \"{0}\" {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
+            agentProcess.Start();
+            log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", agentProcess.Id);
+            log.Debug("Command line: \"{0}\" {1}", agentProcess.StartInfo.FileName, agentProcess.StartInfo.Arguments);
 
-            _agentStore.AddAgent(agentId, process);
+            _agentStore.AddAgent(agentId, agentProcess);
 
             log.Debug($"Waiting for agent {agentId:B} to register");
 
             const int pollTime = 200;
 
+            // Increase the timeout to give time to attach a debugger
+            bool debug = package.GetSetting(EnginePackageSettings.DebugAgent, false) ||
+                         package.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
+
+            int waitTime = debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT;
+
             // Wait for agent registration based on the agent actually getting processor time to avoid falling over
             // under process starvation.
-            while (waitTime > process.TotalProcessorTime.TotalMilliseconds && !process.HasExited)
+            while (waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
             {
                 Thread.Sleep(pollTime);
 
                 if (_agentStore.IsReady(agentId, out var agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
-                    return new AgentLease(this, agentId, agent);
+
+                    return new TestAgentRemotingProxy(agent, agentId);
                 }
             }
 
             return null;
+        }
+
+        internal bool IsAgentProcessActive(Guid agentId, out Process process)
+        {
+            return _agentStore.IsAgentProcessActive(agentId, out process);
         }
 
         private void OnAgentExit(Process process, Guid agentId)
@@ -147,11 +157,14 @@ namespace NUnit.Engine.Services
 
         public ServiceStatus Status { get; private set; }
 
+        // TODO: it would be better if we had a list of transports to start and stop!
+
         public void StopService()
         {
             try
             {
-                Stop();
+                _remotingTransport.Stop();
+                //_tcpTransport.Stop();
             }
             finally
             {
@@ -161,9 +174,14 @@ namespace NUnit.Engine.Services
 
         public void StartService()
         {
-            try
-            {
-                Start();
+            _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();
+            if (_runtimeService == null)
+                Status = ServiceStatus.Error;
+            else
+                try
+                {
+                _remotingTransport.Start();
+                //_tcpTransport.Start();
                 Status = ServiceStatus.Started;
             }
             catch
@@ -173,46 +191,49 @@ namespace NUnit.Engine.Services
             }
         }
 
-        private void Release(Guid agentId, ITestAgent agent)
-        {
-            if (_agentStore.IsAgentProcessActive(agentId, out var process))
-            {
-                try
-                {
-                    log.Debug("Stopping remote agent");
-                    agent.Stop();
-                }
-                catch (SocketException ex)
-                {
-                    int? exitCode;
-                    try
-                    {
-                        exitCode = process.ExitCode;
-                    }
-                    catch (NotSupportedException)
-                    {
-                        exitCode = null;
-                    }
+        // TODO: Need to figure out how to incorporate this in the
+        // new structure, if possible. Originally, Release was only
+        // called when the nested AgentLease class was disposed.
+        //public void Release(Guid agentId, ITestAgent agent)
+        //{
+        //    if (_agentStore.IsAgentProcessActive(agentId, out var process))
+        //    {
+        //        try
+        //        {
+        //            log.Debug("Stopping remote agent");
+        //            agent.Stop();
+        //        }
+        //        catch (SocketException ex)
+        //        {
+        //            int? exitCode;
+        //            try
+        //            {
+        //                exitCode = process.ExitCode;
+        //            }
+        //            catch (NotSupportedException)
+        //            {
+        //                exitCode = null;
+        //            }
 
-                    if (exitCode == 0)
-                    {
-                        log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
-                    }
-                    else
-                    {
-                        var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(ex)}";
-                        log.Error(stopError);
-                        throw new NUnitEngineUnloadException(stopError, ex);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
-                    log.Error(stopError);
-                    throw new NUnitEngineUnloadException(stopError, ex);
-                }
-            }
-        }
+        //            if (exitCode == 0)
+        //            {
+        //                log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
+        //            }
+        //            else
+        //            {
+        //                var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode?.ToString() ?? "unknown"}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(ex)}";
+        //                log.Error(stopError);
+        //                throw new NUnitEngineUnloadException(stopError, ex);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(ex);
+        //            log.Error(stopError);
+        //            throw new NUnitEngineUnloadException(stopError, ex);
+        //        }
+        //    }
+        //}
     }
 }
 #endif

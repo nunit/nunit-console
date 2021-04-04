@@ -21,7 +21,7 @@ namespace NUnit.Engine.Services
         public void SetUp()
         {
             _agency = Substitute.For<TestAgency>();
-            _agency.ServerUrl.ReturnsForAnyArgs(REMOTING_URL);
+            _agency.RemotingUrl.ReturnsForAnyArgs(REMOTING_URL);
             _package = new TestPackage("junk.dll");
             // Only required setting, some tests may change this
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = "net-4.5";

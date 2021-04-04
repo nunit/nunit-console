@@ -166,6 +166,56 @@ namespace NUnit.Engine.Internal
             return result;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the specified file path is absolute or not on Windows operating systems.
+        /// </summary>
+        /// <param name="path">Path to check</param>
+        /// <returns><see langword="true"/> if <paramref name="path"/> is an absolute or UNC path; otherwhise, false.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
+        public static bool IsFullyQualifiedWindowsPath(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (path.Length > 2)
+            {
+                return (IsValidDriveSpecifier(path[0]) && path[1] == ':' && IsWindowsDirectorySeparator(path[2]))
+                    || (IsWindowsDirectorySeparator(path[0]) && IsWindowsDirectorySeparator(path[1]));
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns a value that indicates whether the specified file path is absolute or not on Linux/macOS/Unix.
+        /// </summary>
+        /// <param name="path">Path to check</param>
+        /// <returns><see langword="true"/> if <paramref name="path"/> is an absolute path; otherwhise, false.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
+        public static bool IsFullyQualifiedUnixPath(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            return path.Length > 0 && path[0] == '/';
+        }
+
+        private static bool IsWindowsDirectorySeparator(char c)
+        {
+            return c == '\\' || c == '/';
+        }
+
+        private static bool IsValidDriveSpecifier(char c)
+        {
+            return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
+        }
+
         private static bool IsWindows()
         {
             return PathUtils.DirectorySeparatorChar == '\\';

@@ -27,7 +27,7 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
-            AgentArgs = new StringBuilder($"{agentId} {agency.ServerUrl} --pid={Process.GetCurrentProcess().Id}");
+            AgentArgs = new StringBuilder($"{agentId} {agency.RemotingUrl} --pid={Process.GetCurrentProcess().Id}");
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
