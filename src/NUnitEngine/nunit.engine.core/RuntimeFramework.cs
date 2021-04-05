@@ -138,6 +138,18 @@ namespace NUnit.Engine
                             return new Version(4, 0, 30319);
                     }
                     break;
+                case RuntimeType.NetCore:
+                    switch (frameworkVersion.Major)
+                    {
+                        case 1:
+                        case 2:
+                            return new Version(4, 0, 30319);
+                        case 3:
+                            return new Version(3, 1, 10);
+                        case 5:
+                            return new Version(5, 0, 1);
+                    }
+                    break;
             }
 
             throw new ArgumentException("Unknown framework version " + frameworkVersion.ToString(), "version");
@@ -488,6 +500,8 @@ namespace NUnit.Engine
             {
                 case RuntimeType.Net:
                     return ".NET";
+                case RuntimeType.NetCore:
+                    return ".NETCore";
                 default:
                     return runtime.ToString();
             }
@@ -528,6 +542,7 @@ namespace NUnit.Engine
                 _availableFrameworks.AddRange(DotNetFrameworkLocator.FindDotNetFrameworks());
 
             FindDefaultMonoFramework();
+            FindDotNetCoreFrameworks();
         }
 
         private static void FindDefaultMonoFramework()
@@ -649,6 +664,73 @@ namespace NUnit.Engine
 
             _availableFrameworks.Add(framework);
         }
-#endif
+
+        private static void FindDotNetCoreFrameworks()
+        {
+            const string WINDOWS_INSTALL_DIR = "C:\\Program Files\\dotnet\\";
+            const string LINUX_INSTALL_DIR = "/usr/shared/dotnet/";
+            string INSTALL_DIR = Path.DirectorySeparatorChar == '\\'
+                ? WINDOWS_INSTALL_DIR
+                : LINUX_INSTALL_DIR;
+
+            if (!Directory.Exists(INSTALL_DIR))
+                return;
+            if (!File.Exists(Path.Combine(INSTALL_DIR, "dotnet.exe")))
+                return;
+
+            string runtimeDir = Path.Combine(INSTALL_DIR, "shared\\Microsoft.NETCore.App");
+            if (!Directory.Exists(runtimeDir))
+                return;
+
+            var dirList = new DirectoryInfo(runtimeDir).GetDirectories();
+            var dirNames = new List<string>();
+            foreach (var dir in dirList)
+                dirNames.Add(dir.Name);
+            var runtimes = GetNetCoreRuntimesFromDirectoryNames(dirNames);
+
+            _availableFrameworks.AddRange(runtimes);
         }
+
+        // Internal for testing
+        internal static IList<RuntimeFramework> GetNetCoreRuntimesFromDirectoryNames(IEnumerable<string> dirNames)
+        {
+            const string VERSION_CHARS = ".0123456789";
+            var runtimes = new List<RuntimeFramework>();
+
+            foreach (string dirName in dirNames)
+            {
+                int len = 0;
+                foreach (char c in dirName)
+                {
+                    if (VERSION_CHARS.IndexOf(c) >= 0)
+                        len++;
+                    else
+                        break;
+                }
+
+                if (len == 0)
+                    continue;
+
+                Version fullVersion = null;
+                try
+                {
+                    fullVersion = new Version(dirName.Substring(0, len));
+                }
+                catch
+                {
+                    continue;
+                }
+
+                var newVersion = new Version(fullVersion.Major, fullVersion.Minor);
+                int count = runtimes.Count;
+                if (count > 0 && runtimes[count - 1].FrameworkVersion == newVersion)
+                    continue;
+
+                runtimes.Add(new RuntimeFramework(RuntimeType.NetCore, newVersion));
+            }
+
+            return runtimes;
+        }
+#endif
+    }
 }

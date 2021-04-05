@@ -181,8 +181,8 @@ namespace NUnit.Engine.Services
                 try
                 {
                 _remotingTransport.Start();
-                _tcpTransport.Start();
-                Status = ServiceStatus.Started;
+                    _tcpTransport.Start();
+                    Status = ServiceStatus.Started;
             }
             catch
             {

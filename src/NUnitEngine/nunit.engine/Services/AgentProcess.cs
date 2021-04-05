@@ -17,6 +17,7 @@ namespace NUnit.Engine.Services
         {
             // Get target runtime
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
+            log.Debug($"TargetRuntime = {runtimeSetting}");
             TargetRuntime = RuntimeFramework.Parse(runtimeSetting);
 
             // Access other package settings
@@ -26,7 +27,8 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
-            AgentArgs = new StringBuilder($"{agentId} {agency.RemotingUrl} --pid={Process.GetCurrentProcess().Id}");
+            string agencyUrl = TargetRuntime.Runtime == RuntimeType.NetCore ? agency.TcpEndPoint : agency.RemotingUrl;
+            AgentArgs = new StringBuilder($"{agentId} {agencyUrl} --pid={Process.GetCurrentProcess().Id}");
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
@@ -74,12 +76,12 @@ namespace NUnit.Engine.Services
 
         public static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
         {
+            log.Debug($"GetTestAgentExePath({targetRuntime}, {requires32Bit})");
             string engineDir = NUnitConfiguration.EngineDirectory;
             if (engineDir == null) return null;
 
             // If running out of a package "agents" is a subdirectory
             string agentsDir = Path.Combine(engineDir, "agents");
-            log.Debug($"Checking for agents at {agentsDir}");
 
             if (!Directory.Exists(agentsDir))
             {
@@ -88,14 +90,28 @@ namespace NUnit.Engine.Services
                 // bit of a kluge, but it's necessary unless we change the binary 
                 // output directory to match the distribution structure.
                 agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
-                log.Debug($"Directory not found! Using {agentsDir}");
+                log.Debug("Assuming test run in project output directory");
             }
 
-            string runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+            log.Debug($"Checking for agents at {agentsDir}");
 
             string agentName = requires32Bit
                 ? "nunit-agent-x86.exe"
                 : "nunit-agent.exe";
+
+            string runtimeDir;
+            switch (targetRuntime.Runtime)
+            {
+                case RuntimeType.Net:
+                case RuntimeType.Mono:
+                    runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+                    break;
+                case RuntimeType.NetCore:
+                    runtimeDir = "netcoreapp3.1";
+                    break;
+                default:
+                    return null;
+            }
 
             return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName);
         }
