@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
     <TargetFrameworks>net20;net40;netcoreapp3.1</TargetFrameworks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -9,6 +8,9 @@
     <IntermediateOutputPath>obj\$(Configuration)\x86\</IntermediateOutputPath>
     <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
     <Reference Include="System.Runtime.Remoting" />

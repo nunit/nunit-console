@@ -51,6 +51,8 @@ var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 var ENGINE_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine/nunit.engine.csproj";
+var AGENT_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit-agent/nunit-agent.csproj";
+    // Agent X86 is in the same directory, so we don't need to do anything with it
 var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
 var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
 var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";
@@ -209,12 +211,17 @@ Task("Build")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach (var framework in new [] { "netstandard2.0" })
-             MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
-                .WithProperty("TargetFramework", framework)
-                .WithProperty("PublishDir", BIN_DIR + framework));
+        foreach (var framework in new[] { "netcoreapp3.1" })
+            MSBuild(AGENT_CSPROJ, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
 
-        foreach(var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
+        foreach (var framework in new[] { "netstandard2.0" })
+            MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + framework));
+
+        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
@@ -478,11 +485,11 @@ Task("BuildChocolateyPackages")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.api.xml", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.core.dll", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/testcentric.engine.metadata.dll", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.exe", Target="tools/agents/netcoreapp3.1" },
-                    //new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.exe.config", Target="tools/agents/netcoreapp3.1" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll", Target="tools/agents/netcoreapp3.1" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll.config", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent-x86.exe", Target="tools/agents/netcoreapp3.1" },
-                    // new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent-x86.exe.config", Target="tools/agents/netcoreapp3.1" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent-x86.dll", Target="tools/agents/netcoreapp3.1" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent-x86.dll.config", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit.engine.api.dll", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit.engine.api.xml", Target="tools/agents/netcoreapp3.1" },
