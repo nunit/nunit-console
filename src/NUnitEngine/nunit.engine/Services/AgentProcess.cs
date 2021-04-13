@@ -61,6 +61,12 @@ namespace NUnit.Engine.Services
                 StartInfo.Arguments = AgentArgs.ToString();
                 StartInfo.LoadUserProfile = loadUserProfile;
             }
+            else if (TargetRuntime.Runtime == RuntimeType.NetCore)
+            {
+                StartInfo.FileName = "dotnet";
+                StartInfo.Arguments = $"{AgentExePath} {AgentArgs}";
+                StartInfo.LoadUserProfile = loadUserProfile;
+            }
             else
             {
                 StartInfo.FileName = AgentExePath;
@@ -70,7 +76,7 @@ namespace NUnit.Engine.Services
 
         // Internal properties exposed for testing
 
-        internal RuntimeFramework TargetRuntime { get; }
+            internal RuntimeFramework TargetRuntime { get; }
         internal string AgentExePath { get; }
         internal StringBuilder AgentArgs { get; }
 
@@ -96,24 +102,28 @@ namespace NUnit.Engine.Services
             log.Debug($"Checking for agents at {agentsDir}");
 
             string agentName = requires32Bit
-                ? "nunit-agent-x86.exe"
-                : "nunit-agent.exe";
+                ? "nunit-agent-x86"
+                : "nunit-agent";
 
             string runtimeDir;
+            string agentExtension;
             switch (targetRuntime.Runtime)
             {
                 case RuntimeType.Net:
                 case RuntimeType.Mono:
                     runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+                    agentExtension = ".exe";
                     break;
                 case RuntimeType.NetCore:
                     runtimeDir = "netcoreapp3.1";
+                    agentExtension = ".dll";
                     break;
                 default:
+                    log.Error($"Unknown runtime type: {targetRuntime.Runtime}");
                     return null;
             }
 
-            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName);
+            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName + agentExtension);
         }
     }
 }

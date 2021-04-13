@@ -26,6 +26,7 @@ namespace NUnit.Agent
         [STAThread]
         public static void Main(string[] args)
         {
+            Console.WriteLine("Agent Process Starting");
             AgentId = new Guid(args[0]);
             AgencyUrl = args[1];
 
@@ -63,12 +64,12 @@ namespace NUnit.Agent
             InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
             log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
+            log.Info("Agent process {0} starting", pid);
+
             if (debugArgPassed)
                 TryLaunchDebugger();
 
             LocateAgencyProcess(agencyPid);
-
-            log.Info("Agent process {0} starting", pid);
 
 #if NETFRAMEWORK
             log.Info("Running under version {0}, {1}",

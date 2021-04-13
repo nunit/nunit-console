@@ -14,8 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.cake = build.cake
 		BUILDING.md = BUILDING.md
 		CHANGES.txt = CHANGES.txt
+		ci.cake = ci.cake
 		CONTRIBUTING.md = CONTRIBUTING.md
 		src\Directory.Build.props = src\Directory.Build.props
+		header-check.cake = header-check.cake
 		LICENSE.txt = LICENSE.txt
 		NetFXTests.nunit = NetFXTests.nunit
 		NOTICES.txt = NOTICES.txt
@@ -24,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		package-checks.cake = package-checks.cake
 		package-tests.cake = package-tests.cake
 		README.md = README.md
+		test-results.cake = test-results.cake
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{A972031D-2F61-4183-AF75-99EE1A9F6B32}"

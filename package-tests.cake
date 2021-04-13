@@ -1,12 +1,14 @@
 // Representation of a single test to be run against a pre-built package.
 public struct PackageTest
 {
+    public string Name;
     public string Description;
     public string Arguments;
     public ExpectedResult ExpectedResult;
 
-    public PackageTest(string description, string arguments, ExpectedResult expectedResult)
+    public PackageTest(string name, string description, string arguments, ExpectedResult expectedResult)
     {
+        Name = name;
         Description = description;
         Arguments = arguments;
         ExpectedResult = expectedResult;
@@ -38,6 +40,7 @@ public abstract class PackageTester
 
     protected abstract string PackageName { get; }
     protected abstract string PackageInstallDirectory { get; }
+    protected abstract string PackageResultDirectory { get; }
     protected abstract string PackageBinDir { get; }
 
     protected string PackageUnderTest => _packageDir + PackageName;
@@ -64,14 +67,12 @@ public abstract class PackageTester
     {
         var reporter = new ResultReporter(PackageName);
 
+        _context.CleanDirectory(PackageResultDirectory);
+
         foreach (var packageTest in PackageTests)
         {
-            var resultFile = _outputDir + "TestResult.xml";
-            // Delete result file ahead of time so we don't mistakenly
-            // read a left-over file from another test run. Leave the
-            // file after the run in case we need it to debug a failure.
-            if (_context.FileExists(resultFile))
-                _context.DeleteFile(resultFile);
+            var resultDir = PackageResultDirectory + packageTest.Name + "/";
+            var resultFile = resultDir + "TestResult.xml";
 
             DisplayBanner(packageTest.Description);
 
@@ -79,7 +80,7 @@ public abstract class PackageTester
                 PackageBinDir + "nunit3-console.exe",
                 new ProcessSettings()
                 {
-                    Arguments = packageTest.Arguments,
+                    Arguments = $"{packageTest.Arguments} --work={resultDir}",
                     WorkingDirectory = _outputDir
                 });
 
@@ -116,6 +117,8 @@ public abstract class PackageTester
     }
 }
 
+// These are tests using the .NET Framework build of the console runner.
+// However, they now include running tests under .Net Core 3.1.
 public abstract class NetFXPackageTester : PackageTester
 {
     public NetFXPackageTester(ICakeContext context, string packageVersion)
@@ -123,6 +126,7 @@ public abstract class NetFXPackageTester : PackageTester
     {
         // Add common tests for running under .NET Framework
         PackageTests.Add(new PackageTest(
+            "net35",
             "Run mock-assembly.dll under .NET 3.5",
             "net35/mock-assembly.dll",
             new ExpectedResult("Failed")
@@ -136,6 +140,7 @@ public abstract class NetFXPackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(
+            "net40",
             "Run mock-assembly.dll under .NET 4.x",
             "net40/mock-assembly.dll",
             new ExpectedResult("Failed")
@@ -149,6 +154,7 @@ public abstract class NetFXPackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(
+            "net35_plus_net40",
             "Run both copies of mock-assembly together",
             "net35/mock-assembly.dll net40/mock-assembly.dll",
             new ExpectedResult("Failed")
@@ -160,6 +166,23 @@ public abstract class NetFXPackageTester : PackageTester
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
+
+        // TODO: Remove this check when msi package is
+        // updated to include .net core assemblies.
+        if (GetType().Name != "MsiPackageTester")
+        PackageTests.Add(new PackageTest(
+            "netcoreapp3.1",
+            "Run mock-assembly.dll under .NET Core 3.1",
+            "netcoreapp3.1/mock-assembly.dll --trace:Debug",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
     }
 }
 
@@ -170,6 +193,7 @@ public abstract class NetCorePackageTester : PackageTester
     {
         // Add common tests for running under .NET Core (2.1 or higher)
         PackageTests.Add(new PackageTest(
+            "netcoreapp2.1",
             "Run mock-assembly.dll targeting .NET Core 2.1",
             "netcoreapp2.1/mock-assembly.dll",
             new ExpectedResult("Failed")
@@ -183,6 +207,7 @@ public abstract class NetCorePackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(
+            "netcoreapp3.1",
             "Run mock-assembly targeting .NET Core 3.1",
             "netcoreapp3.1/mock-assembly.dll",
             new ExpectedResult("Failed")
@@ -196,6 +221,7 @@ public abstract class NetCorePackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(
+            "netcoreapp2.1_plus_netcoreapp3.1",
             "Run both copies of mock-assembly together",
             "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll",
             new ExpectedResult("Failed")
@@ -218,6 +244,7 @@ public class NuGetNetFXPackageTester : NetFXPackageTester
     protected override string PackageName => $"NUnit.ConsoleRunner.{_packageVersion}.nupkg";
     protected override string PackageInstallDirectory => _packageDir + "test/nuget-netfx/";
     protected override string PackageBinDir => PackageInstallDirectory + "tools/";
+    protected override string PackageResultDirectory => _packageDir + "test-results/nuget-netfx/";
 }
 
 public class NuGetNetCorePackageTester : NetCorePackageTester
@@ -228,6 +255,7 @@ public class NuGetNetCorePackageTester : NetCorePackageTester
     protected override string PackageName => $"NUnit.ConsoleRunner.NetCore.{_packageVersion}.nupkg";
     protected override string PackageInstallDirectory => _packageDir + "test/nuget-netcore/";
     protected override string PackageBinDir => PackageInstallDirectory + "tools/netcoreapp3.1/any/";
+    protected override string PackageResultDirectory => _packageDir + "test-results/nuget-netcore/";
 }
 
 public class ChocolateyPackageTester : NetFXPackageTester
@@ -238,6 +266,7 @@ public class ChocolateyPackageTester : NetFXPackageTester
     protected override string PackageName => $"nunit-console-runner.{_packageVersion}.nupkg";
     protected override string PackageInstallDirectory => _packageDir + "test/choco/";
     protected override string PackageBinDir => PackageInstallDirectory + "tools/";
+    protected override string PackageResultDirectory => _packageDir + "test-results/choco/";
 }
 
 public class MsiPackageTester : NetFXPackageTester
@@ -247,6 +276,7 @@ public class MsiPackageTester : NetFXPackageTester
     {
         // Add tests specific to the msi package
         PackageTests.Add(new PackageTest(
+            "net35_plus_net40_project",
             "Run project with both copies of mock-assembly",
             $"../../NetFXTests.nunit --config={_config}",
             new ExpectedResult("Failed")
@@ -263,6 +293,7 @@ public class MsiPackageTester : NetFXPackageTester
     protected override string PackageName => $"NUnit.Console-{_packageVersion}.msi";
     protected override string PackageInstallDirectory => _packageDir + "test/msi/";
     protected override string PackageBinDir => PackageInstallDirectory + "NUnit.org/nunit-console/";
+    protected override string PackageResultDirectory => _packageDir + "test-results/msi/";
 
     protected override void CreatePackageInstallDirectory()
     {
@@ -284,6 +315,9 @@ public class MsiPackageTester : NetFXPackageTester
             _context.CopyFiles(
                 PackageBinDir + "*.dll",
                 PackageBinDir + "agents/net40/");
+            _context.CopyFiles(
+                PackageBinDir + "*.dll",
+                PackageBinDir + "agents/netcoreapp3.1");
         }
     }
 }
@@ -295,6 +329,7 @@ public class ZipPackageTester : NetFXPackageTester
     {
         // Add tests specific to the zip package
         PackageTests.Add(new PackageTest(
+            "net35_plus_net40_project",
             "Run project with both copies of mock-assembly",
             $"../../NetFXTests.nunit --config={_config}",
             new ExpectedResult("Failed")
@@ -311,4 +346,5 @@ public class ZipPackageTester : NetFXPackageTester
     protected override string PackageName => $"NUnit.Console-{_packageVersion}.zip";
     protected override string PackageInstallDirectory => _packageDir + "test/zip/";
     protected override string PackageBinDir => PackageInstallDirectory + "bin/net20/";
+    protected override string PackageResultDirectory => _packageDir + "test-results/zip/";
 }

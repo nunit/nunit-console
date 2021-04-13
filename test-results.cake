@@ -130,10 +130,11 @@ public class TestReport
         foreach (XmlNode suite in suites)
         {
             // Narrow down to the specific failures we want
+            string runState = GetAttribute(suite, "runstate");
             string suiteResult = GetAttribute(suite, "result");
             string label = GetAttribute(suite, "label");
             string site = suite.Attributes["site"]?.Value ?? "Test";
-            if (suiteResult == "Failed" && site == "Test" && label == "Invalid")
+            if (runState == "NotRunnable" || suiteResult == "Failed" && site == "Test" && (label == "Invalid" || label=="Error"))
             {
                 string message = suite.SelectSingleNode("reason/message")?.InnerText;
                 Errors.Add($"     {message}");

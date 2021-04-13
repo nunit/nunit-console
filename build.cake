@@ -487,6 +487,7 @@ Task("BuildChocolateyPackages")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/testcentric.engine.metadata.dll", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll.config", Target="tools/agents/netcoreapp3.1" },
+                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent-x86.dll", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent-x86.dll.config", Target="tools/agents/netcoreapp3.1" },

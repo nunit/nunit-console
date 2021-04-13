@@ -66,6 +66,7 @@
     
     <file src="bin/agents/netcoreapp3.1/nunit-agent.dll" target="contentFiles/any/agents/netcoreapp3.1" />
     <file src="bin/agents/netcoreapp3.1/nunit-agent.dll.config" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" target="tools/agents/netcoreapp3.1" />
     <file src="bin/agents/netcoreapp3.1/nunit-agent-x86.dll" target="contentFiles/any/agents/netcoreapp3.1" />
     <file src="bin/agents/netcoreapp3.1/nunit-agent-x86.dll.config" target="contentFiles/any/agents/netcoreapp3.1" />
     <file src="bin/agents/netcoreapp3.1/nunit.engine.core.dll" target="contentFiles/any/agents/netcoreapp3.1" />
