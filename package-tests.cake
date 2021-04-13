@@ -315,9 +315,6 @@ public class MsiPackageTester : NetFXPackageTester
             _context.CopyFiles(
                 PackageBinDir + "*.dll",
                 PackageBinDir + "agents/net40/");
-            _context.CopyFiles(
-                PackageBinDir + "*.dll",
-                PackageBinDir + "agents/netcoreapp3.1");
         }
     }
 }
