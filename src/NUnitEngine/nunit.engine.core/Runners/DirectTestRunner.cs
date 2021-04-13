@@ -103,6 +103,8 @@ namespace NUnit.Engine.Runners
 
             var driverService = Services.GetService<IDriverService>();
 
+            _drivers.Clear();
+
             foreach (var subPackage in packagesToLoad)
             {
                 var testFile = subPackage.FullName;
