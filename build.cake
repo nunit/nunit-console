@@ -52,7 +52,6 @@ var ZIP_IMG = PROJECT_DIR + "zip-image/";
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 var ENGINE_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine/nunit.engine.csproj";
 var AGENT_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit-agent/nunit-agent.csproj";
-    // Agent X86 is in the same directory, so we don't need to do anything with it
 var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
 var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
 var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";

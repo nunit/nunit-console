@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>nunit.agent</RootNamespace>
+    <TargetFrameworks>net20;net40</TargetFrameworks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\..\..\bin\$(Configuration)\agents\</OutputPath>
+    <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
+    <Reference Include="System.Runtime.Remoting" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\nunit.ico">
+      <Link>nunit.ico</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\nunit.engine.core\nunit.engine.core.csproj" />
+  </ItemGroup>
+</Project>
