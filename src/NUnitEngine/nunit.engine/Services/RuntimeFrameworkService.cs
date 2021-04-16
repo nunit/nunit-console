@@ -58,7 +58,7 @@ namespace NUnit.Engine.Services
             var rt1 = f1.Runtime;
             var rt2 = f2.Runtime;
 
-            if (rt1 != RuntimeType.Any && rt2 != RuntimeType.Any && rt1 != rt2)
+            if (!RuntimesMatch(rt1, rt2))
                 return false;
 
             var v1 = f1.ClrVersion;
@@ -73,6 +73,23 @@ namespace NUnit.Engine.Services
                    (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision) &&
                    f1.FrameworkVersion.Major == f2.FrameworkVersion.Major &&
                    f1.FrameworkVersion.Minor == f2.FrameworkVersion.Minor;
+        }
+
+        private static bool RuntimesMatch(RuntimeType rt1, RuntimeType rt2)
+        {
+            if (rt1 == rt2)
+                return true;
+
+            if (rt1 == RuntimeType.Any || rt2 == RuntimeType.Any)
+                return true;
+
+            if (rt1 == RuntimeType.Net && rt2 == RuntimeType.Mono)
+                return true;
+
+            if (rt1 == RuntimeType.Mono && rt2 == RuntimeType.Net)
+                return true;
+
+            return false;
         }
 
         /// <summary>

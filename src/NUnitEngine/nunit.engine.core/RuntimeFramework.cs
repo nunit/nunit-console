@@ -440,9 +440,14 @@ namespace NUnit.Engine
 
         /// <summary>
         /// Returns true if the current framework matches the
-        /// one supplied as an argument. Two frameworks match
-        /// if their runtime types are the same or either one
-        /// is RuntimeType.Any and all specified version components
+        /// one supplied as an argument. Both the RuntimeType
+        /// and the version must match.
+        /// 
+        /// Two RuntimeTypes match if they are equal, if either one
+        /// is RuntimeType.Any or if one is RuntimeType.Net and
+        /// the other is RuntimeType.Mono.
+        /// 
+        /// Two versions match if all specified version components
         /// are equal. Negative (i.e. unspecified) version
         /// components are ignored.
         /// </summary>
@@ -450,9 +455,7 @@ namespace NUnit.Engine
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
         public bool Supports(RuntimeFramework target)
         {
-            if (this.Runtime != RuntimeType.Any
-                && target.Runtime != RuntimeType.Any
-                && this.Runtime != target.Runtime)
+            if (!this.Supports(target.Runtime))
                 return false;
 
             if (this.AllowAnyVersion || target.AllowAnyVersion)
@@ -461,6 +464,23 @@ namespace NUnit.Engine
             return VersionsMatch(this.ClrVersion, target.ClrVersion)
                 && this.FrameworkVersion.Major >= target.FrameworkVersion.Major
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
+        }
+
+        private bool Supports(RuntimeType targetRuntime)
+        {
+            if (this.Runtime == targetRuntime)
+                return true;
+
+            if (this.Runtime == RuntimeType.Any || targetRuntime == RuntimeType.Any)
+                return true;
+
+            if (this.Runtime == RuntimeType.Net && targetRuntime == RuntimeType.Mono)
+                return true;
+
+            if (this.Runtime == RuntimeType.Mono && targetRuntime == RuntimeType.Net)
+                return true;
+
+            return false;
         }
 
         public bool CanLoad(IRuntimeFramework requested)

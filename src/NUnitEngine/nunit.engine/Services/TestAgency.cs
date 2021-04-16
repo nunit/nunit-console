@@ -56,12 +56,16 @@ namespace NUnit.Engine.Services
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
 
-            // If target runtime is not available, something went wrong earlier
+            // If target runtime is not available, something went wrong earlier.
+            // We list all available frameworks to use in debugging.
             var targetRuntime = RuntimeFramework.Parse(runtimeSetting);
             if (!_runtimeService.IsAvailable(targetRuntime.Id))
-                throw new ArgumentException(
-                    string.Format("The {0} framework is not available", targetRuntime),
-                    "framework");
+            {
+                string msg = $"The {targetRuntime} framework is not available.\r\nAvailable frameworks:";
+                foreach (var runtime in RuntimeFramework.AvailableFrameworks)
+                    msg += $" {runtime}";
+                throw new ArgumentException(msg);
+            }
 
             var agentId = Guid.NewGuid();
             var agentProcess = new AgentProcess(this, package, agentId);
