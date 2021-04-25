@@ -4,9 +4,7 @@ using System;
 
 namespace NUnit.Engine.Communication.Messages
 {
-#if !NETSTANDARD1_6
     [Serializable]
-#endif
     public class ProgressMessage : TestEngineMessage
     {
         public ProgressMessage(string report)

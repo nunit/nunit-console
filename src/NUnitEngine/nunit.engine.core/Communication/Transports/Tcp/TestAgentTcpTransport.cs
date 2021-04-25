@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETSTANDARD1_6
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -12,6 +11,11 @@ using NUnit.Engine.Communication.Protocols;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
+    /// <summary>
+    /// TestAgentRemotingTransport uses TCP to support
+    /// a TestAgent in communicating with a TestAgency and
+    /// with the runners that make use of it.
+    /// </summary>
     public class TestAgentTcpTransport : ITestAgentTransport, ITestEventListener
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentTcpTransport));
@@ -131,4 +135,3 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         }
     }
 }
-#endif

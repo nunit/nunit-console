@@ -4,9 +4,7 @@ using System;
 
 namespace NUnit.Engine.Communication.Messages
 {
-#if !NETSTANDARD1_6
     [Serializable]
-#endif
     public class CommandReturnMessage : TestEngineMessage
     {
         public CommandReturnMessage(object returnValue)

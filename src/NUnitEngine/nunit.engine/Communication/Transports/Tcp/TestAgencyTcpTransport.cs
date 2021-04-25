@@ -9,7 +9,8 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
     /// <summary>
-    /// Summary description for TestAgencyTcpTransport.
+    /// TestAgencyTcpTransport uses the TCP protocol to connect a
+    /// TestAgency with its agents.
     /// </summary>
     public class TestAgencyTcpTransport : ITestAgencyTransport, ITestAgency, IDisposable
     {

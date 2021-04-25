@@ -173,7 +173,7 @@ public abstract class NetFXPackageTester : PackageTester
         PackageTests.Add(new PackageTest(
             "netcoreapp3.1",
             "Run mock-assembly.dll under .NET Core 3.1",
-            "netcoreapp3.1/mock-assembly.dll --trace:Debug",
+            "netcoreapp3.1/mock-assembly.dll",
             new ExpectedResult("Failed")
             {
                 Total = 37,

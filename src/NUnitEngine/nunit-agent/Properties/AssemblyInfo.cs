@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("NUnit Agent")]
-[assembly: AssemblyDescription("Runs tests in a separate process when necessary")]
+[assembly: AssemblyDescription("An agent to run tests in a child process created by the engine")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

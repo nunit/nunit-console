@@ -8,6 +8,10 @@ using NUnit.Engine.Communication.Protocols;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
+    /// <summary>
+    /// SocketReader reads a socket and composes Messages
+    /// for consumption using a specific wire protocol.
+    /// </summary>
     public class SocketReader
     {
         private const int BUFFER_SIZE = 1024;

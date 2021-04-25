@@ -4,6 +4,10 @@ using NUnit.Engine.Agents;
 
 namespace NUnit.Engine.Communication.Transports
 {
+    /// <summary>
+    /// The ITestAgentTransport interface is implemented by a
+    /// class providing communication for a TestAgent.
+    /// </summary>
     public interface ITestAgentTransport : ITransport
     {
         TestAgent Agent { get; }

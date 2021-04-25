@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETSTANDARD1_6
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -246,4 +245,3 @@ namespace NUnit.Engine.Communication.Protocols
         }
     }
 }
-#endif

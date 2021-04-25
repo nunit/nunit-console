@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
 using NUnit.Common;
 using NUnit.Engine;
@@ -26,7 +27,6 @@ namespace NUnit.Agent
         [STAThread]
         public static void Main(string[] args)
         {
-            Console.WriteLine("Agent Process Starting");
             AgentId = new Guid(args[0]);
             AgencyUrl = args[1];
 
@@ -71,10 +71,12 @@ namespace NUnit.Agent
 
             LocateAgencyProcess(agencyPid);
 
-#if NETFRAMEWORK
-            log.Info("Running under version {0}, {1}",
-                Environment.Version,
-                RuntimeFramework.CurrentFramework.DisplayName);
+#if NETCOREAPP3_1
+            log.Info($"Running .NET Core 3.1 agent under {RuntimeInformation.FrameworkDescription}");
+#elif NET40
+            log.Info($"Running .NET 4.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
+#elif NET20
+            log.Info($"Running .NET 2.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
 #endif
 
             // Create CoreEngine

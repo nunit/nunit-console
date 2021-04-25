@@ -143,6 +143,7 @@ namespace NUnit.Engine
                     {
                         case 1:
                         case 2:
+                            // For pre-3.0 versions of .NET Core, Environment.Version returns 4.0.30319.42000
                             return new Version(4, 0, 30319);
                         case 3:
                             return new Version(3, 1, 10);
@@ -698,7 +699,7 @@ namespace NUnit.Engine
             if (!File.Exists(Path.Combine(INSTALL_DIR, "dotnet.exe")))
                 return;
 
-            string runtimeDir = Path.Combine(INSTALL_DIR, "shared\\Microsoft.NETCore.App");
+            string runtimeDir = Path.Combine(INSTALL_DIR, Path.Combine("shared", "Microsoft.NETCore.App"));
             if (!Directory.Exists(runtimeDir))
                 return;
 
@@ -711,7 +712,7 @@ namespace NUnit.Engine
             _availableFrameworks.AddRange(runtimes);
         }
 
-        // Internal for testing
+        // Deal with oddly named directories, which may sometimes appear when previews are installed
         internal static IList<RuntimeFramework> GetNetCoreRuntimesFromDirectoryNames(IEnumerable<string> dirNames)
         {
             const string VERSION_CHARS = ".0123456789";

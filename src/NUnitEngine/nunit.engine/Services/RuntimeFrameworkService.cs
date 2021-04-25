@@ -53,40 +53,34 @@ namespace NUnit.Engine.Services
 
         private static readonly Version AnyVersion = new Version(0, 0);
 
-        private static bool FrameworksMatch(RuntimeFramework f1, RuntimeFramework f2)
+        private static bool FrameworksMatch(RuntimeFramework requested, RuntimeFramework available)
         {
-            var rt1 = f1.Runtime;
-            var rt2 = f2.Runtime;
-
-            if (!RuntimesMatch(rt1, rt2))
+            if (!RuntimesMatch(requested.Runtime, available.Runtime))
                 return false;
 
-            var v1 = f1.ClrVersion;
-            var v2 = f2.ClrVersion;
+            var requestedVersion = requested.FrameworkVersion;
+            var availableVersion = available.FrameworkVersion;
 
-            if (v1 == AnyVersion || v2 == AnyVersion)
+            if (requestedVersion == AnyVersion)
                 return true;
 
-            return v1.Major == v2.Major &&
-                   v1.Minor == v2.Minor &&
-                   (v1.Build < 0 || v2.Build < 0 || v1.Build == v2.Build) &&
-                   (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision) &&
-                   f1.FrameworkVersion.Major == f2.FrameworkVersion.Major &&
-                   f1.FrameworkVersion.Minor == f2.FrameworkVersion.Minor;
+            return requestedVersion.Major == availableVersion.Major &&
+                   requestedVersion.Minor == availableVersion.Minor &&
+                   (requestedVersion.Build < 0 || availableVersion.Build < 0 || requestedVersion.Build == availableVersion.Build) &&
+                   (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision) &&
+                   requestedVersion.Major == availableVersion.Major &&
+                   requestedVersion.Minor == availableVersion.Minor;
         }
 
-        private static bool RuntimesMatch(RuntimeType rt1, RuntimeType rt2)
+        private static bool RuntimesMatch(RuntimeType requested, RuntimeType available)
         {
-            if (rt1 == rt2)
+            if (requested == available || requested == RuntimeType.Any)
                 return true;
 
-            if (rt1 == RuntimeType.Any || rt2 == RuntimeType.Any)
+            if (requested == RuntimeType.Net && available == RuntimeType.Mono)
                 return true;
 
-            if (rt1 == RuntimeType.Net && rt2 == RuntimeType.Mono)
-                return true;
-
-            if (rt1 == RuntimeType.Mono && rt2 == RuntimeType.Net)
+            if (requested == RuntimeType.Mono && available == RuntimeType.Net)
                 return true;
 
             return false;
