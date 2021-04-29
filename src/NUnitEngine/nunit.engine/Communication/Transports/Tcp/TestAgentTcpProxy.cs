@@ -94,7 +94,6 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         private void SendCommandMessage(string command, params object[] arguments)
