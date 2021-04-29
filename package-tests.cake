@@ -118,7 +118,7 @@ public abstract class PackageTester
 }
 
 // These are tests using the .NET Framework build of the console runner.
-// However, they now include running tests under .Net Core 3.1.
+// However, they now include running tests under .Net Core.
 public abstract class NetFXPackageTester : PackageTester
 {
     public NetFXPackageTester(ICakeContext context, string packageVersion)
@@ -140,9 +140,37 @@ public abstract class NetFXPackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(
+            "net35-x86",
+            "Run mock-assembly-x86.dll under .NET 3.5",
+            "net35/mock-assembly-x86.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(
             "net40",
             "Run mock-assembly.dll under .NET 4.x",
             "net40/mock-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 0,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(
+            "net40-x86",
+            "Run mock-assembly-x86.dll under .NET 4.x",
+            "net40/mock-assembly-x86.dll",
             new ExpectedResult("Failed")
             {
                 Total = 37,
