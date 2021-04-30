@@ -121,9 +121,13 @@ public abstract class PackageTester
 // However, they now include running tests under .Net Core.
 public abstract class NetFXPackageTester : PackageTester
 {
+    static readonly string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+
     public NetFXPackageTester(ICakeContext context, string packageVersion)
         : base(context, packageVersion)
     {
+        bool dotnetX86Available = _context.IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
+
         // Add common tests for running under .NET Framework
         PackageTests.Add(new PackageTest(
             "net35",
@@ -213,6 +217,7 @@ public abstract class NetFXPackageTester : PackageTester
                     Skipped = 7
                 }));
 
+            if (dotnetX86Available)
             PackageTests.Add(new PackageTest(
                 "netcoreapp3.1-x86",
                 "Run mock-assembly-x86.dll under .NET Core 3.1",
