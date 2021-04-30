@@ -198,19 +198,35 @@ public abstract class NetFXPackageTester : PackageTester
         // TODO: Remove this check when msi package is
         // updated to include .net core assemblies.
         if (GetType().Name != "MsiPackageTester")
-        PackageTests.Add(new PackageTest(
-            "netcoreapp3.1",
-            "Run mock-assembly.dll under .NET Core 3.1",
-            "netcoreapp3.1/mock-assembly.dll",
-            new ExpectedResult("Failed")
-            {
-                Total = 37,
-                Passed = 23,
-                Failed = 5,
-                Warnings = 0,
-                Inconclusive = 1,
-                Skipped = 7
-            }));
+        {
+            PackageTests.Add(new PackageTest(
+                "netcoreapp3.1",
+                "Run mock-assembly.dll under .NET Core 3.1",
+                "netcoreapp3.1/mock-assembly.dll",
+                new ExpectedResult("Failed")
+                {
+                    Total = 37,
+                    Passed = 23,
+                    Failed = 5,
+                    Warnings = 0,
+                    Inconclusive = 1,
+                    Skipped = 7
+                }));
+
+            PackageTests.Add(new PackageTest(
+                "netcoreapp3.1-x86",
+                "Run mock-assembly-x86.dll under .NET Core 3.1",
+                "netcoreapp3.1/mock-assembly-x86.dll",
+                new ExpectedResult("Failed")
+                {
+                    Total = 37,
+                    Passed = 23,
+                    Failed = 5,
+                    Warnings = 0,
+                    Inconclusive = 1,
+                    Skipped = 7
+                }));
+        }
     }
 }
 

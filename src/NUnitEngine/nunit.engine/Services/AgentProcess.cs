@@ -63,7 +63,9 @@ namespace NUnit.Engine.Services
             }
             else if (TargetRuntime.Runtime == RuntimeType.NetCore)
             {
-                StartInfo.FileName = "dotnet";
+                StartInfo.FileName = runAsX86
+                    ? @"C:\Program Files (x86)\dotnet\dotnet.exe"
+                    : "dotnet";
                 StartInfo.Arguments = $"{AgentExePath} {AgentArgs}";
                 StartInfo.LoadUserProfile = loadUserProfile;
             }
@@ -101,21 +103,20 @@ namespace NUnit.Engine.Services
 
             log.Debug($"Checking for agents at {agentsDir}");
 
-            string agentName = requires32Bit
-                ? "nunit-agent-x86"
-                : "nunit-agent";
-
             string runtimeDir;
+            string agentName;
             string agentExtension;
             switch (targetRuntime.Runtime)
             {
                 case RuntimeType.Net:
                 case RuntimeType.Mono:
                     runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+                    agentName = requires32Bit ? "nunit-agent-x86" : "nunit-agent";
                     agentExtension = ".exe";
                     break;
                 case RuntimeType.NetCore:
                     runtimeDir = "netcoreapp3.1";
+                    agentName = "nunit-agent";
                     agentExtension = ".dll";
                     break;
                 default:
