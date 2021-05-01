@@ -46,6 +46,7 @@
             </Component>
             <ComponentGroupRef Id="NET20_AGENT" />
             <ComponentGroupRef Id="NET40_AGENT" />
+            <ComponentGroupRef Id="NETCORE31_AGENT" />
         </ComponentGroup>
     </Fragment>
     <Fragment>
@@ -85,6 +86,35 @@
             </Component>
             <Component Id="NUNIT_AGENT_ADDINS_NET40" Location="local" Guid="">
                 <File Id="nunit.agent.net40.addins" Source="$(var.InstallImage)nunit.agent.addins" />
+            </Component>
+        </ComponentGroup>
+        <ComponentGroup Id="NETCORE31_AGENT" Directory="NETCORE31_AGENT_DIR">
+            <Component Id="NUNIT_AGENT_NETCORE31" Location="local" Guid="21E39B4C-07E4-4C38-8F91-7030516127E2">
+                <File Id="nunit_agent_netcore31.exe"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.dll" />
+                <File Id="nunit_agent.runtimeconfig.json"
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NETCORE31_ENGINE_API" Location="local" Guid="E176F594-2DDE-409A-9661-4DF0B81D7A36">
+                <File Id="nunit.agent.netcore31.engine.api.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/netcoreapp3.1/nunit.engine.api.dll" />
+                <File Id="nunit.agent.netcore31.engine.api.xml"
+                      Source="$(var.InstallImage)bin/netcoreapp3.1/nunit.engine.api.xml" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NETCORE31_ENGINE_CORE" Location="local" Guid="1C30670A-301C-42EB-BC9B-969DD6475CB2">
+                <File Id="nunit.agent.netcore31.engine.core.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/netcoreapp3.1/nunit.engine.core.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NETCORE31_ENGINE_METADATA" Location="local" Guid="43798734-A674-4D13-A1F5-B1EBB22B165A">
+                <File Id="nunit.agent.netcore31.engine.metadata.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/netcoreapp3.1/testcentric.engine.metadata.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_ADDINS_NETCORE31" Location="local" Guid="21D2D9FB-A57D-4B02-92A0-6697674FB869">
+                <File Id="nunit.agent.netcore31.addins" Source="$(var.InstallImage)nunit.agent.addins" />
             </Component>
         </ComponentGroup>
     </Fragment>
