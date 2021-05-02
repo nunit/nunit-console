@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
 using System.IO;
 using NUnit.Framework;
 
@@ -25,8 +24,16 @@ namespace NUnit.Engine.Tests.Acceptance
                 var engine = TestEngineActivator.CreateInstance();
                 var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
                 var package = new TestPackage(mockAssemblyPath);
-                engine.GetRunner(package).Run(null, null);
+                engine.GetRunner(package).Run(new NullListener(), TestFilter.Empty);
             });
+        }
+
+        private class NullListener : ITestEventListener
+        {
+            public void OnTestEvent(string testEvent)
+            {
+                // No action
+            }
         }
 
     }
