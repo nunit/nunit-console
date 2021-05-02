@@ -37,10 +37,10 @@ namespace NUnit.Engine.Services
         internal virtual string RemotingUrl => _remotingTransport.ServerUrl;
         //internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
 
-        public TestAgency() : this("TestAgency-" + Guid.NewGuid(), 0) { }
-
-        public TestAgency( string uri, int port )
+        public TestAgency()
         {
+            var uri = "TestAgency-" + Guid.NewGuid();
+            var port = 0;
             _remotingTransport = new TestAgencyRemotingTransport(this, uri, port);
             //_tcpTransport = new TestAgencyTcpTransport(this, port);
         }
