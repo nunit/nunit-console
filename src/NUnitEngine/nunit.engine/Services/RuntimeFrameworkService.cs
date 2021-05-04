@@ -67,9 +67,7 @@ namespace NUnit.Engine.Services
             return requestedVersion.Major == availableVersion.Major &&
                    requestedVersion.Minor == availableVersion.Minor &&
                    (requestedVersion.Build < 0 || availableVersion.Build < 0 || requestedVersion.Build == availableVersion.Build) &&
-                   (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision) &&
-                   requestedVersion.Major == availableVersion.Major &&
-                   requestedVersion.Minor == availableVersion.Minor;
+                   (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision);
         }
 
         private static bool RuntimesMatch(RuntimeType requested, RuntimeType available)
@@ -141,7 +139,7 @@ namespace NUnit.Engine.Services
             if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
             {
                 // Assume .NET Framework
-                targetRuntime = RuntimeType.Net;
+                targetRuntime = currentFramework.Runtime;
                 targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
             }
             else

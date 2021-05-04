@@ -35,8 +35,6 @@ public void CheckAllPackages()
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_FILES),
             HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
-            HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
-            HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckNuGetPackage(

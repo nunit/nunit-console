@@ -11,8 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
-    <Compile Include="..\mock-assembly\AccessesCurrentTestContextDuringDiscovery.cs" Link="AccessesCurrentTestContextDuringDiscovery.cs" />
-    <Compile Include="..\mock-assembly\MockAssembly.cs" Link="MockAssembly.cs" />
+    <Compile Include="..\mock-assembly\*.cs" />
     <None Include="..\..\nunit.snk" Link="nunit.snk" />
   </ItemGroup>
   <ItemGroup>

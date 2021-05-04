@@ -93,6 +93,8 @@
                 <File Id="nunit_agent_netcore31.exe"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.dll" />
+                <File Id="nunit_agent.runtimeconfig.dev.json"
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.dev.json" />
                 <File Id="nunit_agent.runtimeconfig.json"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" />
             </Component>
@@ -112,9 +114,6 @@
                 <File Id="nunit.agent.netcore31.engine.metadata.dll"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/netcoreapp3.1/testcentric.engine.metadata.dll" />
-            </Component>
-            <Component Id="NUNIT_AGENT_ADDINS_NETCORE31" Location="local" Guid="21D2D9FB-A57D-4B02-92A0-6697674FB869">
-                <File Id="nunit.agent.netcore31.addins" Source="$(var.InstallImage)nunit.agent.addins" />
             </Component>
         </ComponentGroup>
     </Fragment>
