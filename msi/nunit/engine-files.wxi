@@ -93,8 +93,8 @@
                 <File Id="nunit_agent_netcore31.exe"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.dll" />
-                <File Id="nunit_agent.runtimeconfig.dev.json"
-                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.dev.json" />
+                <File Id="nunit_agent.deps.json"
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.deps.json" />
                 <File Id="nunit_agent.runtimeconfig.json"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" />
             </Component>
