@@ -50,7 +50,7 @@ namespace NUnit.Engine.Agents
         /// <summary>
         ///  Creates a test runner
         /// </summary>
-        public abstract ITestEngineRunner CreateRunner(TestPackage package);
+        public abstract ITestEngineRunner CreateRunner(ITestPackage package);
 
         public bool WaitForStop(int timeout)
         {

@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
@@ -74,12 +72,32 @@ namespace NUnit.Engine
         }
 
         /// <summary>
+        /// Creates a new test package
+        /// </summary>
+        /// <param name="testFiles">A list of either test assemblies or project files, which will
+        /// be added to the ITestPackage as sub-packages</param>
+        public ITestPackage CreatePackage(IList<string> testFiles)
+        {
+            return new TestPackage(testFiles);
+        }
+
+        /// <summary>
+        /// Creates a new test package
+        /// </summary>
+        /// <param name="testFiles">A list of either test assemblies or project files, which will
+        /// be added to the ITestPackage as sub-packages</param>
+        public ITestPackage CreatePackage(params string[] testFiles)
+        {
+            return new TestPackage(testFiles);
+        }
+
+        /// <summary>
         /// Returns a test runner for use by clients that need to load the
         /// tests once and run them multiple times. If necessary, the
         /// services are initialized first.
         /// </summary>
         /// <returns>An ITestRunner.</returns>
-        public ITestRunner GetRunner(TestPackage package)
+        public ITestRunner GetRunner(ITestPackage package)
         {
             if(!Services.ServiceManager.ServicesInitialized)
                 Initialize();

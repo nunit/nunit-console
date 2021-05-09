@@ -42,7 +42,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public void RunnerSelectionTest(TestPackage package, RunnerResult expected)
+        public void RunnerSelectionTest(ITestPackage package, RunnerResult expected)
         {
             var masterRunner = new MasterTestRunner(_services, package);
             var runner = masterRunner.GetEngineRunner();

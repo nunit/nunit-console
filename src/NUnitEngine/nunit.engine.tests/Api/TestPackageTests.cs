@@ -38,7 +38,7 @@ namespace NUnit.Engine.Api.Tests
             Assert.That(_package.SubPackages.Count, Is.EqualTo(_fileNames.Length));
             for (int i = 0; i < _fileNames.Length; i++)
             {
-                TestPackage subPackage = _package.SubPackages[i];
+                var subPackage = _package.SubPackages[i];
                 string fileName = _fileNames[i];
 
                 Assert.That(subPackage.Name, Is.EqualTo(fileName));

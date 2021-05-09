@@ -9,7 +9,7 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class LocalTestRunner : DirectTestRunner
     {
-        public LocalTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public LocalTestRunner(IServiceLocator services, ITestPackage package) : base(services, package)
         {
             TestDomain = AppDomain.CurrentDomain;
         }

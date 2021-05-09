@@ -64,7 +64,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             Agent.StopSignal.Set();
         }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
+        public ITestEngineRunner CreateRunner(ITestPackage package)
         {
             return Agent.CreateRunner(package);
         }

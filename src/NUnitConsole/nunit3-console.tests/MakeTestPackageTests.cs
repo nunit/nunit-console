@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
 using System.IO;
+using NUnit.Common;
+using NUnit.Engine;
 using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Tests
@@ -11,7 +14,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void SingleAssembly()
         {
             var options = ConsoleMocks.Options("test.dll");
-            var package = ConsoleRunner.MakeTestPackage(options);
+            var package = CreatePackage(options);
 
             Assert.That(package.SubPackages.Count, Is.EqualTo(1));
             Assert.That(package.SubPackages[0].FullName, Is.EqualTo(Path.GetFullPath("test.dll")));
@@ -22,7 +25,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var names = new [] { "test1.dll", "test2.dll", "test3.dll" };
             var options = ConsoleMocks.Options(names);
-            var package = ConsoleRunner.MakeTestPackage(options);
+            var package = CreatePackage(options);
 
             Assert.That(package.SubPackages.Count, Is.EqualTo(3));
             Assert.That(package.SubPackages[0].FullName, Is.EqualTo(Path.GetFullPath("test1.dll")));
@@ -61,7 +64,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void WhenOptionIsSpecified_PackageIncludesSetting(string option, string key, object val)
         {
             var options = ConsoleMocks.Options("test.dll", option);
-            var package = ConsoleRunner.MakeTestPackage(options);
+            var package = CreatePackage(options);
 
             Assert.That(package.Settings.ContainsKey(key), "Setting not included for {0}", option);
             Assert.That(package.Settings[key], Is.EqualTo(val), "NumberOfTestWorkers not set correctly for {0}", option);
@@ -72,7 +75,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void WhenDebugging_NumberOfTestWorkersDefaultsToZero()
         {
             var options = ConsoleMocks.Options("test.dll", "--debug");
-            var package = ConsoleRunner.MakeTestPackage(options);
+            var package = CreatePackage(options);
 
             Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
             Assert.That(package.Settings["NumberOfTestWorkers"], Is.EqualTo(0));
@@ -82,7 +85,7 @@ namespace NUnit.ConsoleRunner.Tests
         public void WhenDebugging_NumberOfTestWorkersMayBeOverridden()
         {
             var options = ConsoleMocks.Options("test.dll", "--debug", "--workers=3");
-            var package = ConsoleRunner.MakeTestPackage(options);
+            var package = CreatePackage(options);
 
             Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
             Assert.That(package.Settings["NumberOfTestWorkers"], Is.EqualTo(3));
@@ -93,9 +96,21 @@ namespace NUnit.ConsoleRunner.Tests
         public void WhenNoOptionsAreSpecified_PackageContainsOnlyTwoSettings()
         {
             var options = ConsoleMocks.Options("test.dll");
-            var package = ConsoleRunner.MakeTestPackage(options);
+            var package = CreatePackage(options);
 
             Assert.That(package.Settings.Keys, Is.EquivalentTo(new string[] { "WorkDirectory", "DisposeRunners" }));
+        }
+
+        private static ITestPackage CreatePackage(ConsoleOptions options)
+        {
+            ITestPackage package;
+            using (var engine = new TestEngine())
+            {
+                var consoleRunner = new ConsoleRunner(engine, options, new ConsoleMocks.ExtendedTextWriter());
+                package = consoleRunner.MakeTestPackage(options);
+            }
+
+            return package;
         }
 
     }

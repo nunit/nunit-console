@@ -12,6 +12,6 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Creates a test runner on the acquired agent.
         /// </summary>
-        ITestEngineRunner CreateRunner(TestPackage package);
+        ITestEngineRunner CreateRunner(ITestPackage package);
     }
 }

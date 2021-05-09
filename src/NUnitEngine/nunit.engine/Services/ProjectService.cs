@@ -34,7 +34,7 @@ namespace NUnit.Engine.Services
         /// a known project format before calling this method.
         /// </summary>
         /// <param name="package">The TestPackage to be expanded</param>
-        public void ExpandProjectPackage(TestPackage package)
+        public void ExpandProjectPackage(ITestPackage package)
         {
             Guard.ArgumentNotNull(package, "package");
             Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", "package");
@@ -52,7 +52,7 @@ namespace NUnit.Engine.Services
             else
                 Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", "package");
 
-            TestPackage tempPackage = project.GetTestPackage(activeConfig);
+            var tempPackage = project.GetTestPackage(activeConfig);
 
             // Add info about the configurations to the project package
             tempPackage.Settings[EnginePackageSettings.ActiveConfig] = activeConfig;

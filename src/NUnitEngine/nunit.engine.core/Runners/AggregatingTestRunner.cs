@@ -65,7 +65,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public AggregatingTestRunner(IServiceLocator services, ITestPackage package) : base(services, package)
         {
         }
 
@@ -222,7 +222,7 @@ namespace NUnit.Engine.Runners
                 throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
-        protected virtual ITestEngineRunner CreateRunner(TestPackage package)
+        protected virtual ITestEngineRunner CreateRunner(ITestPackage package)
         {
             return TestRunnerFactory.MakeTestRunner(package);
         }

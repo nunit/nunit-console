@@ -13,7 +13,7 @@ namespace NUnit.Engine.Runners
     {
         private DomainManager _domainManager;
 
-        public TestDomainRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public TestDomainRunner(IServiceLocator services, ITestPackage package) : base(services, package)
         {
             _domainManager = Services.GetService<DomainManager>();
         }

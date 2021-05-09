@@ -22,7 +22,7 @@ namespace NUnit.Engine.Services.Tests.Fakes
             _projects.Add(projectName, assemblies);
         }
 
-        void IProjectService.ExpandProjectPackage(TestPackage package)
+        void IProjectService.ExpandProjectPackage(ITestPackage package)
         {
             if (_projects.ContainsKey(package.Name))
             {

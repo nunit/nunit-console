@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace NUnit.Engine
@@ -47,11 +48,29 @@ namespace NUnit.Engine
         void Initialize();
 
         /// <summary>
+        /// Construct a top-level ITestPackage that wraps one or more
+        /// test files, contained as subpackages.
+        /// </summary>
+        /// <remarks>
+        /// Semantically equivalent to the array method.
+        /// </remarks>
+        ITestPackage CreatePackage(IList<string> testFiles);
+
+        /// <summary>
+        /// Construct a top-level ITestPackage that wraps one or more
+        /// test files, contained as subpackages.
+        /// </summary>
+        /// <remarks>
+        /// Semantically equivalent to the IList method.
+        /// </remarks>
+        ITestPackage CreatePackage(params string[] testFiles);
+
+        /// <summary>
         /// Returns a test runner instance for use by clients in discovering,
         /// exploring and executing tests.
         /// </summary>
-        /// <param name="package">The TestPackage for which the runner is intended.</param>
+        /// <param name="package">The ITestPackage for which the runner is intended.</param>
         /// <returns>An ITestRunner.</returns>
-        ITestRunner GetRunner(TestPackage package);
+        ITestRunner GetRunner(ITestPackage package);
     }
 }

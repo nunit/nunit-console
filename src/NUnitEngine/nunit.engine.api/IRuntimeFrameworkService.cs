@@ -32,6 +32,6 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="package">A TestPackage</param>
         /// <returns>The selected RuntimeFramework</returns>
-        string SelectRuntimeFramework(TestPackage package);
+        string SelectRuntimeFramework(ITestPackage package);
     }
 }

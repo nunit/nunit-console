@@ -24,7 +24,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public Guid Id { get; }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
+        public ITestEngineRunner CreateRunner(ITestPackage package)
         {
             SendCommandMessage("CreateRunner", package);
 

@@ -23,10 +23,14 @@ namespace NUnit.Engine.Tests
             Directory.SetCurrentDirectory(_origWorkingDir);
         }
 
-        [Test]
+        [Test, Platform("Net")] //https://github.com/nunit/nunit-console/issues/946
         public void EngineCanBeCreatedFromAnyWorkingDirectory()
         {
-            Assert.That(() => TestEngineActivator.CreateInstance(), Throws.Nothing);
+            Assert.That(() =>
+            {
+                var engine = TestEngineActivator.CreateInstance();
+                engine.Dispose();
+            }, Throws.Nothing);
         }
     }
 }

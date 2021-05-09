@@ -33,7 +33,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">The TestPackage to be loaded and run</param>
         /// <returns>A TestRunner</returns>
-        public override ITestEngineRunner MakeTestRunner(TestPackage package)
+        public override ITestEngineRunner MakeTestRunner(ITestPackage package)
         {
 #if !NETFRAMEWORK
             if (package.SubPackages.Count > 1)
@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services
                 default:
                 case ProcessModel.Default:
                     bool isNested = false;
-                    foreach (TestPackage subPackage in package.SubPackages)
+                    foreach (var subPackage in package.SubPackages)
                     {
                         if (subPackage.SubPackages.Count > 0)
                         {
@@ -78,7 +78,7 @@ namespace NUnit.Engine.Services
 
         // TODO: Review this method once used by a gui - the implementation is
         // overly simplistic. It is not currently used by any known runner.
-        public override bool CanReuse(ITestEngineRunner runner, TestPackage package)
+        public override bool CanReuse(ITestEngineRunner runner, ITestPackage package)
         {
             ProcessModel processModel = GetTargetProcessModel(package);
 
@@ -101,7 +101,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">A TestPackage</param>
         /// <returns>The string representation of the process model or "Default" if none was specified.</returns>
-        private ProcessModel GetTargetProcessModel(TestPackage package)
+        private ProcessModel GetTargetProcessModel(ITestPackage package)
         {
             return (ProcessModel)System.Enum.Parse(
                 typeof(ProcessModel),

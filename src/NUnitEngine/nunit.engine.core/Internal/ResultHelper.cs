@@ -54,7 +54,7 @@ namespace NUnit.Engine.Internal
         /// <param name="result">A new TestEngineResult with xml nodes for each assembly or project.</param>
         /// <param name="package">The <see cref="TestPackage"/> for which we are aggregating.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult MakeProjectResult(this TestEngineResult result, TestPackage package)
+        public static TestEngineResult MakeProjectResult(this TestEngineResult result, ITestPackage package)
         {
             return Aggregate(result, TEST_SUITE_ELEMENT, PROJECT_SUITE_TYPE, package.ID, package.Name, package.FullName);
         }
@@ -65,7 +65,7 @@ namespace NUnit.Engine.Internal
         /// <param name="result">A new TestEngineResult with xml nodes for each assembly or project.</param>
         /// <param name="package">The <see cref="TestPackage"/> for which we are aggregating.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult MakeTestRunResult(this TestEngineResult result, TestPackage package)
+        public static TestEngineResult MakeTestRunResult(this TestEngineResult result, ITestPackage package)
         {
             return Aggregate(result, TEST_RUN_ELEMENT, package.ID, package.Name, package.FullName);
         }
