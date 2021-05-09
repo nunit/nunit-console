@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NUnit Agent")]
+[assembly: AssemblyTitle("NUnit Agent (X86)")]
 [assembly: AssemblyDescription("An agent to run tests in a child process created by the engine")]
 [assembly: AssemblyCulture("")]
 

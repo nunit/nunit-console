@@ -18,6 +18,7 @@ namespace NUnit.Engine.Services
         {
             // Get target runtime
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
+            log.Debug($"TargetRuntime = {runtimeSetting}");
             TargetRuntime = RuntimeFramework.Parse(runtimeSetting);
 
             // Access other package settings
@@ -27,7 +28,8 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
-            AgentArgs = new StringBuilder($"{agentId} {agency.RemotingUrl} --pid={Process.GetCurrentProcess().Id}");
+            string agencyUrl = TargetRuntime.Runtime == RuntimeType.NetCore ? agency.TcpEndPoint : agency.RemotingUrl;
+            AgentArgs = new StringBuilder($"{agentId} {agencyUrl} --pid={Process.GetCurrentProcess().Id}");
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
@@ -60,6 +62,25 @@ namespace NUnit.Engine.Services
                 StartInfo.Arguments = AgentArgs.ToString();
                 StartInfo.LoadUserProfile = loadUserProfile;
             }
+            else if (TargetRuntime.Runtime == RuntimeType.NetCore)
+            {
+                StartInfo.FileName = "dotnet";
+                StartInfo.Arguments = $"{AgentExePath} {AgentArgs}";
+                StartInfo.LoadUserProfile = loadUserProfile;
+
+                // TODO: Remove the windows limitation and the use of a hard-coded path.
+                if (runAsX86)
+                {
+                    if (Path.DirectorySeparatorChar != '\\')
+                        throw new Exception("Running .NET Core as X86 is currently only supported on Windows");
+
+                    var x86_dotnet_exe = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+                    if (!File.Exists(x86_dotnet_exe))
+                        throw new Exception("The X86 version of dotnet.exe is not installed");
+
+                    StartInfo.FileName = x86_dotnet_exe;
+                }
+            }
             else
             {
                 StartInfo.FileName = AgentExePath;
@@ -75,12 +96,13 @@ namespace NUnit.Engine.Services
 
         public static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
         {
+            log.Debug($"GetTestAgentExePath({targetRuntime}, {requires32Bit})");
+            
             string engineDir = AssemblyHelper.GetDirectoryName(Assembly.GetExecutingAssembly());
             if (engineDir == null) return null;
 
             // If running out of a package "agents" is a subdirectory
             string agentsDir = Path.Combine(engineDir, "agents");
-            log.Debug($"Checking for agents at {agentsDir}");
 
             if (!Directory.Exists(agentsDir))
             {
@@ -89,16 +111,33 @@ namespace NUnit.Engine.Services
                 // bit of a kluge, but it's necessary unless we change the binary 
                 // output directory to match the distribution structure.
                 agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
-                log.Debug($"Directory not found! Using {agentsDir}");
+                log.Debug("Assuming test run in project output directory");
             }
 
-            string runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+            log.Debug($"Checking for agents at {agentsDir}");
 
-            string agentName = requires32Bit
-                ? "nunit-agent-x86.exe"
-                : "nunit-agent.exe";
+            string runtimeDir;
+            string agentName;
+            string agentExtension;
+            switch (targetRuntime.Runtime)
+            {
+                case RuntimeType.Net:
+                case RuntimeType.Mono:
+                    runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+                    agentName = requires32Bit ? "nunit-agent-x86" : "nunit-agent";
+                    agentExtension = ".exe";
+                    break;
+                case RuntimeType.NetCore:
+                    runtimeDir = "netcoreapp3.1";
+                    agentName = "nunit-agent";
+                    agentExtension = ".dll";
+                    break;
+                default:
+                    log.Error($"Unknown runtime type: {targetRuntime.Runtime}");
+                    return null;
+            }
 
-            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName);
+            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName + agentExtension);
         }
     }
 }

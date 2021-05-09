@@ -18,6 +18,8 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class DriverService : Service, IDriverService
     {
+        static ILogger log = InternalTrace.GetLogger("DriverService");
+
         readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 
         /// <summary>
@@ -67,6 +69,8 @@ namespace NUnit.Engine.Services
 
                     foreach (var factory in _factories)
                     {
+                        log.Debug($"Trying {factory.GetType().Name}");
+
                         foreach (var reference in references)
                         {
                             if (factory.IsSupportedTestFramework(reference))

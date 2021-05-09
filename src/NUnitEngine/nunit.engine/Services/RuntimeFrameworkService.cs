@@ -7,6 +7,9 @@ using System.IO;
 using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
+#if NET20
+using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
+#endif
 
 namespace NUnit.Engine.Services
 {
@@ -50,26 +53,35 @@ namespace NUnit.Engine.Services
 
         private static readonly Version AnyVersion = new Version(0, 0);
 
-        private static bool FrameworksMatch(RuntimeFramework f1, RuntimeFramework f2)
+        private static bool FrameworksMatch(RuntimeFramework requested, RuntimeFramework available)
         {
-            var rt1 = f1.Runtime;
-            var rt2 = f2.Runtime;
-
-            if (rt1 != RuntimeType.Any && rt2 != RuntimeType.Any && rt1 != rt2)
+            if (!RuntimesMatch(requested.Runtime, available.Runtime))
                 return false;
 
-            var v1 = f1.ClrVersion;
-            var v2 = f2.ClrVersion;
+            var requestedVersion = requested.FrameworkVersion;
+            var availableVersion = available.FrameworkVersion;
 
-            if (v1 == AnyVersion || v2 == AnyVersion)
+            if (requestedVersion == AnyVersion)
                 return true;
 
-            return v1.Major == v2.Major &&
-                   v1.Minor == v2.Minor &&
-                   (v1.Build < 0 || v2.Build < 0 || v1.Build == v2.Build) &&
-                   (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision) &&
-                   f1.FrameworkVersion.Major == f2.FrameworkVersion.Major &&
-                   f1.FrameworkVersion.Minor == f2.FrameworkVersion.Minor;
+            return requestedVersion.Major == availableVersion.Major &&
+                   requestedVersion.Minor == availableVersion.Minor &&
+                   (requestedVersion.Build < 0 || availableVersion.Build < 0 || requestedVersion.Build == availableVersion.Build) &&
+                   (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision);
+        }
+
+        private static bool RuntimesMatch(RuntimeType requested, RuntimeType available)
+        {
+            if (requested == available || requested == RuntimeType.Any)
+                return true;
+
+            if (requested == RuntimeType.Net && available == RuntimeType.Mono)
+                return true;
+
+            if (requested == RuntimeType.Mono && available == RuntimeType.Net)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -89,7 +101,7 @@ namespace NUnit.Engine.Services
             return targetFramework.ToString();
         }
 
-        private static RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
+        private RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
         {
             foreach (var subPackage in package.SubPackages)
             {
@@ -109,21 +121,45 @@ namespace NUnit.Engine.Services
                     throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
 
                 log.Debug($"Requested framework for {package.Name} is {requestedFramework}");
+
+                if (!IsAvailable(frameworkSetting))
+                    throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
+
+                package.Settings[EnginePackageSettings.TargetRuntimeFramework] = frameworkSetting;
+
+                return requestedFramework;
+            }
+
+            log.Debug($"No specific framework requested for {package.Name}");
+
+            string imageTargetFrameworkNameSetting = package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
+            RuntimeType targetRuntime;
+            Version targetVersion;
+
+            if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
+            {
+                // Assume .NET Framework
+                targetRuntime = currentFramework.Runtime;
+                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
             }
             else
             {
-                requestedFramework = new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion);
-                log.Debug($"No specific framework requested for {package.Name}");
+                FrameworkName frameworkName = new FrameworkName(imageTargetFrameworkNameSetting);
+
+                switch (frameworkName.Identifier)
+                {
+                    case ".NETFramework":
+                        targetRuntime = RuntimeType.Net;
+                        break;
+                    case ".NETCoreApp":
+                        targetRuntime = RuntimeType.NetCore;
+                        break;
+                    default:
+                        throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
+                }
+
+                targetVersion = frameworkName.Version;
             }
-
-            RuntimeType targetRuntime = requestedFramework.Runtime;
-            Version targetVersion = requestedFramework.FrameworkVersion;
-
-            if (targetRuntime == RuntimeType.Any)
-                targetRuntime = currentFramework.Runtime;
-
-            if (targetVersion == RuntimeFramework.DefaultVersion)
-                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, currentFramework.FrameworkVersion);
 
             if (!new RuntimeFramework(targetRuntime, targetVersion).IsAvailable)
             {

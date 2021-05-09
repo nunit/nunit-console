@@ -15,6 +15,10 @@ using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Communication.Transports.Remoting
 {
+    /// <summary>
+    /// TestAgencyRemotingTransport uses the remoting to connect a
+    /// TestAgency with its agents.
+    /// </summary>
     public class TestAgencyRemotingTransport : MarshalByRefObject, ITestAgencyTransport, ITestAgency, IDisposable
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgencyRemotingTransport));

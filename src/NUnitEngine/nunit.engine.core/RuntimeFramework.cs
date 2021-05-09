@@ -1,13 +1,14 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
+#if NETFRAMEWORK
 using NUnit.Engine.Internal.RuntimeFrameworks;
+#endif
 
 namespace NUnit.Engine
 {
@@ -45,7 +46,9 @@ namespace NUnit.Engine
         public static readonly Version DefaultVersion = new Version(0, 0);
 
         private static RuntimeFramework _currentFramework;
+#if NETFRAMEWORK
         private static List<RuntimeFramework> _availableFrameworks;
+#endif
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
@@ -133,6 +136,19 @@ namespace NUnit.Engine
                             return new Version(2, 0, 50727);
                         case 4:
                             return new Version(4, 0, 30319);
+                    }
+                    break;
+                case RuntimeType.NetCore:
+                    switch (frameworkVersion.Major)
+                    {
+                        case 1:
+                        case 2:
+                            // For pre-3.0 versions of .NET Core, Environment.Version returns 4.0.30319.42000
+                            return new Version(4, 0, 30319);
+                        case 3:
+                            return new Version(3, 1, 10);
+                        case 5:
+                            return new Version(5, 0, 1);
                     }
                     break;
             }
@@ -241,6 +257,7 @@ namespace NUnit.Engine
             }
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Gets an array of all available frameworks
         /// </summary>
@@ -254,6 +271,7 @@ namespace NUnit.Engine
                 return _availableFrameworks.ToArray();
             }
         }
+#endif
 
         /// <summary>
         /// The version of Mono in use or null if no Mono runtime
@@ -305,6 +323,7 @@ namespace NUnit.Engine
             }
         }
 
+#if NETFRAMEWORK
         /// <summary>
         /// Returns true if the current RuntimeFramework is available.
         /// In the current implementation, only Mono and Microsoft .NET
@@ -322,6 +341,7 @@ namespace NUnit.Engine
                 return false;
             }
         }
+#endif
 
         /// <summary>
         /// The type of this runtime framework
@@ -421,9 +441,14 @@ namespace NUnit.Engine
 
         /// <summary>
         /// Returns true if the current framework matches the
-        /// one supplied as an argument. Two frameworks match
-        /// if their runtime types are the same or either one
-        /// is RuntimeType.Any and all specified version components
+        /// one supplied as an argument. Both the RuntimeType
+        /// and the version must match.
+        /// 
+        /// Two RuntimeTypes match if they are equal, if either one
+        /// is RuntimeType.Any or if one is RuntimeType.Net and
+        /// the other is RuntimeType.Mono.
+        /// 
+        /// Two versions match if all specified version components
         /// are equal. Negative (i.e. unspecified) version
         /// components are ignored.
         /// </summary>
@@ -431,9 +456,7 @@ namespace NUnit.Engine
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
         public bool Supports(RuntimeFramework target)
         {
-            if (this.Runtime != RuntimeType.Any
-                && target.Runtime != RuntimeType.Any
-                && this.Runtime != target.Runtime)
+            if (!this.Supports(target.Runtime))
                 return false;
 
             if (this.AllowAnyVersion || target.AllowAnyVersion)
@@ -442,6 +465,23 @@ namespace NUnit.Engine
             return VersionsMatch(this.ClrVersion, target.ClrVersion)
                 && this.FrameworkVersion.Major >= target.FrameworkVersion.Major
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
+        }
+
+        private bool Supports(RuntimeType targetRuntime)
+        {
+            if (this.Runtime == targetRuntime)
+                return true;
+
+            if (this.Runtime == RuntimeType.Any || targetRuntime == RuntimeType.Any)
+                return true;
+
+            if (this.Runtime == RuntimeType.Net && targetRuntime == RuntimeType.Mono)
+                return true;
+
+            if (this.Runtime == RuntimeType.Mono && targetRuntime == RuntimeType.Net)
+                return true;
+
+            return false;
         }
 
         public bool CanLoad(IRuntimeFramework requested)
@@ -481,6 +521,8 @@ namespace NUnit.Engine
             {
                 case RuntimeType.Net:
                     return ".NET";
+                case RuntimeType.NetCore:
+                    return ".NETCore";
                 default:
                     return runtime.ToString();
             }
@@ -494,6 +536,25 @@ namespace NUnit.Engine
                   (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision);
         }
 
+        private static string GetMonoPrefixFromAssembly(Assembly assembly)
+        {
+            string prefix = assembly.Location;
+
+            // In all normal mono installations, there will be sufficient
+            // levels to complete the four iterations. But just in case
+            // files have been copied to some non-standard place, we check.
+            for (int i = 0; i < 4; i++)
+            {
+                string dir = Path.GetDirectoryName(prefix);
+                if (string.IsNullOrEmpty(dir)) break;
+
+                prefix = dir;
+            }
+
+            return prefix;
+        }
+
+#if NETFRAMEWORK
         private static void FindAvailableFrameworks()
         {
             _availableFrameworks = new List<RuntimeFramework>();
@@ -502,6 +563,7 @@ namespace NUnit.Engine
                 _availableFrameworks.AddRange(DotNetFrameworkLocator.FindDotNetFrameworks());
 
             FindDefaultMonoFramework();
+            FindDotNetCoreFrameworks();
         }
 
         private static void FindDefaultMonoFramework()
@@ -523,24 +585,6 @@ namespace NUnit.Engine
 
             // If Mono 4.0+ or no profiles found, just use current runtime
             _availableFrameworks.Add(RuntimeFramework.CurrentFramework);
-        }
-
-        private static string GetMonoPrefixFromAssembly(Assembly assembly)
-        {
-            string prefix = assembly.Location;
-
-            // In all normal mono installations, there will be sufficient
-            // levels to complete the four iterations. But just in case
-            // files have been copied to some non-standard place, we check.
-            for (int i = 0; i < 4; i++)
-            {
-                string dir = Path.GetDirectoryName(prefix);
-                if (string.IsNullOrEmpty(dir)) break;
-
-                prefix = dir;
-            }
-
-            return prefix;
         }
 
         private static void FindBestMonoFrameworkOnWindows()
@@ -641,6 +685,73 @@ namespace NUnit.Engine
 
             _availableFrameworks.Add(framework);
         }
+
+        private static void FindDotNetCoreFrameworks()
+        {
+            const string WINDOWS_INSTALL_DIR = "C:\\Program Files\\dotnet\\";
+            const string LINUX_INSTALL_DIR = "/usr/shared/dotnet/";
+            string INSTALL_DIR = Path.DirectorySeparatorChar == '\\'
+                ? WINDOWS_INSTALL_DIR
+                : LINUX_INSTALL_DIR;
+
+            if (!Directory.Exists(INSTALL_DIR))
+                return;
+            if (!File.Exists(Path.Combine(INSTALL_DIR, "dotnet.exe")))
+                return;
+
+            string runtimeDir = Path.Combine(INSTALL_DIR, Path.Combine("shared", "Microsoft.NETCore.App"));
+            if (!Directory.Exists(runtimeDir))
+                return;
+
+            var dirList = new DirectoryInfo(runtimeDir).GetDirectories();
+            var dirNames = new List<string>();
+            foreach (var dir in dirList)
+                dirNames.Add(dir.Name);
+            var runtimes = GetNetCoreRuntimesFromDirectoryNames(dirNames);
+
+            _availableFrameworks.AddRange(runtimes);
+        }
+
+        // Deal with oddly named directories, which may sometimes appear when previews are installed
+        internal static IList<RuntimeFramework> GetNetCoreRuntimesFromDirectoryNames(IEnumerable<string> dirNames)
+        {
+            const string VERSION_CHARS = ".0123456789";
+            var runtimes = new List<RuntimeFramework>();
+
+            foreach (string dirName in dirNames)
+            {
+                int len = 0;
+                foreach (char c in dirName)
+                {
+                    if (VERSION_CHARS.IndexOf(c) >= 0)
+                        len++;
+                    else
+                        break;
+                }
+
+                if (len == 0)
+                    continue;
+
+                Version fullVersion = null;
+                try
+                {
+                    fullVersion = new Version(dirName.Substring(0, len));
+                }
+                catch
+                {
+                    continue;
+                }
+
+                var newVersion = new Version(fullVersion.Major, fullVersion.Minor);
+                int count = runtimes.Count;
+                if (count > 0 && runtimes[count - 1].FrameworkVersion == newVersion)
+                    continue;
+
+                runtimes.Add(new RuntimeFramework(RuntimeType.NetCore, newVersion));
+            }
+
+            return runtimes;
+        }
+#endif
     }
 }
-#endif

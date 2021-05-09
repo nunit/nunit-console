@@ -7,7 +7,7 @@ using System.Diagnostics;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Communication.Transports.Remoting;
-//using NUnit.Engine.Communication.Transports.Tcp;
+using NUnit.Engine.Communication.Transports.Tcp;
 
 namespace NUnit.Engine.Services
 {
@@ -32,17 +32,17 @@ namespace NUnit.Engine.Services
 
         // Transports used for various target runtimes
         private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
-        //private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
+        private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
 
         internal virtual string RemotingUrl => _remotingTransport.ServerUrl;
-        //internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
+        internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
 
         public TestAgency() : this( "TestAgency", 0 ) { }
 
         public TestAgency( string uri, int port )
         {
             _remotingTransport = new TestAgencyRemotingTransport(this, uri, port);
-            //_tcpTransport = new TestAgencyTcpTransport(this, port);
+            _tcpTransport = new TestAgencyTcpTransport(this, port);
         }
 
         public void Register(ITestAgent agent)
@@ -56,12 +56,16 @@ namespace NUnit.Engine.Services
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
 
-            // If target runtime is not available, something went wrong earlier
+            // If target runtime is not available, something went wrong earlier.
+            // We list all available frameworks to use in debugging.
             var targetRuntime = RuntimeFramework.Parse(runtimeSetting);
             if (!_runtimeService.IsAvailable(targetRuntime.Id))
-                throw new ArgumentException(
-                    string.Format("The {0} framework is not available", targetRuntime),
-                    "framework");
+            {
+                string msg = $"The {targetRuntime} framework is not available.\r\nAvailable frameworks:";
+                foreach (var runtime in RuntimeFramework.AvailableFrameworks)
+                    msg += $" {runtime}";
+                throw new ArgumentException(msg);
+            }
 
             var agentId = Guid.NewGuid();
             var agentProcess = new AgentProcess(this, package, agentId);
@@ -164,7 +168,7 @@ namespace NUnit.Engine.Services
             try
             {
                 _remotingTransport.Stop();
-                //_tcpTransport.Stop();
+                _tcpTransport.Stop();
             }
             finally
             {
@@ -181,8 +185,8 @@ namespace NUnit.Engine.Services
                 try
                 {
                 _remotingTransport.Start();
-                //_tcpTransport.Start();
-                Status = ServiceStatus.Started;
+                    _tcpTransport.Start();
+                    Status = ServiceStatus.Started;
             }
             catch
             {

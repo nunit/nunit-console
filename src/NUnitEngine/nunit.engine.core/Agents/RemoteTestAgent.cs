@@ -1,13 +1,8 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
-using System.Threading;
 using NUnit.Common;
 using NUnit.Engine.Communication.Transports;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Agents
 {
@@ -47,4 +42,3 @@ namespace NUnit.Engine.Agents
         }
     }
 }
-#endif
