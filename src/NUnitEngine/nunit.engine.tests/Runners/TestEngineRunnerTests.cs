@@ -3,14 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml;
-using NUnit.Engine.Internal;
+using NUnit.Engine.Runners;
+using NUnit.Engine.Services;
 using NUnit.Framework;
-using NUnit.Tests;
 using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Tests.Runners
 {
     // Temporarily commenting out Process tests due to
     // intermittent errors, probably due to the test
@@ -46,15 +45,15 @@ namespace NUnit.Engine.Runners.Tests
         {
             // Add all services needed by any of our TestEngineRunners
             _services = new ServiceContext();
-            _services.Add(new Services.ExtensionService());
-            _services.Add(new Services.ProjectService());
+            _services.Add(new ExtensionService());
+            _services.Add(new ProjectService());
 #if NETFRAMEWORK
-            _services.Add(new Services.DomainManager());
-            _services.Add(new Services.RuntimeFrameworkService());
-            _services.Add(new Services.TestAgency("ProcessRunnerTests", 0));
+            _services.Add(new DomainManager());
+            _services.Add(new RuntimeFrameworkService());
+            _services.Add(new TestAgency("ProcessRunnerTests", 0));
 #endif
-            _services.Add(new Services.DriverService());
-            _services.Add(new Services.DefaultTestRunnerFactory());
+            _services.Add(new DriverService());
+            _services.Add(new DefaultTestRunnerFactory());
             _services.ServiceManager.StartServices();
 
             var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");

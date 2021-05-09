@@ -3,13 +3,13 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Xml;
-using NUnit.Tests.Assemblies;
+using NUnit.Engine.Drivers;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Drivers.Tests
+namespace NUnit.Engine.Tests.Drivers
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
     public class NUnit3FrameworkDriverTests

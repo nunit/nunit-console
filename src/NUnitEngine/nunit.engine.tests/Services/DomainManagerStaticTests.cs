@@ -5,9 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using NUnit.Engine.Services;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
     public static class DomainManagerStaticTests
     {

@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Engine.Extensibility;
+using NUnit.Engine.Services;
 
-namespace NUnit.Engine.Services.Tests.Fakes
+namespace NUnit.Engine.Tests.Services.Fakes
 {
     public class FakeProjectService : FakeService, IProjectService
     {

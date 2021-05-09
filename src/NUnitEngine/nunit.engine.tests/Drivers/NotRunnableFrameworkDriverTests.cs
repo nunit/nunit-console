@@ -3,12 +3,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using NUnit.Engine.Drivers;
+using NUnit.Engine.Extensibility;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
-using NUnit.Engine.Extensibility;
-using System;
 
-namespace NUnit.Engine.Drivers.Tests
+namespace NUnit.Engine.Tests.Drivers
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
     public abstract class NotRunnableFrameworkDriverTests

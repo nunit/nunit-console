@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
+using NUnit.Engine.Extensibility;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Engine.Tests.Internal.Extensibility
 {
     public class ExtensionAttributeTests
     {

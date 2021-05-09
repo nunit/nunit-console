@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services;
-using NUnit.Engine.Services.Tests.Fakes;
+using NUnit.Engine.Tests.Services.Fakes;
 using NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases;
 using NUnit.Framework;
 

@@ -2,12 +2,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using SIO = System.IO;
-using NUnit.Framework;
 using NSubstitute;
+using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Framework;
+using SIO = System.IO;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Tests.Internal
 {
     public class DirectoryFinderTests
     {

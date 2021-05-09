@@ -2,14 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using NUnit.Engine.Drivers;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
-    using Drivers;
-
     public class TestFilteringTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";

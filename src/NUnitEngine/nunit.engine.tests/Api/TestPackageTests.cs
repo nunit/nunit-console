@@ -3,7 +3,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Api.Tests
+namespace NUnit.Engine.Tests.Api
 {
     public class TestPackageTests_SingleAssembly
     {

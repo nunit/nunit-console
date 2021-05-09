@@ -2,13 +2,11 @@
 
 #if NETFRAMEWORK
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using NUnit.Engine.Services;
 using NUnit.Framework;
-using NUnit.Tests;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
     public class RuntimeFrameworkServiceTests
     {

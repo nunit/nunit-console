@@ -1,17 +1,18 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Linq;
-using NUnit.Framework;
-using NUnit.Engine.Extensibility;
-using System.IO;
-using System.Reflection;
 using System.Collections.Generic;
-using NUnit.Engine.Internal;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using NSubstitute;
+using NUnit.Engine.Extensibility;
+using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Engine.Services;
+using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
     public class ExtensionServiceTests
     {

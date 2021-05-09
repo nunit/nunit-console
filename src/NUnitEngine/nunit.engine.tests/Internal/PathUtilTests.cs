@@ -3,9 +3,10 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using NUnit.Engine.Internal;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Tests.Internal
 {
     [TestFixture]
     public class PathUtilsTests

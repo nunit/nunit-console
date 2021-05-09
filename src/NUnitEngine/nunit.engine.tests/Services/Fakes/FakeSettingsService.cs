@@ -3,7 +3,7 @@
 using System;
 using NUnit.Engine.Internal;
 
-namespace NUnit.Engine.Services.Tests.Fakes
+namespace NUnit.Engine.Tests.Services.Fakes
 {
     public class FakeSettingsService : SettingsStore, IService
     {

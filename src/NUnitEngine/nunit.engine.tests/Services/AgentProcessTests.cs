@@ -2,12 +2,13 @@
 
 #if NETFRAMEWORK
 using System;
-using System.IO;
 using System.Diagnostics;
-using NUnit.Framework;
+using System.IO;
 using NSubstitute;
+using NUnit.Engine.Services;
+using NUnit.Framework;
 
-namespace NUnit.Engine.Services
+namespace NUnit.Engine.Tests.Services
 {
     public class AgentProcessTests
     {

@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine.Tests.Services
 {
     public class TestSelectionParserTests
     {

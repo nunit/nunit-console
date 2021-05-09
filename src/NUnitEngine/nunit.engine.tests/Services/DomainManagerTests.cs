@@ -3,10 +3,11 @@
 #if NETFRAMEWORK
 using System;
 using System.IO;
+using NUnit.Engine.Services;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
     public class DomainManagerTests
     {

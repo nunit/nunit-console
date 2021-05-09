@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-namespace NUnit.Engine.Services.Tests.Fakes
+namespace NUnit.Engine.Tests.Services.Fakes
 {
     public class FakeService : IService
     {

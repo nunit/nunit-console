@@ -2,9 +2,10 @@
 
 using System;
 using System.Threading;
+using NUnit.Engine.Runners;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Tests.Runners
 {
     public class ParallelTaskWorkerPoolTests
     {
