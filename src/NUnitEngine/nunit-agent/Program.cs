@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security;
 using NUnit.Common;
 using NUnit.Engine;
@@ -63,16 +64,20 @@ namespace NUnit.Agent
             InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
             log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
+            log.Info("Agent process {0} starting", pid);
+
             if (debugArgPassed)
                 TryLaunchDebugger();
 
             LocateAgencyProcess(agencyPid);
 
-            log.Info("Agent process {0} starting", pid);
-
-            log.Info("Running under version {0}, {1}",
-                Environment.Version,
-                RuntimeFramework.CurrentFramework.DisplayName);
+#if NETCOREAPP3_1
+            log.Info($"Running .NET Core 3.1 agent under {RuntimeInformation.FrameworkDescription}");
+#elif NET40
+            log.Info($"Running .NET 4.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
+#elif NET20
+            log.Info($"Running .NET 2.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
+#endif
 
             // Create CoreEngine
             var engine = new CoreEngine

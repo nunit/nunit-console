@@ -13,6 +13,8 @@ namespace NUnit.Engine
         /// <summary>Microsoft .NET Framework</summary>
         Net,
         /// <summary>Mono</summary>
-        Mono
+        Mono,
+        /// <summary>.NET Core</summary>
+        NetCore
     }
 }

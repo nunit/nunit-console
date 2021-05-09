@@ -35,6 +35,7 @@
     <file src="bin/agents/net20/nunit.engine.core.dll" target="tools/agents/net20" />
     <file src="bin/agents/net20/testcentric.engine.metadata.dll" target="tools/agents/net20" />
     <file src="../../nuget/runners/nunit.agent.addins" target="tools/agents/net20"/>
+    
     <file src="bin/agents/net40/nunit-agent.exe" target="tools/agents/net40" />
     <file src="bin/agents/net40/nunit-agent.exe.config" target="tools/agents/net40" />
     <file src="bin/agents/net40/nunit-agent-x86.exe" target="tools/agents/net40" />
@@ -44,6 +45,17 @@
     <file src="bin/agents/net40/nunit.engine.core.dll" target="tools/agents/net40" />
     <file src="bin/agents/net40/testcentric.engine.metadata.dll" target="tools/agents/net40" />
     <file src="../../nuget/runners/nunit.agent.addins" target="tools/agents/net40"/>
+    
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.dll.config" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.deps.json" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit.engine.api.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit.engine.api.xml" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit.engine.core.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="../../nuget/engine/nunit.agent.addins" target="tools/agents/netcoreapp3.1"/>
+
     <file src="bin/net20/nunit3-console.exe" target="tools" />
     <file src="bin/net20/nunit3-console.exe.config" target="tools" />
     <file src="bin/net20/nunit.engine.api.dll" target="tools" />

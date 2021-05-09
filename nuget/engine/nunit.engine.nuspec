@@ -34,10 +34,12 @@
   <files>
     <file src="LICENSE.txt" />
     <file src="NOTICES.txt" />
+    
     <file src="bin/net20/nunit.engine.dll" target="lib/net20" />
     <file src="bin/net20/nunit.engine.core.dll" target="lib/net20" />
     <file src="bin/net20/nunit.engine.api.dll" target="lib/net20" />
     <file src="bin/net20/testcentric.engine.metadata.dll" target="lib/net20" />
+    
     <file src="bin/agents/net20/nunit-agent.exe" target="contentFiles/any/agents/net20" />
     <file src="bin/agents/net20/nunit-agent.exe.config" target="contentFiles/any/agents/net20" />
     <file src="bin/agents/net20/nunit-agent-x86.exe" target="contentFiles/any/agents/net20" />
@@ -45,6 +47,7 @@
     <file src="bin/agents/net20/nunit.engine.core.dll" target="contentFiles/any/agents/net20" />
     <file src="bin/agents/net20/nunit.engine.api.dll" target="contentFiles/any/agents/net20" />
     <file src="bin/agents/net20/testcentric.engine.metadata.dll" target="contentFiles/any/agents/net20" />
+    
     <file src="bin/agents/net40/nunit-agent.exe" target="contentFiles/any/agents/net40" />
     <file src="bin/agents/net40/nunit-agent.exe.config" target="contentFiles/any/agents/net40" />
     <file src="bin/agents/net40/nunit-agent-x86.exe" target="contentFiles/any/agents/net40" />
@@ -52,19 +55,32 @@
     <file src="bin/agents/net40/nunit.engine.core.dll" target="contentFiles/any/agents/net40" />
     <file src="bin/agents/net40/nunit.engine.api.dll" target="contentFiles/any/agents/net40" />
     <file src="bin/agents/net40/testcentric.engine.metadata.dll" target="contentFiles/any/agents/net40" />
+    
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.dll" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.dll.config" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.deps.json" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit.engine.core.dll" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/nunit.engine.api.dll" target="contentFiles/any/agents/netcoreapp3.1" />
+    <file src="bin/agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="contentFiles/any/agents/netcoreapp3.1" />
+    
     <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/net20"/>
     <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/net20"/>
     <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/net40"/>
+    <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/netcoreapp3.1"/>
+
     <file src="bin/netstandard2.0/nunit.engine.dll" target="lib/netstandard2.0" />
     <file src="bin/netstandard2.0/nunit.engine.core.dll" target="lib/netstandard2.0" />
     <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netstandard2.0" />
     <file src="bin/netstandard2.0/testcentric.engine.metadata.dll" target="lib/netstandard2.0" />
     <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/netstandard2.0"/>
+
     <file src="bin/netcoreapp3.1/nunit.engine.dll" target="lib/netcoreapp3.1" />
     <file src="bin/netcoreapp3.1/nunit.engine.core.dll" target="lib/netcoreapp3.1" />
     <file src="bin/netcoreapp3.1/testcentric.engine.metadata.dll" target="lib/netcoreapp3.1" />
     <file src="bin/netstandard2.0/nunit.engine.api.dll" target="lib/netcoreapp3.1" />
     <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/netcoreapp3.1"/>
+
     <file src="../../nuget/engine/build/**/*" target="build" />
     <file src="../../nunit_256.png" target="images" />
   </files>

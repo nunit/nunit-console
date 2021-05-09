@@ -150,7 +150,19 @@ namespace NUnit.Engine.Tests
             new TestCaseData(
                 new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
                 new RuntimeFramework(RuntimeType.Mono, new Version(2,0)))
-                .Returns(false),
+                .Returns(true),
+            new TestCaseData(
+                new RuntimeFramework(RuntimeType.Mono, new Version(2,0)),
+                new RuntimeFramework(RuntimeType.Net, new Version(2,0)))
+                .Returns(true),
+            new TestCaseData(
+                new RuntimeFramework(RuntimeType.Net, new Version(4,0)),
+                new RuntimeFramework(RuntimeType.Mono, new Version(4,0)))
+                .Returns(true),
+            new TestCaseData(
+                new RuntimeFramework(RuntimeType.Mono, new Version(4,0)),
+                new RuntimeFramework(RuntimeType.Net, new Version(4,0)))
+                .Returns(true),
             new TestCaseData(
                 new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
                 new RuntimeFramework(RuntimeType.Net, new Version(1,1)))

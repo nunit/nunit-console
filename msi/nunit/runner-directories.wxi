@@ -13,6 +13,7 @@
           <Directory Id="AGENTS" Name="agents">
               <Directory Id="NET20_AGENT_DIR" Name="net20" />
               <Directory Id="NET40_AGENT_DIR" Name="net40" />
+              <Directory Id="NETCORE31_AGENT_DIR" Name="netcoreapp3.1" />
           </Directory>
       </Directory>
     </DirectoryRef>

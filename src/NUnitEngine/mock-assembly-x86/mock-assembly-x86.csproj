@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>NUnit.Tests</RootNamespace>
+    <TargetFrameworks>net35;net40;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.13.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\mock-assembly\*.cs" />
+    <None Include="..\..\nunit.snk" Link="nunit.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+</Project>

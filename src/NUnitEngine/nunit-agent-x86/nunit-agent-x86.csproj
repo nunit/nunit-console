@@ -6,7 +6,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
-    <IntermediateOutputPath>obj\$(Configuration)\x86\</IntermediateOutputPath>
     <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
   </PropertyGroup>
@@ -15,6 +14,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\nunit-agent\AgentExitCodes.cs" Link="AgentExitCodes.cs" />
+    <Compile Include="..\nunit-agent\Program.cs" Link="Program.cs" />
     <Compile Include="..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
   </ItemGroup>
   <ItemGroup>
