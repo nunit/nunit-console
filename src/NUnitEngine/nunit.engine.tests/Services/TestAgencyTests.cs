@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
+using NUnit.Engine.Tests.Services.Fakes;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
 {
-    using Fakes;
-
     public class TestAgencyTests
     {
         private TestAgency _testAgency;

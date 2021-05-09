@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System.IO;
 using NSubstitute;
+using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Framework;
-using System.IO;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Tests.Internal
 {
     /// <summary>
     /// Tests the implementation of <see cref="AddinsFileReader"/>.

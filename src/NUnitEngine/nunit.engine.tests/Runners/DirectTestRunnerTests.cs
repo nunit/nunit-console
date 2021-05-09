@@ -8,7 +8,7 @@ using NUnit.Engine.Extensibility;
 using NUnit.Engine.Tests.Runners.Fakes;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Tests.Runners
 {
     public class DirectTestRunnerTests
     {

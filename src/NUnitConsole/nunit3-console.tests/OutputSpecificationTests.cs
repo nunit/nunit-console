@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
+
 using System;
 using System.IO;
+using NUnit.Common;
 using NUnit.Framework;
 
-namespace NUnit.Common.Tests
+namespace NUnit.ConsoleRunner.Tests
 {
     public class OutputSpecificationTests
     {

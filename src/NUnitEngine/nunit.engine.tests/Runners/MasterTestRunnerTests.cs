@@ -4,15 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Xml;
+using NUnit.Engine.Runners;
+using NUnit.Engine.Services;
+using NUnit.Engine.Tests.Services.Fakes;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
-using NUnit.Engine.Services;
-using NUnit.Engine.Services.Tests.Fakes;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Tests.Runners
 {
     [TestFixtureSource(nameof(FixtureData))]
     public class MasterTestRunnerTests : ITestEventListener

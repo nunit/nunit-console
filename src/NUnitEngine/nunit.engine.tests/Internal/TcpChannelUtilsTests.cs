@@ -4,11 +4,12 @@
 using System;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using NUnit.Engine.Internal;
 using NUnit.Engine.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Tests.Internal
 {
     [TestFixture]
     [Parallelizable(ParallelScope.None)] // GetTcpChannel affects the whole AppDomain

@@ -3,7 +3,7 @@
 #if !NETCOREAPP2_0
 using System;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
     public partial class AgentStoreTests
     {

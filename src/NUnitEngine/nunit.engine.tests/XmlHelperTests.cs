@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
 using System.Xml;
 using NUnit.Framework;
 
-namespace NUnit.Tests
+namespace NUnit.Engine.Tests
 {
     public class XmlHelperTests
     {

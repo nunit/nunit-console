@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using NUnit.Framework;
 using NUnit.Engine.Drivers;
-using NUnit.Engine.Extensibility;
+using NUnit.Engine.Services;
+using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
     [TestFixture]
     public class DriverServiceTests

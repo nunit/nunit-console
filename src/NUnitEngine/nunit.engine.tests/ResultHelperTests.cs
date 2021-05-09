@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System.Xml;
+using NUnit.Engine.Internal;
+using NUnit.Framework;
+using Assert = NUnit.Engine.Tests.Internal.Assert;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Tests
 {
-    using Framework;
-
     public class ResultHelperTests
     {
         private const string resultText1 = "<test-assembly result=\"Passed\" total=\"23\" passed=\"23\" failed=\"0\" inconclusive=\"0\" skipped=\"0\" asserts=\"40\" />";
