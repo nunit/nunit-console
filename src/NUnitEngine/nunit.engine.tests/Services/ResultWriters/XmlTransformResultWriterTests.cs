@@ -3,7 +3,7 @@
 using System.IO;
 using System.Xml;
 using NUnit.Engine.Runners;
-using NUnit.Engine.Services.Tests.Fakes;
+using NUnit.Engine.Tests.Services.Fakes;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services.ResultWriters.Tests
