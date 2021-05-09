@@ -85,7 +85,7 @@ namespace NUnit.ConsoleRunner
 
             DisplayTestFiles();
 
-            TestPackage package = MakeTestPackage(_options);
+            var package = MakeTestPackage(_options);
 
             // We display the filters at this point so  that any exception message
             // thrown by CreateTestFilter will be understandable.
@@ -107,7 +107,7 @@ namespace NUnit.ConsoleRunner
             _outWriter.WriteLine();
         }
 
-        private int ExploreTests(TestPackage package, TestFilter filter)
+        private int ExploreTests(ITestPackage package, TestFilter filter)
         {
             XmlNode result;
 
@@ -130,7 +130,7 @@ namespace NUnit.ConsoleRunner
             return ConsoleRunner.OK;
         }
 
-        private int RunTests(TestPackage package, TestFilter filter)
+        private int RunTests(ITestPackage package, TestFilter filter)
         {
 
             var writer = new ColorConsoleWriter(!_options.NoColor);
@@ -364,9 +364,9 @@ namespace NUnit.ConsoleRunner
         }
 
         // This is public static for ease of testing
-        public static TestPackage MakeTestPackage(ConsoleOptions options)
+        public ITestPackage MakeTestPackage(ConsoleOptions options)
         {
-            TestPackage package = new TestPackage(options.InputFiles);
+            var package = _engine.CreatePackage(options.InputFiles);
 
             if (options.ProcessModelSpecified)
                 package.AddSetting(EnginePackageSettings.ProcessModel, options.ProcessModel);
@@ -453,7 +453,7 @@ namespace NUnit.ConsoleRunner
         /// <summary>
         /// Sets test parameters, handling backwards compatibility.
         /// </summary>
-        private static void AddTestParametersSetting(TestPackage testPackage, IDictionary<string, string> testParameters)
+        private static void AddTestParametersSetting(ITestPackage testPackage, IDictionary<string, string> testParameters)
         {
             testPackage.AddSetting(FrameworkPackageSettings.TestParametersDictionary, testParameters);
 

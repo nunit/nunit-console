@@ -23,7 +23,7 @@ namespace NUnit.Engine
     /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
     [Serializable]
-    public class TestPackage
+    public class TestPackage : ITestPackage
     {
         /// <summary>
         /// Construct a top-level TestPackage that wraps one or more
@@ -90,7 +90,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the list of SubPackages contained in this package
         /// </summary>
-        public IList<TestPackage> SubPackages { get; } = new List<TestPackage>();
+        public IList<ITestPackage> SubPackages { get; } = new List<ITestPackage>();
 
         /// <summary>
         /// Gets the settings dictionary for this package.
@@ -101,7 +101,7 @@ namespace NUnit.Engine
         /// Add a subpackage to the package.
         /// </summary>
         /// <param name="subPackage">The subpackage to be added</param>
-        public void AddSubPackage(TestPackage subPackage)
+        public void AddSubPackage(ITestPackage subPackage)
         {
             SubPackages.Add(subPackage);
 
@@ -114,9 +114,9 @@ namespace NUnit.Engine
         /// the only way to add a named subpackage to the top-level package.
         /// </summary>
         /// <param name="packageName">The name of the subpackage to be added</param>
-        public TestPackage AddSubPackage(string packageName)
+        public ITestPackage AddSubPackage(string packageName)
         {
-            var subPackage = new TestPackage() { FullName = Path.GetFullPath(packageName) };
+            var subPackage = new TestPackage { FullName = Path.GetFullPath(packageName) };
             SubPackages.Add(subPackage);
 
             return subPackage;

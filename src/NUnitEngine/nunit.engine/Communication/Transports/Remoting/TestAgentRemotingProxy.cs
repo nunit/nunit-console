@@ -23,7 +23,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
         public Guid Id { get; private set; }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
+        public ITestEngineRunner CreateRunner(ITestPackage package)
         {
             return _remoteAgent.CreateRunner(package);
         }

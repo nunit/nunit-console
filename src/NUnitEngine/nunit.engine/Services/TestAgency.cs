@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services
             _agentStore.Register(agent);
         }
 
-        public ITestAgent GetAgent(TestPackage package)
+        public ITestAgent GetAgent(ITestPackage package)
         {
             // Target Runtime must be specified by this point
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");

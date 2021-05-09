@@ -14,7 +14,7 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(AgentProcess));
 
-        public AgentProcess(TestAgency agency, TestPackage package, Guid agentId)
+        public AgentProcess(TestAgency agency, ITestPackage package, Guid agentId)
         {
             // Get target runtime
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");

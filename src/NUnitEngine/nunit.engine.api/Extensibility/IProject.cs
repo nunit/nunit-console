@@ -33,7 +33,7 @@ namespace NUnit.Engine.Extensibility
         /// specified in the project format.
         /// </summary>
         /// <returns>A TestPackage</returns>
-        TestPackage GetTestPackage();
+        ITestPackage GetTestPackage();
 
         /// <summary>
         /// Gets a TestPackage for a specific configuration
@@ -43,6 +43,6 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="configName">The name of the config to use</param>
         /// <returns>A TestPackage for the named configuration.</returns>
-        TestPackage GetTestPackage(string configName);
+        ITestPackage GetTestPackage(string configName);
     }
 }

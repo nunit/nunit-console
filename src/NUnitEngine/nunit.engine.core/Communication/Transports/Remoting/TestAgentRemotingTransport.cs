@@ -95,7 +95,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
             });
         }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
+        public ITestEngineRunner CreateRunner(ITestPackage package)
         {
             _runner = Agent.CreateRunner(package);
             return this;

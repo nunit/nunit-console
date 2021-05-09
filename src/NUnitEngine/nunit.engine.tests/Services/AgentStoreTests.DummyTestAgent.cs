@@ -16,7 +16,7 @@ namespace NUnit.Engine.Services.Tests
 
             public Guid Id { get; }
 
-            public ITestEngineRunner CreateRunner(TestPackage package)
+            public ITestEngineRunner CreateRunner(ITestPackage package)
             {
                 throw new NotImplementedException();
             }

@@ -14,9 +14,9 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="services">The services.</param>
         /// <param name="package">The package.</param>
-        public MultipleTestDomainRunner(IServiceLocator services, TestPackage package) : base(services, package) { }
+        public MultipleTestDomainRunner(IServiceLocator services, ITestPackage package) : base(services, package) { }
 
-        protected override ITestEngineRunner CreateRunner(TestPackage package)
+        protected override ITestEngineRunner CreateRunner(ITestPackage package)
         {
             return new TestDomainRunner(Services, package);
         }

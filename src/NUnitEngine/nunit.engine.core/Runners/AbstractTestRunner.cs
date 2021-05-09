@@ -14,7 +14,7 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public abstract class AbstractTestRunner : ITestEngineRunner
     {
-        public AbstractTestRunner(IServiceLocator services, TestPackage package)
+        public AbstractTestRunner(IServiceLocator services, ITestPackage package)
         {
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
@@ -24,14 +24,14 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// Our Service Context
         /// </summary>
-        protected IServiceLocator Services { get; private set; }
+        protected IServiceLocator Services { get; }
 
-        protected ITestRunnerFactory TestRunnerFactory { get; private set; }
+        protected ITestRunnerFactory TestRunnerFactory { get; }
 
         /// <summary>
         /// The TestPackage for which this is the runner
         /// </summary>
-        protected TestPackage TestPackage { get; set; }
+        protected ITestPackage TestPackage { get; }
 
         /// <summary>
         /// The result of the last call to LoadPackage

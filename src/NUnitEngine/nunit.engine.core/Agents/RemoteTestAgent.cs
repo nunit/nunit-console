@@ -36,7 +36,7 @@ namespace NUnit.Engine.Agents
             Transport.Stop();
         }
 
-        public override ITestEngineRunner CreateRunner(TestPackage package)
+        public override ITestEngineRunner CreateRunner(ITestPackage package)
         {
             return Services.GetService<ITestRunnerFactory>().MakeTestRunner(package);
         }

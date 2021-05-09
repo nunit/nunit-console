@@ -20,7 +20,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">The TestPackage to be loaded and run</param>
         /// <returns>An ITestEngineRunner</returns>
-        public virtual ITestEngineRunner MakeTestRunner(TestPackage package)
+        public virtual ITestEngineRunner MakeTestRunner(ITestPackage package)
         {
 #if !NETFRAMEWORK
             return new LocalTestRunner(ServiceContext, package);
@@ -35,7 +35,7 @@ namespace NUnit.Engine.Services
 #endif
         }
 
-        public virtual bool CanReuse(ITestEngineRunner runner, TestPackage package)
+        public virtual bool CanReuse(ITestEngineRunner runner, ITestPackage package)
         {
             return false;
         }

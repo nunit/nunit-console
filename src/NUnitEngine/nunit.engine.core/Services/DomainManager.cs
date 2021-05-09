@@ -30,7 +30,7 @@ namespace NUnit.Engine.Services
         /// Construct an application domain for running a test package
         /// </summary>
         /// <param name="package">The TestPackage to be run</param>
-        public AppDomain CreateDomain( TestPackage package )
+        public AppDomain CreateDomain(ITestPackage package)
         {
             AppDomainSetup setup = CreateAppDomainSetup(package);
 
@@ -71,7 +71,7 @@ namespace NUnit.Engine.Services
         }
 
         // Made separate and internal for testing
-        AppDomainSetup CreateAppDomainSetup(TestPackage package)
+        AppDomainSetup CreateAppDomainSetup(ITestPackage package)
         {
             AppDomainSetup setup = new AppDomainSetup();
 
@@ -180,7 +180,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">The package</param>
         /// <returns>The ApplicationBase</returns>
-        public static string GetApplicationBase(TestPackage package)
+        public static string GetApplicationBase(ITestPackage package)
         {
             Guard.ArgumentNotNull(package, "package");
 
@@ -203,7 +203,7 @@ namespace NUnit.Engine.Services
             return appBase;
         }
 
-        public static string GetConfigFile(string appBase, TestPackage package)
+        public static string GetConfigFile(string appBase, ITestPackage package)
         {
             Guard.ArgumentNotNullOrEmpty(appBase, "appBase");
             Guard.ArgumentNotNull(package, "package");
@@ -241,7 +241,7 @@ namespace NUnit.Engine.Services
             return ext == ".dll" || ext == ".exe";
         }
 
-        public static string GetCommonAppBase(IList<TestPackage> packages)
+        private static string GetCommonAppBase(IList<ITestPackage> packages)
         {
             var assemblies = new List<string>();
             foreach (var package in packages)
@@ -271,7 +271,7 @@ namespace NUnit.Engine.Services
             return GetPrivateBinPath(basePath, new string[] { fileName });
         }
 
-        public static string GetPrivateBinPath(string appBase, TestPackage package)
+        public static string GetPrivateBinPath(string appBase, ITestPackage package)
         {
             var binPath = package.GetSetting(EnginePackageSettings.PrivateBinPath, string.Empty);
 
@@ -285,7 +285,7 @@ namespace NUnit.Engine.Services
             return binPath;
         }
 
-        public static string GetPrivateBinPath(string basePath, IList<TestPackage> packages)
+        private static string GetPrivateBinPath(string basePath, IList<ITestPackage> packages)
         {
             var assemblies = new List<string>();
             foreach (var package in packages)

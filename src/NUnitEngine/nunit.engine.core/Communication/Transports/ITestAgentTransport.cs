@@ -11,6 +11,6 @@ namespace NUnit.Engine.Communication.Transports
     public interface ITestAgentTransport : ITransport
     {
         TestAgent Agent { get; }
-        ITestEngineRunner CreateRunner(TestPackage package);
+        ITestEngineRunner CreateRunner(ITestPackage package);
     }
 }

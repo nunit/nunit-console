@@ -43,7 +43,7 @@ namespace NUnit.Engine.Runners
 
         protected AppDomain TestDomain { get; set; }
 
-        public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public DirectTestRunner(IServiceLocator services, ITestPackage package) : base(services, package)
         {
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
@@ -101,6 +101,9 @@ namespace NUnit.Engine.Runners
             // found in the terminal nodes.
             var packagesToLoad = TestPackage.Select(p => !p.HasSubPackages());
 
+            var testPackage = new TestPackage();
+            testPackage.Select(p => !p.HasSubPackages());
+
             var driverService = Services.GetService<IDriverService>();
 
             _drivers.Clear();
@@ -129,7 +132,7 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
-        private static string LoadDriver(IFrameworkDriver driver, string testFile, TestPackage subPackage)
+        private static string LoadDriver(IFrameworkDriver driver, string testFile, ITestPackage subPackage)
         {
             try
             {

@@ -47,7 +47,7 @@ namespace NUnit.Engine.Runners
 
         private const int WAIT_FOR_CANCEL_TO_COMPLETE = 5000;
 
-        public MasterTestRunner(IServiceLocator services, TestPackage package)
+        public MasterTestRunner(IServiceLocator services, ITestPackage package)
         {
             if (services == null) throw new ArgumentNullException("services");
             if (package == null) throw new ArgumentNullException("package");
@@ -72,7 +72,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// The TestPackage for which this is the runner
         /// </summary>
-        protected TestPackage TestPackage { get; set; }
+        protected ITestPackage TestPackage { get; set; }
 
         /// <summary>
         /// The result of the last call to LoadPackage
@@ -326,7 +326,7 @@ namespace NUnit.Engine.Runners
             return topLevelResult;
         }
 
-        private void EnsurePackagesAreExpanded(TestPackage package)
+        private void EnsurePackagesAreExpanded(ITestPackage package)
         {
             if (package == null) throw new ArgumentNullException("package");
 
@@ -341,7 +341,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        private bool IsProjectPackage(TestPackage package)
+        private bool IsProjectPackage(ITestPackage package)
         {
             if (package == null) throw new ArgumentNullException("package");
 

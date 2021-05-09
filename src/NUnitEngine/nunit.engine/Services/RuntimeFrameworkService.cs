@@ -92,7 +92,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">A TestPackage</param>
         /// <returns>A string representing the selected RuntimeFramework</returns>
-        public string SelectRuntimeFramework(TestPackage package)
+        public string SelectRuntimeFramework(ITestPackage package)
         {
             // Evaluate package target framework
             ApplyImageData(package);
@@ -101,7 +101,7 @@ namespace NUnit.Engine.Services
             return targetFramework.ToString();
         }
 
-        private RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
+        private RuntimeFramework SelectRuntimeFrameworkInner(ITestPackage package)
         {
             foreach (var subPackage in package.SubPackages)
             {
@@ -200,8 +200,7 @@ namespace NUnit.Engine.Services
         /// Use Mono.Cecil to get information about all assemblies and
         /// apply it to the package using special internal keywords.
         /// </summary>
-        /// <param name="package"></param>
-        private static void ApplyImageData(TestPackage package)
+        private static void ApplyImageData(ITestPackage package)
         {
             string packageName = package.FullName;
 

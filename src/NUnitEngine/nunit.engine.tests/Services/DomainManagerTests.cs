@@ -13,7 +13,7 @@ namespace NUnit.Engine.Services.Tests
         private DomainManager _domainManager;
         // We use a named subpackage because that's what is normally
         // used by the Domain Manager
-        private TestPackage _package = new TestPackage(MockAssembly.AssemblyPath).SubPackages[0];
+        private readonly ITestPackage _package = new TestPackage(MockAssembly.AssemblyPath).SubPackages[0];
 
         [SetUp]
         public void CreateDomainManager()

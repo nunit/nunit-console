@@ -20,12 +20,12 @@ namespace NUnit.Engine.Services
         bool CanLoadFrom(string path);
 
         /// <summary>
-        /// Expands a TestPackage based on a known project format, populating it
+        /// Expands an ITestPackage based on a known project format, populating it
         /// with the project contents and any settings the project provides. 
         /// Note that the package file path must be checked to ensure that it is
         /// a known project format before calling this method.
         /// </summary>
-        /// <param name="package">The TestPackage to be expanded</param>
-        void ExpandProjectPackage(TestPackage package);
+        /// <param name="package">The ITestPackage to be expanded</param>
+        void ExpandProjectPackage(ITestPackage package);
     }
 }
