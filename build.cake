@@ -888,11 +888,6 @@ Task("Appveyor")
     .IsDependentOn("Test")
     .IsDependentOn("Package");
 
-Task("Travis")
-    .Description("Builds and tests on Travis")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test");
-
 Task("Default")
     .Description("Builds the engine and console runner")
     .IsDependentOn("Build");
