@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Api.Tests
+namespace NUnit.Engine.Tests.Api
 {
     public class ServiceLocatorTests
     {
@@ -16,6 +14,12 @@ namespace NUnit.Engine.Api.Tests
         {
             _testEngine = new TestEngine();
             _testEngine.InternalTraceLevel = InternalTraceLevel.Off;
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _testEngine.Dispose();
         }
 
         [TestCase(typeof(ISettings))]
