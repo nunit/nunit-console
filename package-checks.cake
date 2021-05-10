@@ -9,11 +9,18 @@
 
 public void CheckAllPackages()
 {
-    string[] ENGINE_FILES = { "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+    string[] ENGINE_FILES = {
+        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
+        "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
     string[] AGENT_FILES = { 
-        "nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-    string[] CONSOLE_FILES = { "nunit3-console.exe", "nunit3-console.exe.config" };
-    string[] CONSOLE_FILES_NETCORE = { "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
+        "nunit-agent.exe", "nunit-agent.pdb", "nunit-agent.exe.config",
+        "nunit-agent-x86.exe", "nunit-agent-x86.pdb", "nunit-agent-x86.exe.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
+        "nunit.engine.core.pdb", "nunit.engine.api.pdb" };
+string[] CONSOLE_FILES = {
+        "nunit3-console.exe", "nunit3-console.pdb", "nunit3-console.exe.config" };
+    string[] CONSOLE_FILES_NETCORE = {
+        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.pdb", "nunit3-console.dll.config" };
 
     bool isOK =
         CheckNuGetPackage(
@@ -67,9 +74,10 @@ public void CheckAllPackages()
             HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES)) &
         CheckMsiPackage("NUnit.Console", 
             HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
-            HasDirectory("NUnit.org/nunit-console").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
-            HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
-            HasDirectory("NUnit.org/nunit-console/agents/net40").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
+            HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
+            ////HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles(AGENT_FILES),
+            ////HasDirectory("NUnit.org/nunit-console/agents/net40").WithFiles(AGENT_FILES),
+            ////HasDirectory("Nunit.org/nunit-console/agents/netcoreapp3.1").WithFiles("nunit-agent.exe", "nunit-agent-x86.exe"),
             HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll"));
 
     if (!isOK)

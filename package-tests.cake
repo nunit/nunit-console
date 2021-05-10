@@ -357,7 +357,13 @@ public class MsiPackageTester : NetFXPackageTester
                 PackageBinDir + "*.dll",
                 PackageBinDir + "agents/net20/");
             _context.CopyFiles(
+                PackageBinDir + "*.pdb",
+                PackageBinDir + "agents/net20/");
+            _context.CopyFiles(
                 PackageBinDir + "*.dll",
+                PackageBinDir + "agents/net40/");
+            _context.CopyFiles(
+                PackageBinDir + "*.pdb",
                 PackageBinDir + "agents/net40/");
         }
     }
