@@ -17,8 +17,7 @@ namespace NUnit.Engine.Tests.Services
         {
             _services = new ServiceContext();
             _services.Add(new FakeRuntimeService());
-            // Use a different URI to avoid conflicting with the "real" TestAgency
-            _testAgency = new TestAgency("TestAgencyTest", 0);
+            _testAgency = new TestAgency();
             _services.Add(_testAgency);
             _services.ServiceManager.StartServices();
         }
