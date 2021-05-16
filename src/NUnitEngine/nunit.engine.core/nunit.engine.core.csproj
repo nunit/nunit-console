@@ -16,7 +16,7 @@
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TestCentric.Metadata" Version="1.4.1" />
+    <PackageReference Include="TestCentric.Metadata" Version="1.7.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />

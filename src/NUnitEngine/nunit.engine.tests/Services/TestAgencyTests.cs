@@ -1,15 +1,16 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
+using NUnit.Engine.Services;
+using NUnit.Engine.Services.Tests.Fakes;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
-    using Fakes;
-
     public class TestAgencyTests
     {
         private TestAgency _testAgency;
+        private ServiceContext _services;
 
         [SetUp]
         public void CreateServiceContext()
@@ -19,6 +20,12 @@ namespace NUnit.Engine.Services.Tests
             _testAgency = new TestAgency();
             services.Add(_testAgency);
             services.ServiceManager.StartServices();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _services.ServiceManager.Dispose();
         }
 
         [Test]
