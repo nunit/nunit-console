@@ -15,11 +15,11 @@ namespace NUnit.Engine.Tests.Services
         [SetUp]
         public void CreateServiceContext()
         {
-            var services = new ServiceContext();
-            services.Add(new FakeRuntimeService());
+            _services = new ServiceContext();
+            _services.Add(new FakeRuntimeService());
             _testAgency = new TestAgency();
-            services.Add(_testAgency);
-            services.ServiceManager.StartServices();
+            _services.Add(_testAgency);
+            _services.ServiceManager.StartServices();
         }
 
         [TearDown]
