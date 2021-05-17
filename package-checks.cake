@@ -10,17 +10,19 @@
 public void CheckAllPackages()
 {
     string[] ENGINE_FILES = {
-        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
+        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+    string[] ENGINE_PDB_FILES = {
         "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-    string[] AGENT_FILES = { 
-        "nunit-agent.exe", "nunit-agent.pdb", "nunit-agent.exe.config",
-        "nunit-agent-x86.exe", "nunit-agent-x86.pdb", "nunit-agent-x86.exe.config",
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-        "nunit.engine.core.pdb", "nunit.engine.api.pdb" };
-string[] CONSOLE_FILES = {
-        "nunit3-console.exe", "nunit3-console.pdb", "nunit3-console.exe.config" };
+    string[] AGENT_FILES = {
+        "nunit-agent.exe", "nunit-agent.exe.config",
+        "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+    string[] AGENT_PDB_FILES = {
+        "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    string[] CONSOLE_FILES = {
+        "nunit3-console.exe", "nunit3-console.exe.config" };
     string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.pdb", "nunit3-console.dll.config" };
+        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
 
     bool isOK =
         CheckNuGetPackage(
@@ -29,7 +31,7 @@ string[] CONSOLE_FILES = {
         CheckNuGetPackage(
             "NUnit.ConsoleRunner",
             HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
+            HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckNuGetPackage(
