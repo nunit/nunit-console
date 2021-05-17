@@ -380,61 +380,38 @@ Task("BuildNuGetPackages")
     {
         CreateDirectory(PACKAGE_DIR);
 
-        NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
+        var basicPackSettings = new NuGetPackSettings()
         {
             Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+            NoPackageAnalysis = true,
+        };
 
-        NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
+        var packSettingsWithSymbols = new NuGetPackSettings()
         {
             Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+            NoPackageAnalysis = true,
+            Symbols = true,
+            // Not yet supported by cake as a setting
+            ArgumentCustomization = args => args.Append("-SymbolPackageFormat snupkg")
+        };
 
-        NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/engine/nunit.engine.api.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/engine/nunit.engine.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/deprecated/nunit.runners.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
 
-        NuGetPack("nuget/deprecated/nunit.engine.netstandard.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
+
+        NuGetPack("nuget/deprecated/nunit.runners.nuspec", basicPackSettings);
+
+        NuGetPack("nuget/deprecated/nunit.engine.netstandard.nuspec", basicPackSettings);
     });
 
 Task("TestNuGetPackages")
