@@ -6,8 +6,6 @@
                 <File Id="nunit.engine.dll"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/net20/nunit.engine.dll" />
-                <File Id="nunit.engine.pdb"
-                      Source="$(var.InstallImage)bin/net20/nunit.engine.pdb" />
             </Component>
             <Component Id="NUNIT.ENGINE.CORE" Location="local" Guid="F4F14D75-6096-467E-82E1-BD513645C0EF">
                 <File Id="nunit.engine.core.dll"
@@ -15,11 +13,6 @@
                       Source="$(var.InstallImage)bin/net20/nunit.engine.core.dll">
                     <CopyFile Id="nunit.agent.net20.engine.core.dll" DestinationDirectory="NET20_AGENT_DIR" />
                     <CopyFile Id="nunit.agent.net40.engine.core.dll" DestinationDirectory="NET40_AGENT_DIR" />
-                </File>
-                <File Id="nunit.engine.core.pdb"
-                      Source="$(var.InstallImage)bin/net20/nunit.engine.core.pdb">
-                    <CopyFile Id="nunit.agent.net20.engine.core.pdb" DestinationDirectory="NET20_AGENT_DIR" />
-                    <CopyFile Id="nunit.agent.net40.engine.core.pdb" DestinationDirectory="NET40_AGENT_DIR" />
                 </File>
             </Component>
             <Component Id="NUNIT.BUNDLE.ADDINS" Location="local" Guid="AE849966-843E-43E7-B3B0-95CD5A12C2C4">
@@ -32,11 +25,6 @@
                       Source="$(var.InstallImage)bin/net20/nunit.engine.api.dll">
                     <CopyFile Id="nunit.agent.net20.engine.api.dll" DestinationDirectory="NET20_AGENT_DIR" />
                     <CopyFile Id="nunit.agent.net40.engine.api.dll" DestinationDirectory="NET40_AGENT_DIR" />
-                </File>
-                <File Id="nunit.engine.api.pdb"
-                      Source="$(var.InstallImage)bin/net20/nunit.engine.api.pdb">
-                    <CopyFile Id="nunit.agent.net20.engine.api.pdb" DestinationDirectory="NET20_AGENT_DIR" />
-                    <CopyFile Id="nunit.agent.net40.engine.api.pdb" DestinationDirectory="NET40_AGENT_DIR" />
                 </File>
                 <File Id="nunit.engine.api.xml"
                       Source="$(var.InstallImage)bin/net20/nunit.engine.api.xml">
@@ -67,8 +55,6 @@
                 <File Id="nunit_agent_net20.exe"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent.exe" />
-                <File Id="nunit_agent_net20.pdb"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent.pdb" />
                 <File Id="nunit_agent_net20.exe.config"
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent.exe.config" />
             </Component>
@@ -76,8 +62,6 @@
                 <File Id="nunit_agent_net20_x86.exe"
                       ProcessorArchitecture="x86"
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe" />
-                <File Id="nunit_agent_net20_x86.pdb"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.pdb" />
                 <File Id="nunit_agent_net20_x86.exe.config"
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe.config" />
             </Component>
@@ -90,8 +74,6 @@
                 <File Id="nunit_agent_net40.exe"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/agents/net40/nunit-agent.exe" />
-                <File Id="nunit_agent_net40.pdb"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent.pdb" />
                 <File Id="nunit_agent_net40.exe.config"
                       Source="$(var.InstallImage)bin/agents/net40/nunit-agent.exe.config" />
             </Component>
@@ -99,8 +81,6 @@
                 <File Id="nunit_agent_net40_x86.exe"
                       ProcessorArchitecture="x86"
                       Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe" />
-                <File Id="nunit_agent_net40_x86.pdb"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.pdb" />
                 <File Id="nunit_agent_net40_x86.exe.config"
                       Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe.config" />
             </Component>
@@ -113,8 +93,6 @@
                 <File Id="nunit_agent_netcore31.exe"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.dll" />
-                <File Id="nunit_agent_netcore31.pdb"
-                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.pdb" />
                 <File Id="nunit_agent.deps.json"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.deps.json" />
                 <File Id="nunit_agent.runtimeconfig.json"
