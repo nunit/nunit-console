@@ -13,7 +13,7 @@ artifacts:
 
 deploy:
   - provider: NuGet
-    server: https://www.myget.org/F/nunit/api/v2
+    server: https://www.myget.org/F/nunit/api/v3/index.json
     api_key:
       secure: wtAvJDVl2tfwiVcyLExFHLvZVfUWiQRHsfdHBFCNEATeCHo1Nd8JP642PfY8xhji
     skip_symbols: true
