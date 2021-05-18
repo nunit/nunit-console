@@ -90,6 +90,8 @@ public abstract class PackageTester
                 var report = new TestReport(packageTest, result);
                 reporter.AddReport(report);
 
+                Console.WriteLine($"Ran tests in {_outputDir}");
+
                 Console.WriteLine(report.Errors.Count == 0
                     ? "\nSUCCESS: Test Result matches expected result!"
                     : "\nERROR: Test Result not as expected!");
@@ -138,7 +140,7 @@ public abstract class NetFXPackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -152,7 +154,7 @@ public abstract class NetFXPackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -166,7 +168,7 @@ public abstract class NetFXPackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -180,7 +182,7 @@ public abstract class NetFXPackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -194,7 +196,7 @@ public abstract class NetFXPackageTester : PackageTester
                 Total = 2 * 37,
                 Passed = 2 * 23,
                 Failed = 2 * 5,
-                Warnings = 0,
+                Warnings = 2 * 1,
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
@@ -208,7 +210,7 @@ public abstract class NetFXPackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -223,7 +225,7 @@ public abstract class NetFXPackageTester : PackageTester
                     Total = 37,
                     Passed = 23,
                     Failed = 5,
-                    Warnings = 0,
+                    Warnings = 1,
                     Inconclusive = 1,
                     Skipped = 7
                 }));
@@ -245,7 +247,7 @@ public abstract class NetCorePackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -259,7 +261,7 @@ public abstract class NetCorePackageTester : PackageTester
                 Total = 37,
                 Passed = 23,
                 Failed = 5,
-                Warnings = 0,
+                Warnings = 1,
                 Inconclusive = 1,
                 Skipped = 7
             }));
@@ -273,7 +275,7 @@ public abstract class NetCorePackageTester : PackageTester
                 Total = 2 * 37,
                 Passed = 2 * 23,
                 Failed = 2 * 5,
-                Warnings = 0,
+                Warnings = 2 * 1,
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
@@ -328,7 +330,7 @@ public class MsiPackageTester : NetFXPackageTester
                 Total = 2 * 37,
                 Passed = 2 * 23,
                 Failed = 2 * 5,
-                Warnings = 0,
+                Warnings = 2 * 1,
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
@@ -378,7 +380,7 @@ public class ZipPackageTester : NetFXPackageTester
                 Total = 2 * 37,
                 Passed = 2 * 23,
                 Failed = 2 * 5,
-                Warnings = 0,
+                Warnings = 2 * 1,
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
