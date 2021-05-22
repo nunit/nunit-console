@@ -59,6 +59,12 @@ namespace NUnit.Engine.Drivers
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
             _assemblyLoadContext = new CustomAssemblyLoadContext(assemblyPath);
 
+            _assemblyLoadContext.Resolving += (context, assemblyName) =>
+            {
+                var calc = context as CustomAssemblyLoadContext; 
+                return calc?.LoadFallback(assemblyName);
+            };
+
             try
             {
                 _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
