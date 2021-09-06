@@ -149,6 +149,8 @@ namespace NUnit.Engine
                             return new Version(3, 1, 10);
                         case 5:
                             return new Version(5, 0, 1);
+                        case 6:
+                            return new Version(6, 0, 0);
                     }
                     break;
             }
