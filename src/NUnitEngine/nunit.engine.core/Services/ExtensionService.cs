@@ -308,9 +308,17 @@ namespace NUnit.Engine.Services
         {
             log.Info("Scanning directory {0} for extensions", startDir.FullName);
 
+            if (WasVisited(startDir.FullName, fromWildCard))
+                return;
+            MarkAsVisited(startDir.FullName, fromWildCard);
+
             if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
+            {
                 foreach (var file in startDir.GetFiles("*.dll"))
+                {
                     ProcessCandidateAssembly(file.FullName, true);
+                }
+            }
         }
 
         /// <summary>
@@ -389,10 +397,10 @@ namespace NUnit.Engine.Services
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
-            if (Visited(filePath)) 
+            if (WasVisited(filePath, fromWildCard)) 
                 return;
 
-            Visit(filePath);
+            MarkAsVisited(filePath, fromWildCard);
 
             try
             {
@@ -430,14 +438,14 @@ namespace NUnit.Engine.Services
 
         private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
 
-        private bool Visited(string filePath)
+        private bool WasVisited(string filePath, bool fromWildcard)
         {
-            return _visited.ContainsKey(filePath);
+            return _visited.ContainsKey($"path={ filePath }_visited={fromWildcard}");
         }
 
-        private void Visit(string filePath)
+        private void MarkAsVisited(string filePath, bool fromWildcard)
         {
-            _visited.Add(filePath, null);
+            _visited.Add($"path={ filePath }_visited={fromWildcard}", null);
         }
 
         /// <summary>
