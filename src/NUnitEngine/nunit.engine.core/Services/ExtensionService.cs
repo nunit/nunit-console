@@ -306,17 +306,22 @@ namespace NUnit.Engine.Services
         /// </summary>
         private void ProcessDirectory(IDirectory startDir, bool fromWildCard)
         {
-            log.Info("Scanning directory {0} for extensions", startDir.FullName);
-
+            var directoryName = startDir.FullName;
             if (WasVisited(startDir.FullName, fromWildCard))
-                return;
-            MarkAsVisited(startDir.FullName, fromWildCard);
-
-            if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
             {
-                foreach (var file in startDir.GetFiles("*.dll"))
+                log.Warning($"Skipping directory '{directoryName}' because it was already visited.");
+            }
+            else
+            {
+                log.Info($"Scanning directory '{directoryName}' for extensions.");
+                MarkAsVisited(directoryName, fromWildCard);
+
+                if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
                 {
-                    ProcessCandidateAssembly(file.FullName, true);
+                    foreach (var file in startDir.GetFiles("*.dll"))
+                    {
+                        ProcessCandidateAssembly(file.FullName, true);
+                    }
                 }
             }
         }
