@@ -63,7 +63,7 @@ jobs:
       packageType: runtime
       version: 2.1.x
 
-- bash: |
+  - bash: |
      dotnet tool install --global Cake.Tool
      dotnet cake --target=Test --configuration=Release
     displayName: Build and test
