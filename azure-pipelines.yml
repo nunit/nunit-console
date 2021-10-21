@@ -43,17 +43,29 @@ jobs:
 
 - job: Linux
   pool:
-    vmImage: ubuntu-16.04
+    vmImage: ubuntu-latest
   steps:
 
-  - bash: |
-      wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-      sudo dpkg -i packages-microsoft-prod.deb
-      sudo apt-get install apt-transport-https
-      sudo apt-get update
-      sudo apt-get install dotnet-sdk-2.2
-      sudo apt-get install dotnet-runtime-5.0
-      ./build.sh --target=Test --configuration=Release
+  - task: UseDotNet@2
+    displayName: 'Install .NET 5.0'
+    inputs:
+      packageType: runtime
+      version: 5.x
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core SDK'
+    inputs:
+      version: 3.1.x
+      
+  - task: UseDotNet@2
+    displayName: 'Install .NET Core runtime 2.1'
+    inputs:
+      packageType: runtime
+      version: 2.1.x
+
+- bash: |
+     dotnet tool install --global Cake.Tool
+     dotnet cake --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
