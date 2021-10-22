@@ -635,7 +635,8 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void ProcessAddinsFile_Issue915_AddinsFilePointsToContainingDirectory()
+        [Platform("win")]
+        public void ProcessAddinsFile_Issue915_AddinsFilePointsToContainingDirectory_Windows()
         {
             // Arrange
             var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
@@ -671,9 +672,9 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.GetDirectories(startDirectory, "./").Returns(new[] { startDirectory });
             directoryFinder.GetFiles(startDirectory, string.Empty).Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, $"..{Path.DirectorySeparatorChar}{Path.GetFileName(startDirectoryPath)}{Path.DirectorySeparatorChar}").Returns(new[] { testAssembly });
-            directoryFinder.GetFiles(startDirectory, $"*{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}").Returns(new[] { testAssembly });
-            directoryFinder.GetFiles(startDirectory, $"**{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}").Returns(new[] { testAssembly });
-            directoryFinder.GetFiles(startDirectory, $"**{Path.DirectorySeparatorChar}.{Path.DirectorySeparatorChar}").Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, @"*\..\").Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, @"**\..\").Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, @"**\.\").Returns(new[] { testAssembly });
             var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
 
             // Act
@@ -686,10 +687,70 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.Received().GetDirectories(startDirectory, "./");
             directoryFinder.Received().GetFiles(startDirectory, string.Empty);
             directoryFinder.Received().GetFiles(startDirectory, $"..{Path.DirectorySeparatorChar}{Path.GetFileName(startDirectoryPath)}{Path.DirectorySeparatorChar}");
-            directoryFinder.Received().GetFiles(startDirectory, $"*{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
-            directoryFinder.Received().GetFiles(startDirectory, $"**{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}");
-            directoryFinder.Received().GetFiles(startDirectory, $"**{Path.DirectorySeparatorChar}.{Path.DirectorySeparatorChar}");
+            directoryFinder.Received().GetFiles(startDirectory, @"*\..\");
+            directoryFinder.Received().GetFiles(startDirectory, @"**\..\");
+            directoryFinder.Received().GetFiles(startDirectory, @"**\.\");
             addinsReader.Received().Read(addinsFile);
+        }
+
+        [Test]
+        [Platform("linux,macosx,unix")]
+        public void ProcessAddinsFile_Issue915_AddinsFilePointsToContainingDirectory_NonWindows()
+        {
+            // Arrange
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectory = Substitute.For<IDirectory>();
+            startDirectory.FullName.Returns(startDirectoryPath);
+
+            // Faking the presence of the assembly is required to reproduce the error described in GitHub issue 915...
+            var testAssembly = Substitute.For<IFile>();
+            testAssembly.Parent.Returns(startDirectory);
+            testAssembly.FullName.Returns(typeof(ExtensionService).Assembly.Location);
+            startDirectory.GetFiles("*.dll").Returns(new[] { testAssembly });
+
+            var parentPath = new DirectoryInfo(startDirectoryPath).Parent.FullName;
+            var parentDirectory = Substitute.For<IDirectory>();
+            parentDirectory.FullName.Returns(parentPath);
+            var addinsFile = Substitute.For<IFile>();
+            addinsFile.Parent.Returns(startDirectory);
+            addinsFile.FullName.Returns(Path.Combine(startDirectoryPath, "my.addins"));
+            startDirectory.GetFiles("*.addins").Returns(new[] { addinsFile });
+            var fileSystem = Substitute.For<IFileSystem>();
+            fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
+            fileSystem.GetDirectory(startDirectoryPath + "/").Returns(startDirectory);
+            var addinsReader = Substitute.For<IAddinsFileReader>();
+            var addinsContent = new[] {
+                "./",
+                startDirectoryPath + "/",
+                $"../{Path.GetFileName(startDirectoryPath)}/",
+                "*/../",
+                "**/../",
+                "**/./"
+            };
+            addinsReader.Read(addinsFile).Returns(addinsContent);
+            var directoryFinder = Substitute.For<IDirectoryFinder>();
+            directoryFinder.GetDirectories(startDirectory, "./").Returns(new[] { startDirectory });
+            directoryFinder.GetFiles(startDirectory, string.Empty).Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, $"../{Path.GetFileName(startDirectoryPath)}/").Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, "*/../").Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, "**/../").Returns(new[] { testAssembly });
+            directoryFinder.GetFiles(startDirectory, "**/./").Returns(new[] { testAssembly });
+            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+
+            // Act
+            sut.StartService();
+
+            // Assert
+            startDirectory.Received().GetFiles("*.addins");
+            addinsReader.Received().Read(addinsFile);
+            startDirectory.DidNotReceive().GetFiles("*.dll");
+            parentDirectory.DidNotReceive().GetFiles("*.dll");
+            directoryFinder.Received().GetDirectories(startDirectory, "./");
+            directoryFinder.Received().GetDirectories(startDirectory, string.Empty);
+            directoryFinder.Received().GetDirectories(startDirectory, $"../{Path.GetFileName(startDirectoryPath)}/");
+            directoryFinder.Received().GetDirectories(startDirectory, "*/../");
+            directoryFinder.Received().GetDirectories(startDirectory, "**/../");
+            directoryFinder.Received().GetDirectories(startDirectory, "**/./");
         }
     }
 }
