@@ -9,11 +9,25 @@
 
 public void CheckAllPackages()
 {
-    string[] ENGINE_FILES = { "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-    string[] AGENT_FILES = { 
-        "nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-    string[] CONSOLE_FILES = { "nunit3-console.exe", "nunit3-console.exe.config" };
-    string[] CONSOLE_FILES_NETCORE = { "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
+    string[] ENGINE_FILES = {
+        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+    string[] ENGINE_PDB_FILES = {
+        "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    string[] AGENT_FILES = {
+        "nunit-agent.exe", "nunit-agent.exe.config",
+        "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+    string[] AGENT_FILES_NETCORE = {
+        "nunit-agent.dll", "nunit-agent.dll.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+    string[] AGENT_PDB_FILES = {
+        "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    string[] AGENT_PDB_FILES_NETCORE = {
+        "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    string[] CONSOLE_FILES = {
+        "nunit3-console.exe", "nunit3-console.exe.config" };
+    string[] CONSOLE_FILES_NETCORE = {
+        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
 
     bool isOK =
         CheckNuGetPackage(
@@ -24,11 +38,21 @@ public void CheckAllPackages()
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
+            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")) &
+        CheckNuGetSourcePackage(
+            "NUnit.ConsoleRunner",
+            HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
+            HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE)) &
         CheckNuGetPackage(
             "NUnit.ConsoleRunner.NetCore",
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools/netcoreapp3.1/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")) &
+        CheckNuGetSourcePackage(
+            "NUnit.ConsoleRunner.NetCore",
+            HasDirectory("tools/netcoreapp3.1/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)) &
         CheckNuGetPackage("NUnit.Engine",
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
@@ -39,11 +63,21 @@ public void CheckAllPackages()
             HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
+        CheckNuGetSourcePackage("NUnit.Engine",
+            HasDirectory("lib/net20").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_PDB_FILES)) &
         CheckNuGetPackage(
             "NUnit.Engine.Api",
             HasFile("LICENSE.txt"),
             HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll")) &
+        CheckNuGetSourcePackage(
+            "NUnit.Engine.Api",
+            HasDirectory("lib/net20").WithFile("nunit.engine.api.pdb"),
+            HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")) &
         CheckNuGetPackage(
             "NUnit.Runners",
             HasFile("LICENSE.txt")) &
@@ -58,18 +92,16 @@ public void CheckAllPackages()
         CheckZipPackage(
             "NUnit.Console",
             HasFiles("LICENSE.txt", "license.rtf", "NOTICES.txt", "CHANGES.txt"),
-            HasDirectory("bin/net20").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
-            HasDirectory("bin/net35").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
-            HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES),
-            HasDirectory("bin/netcoreapp2.1").WithFiles(ENGINE_FILES),
-            HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_FILES),
-            HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES),
-            HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES)) &
+            HasDirectory("bin/net20").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/net35").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/netcoreapp2.1").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
+            HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES)) &
         CheckMsiPackage("NUnit.Console", 
             HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
-            HasDirectory("NUnit.org/nunit-console").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
-            HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
-            HasDirectory("NUnit.org/nunit-console/agents/net40").WithFiles("nunit-agent.exe", "nunit-agent.exe.config", "nunit-agent-x86.exe", "nunit-agent-x86.exe.config", "nunit.agent.addins"),
+            HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
             HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll"));
 
     if (!isOK)
@@ -79,6 +111,11 @@ public void CheckAllPackages()
 private bool CheckNuGetPackage(string packageId, params ICheck[] checks)
 {
     return CheckPackage($"{PACKAGE_DIR}{packageId}.{productVersion}.nupkg", checks);
+}
+
+private bool CheckNuGetSourcePackage(string packageId, params ICheck[] checks)
+{
+    return CheckPackage($"{PACKAGE_DIR}{packageId}.{productVersion}.snupkg", checks);
 }
 
 private bool CheckChocolateyPackage(string packageId, params ICheck[] checks)

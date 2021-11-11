@@ -3,7 +3,7 @@
 using System;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Api.Tests
+namespace NUnit.Engine.Tests.Api
 {
     public class ServiceLocatorTests
     {
@@ -18,9 +18,9 @@ namespace NUnit.Engine.Api.Tests
 
         [TestCase(typeof(ITestFilterService))]
         [TestCase(typeof(IExtensionService))]
-        [TestCase(typeof(Services.ProjectService))]
+        //[TestCase(typeof(Services.ProjectService))]
 #if NETFRAMEWORK
-        [TestCase(typeof(Services.DomainManager))]
+        //[TestCase(typeof(Services.DomainManager))]
         [TestCase(typeof(IRuntimeFrameworkService))]
         [TestCase(typeof(ITestAgency))]
 #endif

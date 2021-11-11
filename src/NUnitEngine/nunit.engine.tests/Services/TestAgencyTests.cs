@@ -1,25 +1,31 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
+using NUnit.Engine.Services;
+using NUnit.Engine.Services.Tests.Fakes;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Tests.Services
 {
-    using Fakes;
-
     public class TestAgencyTests
     {
         private TestAgency _testAgency;
+        private ServiceContext _services;
 
         [SetUp]
         public void CreateServiceContext()
         {
-            var services = new ServiceContext();
-            services.Add(new FakeRuntimeService());
-            // Use a different URI to avoid conflicting with the "real" TestAgency
-            _testAgency = new TestAgency("TestAgencyTest", 0);
-            services.Add(_testAgency);
-            services.ServiceManager.StartServices();
+            _services = new ServiceContext();
+            _services.Add(new FakeRuntimeService());
+            _testAgency = new TestAgency();
+            _services.Add(_testAgency);
+            _services.ServiceManager.StartServices();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _services.ServiceManager.Dispose();
         }
 
         [Test]

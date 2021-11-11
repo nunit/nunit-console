@@ -131,6 +131,7 @@ namespace NUnit.Engine.Internal
             int total = 0;
             int passed = 0;
             int failed = 0;
+            int warnings = 0;
             int inconclusive = 0;
             int skipped = 0;
             int asserts = 0;
@@ -176,6 +177,7 @@ namespace NUnit.Engine.Internal
                     total += node.GetAttribute("total", 0);
                     passed += node.GetAttribute("passed", 0);
                     failed += node.GetAttribute("failed", 0);
+                    warnings += node.GetAttribute("warnings", 0);
                     inconclusive += node.GetAttribute("inconclusive", 0);
                     skipped += node.GetAttribute("skipped", 0);
                     asserts += node.GetAttribute("asserts", 0);
@@ -199,6 +201,7 @@ namespace NUnit.Engine.Internal
                 combinedNode.AddAttribute("total", total.ToString());
                 combinedNode.AddAttribute("passed", passed.ToString());
                 combinedNode.AddAttribute("failed", failed.ToString());
+                combinedNode.AddAttribute("warnings", warnings.ToString());
                 combinedNode.AddAttribute("inconclusive", inconclusive.ToString());
                 combinedNode.AddAttribute("skipped", skipped.ToString());
                 combinedNode.AddAttribute("asserts", asserts.ToString());
