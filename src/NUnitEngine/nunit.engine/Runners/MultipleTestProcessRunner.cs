@@ -2,6 +2,7 @@
 
 #if NETFRAMEWORK
 using System;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {
@@ -19,13 +20,13 @@ namespace NUnit.Engine.Runners
         public MultipleTestProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
         }
-
+        
         public override int LevelOfParallelism
         {
             get
             {
                 var maxAgents = TestPackage.GetSetting(EnginePackageSettings.MaxAgents, Environment.ProcessorCount);
-                return Math.Min(maxAgents, TestPackage.SubPackages.Count);
+                return Math.Min(maxAgents, TestPackage.Select(p => !p.HasSubPackages()).Count);
             }
         }
 
