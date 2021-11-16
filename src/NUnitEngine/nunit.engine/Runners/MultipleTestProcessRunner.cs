@@ -12,20 +12,28 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class MultipleTestProcessRunner : AggregatingTestRunner
     {
+        private int _processorCount;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTestProcessRunner"/> class.
         /// </summary>
         /// <param name="services">The services.</param>
         /// <param name="package">The package.</param>
-        public MultipleTestProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        /// <param name="processorCount">Processor count (used for testing)</param>
+        public MultipleTestProcessRunner(IServiceLocator services, TestPackage package, int processorCount = 0)
+            : base(services, package)
         {
+            _processorCount = processorCount <= 0
+                ? Environment.ProcessorCount
+                : processorCount;
+
         }
         
         public override int LevelOfParallelism
         {
             get
             {
-                var maxAgents = TestPackage.GetSetting(EnginePackageSettings.MaxAgents, Environment.ProcessorCount);
+                var maxAgents = TestPackage.GetSetting(EnginePackageSettings.MaxAgents, _processorCount);
                 return Math.Min(maxAgents, TestPackage.Select(p => !p.HasSubPackages()).Count);
             }
         }
