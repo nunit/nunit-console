@@ -7,16 +7,9 @@
     <title>NUnit 3 Console Runner Plus Extensions</title>
     <summary>Console runner for the NUnit 3 unit-testing framework with selected extensions.</summary>
     <description>
-      This package includes the nunit3-console runner and test engine for version 3 of the NUnit unit-testing framework.
-
-      The following extensions are included with this package:
-      * NUnitProjectLoader     - loads tests from NUnit projects
-      * VSProjectLoader        - loads tests from Visual Studio projects
-      * NUnitV2ResultWriter    - saves results in NUnit V2 format.
-      * NUnitV2FrameworkDriver - runs NUnit V2 tests.
-      * TeamCityEventListener - supports special progress messages used by teamcity.
-
-      Other extensions, if needed, must be installed separately.
+      This package is now obsolete. It is partially replaced by the nunit-console-runner package.
+      Because of the nature of Chocolatey, it is not necessary to have a console runner with a set of
+      standard extensions built-in. Install extensions separately for use with nunit-console-runner.
     </description>
     <projectUrl>https://nunit.org</projectUrl>
     <projectSourceUrl>https://github.com/nunit/nunit-console</projectSourceUrl>
@@ -36,11 +29,6 @@
     <dependencies>
       <group>
           <dependency id="nunit-console-runner" version="$version$" />
-          <dependency id="nunit-extension-nunit-project-loader" version="3.6.0" />
-          <dependency id="nunit-extension-vs-project-loader" version="3.8.0" />
-          <dependency id="nunit-extension-nunit-v2-result-writer" version="3.6.0" />
-          <dependency id="nunit-extension-nunit-v2-driver" version="3.8.0" />
-          <dependency id="nunit-extension-teamcity-event-listener" version="1.0.7" />
       </group>
     </dependencies>
   </metadata>

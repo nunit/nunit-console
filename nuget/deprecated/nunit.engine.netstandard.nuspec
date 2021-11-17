@@ -15,8 +15,6 @@
     <summary>Deprecated NUnit 3 .NET Standard engine - use NUnit.Engine.</summary>
     <description>
       This package is now obsolete and has been replaced by the NUnit.Engine package.
-
-      Provides a common interface for loading, exploring and running NUnit tests in .NET Core and .NET Standard
     </description>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
@@ -27,8 +25,4 @@
       </group>
     </dependencies>
   </metadata>
-  <files>
-    <file src="LICENSE.txt" />
-    <file src="..\..\nunit_256.png" target="images"/>
-  </files>
 </package>
