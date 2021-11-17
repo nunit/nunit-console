@@ -56,7 +56,6 @@ namespace NUnit.Engine.Runners
                 {
                     _runners = new List<ITestEngineRunner>();
                     foreach (var subPackage in TestPackage.Select(p => !p.HasSubPackages()))
-                    //foreach (var subPackage in TestPackage.SubPackages)
                     {
                         _runners.Add(CreateRunner(subPackage));
                     }
