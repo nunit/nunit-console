@@ -78,17 +78,11 @@ public void CheckAllPackages()
             "NUnit.Engine.Api",
             HasDirectory("lib/net20").WithFile("nunit.engine.api.pdb"),
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")) &
-        //CheckNuGetPackage(
-        //    "NUnit.Runners",
-        //    HasFile("LICENSE.txt")) &
         CheckChocolateyPackage(
             "nunit-console-runner",
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
-        //CheckChocolateyPackage(
-        //    "nunit-console-with-extensions",
-        //    HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt")) &
         CheckZipPackage(
             "NUnit.Console",
             HasFiles("LICENSE.txt", "license.rtf", "NOTICES.txt", "CHANGES.txt"),

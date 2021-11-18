@@ -477,18 +477,6 @@ Task("BuildChocolateyPackages")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "testcentric.engine.metadata.dll", Target="tools" }
                 }
             });
-
-        //ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
-        //    new ChocolateyPackSettings()
-        //    {
-        //        Version = productVersion,
-        //        OutputDirectory = PACKAGE_DIR,
-        //        Files = new [] {
-        //            new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
-        //            new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
-        //            new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
-        //        }
-        //    });
     });
 
 Task("TestChocolateyPackage")
