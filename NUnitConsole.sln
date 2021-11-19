@@ -82,7 +82,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA
 		choco\nunit-agent-x86.exe.ignore = choco\nunit-agent-x86.exe.ignore
 		choco\nunit-agent.exe.ignore = choco\nunit-agent.exe.ignore
 		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
-		choco\nunit-console-with-extensions.nuspec = choco\nunit-console-with-extensions.nuspec
 		choco\nunit.agent.addins = choco\nunit.agent.addins
 		choco\nunit.choco.addins = choco\nunit.choco.addins
 		choco\VERIFICATION.txt = choco\VERIFICATION.txt
@@ -99,6 +98,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-x86", "src\NUnitEngine\nunit-agent-x86\nunit-agent-x86.csproj", "{333D2FBC-CCA7-46AF-9453-C310671A67B0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly-x86", "src\NUnitEngine\mock-assembly-x86\mock-assembly-x86.csproj", "{9D3015EE-5B84-41B3-A1D3-1A439370C392}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", "{068F6CA9-6108-4F45-8540-351AA5227259}"
+	ProjectSection(SolutionItems) = preProject
+		choco\deprecated\nunit-console-with-extensions.nuspec = choco\deprecated\nunit-console-with-extensions.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -171,6 +175,7 @@ Global
 		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{333D2FBC-CCA7-46AF-9453-C310671A67B0} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{9D3015EE-5B84-41B3-A1D3-1A439370C392} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{068F6CA9-6108-4F45-8540-351AA5227259} = {4FDF7BFA-A337-41D3-898D-C6A98278E6AD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
