@@ -9,7 +9,7 @@ namespace NUnit.Engine.Drivers
 {
     public class NUnit3DriverFactory : IDriverFactory
     {
-        private const string NUNIT_FRAMEWORK = "nunit.framework";
+        public const string NUNIT_FRAMEWORK = "nunit.framework";
 
         /// <summary>
         /// Gets a flag indicating whether a given assembly name and version
