@@ -95,7 +95,7 @@ Setup(context =>
         var branch = AppVeyor.Environment.Repository.Branch;
         var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
 
-        if (branch == "master" && !isPullRequest)
+        if ((branch == "master" || branch == "dev-4.0") && !isPullRequest)
         {
             productVersion = version + "-dev-" + buildNumber;
         }
