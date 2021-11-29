@@ -380,61 +380,34 @@ Task("BuildNuGetPackages")
     {
         CreateDirectory(PACKAGE_DIR);
 
-        NuGetPack("nuget/engine/nunit.engine.api.nuspec", new NuGetPackSettings()
+        var basicPackSettings = new NuGetPackSettings()
         {
             Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+            NoPackageAnalysis = true,
+        };
 
-        NuGetPack("nuget/engine/nunit.engine.nuspec", new NuGetPackSettings()
+        var packSettingsWithSymbols = new NuGetPackSettings()
         {
             Version = productVersion,
             BasePath = CURRENT_IMG_DIR,
             OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+            NoPackageAnalysis = true,
+            Symbols = true,
+            // Not yet supported by cake as a setting
+            ArgumentCustomization = args => args.Append("-SymbolPackageFormat snupkg")
+        };
 
-        NuGetPack("nuget/runners/nunit.console-runner.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/engine/nunit.engine.api.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/engine/nunit.engine.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/deprecated/nunit.runners.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
 
-        NuGetPack("nuget/deprecated/nunit.engine.netstandard.nuspec", new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true
-        });
+        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
     });
 
 Task("TestNuGetPackages")
@@ -474,6 +447,7 @@ Task("BuildChocolateyPackages")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.api.xml", Target="tools/agents/net20" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.core.dll", Target="tools/agents/net20" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/testcentric.engine.metadata.dll", Target="tools/agents/net20" },
+
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent.exe", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent.exe.config", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/net40" },
@@ -484,6 +458,7 @@ Task("BuildChocolateyPackages")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.api.xml", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.core.dll", Target="tools/agents/net40" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/testcentric.engine.metadata.dll", Target="tools/agents/net40" },
+
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll.config", Target="tools/agents/netcoreapp3.1" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.deps.json", Target="tools/agents/netcoreapp3.1" },
@@ -500,18 +475,6 @@ Task("BuildChocolateyPackages")
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.core.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.dll", Target="tools" },
                     new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "testcentric.engine.metadata.dll", Target="tools" }
-                }
-            });
-
-        ChocolateyPack("choco/nunit-console-with-extensions.nuspec",
-            new ChocolateyPackSettings()
-            {
-                Version = productVersion,
-                OutputDirectory = PACKAGE_DIR,
-                Files = new [] {
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" }
                 }
             });
     });
@@ -887,11 +850,6 @@ Task("Appveyor")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Package");
-
-Task("Travis")
-    .Description("Builds and tests on Travis")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test");
 
 Task("Default")
     .Description("Builds the engine and console runner")

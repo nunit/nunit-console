@@ -306,11 +306,24 @@ namespace NUnit.Engine.Services
         /// </summary>
         private void ProcessDirectory(IDirectory startDir, bool fromWildCard)
         {
-            log.Info("Scanning directory {0} for extensions", startDir.FullName);
+            var directoryName = startDir.FullName;
+            if (WasVisited(startDir.FullName, fromWildCard))
+            {
+                log.Warning($"Skipping directory '{directoryName}' because it was already visited.");
+            }
+            else
+            {
+                log.Info($"Scanning directory '{directoryName}' for extensions.");
+                MarkAsVisited(directoryName, fromWildCard);
 
-            if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
-                foreach (var file in startDir.GetFiles("*.dll"))
-                    ProcessCandidateAssembly(file.FullName, true);
+                if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
+                {
+                    foreach (var file in startDir.GetFiles("*.dll"))
+                    {
+                        ProcessCandidateAssembly(file.FullName, true);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -389,10 +402,10 @@ namespace NUnit.Engine.Services
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
-            if (Visited(filePath)) 
+            if (WasVisited(filePath, fromWildCard)) 
                 return;
 
-            Visit(filePath);
+            MarkAsVisited(filePath, fromWildCard);
 
             try
             {
@@ -430,14 +443,14 @@ namespace NUnit.Engine.Services
 
         private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
 
-        private bool Visited(string filePath)
+        private bool WasVisited(string filePath, bool fromWildcard)
         {
-            return _visited.ContainsKey(filePath);
+            return _visited.ContainsKey($"path={ filePath }_visited={fromWildcard}");
         }
 
-        private void Visit(string filePath)
+        private void MarkAsVisited(string filePath, bool fromWildcard)
         {
-            _visited.Add(filePath, null);
+            _visited.Add($"path={ filePath }_visited={fromWildcard}", null);
         }
 
         /// <summary>

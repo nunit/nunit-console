@@ -48,9 +48,9 @@ namespace NUnit.Engine.Tests.Runners
             _services.Add(new ExtensionService());
             _services.Add(new ProjectService());
 #if NETFRAMEWORK
-            _services.Add(new DomainManager());
-            _services.Add(new RuntimeFrameworkService());
-            _services.Add(new TestAgency("ProcessRunnerTests", 0));
+            _services.Add(new Services.DomainManager());
+            _services.Add(new Services.RuntimeFrameworkService());
+            _services.Add(new Services.TestAgency());
 #endif
             _services.Add(new DriverService());
             _services.Add(new DefaultTestRunnerFactory());

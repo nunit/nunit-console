@@ -38,6 +38,7 @@ namespace NUnit.Engine.Drivers
         Assembly _frameworkAssembly;
         object _frameworkController;
         Type _frameworkControllerType;
+        CustomAssemblyLoadContext _assemblyLoadContext;
 
         /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
@@ -56,10 +57,17 @@ namespace NUnit.Engine.Drivers
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
-            var assemblyLoadContext = new CustomAssemblyLoadContext(assemblyPath);
+            _assemblyLoadContext = new CustomAssemblyLoadContext(assemblyPath);
+
+            _assemblyLoadContext.Resolving += (context, assemblyName) =>
+            {
+                var calc = context as CustomAssemblyLoadContext; 
+                return calc?.LoadFallback(assemblyName);
+            };
+
             try
             {
-                _testAssembly = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+                _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
             }
             catch (Exception e)
             {
@@ -67,11 +75,11 @@ namespace NUnit.Engine.Drivers
             }
 
             var nunitRef = _testAssembly.GetReferencedAssemblies().FirstOrDefault(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase));
-            
+
             if (nunitRef == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
 
-            _frameworkAssembly = assemblyLoadContext.LoadFromAssemblyName(nunitRef);
+            _frameworkAssembly = _assemblyLoadContext.LoadFromAssemblyName(nunitRef);
             if (_frameworkAssembly == null)
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
 
@@ -112,7 +120,7 @@ namespace NUnit.Engine.Drivers
         }
 
         /// <summary>
-        /// Executes the tests in an assembly asyncronously.
+        /// Executes the tests in an assembly asynchronously.
         /// </summary>
         /// <param name="callback">A callback that receives XML progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
@@ -179,7 +187,11 @@ namespace NUnit.Engine.Drivers
             {
                 throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
             }
-            return method.Invoke(_frameworkController, args);
+
+            using (_assemblyLoadContext.EnterContextualReflection())
+            {
+                return method.Invoke(_frameworkController, args);
+            }
         }
     }
 }

@@ -19,8 +19,8 @@ namespace NUnit.Engine.Tests.Internal
         [TestCase("c:bar\\", ExpectedResult = false)]
         [TestCase("c:bar/", ExpectedResult = false)]
         [TestCase("c:bar", ExpectedResult = false)]
-        [TestCase("ä:\\bar", ExpectedResult = false)]
-        [TestCase("ä://bar", ExpectedResult = false)]
+        [TestCase("Ã¤:\\bar", ExpectedResult = false)]
+        [TestCase("Ã¤://bar", ExpectedResult = false)]
         [TestCase("\\\\server01\\foo", ExpectedResult = true)]
         [TestCase("\\server01\\foo", ExpectedResult = false)]
         [TestCase("c:", ExpectedResult = false)]
@@ -42,8 +42,8 @@ namespace NUnit.Engine.Tests.Internal
         [TestCase("c:bar\\", ExpectedResult = false)]
         [TestCase("c:bar/", ExpectedResult = false)]
         [TestCase("c:bar", ExpectedResult = false)]
-        [TestCase("ä:\\bar", ExpectedResult = false)]
-        [TestCase("ä://bar", ExpectedResult = false)]
+        [TestCase("Ã¤:\\bar", ExpectedResult = false)]
+        [TestCase("Ã¤://bar", ExpectedResult = false)]
         [TestCase("\\\\server01\\foo", ExpectedResult = false)]
         [TestCase("\\server01\\foo", ExpectedResult = false)]
         [TestCase("c:", ExpectedResult = false)]
@@ -165,6 +165,7 @@ namespace NUnit.Engine.Tests.Internal
         }
 
         [Test]
+		[Platform("win")] // Issue #1026 created to make this run under netcoreapp2.1/Linux again
 		public void SamePathOrUnder()
 		{
 			Assert.SamePathOrUnder( @"C:\folder1\folder2\folder3", @"c:\folder1\.\folder2\junk\..\folder3" );

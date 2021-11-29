@@ -44,6 +44,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         {
                             RunnerResult.ProcessRunner,
                             RunnerResult.ProcessRunner,
+                            RunnerResult.ProcessRunner,
+                            RunnerResult.ProcessRunner,
                             RunnerResult.ProcessRunner
                         }
                     };
@@ -78,6 +80,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         {
                             RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner
                         }
                     };
@@ -91,6 +95,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         TestRunner = typeof(MultipleTestDomainRunner),
                         SubRunners = new[]
                         {
+                            RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner,
                             RunnerResult.TestDomainRunner
@@ -110,8 +116,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                 case DomainUsage.Single:
                 case DomainUsage.Multiple:
                     return new RunnerResult(typeof(AggregatingTestRunner),
-                        RunnerResult.MultiRunnerWithTwoSubRunners,
-                        RunnerResult.MultiRunnerWithTwoSubRunners,
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner,
                         RunnerResult.ProcessRunner);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);

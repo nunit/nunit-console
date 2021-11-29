@@ -4,6 +4,8 @@
     <TargetFrameworks>net20;netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Runtime.Remoting" />
@@ -16,9 +18,6 @@
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
     <Compile Include="..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Internal\ExceptionHelper.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="TestCentric.Metadata" Version="1.4.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />

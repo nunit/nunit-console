@@ -79,17 +79,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
-                        SubRunners = new List<RunnerResult>
+                        SubRunners = new []
                         {
-                            new RunnerResult
-                            {
-                                TestRunner = typeof(AggregatingTestRunner),
-                                SubRunners = new List<RunnerResult>
-                                {
-                                    RunnerResult.LocalTestRunner,
-                                    RunnerResult.LocalTestRunner
-                                }
-                            },
+                            RunnerResult.LocalTestRunner,
+                            RunnerResult.LocalTestRunner,
                             RunnerResult.LocalTestRunner
                         }
                     }
@@ -101,17 +94,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
-                        SubRunners = new List<RunnerResult>
+                        SubRunners = new []
                         {
-                            new RunnerResult
-                            {
-                                TestRunner = typeof(AggregatingTestRunner),
-                                SubRunners = new List<RunnerResult>
-                                {
-                                    RunnerResult.LocalTestRunner,
-                                    RunnerResult.LocalTestRunner
-                                }
-                            },
+                            RunnerResult.LocalTestRunner,
+                            RunnerResult.LocalTestRunner,
                             RunnerResult.LocalTestRunner
                         }
                     }
@@ -123,17 +109,10 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
-                        SubRunners = new List<RunnerResult>
+                        SubRunners = new []
                         {
-                            new RunnerResult
-                            {
-                                TestRunner = typeof(AggregatingTestRunner),
-                                SubRunners = new List<RunnerResult>
-                                {
-                                    RunnerResult.LocalTestRunner,
-                                    RunnerResult.LocalTestRunner
-                                }
-                            },
+                            RunnerResult.LocalTestRunner,
+                            RunnerResult.LocalTestRunner,
                             RunnerResult.LocalTestRunner,
                             RunnerResult.LocalTestRunner
                         }
@@ -150,15 +129,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         {
                             RunnerResult.LocalTestRunner,
                             RunnerResult.LocalTestRunner,
-                            new RunnerResult
-                            {
-                                TestRunner = typeof(AggregatingTestRunner),
-                                SubRunners = new List<RunnerResult>
-                                {
-                                    RunnerResult.LocalTestRunner,
-                                    RunnerResult.LocalTestRunner
-                                }
-                            }
+                            RunnerResult.LocalTestRunner,
+                            RunnerResult.LocalTestRunner
                         }
                     }
                 );
@@ -183,19 +155,12 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
-                        SubRunners = new List<RunnerResult>
+                        SubRunners = new []
                         {
                             RunnerResult.LocalTestRunner,
                             RunnerResult.LocalTestRunner,
-                            new RunnerResult
-                            {
-                                TestRunner = typeof(AggregatingTestRunner),
-                                SubRunners = new List<RunnerResult>
-                                {
-                                    RunnerResult.LocalTestRunner,
-                                    RunnerResult.LocalTestRunner
-                                }
-                            }
+                            RunnerResult.LocalTestRunner,
+                            RunnerResult.LocalTestRunner
                         }
                     }
                 );

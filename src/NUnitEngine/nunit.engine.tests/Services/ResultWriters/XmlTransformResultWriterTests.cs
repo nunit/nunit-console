@@ -4,9 +4,12 @@ using System.IO;
 using System.Xml;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Tests.Services.Fakes;
+using NUnit.Engine.Services;
+using NUnit.Engine.Services.Tests.Fakes;
+
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.ResultWriters.Tests
+namespace NUnit.Engine.Tests.Services.ResultWriters
 {
     public class XmlTransformResultWriterTests
     {
@@ -26,10 +29,11 @@ namespace NUnit.Engine.Services.ResultWriters.Tests
 #if NETFRAMEWORK
             serviceContext.Add(new DomainManager());
 #endif
-
-            var runner = new MasterTestRunner(serviceContext, new TestPackage(assemblyPath));
-            runner.Load();
-            _engineResult = runner.Run(null, TestFilter.Empty);
+            using (var runner = new MasterTestRunner(serviceContext, new TestPackage(assemblyPath)))
+            {
+                runner.Load();
+                _engineResult = runner.Run(null, TestFilter.Empty);
+            }
         }
 
 
