@@ -204,7 +204,7 @@ Task("Build")
 
         Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
-        foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
+        foreach(var framework in new [] { "netstandard2.0" })
             MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + framework));

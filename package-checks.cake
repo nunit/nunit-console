@@ -13,6 +13,10 @@ public void CheckAllPackages()
         "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
     string[] ENGINE_PDB_FILES = {
         "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    string[] ENGINE_CORE_FILES = {
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+    string[] ENGINE_CORE_PDB_FILES = {
+        "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
     string[] AGENT_FILES = {
         "nunit-agent.exe", "nunit-agent.exe.config",
         "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
@@ -48,7 +52,7 @@ public void CheckAllPackages()
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
-            HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_FILES),
+            HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES),
             HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
@@ -57,7 +61,7 @@ public void CheckAllPackages()
         CheckNuGetSourcePackage("NUnit.Engine",
             HasDirectory("lib/net20").WithFiles(ENGINE_PDB_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
-            HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_PDB_FILES),
             HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_PDB_FILES)) &
         CheckNuGetPackage(

@@ -92,8 +92,6 @@
     <file src="bin/netstandard2.0/testcentric.engine.metadata.dll" target="lib/netstandard2.0" />
     <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/netstandard2.0"/>
 
-    <file src="bin/netcoreapp3.1/nunit.engine.dll" target="lib/netcoreapp3.1" />
-    <file src="bin/netcoreapp3.1/nunit.engine.pdb" target="lib/netcoreapp3.1" />
     <file src="bin/netcoreapp3.1/nunit.engine.core.dll" target="lib/netcoreapp3.1" />
     <file src="bin/netcoreapp3.1/nunit.engine.core.pdb" target="lib/netcoreapp3.1" />
     <file src="bin/netcoreapp3.1/testcentric.engine.metadata.dll" target="lib/netcoreapp3.1" />
