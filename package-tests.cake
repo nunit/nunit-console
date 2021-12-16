@@ -293,17 +293,6 @@ public class NuGetNetFXPackageTester : NetFXPackageTester
     protected override string PackageResultDirectory => _packageDir + "test-results/nuget-netfx/";
 }
 
-public class NuGetNetCorePackageTester : NetCorePackageTester
-{
-    public NuGetNetCorePackageTester(ICakeContext context, string packageVersion)
-        : base(context, packageVersion) { }
-
-    protected override string PackageName => $"NUnit.ConsoleRunner.NetCore.{_packageVersion}.nupkg";
-    protected override string PackageInstallDirectory => _packageDir + "test/nuget-netcore/";
-    protected override string PackageBinDir => PackageInstallDirectory + "tools/netcoreapp3.1/any/";
-    protected override string PackageResultDirectory => _packageDir + "test-results/nuget-netcore/";
-}
-
 public class ChocolateyPackageTester : NetFXPackageTester
 {
     public ChocolateyPackageTester(ICakeContext context, string packageVersion)

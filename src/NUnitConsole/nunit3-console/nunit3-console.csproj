@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit3-console</AssemblyName>
-    <TargetFrameworks>net20;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net20</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>

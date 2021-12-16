@@ -26,8 +26,6 @@ public void CheckAllPackages()
         "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
     string[] CONSOLE_FILES = {
         "nunit3-console.exe", "nunit3-console.exe.config" };
-    string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
 
     bool isOK =
         CheckNuGetPackage(
@@ -46,13 +44,6 @@ public void CheckAllPackages()
             HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE)) &
-        CheckNuGetPackage(
-            "NUnit.ConsoleRunner.NetCore",
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools/netcoreapp3.1/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")) &
-        CheckNuGetSourcePackage(
-            "NUnit.ConsoleRunner.NetCore",
-            HasDirectory("tools/netcoreapp3.1/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)) &
         CheckNuGetPackage("NUnit.Engine",
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net20").WithFiles(ENGINE_FILES),

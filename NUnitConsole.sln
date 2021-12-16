@@ -68,7 +68,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E8
 	ProjectSection(SolutionItems) = preProject
 		nuget\runners\nunit.agent.addins = nuget\runners\nunit.agent.addins
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
-		nuget\runners\nunit.console-runner.netcore.nuspec = nuget\runners\nunit.console-runner.netcore.nuspec
 		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
 		nuget\runners\nunit.console.nuget.addins = nuget\runners\nunit.console.nuget.addins
 	EndProjectSection

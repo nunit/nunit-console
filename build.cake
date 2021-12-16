@@ -62,7 +62,6 @@ var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets ne
 
 // Test Runners
 var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
-var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/" + "nunit3-console.dll";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
@@ -225,14 +224,6 @@ Task("Build")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
 
-        MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", "netcoreapp3.1")
-            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
-
-         MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", "netcoreapp3.1")
-            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
-
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -288,29 +279,6 @@ Task("TestNet20Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET CORE 3.1 CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetCore31Console")
-    .Description("Tests the .NET Core 3.1 console runner")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        var runtimes = new[] { "3.1", "5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                NETCOREAPP31_BIN_DIR,
-                CONSOLE_TESTS,
-                runtime,
-                ref ErrorDetail);
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
 // TEST NETSTANDARD 2.0 ENGINE
 //////////////////////////////////////////////////////////////////////
 
@@ -325,30 +293,6 @@ Task("TestNetStandard20Engine")
             NETCOREAPP21_BIN_DIR,
             "netcoreapp2.1",
             ref ErrorDetail);
-    });
-
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETCORE 3.1 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetCore31Engine")
-    .Description("Tests the .NET Core 3.1 Engine")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        var runtimes = new[] { "3.1", "5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                NETCOREAPP31_BIN_DIR,
-                ENGINE_TESTS,
-                runtime,
-                ref ErrorDetail);
-        }
     });
 
 
@@ -406,16 +350,12 @@ Task("BuildNuGetPackages")
         NuGetPack("nuget/runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
 
         NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
-
-        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
     });
 
 Task("TestNuGetPackages")
     .Does(() =>
     {
         new NuGetNetFXPackageTester(Context, productVersion).RunTests();
-
-        new NuGetNetCorePackageTester(Context, productVersion).RunTests();
     });
 
 Task("BuildChocolateyPackages")
@@ -810,14 +750,12 @@ Task("Rebuild")
 
 Task("TestConsole")
     .Description("Builds and tests the console runner")
-    .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNetCore31Console");
+    .IsDependentOn("TestNet20Console");
 
 Task("TestEngine")
     .Description("Builds and tests the engine")
     .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNetStandard20Engine")
-    .IsDependentOn("TestNetCore31Engine");
+    .IsDependentOn("TestNetStandard20Engine");
 
 Task("Test")
     .Description("Builds and tests the engine")
