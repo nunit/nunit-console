@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp3.1</TargetFrameworks>
     <OutputType Condition="'$(TargetFramework)'!='net35'">Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>Full</DebugType>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.2" />

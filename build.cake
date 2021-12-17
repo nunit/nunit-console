@@ -220,7 +220,7 @@ Task("Build")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
+        foreach (var framework in new [] { "netcoreapp3.1" })
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));
@@ -290,9 +290,9 @@ Task("TestNetStandard20Engine")
     .Does(() =>
     {
         RunDotnetCoreNUnitLiteTests(
-            NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
-            NETCOREAPP21_BIN_DIR,
-            "netcoreapp2.1",
+            NETCOREAPP31_BIN_DIR + ENGINE_TESTS,
+            NETCOREAPP31_BIN_DIR,
+            "netcoreapp3.1",
             ref ErrorDetail);
     });
 
