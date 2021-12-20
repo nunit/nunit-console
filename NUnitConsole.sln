@@ -104,6 +104,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", 
 		choco\deprecated\nunit-console-with-extensions.nuspec = choco\deprecated\nunit-console-with-extensions.nuspec
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D072-424B-A6DF-5BECF719C1FB}"
+	ProjectSection(SolutionItems) = preProject
+		cake\ci.cake = cake\ci.cake
+		cake\header-check.cake = cake\header-check.cake
+		cake\local-tasks.cake = cake\local-tasks.cake
+		cake\package-checks.cake = cake\package-checks.cake
+		cake\package-tests.cake = cake\package-tests.cake
+		cake\test-results.cake = cake\test-results.cake
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -176,6 +186,7 @@ Global
 		{333D2FBC-CCA7-46AF-9453-C310671A67B0} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{9D3015EE-5B84-41B3-A1D3-1A439370C392} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{068F6CA9-6108-4F45-8540-351AA5227259} = {4FDF7BFA-A337-41D3-898D-C6A98278E6AD}
+		{9BCA00E2-D072-424B-A6DF-5BECF719C1FB} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

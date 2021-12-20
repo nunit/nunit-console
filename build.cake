@@ -37,32 +37,28 @@ var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
-var NET35_BIN_DIR = BIN_DIR + "net35/";
-var NETCOREAPP21_BIN_DIR = BIN_DIR + "netcoreapp2.1/";
-var NETCOREAPP31_BIN_DIR = BIN_DIR + "netcoreapp3.1/";
+var NUGET_DIR = PROJECT_DIR + "nuget/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
-var IMAGE_DIR = PROJECT_DIR + "images/";
+var IMAGE_DIR = PROJECT_DIR + "image/";
 var MSI_DIR = PROJECT_DIR + "msi/";
-var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
-var CURRENT_IMG_NET20_BIN_DIR = CURRENT_IMG_DIR + "bin/net20/";
+var SOURCE_DIR = PROJECT_DIR + "src/";
 var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
-var ENGINE_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine/nunit.engine.csproj";
-var AGENT_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit-agent/nunit-agent.csproj";
-var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
-var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
-var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";
-var CONSOLE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
-var MOCK_ASSEMBLY_CSPROJ = PROJECT_DIR + "src/NUnitEngine/mock-assembly/mock-assembly.csproj";
+var ENGINE_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
+var AGENT_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
+var ENGINE_API_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
+var ENGINE_TESTS_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+var CONSOLE_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
+var CONSOLE_TESTS_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
 
 // Test Runners
-var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
-var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/" + "nunit3-console.dll";
+var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
+var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/nunit3-console.dll";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
@@ -75,6 +71,7 @@ var PACKAGE_SOURCE = new string[]
     "https://www.myget.org/F/nunit/api/v2"
 };
 
+// Extensions we bundle
 var EXTENSION_PACKAGES = new []
 {
   "NUnit.Extension.VSProjectLoader",
@@ -154,9 +151,9 @@ Task("UpdateAssemblyInfo")
     .Description("Sets the assembly versions to the calculated version.")
     .Does(() =>
     {
-        PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
-        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
-        PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", productVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", productVersion, version);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -245,11 +242,11 @@ Task("BuildCppTestFiles")
     .Does(() =>
     {
         MSBuild(
-            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-             CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
+            CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
 
         MSBuild(
-            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
+            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
             CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
     });
 
@@ -271,7 +268,7 @@ Task("TestNet20Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, NET35_BIN_DIR, ENGINE_TESTS, "net35", ref ErrorDetail);
+        RunTest(NET20_CONSOLE, BIN_DIR + "net35/", ENGINE_TESTS, "net35", ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -284,7 +281,7 @@ Task("TestNet20Console")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "net35", ref ErrorDetail);
+        RunTest(NET20_CONSOLE, BIN_DIR + "net35/", CONSOLE_TESTS, "net35", ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -303,7 +300,7 @@ Task("TestNetCore31Console")
         {
             RunDotnetCoreTests(
                 NETCORE31_CONSOLE,
-                NETCOREAPP31_BIN_DIR,
+                BIN_DIR + "netcoreapp3.1/",
                 CONSOLE_TESTS,
                 runtime,
                 ref ErrorDetail);
@@ -321,8 +318,8 @@ Task("TestNetStandard20Engine")
     .Does(() =>
     {
         RunDotnetCoreNUnitLiteTests(
-            NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
-            NETCOREAPP21_BIN_DIR,
+            BIN_DIR + "netcoreapp2.1/" + ENGINE_TESTS,
+            BIN_DIR + "netcoreapp2.1",
             "netcoreapp2.1",
             ref ErrorDetail);
     });
@@ -344,7 +341,7 @@ Task("TestNetCore31Engine")
         {
             RunDotnetCoreTests(
                 NETCORE31_CONSOLE,
-                NETCOREAPP31_BIN_DIR,
+                BIN_DIR + "netcoreapp3.1/",
                 ENGINE_TESTS,
                 runtime,
                 ref ErrorDetail);
@@ -368,9 +365,9 @@ Task("CreateImage")
     .Description("Copies all files into the image directory")
     .Does(() =>
     {
-        CleanDirectory(CURRENT_IMG_DIR);
-        CopyFiles(RootFiles, CURRENT_IMG_DIR);
-        CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
+        CleanDirectory(IMAGE_DIR);
+        CopyFiles(RootFiles, IMAGE_DIR);
+        CopyDirectory(BIN_DIR, IMAGE_DIR + "bin/");
     });
 
 Task("BuildNuGetPackages")
@@ -398,15 +395,15 @@ Task("BuildNuGetPackages")
             ArgumentCustomization = args => args.Append("-SymbolPackageFormat snupkg")
         };
 
-        NuGetPack("nuget/engine/nunit.engine.api.nuspec", packSettingsWithSymbols);
+        NuGetPack(NUGET_DIR + "engine/nunit.engine.api.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/engine/nunit.engine.nuspec", packSettingsWithSymbols);
+        NuGetPack(NUGET_DIR + "engine/nunit.engine.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
+        NuGetPack(NUGET_DIR + "runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
 
-        NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
+        NuGetPack(NUGET_DIR + "runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
 
-        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
+        NuGetPack(NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
     });
 
 Task("TestNuGetPackages")
@@ -509,9 +506,9 @@ Task("CreateCombinedImage")
 {
     foreach(var framework in NETFX_FRAMEWORKS)
     {
-        var addinsImgDir = CURRENT_IMG_DIR + "bin/" + framework +"/addins/";
+        var addinsImgDir = IMAGE_DIR + "bin/" + framework +"/addins/";
 
-        CopyDirectory(MSI_DIR + "resources/", CURRENT_IMG_DIR);
+        CopyDirectory(MSI_DIR + "resources/", IMAGE_DIR);
         CleanDirectory(addinsImgDir);
 
         foreach(var packageDir in GetAllDirectories(EXTENSION_PACKAGES_DIR))
@@ -529,7 +526,7 @@ Task("BuildMsiPackage")
         .WithProperty("Version", version)
         .WithProperty("DisplayVersion", version)
         .WithProperty("OutDir", PACKAGE_DIR)
-        .WithProperty("Image", CURRENT_IMG_DIR)
+        .WithProperty("Image", IMAGE_DIR)
         .SetMSBuildPlatform(MSBuildPlatform.x86)
         .SetNodeReuse(false)
         );
@@ -546,7 +543,7 @@ Task("BuildZipPackage")
 .Does(() =>
 {
     CleanDirectory(ZIP_IMG);
-    CopyDirectory(CURRENT_IMG_DIR, ZIP_IMG);
+    CopyDirectory(IMAGE_DIR, ZIP_IMG);
 
     foreach(var framework in NETFX_FRAMEWORKS)
     {
@@ -554,7 +551,7 @@ Task("BuildZipPackage")
         var netfxZipImg = ZIP_IMG + "bin/" + framework + "/";
         DeleteFiles(ZIP_IMG + "*.addins");
         DeleteFiles(netfxZipImg + "*.addins");
-        CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", netfxZipImg + "nunit.bundle.addins");
+        CopyFile(IMAGE_DIR + "nunit.bundle.addins", netfxZipImg + "nunit.bundle.addins");
     }
 
     var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, productVersion);
