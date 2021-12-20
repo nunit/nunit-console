@@ -27,23 +27,23 @@
     </packageTypes>
   </metadata>
   <files>
-    <file src="LICENSE.txt" />
-    <file src="NOTICES.txt" />
-    <file src="bin/netcoreapp3.1/nunit3-console.exe" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit3-console.pdb" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit3-console.dll" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit3-console.dll.config" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit3-console.deps.json" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit3-console.runtimeconfig.json" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.core.dll" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.core.pdb" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.dll" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.pdb" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.deps.json" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.api.dll" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.api.pdb" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/nunit.engine.api.xml" target="tools/netcoreapp3.1/any" />
-    <file src="bin/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/netcoreapp3.1/any" />
+    <file src="../../LICENSE.txt" />
+    <file src="../../NOTICES.txt" />
+    <file src="netcoreapp3.1/nunit3-console.exe" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit3-console.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit3-console.dll" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit3-console.dll.config" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit3-console.deps.json" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit3-console.runtimeconfig.json" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.core.dll" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.core.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.dll" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.deps.json" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.api.dll" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.api.pdb" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/nunit.engine.api.xml" target="tools/netcoreapp3.1/any" />
+    <file src="netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/netcoreapp3.1/any" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools/netcoreapp3.1/any"/>
     <file src="../../nuget/runners/DotnetToolSettings.xml" target="tools/netcoreapp3.1/any"/>
     <file src="../../nunit_256.png" target="images"/>

@@ -375,7 +375,6 @@ Task("CreateImage")
 
 Task("BuildNuGetPackages")
     .Description("Creates NuGet packages of the engine/console")
-    .IsDependentOn("CreateImage")
     .Does(() =>
     {
         CreateDirectory(PACKAGE_DIR);
@@ -383,7 +382,7 @@ Task("BuildNuGetPackages")
         var basicPackSettings = new NuGetPackSettings()
         {
             Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
+            BasePath = BIN_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true,
         };
@@ -391,7 +390,7 @@ Task("BuildNuGetPackages")
         var packSettingsWithSymbols = new NuGetPackSettings()
         {
             Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
+            BasePath = BIN_DIR,
             OutputDirectory = PACKAGE_DIR,
             NoPackageAnalysis = true,
             Symbols = true,
