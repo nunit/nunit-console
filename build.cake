@@ -195,6 +195,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
 Task("Build")
     .Description("Builds the engine and console") 
     .IsDependentOn("CheckHeaders")
+    .IsDependentOn("Clean")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
@@ -798,11 +799,6 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
-
-Task("Rebuild")
-    .Description("Rebuilds the engine and console runner")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Build");
 
 Task("TestConsole")
     .Description("Builds and tests the console runner")
