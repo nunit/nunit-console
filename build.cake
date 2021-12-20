@@ -837,6 +837,7 @@ Task("TestPackages")
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("CheckForError")
+    .IsDependentOn("Build")
     .IsDependentOn("BuildPackages")
     .IsDependentOn("CheckPackageContent")
     .IsDependentOn("TestPackages");
