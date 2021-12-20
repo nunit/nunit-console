@@ -1,9 +1,9 @@
-#load ci.cake
-#load package-checks.cake
-#load test-results.cake
-#load package-tests.cake
-#load header-check.cake
-#load local-tasks.cake
+#load cake/ci.cake
+#load cake/package-checks.cake
+#load cake/test-results.cake
+#load cake/package-tests.cake
+#load cake/header-check.cake
+#load cake/local-tasks.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
