@@ -16,7 +16,7 @@ var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var productVersion = Argument("productVersion", "3.13.0");
 
-var ErrorDetail = new List<string>();
+var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 
 //////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ Setup(context =>
 Teardown(context =>
 {
     // Executed AFTER the last task.
-    //CheckForError(ref ErrorDetail);
+    DisplayUnreportedErrors();
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -262,7 +262,7 @@ Task("BuildCppTestFiles")
 // and throws if there were any errors.
 Task("CheckForTestErrors")
     .Description("Checks for errors running the test suites")
-    .Does(() => CheckForError(ref ErrorDetail));
+    .Does(() => DisplayUnreportedErrors());
 
 //////////////////////////////////////////////////////////////////////
 // TEST .NET 2.0 ENGINE
@@ -271,7 +271,7 @@ Task("CheckForTestErrors")
 Task("TestNet20Engine")
     .Description("Tests the engine")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         RunTest(
@@ -279,7 +279,7 @@ Task("TestNet20Engine")
             BIN_DIR + "net35/",
             ENGINE_TESTS,
             "net35", 
-            ref ErrorDetail);
+            ref UnreportedErrors);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -289,14 +289,14 @@ Task("TestNet20Engine")
 Task("TestNetStandard20Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         RunDotnetCoreNUnitLiteTests(
             BIN_DIR + "netcoreapp2.1/" + ENGINE_TESTS,
             BIN_DIR + "netcoreapp2.1",
             "netcoreapp2.1",
-            ref ErrorDetail);
+            ref UnreportedErrors);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ Task("TestNetStandard20Engine")
 Task("TestNetCore31Engine")
     .Description("Tests the .NET Core 3.1 Engine")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         var runtimes = new[] { "3.1", "5.0" };
@@ -318,7 +318,7 @@ Task("TestNetCore31Engine")
                 BIN_DIR + "netcoreapp3.1/",
                 ENGINE_TESTS,
                 runtime,
-                ref ErrorDetail);
+                ref UnreportedErrors);
         }
     });
 
@@ -329,14 +329,14 @@ Task("TestNetCore31Engine")
 Task("TestNet20Console")
     .Description("Tests the .NET 2.0 console runner")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         RunTest(NET20_CONSOLE,
             BIN_DIR + "net35/",
             CONSOLE_TESTS,
             "net35",
-            ref ErrorDetail);
+            ref UnreportedErrors);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -346,7 +346,7 @@ Task("TestNet20Console")
 Task("TestNetCore31Console")
     .Description("Tests the .NET Core 3.1 console runner")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         var runtimes = new[] { "3.1", "5.0" };
@@ -358,7 +358,7 @@ Task("TestNetCore31Console")
                 BIN_DIR + "netcoreapp3.1/",
                 CONSOLE_TESTS,
                 runtime,
-                ref ErrorDetail);
+                ref UnreportedErrors);
         }
     });
 
@@ -624,15 +624,15 @@ bool CheckIfDotNetCoreInstalled()
     return true;
 }
 
-void CheckForError(ref List<string> errorDetail)
+void DisplayUnreportedErrors()
 {
-    if(errorDetail.Count != 0)
+    if(UnreportedErrors.Count > 0)
     {
-        var copyError = new List<string>();
-        copyError = errorDetail.Select(s => s).ToList();
-        errorDetail.Clear();
-        throw new Exception("One or more unit tests failed, breaking the build.\n"
-                              + copyError.Aggregate((x,y) => x + "\n" + y));
+        string msg = "One or more unit tests failed, breaking the build.\r\n"
+          + UnreportedErrors.Aggregate((x, y) => x + "\r\n" + y);
+
+        UnreportedErrors.Clear();
+        throw new Exception(msg);
     }
 }
 
@@ -776,9 +776,10 @@ Task("TestEngine")
     .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")
-    .Description("Builds and tests the engine")
+    .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestEngine")
-    .IsDependentOn("TestConsole");
+    .IsDependentOn("TestConsole")
+    .IsDependentOn("CheckForTestErrors");
 
 Task("BuildPackages")
     .Description("Builds all packages for distribution")
@@ -796,17 +797,20 @@ Task("TestPackages")
 
 Task("Package")
     .Description("Builds and tests all packages")
-    //.IsDependentOn("CheckForError")
     .IsDependentOn("Build")
     .IsDependentOn("BuildPackages")
     .IsDependentOn("CheckPackageContent")
     .IsDependentOn("TestPackages");
 
-Task("Appveyor")
-    .Description("Builds, tests and packages on AppVeyor")
+Task("BuildTestPackage")
+    .Description("Builds, tests and packages")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Package");
+
+Task("Appveyor")
+    .Description("Target we run in our AppVeyor CI")
+    .IsDependentOn("BuildTestPackage");
 
 Task("Default")
     .Description("Builds the engine and console runner")
