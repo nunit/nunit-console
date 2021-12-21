@@ -39,11 +39,14 @@ var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NUGET_DIR = PROJECT_DIR + "nuget/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
-var TOOLS_DIR = PROJECT_DIR + "tools/";
-var IMAGE_DIR = PROJECT_DIR + "image/";
 var MSI_DIR = PROJECT_DIR + "msi/";
+var ZIP_DIR = PROJECT_DIR + "zip/";
+var TOOLS_DIR = PROJECT_DIR + "tools/";
+var IMAGE_DIR = PROJECT_DIR + "images/";
+var MSI_IMG_DIR = IMAGE_DIR + "msi/";
+var ZIP_IMG_DIR = IMAGE_DIR + "zip/";
 var SOURCE_DIR = PROJECT_DIR + "src/";
-var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
+var EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
@@ -72,7 +75,7 @@ var PACKAGE_SOURCE = new string[]
 };
 
 // Extensions we bundle
-var EXTENSION_PACKAGES = new []
+var BUNDLED_EXTENSIONS = new []
 {
   "NUnit.Extension.VSProjectLoader",
   "NUnit.Extension.NUnitProjectLoader",
@@ -124,7 +127,7 @@ Setup(context =>
 Teardown(context =>
 {
     // Executed AFTER the last task.
-    CheckForError(ref ErrorDetail);
+    //CheckForError(ref ErrorDetail);
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -138,8 +141,7 @@ Task("Clean")
         CleanDirectory(PROJECT_DIR + "bin/");
         CleanDirectory(PROJECT_DIR + "packages/");
         CleanDirectory(IMAGE_DIR);
-        CleanDirectory(EXTENSION_PACKAGES_DIR);
-        CleanDirectory(ZIP_IMG);
+        CleanDirectory(EXTENSIONS_DIR);
         CleanDirectory(PACKAGE_DIR);
     });
 
@@ -255,12 +257,15 @@ Task("BuildCppTestFiles")
 // TEST
 //////////////////////////////////////////////////////////////////////
 
-Task("CheckForError")
+// All Unit Tests are run and any error results are saved in
+// the global PendingUnitTestErrors. This method task displays them
+// and throws if there were any errors.
+Task("CheckForTestErrors")
     .Description("Checks for errors running the test suites")
     .Does(() => CheckForError(ref ErrorDetail));
 
 //////////////////////////////////////////////////////////////////////
-// TEST ENGINE
+// TEST .NET 2.0 ENGINE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNet20Engine")
@@ -269,7 +274,52 @@ Task("TestNet20Engine")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, BIN_DIR + "net35/", ENGINE_TESTS, "net35", ref ErrorDetail);
+        RunTest(
+            NET20_CONSOLE,
+            BIN_DIR + "net35/",
+            ENGINE_TESTS,
+            "net35", 
+            ref ErrorDetail);
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETSTANDARD 2.0 ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetStandard20Engine")
+    .Description("Tests the .NET Standard Engine")
+    .IsDependentOn("Build")
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunDotnetCoreNUnitLiteTests(
+            BIN_DIR + "netcoreapp2.1/" + ENGINE_TESTS,
+            BIN_DIR + "netcoreapp2.1",
+            "netcoreapp2.1",
+            ref ErrorDetail);
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETCORE 3.1 ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore31Engine")
+    .Description("Tests the .NET Core 3.1 Engine")
+    .IsDependentOn("Build")
+    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .Does(() =>
+    {
+        var runtimes = new[] { "3.1", "5.0" };
+
+        foreach (var runtime in runtimes)
+        {
+            RunDotnetCoreTests(
+                NETCORE31_CONSOLE,
+                BIN_DIR + "netcoreapp3.1/",
+                ENGINE_TESTS,
+                runtime,
+                ref ErrorDetail);
+        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -282,7 +332,11 @@ Task("TestNet20Console")
     .OnError(exception => { ErrorDetail.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, BIN_DIR + "net35/", CONSOLE_TESTS, "net35", ref ErrorDetail);
+        RunTest(NET20_CONSOLE,
+            BIN_DIR + "net35/",
+            CONSOLE_TESTS,
+            "net35",
+            ref ErrorDetail);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -309,67 +363,8 @@ Task("TestNetCore31Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 2.0 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetStandard20Engine")
-    .Description("Tests the .NET Standard Engine")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetCoreNUnitLiteTests(
-            BIN_DIR + "netcoreapp2.1/" + ENGINE_TESTS,
-            BIN_DIR + "netcoreapp2.1",
-            "netcoreapp2.1",
-            ref ErrorDetail);
-    });
-
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETCORE 3.1 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetCore31Engine")
-    .Description("Tests the .NET Core 3.1 Engine")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        var runtimes = new[] { "3.1", "5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                BIN_DIR + "netcoreapp3.1/",
-                ENGINE_TESTS,
-                runtime,
-                ref ErrorDetail);
-        }
-    });
-
-
-//////////////////////////////////////////////////////////////////////
 // PACKAGE
 //////////////////////////////////////////////////////////////////////
-
-var RootFiles = new FilePath[]
-{
-    "LICENSE.txt",
-    "NOTICES.txt",
-    "CHANGES.txt",
-    "nunit.ico"
-};
-
-Task("CreateImage")
-    .Description("Copies all files into the image directory")
-    .Does(() =>
-    {
-        CleanDirectory(IMAGE_DIR);
-        CopyFiles(RootFiles, IMAGE_DIR);
-        CopyDirectory(BIN_DIR, IMAGE_DIR + "bin/");
-    });
 
 Task("BuildNuGetPackages")
     .Description("Creates NuGet packages of the engine/console")
@@ -483,55 +478,60 @@ Task("TestChocolateyPackage")
     });
 
 //////////////////////////////////////////////////////////////////////
-// PACKAGE COMBINED DISTRIBUTIONS
+// PACKAGE COMBINED DISTRIBUTIONS INCLUDING EXTENSIONS
 //////////////////////////////////////////////////////////////////////
 
 Task("FetchExtensions")
 .Does(() =>
 {
-    CleanDirectory(EXTENSION_PACKAGES_DIR);
+    CleanDirectory(EXTENSIONS_DIR);
 
-    foreach(var package in EXTENSION_PACKAGES)
+    foreach(var package in BUNDLED_EXTENSIONS)
     {
         NuGetInstall(package, new NuGetInstallSettings {
-                        OutputDirectory = EXTENSION_PACKAGES_DIR,
+                        OutputDirectory = EXTENSIONS_DIR,
                         Source = new [] { "https://www.nuget.org/api/v2" }
                     });
     }
 });
 
-Task("CreateCombinedImage")
-.IsDependentOn("CreateImage")
-.IsDependentOn("FetchExtensions")
-.Does(() =>
-{
-    foreach(var framework in NETFX_FRAMEWORKS)
+Task("CreateMsiImage")
+    .IsDependentOn("FetchExtensions")
+    .Does(() =>
     {
-        var addinsImgDir = IMAGE_DIR + "bin/" + framework +"/addins/";
+        CleanDirectory(MSI_IMG_DIR);
+        CopyFiles(
+            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
+            MSI_IMG_DIR);
+        CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
 
-        CopyDirectory(MSI_DIR + "resources/", IMAGE_DIR);
-        CleanDirectory(addinsImgDir);
+        foreach (var framework in NETFX_FRAMEWORKS)
+        {
+            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework +"/addins/";
 
-        foreach(var packageDir in GetAllDirectories(EXTENSION_PACKAGES_DIR))
-            CopyPackageContents(packageDir, addinsImgDir);
-    }
-});
+            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
+            CleanDirectory(addinsImgDir);
+
+            foreach(var packageDir in GetAllDirectories(EXTENSIONS_DIR))
+                CopyPackageContents(packageDir, addinsImgDir);
+        }
+    });
 
 Task("BuildMsiPackage")
-.IsDependentOn("CreateCombinedImage")
-.Does(() =>
-{
-    MSBuild(MSI_DIR + "nunit/nunit.wixproj", new MSBuildSettings()
-        .WithTarget("Rebuild")
-        .SetConfiguration(configuration)
-        .WithProperty("Version", version)
-        .WithProperty("DisplayVersion", version)
-        .WithProperty("OutDir", PACKAGE_DIR)
-        .WithProperty("Image", IMAGE_DIR)
-        .SetMSBuildPlatform(MSBuildPlatform.x86)
-        .SetNodeReuse(false)
-        );
-});
+    .IsDependentOn("CreateMsiImage")
+    .Does(() =>
+    {
+        MSBuild(MSI_DIR + "nunit/nunit.wixproj", new MSBuildSettings()
+            .WithTarget("Rebuild")
+            .SetConfiguration(configuration)
+            .WithProperty("Version", version)
+            .WithProperty("DisplayVersion", version)
+            .WithProperty("OutDir", PACKAGE_DIR)
+            .WithProperty("Image", MSI_IMG_DIR)
+            .SetMSBuildPlatform(MSBuildPlatform.x86)
+            .SetNodeReuse(false)
+            );
+    });
 
 Task("TestMsiPackage")
     .Does(() =>
@@ -539,25 +539,35 @@ Task("TestMsiPackage")
         new MsiPackageTester(Context, version).RunTests();
     });
 
-Task("BuildZipPackage")
-.IsDependentOn("CreateCombinedImage")
-.Does(() =>
-{
-    CleanDirectory(ZIP_IMG);
-    CopyDirectory(IMAGE_DIR, ZIP_IMG);
-
-    foreach(var framework in NETFX_FRAMEWORKS)
+Task("CreateZipImage")
+    .IsDependentOn("FetchExtensions")
+    .Does(() =>
     {
-        //Ensure single and correct addins file (.NET Framework only)
-        var netfxZipImg = ZIP_IMG + "bin/" + framework + "/";
-        DeleteFiles(ZIP_IMG + "*.addins");
-        DeleteFiles(netfxZipImg + "*.addins");
-        CopyFile(IMAGE_DIR + "nunit.bundle.addins", netfxZipImg + "nunit.bundle.addins");
-    }
+        CleanDirectory(ZIP_IMG_DIR);
+        CopyFiles(
+            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
+            ZIP_IMG_DIR);
+        CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
 
-    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, productVersion);
-    Zip(ZIP_IMG, zipPath);
-});
+        foreach (var framework in NETFX_FRAMEWORKS)
+        {
+            var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
+            CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
+
+            var addinsDir = frameworkDir + "addins/";
+            CleanDirectory(addinsDir);
+
+            foreach (var packageDir in GetAllDirectories(EXTENSIONS_DIR))
+                CopyPackageContents(packageDir, addinsDir);
+        }
+    });
+
+Task("BuildZipPackage")
+    .IsDependentOn("CreateZipImage")
+    .Does(() =>
+    {
+        Zip(ZIP_IMG_DIR, $"{PACKAGE_DIR}NUnit.Console-{productVersion}.zip");
+    });
 
 Task("TestZipPackage")
     .Does(() =>
@@ -832,7 +842,7 @@ Task("TestPackages")
 
 Task("Package")
     .Description("Builds and tests all packages")
-    .IsDependentOn("CheckForError")
+    //.IsDependentOn("CheckForError")
     .IsDependentOn("Build")
     .IsDependentOn("BuildPackages")
     .IsDependentOn("CheckPackageContent")

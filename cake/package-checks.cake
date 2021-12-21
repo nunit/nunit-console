@@ -85,7 +85,7 @@ public void CheckAllPackages()
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")) &
         CheckZipPackage(
             "NUnit.Console",
-            HasFiles("LICENSE.txt", "license.rtf", "NOTICES.txt", "CHANGES.txt"),
+            HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
             HasDirectory("bin/net20").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/net35").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),

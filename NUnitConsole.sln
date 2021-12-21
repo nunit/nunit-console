@@ -114,6 +114,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D
 		cake\test-results.cake = cake\test-results.cake
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "msi", "msi", "{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A}"
+	ProjectSection(SolutionItems) = preProject
+		msi\resources\nunit.bundle.addins = msi\resources\nunit.bundle.addins
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zip", "zip", "{20005864-BE82-412D-99BF-288E2D8370E9}"
+	ProjectSection(SolutionItems) = preProject
+		zip\nunit.bundle.addins = zip\nunit.bundle.addins
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +197,8 @@ Global
 		{9D3015EE-5B84-41B3-A1D3-1A439370C392} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{068F6CA9-6108-4F45-8540-351AA5227259} = {4FDF7BFA-A337-41D3-898D-C6A98278E6AD}
 		{9BCA00E2-D072-424B-A6DF-5BECF719C1FB} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{20005864-BE82-412D-99BF-288E2D8370E9} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
