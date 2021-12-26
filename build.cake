@@ -1,7 +1,9 @@
 #load cake/ci.cake
+#load cake/packaging.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
 #load cake/package-tests.cake
+#load cake/package-tester.cake
 #load cake/header-check.cake
 #load cake/local-tasks.cake
 
@@ -34,8 +36,11 @@ var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 // DEFINE RUN CONSTANTS
 //////////////////////////////////////////////////////////////////////
 
-var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
+// Some values are static so they may be used in property initialization
+static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
+static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
+static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
+static string PACKAGE_RESULT_DIR; PACKAGE_RESULT_DIR = PACKAGE_DIR + "results/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
 var NUGET_DIR = PROJECT_DIR + "nuget/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
@@ -84,6 +89,9 @@ var BUNDLED_EXTENSIONS = new []
   "NUnit.Extension.TeamCityEventListener"
 };
 
+// This needs to be loaded after we have defined our constants
+#load cake/package-definitions.cake
+
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
 //////////////////////////////////////////////////////////////////////
@@ -119,6 +127,8 @@ Setup(context =>
 
         AppVeyor.UpdateBuildVersion(productVersion);
     }
+
+    InitializePackageDefinitions();
 
     // Executed BEFORE the first task.
     Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
@@ -363,170 +373,56 @@ Task("TestNetCore31Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// PACKAGE
+// BUILD PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-Task("BuildNuGetPackages")
-    .Description("Creates NuGet packages of the engine/console")
-    .Does(() =>
-    {
-        CreateDirectory(PACKAGE_DIR);
-
-        var basicPackSettings = new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = BIN_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true,
-        };
-
-        var packSettingsWithSymbols = new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = BIN_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true,
-            Symbols = true,
-            // Not yet supported by cake as a setting
-            ArgumentCustomization = args => args.Append("-SymbolPackageFormat snupkg")
-        };
-
-        NuGetPack(NUGET_DIR + "engine/nunit.engine.api.nuspec", packSettingsWithSymbols);
-
-        NuGetPack(NUGET_DIR + "engine/nunit.engine.nuspec", packSettingsWithSymbols);
-
-        NuGetPack(NUGET_DIR + "runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
-
-        NuGetPack(NUGET_DIR + "runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
-
-        NuGetPack(NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
-    });
-
-Task("TestNuGetPackages")
-    .Does(() =>
-    {
-        new NuGetNetFXPackageTester(Context, productVersion).RunTests();
-
-        new NuGetNetCorePackageTester(Context, productVersion).RunTests();
-    });
-
-Task("BuildChocolateyPackage")
-    .Description("Creates chocolatey packages of the console runner")
+Task("BuildPackages")
     .Does(() =>
     {
         EnsureDirectoryExists(PACKAGE_DIR);
+        FetchExtensions();
 
-        ChocolateyPack("choco/nunit-console-runner.nuspec",
-            new ChocolateyPackSettings()
-            {
-                Version = productVersion,
-                OutputDirectory = PACKAGE_DIR,
-                ArgumentCustomization = args => args.Append($"BIN_DIR={BIN_DIR}")
-            });
-    });
-
-Task("TestChocolateyPackage")
-    .Does(() =>
-    {
-        new ChocolateyPackageTester(Context, productVersion).RunTests();
+        foreach (var package in AllPackages)
+            BuildPackage(package);
     });
 
 //////////////////////////////////////////////////////////////////////
-// PACKAGE COMBINED DISTRIBUTIONS INCLUDING EXTENSIONS
+// VERIFY PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-Task("FetchExtensions")
-.Does(() =>
-{
-    CleanDirectory(EXTENSIONS_DIR);
-
-    foreach(var package in BUNDLED_EXTENSIONS)
-    {
-        NuGetInstall(package, new NuGetInstallSettings {
-                        OutputDirectory = EXTENSIONS_DIR,
-                        Source = new [] { "https://www.nuget.org/api/v2" }
-                    });
-    }
-});
-
-Task("CreateMsiImage")
-    .IsDependentOn("FetchExtensions")
+Task("VerifyPackages")
+    .Description("Check content of all the packages we build")
     .Does(() =>
     {
-        CleanDirectory(MSI_IMG_DIR);
-        CopyFiles(
-            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
-            MSI_IMG_DIR);
-        CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
+        int failures = 0;
 
-        foreach (var framework in NETFX_FRAMEWORKS)
+        foreach (var package in AllPackages)
         {
-            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework +"/addins/";
+            if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
+                ++failures;
 
-            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
-            CleanDirectory(addinsImgDir);
-
-            foreach(var packageDir in GetAllDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsImgDir);
+            if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
+                ++failures;
         }
+
+        if (failures == 0)
+            Information("\nAll packages passed verification.");
+        else
+            throw new System.Exception($"{failures} packages failed verification.");
     });
 
-Task("BuildMsiPackage")
-    .IsDependentOn("CreateMsiImage")
+//////////////////////////////////////////////////////////////////////
+// TEST PACKAGES
+//////////////////////////////////////////////////////////////////////
+
+Task("TestPackages")
     .Does(() =>
     {
-        MSBuild(MSI_DIR + "nunit/nunit.wixproj", new MSBuildSettings()
-            .WithTarget("Rebuild")
-            .SetConfiguration(configuration)
-            .WithProperty("Version", version)
-            .WithProperty("DisplayVersion", version)
-            .WithProperty("OutDir", PACKAGE_DIR)
-            .WithProperty("Image", MSI_IMG_DIR)
-            .SetMSBuildPlatform(MSBuildPlatform.x86)
-            .SetNodeReuse(false)
-            );
-    });
-
-Task("TestMsiPackage")
-    .Does(() =>
-    {
-        new MsiPackageTester(Context, version).RunTests();
-    });
-
-Task("CreateZipImage")
-    .IsDependentOn("FetchExtensions")
-    .Does(() =>
-    {
-        CleanDirectory(ZIP_IMG_DIR);
-        CopyFiles(
-            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
-            ZIP_IMG_DIR);
-        CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
-
-        foreach (var framework in NETFX_FRAMEWORKS)
+        foreach (var package in AllPackages)
         {
-            var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
-            CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
-
-            var addinsDir = frameworkDir + "addins/";
-            CleanDirectory(addinsDir);
-
-            foreach (var packageDir in GetAllDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsDir);
+            if (package.PackageTests != null)
+                new PackageTester(Context, package).RunTests();
         }
-    });
-
-Task("BuildZipPackage")
-    .IsDependentOn("CreateZipImage")
-    .Does(() =>
-    {
-        Zip(ZIP_IMG_DIR, $"{PACKAGE_DIR}NUnit.Console-{productVersion}.zip");
-    });
-
-Task("TestZipPackage")
-    .Does(() =>
-    {
-        new ZipPackageTester(Context, productVersion).RunTests();
     });
 
 Task("InstallSigningTool")
@@ -582,13 +478,6 @@ Task("SignPackages")
                 throw new InvalidOperationException("Signing failed!");
             }
         }
-    });
-
-Task("CheckPackageContent")
-    .Description("Check content of all the packages we build")
-    .Does(() =>
-    {
-        CheckAllPackages();
     });
 
 Task("ListInstalledNetCoreRuntimes")
@@ -749,11 +638,6 @@ public List<string> GetInstalledNetCoreRuntimes()
 // HELPER METHODS - PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public string[] GetAllDirectories(string dirPath)
-{
-    return System.IO.Directory.GetDirectories(dirPath);
-}
-
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
     var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));
@@ -781,28 +665,14 @@ Task("Test")
     .IsDependentOn("TestConsole")
     .IsDependentOn("CheckForTestErrors");
 
-Task("BuildPackages")
-    .Description("Builds all packages for distribution")
-    .IsDependentOn("BuildNuGetPackages")
-    .IsDependentOn("BuildChocolateyPackage")
-    .IsDependentOn("BuildMsiPackage")
-    .IsDependentOn("BuildZipPackage");
-
-Task("TestPackages")
-    .Description("Tests the packages")
-    .IsDependentOn("TestNuGetPackages")
-    .IsDependentOn("TestChocolateyPackage")
-    .IsDependentOn("TestMsiPackage")
-    .IsDependentOn("TestZipPackage");
-
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("Build")
     .IsDependentOn("BuildPackages")
-    .IsDependentOn("CheckPackageContent")
+    .IsDependentOn("VerifyPackages")
     .IsDependentOn("TestPackages");
 
-Task("BuildTestPackage")
+Task("BuildTestAndPackage")
     .Description("Builds, tests and packages")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
@@ -810,7 +680,7 @@ Task("BuildTestPackage")
 
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
-    .IsDependentOn("BuildTestPackage");
+    .IsDependentOn("BuildTestAndPackage");
 
 Task("Default")
     .Description("Builds the engine and console runner")
