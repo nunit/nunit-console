@@ -17,7 +17,7 @@ namespace NUnit.Engine.Tests.Integration
             {
                 for (var times = 0; times < 3; times++)
                 {
-                    var result = ProcessUtils.Run(new ProcessStartInfo(runner.ConsoleExe, $"--explore \"{test.MockAssemblyDll}\""));
+                    var result = ProcessTester.Run(new ProcessStartInfo(runner.ConsoleExe, $"--explore \"{test.MockAssemblyDll}\""));
                     Assert.That(result.StandardStreamData, Has.None.With.Property("Data").Contains("System.Net.Sockets.SocketException"));
                     Assert.That(result.StandardStreamData, Has.None.With.Property("IsError").True);
                     Assert.That(result, Has.Property("ExitCode").Zero);
