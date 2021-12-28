@@ -7,7 +7,7 @@ using System.Text;
 
 namespace NUnit.Engine.Tests.Helpers
 {
-    public static class ProcessUtils
+    public static class ProcessTester
     {
         public static ProcessResult Run(ProcessStartInfo startInfo)
         {

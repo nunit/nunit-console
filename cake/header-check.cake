@@ -5,7 +5,6 @@
 static readonly int CD_LENGTH = Environment.CurrentDirectory.Length + 1;
 
 static readonly string[] EXEMPT_FILES = new [] {
-    "AssemblyInfo.cs",
     "Options.cs",
     "ProcessUtils.cs",
     "ProcessUtilsTests.cs"
@@ -30,9 +29,14 @@ Task("CheckHeaders")
             if (file.ToString().Contains("/obj/"))
                 continue;
 
+            var filename = file.GetFilename().ToString();
+            if (filename == "AssemblyInfo.cs")
+                continue;
+
             examined++;
             var header = GetHeader(file);
-            if (EXEMPT_FILES.Contains(file.GetFilename().ToString()))
+
+            if (EXEMPT_FILES.Contains(filename))
                 Exempted.Add(file);
             else if (header.Count == 0)
                 NoHeader.Add(file);

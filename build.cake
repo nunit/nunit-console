@@ -1,9 +1,11 @@
-#load ci.cake
-#load package-checks.cake
-#load test-results.cake
-#load package-tests.cake
-#load header-check.cake
-#load local-tasks.cake
+#load cake/ci.cake
+#load cake/packaging.cake
+#load cake/package-checks.cake
+#load cake/test-results.cake
+#load cake/package-tests.cake
+#load cake/package-tester.cake
+#load cake/header-check.cake
+#load cake/local-tasks.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
@@ -16,7 +18,7 @@ var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var productVersion = Argument("productVersion", "3.13.0");
 
-var ErrorDetail = new List<string>();
+var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 
 //////////////////////////////////////////////////////////////////////
@@ -34,35 +36,37 @@ var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 // DEFINE RUN CONSTANTS
 //////////////////////////////////////////////////////////////////////
 
-var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
+// Some values are static so they may be used in property initialization
+static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
+static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
+static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
+static string PACKAGE_RESULT_DIR; PACKAGE_RESULT_DIR = PACKAGE_DIR + "results/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
-var NET35_BIN_DIR = BIN_DIR + "net35/";
-var NETCOREAPP21_BIN_DIR = BIN_DIR + "netcoreapp2.1/";
-var NETCOREAPP31_BIN_DIR = BIN_DIR + "netcoreapp3.1/";
+var NUGET_DIR = PROJECT_DIR + "nuget/";
 var CHOCO_DIR = PROJECT_DIR + "choco/";
+var MSI_DIR = PROJECT_DIR + "msi/";
+var ZIP_DIR = PROJECT_DIR + "zip/";
 var TOOLS_DIR = PROJECT_DIR + "tools/";
 var IMAGE_DIR = PROJECT_DIR + "images/";
-var MSI_DIR = PROJECT_DIR + "msi/";
-var CURRENT_IMG_DIR = IMAGE_DIR + $"NUnit-{productVersion}/";
-var CURRENT_IMG_NET20_BIN_DIR = CURRENT_IMG_DIR + "bin/net20/";
-var EXTENSION_PACKAGES_DIR = PROJECT_DIR + "extension-packages/";
+var MSI_IMG_DIR = IMAGE_DIR + "msi/";
+var ZIP_IMG_DIR = IMAGE_DIR + "zip/";
+var SOURCE_DIR = PROJECT_DIR + "src/";
+var EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 var ZIP_IMG = PROJECT_DIR + "zip-image/";
 
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
-var ENGINE_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine/nunit.engine.csproj";
-var AGENT_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit-agent/nunit-agent.csproj";
-var ENGINE_API_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
-var ENGINE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
-var CONSOLE_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console/nunit3-console.csproj";
-var CONSOLE_TESTS_CSPROJ = PROJECT_DIR + "src/NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
-var MOCK_ASSEMBLY_CSPROJ = PROJECT_DIR + "src/NUnitEngine/mock-assembly/mock-assembly.csproj";
+var ENGINE_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
+var AGENT_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
+var ENGINE_API_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
+var ENGINE_TESTS_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+var CONSOLE_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
+var CONSOLE_TESTS_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
 
 var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
 
 // Test Runners
-var NET20_CONSOLE = BIN_DIR + "net20/" + "nunit3-console.exe";
-var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/" + "nunit3-console.dll";
+var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
+var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/nunit3-console.dll";
 
 // Test Assemblies
 var ENGINE_TESTS = "nunit.engine.tests.dll";
@@ -75,7 +79,8 @@ var PACKAGE_SOURCE = new string[]
     "https://www.myget.org/F/nunit/api/v2"
 };
 
-var EXTENSION_PACKAGES = new []
+// Extensions we bundle
+var BUNDLED_EXTENSIONS = new []
 {
   "NUnit.Extension.VSProjectLoader",
   "NUnit.Extension.NUnitProjectLoader",
@@ -83,6 +88,9 @@ var EXTENSION_PACKAGES = new []
   "NUnit.Extension.NUnitV2ResultWriter",
   "NUnit.Extension.TeamCityEventListener"
 };
+
+// This needs to be loaded after we have defined our constants
+#load cake/package-definitions.cake
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
@@ -120,6 +128,8 @@ Setup(context =>
         AppVeyor.UpdateBuildVersion(productVersion);
     }
 
+    InitializePackageDefinitions();
+
     // Executed BEFORE the first task.
     Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
 });
@@ -127,7 +137,7 @@ Setup(context =>
 Teardown(context =>
 {
     // Executed AFTER the last task.
-    CheckForError(ref ErrorDetail);
+    DisplayUnreportedErrors();
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -141,8 +151,7 @@ Task("Clean")
         CleanDirectory(PROJECT_DIR + "bin/");
         CleanDirectory(PROJECT_DIR + "packages/");
         CleanDirectory(IMAGE_DIR);
-        CleanDirectory(EXTENSION_PACKAGES_DIR);
-        CleanDirectory(ZIP_IMG);
+        CleanDirectory(EXTENSIONS_DIR);
         CleanDirectory(PACKAGE_DIR);
     });
 
@@ -154,9 +163,9 @@ Task("UpdateAssemblyInfo")
     .Description("Sets the assembly versions to the calculated version.")
     .Does(() =>
     {
-        PatchAssemblyInfo("src/NUnitConsole/ConsoleVersion.cs", productVersion, version);
-        PatchAssemblyInfo("src/NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
-        PatchAssemblyInfo("src/NUnitEngine/EngineVersion.cs", productVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", productVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", productVersion, version);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -198,6 +207,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
 Task("Build")
     .Description("Builds the engine and console") 
     .IsDependentOn("CheckHeaders")
+    .IsDependentOn("Clean")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
@@ -245,11 +255,11 @@ Task("BuildCppTestFiles")
     .Does(() =>
     {
         MSBuild(
-            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-             CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
+            CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
 
         MSBuild(
-            "./src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
+            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
             CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
     });
 
@@ -257,57 +267,29 @@ Task("BuildCppTestFiles")
 // TEST
 //////////////////////////////////////////////////////////////////////
 
-Task("CheckForError")
+// All Unit Tests are run and any error results are saved in
+// the global PendingUnitTestErrors. This method task displays them
+// and throws if there were any errors.
+Task("CheckForTestErrors")
     .Description("Checks for errors running the test suites")
-    .Does(() => CheckForError(ref ErrorDetail));
+    .Does(() => DisplayUnreportedErrors());
 
 //////////////////////////////////////////////////////////////////////
-// TEST ENGINE
+// TEST .NET 2.0 ENGINE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNet20Engine")
     .Description("Tests the engine")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE, NET35_BIN_DIR, ENGINE_TESTS, "net35", ref ErrorDetail);
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet20Console")
-    .Description("Tests the .NET 2.0 console runner")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunTest(NET20_CONSOLE, NET35_BIN_DIR, CONSOLE_TESTS, "net35", ref ErrorDetail);
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST .NET CORE 3.1 CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetCore31Console")
-    .Description("Tests the .NET Core 3.1 console runner")
-    .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
-    .Does(() =>
-    {
-        var runtimes = new[] { "3.1", "5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                NETCOREAPP31_BIN_DIR,
-                CONSOLE_TESTS,
-                runtime,
-                ref ErrorDetail);
-        }
+        RunTest(
+            NET20_CONSOLE,
+            BIN_DIR + "net35/",
+            ENGINE_TESTS,
+            "net35", 
+            ref UnreportedErrors);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -317,16 +299,15 @@ Task("TestNetCore31Console")
 Task("TestNetStandard20Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         RunDotnetCoreNUnitLiteTests(
-            NETCOREAPP21_BIN_DIR + ENGINE_TESTS,
-            NETCOREAPP21_BIN_DIR,
+            BIN_DIR + "netcoreapp2.1/" + ENGINE_TESTS,
+            BIN_DIR + "netcoreapp2.1",
             "netcoreapp2.1",
-            ref ErrorDetail);
+            ref UnreportedErrors);
     });
-
 
 //////////////////////////////////////////////////////////////////////
 // TEST NETCORE 3.1 ENGINE
@@ -335,7 +316,7 @@ Task("TestNetStandard20Engine")
 Task("TestNetCore31Engine")
     .Description("Tests the .NET Core 3.1 Engine")
     .IsDependentOn("Build")
-    .OnError(exception => { ErrorDetail.Add(exception.Message); })
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
         var runtimes = new[] { "3.1", "5.0" };
@@ -344,228 +325,104 @@ Task("TestNetCore31Engine")
         {
             RunDotnetCoreTests(
                 NETCORE31_CONSOLE,
-                NETCOREAPP31_BIN_DIR,
+                BIN_DIR + "netcoreapp3.1/",
                 ENGINE_TESTS,
                 runtime,
-                ref ErrorDetail);
+                ref UnreportedErrors);
         }
     });
 
+//////////////////////////////////////////////////////////////////////
+// TEST .NET 2.0 CONSOLE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNet20Console")
+    .Description("Tests the .NET 2.0 console runner")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunTest(NET20_CONSOLE,
+            BIN_DIR + "net35/",
+            CONSOLE_TESTS,
+            "net35",
+            ref UnreportedErrors);
+    });
 
 //////////////////////////////////////////////////////////////////////
-// PACKAGE
+// TEST .NET CORE 3.1 CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-var RootFiles = new FilePath[]
-{
-    "LICENSE.txt",
-    "NOTICES.txt",
-    "CHANGES.txt",
-    "nunit.ico"
-};
-
-Task("CreateImage")
-    .Description("Copies all files into the image directory")
+Task("TestNetCore31Console")
+    .Description("Tests the .NET Core 3.1 console runner")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        CleanDirectory(CURRENT_IMG_DIR);
-        CopyFiles(RootFiles, CURRENT_IMG_DIR);
-        CopyDirectory(BIN_DIR, CURRENT_IMG_DIR + "bin/");
-    });
+        var runtimes = new[] { "3.1", "5.0" };
 
-Task("BuildNuGetPackages")
-    .Description("Creates NuGet packages of the engine/console")
-    .IsDependentOn("CreateImage")
-    .Does(() =>
-    {
-        CreateDirectory(PACKAGE_DIR);
-
-        var basicPackSettings = new NuGetPackSettings()
+        foreach (var runtime in runtimes)
         {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true,
-        };
-
-        var packSettingsWithSymbols = new NuGetPackSettings()
-        {
-            Version = productVersion,
-            BasePath = CURRENT_IMG_DIR,
-            OutputDirectory = PACKAGE_DIR,
-            NoPackageAnalysis = true,
-            Symbols = true,
-            // Not yet supported by cake as a setting
-            ArgumentCustomization = args => args.Append("-SymbolPackageFormat snupkg")
-        };
-
-        NuGetPack("nuget/engine/nunit.engine.api.nuspec", packSettingsWithSymbols);
-
-        NuGetPack("nuget/engine/nunit.engine.nuspec", packSettingsWithSymbols);
-
-        NuGetPack("nuget/runners/nunit.console-runner.nuspec", packSettingsWithSymbols);
-
-        NuGetPack("nuget/runners/nunit.console-runner-with-extensions.nuspec", basicPackSettings);
-
-        NuGetPack("nuget/runners/nunit.console-runner.netcore.nuspec", packSettingsWithSymbols);
+            RunDotnetCoreTests(
+                NETCORE31_CONSOLE,
+                BIN_DIR + "netcoreapp3.1/",
+                CONSOLE_TESTS,
+                runtime,
+                ref UnreportedErrors);
+        }
     });
 
-Task("TestNuGetPackages")
-    .Does(() =>
-    {
-        new NuGetNetFXPackageTester(Context, productVersion).RunTests();
+//////////////////////////////////////////////////////////////////////
+// BUILD PACKAGES
+//////////////////////////////////////////////////////////////////////
 
-        new NuGetNetCorePackageTester(Context, productVersion).RunTests();
-    });
-
-Task("BuildChocolateyPackages")
-    .Description("Creates chocolatey packages of the console runner")
+Task("BuildPackages")
     .Does(() =>
     {
         EnsureDirectoryExists(PACKAGE_DIR);
+        FetchExtensions();
 
-        ChocolateyPack("choco/nunit-console-runner.nuspec",
-            new ChocolateyPackSettings()
-            {
-                Version = productVersion,
-                OutputDirectory = PACKAGE_DIR,
-                Files = new [] {
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "LICENSE.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "NOTICES.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "VERIFICATION.txt", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.choco.addins", Target = "tools" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit.agent.addins", Target = "tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent.exe", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent.exe.config", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent-x86.exe", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit-agent-x86.exe.config", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.api.dll", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.api.xml", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/nunit.engine.core.dll", Target="tools/agents/net20" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net20/testcentric.engine.metadata.dll", Target="tools/agents/net20" },
-
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent.exe", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent.exe.config", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent-x86.exe", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit-agent-x86.exe.config", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent-x86.exe.ignore", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.api.dll", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.api.xml", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/nunit.engine.core.dll", Target="tools/agents/net40" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/net40/testcentric.engine.metadata.dll", Target="tools/agents/net40" },
-
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.dll.config", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.deps.json", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CHOCO_DIR + "nunit-agent.exe.ignore", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit.engine.api.dll", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit.engine.api.xml", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/nunit.engine.core.dll", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_DIR + "bin/agents/netcoreapp3.1/testcentric.engine.metadata.dll", Target="tools/agents/netcoreapp3.1" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit3-console.exe.config", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.api.xml", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.core.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "nunit.engine.dll", Target="tools" },
-                    new ChocolateyNuSpecContent { Source = CURRENT_IMG_NET20_BIN_DIR + "testcentric.engine.metadata.dll", Target="tools" }
-                }
-            });
-    });
-
-Task("TestChocolateyPackage")
-    .Does(() =>
-    {
-        new ChocolateyPackageTester(Context, productVersion).RunTests();
+        foreach (var package in AllPackages)
+            BuildPackage(package);
     });
 
 //////////////////////////////////////////////////////////////////////
-// PACKAGE COMBINED DISTRIBUTIONS
+// VERIFY PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-Task("FetchExtensions")
-.Does(() =>
-{
-    CleanDirectory(EXTENSION_PACKAGES_DIR);
-
-    foreach(var package in EXTENSION_PACKAGES)
-    {
-        NuGetInstall(package, new NuGetInstallSettings {
-                        OutputDirectory = EXTENSION_PACKAGES_DIR,
-                        Source = new [] { "https://www.nuget.org/api/v2" }
-                    });
-    }
-});
-
-Task("CreateCombinedImage")
-.IsDependentOn("CreateImage")
-.IsDependentOn("FetchExtensions")
-.Does(() =>
-{
-    foreach(var framework in NETFX_FRAMEWORKS)
-    {
-        var addinsImgDir = CURRENT_IMG_DIR + "bin/" + framework +"/addins/";
-
-        CopyDirectory(MSI_DIR + "resources/", CURRENT_IMG_DIR);
-        CleanDirectory(addinsImgDir);
-
-        foreach(var packageDir in GetAllDirectories(EXTENSION_PACKAGES_DIR))
-            CopyPackageContents(packageDir, addinsImgDir);
-    }
-});
-
-Task("BuildMsiPackage")
-.IsDependentOn("CreateCombinedImage")
-.Does(() =>
-{
-    MSBuild(MSI_DIR + "nunit/nunit.wixproj", new MSBuildSettings()
-        .WithTarget("Rebuild")
-        .SetConfiguration(configuration)
-        .WithProperty("Version", version)
-        .WithProperty("DisplayVersion", version)
-        .WithProperty("OutDir", PACKAGE_DIR)
-        .WithProperty("Image", CURRENT_IMG_DIR)
-        .SetMSBuildPlatform(MSBuildPlatform.x86)
-        .SetNodeReuse(false)
-        );
-});
-
-Task("TestMsiPackage")
+Task("VerifyPackages")
+    .Description("Check content of all the packages we build")
     .Does(() =>
     {
-        new MsiPackageTester(Context, version).RunTests();
+        int failures = 0;
+
+        foreach (var package in AllPackages)
+        {
+            if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
+                ++failures;
+
+            if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
+                ++failures;
+        }
+
+        if (failures == 0)
+            Information("\nAll packages passed verification.");
+        else
+            throw new System.Exception($"{failures} packages failed verification.");
     });
 
-Task("BuildZipPackage")
-.IsDependentOn("CreateCombinedImage")
-.Does(() =>
-{
-    CleanDirectory(ZIP_IMG);
-    CopyDirectory(CURRENT_IMG_DIR, ZIP_IMG);
+//////////////////////////////////////////////////////////////////////
+// TEST PACKAGES
+//////////////////////////////////////////////////////////////////////
 
-    foreach(var framework in NETFX_FRAMEWORKS)
-    {
-        //Ensure single and correct addins file (.NET Framework only)
-        var netfxZipImg = ZIP_IMG + "bin/" + framework + "/";
-        DeleteFiles(ZIP_IMG + "*.addins");
-        DeleteFiles(netfxZipImg + "*.addins");
-        CopyFile(CURRENT_IMG_DIR + "nunit.bundle.addins", netfxZipImg + "nunit.bundle.addins");
-    }
-
-    var zipPath = string.Format("{0}NUnit.Console-{1}.zip", PACKAGE_DIR, productVersion);
-    Zip(ZIP_IMG, zipPath);
-});
-
-Task("TestZipPackage")
+Task("TestPackages")
     .Does(() =>
     {
-        new ZipPackageTester(Context, productVersion).RunTests();
+        foreach (var package in AllPackages)
+        {
+            if (package.PackageTests != null)
+                new PackageTester(Context, package).RunTests();
+        }
     });
 
 Task("InstallSigningTool")
@@ -623,13 +480,6 @@ Task("SignPackages")
         }
     });
 
-Task("CheckPackageContent")
-    .Description("Check content of all the packages we build")
-    .Does(() =>
-    {
-        CheckAllPackages();
-    });
-
 Task("ListInstalledNetCoreRuntimes")
     .Description("Lists all installed .NET Core Runtimes")
     .Does(() => 
@@ -663,15 +513,15 @@ bool CheckIfDotNetCoreInstalled()
     return true;
 }
 
-void CheckForError(ref List<string> errorDetail)
+void DisplayUnreportedErrors()
 {
-    if(errorDetail.Count != 0)
+    if(UnreportedErrors.Count > 0)
     {
-        var copyError = new List<string>();
-        copyError = errorDetail.Select(s => s).ToList();
-        errorDetail.Clear();
-        throw new Exception("One or more unit tests failed, breaking the build.\n"
-                              + copyError.Aggregate((x,y) => x + "\n" + y));
+        string msg = "One or more unit tests failed, breaking the build.\r\n"
+          + UnreportedErrors.Aggregate((x, y) => x + "\r\n" + y);
+
+        UnreportedErrors.Clear();
+        throw new Exception(msg);
     }
 }
 
@@ -788,11 +638,6 @@ public List<string> GetInstalledNetCoreRuntimes()
 // HELPER METHODS - PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public string[] GetAllDirectories(string dirPath)
-{
-    return System.IO.Directory.GetDirectories(dirPath);
-}
-
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
     var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));
@@ -802,11 +647,6 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
-
-Task("Rebuild")
-    .Description("Rebuilds the engine and console runner")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Build");
 
 Task("TestConsole")
     .Description("Builds and tests the console runner")
@@ -820,36 +660,27 @@ Task("TestEngine")
     .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")
-    .Description("Builds and tests the engine")
+    .Description("Builds and tests the engine and console runner")
     .IsDependentOn("TestEngine")
-    .IsDependentOn("TestConsole");
-
-Task("BuildPackages")
-    .Description("Builds all packages for distribution")
-    .IsDependentOn("BuildNuGetPackages")
-    .IsDependentOn("BuildChocolateyPackages")
-    .IsDependentOn("BuildMsiPackage")
-    .IsDependentOn("BuildZipPackage");
-
-Task("TestPackages")
-    .Description("Tests the packages")
-    .IsDependentOn("TestNuGetPackages")
-    .IsDependentOn("TestChocolateyPackage")
-    .IsDependentOn("TestMsiPackage")
-    .IsDependentOn("TestZipPackage");
+    .IsDependentOn("TestConsole")
+    .IsDependentOn("CheckForTestErrors");
 
 Task("Package")
     .Description("Builds and tests all packages")
-    .IsDependentOn("CheckForError")
+    .IsDependentOn("Build")
     .IsDependentOn("BuildPackages")
-    .IsDependentOn("CheckPackageContent")
+    .IsDependentOn("VerifyPackages")
     .IsDependentOn("TestPackages");
 
-Task("Appveyor")
-    .Description("Builds, tests and packages on AppVeyor")
+Task("BuildTestAndPackage")
+    .Description("Builds, tests and packages")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("Package");
+
+Task("Appveyor")
+    .Description("Target we run in our AppVeyor CI")
+    .IsDependentOn("BuildTestAndPackage");
 
 Task("Default")
     .Description("Builds the engine and console runner")

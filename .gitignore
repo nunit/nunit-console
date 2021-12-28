@@ -183,8 +183,7 @@ MockAssemblyResult.xml
 PortabilityAnalysis*.html
 tools
 !tools/packages.config
-extension-packages
-zip-image
+bundled-extensions
 
 # =========================
 # Docker Mono build packages
