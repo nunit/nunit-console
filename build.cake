@@ -205,7 +205,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
 }
 
 Task("Build")
-    .Description("Builds the engine and console") 
+    .Description("Builds the engine and console")
     .IsDependentOn("CheckHeaders")
     .IsDependentOn("Clean")
     .IsDependentOn("UpdateAssemblyInfo")
@@ -668,6 +668,12 @@ Task("Test")
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("Build")
+    .IsDependentOn("BuildPackages")
+    .IsDependentOn("VerifyPackages")
+    .IsDependentOn("TestPackages");
+
+Task("PackageExistingBuild")
+    .Description("Builds and tests all packages, using previously build binaries")
     .IsDependentOn("BuildPackages")
     .IsDependentOn("VerifyPackages")
     .IsDependentOn("TestPackages");
