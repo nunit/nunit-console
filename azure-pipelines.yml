@@ -11,7 +11,7 @@ jobs:
   
   steps:
 
-  - powershell: .\build.ps1 -Target Test -Configuration Release
+  - powershell: .\build.ps1 --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
@@ -32,7 +32,7 @@ jobs:
       testRunTitle: netcoreapp2.1/Windows
     condition: succeededOrFailed()
 
-  - powershell: .\build.ps1 -Target Package --artifact-dir='$(Build.ArtifactStagingDirectory)'
+  - powershell: .\build.ps1 --target=PackageExistingBuild --artifact-dir='$(Build.ArtifactStagingDirectory)'
     displayName: Package
 
   - task: PublishBuildArtifacts@1
@@ -64,8 +64,7 @@ jobs:
       version: 2.1.x
 
   - bash: |
-     dotnet tool install --global Cake.Tool
-     dotnet cake --target=Test --configuration=Release
+     ./build.sh --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
@@ -108,9 +107,8 @@ jobs:
       packageType: runtime
       version: 2.1.x
 
-  - bash: |
-     dotnet tool install --global Cake.Tool
-     dotnet cake --target=Test --configuration=Release
+  - bash:
+     ./build.sh --target=Test --configuration=Release
     displayName: Build and test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
