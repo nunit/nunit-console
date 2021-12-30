@@ -213,27 +213,27 @@ public abstract class PackageDefinition
         ICakeContext context,
         PackageType packageType,
         string id,
-        string version, 
+        string version,
         string source,
         string executable = null,
         PackageCheck[] checks = null,
         PackageCheck[] symbols = null,
-        IEnumerable<PackageTest> tests = null )
-	{
+        IEnumerable<PackageTest> tests = null)
+    {
         if (executable == null && tests != null)
             throw new System.ArgumentException($"Unable to create {packageType} package {id}: Executable must be provided if there are tests", nameof(executable));
 
         _context = context;
 
-		PackageType = packageType;
-		PackageId = id;
+        PackageType = packageType;
+        PackageId = id;
         PackageVersion = version;
-		PackageSource = source;
+        PackageSource = source;
         TestExecutable = executable;
         PackageChecks = checks;
         PackageTests = tests;
         SymbolChecks = symbols;
-	}
+    }
 
     public PackageType PackageType { get; }
 	public string PackageId { get; }
