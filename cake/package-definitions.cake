@@ -11,7 +11,7 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage;
 PackageDefinition NUnitConsoleMsiPackage;
 PackageDefinition NUnitConsoleZipPackage;
 
-public void InitializePackageDefinitions()
+public void InitializePackageDefinitions(ICakeContext context)
 {
     const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
     bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
@@ -44,14 +44,16 @@ public void InitializePackageDefinitions()
     AllPackages.AddRange(new PackageDefinition[] {
 
         NUnitConsoleNuGetPackage = new NuGetPackage(
+            context: context,
             id: "NUnit.Console",
-            version: productVersion,
+            version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner-with-extensions.nuspec",
             checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
 
         NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
+            context: context,
             id: "NUnit.ConsoleRunner",
-            version: productVersion,
+            version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -70,8 +72,9 @@ public void InitializePackageDefinitions()
             tests: StandardRunnerTests),
 
         NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
+            context: context,
             id: "NUnit.ConsoleRunner.NetCore",
-            version: productVersion,
+            version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -84,8 +87,9 @@ public void InitializePackageDefinitions()
             tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
+            context: context,
             id: "nunit-console-runner",
-            version: productVersion,
+            version: ProductVersion,
             source: CHOCO_DIR + "nunit-console-runner.nuspec",
             checks: new PackageCheck[] {
                 HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
@@ -96,6 +100,7 @@ public void InitializePackageDefinitions()
             tests: StandardRunnerTests),
 
         NUnitConsoleMsiPackage = new MsiPackage(
+            context: context,
             id: "NUnit.Console",
             version: version,
             source: MSI_DIR + "nunit/nunit.wixproj",
@@ -108,8 +113,9 @@ public void InitializePackageDefinitions()
             tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
 
         NUnitConsoleZipPackage = new ZipPackage(
+            context: context,
             id: "NUnit.Console",
-            version: productVersion,
+            version: ProductVersion,
             source: ZIP_IMG_DIR,
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
@@ -127,8 +133,9 @@ public void InitializePackageDefinitions()
         // NOTE: Packages below this point have no direct tests
 
         NUnitEnginePackage = new NuGetPackage(
+            context: context,
             id: "NUnit.Engine",
-            version: productVersion,
+            version: ProductVersion,
             source: NUGET_DIR + "engine/nunit.engine.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -150,8 +157,9 @@ public void InitializePackageDefinitions()
             }),
 
         NUnitEngineApiPackage = new NuGetPackage(
+            context: context,
             id: "NUnit.Engine.Api",
-            version: productVersion,
+            version: ProductVersion,
             source: NUGET_DIR + "engine/nunit.engine.api.nuspec",
             checks: new PackageCheck[] {
                 HasFile("LICENSE.txt"),
@@ -188,6 +196,8 @@ public enum PackageType
 /// </summary>
 public abstract class PackageDefinition
 {
+    protected ICakeContext _context;
+
     /// <summary>
     /// 
     /// </summary>
@@ -200,27 +210,30 @@ public abstract class PackageDefinition
     /// <param name="symbols">An array of PackageChecks to be made on the symbol package, if one is created. Optional. Only supported for nuget packages.</param>
     /// <param name="tests">An array of PackageTests to be run against the package. Optional.</param>
 	protected PackageDefinition(
+        ICakeContext context,
         PackageType packageType,
         string id,
-        string version, 
+        string version,
         string source,
         string executable = null,
         PackageCheck[] checks = null,
         PackageCheck[] symbols = null,
-        IEnumerable<PackageTest> tests = null )
-	{
+        IEnumerable<PackageTest> tests = null)
+    {
         if (executable == null && tests != null)
             throw new System.ArgumentException($"Unable to create {packageType} package {id}: Executable must be provided if there are tests", nameof(executable));
 
-		PackageType = packageType;
-		PackageId = id;
+        _context = context;
+
+        PackageType = packageType;
+        PackageId = id;
         PackageVersion = version;
-		PackageSource = source;
+        PackageSource = source;
         TestExecutable = executable;
         PackageChecks = checks;
         PackageTests = tests;
         SymbolChecks = symbols;
-	}
+    }
 
     public PackageType PackageType { get; }
 	public string PackageId { get; }
@@ -232,7 +245,8 @@ public abstract class PackageDefinition
     public IEnumerable<PackageTest> PackageTests { get; }
 
     public abstract string PackageName { get; }
-    
+    public abstract void BuildPackage();
+
     public bool HasSymbols { get; protected set; } = false;
     public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {PackageType} packages.");
 }
@@ -242,9 +256,9 @@ public abstract class PackageDefinition
 // PackageDefinition with an unknown package type.
 public class NuGetPackage : PackageDefinition
 {
-    public NuGetPackage(string id, string version, string source, string executable = null,
+    public NuGetPackage(ICakeContext context, string id, string version, string source, string executable = null,
         PackageCheck[] checks = null, PackageCheck[] symbols = null, IEnumerable<PackageTest> tests = null)
-        : base(PackageType.NuGet, id, version, source, executable: executable, checks: checks, symbols: symbols, tests: tests)
+        : base(context, PackageType.NuGet, id, version, source, executable: executable, checks: checks, symbols: symbols, tests: tests)
     {
         if (symbols != null)
         {
@@ -255,31 +269,79 @@ public class NuGetPackage : PackageDefinition
 
     public override string PackageName => $"{PackageId}.{PackageVersion}.nupkg";
     public override string SymbolPackageName => System.IO.Path.ChangeExtension(PackageName, ".snupkg");
+
+    public override void BuildPackage()
+    {
+        var nugetPackSettings = new NuGetPackSettings()
+        {
+            Version = PackageVersion,
+            BasePath = BIN_DIR,
+            OutputDirectory = PACKAGE_DIR,
+            NoPackageAnalysis = true,
+            Symbols = HasSymbols
+        };
+
+        // Not yet supported by cake as a setting
+        if (HasSymbols)
+            nugetPackSettings.ArgumentCustomization =
+                args => args.Append("-SymbolPackageFormat snupkg");
+
+        _context.NuGetPack(PackageSource, nugetPackSettings);
+    }
 }
 
 public class ChocolateyPackage : PackageDefinition
 {
-    public ChocolateyPackage(string id, string version, string source, string executable = null, 
+    public ChocolateyPackage(ICakeContext context, string id, string version, string source, string executable = null, 
         PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(PackageType.Chocolatey, id, version, source, executable: executable, checks: checks, tests: tests) { }
+        : base(context, PackageType.Chocolatey, id, version, source, executable: executable, checks: checks, tests: tests) { }
 
     public override string PackageName => $"{PackageId}.{PackageVersion}.nupkg";
+    
+    public override void BuildPackage()
+    {
+        _context.ChocolateyPack(PackageSource,
+            new ChocolateyPackSettings()
+            {
+                Version = PackageVersion,
+                OutputDirectory = PACKAGE_DIR,
+                ArgumentCustomization = args => args.Append($"BIN_DIR={BIN_DIR}")
+            });
+    }
 }
 
 public class MsiPackage : PackageDefinition
 {
-    public MsiPackage(string id, string version, string source, string executable = null,
+    public MsiPackage(ICakeContext context, string id, string version, string source, string executable = null,
         PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(PackageType.Msi, id, version, source, executable: executable, checks: checks, tests: tests) { }
+        : base(context, PackageType.Msi, id, version, source, executable: executable, checks: checks, tests: tests) { }
 
     public override string PackageName => $"{PackageId}-{PackageVersion}.msi";
+
+    public override void BuildPackage()
+    {
+        _context.MSBuild(PackageSource, new MSBuildSettings()
+            .WithTarget("Rebuild")
+            .SetConfiguration(Configuration)
+            .WithProperty("Version", PackageVersion)
+            .WithProperty("DisplayVersion", PackageVersion)
+            .WithProperty("OutDir", PACKAGE_DIR)
+            .WithProperty("Image", MSI_IMG_DIR)
+            .SetMSBuildPlatform(MSBuildPlatform.x86)
+            .SetNodeReuse(false));
+    }
 }
 
 public class ZipPackage : PackageDefinition
 {
-    public ZipPackage(string id, string version, string source, string executable = null,
+    public ZipPackage(ICakeContext context, string id, string version, string source, string executable = null,
         PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(PackageType.Zip, id, version, source, executable: executable, checks: checks, tests: tests) { }
+        : base(context, PackageType.Zip, id, version, source, executable: executable, checks: checks, tests: tests) { }
 
     public override string PackageName => $"{PackageId}-{PackageVersion}.zip";
+    
+    public override void BuildPackage()
+    {
+        _context.Zip(ZIP_IMG_DIR, $"{PACKAGE_DIR}{PackageName}");
+    }
 }

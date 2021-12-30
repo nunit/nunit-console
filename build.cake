@@ -1,10 +1,9 @@
 #load cake/ci.cake
-#load cake/packaging.cake
+#load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
 #load cake/package-tests.cake
 #load cake/package-tester.cake
-#load cake/header-check.cake
 #load cake/local-tasks.cake
 
 // Install Tools
@@ -14,9 +13,9 @@
 // ARGUMENTS & INITIALISATION
 //////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Release");
-var productVersion = Argument("productVersion", "3.13.0");
+static string Target; Target = Argument("target", "Default");
+static string Configuration; Configuration = Argument("configuration", "Release");
+static string ProductVersion; ProductVersion = Argument("productVersion", "3.14.0");
 
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -25,10 +24,10 @@ var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 // SET PACKAGE VERSION
 //////////////////////////////////////////////////////////////////////
 
-var dash = productVersion.IndexOf('-');
+var dash = ProductVersion.IndexOf('-');
 var version = dash > 0
-    ? productVersion.Substring(0, dash)
-    : productVersion;
+    ? ProductVersion.Substring(0, dash)
+    : ProductVersion;
 
 var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
 
@@ -41,18 +40,17 @@ static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.Fu
 static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
 static string PACKAGE_RESULT_DIR; PACKAGE_RESULT_DIR = PACKAGE_DIR + "results/";
-var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
-var NUGET_DIR = PROJECT_DIR + "nuget/";
-var CHOCO_DIR = PROJECT_DIR + "choco/";
-var MSI_DIR = PROJECT_DIR + "msi/";
-var ZIP_DIR = PROJECT_DIR + "zip/";
-var TOOLS_DIR = PROJECT_DIR + "tools/";
-var IMAGE_DIR = PROJECT_DIR + "images/";
-var MSI_IMG_DIR = IMAGE_DIR + "msi/";
-var ZIP_IMG_DIR = IMAGE_DIR + "zip/";
-var SOURCE_DIR = PROJECT_DIR + "src/";
-var EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
-var ZIP_IMG = PROJECT_DIR + "zip-image/";
+static string BIN_DIR; BIN_DIR = PROJECT_DIR + "bin/" + Configuration + "/";
+static string NUGET_DIR; NUGET_DIR = PROJECT_DIR + "nuget/";
+static string CHOCO_DIR; CHOCO_DIR = PROJECT_DIR + "choco/";
+static string MSI_DIR; MSI_DIR = PROJECT_DIR + "msi/";
+static string ZIP_DIR; ZIP_DIR = PROJECT_DIR + "zip/";
+static string TOOLS_DIR; TOOLS_DIR = PROJECT_DIR + "tools/";
+static string IMAGE_DIR; IMAGE_DIR = PROJECT_DIR + "images/";
+static string MSI_IMG_DIR; MSI_IMG_DIR = IMAGE_DIR + "msi/";
+static string ZIP_IMG_DIR; ZIP_IMG_DIR = IMAGE_DIR + "zip/";
+static string SOURCE_DIR; SOURCE_DIR = PROJECT_DIR + "src/";
+static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 var ENGINE_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
@@ -105,7 +103,7 @@ Setup(context =>
 
         if (branch == "master" && !isPullRequest)
         {
-            productVersion = version + "-dev-" + buildNumber;
+            ProductVersion = version + "-dev-" + buildNumber;
         }
         else
         {
@@ -122,16 +120,16 @@ Setup(context =>
             if (suffix.Length > 21)
                 suffix = suffix.Substring(0, 21);
 
-            productVersion = version + suffix;
+            ProductVersion = version + suffix;
         }
 
-        AppVeyor.UpdateBuildVersion(productVersion);
+        AppVeyor.UpdateBuildVersion(ProductVersion);
     }
 
-    InitializePackageDefinitions();
+    InitializePackageDefinitions(context);
 
     // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit Console/Engine.", configuration, productVersion);
+    Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
 });
 
 Teardown(context =>
@@ -163,9 +161,9 @@ Task("UpdateAssemblyInfo")
     .Description("Sets the assembly versions to the calculated version.")
     .Does(() =>
     {
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", productVersion, version);
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineApiVersion.cs", productVersion, assemblyVersion: null);
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", productVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", ProductVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineApiVersion.cs", ProductVersion, assemblyVersion: null);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", ProductVersion, version);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -175,9 +173,9 @@ Task("UpdateAssemblyInfo")
 MSBuildSettings CreateMSBuildSettings(string target)
 {
     var settings = new MSBuildSettings()
-        .SetConfiguration(configuration)
+        .SetConfiguration(Configuration)
         .SetVerbosity(Verbosity.Minimal)
-        .WithProperty("PackageVersion", productVersion)
+        .WithProperty("PackageVersion", ProductVersion)
         .WithTarget(target)
         // Workaround for https://github.com/Microsoft/msbuild/issues/3626
         .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
@@ -373,17 +371,94 @@ Task("TestNetCore31Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// BUILD PACKAGES
+// FETCH BUNDLED EXTENSIONS
 //////////////////////////////////////////////////////////////////////
 
+Task("FetchBundledExtensions")
+    .Does(() =>
+    {
+        CleanDirectory(EXTENSIONS_DIR);
+
+        DisplayBanner("Fetching bundled extensions");
+
+        foreach (var extension in BUNDLED_EXTENSIONS)
+        {
+            DisplayBanner(extension);
+
+            NuGetInstall(extension, new NuGetInstallSettings
+            {
+                OutputDirectory = EXTENSIONS_DIR,
+                Source = new[] { "https://www.nuget.org/api/v2" }
+            });
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
+// CREATE MSI IMAGE
+//////////////////////////////////////////////////////////////////////
+
+Task("CreateMsiImage")
+    .IsDependentOn("FetchBundledExtensions")
+    .Does(() =>
+    {
+        CleanDirectory(MSI_IMG_DIR);
+        CopyFiles(
+            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
+            MSI_IMG_DIR);
+        CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
+
+        foreach (var framework in NETFX_FRAMEWORKS)
+        {
+            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
+
+            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
+            CleanDirectory(addinsImgDir);
+
+            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+                CopyPackageContents(packageDir, addinsImgDir);
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
+// CREATE ZIP IMAGE
+//////////////////////////////////////////////////////////////////////
+
+Task("CreateZipImage")
+    .IsDependentOn("FetchBundledExtensions")
+    .Does(() =>
+    {
+        CleanDirectory(ZIP_IMG_DIR);
+        CopyFiles(
+            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
+            ZIP_IMG_DIR);
+        CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
+
+        foreach (var framework in NETFX_FRAMEWORKS)
+        {
+            var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
+            CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
+
+            var addinsDir = frameworkDir + "addins/";
+            CleanDirectory(addinsDir);
+
+            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+                CopyPackageContents(packageDir, addinsDir);
+        }
+    });
+
 Task("BuildPackages")
+    .IsDependentOn("CreateMsiImage")
+    .IsDependentOn("CreateZipImage")
     .Does(() =>
     {
         EnsureDirectoryExists(PACKAGE_DIR);
-        FetchExtensions();
 
         foreach (var package in AllPackages)
-            BuildPackage(package);
+        {
+            DisplayBanner($"Building package {package.PackageName}");
+
+            package.BuildPackage();
+        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -425,11 +500,19 @@ Task("TestPackages")
         }
     });
 
+//////////////////////////////////////////////////////////////////////
+// INSTALL SIGNING TOOL
+//////////////////////////////////////////////////////////////////////
+
 Task("InstallSigningTool")
     .Does(() =>
     {
         var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient --global" });
     });
+
+//////////////////////////////////////////////////////////////////////
+// SIGN PACKAGES
+//////////////////////////////////////////////////////////////////////
 
 Task("SignPackages")
     .IsDependentOn("InstallSigningTool")
@@ -523,6 +606,13 @@ void DisplayUnreportedErrors()
         UnreportedErrors.Clear();
         throw new Exception(msg);
     }
+}
+
+public static void DisplayBanner(string message)
+{
+    Console.WriteLine("\r\n=================================================="); ;
+    Console.WriteLine(message);
+    Console.WriteLine("==================================================");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -696,4 +786,4 @@ Task("Default")
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
 
-RunTarget(target);
+RunTarget(Target);
