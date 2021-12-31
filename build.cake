@@ -13,8 +13,8 @@ static string Configuration; Configuration = Argument("configuration", "Release"
 #load cake/package-definitions.cake
 
 // Install Tools
-#tool NuGet.CommandLine&version=5.3.1
-#tool nuget:?package=GitVersion.CommandLine&version=5.0.0
+#tool NuGet.CommandLine&version=6.0.0
+#tool dotnet:?package=GitVersion.Tool&version=5.8.1
 
 static string ProductVersion;
 static string SemVer;
