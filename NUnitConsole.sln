@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ci.cake = ci.cake
 		CONTRIBUTING.md = CONTRIBUTING.md
 		src\Directory.Build.props = src\Directory.Build.props
+		GitVersion.yml = GitVersion.yml
 		header-check.cake = header-check.cake
 		LICENSE.txt = LICENSE.txt
 		NetFXTests.nunit = NetFXTests.nunit
@@ -107,6 +108,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D072-424B-A6DF-5BECF719C1FB}"
 	ProjectSection(SolutionItems) = preProject
 		cake\ci.cake = cake\ci.cake
+		cake\constants.cake = cake\constants.cake
 		cake\header-check.cake = cake\header-check.cake
 		cake\local-tasks.cake = cake\local-tasks.cake
 		cake\package-checks.cake = cake\package-checks.cake
@@ -114,6 +116,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D
 		cake\package-tester.cake = cake\package-tester.cake
 		cake\package-tests.cake = cake\package-tests.cake
 		cake\test-results.cake = cake\test-results.cake
+		cake\versioning.cake = cake\versioning.cake
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "msi", "msi", "{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A}"

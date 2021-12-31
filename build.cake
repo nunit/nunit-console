@@ -1,3 +1,7 @@
+static string Target; Target = Argument("target", "Default");
+static string Configuration; Configuration = Argument("configuration", "Release");
+
+#load cake/constants.cake
 #load cake/ci.cake
 #load cake/header-check.cake
 #load cake/package-checks.cake
@@ -5,128 +9,33 @@
 #load cake/package-tests.cake
 #load cake/package-tester.cake
 #load cake/local-tasks.cake
+#load cake/versioning.cake
+#load cake/package-definitions.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=5.3.1
+#tool nuget:?package=GitVersion.CommandLine&version=5.0.0
 
-//////////////////////////////////////////////////////////////////////
-// ARGUMENTS & INITIALISATION
-//////////////////////////////////////////////////////////////////////
-
-static string Target; Target = Argument("target", "Default");
-static string Configuration; Configuration = Argument("configuration", "Release");
-static string ProductVersion; ProductVersion = Argument("productVersion", "3.14.0");
+static string ProductVersion;
+static string SemVer;
 
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
-
-//////////////////////////////////////////////////////////////////////
-// SET PACKAGE VERSION
-//////////////////////////////////////////////////////////////////////
-
-var dash = ProductVersion.IndexOf('-');
-var version = dash > 0
-    ? ProductVersion.Substring(0, dash)
-    : ProductVersion;
-
-var isAppveyor = BuildSystem.IsRunningOnAppVeyor;
-
-//////////////////////////////////////////////////////////////////////
-// DEFINE RUN CONSTANTS
-//////////////////////////////////////////////////////////////////////
-
-// Some values are static so they may be used in property initialization
-static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
-static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
-static string PACKAGE_RESULT_DIR; PACKAGE_RESULT_DIR = PACKAGE_DIR + "results/";
-static string BIN_DIR; BIN_DIR = PROJECT_DIR + "bin/" + Configuration + "/";
-static string NUGET_DIR; NUGET_DIR = PROJECT_DIR + "nuget/";
-static string CHOCO_DIR; CHOCO_DIR = PROJECT_DIR + "choco/";
-static string MSI_DIR; MSI_DIR = PROJECT_DIR + "msi/";
-static string ZIP_DIR; ZIP_DIR = PROJECT_DIR + "zip/";
-static string TOOLS_DIR; TOOLS_DIR = PROJECT_DIR + "tools/";
-static string IMAGE_DIR; IMAGE_DIR = PROJECT_DIR + "images/";
-static string MSI_IMG_DIR; MSI_IMG_DIR = IMAGE_DIR + "msi/";
-static string ZIP_IMG_DIR; ZIP_IMG_DIR = IMAGE_DIR + "zip/";
-static string SOURCE_DIR; SOURCE_DIR = PROJECT_DIR + "src/";
-static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
-
-var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
-var ENGINE_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
-var AGENT_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
-var ENGINE_API_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
-var ENGINE_TESTS_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
-var CONSOLE_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
-var CONSOLE_TESTS_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
-
-var NETFX_FRAMEWORKS = new [] { "net20", "net35" }; //Production code targets net20, tests target nets35
-
-// Test Runners
-var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
-var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/nunit3-console.dll";
-
-// Test Assemblies
-var ENGINE_TESTS = "nunit.engine.tests.dll";
-var CONSOLE_TESTS = "nunit3-console.tests.dll";
-
-// Package sources for nuget restore
-var PACKAGE_SOURCE = new string[]
-{
-    "https://www.nuget.org/api/v2",
-    "https://www.myget.org/F/nunit/api/v2"
-};
-
-// Extensions we bundle
-var BUNDLED_EXTENSIONS = new []
-{
-  "NUnit.Extension.VSProjectLoader",
-  "NUnit.Extension.NUnitProjectLoader",
-  "NUnit.Extension.NUnitV2Driver",
-  "NUnit.Extension.NUnitV2ResultWriter",
-  "NUnit.Extension.TeamCityEventListener"
-};
-
-// This needs to be loaded after we have defined our constants
-#load cake/package-definitions.cake
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
 //////////////////////////////////////////////////////////////////////
 Setup(context =>
 {
-    if (BuildSystem.IsRunningOnAppVeyor)
-    {
-        var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
-        var branch = AppVeyor.Environment.Repository.Branch;
-        var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
+    var buildVersion = new BuildVersion(context);
 
-        if (branch == "master" && !isPullRequest)
-        {
-            ProductVersion = version + "-dev-" + buildNumber;
-        }
-        else
-        {
-            var suffix = "-ci-" + buildNumber;
-
-            if (isPullRequest)
-                suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
-            else if (AppVeyor.Environment.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-                suffix += "-pre-" + buildNumber;
-            else
-                suffix += "-" + System.Text.RegularExpressions.Regex.Replace(branch, "[^0-9A-Za-z-]+", "-");
-
-            // NuGet limits "special version part" to 20 chars. Add one for the hyphen.
-            if (suffix.Length > 21)
-                suffix = suffix.Substring(0, 21);
-
-            ProductVersion = version + suffix;
-        }
-
-        AppVeyor.UpdateBuildVersion(ProductVersion);
-    }
+    ProductVersion = buildVersion.ProductVersion;
+    SemVer = buildVersion.SemVer;
 
     InitializePackageDefinitions(context);
+
+    if (BuildSystem.IsRunningOnAppVeyor)
+        AppVeyor.UpdateBuildVersion(ProductVersion);
 
     // Executed BEFORE the first task.
     Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
@@ -161,9 +70,9 @@ Task("UpdateAssemblyInfo")
     .Description("Sets the assembly versions to the calculated version.")
     .Does(() =>
     {
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", ProductVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", ProductVersion, SemVer);
         PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineApiVersion.cs", ProductVersion, assemblyVersion: null);
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", ProductVersion, version);
+        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", ProductVersion, SemVer);
     });
 
 //////////////////////////////////////////////////////////////////////

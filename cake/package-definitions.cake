@@ -102,7 +102,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleMsiPackage = new MsiPackage(
             context: context,
             id: "NUnit.Console",
-            version: version,
+            version: SemVer,
             source: MSI_DIR + "nunit/nunit.wixproj",
             checks: new PackageCheck[] {
                 HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
