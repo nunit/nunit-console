@@ -107,15 +107,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D072-424B-A6DF-5BECF719C1FB}"
 	ProjectSection(SolutionItems) = preProject
-		cake\ci.cake = cake\ci.cake
 		cake\constants.cake = cake\constants.cake
 		cake\header-check.cake = cake\header-check.cake
-		cake\local-tasks.cake = cake\local-tasks.cake
 		cake\package-checks.cake = cake\package-checks.cake
 		cake\package-definitions.cake = cake\package-definitions.cake
 		cake\package-tester.cake = cake\package-tester.cake
 		cake\package-tests.cake = cake\package-tests.cake
 		cake\test-results.cake = cake\test-results.cake
+		cake\utilities.cake = cake\utilities.cake
 		cake\versioning.cake = cake\versioning.cake
 	EndProjectSection
 EndProject

@@ -55,3 +55,9 @@ var BUNDLED_EXTENSIONS = new[]
   "NUnit.Extension.NUnitV2ResultWriter",
   "NUnit.Extension.TeamCityEventListener"
 };
+
+// URLs for uploading packages
+private const string MYGET_PUSH_URL = "https://www.myget.org/F/testcentric/api/v2";
+
+// Environment Variable names holding API keys
+private const string MYGET_API_KEY = "MYGET_API_KEY";
