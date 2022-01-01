@@ -11,12 +11,6 @@ artifacts:
 - path: package\*.msi
 - path: package\*.zip
 
-deploy:
-  - provider: NuGet
-    server: https://www.myget.org/F/nunit/api/v2
-    api_key:
-      secure: wtAvJDVl2tfwiVcyLExFHLvZVfUWiQRHsfdHBFCNEATeCHo1Nd8JP642PfY8xhji
-    skip_symbols: true
-    on:
-      branch: master
-      APPVEYOR_REPO_NAME: nunit/nunit-console
+environment:
+  MYGET_API_KEY:
+    secure: wtAvJDVl2tfwiVcyLExFHLvZVfUWiQRHsfdHBFCNEATeCHo1Nd8JP642PfY8xhji

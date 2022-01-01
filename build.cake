@@ -2,14 +2,13 @@ static string Target; Target = Argument("target", "Default");
 static string Configuration; Configuration = Argument("configuration", "Release");
 
 #load cake/constants.cake
-#load cake/ci.cake
 #load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
 #load cake/package-tests.cake
 #load cake/package-tester.cake
-#load cake/local-tasks.cake
 #load cake/versioning.cake
+#load cake/utilities.cake
 #load cake/package-definitions.cake
 
 // Install Tools
@@ -18,6 +17,7 @@ static string Configuration; Configuration = Argument("configuration", "Release"
 
 static string ProductVersion;
 static string SemVer;
+static string PreReleaseLabel;
 
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -32,6 +32,7 @@ Setup(context =>
 
     ProductVersion = buildVersion.ProductVersion;
     SemVer = buildVersion.SemVer;
+    PreReleaseLabel = buildVersion.PreReleaseLabel;
     Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
 
     Information("Initializing PackageDefinitions");
@@ -48,7 +49,7 @@ Teardown(context =>
 });
 
 //////////////////////////////////////////////////////////////////////
-// CLEAN
+// CLEANING
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
@@ -61,6 +62,21 @@ Task("Clean")
         CleanDirectory(EXTENSIONS_DIR);
         CleanDirectory(PACKAGE_DIR);
     });
+
+Task("DeleteObjectDirectories")
+    .WithCriteria(BuildSystem.IsLocalBuild)
+    .Does(() =>
+    {
+        Information("Deleting object directories");
+
+        foreach (var dir in GetDirectories("src/**/obj/"))
+            DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });
+    });
+
+Task("CleanAll")
+    .Description("Perform standard 'Clean' followed by deleting object directories")
+    .IsDependentOn("Clean")
+    .IsDependentOn("DeleteObjectDirectories");
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
@@ -78,38 +94,6 @@ Task("UpdateAssemblyInfo")
 //////////////////////////////////////////////////////////////////////
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
-
-MSBuildSettings CreateMSBuildSettings(string target)
-{
-    var settings = new MSBuildSettings()
-        .SetConfiguration(Configuration)
-        .SetVerbosity(Verbosity.Minimal)
-        .WithProperty("PackageVersion", ProductVersion)
-        .WithTarget(target)
-        // Workaround for https://github.com/Microsoft/msbuild/issues/3626
-        .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
-
-    if (IsRunningOnWindows())
-    {
-        // The fallback is in case only a preview of VS is installed.
-        var vsInstallation =
-            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" })
-            ?? VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
-
-        if (vsInstallation != null)
-        {
-            var msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\Current\Bin\MSBuild.exe");
-
-            if (!FileExists(msBuildPath))
-                msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
-
-            if (FileExists(msBuildPath))
-                settings.ToolPath = msBuildPath;
-        }
-    }
-
-    return settings;
-}
 
 Task("Build")
     .Description("Builds the engine and console")
@@ -472,6 +456,31 @@ Task("SignPackages")
         }
     });
 
+//////////////////////////////////////////////////////////////////////
+// PUBLISH PACKAGES
+//////////////////////////////////////////////////////////////////////
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToMyGet")
+    .Description("Publish packages to MyGet")
+    .WithCriteria(PreReleaseLabel == "dev" || PreReleaseLabel == "pre")
+    .Does(() =>
+    {
+        var apiKey = EnvironmentVariable(MYGET_API_KEY);
+
+        foreach (var package in AllPackages)
+            switch(package.PackageType)
+            {
+                case PackageType.NuGet:
+                    PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
+                    break;
+                case PackageType.Chocolatey:
+                    PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
+                    break;
+            }
+    });
+
 Task("ListInstalledNetCoreRuntimes")
     .Description("Lists all installed .NET Core Runtimes")
     .Does(() => 
@@ -482,166 +491,6 @@ Task("ListInstalledNetCoreRuntimes")
             Information(runtime);            
         }
     });
-
-//////////////////////////////////////////////////////////////////////
-// HELPER METHODS - GENERAL
-//////////////////////////////////////////////////////////////////////
-
-bool CheckIfDotNetCoreInstalled()
-{
-    try
-    {
-        Information("Checking if .NET Core SDK is installed...");
-        StartProcess("dotnet", new ProcessSettings
-        {
-            Arguments = "--info"
-        });
-    }
-    catch(Exception)
-    {
-        Warning(".NET Core SDK is not installed. It can be installed from https://www.microsoft.com/net/core");
-        return false;
-    }
-    return true;
-}
-
-void DisplayUnreportedErrors()
-{
-    if(UnreportedErrors.Count > 0)
-    {
-        string msg = "One or more unit tests failed, breaking the build.\r\n"
-          + UnreportedErrors.Aggregate((x, y) => x + "\r\n" + y);
-
-        UnreportedErrors.Clear();
-        throw new Exception(msg);
-    }
-}
-
-public static void DisplayBanner(string message)
-{
-    Console.WriteLine("\r\n=================================================="); ;
-    Console.WriteLine(message);
-    Console.WriteLine("==================================================");
-}
-
-//////////////////////////////////////////////////////////////////////
-// HELPER METHODS - TEST
-//////////////////////////////////////////////////////////////////////
-
-FilePath GetResultXmlPath(string testAssembly, string framework)
-{
-    var assemblyName = System.IO.Path.GetFileNameWithoutExtension(testAssembly);
-
-    // Required for test suites running under NUnitLite
-    CreateDirectory($@"test-results\{framework}");
-
-    return MakeAbsolute(new FilePath($@"test-results\{framework}\{assemblyName}.xml"));
-}
-
-void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, string framework, ref List<string> errorDetail)
-{
-    int rc = StartProcess(
-        MakeAbsolute(exePath),
-        new ProcessSettings()
-        {
-            Arguments = new ProcessArgumentBuilder()
-                .Append(testAssembly)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(testAssembly, framework).FullPath)
-                .Render(),
-            WorkingDirectory = workingDir
-        });
-
-    if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
-    else if (rc < 0)
-        errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
-}
-
-void RunDotnetCoreNUnitLiteTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
-{
-    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
-}
-
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
-{
-    //Filename is first arg if running on NUnit Console, or exePath if running NUnitLite tests
-    var fileName = arguments ?? exePath.GetFilename();
-
-    //Find most suitable runtime
-    var fxVersion = new string(framework.SkipWhile(c => !char.IsDigit(c)).ToArray());
-    //Select latest runtime matching requested major/minor version
-    var selectedFramework = installedNetCoreRuntimes.Where(v => v.StartsWith(fxVersion)).OrderByDescending(Version.Parse).FirstOrDefault();
-
-    if (selectedFramework == null)
-    {
-        var msg = $"No suitable runtime found to run tests under {framework}";
-        if (!BuildSystem.IsLocalBuild)
-            throw new Exception(msg);
-
-        Warning(msg);
-        return;
-    }
-    else
-    {
-        Information($"Runtime framework version {selectedFramework} selected to run {fileName} for {framework}.");
-    }
-
-    //Run Tests
-
-    var args = new ProcessArgumentBuilder()
-                .AppendSwitch("--fx-version", " ", selectedFramework)
-                .AppendQuoted(exePath.FullPath)
-                .Append(arguments)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, framework).FullPath)
-                .Render();
-
-    int rc = StartProcess(
-        "dotnet",
-        new ProcessSettings
-        {
-            Arguments = args,
-            WorkingDirectory = workingDir
-        });
-
-    if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
-    else if (rc < 0)
-        errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
-}
-
-public List<string> GetInstalledNetCoreRuntimes()
-{
-    var list = new List<string>();
-
-    var process = StartProcess("dotnet", 
-            new ProcessSettings 
-            { 
-                Arguments = "--list-runtimes",
-                RedirectStandardOutput = true,
-                RedirectedStandardOutputHandler = 
-                s => {
-                    if (s == null || !s.StartsWith("Microsoft.NETCore.App"))
-                        return s;
-
-                    var version = s.Split(' ')[1];                    
-
-                    list.Add(version);
-                    return s;
-                }
-            });
-    return list;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// HELPER METHODS - PACKAGE
-//////////////////////////////////////////////////////////////////////
-
-public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
-{
-    var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));
-    CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
-}
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
@@ -664,6 +513,10 @@ Task("Test")
     .IsDependentOn("TestConsole")
     .IsDependentOn("CheckForTestErrors");
 
+Task("Publish")
+    .Description("Publish nuget and chocolatey packages according to the current settings")
+    .IsDependentOn("PublishToMyGet");
+
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("Build")
@@ -685,7 +538,8 @@ Task("BuildTestAndPackage")
 
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
-    .IsDependentOn("BuildTestAndPackage");
+    .IsDependentOn("BuildTestAndPackage")
+    .IsDependentOn("Publish");
 
 Task("Default")
     .Description("Builds the engine and console runner")
