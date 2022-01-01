@@ -281,10 +281,8 @@ public class NuGetPackage : PackageDefinition
             Symbols = HasSymbols
         };
 
-        // Not yet supported by cake as a setting
         if (HasSymbols)
-            nugetPackSettings.ArgumentCustomization =
-                args => args.Append("-SymbolPackageFormat snupkg");
+            nugetPackSettings.SymbolPackageFormat = "snupkg";
 
         _context.NuGetPack(PackageSource, nugetPackSettings);
     }
