@@ -42,7 +42,7 @@ The command-line is a _published interface_ as defined above. It is specified in
 
 - Adding a new option
 - Modifying the behavior of an option so it does the same thing better or more effectively or has added sub-options.
-- Adding support for running under an new platform
+- Adding support for running under a new platform
 
 ### Examples of PATCH Command-Line Changes
 
