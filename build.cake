@@ -34,6 +34,7 @@ Setup(context =>
     SemVer = buildVersion.SemVer;
     PreReleaseLabel = buildVersion.PreReleaseLabel;
     Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
+    Information("PreReleaseLabel is " + PreReleaseLabel);
 
     Information("Initializing PackageDefinitions");
     InitializePackageDefinitions(context);
@@ -464,7 +465,7 @@ Task("SignPackages")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToMyGet")
     .Description("Publish packages to MyGet")
-    .WithCriteria(PreReleaseLabel == "dev" || PreReleaseLabel == "pre")
+    .WithCriteria(() => PreReleaseLabel == "dev" || PreReleaseLabel == "pre")
     .Does(() =>
     {
         var apiKey = EnvironmentVariable(MYGET_API_KEY);
