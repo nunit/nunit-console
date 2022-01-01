@@ -20,11 +20,10 @@ public class BuildVersion
         BranchName = _gitVersion.BranchName;
         IsReleaseBranch = BranchName.StartsWith("release-");
 
-        // TODO: Get GitVersion to work on Linux
         string productVersion = context.HasArgument("productVersion")
-            ? context.Argument("productVersion", "3.14.0")
+            ? context.Argument<string>("productVersion")
             : CalculateProductVersion();
-
+        
         int dash = productVersion.IndexOf('-');
         IsPreRelease = dash > 0;
 
@@ -77,6 +76,7 @@ public class BuildVersion
             return _gitVersion.MajorMinorPatch;
 
         string branchName = _gitVersion.BranchName;
+
         // We don't currently use this pattern, but check in case we do later.
         if (branchName.StartsWith("feature/"))
             branchName = branchName.Substring(8);
@@ -109,33 +109,6 @@ public class BuildVersion
             case "beta":
             default:
                 return _gitVersion.LegacySemVer;
-        }
-    }
-
-    string ReplaceAttributeString(string source, string attributeName, string value)
-    {
-        var matches = Regex.Matches(source, $@"\[assembly: {Regex.Escape(attributeName)}\(""(?<value>[^""]+)""\)\]");
-        if (matches.Count != 1) throw new InvalidOperationException($"Expected exactly one line similar to:\r\n[assembly: {attributeName}(\"1.2.3-optional\")]");
-
-        var group = matches[0].Groups["value"];
-        return source.Substring(0, group.Index) + value + source.Substring(group.Index + group.Length);
-    }
-
-    void ReplaceFileContents(string filePath, Func<string, string> update)
-    {
-        using (var file = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-        {
-            string source;
-            using (var reader = new StreamReader(file, new UTF8Encoding(false), true, 4096, leaveOpen: true))
-                source = reader.ReadToEnd();
-
-            var newSource = update.Invoke(source);
-            if (newSource == source) return;
-
-            file.Seek(0, SeekOrigin.Begin);
-            using (var writer = new StreamWriter(file, new UTF8Encoding(false), 4096, leaveOpen: true))
-                writer.Write(newSource);
-            file.SetLength(file.Position);
         }
     }
 }

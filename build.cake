@@ -14,7 +14,7 @@ static string Configuration; Configuration = Argument("configuration", "Release"
 
 // Install Tools
 #tool NuGet.CommandLine&version=6.0.0
-#tool dotnet:?package=GitVersion.Tool&version=5.8.1
+#tool dotnet:?package=GitVersion.Tool&version=5.6.3
 
 static string ProductVersion;
 static string SemVer;
@@ -27,18 +27,18 @@ var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 //////////////////////////////////////////////////////////////////////
 Setup(context =>
 {
+    Information("Creating BuildVersion");
     var buildVersion = new BuildVersion(context);
 
     ProductVersion = buildVersion.ProductVersion;
     SemVer = buildVersion.SemVer;
+    Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
 
+    Information("Initializing PackageDefinitions");
     InitializePackageDefinitions(context);
 
     if (BuildSystem.IsRunningOnAppVeyor)
-        AppVeyor.UpdateBuildVersion(ProductVersion);
-
-    // Executed BEFORE the first task.
-    Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
+        AppVeyor.UpdateBuildVersion(ProductVersion + "-" + AppVeyor.Environment.Build.Number);
 });
 
 Teardown(context =>
