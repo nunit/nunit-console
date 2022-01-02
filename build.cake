@@ -484,7 +484,7 @@ Task("PublishToMyGet")
     .Description("Publish packages to MyGet")
     .Does(() =>
     {
-        if (!ShouldPublishToMyGet())
+        if (!ShouldPublishToMyGet)
             Information("Nothing to publish to MyGet from this run.");
         else
         {
@@ -516,7 +516,7 @@ Task("PublishToNuGet")
     .Description("Publish packages to NuGet")
     .Does(() =>
     {
-        if (!ShouldPublishToNuGet())
+        if (!ShouldPublishToNuGet)
             Information("Nothing to publish to NuGet from this run.");
         else
         {
@@ -541,7 +541,7 @@ Task("PublishToChocolatey")
     .Description("Publish packages to Chocolatey")
     .Does(() =>
     {
-        if (!ShouldPublishToChocolatey())
+        if (!ShouldPublishToChocolatey)
             Information("Nothing to publish to Chocolatey from this run.");
         else
         {
@@ -612,6 +612,34 @@ Task("CreateDraftRelease")
     });
 
 //////////////////////////////////////////////////////////////////////
+// CREATE A PRODUCTION RELEASE
+//////////////////////////////////////////////////////////////////////
+
+Task("CreateProductionRelease")
+    .Does(() =>
+    {
+        if (IsProductionRelease)
+        {
+            string token = EnvironmentVariable(GITHUB_ACCESS_TOKEN);
+            string tagName = ProductVersion;
+
+            var assetList = new List<string>();
+            foreach (var package in AllPackages)
+                assetList.Add(PACKAGE_DIR + package.PackageName);
+            string assets = $"\"{string.Join(',', assetList.ToArray())}\"";
+
+            Information($"Publishing release {tagName} to GitHub");
+
+            GitReleaseManagerAddAssets(token, GITHUB_OWNER, GITHUB_REPO, tagName, assets);
+            GitReleaseManagerClose(token, GITHUB_OWNER, GITHUB_REPO, tagName);
+        }
+        else
+        {
+            Information("Skipping CreateProductionRelease because this is not a production release");
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
@@ -655,7 +683,8 @@ Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
     .IsDependentOn("BuildTestAndPackage")
     .IsDependentOn("PublishPackages")
-    .IsDependentOn("CreateDraftRelease");
+    .IsDependentOn("CreateDraftRelease")
+    .IsDependentOn("CreateProductionRelease");
 
 Task("Default")
     .Description("Builds the engine and console runner")

@@ -4,4 +4,4 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("NUnit Console Runner")]
 [assembly: AssemblyVersion("3.14.0")]
-[assembly: AssemblyInformationalVersion("3.14.0-ci00038-issue-1070")]
+[assembly: AssemblyInformationalVersion("3.14.0-ci00040-issue-1072")]

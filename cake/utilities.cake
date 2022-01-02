@@ -253,8 +253,9 @@ private void CheckPackageExists(FilePath package)
 			$"Package not found: {package.GetFilename()}.\nCode may have changed since package was last built.");
 }
 
-public bool IsPreRelease() => !string.IsNullOrEmpty(PreReleaseLabel);
+public bool IsPreRelease => !string.IsNullOrEmpty(PreReleaseLabel);
 
-public bool ShouldPublishToMyGet() => IsPreRelease() && LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel);
-public bool ShouldPublishToNuGet() => !IsPreRelease() || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel);
-public bool ShouldPublishToChocolatey() => !IsPreRelease() || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);
+public bool ShouldPublishToMyGet => IsPreRelease && LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel);
+public bool ShouldPublishToNuGet => !IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel);
+public bool ShouldPublishToChocolatey => !IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);
+public bool IsProductionRelease => !IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(PreReleaseLabel);
