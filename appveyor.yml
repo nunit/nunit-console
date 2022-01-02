@@ -14,3 +14,9 @@ artifacts:
 environment:
   MYGET_API_KEY:
     secure: wtAvJDVl2tfwiVcyLExFHLvZVfUWiQRHsfdHBFCNEATeCHo1Nd8JP642PfY8xhji
+  NUGET_API_KEY:
+    secure: PVHROoT0SmGkr9CHgrKapuA0/CcJGHSP63M3fZaNLvcEVbBnzYLeCwpc0PZHhdvD
+  CHOCO_API_KEY:
+    secure: aDsu1U+umVYFVybjkBVtVQsatSj3QKbD7VkGQci9mNF3493g9Giao/GABISIaHjT
+  GITHUB_ACCESS_TOKEN:
+    secure: xmGXWrw5Nj3CI3fPxhw/DWIU5YL/1mM06pSmjpkd9LpKs3t3EYXbECbEQs62lU/O

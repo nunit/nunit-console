@@ -14,10 +14,13 @@ static string Configuration; Configuration = Argument("configuration", "Release"
 // Install Tools
 #tool NuGet.CommandLine&version=6.0.0
 #tool dotnet:?package=GitVersion.Tool&version=5.6.3
+#tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
 
-static string ProductVersion;
-static string SemVer;
-static string PreReleaseLabel;
+BuildVersion _buildVersion;
+string ProductVersion => _buildVersion.ProductVersion;
+string SemVer => _buildVersion.SemVer;
+string PreReleaseLabel => _buildVersion.PreReleaseLabel;
+bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
 
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -28,11 +31,8 @@ var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 Setup(context =>
 {
     Information("Creating BuildVersion");
-    var buildVersion = new BuildVersion(context);
+    _buildVersion = new BuildVersion(context);
 
-    ProductVersion = buildVersion.ProductVersion;
-    SemVer = buildVersion.SemVer;
-    PreReleaseLabel = buildVersion.PreReleaseLabel;
     Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
     Information("PreReleaseLabel is " + PreReleaseLabel);
 
@@ -571,6 +571,47 @@ Task("ListInstalledNetCoreRuntimes")
     });
 
 //////////////////////////////////////////////////////////////////////
+// CREATE A DRAFT RELEASE
+//////////////////////////////////////////////////////////////////////
+
+Task("CreateDraftRelease")
+    .Does(() =>
+    {
+        if (IsReleaseBranch)
+        {
+            // NOTE: Since this is a release branch, the pre-release label
+            // is "pre", which we don't want to use for the draft release.
+            // The branch name contains the full information to be used
+            // for both the name of the draft release and the milestone,
+            // i.e. release-2.0.0, release-2.0.0-beta2, etc.
+            string milestone = _buildVersion.BranchName.Substring(8);
+            string releaseName = $"NUnit Console and Engine {milestone}";
+
+            Information($"Creating draft release for {releaseName}");
+
+            try
+            {
+                GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
+                {
+                    Name = releaseName,
+                    Milestone = milestone
+                });
+            }
+            catch
+            {
+                Error($"Unable to create draft release for {releaseName}.");
+                Error($"Check that there is a {milestone} milestone with at least one closed issue.");
+                Error("");
+                throw;
+            }
+        }
+        else
+        {
+            Information("Skipping Release creation because this is not a release branch");
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
@@ -613,7 +654,8 @@ Task("BuildTestAndPackage")
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
     .IsDependentOn("BuildTestAndPackage")
-    .IsDependentOn("PublishPackages");
+    .IsDependentOn("PublishPackages")
+    .IsDependentOn("CreateDraftRelease");
 
 Task("Default")
     .Description("Builds the engine and console runner")

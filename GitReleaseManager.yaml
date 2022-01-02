@@ -1,0 +1,53 @@
+# NOTE: The milestone must not contain any closed issues without one
+# of the labels listed here under issue-labels-include or issue-labels-exclude.
+# If no such label is found, then GRM fails with an error.
+
+# The labels that will be used to include issues in release notes.
+issue-labels-include:
+- Breaking Change
+- Feature
+- Enhancement
+- Bug
+- Build
+- Documentation
+# The labels that will NOT be used when including issues in release notes.
+issue-labels-exclude:
+- Refactor
+# Overrides default pluralization and header names for specific labels.
+issue-labels-alias:
+- name: Build
+  header: Build
+  plural: Build
+- name: Documentation
+  header: Documentation
+  plural: Documentation
+# Configuration values used when creating new releases
+create:
+  include-footer: true
+  footer-heading: Choosing a Package
+  footer-content: >-
+    The package `nunit-console-runner.nupkg` is a Chocolatey package and
+    should be installed using `choco.exe`. It is also available at
+    [chocolatey.org](https://chocolatey.org/packages/nunit-console-runner/). 
+    All other `.nupkg` packages are intended for use with `nuget.exe` and may
+    be downloaded from [nuget.org](https://nuget.org) as well as here.
+  footer-includes-milestone: false
+  include-sha-section: true
+  sha-section-heading: "SHA256 Hashes of the release artifacts"
+  sha-section-line-format: "- `{1}\t{0}`"
+  allow-update-to-published: false
+# Configuration values used when exporting release notes
+export:
+  include-created-date-in-title: true
+  created-date-string-format: MMMM dd, yyyy
+  perform-regex-removal: false
+close:
+# Whether to add comments to issues closed with the published milestone release.
+  use-issue-comments: true
+  issue-comment: |-
+    This issue has been resolved in version {milestone}
+
+    The release is available on:
+    [GitHub](https://github.com/{owner}/{repository}/releases/tag/{milestone}).
+    NuGet packages are also available [NuGet.org](https://www.nuget.org) and
+    Chocolatey Packages may be found at [Chocolatey.org](https://chocolatey.org)
