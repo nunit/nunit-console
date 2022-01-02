@@ -234,13 +234,13 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
     CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
 }
 
-private void PushNuGetPackage(FilePath package, string apiKey, string url)
+public void PushNuGetPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
 	NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
 }
 
-private void PushChocolateyPackage(FilePath package, string apiKey, string url)
+public void PushChocolateyPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
 	ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
@@ -252,3 +252,9 @@ private void CheckPackageExists(FilePath package)
 		throw new InvalidOperationException(
 			$"Package not found: {package.GetFilename()}.\nCode may have changed since package was last built.");
 }
+
+public bool IsPreRelease() => !string.IsNullOrEmpty(PreReleaseLabel);
+
+public bool ShouldPublishToMyGet() => IsPreRelease() && LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel);
+public bool ShouldPublishToNuGet() => !IsPreRelease() || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel);
+public bool ShouldPublishToChocolatey() => !IsPreRelease() || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);

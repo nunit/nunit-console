@@ -461,25 +461,102 @@ Task("SignPackages")
 // PUBLISH PACKAGES
 //////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////
+// PUBLISH PACKAGES
+//////////////////////////////////////////////////////////////////////
+
+static bool HadPublishingErrors = false;
+
+Task("PublishPackages")
+    .Description("Publish nuget and chocolatey packages according to the current settings")
+    .IsDependentOn("PublishToMyGet")
+    .IsDependentOn("PublishToNuGet")
+    .IsDependentOn("PublishToChocolatey")
+    .Does(() =>
+    {
+        if (HadPublishingErrors)
+            throw new Exception("One of the publishing steps failed.");
+    });
+
 // This task may either be run by the PublishPackages task,
 // which depends on it, or directly when recovering from errors.
 Task("PublishToMyGet")
     .Description("Publish packages to MyGet")
-    .WithCriteria(() => PreReleaseLabel == "dev" || PreReleaseLabel == "pre")
     .Does(() =>
     {
-        var apiKey = EnvironmentVariable(MYGET_API_KEY);
+        if (!ShouldPublishToMyGet())
+            Information("Nothing to publish to MyGet from this run.");
+        else
+        {
+            var apiKey = EnvironmentVariable(MYGET_API_KEY);
 
-        foreach (var package in AllPackages)
-            switch(package.PackageType)
-            {
-                case PackageType.NuGet:
-                    PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                    break;
-                case PackageType.Chocolatey:
-                    PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                    break;
-            }
+            foreach (var package in AllPackages)
+                try
+                {
+                    switch (package.PackageType)
+                    {
+                        case PackageType.NuGet:
+                            PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
+                            break;
+                        case PackageType.Chocolatey:
+                            PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
+                            break;
+                    }
+                }
+                catch(Exception)
+                {
+                    HadPublishingErrors = true;
+                }
+        }
+    });
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToNuGet")
+    .Description("Publish packages to NuGet")
+    .Does(() =>
+    {
+        if (!ShouldPublishToNuGet())
+            Information("Nothing to publish to NuGet from this run.");
+        else
+        {
+            var apiKey = EnvironmentVariable(NUGET_API_KEY);
+
+            foreach (var package in AllPackages)
+                if (package.PackageType == PackageType.NuGet)
+                    try
+                    {
+                        PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, NUGET_PUSH_URL);
+                    }
+                    catch (Exception)
+                    {
+                        HadPublishingErrors = true;
+                    }
+        }
+    });
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToChocolatey")
+    .Description("Publish packages to Chocolatey")
+    .Does(() =>
+    {
+        if (!ShouldPublishToChocolatey())
+            Information("Nothing to publish to Chocolatey from this run.");
+        else
+        {
+            var apiKey = EnvironmentVariable(CHOCO_API_KEY);
+
+            foreach (var package in AllPackages)
+                try
+                {
+                    PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
+                }
+                catch (Exception)
+                {
+                    HadPublishingErrors = true;
+                }
+        }
     });
 
 Task("ListInstalledNetCoreRuntimes")
@@ -514,10 +591,6 @@ Task("Test")
     .IsDependentOn("TestConsole")
     .IsDependentOn("CheckForTestErrors");
 
-Task("Publish")
-    .Description("Publish nuget and chocolatey packages according to the current settings")
-    .IsDependentOn("PublishToMyGet");
-
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("Build")
@@ -540,7 +613,7 @@ Task("BuildTestAndPackage")
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
     .IsDependentOn("BuildTestAndPackage")
-    .IsDependentOn("Publish");
+    .IsDependentOn("PublishPackages");
 
 Task("Default")
     .Description("Builds the engine and console runner")
