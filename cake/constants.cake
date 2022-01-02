@@ -65,6 +65,10 @@ private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
 private const string MYGET_API_KEY = "MYGET_API_KEY";
 private const string NUGET_API_KEY = "NUGET_API_KEY";
 private const string CHOCO_API_KEY = "CHOCO_API_KEY";
+
+// GitHub Information
+private const string GITHUB_OWNER = "nunit";
+private const string GITHUB_REPO = "nunit-console";
 private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
 
 // Pre-release labels that we publish
