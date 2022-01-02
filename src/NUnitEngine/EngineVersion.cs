@@ -4,4 +4,4 @@ using System.Reflection;
 
 [assembly: AssemblyProduct("NUnit Engine")]
 [assembly: AssemblyVersion("3.14.0")]
-[assembly: AssemblyInformationalVersion("3.14.0-ci00026-issue-1064")]
+[assembly: AssemblyInformationalVersion("3.14.0-ci00036-issue-1065")]
