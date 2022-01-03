@@ -49,7 +49,6 @@ jobs:
   - task: UseDotNet@2
     displayName: 'Install .NET 5.0'
     inputs:
-      packageType: runtime
       version: 5.x
 
   - task: UseDotNet@2
@@ -93,7 +92,6 @@ jobs:
   - task: UseDotNet@2
     displayName: 'Install .NET 5.0'
     inputs:
-      packageType: runtime
       version: 5.x
 
   - task: UseDotNet@2
