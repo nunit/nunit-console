@@ -126,7 +126,7 @@ namespace NUnit.Engine.Services
                     agentExtension = ".exe";
                     break;
                 case RuntimeType.NetCore:
-                    runtimeDir = "netcoreapp3.1";
+                    runtimeDir = targetRuntime.FrameworkVersion.Major >= 5 ? "net5.0" : "netcoreapp3.1";
                     agentName = "nunit-agent";
                     agentExtension = ".dll";
                     break;

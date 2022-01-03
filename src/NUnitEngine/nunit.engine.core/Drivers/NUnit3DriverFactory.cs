@@ -4,12 +4,14 @@ using System;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Engine.Extensibility;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Drivers
 {
     public class NUnit3DriverFactory : IDriverFactory
     {
         private const string NUNIT_FRAMEWORK = "nunit.framework";
+        static ILogger log = InternalTrace.GetLogger(typeof(NUnit3DriverFactory));
 
         /// <summary>
         /// Gets a flag indicating whether a given assembly name and version
@@ -45,9 +47,11 @@ namespace NUnit.Engine.Drivers
         public IFrameworkDriver GetDriver(AssemblyName reference)
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
-#if NETSTANDARD
+#if NETSTANDARD            
+            log.Info("Using NUnitNetStandardDriver");
             return new NUnitNetStandardDriver();
-#elif NETCOREAPP3_1
+#else
+            log.Info("Using NUnitNetCore31Driver");
             return new NUnitNetCore31Driver();
 #endif
         }

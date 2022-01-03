@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
-    <TargetFrameworks>net20;net40;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net20;net40;netcoreapp3.1;net5.0</TargetFrameworks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>

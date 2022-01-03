@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETCOREAPP2_0
 using System;
 
 namespace NUnit.Engine.Services.Tests
@@ -33,4 +32,3 @@ namespace NUnit.Engine.Services.Tests
         }
     }
 }
-#endif

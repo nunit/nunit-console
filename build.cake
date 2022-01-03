@@ -113,7 +113,7 @@ Task("Build")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach (var framework in new[] { "netcoreapp3.1" })
+        foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
             MSBuild(AGENT_CSPROJ, CreateMSBuildSettings("Publish")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
@@ -123,7 +123,7 @@ Task("Build")
                .WithProperty("TargetFramework", framework)
                .WithProperty("PublishDir", BIN_DIR + framework));
 
-        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
+        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1", "net5.0" })
              MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
                 .WithProperty("TargetFramework", framework)
                 .WithProperty("PublishDir", BIN_DIR + framework));

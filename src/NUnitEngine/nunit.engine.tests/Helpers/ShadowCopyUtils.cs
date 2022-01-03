@@ -26,7 +26,11 @@ namespace NUnit.Engine.Tests.Helpers
             {
                 var dependency = Assembly.ReflectionOnlyLoad(dependencyName.FullName);
 
+#if NET5_0_OR_GREATER
+                if (r.Add(Path.GetFullPath(dependency.Location)))
+#else
                 if (!dependency.GlobalAssemblyCache && r.Add(Path.GetFullPath(dependency.Location)))
+#endif
                 {
                     dependencies.Recurse(dependency.GetReferencedAssemblies());
                 }

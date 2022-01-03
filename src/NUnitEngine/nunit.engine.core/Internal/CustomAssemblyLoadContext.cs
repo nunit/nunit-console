@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1_OR_GREATER
 
 using System.Reflection;
 using System.Runtime.Loader;
