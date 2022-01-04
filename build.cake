@@ -1,5 +1,6 @@
 static string Target; Target = Argument("target", "Default");
 static string Configuration; Configuration = Argument("configuration", "Release");
+static bool NoPush; NoPush = HasArgument("nopush");
 
 #load cake/constants.cake
 #load cake/header-check.cake
@@ -580,8 +581,6 @@ Task("CreateDraftRelease")
     {
         if (IsReleaseBranch)
         {
-            // NOTE: Since this is a release branch, the pre-release label
-            // is "pre", which we don't want to use for the draft release.
             // The branch name contains the full information to be used
             // for both the name of the draft release and the milestone,
             // i.e. release-2.0.0, release-2.0.0-beta2, etc.
@@ -590,6 +589,7 @@ Task("CreateDraftRelease")
 
             Information($"Creating draft release for {releaseName}");
 
+            if (!NoPush)
             try
             {
                 GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
@@ -631,8 +631,17 @@ Task("CreateProductionRelease")
 
             Information($"Publishing release {tagName} to GitHub");
 
-            GitReleaseManagerAddAssets(token, GITHUB_OWNER, GITHUB_REPO, tagName, assets);
-            GitReleaseManagerClose(token, GITHUB_OWNER, GITHUB_REPO, tagName);
+            if (NoPush)
+            {
+                Information($"Assets:");
+                foreach (var asset in assetList)
+                    Information("  " + asset);
+            }
+            else
+            {
+                GitReleaseManagerAddAssets(token, GITHUB_OWNER, GITHUB_REPO, tagName, assets);
+                GitReleaseManagerClose(token, GITHUB_OWNER, GITHUB_REPO, tagName);
+            }
         }
         else
         {
