@@ -551,12 +551,12 @@ Task("PublishToChocolatey")
                 if (package.PackageType == PackageType.Chocolatey)
                     try
                     {
-                    PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
-                }
-                catch (Exception)
-                {
-                    HadPublishingErrors = true;
-                }
+                        PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
+                    }
+                    catch (Exception)
+                    {
+                        HadPublishingErrors = true;
+                    }
         }
     });
 
