@@ -548,8 +548,9 @@ Task("PublishToChocolatey")
             var apiKey = EnvironmentVariable(CHOCO_API_KEY);
 
             foreach (var package in AllPackages)
-                try
-                {
+                if (package.PackageType == PackageType.Chocolatey)
+                    try
+                    {
                     PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
                 }
                 catch (Exception)
