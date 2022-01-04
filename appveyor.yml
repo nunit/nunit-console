@@ -19,4 +19,4 @@ environment:
   CHOCO_API_KEY:
     secure: aDsu1U+umVYFVybjkBVtVQsatSj3QKbD7VkGQci9mNF3493g9Giao/GABISIaHjT
   GITHUB_ACCESS_TOKEN:
-    secure: xmGXWrw5Nj3CI3fPxhw/DWIU5YL/1mM06pSmjpkd9LpKs3t3EYXbECbEQs62lU/O
+    secure: RJ6sKRBZzwXz8JQvj8zcp45mkHNDad1UlvmfCsiVx63V9/pXHcm2Y2Lg/G/Vyhlz
