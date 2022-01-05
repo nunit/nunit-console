@@ -237,13 +237,19 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 public void PushNuGetPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
-	NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
+    if (NoPush)
+        Information($"Push {package} to {url}");
+    else
+        NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
 }
 
 public void PushChocolateyPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
-	ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
+    if (NoPush)
+        Information($"Push {package} to {url}");
+    else
+        ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
 }
 
 private void CheckPackageExists(FilePath package)
