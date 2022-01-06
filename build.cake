@@ -225,6 +225,64 @@ Task("CheckForTestErrors")
     .Does(() => DisplayUnreportedErrors());
 
 //////////////////////////////////////////////////////////////////////
+// TEST .NET 2.0 ENGINE CORE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNet20EngineCore")
+    .Description("Tests the engine core assembly")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunTest(
+            NET20_CONSOLE,
+            BIN_DIR + "net35/",
+            ENGINE_CORE_TESTS,
+            "net35",
+            ref UnreportedErrors);
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETSTANDARD 2.0 ENGINE Core
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetStandard20EngineCore")
+    .Description("Tests the .NET Standard Engine core assembly")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunDotnetCoreNUnitLiteTests(
+            BIN_DIR + "netcoreapp2.1/" + ENGINE_CORE_TESTS,
+            BIN_DIR + "netcoreapp2.1",
+            "netcoreapp2.1",
+            ref UnreportedErrors);
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NETCORE 3.1 ENGINE CORE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore31EngineCore")
+    .Description("Tests the .NET Core 3.1 Engine core assembly")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        var runtimes = new[] { "3.1", "5.0" };
+
+        foreach (var runtime in runtimes)
+        {
+            RunDotnetCoreTests(
+                NETCORE31_CONSOLE,
+                BIN_DIR + "netcoreapp3.1/",
+                ENGINE_CORE_TESTS,
+                runtime,
+                ref UnreportedErrors);
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
 // TEST .NET 2.0 ENGINE
 //////////////////////////////////////////////////////////////////////
 
@@ -238,7 +296,7 @@ Task("TestNet20Engine")
             NET20_CONSOLE,
             BIN_DIR + "net35/",
             ENGINE_TESTS,
-            "net35", 
+            "net35",
             ref UnreportedErrors);
     });
 
@@ -715,14 +773,21 @@ Task("TestConsole")
     .IsDependentOn("TestNet20Console")
     .IsDependentOn("TestNetCore31Console");
 
+Task("TestEngineCore")
+    .Description("Builds and tests the engine core assembly")
+    .IsDependentOn("TestNet20EngineCore")
+    .IsDependentOn("TestNetStandard20EngineCore")
+    .IsDependentOn("TestNetCore31EngineCore");
+
 Task("TestEngine")
-    .Description("Builds and tests the engine")
+    .Description("Builds and tests the engine assembly")
     .IsDependentOn("TestNet20Engine")
     .IsDependentOn("TestNetStandard20Engine")
     .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")
     .Description("Builds and tests the engine and console runner")
+    .IsDependentOn("TestEngineCore")
     .IsDependentOn("TestEngine")
     .IsDependentOn("TestConsole")
     .IsDependentOn("CheckForTestErrors");
