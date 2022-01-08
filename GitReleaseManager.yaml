@@ -24,7 +24,7 @@ issue-labels-alias:
 # Configuration values used when creating new releases
 create:
   include-footer: true
-  footer-heading: Choosing a Package"- `{1}\t{0}`"
+  footer-heading: Choosing a Package
   footer-content: >-
     The package `nunit-console-runner.nupkg` is a Chocolatey package and
     should be installed using `choco.exe`. It is also available at
