@@ -116,7 +116,7 @@ Task("Build")
         // Projects with net35 targets must be built differently
         BuildEachTarget(ENGINE_TESTS_CSPROJ, "net35", "netcoreapp3.1", "net5.0");
         BuildEachTarget(CONSOLE_TESTS_CSPROJ, "net35", "netcoreapp3.1");
-        BuildBuildEachTarget(NOTEST_CSPROJ, "net35", "netcoreapp2.1", "netcoreapp3.1");
+        BuildEachTarget(NOTEST_CSPROJ, "net35", "netcoreapp2.1", "netcoreapp3.1");
         
         //Information("Publishing .NET Core & Standard projects so that dependencies are present...");
 
