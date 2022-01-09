@@ -38,7 +38,6 @@ namespace NUnit.Engine.Services
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, "File type is not supported");
 
-#if NETFRAMEWORK
             if (targetFramework != null)
             {
                 // This takes care of an issue with Roslyn. It may get fixed, but we still
@@ -47,10 +46,10 @@ namespace NUnit.Engine.Services
                 var platform = targetFramework == ".NETPortable,Version=v5.0"
                     ? ".NETStandard"
                     : targetFramework.Split(new char[] { ',' })[0];
+
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
                     return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not supported by this version of the engine");
             }
-#endif
 
             try
             {
@@ -74,10 +73,10 @@ namespace NUnit.Engine.Services
                         foreach (var reference in references)
                         {
                             if (factory.IsSupportedTestFramework(reference))
-#if !NETFRAMEWORK
-                            return factory.GetDriver(reference);
-#else
+#if NETFRAMEWORK
                             return factory.GetDriver(domain, reference);
+#else
+                            return factory.GetDriver(reference);
 #endif
                         }
                     }
@@ -107,7 +106,7 @@ namespace NUnit.Engine.Services
                     foreach (IDriverFactory factory in extensionService.GetExtensions<IDriverFactory>())
                         _factories.Add(factory);
 
-#if NET20
+#if NETFRAMEWORK
                     var node = extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
                     if (node != null)
                         _factories.Add(new NUnit2DriverFactory(node));
