@@ -32,6 +32,8 @@ var ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engi
 var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
 var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
 var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
+var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";
+var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock-assembly-x86.csproj";
 var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
 // Console Runner
 var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
