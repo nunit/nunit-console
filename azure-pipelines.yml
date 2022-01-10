@@ -64,8 +64,8 @@ jobs:
       version: 2.1.x
 
   - bash: |
-     ./build.sh --target=Build --configuration=Release
-    displayName: Just build for now
+     ./build.sh --target=Test --configuration=Release
+    displayName: Build and Test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
   - task: PublishTestResults@2

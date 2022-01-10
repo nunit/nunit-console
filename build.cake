@@ -107,47 +107,55 @@ Task("Build")
         // Restore the solution file
         DotNetRestore(SOLUTION_FILE);
 
+        // NOTE: On Linux, we are unable to build the solution file. If we use DotNet
+        // to build, then our net35 projects fail. If we use MSBuild, then the 
+        // net5.0 projects fail. So we build each project differently depending on
+        // whether it has net35 as one of its targets. 
+
         // Build projects that DotNet can build
-        DotNetMSBuild(ENGINE_CSPROJ, CreateDotNetMSBuildSettings("Build"));
-        DotNetMSBuild(CONSOLE_CSPROJ, CreateDotNetMSBuildSettings("Build"));
-        DotNetMSBuild(AGENT_CSPROJ, CreateDotNetMSBuildSettings("Build"));
-        DotNetMSBuild(AGENT_X86_CSPROJ, CreateDotNetMSBuildSettings("Build"));
+        DotNetMSBuild(ENGINE_API_PROJECT, CreateDotNetMSBuildSettings("Build"));
+        foreach (var framework in new[] { "netstandard2.0" })
+            MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + framework));
 
-        // Projects with net35 targets must be built differently
-        BuildEachTarget(ENGINE_TESTS_CSPROJ, "net35", "netcoreapp3.1", "net5.0");
-        BuildEachTarget(CONSOLE_TESTS_CSPROJ, "net35", "netcoreapp3.1");
-        BuildEachTarget(NOTEST_CSPROJ, "net35", "netcoreapp2.1", "netcoreapp3.1");
-        
-        //Information("Publishing .NET Core & Standard projects so that dependencies are present...");
+        DotNetMSBuild(ENGINE_CORE_PROJECT, CreateDotNetMSBuildSettings("Build"));
+        foreach (var framework in new[] { "netstandard2.0", "netcoreapp3.1", "net5.0"})
+            MSBuild(ENGINE_CORE_PROJECT, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + framework));
 
-        // foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
-        //     MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
-        //        .WithProperty("TargetFramework", framework)
-        //        .WithProperty("PublishDir", BIN_DIR + framework));
+        DotNetMSBuild(ENGINE_PROJECT, CreateDotNetMSBuildSettings("Build"));
+        foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
+            MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + framework));
 
-        // foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
-        //     MSBuild(AGENT_CSPROJ, CreateMSBuildSettings("Publish")
-        //        .WithProperty("TargetFramework", framework)
-        //        .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
+        DotNetMSBuild(CONSOLE_PROJECT, CreateDotNetMSBuildSettings("Build"));
+        MSBuild(CONSOLE_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", "netcoreapp3.1")
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 
-        // foreach (var framework in new[] { "netstandard2.0" })
-            // MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
-            //    .WithProperty("TargetFramework", framework)
-            //    .WithProperty("PublishDir", BIN_DIR + framework));
+        DotNetMSBuild(AGENT_PROJECT, CreateDotNetMSBuildSettings("Build"));
+        DotNetMSBuild(AGENT_X86_PROJECT, CreateDotNetMSBuildSettings("Build"));
+        foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
+            MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
+               .WithProperty("TargetFramework", framework)
+               .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
 
-        // foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1", "net5.0" })
-        //      MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-        //         .WithProperty("TargetFramework", framework)
-        //         .WithProperty("PublishDir", BIN_DIR + framework));
+        // Projects with net35 targets must be built one target at a time
+        BuildEachTarget(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0");
+        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1", "net5.0" })
+             MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+                .WithProperty("TargetFramework", framework)
+                .WithProperty("PublishDir", BIN_DIR + framework));
 
-        // MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
-        //     .WithProperty("TargetFramework", "netcoreapp3.1")
-        //     .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
+        BuildEachTarget(CONSOLE_TESTS_PROJECT, "net35", "netcoreapp3.1");
+         MSBuild(CONSOLE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", "netcoreapp3.1")
+            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 
-        //  MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-        //     .WithProperty("TargetFramework", "netcoreapp3.1")
-        //     .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
-
+        BuildEachTarget(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
     });
 
 // We only need to call this for projects, which have net35 as a target framework

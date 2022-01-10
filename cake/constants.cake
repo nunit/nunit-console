@@ -5,6 +5,7 @@
 // Some values are static so they may be used in property initialization and in
 // classes. Initialization is separate to allow use of non-constant expressions.
 
+// Directories
 static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
@@ -21,26 +22,25 @@ static string ZIP_IMG_DIR; ZIP_IMG_DIR = IMAGE_DIR + "zip/";
 static string SOURCE_DIR; SOURCE_DIR = PROJECT_DIR + "src/";
 static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 
+// Solution and Projects
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
-var ENGINE_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
-var AGENT_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
-var AGENT_X86_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
-var ENGINE_API_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
-var ENGINE_CORE_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
-var ENGINE_TESTS_CSPROJ = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
-var CONSOLE_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
-var CONSOLE_TESTS_CSPROJ = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
-var NOTEST_CSPROJ = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
-
-var NETFX_FRAMEWORKS = new[] { "net20", "net35" }; //Production code targets net20, tests target nets35
-
-// Test Runners
+var ENGINE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
+var AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
+var AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/nunit-agent-x86/nunit-agent-x86.csproj";
+var ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
+var ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
+var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
+var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
+var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
+// Console Runner
 var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
 var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/nunit3-console.dll";
-
-// Test Assemblies
+// Unit Tests
 var ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
+
+var NETFX_FRAMEWORKS = new[] { "net20", "net35" }; //Production code targets net20, tests target nets35
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]
