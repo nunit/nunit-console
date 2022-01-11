@@ -104,39 +104,96 @@ Task("Build")
     .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
-        MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
-
-        Information("Publishing .NET Core & Standard projects so that dependencies are present...");
-
-        foreach(var framework in new [] { "netstandard2.0", "netcoreapp3.1" })
-            MSBuild(ENGINE_CSPROJ, CreateMSBuildSettings("Publish")
-               .WithProperty("TargetFramework", framework)
-               .WithProperty("PublishDir", BIN_DIR + framework));
-
-        foreach (var framework in new[] { "netcoreapp3.1" })
-            MSBuild(AGENT_CSPROJ, CreateMSBuildSettings("Publish")
-               .WithProperty("TargetFramework", framework)
-               .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
-
-        foreach (var framework in new[] { "netstandard2.0" })
-            MSBuild(ENGINE_API_CSPROJ, CreateMSBuildSettings("Publish")
-               .WithProperty("TargetFramework", framework)
-               .WithProperty("PublishDir", BIN_DIR + framework));
-
-        foreach (var framework in new [] { "netcoreapp2.1", "netcoreapp3.1" })
-             MSBuild(ENGINE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-                .WithProperty("TargetFramework", framework)
-                .WithProperty("PublishDir", BIN_DIR + framework));
-
-        MSBuild(CONSOLE_CSPROJ, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", "netcoreapp3.1")
-            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
-
-         MSBuild(CONSOLE_TESTS_CSPROJ, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", "netcoreapp3.1")
-            .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
-
+        if (IsRunningOnLinux())
+            BuildEachProjectSeparatelyOnLinux();
+        else
+            BuildUsingMSBuildOnWindowsOrMacOS();
     });
+
+public void BuildUsingMSBuildOnWindowsOrMacOS()
+{
+    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
+
+    Information("Publishing .NET Core & Standard projects so that dependencies are present...");
+
+    foreach (var framework in new[] { "netstandard2.0", "netcoreapp3.1" })
+        MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + framework));
+
+    foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
+        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
+
+    foreach (var framework in new[] { "netstandard2.0" })
+        MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + framework));
+
+    foreach (var framework in new[] { "netcoreapp2.1", "netcoreapp3.1", "net5.0" })
+        MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + framework));
+
+    MSBuild(CONSOLE_PROJECT, CreateMSBuildSettings("Publish")
+        .WithProperty("TargetFramework", "netcoreapp3.1")
+        .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
+
+    MSBuild(CONSOLE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+        .WithProperty("TargetFramework", "netcoreapp3.1")
+        .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
+}
+
+private void BuildEachProjectSeparatelyOnLinux()
+{
+    DotNetRestore(SOLUTION_FILE);
+
+    BuildProject(ENGINE_PROJECT, "net20", "netstandard2.0", "netcoreapp3.1");
+    BuildProject(CONSOLE_PROJECT, "net20", "netcoreapp3.1");
+    BuildProject(AGENT_PROJECT, "net20", "net40", "netcoreapp3.1", "net5.0");
+    BuildProject(AGENT_X86_PROJECT, "net20", "net40");
+
+    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0");
+    BuildProject(CONSOLE_TESTS_PROJECT, "net35", "netcoreapp3.1");
+
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
+
+
+    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+       .WithProperty("TargetFramework", "netstandard2.0")
+       .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
+    CopyFileToDirectory(
+       BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
+       BIN_DIR + "netcoreapp2.1");
+    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+       .WithProperty("TargetFramework", "netcoreapp2.1")
+       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+}
+
+// NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
+// If we use MSBuild, then the net5.0 projects fail. So we build each project
+// differently depending on whether it has net35 as one of its targets. 
+private void BuildProject(string project, params string[] targetFrameworks)
+{
+    if (targetFrameworks.Contains("net35"))
+    {
+        foreach (var framework in targetFrameworks)
+        {
+            DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
+            if (framework == "net35")
+                MSBuild(project, CreateMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+            else
+                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+        }
+    }
+    else
+    {
+        DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
+        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 // BUILD C++ TESTS

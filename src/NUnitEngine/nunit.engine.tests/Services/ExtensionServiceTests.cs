@@ -152,7 +152,7 @@ namespace NUnit.Engine.Services.Tests
 
 #if NETCOREAPP
             string other = "net35"; // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
-#elif NET35
+#else
             string other = "netcoreapp2.1"; // Attempt to load the .NET Core 2.1 version of the extensions from the .NET 3.5 tests
 #endif
             var assemblyName = Path.Combine(GetSiblingDirectory(other), "nunit.engine.tests.dll");

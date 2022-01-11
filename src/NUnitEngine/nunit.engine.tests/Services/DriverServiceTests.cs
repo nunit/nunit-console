@@ -31,7 +31,7 @@ namespace NUnit.Engine.Services.Tests
         }
 
 
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1_OR_GREATER
         [TestCase("mock-assembly.dll", false, typeof(NUnitNetCore31Driver))]
         [TestCase("mock-assembly.dll", true, typeof(NUnitNetCore31Driver))]
         [TestCase("notest-assembly.dll", false, typeof(NUnitNetCore31Driver))]

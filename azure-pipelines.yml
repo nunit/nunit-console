@@ -6,6 +6,7 @@ trigger:
 jobs:
 
 - job: Windows
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-linux-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
     vmImage: windows-2019
   
@@ -42,6 +43,7 @@ jobs:
       ArtifactName: Package
 
 - job: Linux
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
     vmImage: ubuntu-latest
   steps:
@@ -49,7 +51,6 @@ jobs:
   - task: UseDotNet@2
     displayName: 'Install .NET 5.0'
     inputs:
-      packageType: runtime
       version: 5.x
 
   - task: UseDotNet@2
@@ -65,7 +66,7 @@ jobs:
 
   - bash: |
      ./build.sh --target=Test --configuration=Release
-    displayName: Build and test
+    displayName: Build and Test
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
   - task: PublishTestResults@2
@@ -86,6 +87,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: macOS
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
   pool:
     vmImage: macOS-latest
   steps:
@@ -93,7 +95,6 @@ jobs:
   - task: UseDotNet@2
     displayName: 'Install .NET 5.0'
     inputs:
-      packageType: runtime
       version: 5.x
 
   - task: UseDotNet@2

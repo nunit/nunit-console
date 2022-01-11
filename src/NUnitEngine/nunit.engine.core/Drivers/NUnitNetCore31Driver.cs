@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1_OR_GREATER
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -54,6 +54,7 @@ namespace NUnit.Engine.Drivers
         /// <returns>An XML string representing the loaded test</returns>
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
+            log.Debug($"Loading {assemblyPath}");
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
@@ -71,23 +72,39 @@ namespace NUnit.Engine.Drivers
             }
             catch (Exception e)
             {
-                throw new NUnitEngineException(string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyPath), e);
+                var msg = string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyPath);
+                log.Error(msg);
+                throw new NUnitEngineException(msg, e);
             }
+            log.Debug($"Loaded {assemblyPath}");
 
             var nunitRef = _testAssembly.GetReferencedAssemblies().FirstOrDefault(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase));
-
             if (nunitRef == null)
+            {
+                log.Error(FAILED_TO_LOAD_NUNIT);
                 throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
+            }
 
-            _frameworkAssembly = _assemblyLoadContext.LoadFromAssemblyName(nunitRef);
-            if (_frameworkAssembly == null)
-                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
+            try
+            {
+                _frameworkAssembly = _assemblyLoadContext.LoadFromAssemblyName(nunitRef);
+            }
+            catch (Exception e)
+            {
+                log.Error($"{FAILED_TO_LOAD_NUNIT}\r\n{e}");
+                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT, e);
+            }
+            log.Debug("Loaded nunit.framework");
 
             _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
             if (_frameworkController == null)
+            {
+                log.Error(INVALID_FRAMEWORK_MESSAGE);
                 throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
+            }
 
             _frameworkControllerType = _frameworkController.GetType();
+            log.Debug($"Created FrameworkControler {_frameworkControllerType.Name}");
 
             log.Info("Loading {0} - see separate log file", _testAssembly.FullName);
             return ExecuteMethod(LOAD_METHOD) as string;
@@ -172,6 +189,9 @@ namespace NUnit.Engine.Drivers
         object ExecuteMethod(string methodName, params object[] args)
         {
             var method = _frameworkControllerType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+            if (method == null)
+                log.Error($"Method {methodName} was not found in {_frameworkControllerType.Name}");
+            log.Debug($"Executing {method.DeclaringType}.{method.Name}");
             return ExecuteMethod(method, args);
         }
 

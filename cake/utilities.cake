@@ -75,6 +75,14 @@ MSBuildSettings CreateMSBuildSettings(string target)
     return settings;
 }
 
+DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
+{
+    return new DotNetMSBuildSettings()
+        .SetConfiguration(Configuration)
+        .WithProperty("PackageVersion", ProductVersion)
+        .WithTarget(target);
+}
+
 public static void PatchAssemblyInfo(string sourceFile, string assemblyInformationalVersion, string assemblyVersion)
 {
     ReplaceFileContents(sourceFile, source =>
