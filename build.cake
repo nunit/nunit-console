@@ -108,13 +108,13 @@ Task("Build")
             BuildEachProjectSeparatelyOnLinux();
         else
             BuildUsingMSBuildOnWindowsOrMacOS();
-
-        PublishDependencies();
     });
 
 public void BuildUsingMSBuildOnWindowsOrMacOS()
 {
     MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
+
+    PublishDependencies();
 }
 
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
@@ -173,15 +173,15 @@ private void BuildEachProjectSeparatelyOnLinux()
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
 
 
-    //MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
-    //    .WithProperty("TargetFramework", "netstandard2.0")
-    //    .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-    //CopyFileToDirectory(
-    //    BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
-    //    BIN_DIR + "netcoreapp2.1");
-    //MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-    //    .WithProperty("TargetFramework", "netcoreapp2.1")
-    //    .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+       .WithProperty("TargetFramework", "netstandard2.0")
+       .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
+    CopyFileToDirectory(
+       BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
+       BIN_DIR + "netcoreapp2.1");
+    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+       .WithProperty("TargetFramework", "netcoreapp2.1")
+       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 }
 
 public void PublishDependencies()
