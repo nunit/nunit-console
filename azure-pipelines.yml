@@ -33,14 +33,14 @@ jobs:
       testRunTitle: netcoreapp2.1/Windows
     condition: succeededOrFailed()
 
-  - powershell: .\build.ps1 --target=PackageExistingBuild --artifact-dir='$(Build.ArtifactStagingDirectory)'
-    displayName: Package
+  # - powershell: .\build.ps1 --target=PackageExistingBuild --artifact-dir='$(Build.ArtifactStagingDirectory)'
+  #   displayName: Package
 
-  - task: PublishBuildArtifacts@1
-    displayName: Save package artifacts
-    inputs:
-      PathtoPublish: $(Build.ArtifactStagingDirectory)
-      ArtifactName: Package
+  # - task: PublishBuildArtifacts@1
+  #   displayName: Save package artifacts
+  #   inputs:
+  #     PathtoPublish: $(Build.ArtifactStagingDirectory)
+  #     ArtifactName: Package
 
 - job: Linux
   condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
