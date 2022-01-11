@@ -6,7 +6,7 @@ trigger:
 jobs:
 
 - job: Windows
-  condition: not(startsWith(variables['Build.SourceBranchName'], 'azure-linux-'))
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-linux-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
     vmImage: windows-2019
   
@@ -43,6 +43,7 @@ jobs:
       ArtifactName: Package
 
 - job: Linux
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
     vmImage: ubuntu-latest
   steps:
@@ -86,7 +87,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: macOS
-  condition: not(startsWith(variables['Build.SourceBranchName'], 'azure-linux-'))
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
   pool:
     vmImage: macOS-latest
   steps:

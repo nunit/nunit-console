@@ -3,7 +3,7 @@ image: Visual Studio 2019
 # do not trigger build for branches intended to test azure pipeline only
 branches:
   except:
-  - /^azure/
+  - /^azure-/
 
 build_script:
   - ps: .\build.ps1 --target=Appveyor --configuration=Release
