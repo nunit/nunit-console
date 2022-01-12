@@ -8,7 +8,7 @@ namespace NUnit.Engine.Internal.Tests
     [TestFixture]
     public class AssemblyHelperTests
     {
-        private static readonly string THIS_ASSEMBLY_PATH = "nunit.engine.tests.dll";
+        private static readonly string THIS_ASSEMBLY_PATH = "nunit.engine.core.tests.dll";
 
         [Test]
         public void GetPathForAssembly()

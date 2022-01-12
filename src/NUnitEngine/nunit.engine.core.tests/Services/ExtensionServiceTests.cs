@@ -48,7 +48,7 @@ namespace NUnit.Engine.Services.Tests
             // Rather than actually starting the service, which would result
             // in finding the extensions actually in use on the current system,
             // we simulate the start using this assemblies dummy extensions.
-            _serviceClass.FindExtensionPoints(typeof(TestEngine).Assembly);
+            //_serviceClass.FindExtensionPoints(typeof(TestEngine).Assembly);   // TODO
             _serviceClass.FindExtensionPoints(typeof(CoreEngine).Assembly);
             _serviceClass.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
@@ -159,7 +159,8 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(assemblyName, Does.Exist);
 
             var service = new ExtensionService();
-            service.FindExtensionPoints(typeof(TestEngine).Assembly);
+            // service.FindExtensionPoints(typeof(TestEngine).Assembly); // TODO
+            service.FindExtensionPoints(typeof(CoreEngine).Assembly);
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
 
