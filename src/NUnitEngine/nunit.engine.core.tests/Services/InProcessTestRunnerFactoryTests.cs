@@ -8,8 +8,6 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Services.Tests
 {
-    using Fakes;
-
     public class InProcessTestRunnerFactoryTests
     {
         private InProcessTestRunnerFactory _factory;
