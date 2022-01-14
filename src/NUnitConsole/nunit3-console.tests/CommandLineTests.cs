@@ -150,9 +150,9 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DebugTests", "debug")]
         [TestCase("PauseBeforeRun", "pause")]
         [TestCase("LoadUserProfile", "loaduserprofile")]
-#endif
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
+#endif
 #endif
         public void CanRecognizeBooleanOptions(string propertyName, string pattern)
         {
