@@ -131,7 +131,7 @@ public void BuildUsingMSBuildOnWindowsOrMacOS()
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + framework));
 
-    foreach (var framework in new[] { "netcoreapp2.1", "netcoreapp3.1", "net5.0" })
+    foreach (var framework in new[] { "netcoreapp2.1", "netcoreapp3.1" })
         MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + framework));
@@ -154,7 +154,7 @@ private void BuildEachProjectSeparatelyOnLinux()
     BuildProject(AGENT_PROJECT, "net20", "net40", "netcoreapp3.1", "net5.0");
     BuildProject(AGENT_X86_PROJECT, "net20", "net40");
 
-    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0");
+    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(CONSOLE_TESTS_PROJECT, "net35", "netcoreapp3.1");
 
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
@@ -243,7 +243,7 @@ Task("TestNet20EngineCore")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 2.0 ENGINE Core
+// TEST NETSTANDARD 2.0 ENGINE CORE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNetStandard20EngineCore")
@@ -280,6 +280,24 @@ Task("TestNetCore31EngineCore")
                 runtime,
                 ref UnreportedErrors);
         }
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST NET 5.0 ENGINE CORE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNet50EngineCore")
+    .Description("Tests the .NET 5.0 Engine core assembly")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunDotnetCoreTests(
+            NETCORE31_CONSOLE,
+            BIN_DIR + "net5.0",
+            ENGINE_CORE_TESTS,
+            "net5.0",
+            ref UnreportedErrors);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -778,6 +796,7 @@ Task("TestEngineCore")
     .IsDependentOn("TestNet20EngineCore")
     .IsDependentOn("TestNetStandard20EngineCore")
     .IsDependentOn("TestNetCore31EngineCore");
+//   .IsDependentOn("TestNet50EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
