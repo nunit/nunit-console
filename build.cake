@@ -799,8 +799,8 @@ Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
     .IsDependentOn("TestNet20EngineCore")
     .IsDependentOn("TestNetStandard20EngineCore")
-    .IsDependentOn("TestNetCore31EngineCore");
-//   .IsDependentOn("TestNet50EngineCore");
+    .IsDependentOn("TestNetCore31EngineCore")
+    .IsDependentOn("TestNet50EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
