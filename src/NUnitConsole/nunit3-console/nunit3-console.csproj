@@ -4,6 +4,7 @@
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit3-console</AssemblyName>
     <TargetFrameworks>net20;netcoreapp3.1</TargetFrameworks>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
