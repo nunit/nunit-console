@@ -9,21 +9,21 @@ namespace NUnit.Engine.Services.Tests
 
     public class ServiceManagerTests
     {
-        private IService _settingsService;
+        private IService _fakeService;
         private ServiceManager _serviceManager;
 
-        private IService _projectService;
+        private IService _extensionService;
 
         [SetUp]
         public void SetUp()
         {
             _serviceManager = new ServiceManager();
 
-            _settingsService = new FakeSettingsService();
-            _serviceManager.AddService(_settingsService);
+            _fakeService = new FakeService();
+            _serviceManager.AddService(_fakeService);
 
-            _projectService = new Fakes.FakeProjectService();
-            _serviceManager.AddService(_projectService);
+            _extensionService = new ExtensionService();
+            _serviceManager.AddService(_extensionService);
         }
 
         [Test]
@@ -31,25 +31,25 @@ namespace NUnit.Engine.Services.Tests
         {
             _serviceManager.StartServices();
 
-            IService service = _serviceManager.GetService(typeof(ISettings));
+            IService service = _serviceManager.GetService(typeof(IFakeService));
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
-            service = _serviceManager.GetService(typeof(IProjectService));
+            service = _serviceManager.GetService(typeof(IExtensionService));
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
         [Test]
         public void InitializationFailure()
         {
-            ((FakeSettingsService)_settingsService).FailToStart = true;
+            ((FakeService)_fakeService).FailToStart = true;
             Assert.That(() => _serviceManager.StartServices(), 
-                Throws.InstanceOf<InvalidOperationException>().And.Message.Contains("FakeSettingsService"));
+                Throws.InstanceOf<InvalidOperationException>().And.Message.Contains("FakeService"));
         }
 
         [Test]
         public void TerminationFailure()
         {
-            ((FakeSettingsService)_settingsService).FailedToStop = true;
-            _settingsService.StartService();
+            ((FakeService)_fakeService).FailedToStop = true;
+            _fakeService.StartService();
 
             Assert.DoesNotThrow(() => _serviceManager.StopServices());
         }
@@ -57,15 +57,15 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AccessServiceByClass()
         {
-            IService service = _serviceManager.GetService(typeof(FakeSettingsService));
-            Assert.That(service, Is.SameAs(_settingsService));
+            IService service = _serviceManager.GetService(typeof(FakeService));
+            Assert.That(service, Is.SameAs(_fakeService));
         }
 
         [Test]
         public void AccessServiceByInterface()
         {
-            IService service = _serviceManager.GetService(typeof(ISettings));
-            Assert.That(service, Is.SameAs(_settingsService));
+            IService service = _serviceManager.GetService(typeof(IFakeService));
+            Assert.That(service, Is.SameAs(_fakeService));
         }
     }
 }

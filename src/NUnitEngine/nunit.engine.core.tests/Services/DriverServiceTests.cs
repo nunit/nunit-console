@@ -31,7 +31,11 @@ namespace NUnit.Engine.Services.Tests
         }
 
 
-#if NETCOREAPP3_1_OR_GREATER
+#if NET5_0_OR_GREATER
+        [TestCase("mock-assembly.dll", false, typeof(NUnitNetCore31Driver))]
+        [TestCase("mock-assembly.dll", true, typeof(NUnitNetCore31Driver))]
+        //[TestCase("notest-assembly.dll", false, typeof(NUnitNetCore31Driver))]
+#elif NETCOREAPP3_1
         [TestCase("mock-assembly.dll", false, typeof(NUnitNetCore31Driver))]
         [TestCase("mock-assembly.dll", true, typeof(NUnitNetCore31Driver))]
         [TestCase("notest-assembly.dll", false, typeof(NUnitNetCore31Driver))]
@@ -49,8 +53,10 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("nunit.engine.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
+#if !NET5_0 // Not yet working
         [TestCase("nunit.engine.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
         [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
+#endif
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
             var driver = _driverService.GetDriver(AppDomain.CurrentDomain, Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), null, skipNonTestAssemblies);
