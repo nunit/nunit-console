@@ -30,6 +30,7 @@ var AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/nunit-agent-x86/nunit-agent-x8
 var ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
 var ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
 var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+var ENGINE_CORE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core.tests/nunit.engine.core.tests.csproj";
 var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
 var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
 var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";

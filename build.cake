@@ -155,6 +155,7 @@ private void BuildEachProjectSeparatelyOnLinux()
     BuildProject(AGENT_X86_PROJECT, "net20", "net40");
 
     BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0");
     BuildProject(CONSOLE_TESTS_PROJECT, "net35", "netcoreapp3.1");
 
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
@@ -168,6 +169,9 @@ private void BuildEachProjectSeparatelyOnLinux()
        BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
        BIN_DIR + "netcoreapp2.1");
     MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+       .WithProperty("TargetFramework", "netcoreapp2.1")
+       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+    MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
        .WithProperty("TargetFramework", "netcoreapp2.1")
        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 }
