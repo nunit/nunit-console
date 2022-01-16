@@ -2,6 +2,15 @@
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
 
+T GetArgument<T>(string pattern, T defaultValue)
+{
+    foreach (string name in pattern.Split('|'))
+        if (HasArgument(name))
+            return Argument<T>(name);
+
+    return defaultValue;
+}
+
 bool CheckIfDotNetCoreInstalled()
 {
     try

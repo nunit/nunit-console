@@ -75,7 +75,7 @@ static PackageTest NetCore21PlusNetCore31PlusNet50Test = new PackageTest(
 static PackageTest NUnitProjectTest;
 NUnitProjectTest = new PackageTest(
     "Run project with both copies of mock-assembly",
-    $"../../NetFXTests.nunit --config={Argument("configuration", "Release")}",
+    $"../../NetFXTests.nunit --config={Configuration}",
     MockAssemblyExpectedResult(2));
 
 // Representation of a single test to be run against a pre-built package.
