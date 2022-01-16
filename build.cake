@@ -1,5 +1,5 @@
-static string Target; Target = Argument("target", "Default");
-static string Configuration; Configuration = Argument("configuration", "Release");
+static string Target; Target = GetArgument("target|t", "Default");
+static string Configuration; Configuration = GetArgument("configuration|c", "Release");
 static bool NoPush; NoPush = HasArgument("nopush");
 
 #load cake/constants.cake

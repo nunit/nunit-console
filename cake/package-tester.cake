@@ -88,7 +88,7 @@ public class PackageTester
             Console.WriteLine($"Running {_installDirectory + _testExecutable}");
 
             var outputDir = System.IO.Path.GetFullPath(
-                $"bin/{_context.Argument("configuration", "Release")}/");
+                $"bin/{Configuration}/");
             int rc = _context.StartProcess(
                 _installDirectory + _testExecutable,
                 new ProcessSettings()
