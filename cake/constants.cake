@@ -39,12 +39,12 @@ var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.c
 // Console Runner
 var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
 var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/nunit3-console.dll";
-// Test Assemblies
-var ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
-var ENGINE_TESTS = "nunit.engine.tests.dll";
+// Unit Tests
+var NETFX_ENGINE_CORE_TESTS = "nunit.engine.core.tests.exe";
+var NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
+var NETFX_ENGINE_TESTS = "nunit.engine.tests.exe";
+var NETCORE_ENGINE_TESTS = "nunit.engine.tests.dll";
 var CONSOLE_TESTS = "nunit3-console.tests.dll";
-
-var NETFX_FRAMEWORKS = new[] { "net20", "net35" }; //Production code targets net20, tests target nets35
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]

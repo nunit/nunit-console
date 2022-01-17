@@ -25,7 +25,10 @@ namespace NUnit.Engine.Tests.Acceptance
                 {
                     var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
                     var package = new TestPackage(mockAssemblyPath);
-                    engine.GetRunner(package).Run(new NullListener(), TestFilter.Empty);
+                    using (var runner = engine.GetRunner(package))
+                    {
+                        runner.Run(new NullListener(), TestFilter.Empty);
+                    }
                 }
             });
         }

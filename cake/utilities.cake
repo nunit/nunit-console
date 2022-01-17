@@ -147,10 +147,55 @@ FilePath GetResultXmlPath(string testAssembly, string framework)
     return MakeAbsolute(new FilePath($@"test-results\{framework}\{assemblyName}.xml"));
 }
 
-void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, string framework, ref List<string> errorDetail)
+void RunNUnitLiteTests(string testAssembly, string framework)
 {
+    var workingDir = BIN_DIR + framework + "/";
+    var assemblyPath = workingDir + testAssembly;
+
     int rc = StartProcess(
-        MakeAbsolute(exePath),
+        assemblyPath,
+        new ProcessSettings()
+        {
+            Arguments = new ProcessArgumentBuilder()
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(testAssembly, framework).FullPath)
+                .Render(),
+            WorkingDirectory = workingDir
+        });
+
+    if (rc > 0)
+        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
+    else if (rc < 0)
+        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
+}
+
+void RunDotnetNUnitLiteTests(string testAssembly, string framework)
+{
+    var workingDir = BIN_DIR + framework + "/";
+    var assemblyPath = workingDir + testAssembly;
+
+    int rc = StartProcess(
+        "dotnet",
+        new ProcessSettings
+        {
+            Arguments = new ProcessArgumentBuilder()
+                .AppendQuoted(assemblyPath)
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(assemblyPath, framework).FullPath)
+                .Render(),
+            WorkingDirectory = workingDir
+        });
+
+    if (rc > 0)
+        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
+    else if (rc < 0)
+        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
+}
+
+void RunNet20Console(string testAssembly, string framework)
+{
+    var workingDir = BIN_DIR + framework;
+
+    int rc = StartProcess(
+        NET20_CONSOLE,
         new ProcessSettings()
         {
             Arguments = new ProcessArgumentBuilder()
@@ -161,61 +206,32 @@ void RunTest(FilePath exePath, DirectoryPath workingDir, string testAssembly, st
         });
 
     if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
+        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
     else if (rc < 0)
-        errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
+        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
 }
 
-void RunDotnetCoreNUnitLiteTests(FilePath exePath, DirectoryPath workingDir, string framework, ref List<string> errorDetail)
+void RunNetCoreConsole(string testAssembly, string framework)
 {
-    RunDotnetCoreTests(exePath, workingDir, arguments: null, framework, ref errorDetail);
-}
-
-void RunDotnetCoreTests(FilePath exePath, DirectoryPath workingDir, string arguments, string framework, ref List<string> errorDetail)
-{
-    //Filename is first arg if running on NUnit Console, or exePath if running NUnitLite tests
-    var fileName = arguments ?? exePath.GetFilename();
-
-    //Find most suitable runtime
-    var fxVersion = new string(framework.SkipWhile(c => !char.IsDigit(c)).ToArray());
-    //Select latest runtime matching requested major/minor version
-    var selectedFramework = installedNetCoreRuntimes.Where(v => v.StartsWith(fxVersion)).OrderByDescending(Version.Parse).FirstOrDefault();
-
-    if (selectedFramework == null)
-    {
-        var msg = $"No suitable runtime found to run tests under {framework}";
-        if (!BuildSystem.IsLocalBuild)
-            throw new Exception(msg);
-
-        Warning(msg);
-        return;
-    }
-    else
-    {
-        Information($"Runtime framework version {selectedFramework} selected to run {fileName} for {framework}.");
-    }
-
-    //Run Tests
-
-    var args = new ProcessArgumentBuilder()
-                .AppendSwitch("--fx-version", " ", selectedFramework)
-                .AppendQuoted(exePath.FullPath)
-                .Append(arguments)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(exePath.FullPath, framework).FullPath)
-                .Render();
+    var workingDir = BIN_DIR + framework + "/";
+    var assemblyPath = workingDir + testAssembly;
 
     int rc = StartProcess(
         "dotnet",
         new ProcessSettings
         {
-            Arguments = args,
+            Arguments = new ProcessArgumentBuilder()
+                .AppendQuoted(NETCORE31_CONSOLE)
+                .AppendQuoted(assemblyPath)
+                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(assemblyPath, framework).FullPath)
+                .Render(),
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        errorDetail.Add(string.Format("{0}: {1} tests failed", framework, rc));
+        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
     else if (rc < 0)
-        errorDetail.Add(string.Format("{0} returned rc = {1}", exePath, rc));
+        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
 }
 
 public List<string> GetInstalledNetCoreRuntimes()
