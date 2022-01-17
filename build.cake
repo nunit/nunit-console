@@ -664,32 +664,36 @@ Task("ListInstalledNetCoreRuntimes")
 Task("CreateDraftRelease")
     .Does(() =>
     {
-        if (IsReleaseBranch)
+        bool isDirectTarget = Target == "CreateDraftRelease";
+
+        if (isDirectTarget && !HasArgument("productVersion"))
+            throw new Exception("Must specify --productVersion with the CreateDraftRelease target.");
+
+        if (IsReleaseBranch || isDirectTarget)
         {
-            // The branch name contains the full information to be used
-            // for both the name of the draft release and the milestone,
-            // i.e. release-2.0.0, release-2.0.0-beta2, etc.
-            string milestone = _buildVersion.BranchName.Substring(8);
+            string milestone = IsReleaseBranch
+                ? _buildVersion.BranchName.Substring(8)
+                : ProductVersion;
             string releaseName = $"NUnit Console and Engine {milestone}";
 
             Information($"Creating draft release for {releaseName}");
 
             if (!NoPush)
-            try
-            {
-                GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
+                try
                 {
-                    Name = releaseName,
-                    Milestone = milestone
-                });
-            }
-            catch
-            {
-                Error($"Unable to create draft release for {releaseName}.");
-                Error($"Check that there is a {milestone} milestone with at least one closed issue.");
-                Error("");
-                throw;
-            }
+                    GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
+                    {
+                        Name = releaseName,
+                        Milestone = milestone
+                    });
+                }
+                catch
+                {
+                    Error($"Unable to create draft release for {releaseName}.");
+                    Error($"Check that there is a {milestone} milestone with at least one closed issue.");
+                    Error("");
+                    throw;
+                }
         }
         else
         {
