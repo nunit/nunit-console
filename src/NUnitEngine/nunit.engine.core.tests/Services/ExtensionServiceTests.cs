@@ -150,12 +150,14 @@ namespace NUnit.Engine.Services.Tests
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
 
 #if NETCOREAPP
-            string other = "net35"; // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
+            // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
+            var assemblyName = Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.core.tests.exe");
 #else
-            string other = "netcoreapp2.1"; // Attempt to load the .NET Core 2.1 version of the extensions from the .NET 3.5 tests
+            // Attempt to load the .NET Core 2.1 version of the extensions from the .NET 3.5 tests
+            var assemblyName = Path.Combine(GetSiblingDirectory("netcoreapp2.1"), "nunit.engine.core.tests.dll");
 #endif
-            var assemblyName = Path.Combine(GetSiblingDirectory(other), "nunit.engine.tests.dll");
             Assert.That(assemblyName, Does.Exist);
+            Console.WriteLine($"{assemblyName} does exist");
 
             var service = new ExtensionService();
             service.FindExtensionPoints(typeof(CoreEngine).Assembly);

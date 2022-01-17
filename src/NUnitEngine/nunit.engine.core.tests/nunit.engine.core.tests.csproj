@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Core.Tests</RootNamespace>
     <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
-    <OutputType Condition="'$(TargetFramework)'!='net35'">Exe</OutputType>
+    <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>Full</DebugType>
@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnitLite" Version="3.13.2" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net35'">
@@ -19,7 +20,6 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1' OR '$(TargetFramework)'=='netcoreapp3.1' OR '$(TargetFramework)'=='net5.0'">
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    <PackageReference Include="NUnitLite" Version="3.13.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />

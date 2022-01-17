@@ -238,12 +238,7 @@ Task("TestNet20EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(
-            NET20_CONSOLE,
-            BIN_DIR + "net35/",
-            ENGINE_CORE_TESTS,
-            "net35",
-            ref UnreportedErrors);
+        RunNUnitLiteTests(NETFX_ENGINE_CORE_TESTS, "net35");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -256,11 +251,7 @@ Task("TestNetStandard20EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetCoreNUnitLiteTests(
-            BIN_DIR + "netcoreapp2.1/" + ENGINE_CORE_TESTS,
-            BIN_DIR + "netcoreapp2.1",
-            "netcoreapp2.1",
-            ref UnreportedErrors);
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -273,17 +264,7 @@ Task("TestNetCore31EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        var runtimes = new[] { "3.1", "5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                BIN_DIR + "netcoreapp3.1/",
-                ENGINE_CORE_TESTS,
-                runtime,
-                ref UnreportedErrors);
-        }
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -296,12 +277,7 @@ Task("TestNet50EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetCoreTests(
-            NETCORE31_CONSOLE,
-            BIN_DIR + "net5.0",
-            ENGINE_CORE_TESTS,
-            "net5.0",
-            ref UnreportedErrors);
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net5.0");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -314,12 +290,7 @@ Task("TestNet20Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(
-            NET20_CONSOLE,
-            BIN_DIR + "net35/",
-            ENGINE_TESTS,
-            "net35",
-            ref UnreportedErrors);
+        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net35");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -332,11 +303,7 @@ Task("TestNetStandard20Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetCoreNUnitLiteTests(
-            BIN_DIR + "netcoreapp2.1/" + ENGINE_TESTS,
-            BIN_DIR + "netcoreapp2.1",
-            "netcoreapp2.1",
-            ref UnreportedErrors);
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -349,16 +316,11 @@ Task("TestNetCore31Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        var runtimes = new[] { "3.1", "5.0" };
+        var runtimes = new[] { "netcoreapp3.1", "net5.0" };
 
         foreach (var runtime in runtimes)
         {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                BIN_DIR + "netcoreapp3.1/",
-                ENGINE_TESTS,
-                runtime,
-                ref UnreportedErrors);
+            RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
         }
     });
 
@@ -372,11 +334,7 @@ Task("TestNet20Console")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunTest(NET20_CONSOLE,
-            BIN_DIR + "net35/",
-            CONSOLE_TESTS,
-            "net35",
-            ref UnreportedErrors);
+        RunNet20Console(CONSOLE_TESTS, "net35");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -389,17 +347,7 @@ Task("TestNetCore31Console")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        var runtimes = new[] { "3.1", "5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetCoreTests(
-                NETCORE31_CONSOLE,
-                BIN_DIR + "netcoreapp3.1/",
-                CONSOLE_TESTS,
-                runtime,
-                ref UnreportedErrors);
-        }
+        RunNetCoreConsole(CONSOLE_TESTS, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -439,7 +387,7 @@ Task("CreateMsiImage")
             MSI_IMG_DIR);
         CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
 
-        foreach (var framework in NETFX_FRAMEWORKS)
+        foreach (var framework in new[] { "net20", "net35" })
         {
             var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
 
@@ -465,7 +413,7 @@ Task("CreateZipImage")
             ZIP_IMG_DIR);
         CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
 
-        foreach (var framework in NETFX_FRAMEWORKS)
+        foreach (var framework in new[] { "net20", "net35" })
         {
             var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
             CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
