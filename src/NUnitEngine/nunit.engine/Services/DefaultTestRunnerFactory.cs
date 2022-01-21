@@ -43,7 +43,9 @@ namespace NUnit.Engine.Services
         }
 #else
 
-            ProcessModel processModel = GetTargetProcessModel(package);
+            ProcessModel processModel = (ProcessModel)System.Enum.Parse(
+                typeof(ProcessModel),
+                package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
 
             switch (processModel)
             {
@@ -74,38 +76,6 @@ namespace NUnit.Engine.Services
                 case ProcessModel.InProcess:
                     return base.MakeTestRunner(package);
             }
-        }
-
-        // TODO: Review this method once used by a gui - the implementation is
-        // overly simplistic. It is not currently used by any known runner.
-        public override bool CanReuse(ITestEngineRunner runner, TestPackage package)
-        {
-            ProcessModel processModel = GetTargetProcessModel(package);
-
-            switch (processModel)
-            {
-                case ProcessModel.Default:
-                case ProcessModel.Multiple:
-                    return runner is MultipleTestProcessRunner;
-                case ProcessModel.Separate:
-                    return runner is ProcessRunner;
-                default:
-                    return base.CanReuse(runner, package);
-            }
-        }
-#endif
-
-#if NETFRAMEWORK
-        /// <summary>
-        /// Get the specified target process model for the package.
-        /// </summary>
-        /// <param name="package">A TestPackage</param>
-        /// <returns>The string representation of the process model or "Default" if none was specified.</returns>
-        private ProcessModel GetTargetProcessModel(TestPackage package)
-        {
-            return (ProcessModel)System.Enum.Parse(
-                typeof(ProcessModel),
-                package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
         }
 #endif
     }
