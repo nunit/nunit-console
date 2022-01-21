@@ -13,13 +13,13 @@ using System.Security.Principal;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 
-namespace NUnit.Engine.Services
+namespace NUnit.Engine.Runners
 {
     /// <summary>
     /// The DomainManager class handles the creation and unloading
     /// of domains as needed and keeps track of all existing domains.
     /// </summary>
-    public class DomainManager : Service
+    public class DomainManager
     {
         static Logger log = InternalTrace.GetLogger(typeof(DomainManager));
 

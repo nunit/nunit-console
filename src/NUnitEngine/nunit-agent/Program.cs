@@ -88,9 +88,6 @@ namespace NUnit.Agent
 
             // Custom Service Initialization
             engine.Services.Add(new ExtensionService(isRunningOnAgent: true));
-#if !NETCOREAPP
-            engine.Services.Add(new DomainManager());
-#endif
             engine.Services.Add(new InProcessTestRunnerFactory());
             engine.Services.Add(new DriverService());
 

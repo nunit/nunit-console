@@ -95,7 +95,6 @@ namespace NUnit.Engine.Runners.Tests
             projectService.Add("project4.nunit", notestsPath, notestsPath);
             _services.Add(projectService);
 #if NETFRAMEWORK
-            _services.Add(new DomainManager());
             _services.Add(new RuntimeFrameworkService());
 #endif
             _services.Add(new DriverService());
