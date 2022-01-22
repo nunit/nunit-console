@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net20;netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks>
@@ -8,20 +9,32 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>NUnit Engine</Product>
+    <AssemblyTitle>NUnit Engine Core</AssemblyTitle>
+    <Description>Common code used by both the engine and agents</Description>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
+  
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='netcoreapp3.1' or '$(TargetFramework)'=='net5.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="TestCentric.Metadata" Version="1.7.1" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
+
 </Project>

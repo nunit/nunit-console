@@ -1,22 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
     <TargetFrameworks>net35;netcoreapp3.1</TargetFrameworks>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>NUnit Console</Product>
+    <AssemblyTitle>NUnit Console Tests</AssemblyTitle>
+    <Description>Tests of the NUnit Console Runner</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" Version="3.13.2" />
   </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'!='net35'">
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
   </ItemGroup>
+  
   <ItemGroup>
     <Content Include="TestListWithEmptyLine.tst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -31,13 +43,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
     <ProjectReference Include="..\nunit3-console\nunit3-console.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+
 </Project>

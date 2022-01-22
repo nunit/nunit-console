@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
@@ -8,10 +9,19 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>NUnit Engine</Product>
+    <AssemblyTitle>NUnit Engine API</AssemblyTitle>
+    <Description>Defines the interfaces used to access the NUnit Engine</Description>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Web" />
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="..\EngineApiVersion.cs" LinkBase="Properties" />
   </ItemGroup>
+  
 </Project>
