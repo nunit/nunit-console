@@ -14,14 +14,12 @@
     <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Engine API</AssemblyTitle>
     <Description>Defines the interfaces used to access the NUnit Engine</Description>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>$(ApiFileVersion).0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">
     <Reference Include="System.Web" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Include="..\EngineApiVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   
 </Project>

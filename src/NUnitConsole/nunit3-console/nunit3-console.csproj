@@ -6,7 +6,6 @@
     <AssemblyName>nunit3-console</AssemblyName>
     <TargetFrameworks>net20;netcoreapp3.1</TargetFrameworks>
     <RollForward>Major</RollForward>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -22,7 +21,6 @@
   <ItemGroup>
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Guard.cs" Link="Utilities\Guard.cs" />
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
-    <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
     <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
   </ItemGroup>
   

@@ -5,7 +5,6 @@
     <TargetFrameworks>net35;netcoreapp3.1</TargetFrameworks>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,10 +22,6 @@
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Include="..\ConsoleVersion.cs" LinkBase="Properties" />
   </ItemGroup>
   
   <ItemGroup>

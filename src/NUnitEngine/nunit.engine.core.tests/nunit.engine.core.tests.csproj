@@ -8,7 +8,6 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>Full</DebugType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -31,10 +30,6 @@
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1' OR '$(TargetFramework)'=='netcoreapp3.1' OR '$(TargetFramework)'=='net5.0'">
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
   </ItemGroup>
 
   <ItemGroup>

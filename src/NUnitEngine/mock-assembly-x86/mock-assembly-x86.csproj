@@ -7,7 +7,6 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>x86</PlatformTarget>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,7 +19,6 @@
     <PackageReference Include="NUnit" Version="3.13.2" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\mock-assembly\*.cs" />
     <None Include="..\..\nunit.snk" Link="nunit.snk" />
   </ItemGroup>

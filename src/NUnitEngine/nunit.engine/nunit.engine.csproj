@@ -21,7 +21,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" LinkBase="Agents" />
     <Compile Include="..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Internal\ExceptionHelper.cs" />
   </ItemGroup>

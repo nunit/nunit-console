@@ -9,7 +9,6 @@
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,7 +22,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" Link="AgentExitCodes.cs" />
     <Compile Include="..\nunit-agent\Program.cs" Link="Program.cs" />
     <Compile Include="..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
