@@ -1,15 +1,15 @@
 <Project>
 
   <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>  
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>7</LangVersion>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\..\CommonAssemblyInfo.cs" LinkBase="Properties" />
-  </ItemGroup>
+  <PropertyGroup>
+    <Company>NUnit Software</Company>
+    <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
+  </PropertyGroup>
 
 </Project>

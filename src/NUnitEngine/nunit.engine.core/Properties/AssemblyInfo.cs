@@ -2,16 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("NUnit Engine Core")]
-[assembly: AssemblyCulture("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+[assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
 
 [assembly: InternalsVisibleTo("nunit.engine.core.tests, PublicKey=" +
     "002400000480000094000000060200000024000052534131000400000100010031eea370b1984b" +

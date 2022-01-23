@@ -81,19 +81,6 @@ Task("CleanAll")
     .IsDependentOn("DeleteObjectDirectories");
 
 //////////////////////////////////////////////////////////////////////
-// INITIALIZE FOR BUILD
-//////////////////////////////////////////////////////////////////////
-
-Task("UpdateAssemblyInfo")
-    .Description("Sets the assembly versions to the calculated version.")
-    .Does(() =>
-    {
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitConsole/ConsoleVersion.cs", ProductVersion, SemVer);
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineApiVersion.cs", ProductVersion, assemblyVersion: null);
-        PatchAssemblyInfo(SOURCE_DIR + "NUnitEngine/EngineVersion.cs", ProductVersion, SemVer);
-    });
-
-//////////////////////////////////////////////////////////////////////
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
@@ -101,7 +88,6 @@ Task("Build")
     .Description("Builds the engine and console")
     .IsDependentOn("CheckHeaders")
     .IsDependentOn("Clean")
-    .IsDependentOn("UpdateAssemblyInfo")
     .Does(() =>
     {
         if (IsRunningOnLinux())
