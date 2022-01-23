@@ -24,9 +24,6 @@ namespace NUnit.Engine.Tests.Services.ResultWriters
             serviceContext.Add(new InProcessTestRunnerFactory());
             serviceContext.Add(new ExtensionService());
             serviceContext.Add(new FakeRuntimeService());
-#if NETFRAMEWORK
-            serviceContext.Add(new DomainManager());
-#endif
             using (var runner = new MasterTestRunner(serviceContext, new TestPackage(assemblyPath)))
             {
                 runner.Load();
