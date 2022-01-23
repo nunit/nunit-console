@@ -46,10 +46,5 @@ namespace NUnit.Engine.Services
             }
 #endif
         }
-
-        public virtual bool CanReuse(ITestEngineRunner runner, TestPackage package)
-        {
-            return false;
-        }
     }
 }
