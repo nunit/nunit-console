@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>NoTest Assembly</AssemblyTitle>
+    <AssemblyTitle>NoTest Assembly ($(TargetFramework))</AssemblyTitle>
     <Description>Assembly with NonTestAssembly attribute used in testing the engine</Description>
   </PropertyGroup>
 

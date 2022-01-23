@@ -12,10 +12,10 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>NUnit Engine API</AssemblyTitle>
+    <AssemblyTitle>NUnit Engine API ($(TargetFramework))</AssemblyTitle>
     <Description>Defines the interfaces used to access the NUnit Engine</Description>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>$(ApiFileVersion).0</FileVersion>
+    <FileVersion>$(ApiFileVersion)</FileVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net20'">

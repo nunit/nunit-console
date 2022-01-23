@@ -58,7 +58,7 @@ MSBuildSettings CreateMSBuildSettings(string target)
         .SetConfiguration(Configuration)
         .SetVerbosity(Verbosity.Minimal)
         .WithProperty("Version", ProductVersion)
-        .WithProperty("ApiFileVersion", SemVer)
+        .WithProperty("ApiFileVersion", SemVer + ".0")
         .WithTarget(target)
         // Workaround for https://github.com/Microsoft/msbuild/issues/3626
         .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
@@ -90,7 +90,7 @@ DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
     return new DotNetMSBuildSettings()
         .SetConfiguration(Configuration)
         .WithProperty("Version", ProductVersion)
-        .WithProperty("ApiFileVersion", SemVer)
+        .WithProperty("ApiFileVersion", SemVer + ".0")
         .WithTarget(target);
 }
 

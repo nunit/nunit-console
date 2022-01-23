@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Product>NUnit Engine</Product>
+    <Product>NUnit Engine ($(TargetFramework))</Product>
     <AssemblyTitle>NUnit Engine Core</AssemblyTitle>
     <Description>Common code used by both the engine and agents</Description>
   </PropertyGroup>

@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>Mock Assembly</AssemblyTitle>
+    <AssemblyTitle>Mock Assembly ($(TargetFramework))</AssemblyTitle>
     <Description>Assembly used in testing the engine</Description>
   </PropertyGroup>
 

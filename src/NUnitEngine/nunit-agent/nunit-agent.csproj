@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>NUnit Agent</AssemblyTitle>
+    <AssemblyTitle>NUnit Agent ($(TargetFramework))</AssemblyTitle>
     <Description>Agent used to run tests out of process</Description>
   </PropertyGroup>
 

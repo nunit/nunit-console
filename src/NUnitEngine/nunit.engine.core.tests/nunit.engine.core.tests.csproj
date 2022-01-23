@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>NUnit Engine Core Tests</AssemblyTitle>
+    <AssemblyTitle>NUnit Engine Core Tests ($(TargetFramework))</AssemblyTitle>
     <Description>Tests of nunit.engine.core assembly</Description>
   </PropertyGroup>
 

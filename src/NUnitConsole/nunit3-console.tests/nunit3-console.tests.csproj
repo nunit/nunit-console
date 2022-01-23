@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <Product>NUnit Console</Product>
-    <AssemblyTitle>NUnit Console Tests</AssemblyTitle>
+    <AssemblyTitle>NUnit Console Tests ($(TargetFramework))</AssemblyTitle>
     <Description>Tests of the NUnit Console Runner</Description>
   </PropertyGroup>
 

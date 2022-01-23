@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>NUnit Engine</AssemblyTitle>
+    <AssemblyTitle>NUnit Engine ($(TargetFramework))</AssemblyTitle>
     <Description>Provides for loading, exploring and running NUnit tests</Description>
   </PropertyGroup>
 

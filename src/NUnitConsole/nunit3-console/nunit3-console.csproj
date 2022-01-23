@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <Product>NUnit Console</Product>
-    <AssemblyTitle>NUnit Console Runner</AssemblyTitle>
+    <AssemblyTitle>NUnit Console Runner ($(TargetFramework))</AssemblyTitle>
     <Description>The console command-line runner for NUnit</Description>
   </PropertyGroup>
 

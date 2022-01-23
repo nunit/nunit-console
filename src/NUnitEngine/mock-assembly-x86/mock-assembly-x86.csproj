@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>Mock Assembly (X86)</AssemblyTitle>
+    <AssemblyTitle>X86 Mock Assembly ($(TargetFramework))</AssemblyTitle>
     <Description>Assembly used in testing the engine</Description>
   </PropertyGroup>
 
