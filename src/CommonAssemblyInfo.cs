@@ -4,9 +4,6 @@ using System.Reflection;
 //
 // Common Information for the NUnit assemblies
 //
-[assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
-[assembly: AssemblyCompany("NUnit Software")]
-[assembly: AssemblyCopyright("Copyright (c) 2021 Charlie Poole, Rob Prouse")]
 
 #if DEBUG
 #if NET35

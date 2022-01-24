@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <RootNamespace>NUnit.Tests</RootNamespace>
     <TargetFrameworks>net35;net40;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
@@ -7,11 +8,17 @@
     <PlatformTarget>x86</PlatformTarget>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>NUnit Engine</Product>
+    <AssemblyTitle>X86 Mock Assembly ($(TargetFramework))</AssemblyTitle>
+    <Description>Assembly used in testing the engine</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.2" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
     <Compile Include="..\mock-assembly\*.cs" />
     <None Include="..\..\nunit.snk" Link="nunit.snk" />
   </ItemGroup>
