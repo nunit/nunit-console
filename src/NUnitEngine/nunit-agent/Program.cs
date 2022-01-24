@@ -88,7 +88,6 @@ namespace NUnit.Agent
 
             // Custom Service Initialization
             engine.Services.Add(new ExtensionService(isRunningOnAgent: true));
-            engine.Services.Add(new InProcessTestRunnerFactory());
             engine.Services.Add(new DriverService());
 
             // Initialize Services
@@ -96,7 +95,7 @@ namespace NUnit.Agent
             engine.InitializeServices();
 
             log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(AgentId, engine.Services);
+            Agent = new RemoteTestAgent(engine.Services, AgentId);
             Agent.Transport =
 #if NETFRAMEWORK
                 new Engine.Communication.Transports.Remoting.TestAgentRemotingTransport(Agent, AgencyUrl);

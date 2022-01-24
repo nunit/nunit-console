@@ -77,7 +77,6 @@ namespace NUnit.Engine
                 // later.
                 Services.Add(new DriverService());
                 Services.Add(new ExtensionService());
-                Services.Add(new InProcessTestRunnerFactory());
             }
 
             Services.ServiceManager.StartServices();
