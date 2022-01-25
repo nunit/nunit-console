@@ -8,7 +8,7 @@ jobs:
 - job: Windows
   condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-linux-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
-    vmImage: windows-2019
+    vmImage: windows-2022
   
   steps:
 
