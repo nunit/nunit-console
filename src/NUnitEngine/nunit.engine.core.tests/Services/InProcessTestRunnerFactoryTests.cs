@@ -10,21 +10,11 @@ namespace NUnit.Engine.Services.Tests
 {
     public class InProcessTestRunnerFactoryTests
     {
-        private InProcessTestRunnerFactory _factory;
-
         [SetUp]
         public void CreateServiceContext()
         {
             var services = new ServiceContext();
-            _factory = new InProcessTestRunnerFactory();
-            services.Add(_factory);
             services.ServiceManager.StartServices();
-        }
-
-        [Test]
-        public void ServiceIsStarted()
-        {
-            Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started), "Failed to start service");
         }
 
 #if NETCOREAPP
@@ -50,7 +40,7 @@ namespace NUnit.Engine.Services.Tests
             var package = new TestPackage(files.Split(new char[] { ' ' }));
             if (domainUsage != null)
                 package.Settings["DomainUsage"] = domainUsage;
-            Assert.That(_factory.MakeTestRunner(package), Is.TypeOf(expectedType));
+            Assert.That(InProcessTestRunnerFactory.MakeTestRunner(new ServiceContext(), package), Is.TypeOf(expectedType));
         }
     }
 }

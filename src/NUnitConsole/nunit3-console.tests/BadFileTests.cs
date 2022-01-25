@@ -19,7 +19,7 @@ namespace NUnit.ConsoleRunner.Tests
             var fullname = Path.Combine(TestContext.CurrentContext.TestDirectory, filename);
 
             var services = new ServiceContext();
-            services.Add(new InProcessTestRunnerFactory());
+            services.Add(new DefaultTestRunnerFactory());
             services.Add(new ExtensionService());
             services.Add(new DriverService());
 #if NET35

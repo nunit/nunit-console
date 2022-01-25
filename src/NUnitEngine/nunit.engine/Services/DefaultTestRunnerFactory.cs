@@ -10,7 +10,7 @@ namespace NUnit.Engine.Services
     /// runner for a given package to be loaded and run either in a
     /// separate process or within the same process.
     /// </summary>
-    public class DefaultTestRunnerFactory : InProcessTestRunnerFactory, ITestRunnerFactory
+    public class DefaultTestRunnerFactory : Service, ITestRunnerFactory
     {
         private IProjectService _projectService;
 
@@ -33,13 +33,13 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">The TestPackage to be loaded and run</param>
         /// <returns>A TestRunner</returns>
-        public override ITestEngineRunner MakeTestRunner(TestPackage package)
+        public ITestEngineRunner MakeTestRunner(TestPackage package)
         {
 #if !NETFRAMEWORK
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
 
-            return base.MakeTestRunner(package);
+            return InProcessTestRunnerFactory.MakeTestRunner(ServiceContext, package);
         }
 #else
 
@@ -61,20 +61,20 @@ namespace NUnit.Engine.Services
                         }
                     }
                     if (isNested)
-                        return new AggregatingTestRunner(this.ServiceContext, package);
+                        return new AggregatingTestRunner(ServiceContext, package);
                     else if (package.SubPackages.Count > 1)
-                        return new MultipleTestProcessRunner(this.ServiceContext, package);
+                        return new MultipleTestProcessRunner(ServiceContext, package);
                     else
-                        return new ProcessRunner(this.ServiceContext, package);
+                        return new ProcessRunner(ServiceContext, package);
 
                 case ProcessModel.Multiple:
-                    return new MultipleTestProcessRunner(this.ServiceContext, package);
+                    return new MultipleTestProcessRunner(ServiceContext, package);
 
                 case ProcessModel.Separate:
-                    return new ProcessRunner(this.ServiceContext, package);
+                    return new ProcessRunner(ServiceContext, package);
 
                 case ProcessModel.InProcess:
-                    return base.MakeTestRunner(package);
+                    return InProcessTestRunnerFactory.MakeTestRunner(ServiceContext, package);
             }
         }
 #endif

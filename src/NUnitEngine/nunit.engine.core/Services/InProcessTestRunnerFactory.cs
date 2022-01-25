@@ -5,11 +5,17 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// InProcessTestRunnerFactory handles creation of a suitable test
-    /// runner for a given package to be loaded and run within the
-    /// same process.
+    /// The InProcessTestRunnerFactory static class handles creation
+    /// of a suitable test runner for a given package to be loaded
+    /// and run within the current process.
     /// </summary>
-    public class InProcessTestRunnerFactory : Service, ITestRunnerFactory
+    /// <remarks>
+    /// This class was originally a non-static Service and was used as
+    /// the base class for DefaultTestRunnerFactory. The static version
+    /// is a temporary measure for use while we are in the process of
+    /// removing all services from the nunit.engine.core assembly.
+    /// </remarks>
+    public static class InProcessTestRunnerFactory
     {
         /// <summary>
         /// Returns a test runner based on the settings in a TestPackage.
@@ -19,10 +25,10 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">The TestPackage to be loaded and run</param>
         /// <returns>An ITestEngineRunner</returns>
-        public virtual ITestEngineRunner MakeTestRunner(TestPackage package)
+        public static ITestEngineRunner MakeTestRunner(IServiceLocator context, TestPackage package)
         {
 #if !NETFRAMEWORK
-            return new LocalTestRunner(ServiceContext, package);
+            return new LocalTestRunner(context, package);
 #else
             DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(
                 typeof(DomainUsage),
@@ -34,15 +40,15 @@ namespace NUnit.Engine.Services
                 case DomainUsage.Default:
                 case DomainUsage.Multiple:
                     if (package.SubPackages.Count > 1)
-                        return new MultipleTestDomainRunner(this.ServiceContext, package);
+                        return new MultipleTestDomainRunner(context, package);
                     else
-                        return new TestDomainRunner(this.ServiceContext, package);
+                        return new TestDomainRunner(context, package);
 
                 case DomainUsage.None:
-                    return new LocalTestRunner(ServiceContext, package);
+                    return new LocalTestRunner(context, package);
 
                 case DomainUsage.Single:
-                    return new TestDomainRunner(ServiceContext, package);
+                    return new TestDomainRunner(context, package);
             }
 #endif
         }

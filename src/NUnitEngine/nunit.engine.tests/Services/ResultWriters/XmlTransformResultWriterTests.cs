@@ -21,10 +21,13 @@ namespace NUnit.Engine.Tests.Services.ResultWriters
 
             var serviceContext = new ServiceContext();
             serviceContext.Add(new DriverService());
-            serviceContext.Add(new InProcessTestRunnerFactory());
+            serviceContext.Add(new DefaultTestRunnerFactory());
             serviceContext.Add(new ExtensionService());
             serviceContext.Add(new FakeRuntimeService());
-            using (var runner = new MasterTestRunner(serviceContext, new TestPackage(assemblyPath)))
+
+            var package = new TestPackage(assemblyPath);
+            package.AddSetting(EnginePackageSettings.ProcessModel, "InProcess");
+            using (var runner = new MasterTestRunner(serviceContext, package))
             {
                 runner.Load();
                 _engineResult = runner.Run(null, TestFilter.Empty);
