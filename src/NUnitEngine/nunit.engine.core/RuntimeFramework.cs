@@ -1,14 +1,13 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
-#if NETFRAMEWORK
 using NUnit.Engine.Internal.RuntimeFrameworks;
-#endif
 
 namespace NUnit.Engine
 {
@@ -45,10 +44,61 @@ namespace NUnit.Engine
         /// </summary>
         public static readonly Version DefaultVersion = new Version(0, 0);
 
+        #region IRuntimeFramework Implementation
+
+        /// <summary>
+        /// Gets the unique Id for this runtime, such as "net-4.5"
+        /// </summary>
+        public string Id
+        {
+            get
+            {
+                if (FrameworkVersion == DefaultVersion)
+                {
+                    return Runtime.ToString().ToLower();
+                }
+                else
+                {
+                    string vstring = FrameworkVersion.ToString();
+                    if (Runtime == RuntimeType.Any)
+                        return "v" + vstring;
+                    else
+                        return Runtime.ToString().ToLower() + "-" + vstring;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The type of this runtime framework
+        /// </summary>
+        public RuntimeType Runtime { get; private set; }
+
+        /// <summary>
+        /// The framework version for this runtime framework
+        /// </summary>
+        public Version FrameworkVersion { get; private set; }
+
+        /// <summary>
+        /// The CLR version for this runtime framework
+        /// </summary>
+        public Version ClrVersion { get; private set; }
+
+        /// <summary>
+        /// The Profile for this framework, where relevant.
+        /// May be null and will have different sets of
+        /// values for each Runtime.
+        /// </summary>
+        public string Profile { get; private set; }
+
+        /// <summary>
+        /// Returns the Display name for this framework
+        /// </summary>
+        public string DisplayName { get; private set; }
+
+        #endregion
+
         private static RuntimeFramework _currentFramework;
-#if NETFRAMEWORK
         private static List<RuntimeFramework> _availableFrameworks;
-#endif
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
@@ -259,7 +309,6 @@ namespace NUnit.Engine
             }
         }
 
-#if NETFRAMEWORK
         /// <summary>
         /// Gets an array of all available frameworks
         /// </summary>
@@ -273,20 +322,19 @@ namespace NUnit.Engine
                 return _availableFrameworks.ToArray();
             }
         }
-#endif
 
         /// <summary>
         /// The version of Mono in use or null if no Mono runtime
         /// is available on this machine.
         /// </summary>
         /// <value>The mono version.</value>
-        public static Version MonoVersion { get; private set; }
+        private static Version MonoVersion { get; set; }
 
         /// <summary>
         /// The install directory where the version of mono in
         /// use is located. Null if no Mono runtime is present.
         /// </summary>
-        public static string MonoPrefix { get; private set; }
+        private static string MonoPrefix { get; set; }
 
         /// <summary>
         /// The path to the mono executable, based on the
@@ -304,29 +352,6 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Gets the unique Id for this runtime, such as "net-4.5"
-        /// </summary>
-        public string Id
-        {
-            get
-            {
-                if (this.AllowAnyVersion)
-                {
-                    return Runtime.ToString().ToLower();
-                }
-                else
-                {
-                    string vstring = FrameworkVersion.ToString();
-                    if (Runtime == RuntimeType.Any)
-                        return "v" + vstring;
-                    else
-                        return Runtime.ToString().ToLower() + "-" + vstring;
-                }
-            }
-        }
-
-#if NETFRAMEWORK
-        /// <summary>
         /// Returns true if the current RuntimeFramework is available.
         /// In the current implementation, only Mono and Microsoft .NET
         /// are supported.
@@ -343,43 +368,6 @@ namespace NUnit.Engine
                 return false;
             }
         }
-#endif
-
-        /// <summary>
-        /// The type of this runtime framework
-        /// </summary>
-        public RuntimeType Runtime { get; private set; }
-
-        /// <summary>
-        /// The framework version for this runtime framework
-        /// </summary>
-        public Version FrameworkVersion { get; private set; }
-
-        /// <summary>
-        /// The CLR version for this runtime framework
-        /// </summary>
-        public Version ClrVersion { get; private set; }
-
-        /// <summary>
-        /// The Profile for this framework, where relevant.
-        /// May be null and will have different sets of
-        /// values for each Runtime.
-        /// </summary>
-        public string Profile { get; private set; }
-
-        /// <summary>
-        /// Return true if any CLR version may be used in
-        /// matching this RuntimeFramework object.
-        /// </summary>
-        public bool AllowAnyVersion
-        {
-            get { return this.ClrVersion == DefaultVersion; }
-        }
-
-        /// <summary>
-        /// Returns the Display name for this framework
-        /// </summary>
-        public string DisplayName { get; private set; }
 
         /// <summary>
         /// Parses a string representing a RuntimeFramework.
@@ -461,7 +449,7 @@ namespace NUnit.Engine
             if (!this.Supports(target.Runtime))
                 return false;
 
-            if (this.AllowAnyVersion || target.AllowAnyVersion)
+            if (FrameworkVersion == DefaultVersion || target.FrameworkVersion == DefaultVersion)
                 return true;
 
             return VersionsMatch(this.ClrVersion, target.ClrVersion)
@@ -556,7 +544,6 @@ namespace NUnit.Engine
             return prefix;
         }
 
-#if NETFRAMEWORK
         private static void FindAvailableFrameworks()
         {
             _availableFrameworks = new List<RuntimeFramework>();
@@ -754,6 +741,6 @@ namespace NUnit.Engine
 
             return runtimes;
         }
-#endif
     }
 }
+#endif
