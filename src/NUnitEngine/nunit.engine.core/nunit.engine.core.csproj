@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
-    <TargetFrameworks>net20;netstandard2.0;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net20;netstandard2.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <NoWarn>$(NoWarn);SYSLIB0011;SYSLIB0012</NoWarn><!-- TODO: Get rid of obsolete stuff -->
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
