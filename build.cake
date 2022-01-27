@@ -91,13 +91,13 @@ Task("Build")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        if (IsRunningOnLinux())
-            BuildEachProjectSeparatelyOnLinux();
+        if (IsRunningOnWindows())
+            BuildSolution();
         else
-            BuildUsingMSBuildOnWindowsOrMacOS();
+            BuildEachProjectSeparately();
     });
 
-public void BuildUsingMSBuildOnWindowsOrMacOS()
+public void BuildSolution()
 {
     MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
@@ -132,17 +132,17 @@ public void BuildUsingMSBuildOnWindowsOrMacOS()
         .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 }
 
-private void BuildEachProjectSeparatelyOnLinux()
+private void BuildEachProjectSeparately()
 {
     DotNetRestore(SOLUTION_FILE);
 
-    BuildProject(ENGINE_PROJECT, "net20", "netstandard2.0", "netcoreapp3.1");
-    BuildProject(CONSOLE_PROJECT, "net20", "netcoreapp3.1");
-    BuildProject(AGENT_PROJECT, "net20", "net40", "netcoreapp3.1", "net5.0");
-    BuildProject(AGENT_X86_PROJECT, "net20", "net40");
+    BuildProject(ENGINE_PROJECT);
+    BuildProject(CONSOLE_PROJECT);
+    BuildProject(AGENT_PROJECT);
+    BuildProject(AGENT_X86_PROJECT);
 
     BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0");
+    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
     BuildProject(CONSOLE_TESTS_PROJECT, "net35", "netcoreapp3.1");
 
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
@@ -168,7 +168,12 @@ private void BuildEachProjectSeparatelyOnLinux()
 // differently depending on whether it has net35 as one of its targets. 
 private void BuildProject(string project, params string[] targetFrameworks)
 {
-    if (targetFrameworks.Contains("net35"))
+    if (targetFrameworks.Length == 0)
+    {
+        DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
+        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
+    }
+    else
     {
         foreach (var framework in targetFrameworks)
         {
@@ -178,11 +183,6 @@ private void BuildProject(string project, params string[] targetFrameworks)
             else
                 DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
         }
-    }
-    else
-    {
-        DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
-        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
     }
 }
 
