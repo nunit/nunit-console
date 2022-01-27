@@ -43,9 +43,11 @@ void DisplayUnreportedErrors()
 
 public static void DisplayBanner(string message)
 {
-    Console.WriteLine("\r\n=================================================="); ;
+    var bar = new string('-', Math.Max(message.Length, 40));
+    Console.WriteLine();
+    Console.WriteLine(bar);
     Console.WriteLine(message);
-    Console.WriteLine("==================================================");
+    Console.WriteLine(bar);
 }
 
 //////////////////////////////////////////////////////////////////////
