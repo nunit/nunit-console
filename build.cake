@@ -136,7 +136,6 @@ private void BuildEachProjectSeparately()
 {
     DotNetRestore(SOLUTION_FILE);
 
-    BuildProject(ENGINE_CORE_PROJECT);
     BuildProject(ENGINE_PROJECT);
     BuildProject(CONSOLE_PROJECT);
     BuildProject(AGENT_PROJECT);
