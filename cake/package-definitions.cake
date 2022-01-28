@@ -26,6 +26,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore21Test,
         NetCore31Test,
         Net50Test,
+        Net60Test,
         NetCore21PlusNetCore31PlusNet50Test
     };
 
