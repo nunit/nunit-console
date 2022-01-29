@@ -26,7 +26,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore21Test,
         NetCore31Test,
         Net50Test,
-        Net60Test,
+        //Net60Test,
         NetCore21PlusNetCore31PlusNet50Test
     };
 
@@ -75,7 +75,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests),
+            tests: StandardRunnerTests.Concat(new [] { Net60Test })),
 
         NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
             context: context,
@@ -106,7 +106,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests),
+            tests: StandardRunnerTests.Concat(new [] { Net60Test })),
 
         NUnitConsoleMsiPackage = new MsiPackage(
             context: context,

@@ -101,7 +101,7 @@ public void BuildSolution()
 {
     MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
-    Information("Publishing .NET Core & Standard projects so that dependencies are present...");
+    DisplayBanner("Publish .NET Core & Standard projects");
 
     foreach (var framework in new[] { "netstandard2.0", "netcoreapp3.1" })
         MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
@@ -148,6 +148,8 @@ private void BuildEachProjectSeparately()
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
 
+
+    DisplayBanner("Publish .NET Core & Standard projects");
 
     MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
        .WithProperty("TargetFramework", "netstandard2.0")

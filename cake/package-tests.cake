@@ -39,7 +39,7 @@ static PackageTest Net35PlusNet40Test = new PackageTest(
 
 static PackageTest Net60Test = new PackageTest(
     "Run mock-assembly.dll under .NET 6.0",
-    "net6.0/mock-assembly.dll",
+    "net6.0/mock-assembly.dll --trace:Debug",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net50Test = new PackageTest(

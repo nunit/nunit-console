@@ -117,16 +117,17 @@ namespace NUnit.Engine.Services
             string runtimeDir;
             string agentName;
             string agentExtension;
+            int major = targetRuntime.FrameworkVersion.Major;
             switch (targetRuntime.Runtime)
             {
                 case RuntimeType.Net:
                 case RuntimeType.Mono:
-                    runtimeDir = targetRuntime.FrameworkVersion.Major >= 4 ? "net40" : "net20";
+                    runtimeDir = major >= 4 ? "net40" : "net20";
                     agentName = requires32Bit ? "nunit-agent-x86" : "nunit-agent";
                     agentExtension = ".exe";
                     break;
                 case RuntimeType.NetCore:
-                    runtimeDir = targetRuntime.FrameworkVersion.Major >= 5 ? "net5.0" : "netcoreapp3.1";
+                    runtimeDir = major >= 6 ? "net6.0" : major == 5 ? "net5.0" : "netcoreapp3.1";
                     agentName = "nunit-agent";
                     agentExtension = ".dll";
                     break;
