@@ -16,6 +16,7 @@ public void InitializePackageDefinitions(ICakeContext context)
     const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
     bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
 
+    // Tests run for all runner packages except NETCORE runner
     var StandardRunnerTests = new List<PackageTest>
     {
         Net35Test,
@@ -26,7 +27,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore21Test,
         NetCore31Test,
         Net50Test,
-        //Net60Test,
+        Net60Test,
         NetCore21PlusNetCore31PlusNet50Test
     };
 
@@ -36,6 +37,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         StandardRunnerTests.Add(NetCore31X86Test);
     }
 
+    // Tests run for the NETCORE runner package
     var NetCoreRunnerTests = new List<PackageTest>
     {
         NetCore21Test,
@@ -75,7 +77,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests.Concat(new [] { Net60Test })),
+            tests: StandardRunnerTests ),
 
         NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
             context: context,
@@ -90,7 +92,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/netcoreapp3.1/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
             },
             executable: "tools/netcoreapp3.1/any/nunit3-console.exe",
-            tests: NetCoreRunnerTests),
+            tests: NetCoreRunnerTests ),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
             context: context,
@@ -106,7 +108,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests.Concat(new [] { Net60Test })),
+            tests: StandardRunnerTests ),
 
         NUnitConsoleMsiPackage = new MsiPackage(
             context: context,
