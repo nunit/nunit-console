@@ -13,10 +13,9 @@ using NUnit.Engine.Internal.FileSystemAccess;
 
 namespace NUnit.Engine.Services.Tests
 {
-    public class ExtensionServiceTests
+    public class ExtensionManagerTests
     {
-        private ExtensionService _serviceClass;
-        private IExtensionService _serviceInterface;
+        private ExtensionManager _extensionManager;
 
 #pragma warning disable 414
         private static readonly string[] KnownExtensionPointPaths = {
@@ -43,15 +42,15 @@ namespace NUnit.Engine.Services.Tests
         [SetUp]
         public void CreateService()
         {
-            _serviceInterface = _serviceClass = new ExtensionService();
+            _extensionManager = new ExtensionManager();
 
             // Rather than actually starting the service, which would result
             // in finding the extensions actually in use on the current system,
             // we simulate the start using this assemblies dummy extensions.
-            _serviceClass.FindExtensionPoints(typeof(CoreEngine).Assembly);
-            _serviceClass.FindExtensionPoints(typeof(ITestEngine).Assembly);
+            _extensionManager.FindExtensionPoints(typeof(CoreEngine).Assembly);
+            _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
-            _serviceClass.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
+            _extensionManager.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
         }
 
         [Test]
@@ -59,7 +58,7 @@ namespace NUnit.Engine.Services.Tests
         {
             var addinsReader = Substitute.For<IAddinsFileReader>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var service = new ExtensionService(false, addinsReader, fileSystem);
+            var service = new ExtensionService(addinsReader, fileSystem);
             var workingDir = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
 
             service.StartService();
@@ -70,7 +69,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AllExtensionPointsAreKnown()
         {
-            Assert.That(_serviceInterface.ExtensionPoints.Select(ep => ep.Path), Is.EquivalentTo(KnownExtensionPointPaths));
+            Assert.That(_extensionManager.ExtensionPoints.Select(ep => ep.Path), Is.EquivalentTo(KnownExtensionPointPaths));
         }
 
         [Test, Sequential]
@@ -78,7 +77,7 @@ namespace NUnit.Engine.Services.Tests
             [ValueSource(nameof(KnownExtensionPointPaths))] string path,
             [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
         {
-            var ep = _serviceInterface.GetExtensionPoint(path);
+            var ep = _extensionManager.GetExtensionPoint(path);
             Assert.NotNull(ep);
             Assert.That(ep.Path, Is.EqualTo(path));
             Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
@@ -89,7 +88,7 @@ namespace NUnit.Engine.Services.Tests
             [ValueSource(nameof(KnownExtensionPointPaths))] string path,
             [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
         {
-            var ep = _serviceClass.GetExtensionPoint(type);
+            var ep = _extensionManager.GetExtensionPoint(type);
             Assert.NotNull(ep);
             Assert.That(ep.Path, Is.EqualTo(path));
             Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
@@ -109,7 +108,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCaseSource(nameof(KnownExtensions))]
         public void CanListExtensions(string typeName)
         {
-            Assert.That(_serviceClass.Extensions,
+            Assert.That(_extensionManager.Extensions,
                 Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(typeName)
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
         }
@@ -119,7 +118,7 @@ namespace NUnit.Engine.Services.Tests
             [ValueSource(nameof(KnownExtensionPointPaths))] string path,
             [ValueSource(nameof(KnownExtensionPointCounts))] int extensionCount)
         {
-            var ep = _serviceClass.GetExtensionPoint(path);
+            var ep = _extensionManager.GetExtensionPoint(path);
             Assume.That(ep, Is.Not.Null);
 
             Assert.That(ep.Extensions.Count, Is.EqualTo(extensionCount));
@@ -128,7 +127,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void ExtensionMayBeDisabledByDefault()
         {
-            Assert.That(_serviceInterface.Extensions,
+            Assert.That(_extensionManager.Extensions,
                 Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo("NUnit.Engine.Tests.DummyDisabledExtension")
                    .And.Property(nameof(ExtensionNode.Enabled)).False);
         }
@@ -136,9 +135,9 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void DisabledExtensionMayBeEnabled()
         {
-            _serviceInterface.EnableExtension("NUnit.Engine.Tests.DummyDisabledExtension", true);
+            _extensionManager.EnableExtension("NUnit.Engine.Tests.DummyDisabledExtension", true);
 
-            Assert.That(_serviceInterface.Extensions,
+            Assert.That(_extensionManager.Extensions,
                 Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo("NUnit.Engine.Tests.DummyDisabledExtension")
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
         }
@@ -159,7 +158,7 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(assemblyName, Does.Exist);
             Console.WriteLine($"{assemblyName} does exist");
 
-            var service = new ExtensionService();
+            var service = new ExtensionManager();
             service.FindExtensionPoints(typeof(CoreEngine).Assembly);
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
@@ -170,21 +169,21 @@ namespace NUnit.Engine.Services.Tests
         [TestCaseSource(nameof(ValidCombos))]
         public void ValidTargetFrameworkCombinations(FrameworkCombo combo)
         {
-            Assert.That(() => ExtensionService.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+            Assert.That(() => ExtensionManager.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
                 Is.True);
         }
 
         [TestCaseSource(nameof(InvalidTargetFrameworkCombos))]
         public void InvalidTargetFrameworkCombinations(FrameworkCombo combo)
         {
-            Assert.That(() => ExtensionService.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+            Assert.That(() => ExtensionManager.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
                 Is.False);
         }
 
         [TestCaseSource(nameof(InvalidRunnerCombos))]
         public void InvalidRunnerTargetFrameworkCombinations(FrameworkCombo combo)
         {
-            Assert.That(() => ExtensionService.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
+            Assert.That(() => ExtensionManager.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
                 Throws.Exception.TypeOf<NUnitEngineException>().And.Message.Contains("not .NET Standard"));
         }
 
@@ -278,7 +277,7 @@ namespace NUnit.Engine.Services.Tests
         /// <returns></returns>
         private static string GetSiblingDirectory(string dir)
         {
-            var file = new FileInfo(typeof(ExtensionServiceTests).Assembly.Location);
+            var file = new FileInfo(typeof(ExtensionManagerTests).Assembly.Location);
             return Path.Combine(file.Directory.Parent.FullName, dir);
         }
 
@@ -296,7 +295,7 @@ namespace NUnit.Engine.Services.Tests
             var fileSystem = Substitute.For<IFileSystem>();
             fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem);
+            var sut = new ExtensionService(addinsReader, fileSystem);
 
             // Act
             sut.StartService();
@@ -332,7 +331,7 @@ namespace NUnit.Engine.Services.Tests
             fileSystem.GetDirectory(subdirectoryPath).Returns(subdirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "subdirectory/" });
-            var sut = new ExtensionService(false, addinsReader, fileSystem);
+            var sut = new ExtensionService(addinsReader, fileSystem);
 
             // Act
             sut.StartService();
@@ -369,7 +368,7 @@ namespace NUnit.Engine.Services.Tests
                     "**/wildcard-file.dll"
                 });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -409,7 +408,7 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "c:/tools/metamorphosator/", "d:/tools/frobuscator.dll" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -446,7 +445,7 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "/tmp/tools/metamorphosator/", "/usr/frobuscator.dll" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -475,7 +474,7 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "/absolute/unix/path" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -502,7 +501,7 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "/absolute/unix/path/" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -531,7 +530,7 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { windowsPath });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -558,7 +557,7 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { windowsPath });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -586,7 +585,7 @@ namespace NUnit.Engine.Services.Tests
             var fileSystem = Substitute.For<IFileSystem>();
             fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
-            var sut = new ExtensionService(false, addinsReader, fileSystem);
+            var sut = new ExtensionService(addinsReader, fileSystem);
 
             // Act
             sut.StartService();
@@ -623,7 +622,7 @@ namespace NUnit.Engine.Services.Tests
             addinsReader.Read(addinsFile).Returns(new[] { "./metamorphosator/" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
             directoryFinder.GetDirectories(startDirectory, "./metamorphosator/").Returns(new[] { referencedDirectory });
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -676,7 +675,7 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.GetFiles(startDirectory, @"*\..\").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, @"**\..\").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, @"**\.\").Returns(new[] { testAssembly });
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
@@ -736,7 +735,7 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.GetFiles(startDirectory, "*/../").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, "**/../").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, "**/./").Returns(new[] { testAssembly });
-            var sut = new ExtensionService(false, addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
 
             // Act
             sut.StartService();
