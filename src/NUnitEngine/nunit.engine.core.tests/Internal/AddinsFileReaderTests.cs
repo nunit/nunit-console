@@ -38,13 +38,12 @@ namespace NUnit.Engine.Internal.Tests
                 "/unix/absolute/directory"
             });
 
-            var reader = new AddinsFileReader();
             IEnumerable<string> result;
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(input)))
             {
                 // Act
-                result = reader.Read(stream);
+                result = AddinsFileReader.Read(stream);
             }
 
             Assert.That(result, Has.Count.EqualTo(5));
@@ -63,13 +62,13 @@ namespace NUnit.Engine.Internal.Tests
             {
                 "c:\\windows\\absolute\\directory"
             });
-            var reader = new AddinsFileReader();
+
             IEnumerable<string> result;
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(input)))
             {
                 // Act
-                result = reader.Read(stream);
+                result = AddinsFileReader.Read(stream);
             }
 
             Assert.That(result, Has.Count.EqualTo(1));
@@ -80,13 +79,12 @@ namespace NUnit.Engine.Internal.Tests
         [Platform("linux,macosx,unix")]
         public void Read_Stream_TransformBackslash_NonWindows()
         {
-            var reader = new AddinsFileReader();
             IEnumerable<string> result;
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes("this/is/a\\ path\\ with\\ spaces/")))
             {
                 // Act
-                result = reader.Read(stream);
+                result = AddinsFileReader.Read(stream);
             }
 
             Assert.That(result, Has.Count.EqualTo(1));

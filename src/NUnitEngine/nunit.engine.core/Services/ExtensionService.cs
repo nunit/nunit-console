@@ -80,7 +80,12 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                _extensionManager.Initialize();
+                _extensionManager.FindExtensionPoints(
+                    Assembly.GetExecutingAssembly(),
+                    typeof(ITestEngine).Assembly);
+
+                var thisAssembly = Assembly.GetExecutingAssembly();
+                _extensionManager.FindExtensions(AssemblyHelper.GetDirectoryName(thisAssembly));
 
                 Status = ServiceStatus.Started;
             }

@@ -51,22 +51,11 @@ namespace NUnit.Engine.Services
             _directoryFinder = directoryFinder;
         }
 
-        public IList<Assembly> RootAssemblies { get; } = new List<Assembly>();
-
-        public void Initialize()
+        internal void FindExtensions(string startDir)
         {
-            var thisAssembly = Assembly.GetExecutingAssembly();
-            var apiAssembly = typeof(ITestEngine).Assembly;
-
-            foreach (var assembly in RootAssemblies)
-                FindExtensionPoints(assembly);
-            FindExtensionPoints(thisAssembly);
-            FindExtensionPoints(apiAssembly);
-
             // Create the list of possible extension assemblies,
-            // eliminating duplicates. Start in Engine directory.
-            var startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(thisAssembly));
-            FindExtensionAssemblies(startDir);
+            // eliminating duplicates, start in the provided directory.
+            FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
 
             // Check each assembly to see if it contains extensions
             foreach (var candidate in _assemblies)
@@ -163,40 +152,16 @@ namespace NUnit.Engine.Services
 
         /// <summary>
         /// Find the extension points in a loaded assembly.
-        /// Public for testing.
         /// </summary>
-        public void FindExtensionPoints(Assembly assembly)
+        public void FindExtensionPoints(params Assembly[] targetAssemblies)
         {
-            log.Info("Scanning {0} assembly for extension points", assembly.GetName().Name);
-
-            foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
+            foreach (var assembly in targetAssemblies)
             {
-                if (_pathIndex.ContainsKey(attr.Path))
+                log.Info("Scanning {0} assembly for extension points", assembly.GetName().Name);
+
+                foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
                 {
-                    string msg = string.Format(
-                        "The Path {0} is already in use for another extension point.",
-                        attr.Path);
-                    throw new NUnitEngineException(msg);
-                }
-
-                var ep = new ExtensionPoint(attr.Path, attr.Type)
-                {
-                    Description = attr.Description,
-                };
-
-                _extensionPoints.Add(ep);
-                _pathIndex.Add(ep.Path, ep);
-
-                log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
-            }
-
-            foreach (Type type in assembly.GetExportedTypes())
-            {
-                foreach (TypeExtensionPointAttribute attr in type.GetCustomAttributes(typeof(TypeExtensionPointAttribute), false))
-                {
-                    string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
-
-                    if (_pathIndex.ContainsKey(path))
+                    if (_pathIndex.ContainsKey(attr.Path))
                     {
                         string msg = string.Format(
                             "The Path {0} is already in use for another extension point.",
@@ -204,15 +169,41 @@ namespace NUnit.Engine.Services
                         throw new NUnitEngineException(msg);
                     }
 
-                    var ep = new ExtensionPoint(path, type)
+                    var ep = new ExtensionPoint(attr.Path, attr.Type)
                     {
                         Description = attr.Description,
                     };
 
                     _extensionPoints.Add(ep);
-                    _pathIndex.Add(path, ep);
+                    _pathIndex.Add(ep.Path, ep);
 
                     log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
+                }
+
+                foreach (Type type in assembly.GetExportedTypes())
+                {
+                    foreach (TypeExtensionPointAttribute attr in type.GetCustomAttributes(typeof(TypeExtensionPointAttribute), false))
+                    {
+                        string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
+
+                        if (_pathIndex.ContainsKey(path))
+                        {
+                            string msg = string.Format(
+                                "The Path {0} is already in use for another extension point.",
+                                attr.Path);
+                            throw new NUnitEngineException(msg);
+                        }
+
+                        var ep = new ExtensionPoint(path, type)
+                        {
+                            Description = attr.Description,
+                        };
+
+                        _extensionPoints.Add(ep);
+                        _pathIndex.Add(path, ep);
+
+                        log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
+                    }
                 }
             }
         }
