@@ -25,7 +25,7 @@ namespace NUnit.Engine.Internal
 
             using (var reader = new FileStream(file.FullName, FileMode.Open,  FileAccess.Read, FileShare.Read))
             {
-                return this.Read(reader);
+                return Read(reader);
             }
         }
 
@@ -36,7 +36,7 @@ namespace NUnit.Engine.Internal
         /// <returns>All entries contained in the file.</returns>
         /// <exception cref="System.IO.IOException"><paramref name="stream"/> cannot be read</exception>
         /// <remarks>If the executing system uses backslashes ('\') to separate directories, these will be substituted with slashes ('/').</remarks>
-        internal IEnumerable<string> Read(Stream stream)
+        internal static IEnumerable<string> Read(Stream stream)
         {
             var result = new List<string>();
             using (var reader = new StreamReader(stream))

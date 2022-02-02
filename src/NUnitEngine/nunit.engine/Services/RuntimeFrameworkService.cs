@@ -15,12 +15,12 @@ namespace NUnit.Engine.Services
 {
     public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
     {
-        static Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
+        static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
         // HACK: This line forces RuntimeFramework to initialize the static property
         // AvailableFrameworks before it is accessed by multiple threads. See comment
         // on RuntimeFramework class for a more detailled explanation.
-        static RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
+        static readonly RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
 
         /// <summary>
         /// Gets a list of available runtimes.
@@ -40,8 +40,7 @@ namespace NUnit.Engine.Services
         {
             Guard.ArgumentNotNullOrEmpty(name, nameof(name));
 
-            RuntimeFramework requestedFramework;
-            if (!RuntimeFramework.TryParse(name, out requestedFramework))
+            if (!RuntimeFramework.TryParse(name, out RuntimeFramework requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
 
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
@@ -114,10 +113,9 @@ namespace NUnit.Engine.Services
 
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
 
-            RuntimeFramework requestedFramework;
             if (frameworkSetting.Length > 0)
             {
-                if (!RuntimeFramework.TryParse(frameworkSetting, out requestedFramework))
+                if (!RuntimeFramework.TryParse(frameworkSetting, out RuntimeFramework requestedFramework))
                     throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
 
                 log.Debug($"Requested framework for {package.Name} is {requestedFramework}");

@@ -34,8 +34,7 @@ namespace NUnit.Engine.Internal
             if (Path.DirectorySeparatorChar == '\\')
                 pattern = pattern.Replace(Path.DirectorySeparatorChar, '/');
 
-            var dirList = new List<IDirectory>();
-            dirList.Add(startDirectory);
+            var dirList = new List<IDirectory> { startDirectory };
 
             while (pattern.Length > 0)
             {
@@ -85,7 +84,7 @@ namespace NUnit.Engine.Internal
             return fileList;
         }
 
-        private List<IDirectory> ExpandOneStep(IList<IDirectory> dirList, string pattern)
+        private static List<IDirectory> ExpandOneStep(IList<IDirectory> dirList, string pattern)
         {
             var newList = new List<IDirectory>();
 
