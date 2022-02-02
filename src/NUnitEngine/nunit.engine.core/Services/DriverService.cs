@@ -96,18 +96,17 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
-            Guard.OperationValid(ServiceContext != null, "Can't start DriverService outside of a ServiceContext");
-
+            // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
             try
             {
-                var extensionService = ServiceContext.GetService<ExtensionService>();
-                if (extensionService != null)
+                var extensionManager = new ExtensionManager();
+                if (extensionManager != null)
                 {
-                    foreach (IDriverFactory factory in extensionService.GetExtensions<IDriverFactory>())
+                    foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
                         _factories.Add(factory);
 
 #if NETFRAMEWORK
-                    var node = extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
+                    var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
                     if (node != null)
                         _factories.Add(new NUnit2DriverFactory(node));
 #endif
