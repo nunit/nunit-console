@@ -172,9 +172,7 @@ public class ResultReporter
 
     public bool ReportResults()
     {
-        Console.WriteLine("\n=================================================="); ;
-        Console.WriteLine($"Test Results for {_packageName}");
-        Console.WriteLine("=================================================="); ;
+        DisplayBanner($"Test Results for {_packageName}");
 
         Console.WriteLine("\nTest Environment");
         Console.WriteLine($"   OS Version: {Environment.OSVersion.VersionString}");

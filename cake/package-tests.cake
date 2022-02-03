@@ -37,9 +37,14 @@ static PackageTest Net35PlusNet40Test = new PackageTest(
     "net35/mock-assembly.dll net40/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
 
+static PackageTest Net60Test = new PackageTest(
+    "Run mock-assembly.dll under .NET 6.0",
+    "net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(1));
+
 static PackageTest Net50Test = new PackageTest(
     "Run mock-assembly.dll under .NET 5.0",
-    "net5.0/mock-assembly.dll --trace:Debug",
+    "net5.0/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest NetCore31Test = new PackageTest(
@@ -67,10 +72,15 @@ static PackageTest NetCore21PlusNetCore31Test = new PackageTest(
     "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
 
-static PackageTest NetCore21PlusNetCore31PlusNet50Test = new PackageTest(
-    "Run three copies of mock-assembly together",
-    "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll net5.0/mock-assembly.dll",
-    MockAssemblyExpectedResult(3));
+static PackageTest NetCore21PlusNetCore31PlusNet50PlusNet60Test = new PackageTest(
+    "Run four copies of mock-assembly together",
+    "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll net5.0/mock-assembly.dll net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(4));
+
+static PackageTest Net40PlusNet60Test = new PackageTest(
+    "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
+    "net40/mock-assembly.dll net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(2));
 
 static PackageTest NUnitProjectTest;
 NUnitProjectTest = new PackageTest(

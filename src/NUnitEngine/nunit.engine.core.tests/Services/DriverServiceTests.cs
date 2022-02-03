@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("nunit.engine.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
-#if !NET5_0 // Not yet working
+#if !NET5_0_OR_GREATER // Not yet working
         [TestCase("nunit.engine.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
         [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
 #endif

@@ -43,9 +43,11 @@ void DisplayUnreportedErrors()
 
 public static void DisplayBanner(string message)
 {
-    Console.WriteLine("\r\n=================================================="); ;
+    var bar = new string('-', Math.Max(message.Length, 40));
+    Console.WriteLine();
+    Console.WriteLine(bar);
     Console.WriteLine(message);
-    Console.WriteLine("==================================================");
+    Console.WriteLine(bar);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -98,101 +100,94 @@ DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
 // HELPER METHODS - TEST
 //////////////////////////////////////////////////////////////////////
 
-FilePath GetResultXmlPath(string testAssembly, string framework)
+FilePath GetResultXmlPath(string testAssembly, string targetRuntime)
 {
     var assemblyName = System.IO.Path.GetFileNameWithoutExtension(testAssembly);
 
     // Required for test suites running under NUnitLite
-    CreateDirectory($@"test-results\{framework}");
+    CreateDirectory($@"test-results\{targetRuntime}");
 
-    return MakeAbsolute(new FilePath($@"test-results\{framework}\{assemblyName}.xml"));
+    return MakeAbsolute(new FilePath($@"test-results\{targetRuntime}\{assemblyName}.xml"));
 }
 
-void RunNUnitLiteTests(string testAssembly, string framework)
+void RunNUnitLiteTests(string testAssembly, string targetRuntime)
 {
-    var workingDir = BIN_DIR + framework + "/";
+    var workingDir = BIN_DIR + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
+    var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
         assemblyPath,
         new ProcessSettings()
         {
-            Arguments = new ProcessArgumentBuilder()
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(testAssembly, framework).FullPath)
-                .Render(),
+            Arguments = $"--result:{resultPath}",
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}): {rc} tests failed");
     else if (rc < 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunDotnetNUnitLiteTests(string testAssembly, string framework)
+void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
 {
-    var workingDir = BIN_DIR + framework + "/";
+    var workingDir = BIN_DIR + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
+    var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
         "dotnet",
         new ProcessSettings
         {
-            Arguments = new ProcessArgumentBuilder()
-                .AppendQuoted(assemblyPath)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(assemblyPath, framework).FullPath)
-                .Render(),
+            Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}): {rc} tests failed");
     else if (rc < 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNet20Console(string testAssembly, string framework)
+void RunNet20Console(string testAssembly, string targetRuntime)
 {
-    var workingDir = BIN_DIR + framework;
+    var workingDir = BIN_DIR + targetRuntime + "/";
+    var assemblyPath = workingDir + testAssembly;
+    var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
         NET20_CONSOLE,
         new ProcessSettings()
         {
-            Arguments = new ProcessArgumentBuilder()
-                .Append(testAssembly)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(testAssembly, framework).FullPath)
-                .Render(),
+            Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}): {rc} tests failed");
     else if (rc < 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetCoreConsole(string testAssembly, string framework)
+void RunNetCoreConsole(string testAssembly, string targetRuntime)
 {
-    var workingDir = BIN_DIR + framework + "/";
+    var workingDir = BIN_DIR + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
+    var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
         "dotnet",
         new ProcessSettings
         {
-            Arguments = new ProcessArgumentBuilder()
-                .AppendQuoted(NETCORE31_CONSOLE)
-                .AppendQuoted(assemblyPath)
-                .AppendSwitchQuoted("--result", ":", GetResultXmlPath(assemblyPath, framework).FullPath)
-                .Render(),
+            Arguments = $"\"{NETCORE31_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 
     if (rc > 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}): {rc} tests failed");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}): {rc} tests failed");
     else if (rc < 0)
-        UnreportedErrors.Add($"{testAssembly}({framework}) returned rc = {rc}");
+        UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
 public List<string> GetInstalledNetCoreRuntimes()
