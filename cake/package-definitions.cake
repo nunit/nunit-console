@@ -28,7 +28,8 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
-        NetCore21PlusNetCore31PlusNet50Test
+        NetCore21PlusNetCore31PlusNet50PlusNet60Test,
+        Net40PlusNet60Test
     };
 
     if (dotnetX86Available)
@@ -77,7 +78,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests ),
+            tests: StandardRunnerTests),
 
         NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
             context: context,
@@ -92,7 +93,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/netcoreapp3.1/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
             },
             executable: "tools/netcoreapp3.1/any/nunit3-console.exe",
-            tests: NetCoreRunnerTests ),
+            tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
             context: context,
@@ -108,7 +109,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests ),
+            tests: StandardRunnerTests),
 
         NUnitConsoleMsiPackage = new MsiPackage(
             context: context,

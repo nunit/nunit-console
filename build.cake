@@ -270,7 +270,7 @@ Task("TestNet50EngineCore")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NET 5.0 ENGINE CORE
+// TEST NET 6.0 ENGINE CORE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNet60EngineCore")
@@ -754,7 +754,8 @@ Task("TestEngineCore")
     .IsDependentOn("TestNet20EngineCore")
     .IsDependentOn("TestNetStandard20EngineCore")
     .IsDependentOn("TestNetCore31EngineCore")
-    .IsDependentOn("TestNet50EngineCore");
+    .IsDependentOn("TestNet50EngineCore")
+    .IsDependentOn("TestNet60EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
