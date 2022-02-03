@@ -101,32 +101,43 @@ public void BuildSolution()
 {
     MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
-    DisplayBanner("Publish .NET Core & Standard projects");
+    // Publishing to ensure that all references are present. Some of these
+    // may not be needed and are marked with a TODO comment.
 
+    DisplayBanner("Publishing ENGINE Project");
     foreach (var framework in new[] { "netstandard2.0", "netcoreapp3.1" })
         MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + framework));
 
+    // TODO: May not be needed
+    DisplayBanner("Publishing AGENT Project");
     foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
         MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
 
+    // TODO: May not be needed
+    DisplayBanner("Publishing ENGINE API Project");
     foreach (var framework in new[] { "netstandard2.0" })
         MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + framework));
 
+    DisplayBanner("Publishing ENGINE TESTS Project");
     foreach (var framework in new[] { "netcoreapp2.1", "netcoreapp3.1" })
         MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + framework));
 
+    // TODO: May not be needed
+    DisplayBanner("Publishing NETCORE CONSOLE RUNNER Project");
     MSBuild(CONSOLE_PROJECT, CreateMSBuildSettings("Publish")
         .WithProperty("TargetFramework", "netcoreapp3.1")
         .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 
+    // TODO: May not be needed
+    DisplayBanner("Publishing NETCORE CONSOLE TESTS Project");
     MSBuild(CONSOLE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
         .WithProperty("TargetFramework", "netcoreapp3.1")
         .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
@@ -318,12 +329,7 @@ Task("TestNetCore31Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        var runtimes = new[] { "netcoreapp3.1", "net5.0" };
-
-        foreach (var runtime in runtimes)
-        {
-            RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
-        }
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
