@@ -180,7 +180,7 @@ void RunNetCoreConsole(string testAssembly, string targetRuntime)
         "dotnet",
         new ProcessSettings
         {
-            Arguments = $"\"{NETCORE31_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{NET60_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 

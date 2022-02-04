@@ -130,17 +130,17 @@ public void BuildSolution()
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + framework));
 
-    // TODO: May not be needed
-    DisplayBanner("Publishing NETCORE CONSOLE RUNNER Project");
-    MSBuild(CONSOLE_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netcoreapp3.1")
-        .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
+    //// TODO: May not be needed
+    //DisplayBanner("Publishing NETCORE CONSOLE RUNNER Project");
+    //MSBuild(CONSOLE_PROJECT, CreateMSBuildSettings("Publish")
+    //    .WithProperty("TargetFramework", "netcoreapp3.1")
+    //    .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 
-    // TODO: May not be needed
-    DisplayBanner("Publishing NETCORE CONSOLE TESTS Project");
-    MSBuild(CONSOLE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netcoreapp3.1")
-        .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
+    //// TODO: May not be needed
+    //DisplayBanner("Publishing NETCORE CONSOLE TESTS Project");
+    //MSBuild(CONSOLE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+    //    .WithProperty("TargetFramework", "netcoreapp3.1")
+    //    .WithProperty("PublishDir", BIN_DIR + "netcoreapp3.1"));
 }
 
 private void BuildEachProjectSeparately()
@@ -346,16 +346,16 @@ Task("TestNet20Console")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET CORE 3.1 CONSOLE
+// TEST .NET 6.0 CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNetCore31Console")
-    .Description("Tests the .NET Core 3.1 console runner")
+Task("TestNet60Console")
+    .Description("Tests the .NET 6.0 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNetCoreConsole(CONSOLE_TESTS, "netcoreapp3.1");
+        RunNetCoreConsole(CONSOLE_TESTS, "net6.0");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -753,7 +753,7 @@ Task("CreateProductionRelease")
 Task("TestConsole")
     .Description("Builds and tests the console runner")
     .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNetCore31Console");
+    .IsDependentOn("TestNet60Console");
 
 Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")

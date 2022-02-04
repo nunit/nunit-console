@@ -4,7 +4,7 @@
 
 PackageDefinition NUnitConsoleNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNuGetPackage;
-PackageDefinition NUnitConsoleRunnerNetCorePackage;
+PackageDefinition NUnitConsoleRunnerNet60Package;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
@@ -80,19 +80,19 @@ public void InitializePackageDefinitions(ICakeContext context)
             executable: "tools/nunit3-console.exe",
             tests: StandardRunnerTests),
 
-        NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
+        NUnitConsoleRunnerNet60Package = new NuGetPackage(
             context: context,
             id: "NUnit.ConsoleRunner.NetCore",
             version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory("tools/netcoreapp3.1/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
+                HasDirectory("tools/net6.0/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
             },
             symbols: new PackageCheck[] {
-                HasDirectory("tools/netcoreapp3.1/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+                HasDirectory("tools/net6.0/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
             },
-            executable: "tools/netcoreapp3.1/any/nunit3-console.exe",
+            executable: "tools/net6.0/any/nunit3-console.exe",
             tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
