@@ -39,7 +39,6 @@
     <file src="net6.0/nunit.engine.core.pdb" target="tools/net6.0/any" />
     <file src="net6.0/nunit.engine.dll" target="tools/net6.0/any" />
     <file src="net6.0/nunit.engine.pdb" target="tools/net6.0/any" />
-    <!--<file src="net6.0/nunit.engine.deps.json" target="tools/net6.0/any" />-->
     <file src="net6.0/nunit.engine.api.dll" target="tools/net6.0/any" />
     <file src="net6.0/nunit.engine.api.pdb" target="tools/net6.0/any" />
     <file src="net6.0/nunit.engine.api.xml" target="tools/net6.0/any" />

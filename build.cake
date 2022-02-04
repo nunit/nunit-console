@@ -101,31 +101,32 @@ public void BuildSolution()
 {
     MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
-    // Publishing to ensure that all references are present. Some of these
-    // may not be needed and are marked with a TODO comment.
-
-    DisplayBanner("Publishing ENGINE Project");
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netstandard2.0")
-        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
+    // Publishing in place where needed to ensure that all references are present.
 
     // TODO: May not be needed
-    DisplayBanner("Publishing AGENT Project");
-    foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
-        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", framework)
-            .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
-
-    // TODO: May not be needed
-    DisplayBanner("Publishing ENGINE API Project");
+    DisplayBanner("Publishing ENGINE API Project for NETSTANDARD_2.0");
     MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
         .WithProperty("TargetFramework", "netstandard2.0")
         .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
 
-    DisplayBanner("Publishing ENGINE TESTS Project");
+    DisplayBanner("Publishing ENGINE Project for NETSTANDARD2.0");
+    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+        .WithProperty("TargetFramework", "netstandard2.0")
+        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
+
+    DisplayBanner("Publishing ENGINE TESTS Project for NETCOREAPP2.1");
     MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
         .WithProperty("TargetFramework", "netcoreapp2.1")
         .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+
+    // TODO: May not be needed
+    foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
+    {
+        DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
+        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
+    }
 }
 
 private void BuildEachProjectSeparately()
