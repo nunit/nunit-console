@@ -6,6 +6,10 @@ string[] ENGINE_FILES = {
         "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
 string[] ENGINE_PDB_FILES = {
         "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+string[] ENGINE_CORE_FILES = {
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+string[] ENGINE_CORE_PDB_FILES = {
+        "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_FILES = {
         "nunit-agent.exe", "nunit-agent.exe.config",
         "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",

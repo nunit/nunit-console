@@ -52,9 +52,9 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
         [TestCase("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("nunit.engine.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("nunit.engine.core.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
+        [TestCase("nunit.engine.core.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
 #if !NET5_0_OR_GREATER // Not yet working
-        [TestCase("nunit.engine.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
         [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
 #endif
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
