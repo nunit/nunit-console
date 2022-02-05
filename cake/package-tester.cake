@@ -81,7 +81,8 @@ public class PackageTester
 
         foreach (var packageTest in _packageTests)
         {
-            var resultFile = _resultDirectory + "TestResult.xml";
+            var testResultDir = _resultDirectory + packageTest.Name + "/";
+            var resultFile = testResultDir + "TestResult.xml";
 
             DisplayBanner(packageTest.Description);
 
@@ -93,7 +94,7 @@ public class PackageTester
                 _installDirectory + _testExecutable,
                 new ProcessSettings()
                 {
-                    Arguments = $"{packageTest.Arguments} --work={_resultDirectory}",
+                    Arguments = $"{packageTest.Arguments} --work={testResultDir}",
                     WorkingDirectory = outputDir
                 });
 
