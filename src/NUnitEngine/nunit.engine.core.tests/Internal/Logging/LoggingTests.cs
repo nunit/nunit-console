@@ -43,7 +43,7 @@ namespace NUnit.Engine.Core.Tests.Internal.Logging
             if (logLevel >= msgLevel)
             {
                 Assert.That(output, Contains.Substring($" {msgLevel} "));
-                Assert.That(output, Does.EndWith($"MyLogger: {msg}\r\n"));
+                Assert.That(output, Does.EndWith($"MyLogger: {msg}" + System.Environment.NewLine));
             }
             else
                 Assert.That(output, Is.Empty);
