@@ -89,9 +89,6 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory("tools/netcoreapp3.1/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
             },
-            symbols: new PackageCheck[] {
-                HasDirectory("tools/netcoreapp3.1/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
-            },
             executable: "tools/netcoreapp3.1/any/nunit3-console.exe",
             tests: NetCoreRunnerTests),
 
