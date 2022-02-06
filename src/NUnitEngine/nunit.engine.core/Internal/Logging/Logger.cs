@@ -14,8 +14,9 @@ namespace NUnit.Engine.Internal
         private const string TraceFmt = "{0} {1,-5} [{2,2}] {3}: {4}";
 
         private readonly string _name;
-        private readonly InternalTraceLevel _maxLevel;
         private readonly TextWriter _writer;
+
+        public InternalTraceLevel TraceLevel { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Logger"/> class.
@@ -25,7 +26,7 @@ namespace NUnit.Engine.Internal
         /// <param name="writer">The writer where logs are sent.</param>
         public Logger(string fullName, InternalTraceLevel level, TextWriter writer)
         {
-            _maxLevel = level;
+            TraceLevel = level;
             _writer = writer;
 
             var index = fullName.LastIndexOf('.');
@@ -110,13 +111,13 @@ namespace NUnit.Engine.Internal
 
         private void Log(InternalTraceLevel level, string message)
         {
-            if (_writer != null && _maxLevel >= level)
+            if (_writer != null && TraceLevel >= level)
                 WriteLog(level, message);
         }
 
         private void Log(InternalTraceLevel level, string format, params object[] args)
         {
-            if (_maxLevel >= level)
+            if (TraceLevel >= level)
                 WriteLog(level, string.Format(format, args));
         }
 

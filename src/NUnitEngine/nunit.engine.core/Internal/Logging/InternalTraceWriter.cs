@@ -7,20 +7,20 @@ namespace NUnit.Engine.Internal
     /// A trace listener that writes to a separate file per domain
     /// and process using it.
     /// </summary>
-    public class InternalTraceWriter : TextWriter
+    internal class InternalTraceWriter : TextWriter
     {
-        TextWriter writer;
-        object myLock = new object();
+        TextWriter _writer;
+        object _myLock = new object();
 
         /// <summary>
         /// Construct an InternalTraceWriter that writes to a file.
         /// </summary>
         /// <param name="logPath">Path to the file to use</param>
-        public InternalTraceWriter(string logPath)
+        internal InternalTraceWriter(string logPath)
         {
             var streamWriter = new StreamWriter(new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.Write));
             streamWriter.AutoFlush = true;
-            this.writer = streamWriter;
+            _writer = streamWriter;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace NUnit.Engine.Internal
         /// <param name="writer"></param>
         public InternalTraceWriter(TextWriter writer)
         {
-            this.writer = writer;
+            _writer = writer;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace NUnit.Engine.Internal
         /// <returns>The character encoding in which the output is written.</returns>
         public override System.Text.Encoding Encoding
         {
-            get { return writer.Encoding; }
+            get { return _writer.Encoding; }
         }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace NUnit.Engine.Internal
         /// <param name="value">The character to write to the text stream.</param>
         public override void Write(char value)
         {
-            lock (myLock)
+            lock (_myLock)
             {
-                writer.Write(value);
+                _writer.Write(value);
             }
         }
 
@@ -60,7 +60,7 @@ namespace NUnit.Engine.Internal
         /// <param name="value">The string to write.</param>
         public override void Write(string value)
         {
-            lock (myLock)
+            lock (_myLock)
             {
                 base.Write(value);
             }
@@ -72,9 +72,9 @@ namespace NUnit.Engine.Internal
         /// <param name="value">The string to write. If <paramref name="value" /> is null, only the line terminator is written.</param>
         public override void WriteLine(string value)
         {
-            lock (myLock)
+            lock (_myLock)
             {
-                writer.WriteLine(value);
+                _writer.WriteLine(value);
             }
         }
 
@@ -84,13 +84,13 @@ namespace NUnit.Engine.Internal
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            lock (myLock)
+            lock (_myLock)
             {
-                if (disposing && writer != null)
+                if (disposing && _writer != null)
                 {
-                    writer.Flush();
-                    writer.Dispose();
-                    writer = null;
+                    _writer.Flush();
+                    _writer.Dispose();
+                    _writer = null;
                 }
             }
 
@@ -102,8 +102,8 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public override void Flush()
         {
-            if ( writer != null )
-                writer.Flush();
+            if ( _writer != null )
+                _writer.Flush();
         }
     }
 }
