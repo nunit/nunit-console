@@ -21,8 +21,9 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class InternalTrace
     {
-        private static InternalTraceLevel traceLevel;
-        private static InternalTraceWriter traceWriter;
+        private static InternalTraceWriter _traceWriter;
+
+        public static InternalTraceLevel DefaultTraceLevel { get; private set; }
 
         /// <summary>
         /// Gets a flag indicating whether the InternalTrace is initialized
@@ -39,35 +40,50 @@ namespace NUnit.Engine.Internal
         {
             if (!Initialized)
             {
-                traceLevel = level;
+                DefaultTraceLevel = level;
 
-                if (traceWriter == null && traceLevel > InternalTraceLevel.Off)
+                if (_traceWriter == null && DefaultTraceLevel > InternalTraceLevel.Off)
                 {
-                    traceWriter = new InternalTraceWriter(logName);
-                    traceWriter.WriteLine("InternalTrace: Initializing at level {0}", traceLevel);
+                    _traceWriter = new InternalTraceWriter(logName);
+                    _traceWriter.WriteLine("InternalTrace: Initializing at level {0}", DefaultTraceLevel);
                 }
 
                 Initialized = true;
             }
             else
-                traceWriter.WriteLine("InternalTrace: Ignoring attempted re-initialization at level {0}", level);
+                _traceWriter.WriteLine("InternalTrace: Ignoring attempted re-initialization at level {0}", level);
         }
 
         /// <summary>
-        /// Get a named Logger
+        /// Get a named Logger specifying the TraceLevel
         /// </summary>
-        /// <returns></returns>
+        public static Logger GetLogger(string name, InternalTraceLevel level)
+        {
+            return new Logger(name, level, _traceWriter);
+        }
+
+        /// <summary>
+        /// Get a logger named for a particular Type, specifying the TraceLevel.
+        /// </summary>
+        public static Logger GetLogger(Type type, InternalTraceLevel level)
+        {
+            return GetLogger(type.FullName, level);
+        }
+
+        /// <summary>
+        /// Get a named Logger using the default TraceLevel
+        /// </summary>
         public static Logger GetLogger(string name)
         {
-            return new Logger(name, traceLevel, traceWriter);
+            return new Logger(name, DefaultTraceLevel, _traceWriter);
         }
 
         /// <summary>
-        /// Get a logger named for a particular Type.
+        /// Get a logger named for a particular Type using the default TraceLevel.
         /// </summary>
         public static Logger GetLogger(Type type)
         {
-            return GetLogger(type.FullName);
+            return GetLogger(type.FullName, DefaultTraceLevel);
         }
     }
 }
