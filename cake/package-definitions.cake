@@ -28,6 +28,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        NetCore21PlusNetCore31Test,
         NetCore21PlusNetCore31PlusNet50PlusNet60Test,
         Net40PlusNet60Test
     };
@@ -43,7 +44,10 @@ public void InitializePackageDefinitions(ICakeContext context)
     {
         NetCore21Test,
         NetCore31Test,
-        NetCore21PlusNetCore31Test
+        Net50Test,
+        Net60Test,
+        NetCore21PlusNetCore31Test,
+        NetCore21PlusNetCore31PlusNet50PlusNet60Test
     };
 
     AllPackages.AddRange(new PackageDefinition[] {
