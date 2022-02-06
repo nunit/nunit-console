@@ -163,19 +163,18 @@ namespace NUnit.Engine.Internal.Tests
                 @"c:\folder1", @"C:\Folder2\folder3"), Is.EqualTo(@"..\Folder2\folder3"));
         }
 
+
         [Test]
-		[Platform("win")] // Issue #1026 created to make this run under netcoreapp2.1/Linux again
-		public void SamePathOrUnder()
+        public void SamePathOrUnder()
 		{
-			Assert.SamePathOrUnder( @"C:\folder1\folder2\folder3", @"c:\folder1\.\folder2\junk\..\folder3" );
-			Assert.SamePathOrUnder( @"C:\folder1\folder2\", @"c:\folder1\.\folder2\junk\..\folder3" );
-			Assert.SamePathOrUnder( @"C:\folder1\folder2", @"c:\folder1\.\folder2\junk\..\folder3" );
-			Assert.SamePathOrUnder( @"C:\folder1\folder2", @"c:\folder1\.\Folder2\junk\..\folder3" );
-			Assert.NotSamePathOrUnder( @"C:\folder1\folder2", @"c:\folder1\.\folder22\junk\..\folder3" );
+			Assert.SamePathOrUnder( @"C:\folder1\folder2\folder3", @"C:\folder1\.\folder2\junk\..\folder3" );
+			Assert.SamePathOrUnder( @"C:\folder1\folder2\", @"C:\folder1\.\folder2\junk\..\folder3" );
+			Assert.SamePathOrUnder( @"C:\folder1\folder2", @"C:\folder1\.\folder2\junk\..\folder3" );
+			Assert.NotSamePathOrUnder( @"C:\folder1\folder2", @"C:\folder1\.\folder22\junk\..\folder3" );
 			Assert.NotSamePathOrUnder( @"C:\folder1\folder2ile.tmp", @"D:\folder1\.\folder2\folder3\file.tmp" );
 			Assert.NotSamePathOrUnder( @"C:\", @"D:\" );
-			Assert.SamePathOrUnder( @"C:\", @"c:\" );
-			Assert.SamePathOrUnder( @"C:\", @"c:\bin\debug" );
+			Assert.SamePathOrUnder( @"C:\", @"C:\" );
+			Assert.SamePathOrUnder( @"C:\", @"C:\bin\debug" );
 
 		}
 	}
