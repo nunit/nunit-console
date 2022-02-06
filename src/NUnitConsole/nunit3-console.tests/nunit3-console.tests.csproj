@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
-    <TargetFrameworks>net35;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;net6.0</TargetFrameworks>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
   </PropertyGroup>

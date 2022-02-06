@@ -38,7 +38,7 @@ var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock
 var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
 // Console Runner
 var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
-var NETCORE31_CONSOLE = BIN_DIR + "netcoreapp3.1/nunit3-console.dll";
+var NET60_CONSOLE = BIN_DIR + "net6.0/nunit3-console.dll";
 // Unit Tests
 var NETFX_ENGINE_CORE_TESTS = "nunit.engine.core.tests.exe";
 var NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";

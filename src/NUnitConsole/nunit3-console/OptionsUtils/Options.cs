@@ -785,9 +785,6 @@ namespace NUnit.Options
         }
 
 #if !PCL
-#pragma warning disable 618 // SecurityPermissionAttribute is obsolete
-        [SecurityPermission(SecurityAction.LinkDemand, SerializationFormatter = true)]
-#pragma warning restore 618
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
