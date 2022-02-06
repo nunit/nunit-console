@@ -42,10 +42,14 @@ namespace NUnit.Engine.Internal
             {
                 DefaultTraceLevel = level;
 
-                if (_traceWriter == null && DefaultTraceLevel > InternalTraceLevel.Off)
+                if (_traceWriter == null)
                 {
+                    // We create the trace writer even if tracing is off, because
+                    // individual loggers are able to override the default level.
                     _traceWriter = new InternalTraceWriter(logName);
-                    _traceWriter.WriteLine("InternalTrace: Initializing at level {0}", DefaultTraceLevel);
+
+                    if (DefaultTraceLevel > InternalTraceLevel.Off)
+                        _traceWriter.WriteLine("InternalTrace: Initializing at level {0}", DefaultTraceLevel);
                 }
 
                 Initialized = true;
