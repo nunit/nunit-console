@@ -35,21 +35,6 @@ namespace NUnit.Engine
 
         #region ITestEngine Members
 
-        ///// <summary>
-        ///// Access the public IServiceLocator, first initializing
-        ///// the services if that has not already been done.
-        ///// </summary>
-        //IServiceLocator ITestEngine.Services
-        //{
-        //    get
-        //    {
-        //        if(!Services.ServiceManager.ServicesInitialized)
-        //            Initialize();
-
-        //        return Services;
-        //    }
-        //}
-
         /// <summary>
         /// Initialize the engine. This includes initializing mono addins,
         /// setting the trace level and creating the standard set of services
@@ -81,20 +66,6 @@ namespace NUnit.Engine
 
             Services.ServiceManager.StartServices();
         }
-
-        /// <summary>
-        /// Returns a test runner for use by clients that need to load the
-        /// tests once and run them multiple times. If necessary, the
-        /// services are initialized first.
-        /// </summary>
-        /// <returns>An ITestRunner.</returns>
-        //public ITestRunner GetRunner(TestPackage package)
-        //{
-        //    if(!Services.ServiceManager.ServicesInitialized)
-        //        Initialize();
-
-        //    return new Runners.MasterTestRunner(Services, package);
-        //}
 
         #endregion
 
