@@ -30,26 +30,10 @@ namespace NUnit.Engine.Services
 #if !NETFRAMEWORK
             return new LocalTestRunner(context, package);
 #else
-            DomainUsage domainUsage = (DomainUsage)System.Enum.Parse(
-                typeof(DomainUsage),
-                package.GetSetting(EnginePackageSettings.DomainUsage, "Default"));
-
-            switch (domainUsage)
-            {
-                default:
-                case DomainUsage.Default:
-                case DomainUsage.Multiple:
-                    if (package.SubPackages.Count > 1)
-                        return new MultipleTestDomainRunner(context, package);
-                    else
-                        return new TestDomainRunner(context, package);
-
-                case DomainUsage.None:
-                    return new LocalTestRunner(context, package);
-
-                case DomainUsage.Single:
-                    return new TestDomainRunner(context, package);
-            }
+            if (package.SubPackages.Count > 1)
+                return new MultipleTestDomainRunner(context, package);
+            else
+                return new TestDomainRunner(context, package);
 #endif
         }
     }

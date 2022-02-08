@@ -197,7 +197,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
 #if NET35
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
-        [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
         [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
@@ -240,7 +239,6 @@ namespace NUnit.ConsoleRunner.Tests
 
 #if NET35
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
-        [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
 #endif
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "OnOutputOnly", "Before", "After", "BeforeAndAfter" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
@@ -290,7 +288,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--encoding")]
 #if NET35
         [TestCase("--process")]
-        [TestCase("--domain")]
         [TestCase("--framework")]
 #endif
         public void MissingValuesAreReported(string option)
