@@ -3,6 +3,7 @@
 using System;
 using NUnit.Common;
 using NUnit.Engine.Communication.Transports;
+using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Agents
 {
@@ -47,7 +48,14 @@ namespace NUnit.Engine.Agents
 
         public override ITestEngineRunner CreateRunner(TestPackage package)
         {
-            return Services.InProcessTestRunnerFactory.MakeTestRunner(_services, package);
+#if NETFRAMEWORK
+            if (package.SubPackages.Count > 1)
+                return new MultipleTestDomainRunner(_services, package);
+            else
+                return new TestDomainRunner(_services, package);
+#else
+            return new LocalTestRunner(_services, package);
+#endif
         }
     }
 }
