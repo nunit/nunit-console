@@ -69,4 +69,3 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #endif
     }
 }
-

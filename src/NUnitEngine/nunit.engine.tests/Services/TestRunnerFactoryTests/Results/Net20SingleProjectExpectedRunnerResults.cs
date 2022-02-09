@@ -7,7 +7,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
 {
 #if !NETCOREAPP
-    internal static class Net20SingleProjectListCtorExpectedRunnerResults
+    internal static class Net20SingleProjectExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
             $"No expected Test result provided for {nameof(ProcessModel)}.";

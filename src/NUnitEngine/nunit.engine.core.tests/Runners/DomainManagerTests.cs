@@ -11,18 +11,13 @@ namespace NUnit.Engine.Runners.Tests
     public class DomainManagerTests
     {
         private DomainManager _domainManager;
-        private TestPackage _package = new TestPackage(MockAssembly.AssemblyPath);
+        // We use a sub-package, because that's what DomainManager normally gets
+        private TestPackage _package = new TestPackage(MockAssembly.AssemblyPath).SubPackages[0];
 
         [SetUp]
         public void CreateDomainManager()
         {
             _domainManager = new DomainManager();
-        }
-
-        [Test]
-        public void ServiceIsStarted()
-        {
-            //Assert.That(_domainManager.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
         [Test, Platform("Linux,Net", Reason = "get_SetupInformation() fails on Windows+Mono")]

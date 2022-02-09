@@ -126,7 +126,8 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
             },
             executable: "NUnit.org/nunit-console/nunit3-console.exe",
-            tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
+            // Extensions are not yet built for 4.0
+            tests: StandardRunnerTests),//.Concat(new[] { NUnitProjectTest })),
 
         NUnitConsoleZipPackage = new ZipPackage(
             context: context,
@@ -147,7 +148,8 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "bin/net20/nunit3-console.exe",
-            tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
+            // Extensions are not yet built for 4.0
+            tests: StandardRunnerTests),//.Concat(new[] { NUnitProjectTest })),
 
         // NOTE: Packages below this point have no direct tests
 

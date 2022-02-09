@@ -5,65 +5,52 @@ using NUnit.Framework;
 
 namespace NUnit.Engine.Api.Tests
 {
-    public class TestPackageTests_SingleAssembly
+    [TestFixture("test.dll")]
+    [TestFixture("test1.dll,test2.dll,test3.dll")]
+    public class TestPackageTests
     {
-        private TestPackage package;
+        private string[] _fileNames;
+        private TestPackage _package;
 
-        [SetUp]
-        public void CreatePackage()
+        public TestPackageTests(string fileNames)
         {
-            package = new TestPackage("test.dll");
+            _fileNames = fileNames.Split(new char[] { ',' });
+            _package = new TestPackage(_fileNames);
         }
 
         [Test]
         public void PackageIDsAreUnique()
         {
-            var another = new TestPackage("another.dll");
-            Assert.That(another.ID, Is.Not.EqualTo(package.ID));
-        }
-
-        [Test]
-        public void AssemblyPathIsUsedAsFilePath()
-        {
-            Assert.That(package.FullName, Is.EqualTo(Path.GetFullPath("test.dll")));
-        }
-
-        [Test]
-        public void FileNameIsUsedAsPackageName()
-        {
-            Assert.That(package.Name, Is.EqualTo("test.dll"));
-        }
-
-        [Test]
-        public void HasNoSubPackages()
-        {
-            Assert.That(package.SubPackages.Count, Is.EqualTo(0));
-        }
-    }
-
-    public class TestPackageTests_MultipleAssemblies
-    {
-        private TestPackage package;
-
-        [SetUp]
-        public void CreatePackage()
-        {
-            package = new TestPackage(new string[] { "test1.dll", "test2.dll", "test3.dll" });
+            var another = new TestPackage(_fileNames);
+            Assert.That(another.ID, Is.Not.EqualTo(_package.ID));
         }
 
         [Test]
         public void PackageIsAnonymous()
         {
-            Assert.Null(package.FullName);
+            Assert.Null(_package.Name);
+            Assert.Null(_package.FullName);
         }
 
         [Test]
-        public void PackageContainsThreeSubpackages()
+        public void HasSubPackageForEachFile()
         {
-            Assert.That(package.SubPackages.Count, Is.EqualTo(3));
-            Assert.That(package.SubPackages[0].FullName, Is.EqualTo(Path.GetFullPath("test1.dll")));
-            Assert.That(package.SubPackages[1].FullName, Is.EqualTo(Path.GetFullPath("test2.dll")));
-            Assert.That(package.SubPackages[2].FullName, Is.EqualTo(Path.GetFullPath("test3.dll")));
+            Assert.That(_package.SubPackages.Count, Is.EqualTo(_fileNames.Length));
+            for (int i = 0; i < _fileNames.Length; i++)
+            {
+                TestPackage subPackage = _package.SubPackages[i];
+                string fileName = _fileNames[i];
+
+                Assert.That(subPackage.Name, Is.EqualTo(fileName));
+                Assert.That(subPackage.FullName, Is.EqualTo(Path.GetFullPath(fileName)));
+            }
+        }
+
+        [Test]
+        public void SubPackagesHaveNoSubPackages()
+        {
+            foreach (TestPackage subPackage in _package.SubPackages)
+                Assert.That(subPackage.SubPackages.Count, Is.EqualTo(0));
         }
     }
 }

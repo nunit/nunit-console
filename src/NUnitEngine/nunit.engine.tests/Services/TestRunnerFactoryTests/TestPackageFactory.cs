@@ -8,64 +8,54 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
         private const string FakeAssembly = "a.dll";
         private const string UnknownExtension = "a.junk";
 
-        public static TestPackage OneAssemblyStringCtor()
+        public static TestPackage OneAssembly()
         {
             return new TestPackage(FakeAssembly);
         }
 
-        public static TestPackage OneAssemblyListCtor()
-        {
-            return new TestPackage(new [] { FakeAssembly });
-        }
-
         public static TestPackage TwoAssemblies()
         {
-            return new TestPackage(new[] { FakeAssembly, FakeAssembly });
+            return new TestPackage(FakeAssembly, FakeAssembly);
         }
 
-        public static TestPackage OneProjectStringCtor()
+        public static TestPackage OneProject()
         {
             return new TestPackage(FakeProject);
         }
 
-        public static TestPackage OneProjectListCtor()
-        {
-            return new TestPackage(new[] { FakeProject });
-        }
-
         public static TestPackage TwoProjects()
         {
-            return new TestPackage(new[] { FakeProject, FakeProject });
+            return new TestPackage(FakeProject, FakeProject);
         }
 
         public static TestPackage OneProjectOneAssembly()
         {
-            return new TestPackage(new[] { FakeProject, FakeAssembly });
+            return new TestPackage(FakeProject, FakeAssembly);
         }
 
         public static TestPackage TwoProjectsOneAssembly()
         {
-            return new TestPackage(new[] { FakeProject, FakeProject, FakeAssembly });
+            return new TestPackage(FakeProject, FakeProject, FakeAssembly);
         }
 
         public static TestPackage TwoAssembliesOneProject()
         {
-            return new TestPackage(new[] { FakeAssembly, FakeAssembly, FakeProject });
+            return new TestPackage(FakeAssembly, FakeAssembly, FakeProject);
         }
 
         public static TestPackage OneUnknownExtension()
         {
-            return new TestPackage(new[] { UnknownExtension });
+            return new TestPackage(UnknownExtension);
         }
 
         public static TestPackage TwoUnknownExtension()
         {
-            return new TestPackage(new[] { UnknownExtension, UnknownExtension });
+            return new TestPackage(UnknownExtension, UnknownExtension);
         }
 
         public static TestPackage OneUnknownOneAssemblyOneProject()
         {
-            return new TestPackage(new[] { UnknownExtension, FakeAssembly, FakeProject });
+            return new TestPackage(UnknownExtension, FakeAssembly, FakeProject);
         }
     }
 }

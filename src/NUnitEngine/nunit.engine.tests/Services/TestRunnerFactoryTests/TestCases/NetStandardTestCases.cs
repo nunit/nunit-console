@@ -48,23 +48,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                     });
 
                 yield return new TestRunnerFactoryData(
-                    "SingleProject (list ctor)",
+                    "SingleProject",
                     new TestPackage(new[] { "a.nunit" }),
                     RunnerResult.LocalTestRunner
-                );
-
-                yield return new TestRunnerFactoryData(
-                    "Single project (string ctor)",
-                    new TestPackage("a.nunit"),
-                    new RunnerResult
-                    {
-                        TestRunner = typeof(AggregatingTestRunner),
-                        SubRunners = new[]
-                        {
-                            RunnerResult.LocalTestRunner,
-                            RunnerResult.LocalTestRunner
-                        }
-                    }
                 );
 
                 yield return new TestRunnerFactoryData(

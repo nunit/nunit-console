@@ -7,7 +7,7 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
 {
 #if !NETCOREAPP
-    internal static class Net20SingleAssemblyStringCtorExpectedRunnerResults
+    internal static class Net20SingleAssemblyExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
             $"No expected Test result provided for ProcessModel {nameof(ProcessModel)}.";
@@ -17,20 +17,20 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
             switch (processModel)
             {
                 case ProcessModel.Default:
-                            return RunnerResult.ProcessRunner;
+                    return RunnerResult.ProcessRunner;
                 case ProcessModel.InProcess:
-                            return RunnerResult.TestDomainRunner;
+                    return RunnerResult.TestDomainRunner;
                 case ProcessModel.Separate:
-                            return RunnerResult.ProcessRunner;
+                    return RunnerResult.ProcessRunner;
                 case ProcessModel.Multiple:
-                            return new RunnerResult
-                            {
-                                TestRunner = typeof(MultipleTestProcessRunner),
-                                SubRunners = new[]
-                                {
-                                    RunnerResult.ProcessRunner
-                                }
-                            };
+                    return new RunnerResult
+                    {
+                        TestRunner = typeof(MultipleTestProcessRunner),
+                        SubRunners = new[]
+                        {
+                            RunnerResult.ProcessRunner
+                        }
+                    };
                 default:
                     throw new ArgumentOutOfRangeException(nameof(processModel), processModel, ExceptionMessage);
             }
