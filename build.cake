@@ -407,6 +407,10 @@ Task("CreateZipImage")
         }
     });
 
+//////////////////////////////////////////////////////////////////////
+// VERIFY PACKAGES
+//////////////////////////////////////////////////////////////////////
+
 Task("BuildPackages")
     .IsDependentOn("CreateMsiImage")
     .IsDependentOn("CreateZipImage")
@@ -454,12 +458,49 @@ Task("VerifyPackages")
 Task("TestPackages")
     .Does(() =>
     {
+        TestPackages();
+    });
+
+Task("TestNuGetNetFXPackage")
+    .Does(() =>
+    {
+        TestPackages(packageType: PackageType.NuGet, packageId: "NUnit.ConsoleRunner");
+    });
+
+Task("TestNuGetNetCorePackage")
+    .Does(() =>
+    {
+        TestPackages(packageType: PackageType.NuGet, packageId: "NUnit.ConsoleRunner.NetCore");
+    });
+
+Task("TestChocolateyPackage")
+    .Does(() =>
+    {
+        TestPackages(packageType: PackageType.Chocolatey);
+    });
+
+Task("TestMsiPackage")
+    .Does(() =>
+    {
+        TestPackages(packageType: PackageType.Msi);
+    });
+
+Task("TestZipPackage")
+    .Does(() =>
+    {
+        TestPackages(packageType: PackageType.Zip);
+    });
+
+private void TestPackages(PackageType? packageType=null, string packageId=null)
+{
         foreach (var package in AllPackages)
         {
             if (package.PackageTests != null)
-                new PackageTester(Context, package).RunTests();
+                if (packageType == null || package.PackageType == packageType)
+                    if (packageId == null || package.PackageId == packageId)
+                        new PackageTester(Context, package).RunTests();
         }
-    });
+}
 
 //////////////////////////////////////////////////////////////////////
 // INSTALL SIGNING TOOL

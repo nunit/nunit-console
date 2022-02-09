@@ -78,9 +78,13 @@ public class PackageTester
         var reporter = new ResultReporter(_packageName);
 
         _context.CleanDirectory(_resultDirectory);
+        string testToRun = _context.Argument("runTest", "ALL");
 
         foreach (var packageTest in _packageTests)
         {
+            if (testToRun != "ALL" && testToRun != packageTest.Name)
+                continue;
+
             var testResultDir = _resultDirectory + packageTest.Name + "/";
             var resultFile = testResultDir + "TestResult.xml";
 
