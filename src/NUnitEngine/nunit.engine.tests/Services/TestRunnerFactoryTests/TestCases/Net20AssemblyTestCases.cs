@@ -30,7 +30,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             var testName = $"Single assembly - {nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
 
-            var package = TestPackageFactory.OneAssembly();
+            var package = new TestPackage("a.dll");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
             var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(processModel);
@@ -41,7 +41,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             var testName = "Single unknown - " +
                            $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.OneUnknownExtension();
+            var package = new TestPackage("a.junk");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
             var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(processModel);
@@ -52,7 +52,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             var testName = "Two assemblies - " +
                            $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.TwoAssemblies();
+            var package = new TestPackage("a.dll", "b.dll");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
             var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel);
@@ -63,7 +63,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             var testName = "Two unknown extensions - " +
                            $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.TwoUnknownExtension();
+            var package = new TestPackage("a.junk", "b.junk");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
             var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel);

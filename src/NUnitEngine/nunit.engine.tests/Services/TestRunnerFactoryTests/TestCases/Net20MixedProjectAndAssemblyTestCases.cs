@@ -22,7 +22,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         var testName = "One project, one assembly - " +
                                        $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
 
-                        var package = TestPackageFactory.OneProjectOneAssembly();
+                        var package = new TestPackage("a.nunit", "c.dll");
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
                         var expected =
@@ -32,7 +32,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         testName = "Two projects, one assembly - " +
                                    $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
 
-                        package = TestPackageFactory.TwoProjectsOneAssembly();
+                        package = new TestPackage("a.nunit", "a.nunit", "x.dll");
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
                         expected = Net20TwoProjectsOneAssemblyExpectedRunnerResults.ResultFor(processModel);
@@ -40,7 +40,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                         testName = "Two assemblies, one project - " +
                                    $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-                        package = TestPackageFactory.TwoAssembliesOneProject();
+                        package = new TestPackage("x.dll", "y.dll", "a.nunit");
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
                         expected = Net20TwoAssembliesOneProjectExpectedRunnerResults.ResultFor(processModel);
@@ -48,7 +48,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                         testName = "One unknown, one assembly, one project - " +
                                    $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-                        package = TestPackageFactory.OneUnknownOneAssemblyOneProject();
+                        package = new TestPackage("a.junk", "a.dll", "a.nunit");
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
                         expected = Net20OneUnknownOneAssemblyOneProjectExpectedRunnerResults.ResultFor(processModel);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");

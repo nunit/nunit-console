@@ -20,14 +20,14 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                 {
                         var testName = "Single project - " +
                                        $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-                        var package = TestPackageFactory.OneProject();
+                        var package = new TestPackage("a.nunit");
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
                         var expected = Net20SingleProjectExpectedRunnerResults.ResultFor(processModel);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
                         testName = "Two projects - " +
                                        $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-                        package = TestPackageFactory.TwoProjects();
+                        package = new TestPackage("a.nunit", "a.nunit");
                         package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
                         expected = Net20TwoProjectExpectedRunnerResults.ResultFor(processModel);
                         yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");

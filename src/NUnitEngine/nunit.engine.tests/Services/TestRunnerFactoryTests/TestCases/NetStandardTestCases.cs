@@ -23,20 +23,14 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
             get
             {
                 yield return new TestRunnerFactoryData(
-                    "SingleAssembly (string ctor)",
+                    "SingleAssembly",
                     new TestPackage("a.dll"),
                     RunnerResult.LocalTestRunner
                 );
 
                 yield return new TestRunnerFactoryData(
-                    "Single assembly (list ctor)",
-                    new TestPackage(new[] { "a.dll" }),
-                    RunnerResult.LocalTestRunner
-                );
-
-                yield return new TestRunnerFactoryData(
                     "Two assemblies",
-                    new TestPackage(new[] { "a.dll", "b.dll" }),
+                    new TestPackage("a.dll", "b.dll"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
@@ -49,19 +43,19 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                 yield return new TestRunnerFactoryData(
                     "SingleProject",
-                    new TestPackage(new[] { "a.nunit" }),
+                    new TestPackage("a.nunit"),
                     RunnerResult.LocalTestRunner
                 );
 
                 yield return new TestRunnerFactoryData(
-                    "Single unknown extension (list ctor)",
-                    new TestPackage(new[] { "a.junk" }),
+                    "Single unknown extension",
+                    new TestPackage("a.junk"),
                     RunnerResult.LocalTestRunner
                 );
 
                 yield return new TestRunnerFactoryData(
                     "Two projects",
-                    new TestPackage(new[] { "a.nunit", "b.nunit" }),
+                    new TestPackage("a.nunit", "b.nunit"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
@@ -76,7 +70,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                 yield return new TestRunnerFactoryData(
                     "One project, one assembly",
-                    new TestPackage(new[] { "a.nunit", "a.dll" }),
+                    new TestPackage("a.nunit", "a.dll"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
@@ -91,7 +85,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                 yield return new TestRunnerFactoryData(
                     "Two projects, one assembly",
-                    new TestPackage(new[] { "a.nunit", "b.nunit", "a.dll" }),
+                    new TestPackage("a.nunit", "b.nunit", "a.dll"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
@@ -107,7 +101,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                 yield return new TestRunnerFactoryData(
                     "Two assemblies, one project",
-                    new TestPackage(new[] { "a.dll", "b.dll", "a.nunit" }),
+                    new TestPackage("a.dll", "b.dll", "a.nunit"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
@@ -123,7 +117,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                 yield return new TestRunnerFactoryData(
                     "Two unknown extensions",
-                    new TestPackage(new[] { "a.junk", "b.junk" }),
+                    new TestPackage("a.junk", "b.junk"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
@@ -137,7 +131,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
 
                 yield return new TestRunnerFactoryData(
                     "One assembly, one project, one unknown",
-                    new TestPackage(new[] { "a.junk", "a.dll", "a.nunit" }),
+                    new TestPackage("a.junk", "a.dll", "a.nunit"),
                     new RunnerResult
                     {
                         TestRunner = typeof(AggregatingTestRunner),
