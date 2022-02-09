@@ -43,11 +43,6 @@ namespace NUnit.ConsoleRunner.Tests
 #if NET35
         [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--shadowcopy", "ShadowCopyFiles", true)]
-        [TestCase("--process=Separate", "ProcessModel", "Separate")]
-        [TestCase("--process=separate", "ProcessModel", "Separate")]
-        [TestCase("--process=Single", "ProcessModel", "InProcess")]
-        [TestCase("--process=InProcess", "ProcessModel", "InProcess")]
-        [TestCase("--inprocess", "ProcessModel", "InProcess")]
         [TestCase("--framework=net-4.0", "RequestedRuntimeFramework", "net-4.0")]
         [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
         [TestCase("--agents=5", "MaxAgents", 5)]

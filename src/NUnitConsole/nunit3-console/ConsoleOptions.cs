@@ -119,11 +119,6 @@ namespace NUnit.Common
         public string ActiveConfig { get; private set; }
         public bool ActiveConfigSpecified { get { return ActiveConfig != null; } }
 
-        // Where to Run Tests
-
-        public string ProcessModel { get; private set; }
-        public bool ProcessModelSpecified { get { return ProcessModel != null; } }
-
         // How to Run Tests
 
         public string Framework { get; private set; }
@@ -332,19 +327,6 @@ namespace NUnit.Common
             this.AddNetFxOnlyOption("configfile=", "{NAME} of configuration file to use for this run.",
                 NetFxOnlyOption("configfile=", v => ConfigurationFile = parser.RequiredValue(v, "--configfile")));
 
-            // Where to Run Tests
-            this.AddNetFxOnlyOption("process=", "{PROCESS} isolation for test assemblies.\nValues: InProcess, Separate, Multiple. If not specified, defaults to Separate for a single assembly or Multiple for more than one.",
-                NetFxOnlyOption("process=", v =>
-                {
-                    ProcessModel = parser.RequiredValue(v, "--process", "Single", "InProcess", "Separate", "Multiple");
-                    // Change so it displays correctly even though it isn't absolutely needed
-                    if (ProcessModel.ToLower() == "single")
-                        ProcessModel = "InProcess";
-                }));
-
-            this.AddNetFxOnlyOption("inprocess", "Synonym for --process:InProcess",
-                NetFxOnlyOption("inprocess", v => ProcessModel = "InProcess"));
-
             // How to Run Tests
             this.AddNetFxOnlyOption("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
                 NetFxOnlyOption("framework=", v => Framework = parser.RequiredValue(v, "--framework")));
@@ -418,10 +400,7 @@ namespace NUnit.Common
 
         private void CheckOptionCombinations()
         {
-            // Normally, console is run in a 64-bit process on a 64-bit machine
-            // but this might vary if the process is started by some other program.
-            if (IntPtr.Size == 8 && RunAsX86 && ProcessModel == "InProcess")
-                ErrorMessages.Add("The --x86 and --inprocess options are incompatible.");
+            // Add any validation of option combinations here
         }
 
         private int _nesting = 0;

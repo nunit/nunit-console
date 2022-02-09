@@ -368,9 +368,6 @@ namespace NUnit.ConsoleRunner
         {
             TestPackage package = new TestPackage(options.InputFiles);
 
-            if (options.ProcessModelSpecified)
-                package.AddSetting(EnginePackageSettings.ProcessModel, options.ProcessModel);
-
             if (options.FrameworkSpecified)
                 package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, options.Framework);
 

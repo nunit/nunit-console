@@ -196,7 +196,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
 #if NET35
-        [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
         [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
@@ -227,19 +226,6 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
-#if NET35
-        [Test]
-        public void CanRecognizeInProcessOption()
-        {
-            ConsoleOptions options = ConsoleMocks.Options("--inprocess");
-            Assert.That(options.Validate(), Is.True, "Should be valid: --inprocess");
-            Assert.That(options.ProcessModel, Is.EqualTo("InProcess"), "Didn't recognize --inprocess");
-        }
-#endif
-
-#if NET35
-        [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
-#endif
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "OnOutputOnly", "Before", "After", "BeforeAndAfter" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
@@ -287,7 +273,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--params")]
         [TestCase("--encoding")]
 #if NET35
-        [TestCase("--process")]
         [TestCase("--framework")]
 #endif
         public void MissingValuesAreReported(string option)
@@ -313,35 +298,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.Validate(), Is.True);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
-
-#if NET35
-        [Test]
-        public void X86AndInProcessAreCompatibleIn32BitProcess()
-        {
-            //Can be replaced with PlatformAttribute("32-Bit"), once NUnit Framework 3.12 can be used
-            if (IntPtr.Size == 8)
-            {
-                Assert.Inconclusive("Test can only be run on 32-bit platform");
-            }
-
-            ConsoleOptions options = ConsoleMocks.Options("nunit.tests.dll", "--x86", "--inprocess");
-            Assert.That(options.Validate(), Is.True);
-            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
-        }
-
-        [Test]
-        public void X86AndInProcessAreNotCompatibleIn64BitProcess()
-        {
-            //Can be replaced with PlatformAttribute("64-Bit"), once NUnit Framework 3.12 can be used
-            if (IntPtr.Size == 4)
-            {
-                Assert.Inconclusive("Test can only be run on 64-bit platform");
-            }
-            ConsoleOptions options = ConsoleMocks.Options("nunit.tests.dll", "--x86", "--inprocess");
-            Assert.That(options.Validate(), Is.False, "Should be invalid");
-            Assert.That(options.ErrorMessages[0], Is.EqualTo("The --x86 and --inprocess options are incompatible."));
-        }
-#endif
 
         [Test]
         public void InvalidOption()
