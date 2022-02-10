@@ -22,8 +22,8 @@ namespace NUnit.Engine.Tests.Api
             _testEngine.Dispose();
         }
 
-        [TestCase(typeof(ISettings))]
-        [TestCase(typeof(IDriverService))]
+        [TestCase(typeof(IResultService))]
+        [TestCase(typeof(ITestRunnerFactory))]
         public void CanAccessService(Type serviceType)
         {
             IService service = _testEngine.Services.GetService(serviceType) as IService;
