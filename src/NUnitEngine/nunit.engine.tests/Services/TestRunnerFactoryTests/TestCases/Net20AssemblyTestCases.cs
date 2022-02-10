@@ -16,57 +16,42 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             get
             {
-                foreach (var processModel in Enum.GetValues(typeof(ProcessModel)).Cast<ProcessModel>())
-                {
-                    yield return SingleAssemblyTest(processModel);
-                    yield return SingleUnknownExtensionTest(processModel);
-                    yield return TwoAssembliesTest(processModel);
-                    yield return TwoUnknownsTest(processModel);
-                }
+                yield return SingleAssemblyTest();
+                yield return SingleUnknownExtensionTest();
+                yield return TwoAssembliesTest();
+                yield return TwoUnknownsTest();
             }
         }
 
-        private static TestCaseData SingleAssemblyTest(ProcessModel processModel)
+        private static TestCaseData SingleAssemblyTest()
         {
-            var testName = $"Single assembly - {nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-
+            var testName = $"Single assembly";
             var package = new TestPackage("a.dll");
-            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-
-            var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(processModel);
+            var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(ProcessModel.Default);
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
         
-        private static TestCaseData SingleUnknownExtensionTest(ProcessModel processModel)
+        private static TestCaseData SingleUnknownExtensionTest()
         {
-            var testName = "Single unknown - " +
-                           $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
+            var testName = "Single unknown";
             var package = new TestPackage("a.junk");
-            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-
-            var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(processModel);
+            var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(ProcessModel.Default);
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
 
-        private static TestCaseData TwoAssembliesTest(ProcessModel processModel)
+        private static TestCaseData TwoAssembliesTest()
         {
-            var testName = "Two assemblies - " +
-                           $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
+            var testName = "Two assemblies";
             var package = new TestPackage("a.dll", "b.dll");
-            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-
-            var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel);
+            var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(ProcessModel.Default);
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
 
-        private static TestCaseData TwoUnknownsTest(ProcessModel processModel)
+        private static TestCaseData TwoUnknownsTest()
         {
-            var testName = "Two unknown extensions - " +
-                           $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
+            var testName = "Two unknown extensions";
             var package = new TestPackage("a.junk", "b.junk");
-            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-
-            var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel);
+            var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(ProcessModel.Default);
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
     }

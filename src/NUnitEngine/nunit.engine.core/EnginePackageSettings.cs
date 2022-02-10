@@ -68,13 +68,6 @@ namespace NUnit
         public const string MaxAgents = "MaxAgents";
 
         /// <summary>
-        /// Indicates how to allocate assemblies to processes. Values are:
-        /// "Default", "Single", "Separate", "Multiple". Default is "Multiple"
-        /// for more than one assembly, "Separate" for a single assembly.
-        /// </summary>
-        public const string ProcessModel = "ProcessModel";
-
-        /// <summary>
         /// Indicates the desired runtime to use for the tests. Values 
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.

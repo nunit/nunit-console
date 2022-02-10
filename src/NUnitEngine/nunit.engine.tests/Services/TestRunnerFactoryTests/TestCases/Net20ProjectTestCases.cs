@@ -16,22 +16,15 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             get
             {
-                foreach (var processModel in Enum.GetValues(typeof(ProcessModel)).Cast<ProcessModel>())
-                {
-                        var testName = "Single project - " +
-                                       $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-                        var package = new TestPackage("a.nunit");
-                        package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-                        var expected = Net20SingleProjectExpectedRunnerResults.ResultFor(processModel);
-                        yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
+                var testName = "Single project";
+                    var package = new TestPackage("a.nunit");
+                    var expected = Net20SingleProjectExpectedRunnerResults.ResultFor(ProcessModel.Default);
+                    yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
 
-                        testName = "Two projects - " +
-                                       $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-                        package = new TestPackage("a.nunit", "a.nunit");
-                        package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-                        expected = Net20TwoProjectExpectedRunnerResults.ResultFor(processModel);
-                        yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
-                }
+                testName = "Two projects";
+                    package = new TestPackage("a.nunit", "a.nunit");
+                    expected = Net20TwoProjectExpectedRunnerResults.ResultFor(ProcessModel.Default);
+                    yield return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
             }
         }
     }

@@ -43,42 +43,21 @@ namespace NUnit.Engine.Services
         }
 #else
 
-            ProcessModel processModel = (ProcessModel)System.Enum.Parse(
-                typeof(ProcessModel),
-                package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));
-
-            switch (processModel)
+            bool isNested = false;
+            foreach (TestPackage subPackage in package.SubPackages)
             {
-                default:
-                case ProcessModel.Default:
-                    bool isNested = false;
-                    foreach (TestPackage subPackage in package.SubPackages)
-                    {
-                        if (subPackage.SubPackages.Count > 0)
-                        {
-                            isNested = true;
-                            break;
-                        }
-                    }
-                    if (isNested)
-                        return new AggregatingTestRunner(ServiceContext, package);
-                    else if (package.SubPackages.Count > 1)
-                        return new MultipleTestProcessRunner(ServiceContext, package);
-                    else
-                        return new ProcessRunner(ServiceContext, package);
-
-                case ProcessModel.Multiple:
-                    return new MultipleTestProcessRunner(ServiceContext, package);
-
-                case ProcessModel.Separate:
-                    return new ProcessRunner(ServiceContext, package);
-
-                case ProcessModel.InProcess:
-                    if (package.SubPackages.Count > 1)
-                        return new MultipleTestDomainRunner(ServiceContext, package);
-                    else
-                        return new TestDomainRunner(ServiceContext, package);
+                if (subPackage.SubPackages.Count > 0)
+                {
+                    isNested = true;
+                    break;
+                }
             }
+            if (isNested)
+                return new AggregatingTestRunner(ServiceContext, package);
+            else if (package.SubPackages.Count > 1)
+                return new MultipleTestProcessRunner(ServiceContext, package);
+            else
+                return new ProcessRunner(ServiceContext, package);
         }
 #endif
     }
