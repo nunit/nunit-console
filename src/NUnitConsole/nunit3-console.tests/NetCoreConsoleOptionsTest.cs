@@ -63,8 +63,6 @@ namespace NUnit.ConsoleRunner.Tests
         private static readonly string[] InvalidOptions = new[]
         {
             "-configfile=app.config",
-            "-process=Single",
-            "-inprocess",
             "-framework=net-3.5",
             "-x86",
             "-shadowcopy",

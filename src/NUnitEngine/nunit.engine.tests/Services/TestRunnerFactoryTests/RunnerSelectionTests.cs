@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services;
 using NUnit.Engine.Services.Tests.Fakes;
-using NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
@@ -41,7 +40,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             Assert.That(((IService)fakeRuntimeService).Status, Is.EqualTo(ServiceStatus.Started));
         }
 
-        [TestCaseSource(nameof(TestCases))]
+        [TestCaseSource(typeof(TestRunnerFactoryData), nameof(TestRunnerFactoryData.TestCases))]
         public void RunnerSelectionTest(TestPackage package, RunnerResult expected)
         {
             var masterRunner = new MasterTestRunner(_services, package);
@@ -59,13 +58,5 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 
             return result;
         }
-
-#if NETCOREAPP
-        private static IEnumerable<TestCaseData> TestCases => NetStandardTestCases.TestCases;
-#else
-        private static IEnumerable<TestCaseData> TestCases => Net20AssemblyTestCases.TestCases
-            .Concat(Net20ProjectTestCases.TestCases)
-            .Concat(Net20MixedProjectAndAssemblyTestCases.TestCases);
-#endif
     }
 }

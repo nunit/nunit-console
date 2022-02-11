@@ -4,24 +4,71 @@ using System.Collections.Generic;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
+namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 {
-#if NETCOREAPP
-    internal static class NetStandardTestCases
+    internal class TestRunnerFactoryData : TestCaseData
     {
-        public class TestRunnerFactoryData : TestCaseData
+        public TestRunnerFactoryData(string testName, TestPackage package, RunnerResult result)
+            : base(package, result)
         {
-            public TestRunnerFactoryData(string testName, TestPackage package, RunnerResult result)
-                : base(package, result)
-            {
-                SetName($"{{m}}({testName}");
-            }
+            SetName($"{{m}}({testName}");
         }
 
-        public static IEnumerable<TestCaseData> TestCases
+        public static IEnumerable<TestRunnerFactoryData> TestCases
         {
             get
             {
+#if NETFRAMEWORK
+                yield return new TestRunnerFactoryData(
+                    "SingleAssembly",
+                    new TestPackage("a.dll"),
+                    RunnerResult.ProcessRunner);
+
+                yield return new TestRunnerFactoryData(
+                    "SingleUnknown",
+                    new TestPackage("a.junk"),
+                    RunnerResult.ProcessRunner);
+
+                yield return new TestRunnerFactoryData(
+                    "TwoAssemblies",
+                    new TestPackage("a.dll", "b.dll"),
+                    RunnerResult.MultipleTestProcessRunner(2));
+
+                yield return new TestRunnerFactoryData(
+                    "TwoUnknowns",
+                    new TestPackage("a.junk", "b.junk"),
+                    RunnerResult.MultipleTestProcessRunner(2));
+
+                yield return new TestRunnerFactoryData(
+                    "OneProject",
+                    new TestPackage("a.nunit"),
+                    RunnerResult.AggregatingTestRunner(2));
+
+                yield return new TestRunnerFactoryData(
+                    "TwoProjects",
+                    new TestPackage("a.nunit", "a.nunit"),
+                    RunnerResult.AggregatingTestRunner(4));
+
+                yield return new TestRunnerFactoryData(
+                    "OneProjectOneAssembly",
+                    new TestPackage("a.nunit", "c.dll"),
+                    RunnerResult.AggregatingTestRunner(RunnerResult.ProcessRunner, 3));
+
+                yield return new TestRunnerFactoryData(
+                    "TwoProjectsOneAssembly",
+                    new TestPackage("a.nunit", "a.nunit", "x.dll"),
+                    RunnerResult.AggregatingTestRunner(5));
+
+                yield return new TestRunnerFactoryData(
+                    "TwoAssembliesOneProject",
+                    new TestPackage("x.dll", "y.dll", "a.nunit"),
+                    RunnerResult.AggregatingTestRunner(4));
+
+                yield return new TestRunnerFactoryData(
+                    "OneUnknownOneAssemblyOneProject",
+                    new TestPackage("a.junk", "a.dll", "a.nunit"),
+                    RunnerResult.AggregatingTestRunner(4));
+#else
                 yield return new TestRunnerFactoryData(
                     "SingleAssembly",
                     new TestPackage("a.dll"),
@@ -144,8 +191,8 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
                         }
                     }
                 );
+#endif
             }
         }
     }
-#endif
 }

@@ -81,7 +81,6 @@ namespace NUnit.Engine.Runners.Tests
         public void Initialize()
         {
             _package = new TestPackage(_testFiles);
-            _package.AddSetting(EnginePackageSettings.ProcessModel, "InProcess");
 
             // Add all services needed
             _services = new ServiceContext();
@@ -96,6 +95,7 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(projectService);
 #if NETFRAMEWORK
             _services.Add(new RuntimeFrameworkService());
+            _services.Add(new TestAgency());
 #endif
             _services.Add(new DriverService());
             _services.Add(new DefaultTestRunnerFactory());
