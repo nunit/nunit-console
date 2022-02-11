@@ -10,7 +10,7 @@ namespace NUnit.Engine.Drivers
 {
     public class NUnit3DriverFactory : IDriverFactory
     {
-        private const string NUNIT_FRAMEWORK = "nunit.framework";
+        internal const string NUNIT_FRAMEWORK = "nunit.framework";
         static ILogger log = InternalTrace.GetLogger(typeof(NUnit3DriverFactory));
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace NUnit.Engine.Drivers
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         public bool IsSupportedTestFramework(AssemblyName reference)
         {
-            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 3;
+            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major >= 3;
         }
 
 #if NETFRAMEWORK
