@@ -18,8 +18,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
             {
                 foreach (var processModel in Enum.GetValues(typeof(ProcessModel)).Cast<ProcessModel>())
                 {
-                    yield return SingleAssemblyStringCtorTest(processModel);
-                    yield return SingleAssemblyListCtorTest(processModel);
+                    yield return SingleAssemblyTest(processModel);
                     yield return SingleUnknownExtensionTest(processModel);
                     yield return TwoAssembliesTest(processModel);
                     yield return TwoUnknownsTest(processModel);
@@ -27,37 +26,25 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
             }
         }
 
-        private static TestCaseData SingleAssemblyStringCtorTest(ProcessModel processModel)
+        private static TestCaseData SingleAssemblyTest(ProcessModel processModel)
         {
-            var testName = "Single assembly (string ctor) - " +
-                           $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.OneAssemblyStringCtor();
+            var testName = $"Single assembly - {nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
+
+            var package = new TestPackage("a.dll");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
-            var expected = Net20SingleAssemblyStringCtorExpectedRunnerResults.ResultFor(processModel);
-            var testCase = new TestCaseData(package, expected).SetName($"{{m}}({testName})");
-            return testCase;
-        }
-
-        private static TestCaseData SingleAssemblyListCtorTest(ProcessModel processModel)
-        {
-            var testName = "Single assembly (list ctor) - " +
-                              $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.OneAssemblyListCtor();
-            package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
-
-            var expected = Net20SingleAssemblyListCtorExpectedRunnerResults.ResultFor(processModel);
+            var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(processModel);
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
-
+        
         private static TestCaseData SingleUnknownExtensionTest(ProcessModel processModel)
         {
             var testName = "Single unknown - " +
                            $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.OneUnknownExtension();
+            var package = new TestPackage("a.junk");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
-            var expected = Net20SingleAssemblyListCtorExpectedRunnerResults.ResultFor(processModel);
+            var expected = Net20SingleAssemblyExpectedRunnerResults.ResultFor(processModel);
             return new TestCaseData(package, expected).SetName($"{{m}}({testName})");
         }
 
@@ -65,7 +52,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             var testName = "Two assemblies - " +
                            $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.TwoAssemblies();
+            var package = new TestPackage("a.dll", "b.dll");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
             var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel);
@@ -76,7 +63,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.TestCases
         {
             var testName = "Two unknown extensions - " +
                            $"{nameof(EnginePackageSettings.ProcessModel)}:{processModel}";
-            var package = TestPackageFactory.TwoUnknownExtension();
+            var package = new TestPackage("a.junk", "b.junk");
             package.AddSetting(EnginePackageSettings.ProcessModel, processModel.ToString());
 
             var expected = Net20TwoAssemblyExpectedRunnerResults.ResultFor(processModel);

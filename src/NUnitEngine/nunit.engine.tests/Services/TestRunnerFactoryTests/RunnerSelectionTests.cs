@@ -27,7 +27,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             _services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
             ((IService)projectService).StartService();
-            projectService.Add(TestPackageFactory.FakeProject, "a.dll", "b.dll");
+            projectService.Add("a.nunit", "a.dll", "b.dll");
             _services.Add(projectService);
             Assert.That(((IService)projectService).Status, Is.EqualTo(ServiceStatus.Started));
             _factory = new DefaultTestRunnerFactory();
@@ -69,4 +69,3 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
 #endif
     }
 }
-
