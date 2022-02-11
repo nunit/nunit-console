@@ -371,9 +371,6 @@ namespace NUnit.ConsoleRunner
             if (options.ProcessModelSpecified)
                 package.AddSetting(EnginePackageSettings.ProcessModel, options.ProcessModel);
 
-            if (options.DomainUsageSpecified)
-                package.AddSetting(EnginePackageSettings.DomainUsage, options.DomainUsage);
-
             if (options.FrameworkSpecified)
                 package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, options.Framework);
 

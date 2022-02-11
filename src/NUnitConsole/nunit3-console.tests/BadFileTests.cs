@@ -28,7 +28,6 @@ namespace NUnit.ConsoleRunner.Tests
 
             var package = new TestPackage(fullname);
             package.AddSetting("ProcessModel", "InProcess");
-            package.AddSetting("DomainUsage", "None");
 
             var runner = new MasterTestRunner(services, package);
 

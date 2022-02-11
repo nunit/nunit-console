@@ -39,7 +39,7 @@ namespace NUnit.Engine.Services
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
 
-            return InProcessTestRunnerFactory.MakeTestRunner(ServiceContext, package);
+            return new LocalTestRunner(ServiceContext, package);
         }
 #else
 
@@ -74,7 +74,10 @@ namespace NUnit.Engine.Services
                     return new ProcessRunner(ServiceContext, package);
 
                 case ProcessModel.InProcess:
-                    return InProcessTestRunnerFactory.MakeTestRunner(ServiceContext, package);
+                    if (package.SubPackages.Count > 1)
+                        return new MultipleTestDomainRunner(ServiceContext, package);
+                    else
+                        return new TestDomainRunner(ServiceContext, package);
             }
         }
 #endif

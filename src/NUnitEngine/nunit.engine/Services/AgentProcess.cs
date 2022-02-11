@@ -96,8 +96,7 @@ namespace NUnit.Engine.Services
         public static string GetTestAgentExePath(RuntimeFramework targetRuntime, bool requires32Bit)
         {
             log.Debug($"GetTestAgentExePath({targetRuntime}, {requires32Bit})");
-            string engineDir = NUnitConfiguration.EngineDirectory;
-            if (engineDir == null) return null;
+            string engineDir = AssemblyHelper.GetDirectoryName(typeof(AgentProcess).Assembly);
 
             // If running out of a package "agents" is a subdirectory
             string agentsDir = Path.Combine(engineDir, "agents");

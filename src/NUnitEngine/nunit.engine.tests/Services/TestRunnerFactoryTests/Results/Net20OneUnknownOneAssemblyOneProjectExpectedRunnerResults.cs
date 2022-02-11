@@ -10,33 +10,33 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
     internal static class Net20OneUnknownOneAssemblyOneProjectExpectedRunnerResults
     {
         private static readonly string ExceptionMessage =
-            $"No expected Test result provided for this {nameof(ProcessModel)}/{nameof(DomainUsage)} combination.";
+            $"No expected Test result provided for ProcessModel {nameof(ProcessModel)}.";
 
-        public static RunnerResult ResultFor(ProcessModel processModel, DomainUsage domainUsage)
+        public static RunnerResult ResultFor(ProcessModel processModel)
         {
             switch (processModel)
             {
                 case ProcessModel.Default:
-                    return GetProcessModelDefaultResult(domainUsage);
+                    return new RunnerResult(typeof(AggregatingTestRunner),
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner,
+                        RunnerResult.ProcessRunner);
                 case ProcessModel.InProcess:
-                    return GetProcessModelInProcessResult(domainUsage);
+                    return new RunnerResult
+                    {
+                        TestRunner = typeof(MultipleTestDomainRunner),
+                        SubRunners = new[]
+                        {
+                            RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner,
+                            RunnerResult.TestDomainRunner
+                        }
+                    };
                 case ProcessModel.Separate:
-                    return GetProcessModelSeparateResult(domainUsage);
+                    return RunnerResult.ProcessRunner;
                 case ProcessModel.Multiple:
-                    return GetProcessModelMultipleResult(domainUsage);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(processModel), processModel, ExceptionMessage);
-            }
-        }
-
-        private static RunnerResult GetProcessModelMultipleResult(DomainUsage domainUsage)
-        {
-            switch (domainUsage)
-            {
-                case DomainUsage.Default:
-                case DomainUsage.None:
-                case DomainUsage.Single:
-                case DomainUsage.Multiple:
                     return new RunnerResult
                     {
                         TestRunner = typeof(MultipleTestProcessRunner),
@@ -49,78 +49,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests.Results
                         }
                     };
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
+                    throw new ArgumentOutOfRangeException(nameof(processModel), processModel, ExceptionMessage);
             }
         }
-
-        private static RunnerResult GetProcessModelSeparateResult(DomainUsage domainUsage)
-        {
-            switch (domainUsage)
-            {
-                case DomainUsage.Default:
-                case DomainUsage.None:
-                case DomainUsage.Single:
-                case DomainUsage.Multiple:
-                    return RunnerResult.ProcessRunner;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
-            }
-        }
-
-        private static RunnerResult GetProcessModelInProcessResult(DomainUsage domainUsage)
-        {
-            switch (domainUsage)
-            {
-                case DomainUsage.Default:
-                    return new RunnerResult
-                    {
-                        TestRunner = typeof(MultipleTestDomainRunner),
-                        SubRunners = new[]
-                        {
-                            RunnerResult.TestDomainRunner,
-                            RunnerResult.TestDomainRunner,
-                            RunnerResult.TestDomainRunner,
-                            RunnerResult.TestDomainRunner
-                        }
-                    };
-                case DomainUsage.None:
-                    return RunnerResult.LocalTestRunner;
-                case DomainUsage.Single:
-                    return RunnerResult.TestDomainRunner;
-                case DomainUsage.Multiple:
-                    return new RunnerResult
-                    {
-                        TestRunner = typeof(MultipleTestDomainRunner),
-                        SubRunners = new[]
-                        {
-                            RunnerResult.TestDomainRunner,
-                            RunnerResult.TestDomainRunner,
-                            RunnerResult.TestDomainRunner,
-                            RunnerResult.TestDomainRunner
-                        }
-                    };
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
-            }
-        }
-
-        private static RunnerResult GetProcessModelDefaultResult(DomainUsage domainUsage)
-        {
-            switch (domainUsage)
-            {
-                case DomainUsage.Default:
-                case DomainUsage.None:
-                case DomainUsage.Single:
-                case DomainUsage.Multiple:
-                    return new RunnerResult(typeof(AggregatingTestRunner),
-                        RunnerResult.ProcessRunner,
-                        RunnerResult.ProcessRunner,
-                        RunnerResult.ProcessRunner,
-                        RunnerResult.ProcessRunner);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(domainUsage), domainUsage, ExceptionMessage);
-            }
-        }
-    }
+   }
 #endif
 }
