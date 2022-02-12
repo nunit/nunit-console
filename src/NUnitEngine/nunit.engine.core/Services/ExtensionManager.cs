@@ -39,19 +39,22 @@ namespace NUnit.Engine.Services
         {
         }
 
-        internal ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem)
+        // TODO: Temporarily public
+        public ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem)
             : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
         {
         }
 
-        internal ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        // TODO: Temporarily public
+        public ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
             _addinsReader = addinsReader;
             _fileSystem = fileSystem;
             _directoryFinder = directoryFinder;
         }
 
-        internal void FindExtensions(string startDir)
+        // TODO: Temporarily public
+        public void FindExtensions(string startDir)
         {
             // Create the list of possible extension assemblies,
             // eliminating duplicates, start in the provided directory.

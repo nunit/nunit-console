@@ -8,7 +8,8 @@ namespace NUnit.Engine.Internal
     /// <summary>
     /// Implementations of this interface can be used to search for directories and files using wildcards.
     /// </summary>
-    internal interface IDirectoryFinder
+    // TODO: Temporarily public
+    public interface IDirectoryFinder
     {
         /// <summary>
         /// Gets all sub-directories recursively that match a pattern.

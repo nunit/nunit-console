@@ -46,7 +46,7 @@ namespace NUnit.Engine.Runners.Tests
         {
             // Add all services needed by any of our TestEngineRunners
             _services = new ServiceContext();
-            _services.Add(new Services.ExtensionService());
+            //_services.Add(new Services.ExtensionService());
             _services.ServiceManager.StartServices();
 
             var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");

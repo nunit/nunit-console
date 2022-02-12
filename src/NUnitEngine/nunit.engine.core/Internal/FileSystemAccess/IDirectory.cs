@@ -7,7 +7,8 @@ namespace NUnit.Engine.Internal.FileSystemAccess
     /// <summary>
     /// A directory contained in a file-system.
     /// </summary>
-    internal interface IDirectory
+    // TODO: Temporarily public
+    public interface IDirectory
     {
         /// <summary>
         /// Gets the parent directory.

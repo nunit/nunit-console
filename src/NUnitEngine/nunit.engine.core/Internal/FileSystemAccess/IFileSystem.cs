@@ -5,7 +5,8 @@ namespace NUnit.Engine.Internal.FileSystemAccess
     /// <summary>
     /// Abstraction of a file-system.
     /// </summary>
-    internal interface IFileSystem
+    // TODO: Temporarily public
+    public interface IFileSystem
     {
         /// <summary>
         /// Checks whether a directory exists or not.

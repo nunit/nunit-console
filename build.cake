@@ -402,8 +402,8 @@ Task("CreateZipImage")
             var addinsDir = frameworkDir + "addins/";
             CleanDirectory(addinsDir);
 
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsDir);
+            //foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+            //    CopyPackageContents(packageDir, addinsDir);
         }
     });
 
