@@ -97,7 +97,6 @@ namespace NUnit.Engine.Runners.Tests
             _services.Add(new RuntimeFrameworkService());
             _services.Add(new TestAgency());
 #endif
-            _services.Add(new DriverService());
             _services.Add(new DefaultTestRunnerFactory());
             _services.ServiceManager.StartServices();
 

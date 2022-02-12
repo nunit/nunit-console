@@ -22,7 +22,6 @@ namespace NUnit.ConsoleRunner.Tests
             var services = new ServiceContext();
             services.Add(new DefaultTestRunnerFactory());
             services.Add(new ExtensionService());
-            services.Add(new DriverService());
 #if NET35
             services.Add(new RuntimeFrameworkService());
             services.Add(new TestAgency());

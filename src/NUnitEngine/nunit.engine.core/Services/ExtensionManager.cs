@@ -21,7 +21,7 @@ namespace NUnit.Engine.Services
 {
     public sealed class ExtensionManager : IDisposable
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
         static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
 
         private readonly IFileSystem _fileSystem;
@@ -215,6 +215,8 @@ namespace NUnit.Engine.Services
         /// </summary>
         private ExtensionPoint DeduceExtensionPointFromType(TypeReference typeRef)
         {
+            log.Debug("Trying to deduce ExtensionPoint from " + typeRef.Name);
+
             var ep = GetExtensionPoint(typeRef);
             if (ep != null)
                 return ep;

@@ -13,7 +13,7 @@
                Title="NUnit Engine"
                Description="Installs the NUnit engine">
         <ComponentGroupRef Id="NUNIT.ENGINE" />
-        <Feature Id="ADDINS.NUNIT.PROJECT.LOADER"
+        <!--<Feature Id="ADDINS.NUNIT.PROJECT.LOADER"
                     Level="1"
                     Title="NUnit Project Loader"
                     Description="Allows you to load NUnit Project files">
@@ -42,7 +42,7 @@
                  Title="TeamCity Event Listener"
                  Description="Provides progress messages when running under TeamCity">
           <ComponentGroupRef Id="TEAMCITY.EVENT.LISTENER" />
-        </Feature>
+        </Feature>-->
       </Feature>
 
       <Feature Id="NUNIT.CONSOLE"

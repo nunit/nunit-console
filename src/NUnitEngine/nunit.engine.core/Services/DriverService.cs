@@ -16,11 +16,31 @@ namespace NUnit.Engine.Services
     /// The DriverService provides drivers able to load and run tests
     /// using various frameworks.
     /// </summary>
-    public class DriverService : Service, IDriverService
+    public class DriverService : IDriverService
     {
-        static ILogger log = InternalTrace.GetLogger("DriverService");
+        static readonly ILogger log = InternalTrace.GetLogger("DriverService");
 
         readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
+
+        public DriverService()
+        {
+            var thisAssembly = Assembly.GetExecutingAssembly();
+            var extensionManager = new ExtensionManager();
+
+            extensionManager.FindExtensionPoints(thisAssembly);
+            extensionManager.FindExtensions(AssemblyHelper.GetDirectoryName(thisAssembly));
+
+            foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
+                _factories.Add(factory);
+
+#if NETFRAMEWORK
+            var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
+            if (node != null)
+                _factories.Add(new NUnit2DriverFactory(node));
+#endif
+
+            _factories.Add(new NUnit3DriverFactory());
+        }
 
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
@@ -92,35 +112,6 @@ namespace NUnit.Engine.Services
             else
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, string.Format("No suitable tests found in '{0}'.\n" +
                                                                               "Either assembly contains no tests or proper test driver has not been found.", assemblyPath));
-        }
-
-        public override void StartService()
-        {
-            // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
-            try
-            {
-                var extensionManager = new ExtensionManager();
-                if (extensionManager != null)
-                {
-                    foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
-                        _factories.Add(factory);
-
-#if NETFRAMEWORK
-                    var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
-                    if (node != null)
-                        _factories.Add(new NUnit2DriverFactory(node));
-#endif
-                }
-
-                _factories.Add(new NUnit3DriverFactory());
-
-                Status = ServiceStatus.Started;
-            }
-            catch(Exception)
-            {
-                Status = ServiceStatus.Error;
-                throw;
-            }
         }
     }
 }
