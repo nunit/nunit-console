@@ -54,15 +54,6 @@ namespace NUnit.Engine
                 InternalTrace.Initialize(Path.Combine(WorkDirectory, logName), InternalTraceLevel);
             }
 
-            // If caller added services beforehand, we don't add any
-            if (Services.ServiceCount == 0)
-            {
-                // Services that depend on other services must be added after their dependencies
-                // For example, ResultService uses ExtensionService, so ExtensionService is added
-                // later.
-                Services.Add(new ExtensionService());
-            }
-
             Services.ServiceManager.StartServices();
         }
 

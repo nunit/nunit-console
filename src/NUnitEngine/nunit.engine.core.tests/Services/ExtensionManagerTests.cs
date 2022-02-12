@@ -47,7 +47,7 @@ namespace NUnit.Engine.Services.Tests
             // Rather than actually starting the service, which would result
             // in finding the extensions actually in use on the current system,
             // we simulate the start using this assemblies dummy extensions.
-            _extensionManager.FindExtensionPoints(typeof(CoreEngine).Assembly);
+            _extensionManager.FindExtensionPoints(typeof(ExtensionManager).Assembly);
             _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
             _extensionManager.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
@@ -58,10 +58,10 @@ namespace NUnit.Engine.Services.Tests
         {
             var addinsReader = Substitute.For<IAddinsFileReader>();
             var fileSystem = Substitute.For<IFileSystem>();
-            var service = new ExtensionService(addinsReader, fileSystem);
-            var workingDir = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var service = new ExtensionManager(addinsReader, fileSystem);
+            var workingDir = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
 
-            service.StartService();
+            Initialize(service);
 
             fileSystem.Received().GetDirectory(workingDir);
         }
@@ -216,7 +216,7 @@ namespace NUnit.Engine.Services.Tests
             yield return new TestCaseData(new FrameworkCombo(netcore, extNetStandard)).SetName("ValidCombo(.NET Core, .NET Standard)");
             yield return new TestCaseData(new FrameworkCombo(netcore, extNetCore)).SetName("ValidCombo(.NET Core, .Net Core)");
 #else
-            Assembly netFramework = typeof(ExtensionService).Assembly;
+            Assembly netFramework = typeof(ExtensionManager).Assembly;
 
             var extNetFramework = new ExtensionAssembly(netFramework.Location, false);
             var extNetStandard = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"), false);
@@ -239,7 +239,7 @@ namespace NUnit.Engine.Services.Tests
 
             yield return new TestCaseData(new FrameworkCombo(netcore, extNetFramework)).SetName("InvalidCombo(.NET Core, .NET Framework)");
 #else
-            Assembly netFramework = typeof(ExtensionService).Assembly;
+            Assembly netFramework = typeof(ExtensionManager).Assembly;
 
             var extNetStandard = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"), false);
             var extNetCore = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netcoreapp2.1"), "nunit.engine.tests.dll"), false);
@@ -285,7 +285,7 @@ namespace NUnit.Engine.Services.Tests
         public void StartService_ReadsAddinsFile()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile = Substitute.For<IFile>();
@@ -295,21 +295,31 @@ namespace NUnit.Engine.Services.Tests
             var fileSystem = Substitute.For<IFileSystem>();
             fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
-            var sut = new ExtensionService(addinsReader, fileSystem);
+            var sut = new ExtensionManager(addinsReader, fileSystem);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             startDirectory.Received().GetFiles("*.addins");
             addinsReader.Received().Read(addinsFile);
         }
 
+        private void Initialize(ExtensionManager sut)
+        {
+            var coreAssembly = typeof(ExtensionManager).Assembly;
+            var apiAssembly = typeof(ITestEngine).Assembly;
+
+            sut.FindExtensionPoints(coreAssembly, apiAssembly);
+
+            sut.FindExtensions(AssemblyHelper.GetDirectoryName(coreAssembly));
+        }
+
         [Test]
         public void StartService_ReadsAddinsFilesFromMultipleDirectories()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var subdirectoryPath = Path.Combine(startDirectoryPath, "subdirectory");
@@ -331,10 +341,10 @@ namespace NUnit.Engine.Services.Tests
             fileSystem.GetDirectory(subdirectoryPath).Returns(subdirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "subdirectory/" });
-            var sut = new ExtensionService(addinsReader, fileSystem);
+            var sut = new ExtensionManager(addinsReader, fileSystem);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             startDirectory.Received().GetFiles("*.addins");
@@ -347,7 +357,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_RelativePaths()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile = Substitute.For<IFile>();
@@ -368,10 +378,10 @@ namespace NUnit.Engine.Services.Tests
                     "**/wildcard-file.dll"
                 });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -388,7 +398,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_AbsolutePath_Windows()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var metamorphosatorDirectoryPath = "c:/tools/metamorphosator";
@@ -408,10 +418,10 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "c:/tools/metamorphosator/", "d:/tools/frobuscator.dll" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -425,7 +435,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_AbsolutePath_NonWindows()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var metamorphosatorDirectoryPath = "/tmp/tools/metamorphosator";
@@ -445,10 +455,10 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "/tmp/tools/metamorphosator/", "/usr/frobuscator.dll" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -462,7 +472,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_InvalidAbsolutePathToFile_Windows()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile = Substitute.For<IFile>();
@@ -474,10 +484,10 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "/absolute/unix/path" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -489,7 +499,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_InvalidAbsolutePathToDirectory_Windows()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile = Substitute.For<IFile>();
@@ -501,10 +511,10 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { "/absolute/unix/path/" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -518,7 +528,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_InvalidAbsolutePathToFile_NonWindows(string windowsPath)
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile = Substitute.For<IFile>();
@@ -530,10 +540,10 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { windowsPath });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -545,7 +555,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_InvalidAbsolutePathToDirectory_NonWindows(string windowsPath)
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile = Substitute.For<IFile>();
@@ -557,10 +567,10 @@ namespace NUnit.Engine.Services.Tests
             var addinsReader = Substitute.For<IAddinsFileReader>();
             addinsReader.Read(addinsFile).Returns(new[] { windowsPath });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             addinsReader.Received().Read(addinsFile);
@@ -571,7 +581,7 @@ namespace NUnit.Engine.Services.Tests
         public void StartService_ReadsMultipleAddinsFilesFromSingleDirectory()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var addinsFile1 = Substitute.For<IFile>();
@@ -585,10 +595,10 @@ namespace NUnit.Engine.Services.Tests
             var fileSystem = Substitute.For<IFileSystem>();
             fileSystem.GetDirectory(startDirectoryPath).Returns(startDirectory);
             var addinsReader = Substitute.For<IAddinsFileReader>();
-            var sut = new ExtensionService(addinsReader, fileSystem);
+            var sut = new ExtensionManager(addinsReader, fileSystem);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             startDirectory.Received().GetFiles("*.addins");
@@ -600,7 +610,7 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_ReadsAddinsFileFromReferencedDirectory()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             var referencedDirectoryPath = Path.Combine(startDirectoryPath, "metamorphosator");
@@ -622,10 +632,10 @@ namespace NUnit.Engine.Services.Tests
             addinsReader.Read(addinsFile).Returns(new[] { "./metamorphosator/" });
             var directoryFinder = Substitute.For<IDirectoryFinder>();
             directoryFinder.GetDirectories(startDirectory, "./metamorphosator/").Returns(new[] { referencedDirectory });
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             startDirectory.Received().GetFiles("*.addins");
@@ -639,14 +649,14 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_Issue915_AddinsFilePointsToContainingDirectory_Windows()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
             
             // Faking the presence of the assembly is required to reproduce the error described in GitHub issue 915...
             var testAssembly = Substitute.For<IFile>();
             testAssembly.Parent.Returns(startDirectory);
-            testAssembly.FullName.Returns(typeof(ExtensionService).Assembly.Location);
+            testAssembly.FullName.Returns(typeof(ExtensionManager).Assembly.Location);
             startDirectory.GetFiles("*.dll").Returns(new[] { testAssembly });
 
             var parentPath = new DirectoryInfo(startDirectoryPath).Parent.FullName;
@@ -675,10 +685,10 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.GetFiles(startDirectory, @"*\..\").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, @"**\..\").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, @"**\.\").Returns(new[] { testAssembly });
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             startDirectory.Received().GetFiles("*.addins");
@@ -698,14 +708,14 @@ namespace NUnit.Engine.Services.Tests
         public void ProcessAddinsFile_Issue915_AddinsFilePointsToContainingDirectory_NonWindows()
         {
             // Arrange
-            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            var startDirectoryPath = AssemblyHelper.GetDirectoryName(typeof(ExtensionManager).Assembly);
             var startDirectory = Substitute.For<IDirectory>();
             startDirectory.FullName.Returns(startDirectoryPath);
 
             // Faking the presence of the assembly is required to reproduce the error described in GitHub issue 915...
             var testAssembly = Substitute.For<IFile>();
             testAssembly.Parent.Returns(startDirectory);
-            testAssembly.FullName.Returns(typeof(ExtensionService).Assembly.Location);
+            testAssembly.FullName.Returns(typeof(ExtensionManager).Assembly.Location);
             startDirectory.GetFiles("*.dll").Returns(new[] { testAssembly });
 
             var parentPath = new DirectoryInfo(startDirectoryPath).Parent.FullName;
@@ -735,10 +745,10 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.GetFiles(startDirectory, "*/../").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, "**/../").Returns(new[] { testAssembly });
             directoryFinder.GetFiles(startDirectory, "**/./").Returns(new[] { testAssembly });
-            var sut = new ExtensionService(addinsReader, fileSystem, directoryFinder);
+            var sut = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
 
             // Act
-            sut.StartService();
+            Initialize(sut);
 
             // Assert
             startDirectory.Received().GetFiles("*.addins");

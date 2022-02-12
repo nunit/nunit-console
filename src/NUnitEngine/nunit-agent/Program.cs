@@ -86,9 +86,6 @@ namespace NUnit.Agent
                 InternalTraceLevel = traceLevel
             };
 
-            // Custom Service Initialization
-            engine.Services.Add(new ExtensionService());
-
             // Initialize Services
             log.Info("Initializing Services");
             engine.InitializeServices();
