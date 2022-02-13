@@ -19,6 +19,7 @@ namespace NUnit.Engine.Services.Tests
 
             _fakeService = new FakeService();
             _serviceManager.AddService(_fakeService);
+            _serviceManager.AddService(new ExtensionService());
         }
 
         [Test]
@@ -28,9 +29,8 @@ namespace NUnit.Engine.Services.Tests
 
             IService service = _serviceManager.GetService(typeof(IFakeService));
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
-            // TODO: Reinstate when this is moved to engine tests
-            //service = _serviceManager.GetService(typeof(IExtensionService));
-            //Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
+            service = _serviceManager.GetService(typeof(IExtensionService));
+            Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
         [Test]
