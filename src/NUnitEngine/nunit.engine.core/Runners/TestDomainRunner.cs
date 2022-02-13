@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
-using NUnit.Engine.Services;
-
 namespace NUnit.Engine.Runners
 {
     /// <summary>

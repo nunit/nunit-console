@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 
@@ -125,7 +126,7 @@ namespace NUnit.Engine.Runners
             var packagesToLoad = TestPackage.Select(p => !p.HasSubPackages());
 
             if (DriverService == null)
-                DriverService = new Services.DriverService();
+                DriverService = new DriverFactory();
 
             _drivers.Clear();
 

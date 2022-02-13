@@ -9,7 +9,6 @@ using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Services;
 
 namespace NUnit.Agent
 {

@@ -17,7 +17,7 @@ using Path = NUnit.Engine.Internal.Backports.Path;
 using Path = System.IO.Path;
 #endif
 
-namespace NUnit.Engine.Services
+namespace NUnit.Engine.Extensibility
 {
     public sealed class ExtensionManager : IDisposable
     {

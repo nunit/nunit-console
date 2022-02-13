@@ -23,8 +23,6 @@ namespace NUnit.Engine.Runners.Tests
 #if NETFRAMEWORK
     [TestFixture(typeof(TestDomainRunner))]
     //[TestFixture(typeof(ProcessRunner))]
-    [TestFixture(typeof(MultipleTestDomainRunner), 1)]
-    [TestFixture(typeof(MultipleTestDomainRunner), 3)]
 #endif
     //[TestFixture(typeof(MultipleTestProcessRunner), 1)]
     //[TestFixture(typeof(MultipleTestProcessRunner), 3)]

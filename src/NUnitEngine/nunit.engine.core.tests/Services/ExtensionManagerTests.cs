@@ -7,9 +7,10 @@ using NUnit.Engine.Extensibility;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using NUnit.Engine.Drivers;
 using NUnit.Engine.Internal;
-using NSubstitute;
 using NUnit.Engine.Internal.FileSystemAccess;
+using NSubstitute;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -159,7 +160,7 @@ namespace NUnit.Engine.Services.Tests
             Console.WriteLine($"{assemblyName} does exist");
 
             var service = new ExtensionManager();
-            service.FindExtensionPoints(typeof(DriverService).Assembly);
+            service.FindExtensionPoints(typeof(DriverFactory).Assembly);
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
 
