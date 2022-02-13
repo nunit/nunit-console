@@ -52,9 +52,9 @@ namespace NUnit.Engine.Agents
             if (package.SubPackages.Count > 1)
                 return new MultipleTestDomainRunner(_services, package);
             else
-                return new TestDomainRunner(_services, package);
+                return new TestDomainRunner(package);
 #else
-            return new LocalTestRunner(_services, package);
+            return new LocalTestRunner(package);
 #endif
         }
     }

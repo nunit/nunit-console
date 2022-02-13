@@ -9,14 +9,14 @@ namespace NUnit.Engine.Tests.Runners.Fakes
 {
     internal class EmptyDirectTestRunner : Engine.Runners.DirectTestRunner
     {
-        public EmptyDirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public EmptyDirectTestRunner(TestPackage package) : base(package)
         {
             TestDomain = AppDomain.CurrentDomain;
         }
 
-        public new void LoadPackage()
+        public new void Load()
         {
-            base.LoadPackage();
+            base.Load();
         }
     }
 }

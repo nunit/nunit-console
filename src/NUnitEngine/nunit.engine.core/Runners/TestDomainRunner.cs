@@ -13,22 +13,22 @@ namespace NUnit.Engine.Runners
     {
         private DomainManager _domainManager;
 
-        public TestDomainRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public TestDomainRunner(TestPackage package) : base(package)
         {
             _domainManager = new DomainManager();
         }
 
-        protected override TestEngineResult LoadPackage()
+        public override TestEngineResult Load()
         {
             TestDomain = _domainManager.CreateDomain(TestPackage);
 
-            return base.LoadPackage();
+            return base.Load();
         }
 
         /// <summary>
         /// Unload any loaded TestPackage as well as the application domain.
         /// </summary>
-        public override void UnloadPackage()
+        public override void Unload()
         {
             if (this.TestDomain != null)
             {

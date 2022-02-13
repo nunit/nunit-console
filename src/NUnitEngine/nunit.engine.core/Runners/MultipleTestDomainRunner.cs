@@ -18,7 +18,7 @@ namespace NUnit.Engine.Runners
 
         protected override ITestEngineRunner CreateRunner(TestPackage package)
         {
-            return new TestDomainRunner(Services, package);
+            return new TestDomainRunner(package);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace NUnit.Engine.Services
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
 
-            return new LocalTestRunner(ServiceContext, package);
+            return new LocalTestRunner(package);
         }
 #else
 

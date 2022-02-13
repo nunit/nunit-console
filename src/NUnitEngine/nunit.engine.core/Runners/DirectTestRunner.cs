@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.ComponentModel;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 
@@ -12,7 +12,7 @@ namespace NUnit.Engine.Runners
     /// DirectTestRunner is the abstract base for runners
     /// that deal directly with a framework driver.
     /// </summary>
-    public abstract class DirectTestRunner : AbstractTestRunner
+    public abstract class DirectTestRunner : ITestEngineRunner
     {
         // DirectTestRunner loads and runs tests in a particular AppDomain using
         // one driver per assembly. All test assemblies are ultimately executed by
@@ -46,8 +46,28 @@ namespace NUnit.Engine.Runners
         // Used to inject DriverService for testing
         internal IDriverService DriverService { get; set; }
 
-        public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        /// <summary>
+        /// The TestPackage for which this is the runner
+        /// </summary>
+        protected TestPackage TestPackage { get; }
+
+        /// <summary>
+        /// The result of the last call to Load
+        /// </summary>
+        protected TestEngineResult LoadResult { get; set; }
+
+        /// <summary>
+        /// Gets an indicator of whether the package has been loaded.
+        /// </summary>
+        public bool IsPackageLoaded
         {
+            get { return LoadResult != null; }
+        }
+
+        public DirectTestRunner(TestPackage package)
+        {
+            TestPackage = package;
+
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
             if (AppDomain.CurrentDomain.IsDefaultAppDomain())
@@ -65,7 +85,7 @@ namespace NUnit.Engine.Runners
         /// <returns>
         /// A TestEngineResult.
         /// </returns>
-        public override TestEngineResult Explore(TestFilter filter)
+        public TestEngineResult Explore(TestFilter filter)
         {
             EnsurePackageIsLoaded();
 
@@ -94,7 +114,7 @@ namespace NUnit.Engine.Runners
         /// Load a TestPackage for exploration or execution
         /// </summary>
         /// <returns>A TestEngineResult.</returns>
-        protected override TestEngineResult LoadPackage()
+        public virtual TestEngineResult Load()
         {
             var result = new TestEngineResult();
 
@@ -133,6 +153,9 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
+        public virtual void Unload() { }
+        public TestEngineResult Reload() => Load();
+
         private static string LoadDriver(IFrameworkDriver driver, string testFile, TestPackage subPackage)
         {
             try
@@ -151,7 +174,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="filter">A TestFilter</param>
         /// <returns>The count of test cases</returns>
-        public override int CountTestCases(TestFilter filter)
+        public int CountTestCases(TestFilter filter)
         {
             EnsurePackageIsLoaded();
 
@@ -181,7 +204,7 @@ namespace NUnit.Engine.Runners
         /// <returns>
         /// A TestEngineResult giving the result of the test execution
         /// </returns>
-        protected override TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
+        public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
         {
             EnsurePackageIsLoaded();
 
@@ -212,11 +235,28 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
+        public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
+        {
+            var testRun = new AsyncTestEngineResult();
+
+            using (var worker = new BackgroundWorker())
+            {
+                worker.DoWork += (s, ea) =>
+                {
+                    var result = Run(listener, filter);
+                    testRun.SetResult(result);
+                };
+                worker.RunWorkerAsync();
+            }
+
+            return testRun;
+        }
+
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
         /// </summary>
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
-        public override void StopRun(bool force)
+        public void StopRun(bool force)
         {
             EnsurePackageIsLoaded();
 
@@ -236,7 +276,26 @@ namespace NUnit.Engine.Runners
         private void EnsurePackageIsLoaded()
         {
             if (!IsPackageLoaded)
-                LoadResult = LoadPackage();
+                LoadResult = Load();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                    Unload();
+
+                _disposed = true;
+            }
         }
     }
 }
