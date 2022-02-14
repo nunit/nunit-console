@@ -21,7 +21,7 @@
     <?include runner-directories.wxi ?>
 
     <!-- Components and files -->
-    <?include addin-files.wxi ?>
+    <!--<?include addin-files.wxi ?>-->
     <?include console-files.wxi ?>
     <?include engine-files.wxi ?>
     <?include utility-files.wxi ?>

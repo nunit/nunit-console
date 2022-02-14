@@ -17,19 +17,8 @@ namespace NUnit.Engine.Services.Tests
         [SetUp]
         public void CreateDriverFactory()
         {
-            var serviceContext = new ServiceContext();
-            serviceContext.Add(new ExtensionService());
             _driverService = new DriverService();
-            serviceContext.Add(_driverService);
-            serviceContext.ServiceManager.StartServices();
         }
-
-        [Test]
-        public void ServiceIsStarted()
-        {
-            Assert.That(_driverService.Status, Is.EqualTo(ServiceStatus.Started), "Failed to start service");
-        }
-
 
 #if NET5_0_OR_GREATER
         [TestCase("mock-assembly.dll", false, typeof(NUnitNetCore31Driver))]

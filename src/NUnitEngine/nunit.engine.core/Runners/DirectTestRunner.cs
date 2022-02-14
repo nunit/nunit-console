@@ -39,9 +39,12 @@ namespace NUnit.Engine.Runners
 
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
 
-        private ProvidedPathsAssemblyResolver _assemblyResolver;
+        private readonly ProvidedPathsAssemblyResolver _assemblyResolver;
 
         protected AppDomain TestDomain { get; set; }
+
+        // Used to inject DriverService for testing
+        internal IDriverService DriverService { get; set; }
 
         public DirectTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
@@ -101,7 +104,8 @@ namespace NUnit.Engine.Runners
             // found in the terminal nodes.
             var packagesToLoad = TestPackage.Select(p => !p.HasSubPackages());
 
-            var driverService = Services.GetService<IDriverService>();
+            if (DriverService == null)
+                DriverService = new Services.DriverService();
 
             _drivers.Clear();
 
@@ -120,7 +124,7 @@ namespace NUnit.Engine.Runners
                     _assemblyResolver.AddPathFromFile(testFile);
                 }
 
-                IFrameworkDriver driver = driverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
+                IFrameworkDriver driver = DriverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
 
                 driver.ID = subPackage.ID;
                 result.Add(LoadDriver(driver, testFile, subPackage));

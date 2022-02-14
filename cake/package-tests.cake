@@ -27,7 +27,7 @@ static PackageTest Net35X86Test = new PackageTest(
 static PackageTest Net40Test = new PackageTest(
     "Net40Test",
     "Run mock-assembly.dll under .NET 4.x",
-    "net40/mock-assembly.dll",
+    "net40/mock-assembly.dll --trace:Debug",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net40X86Test = new PackageTest(
