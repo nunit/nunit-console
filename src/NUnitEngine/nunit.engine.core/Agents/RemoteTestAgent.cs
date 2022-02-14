@@ -16,8 +16,6 @@ namespace NUnit.Engine.Agents
     /// </summary>
     public class RemoteTestAgent : TestAgent
     {
-        private IServiceLocator _services;
-
         /// <summary>
         /// Construct a RemoteTestAgent
         /// </summary>
@@ -25,11 +23,7 @@ namespace NUnit.Engine.Agents
         /// The first argument is a temporary measure and will be removed
         /// once services are all moved from nunit.engine.core to nunit.engine.
         /// </remarks>
-        public RemoteTestAgent(IServiceLocator services, Guid agentId)
-            : base(agentId)
-        {
-            _services = services;
-        }
+        public RemoteTestAgent(Guid agentId) : base(agentId) { }
 
         public ITestAgentTransport Transport;
 
@@ -49,12 +43,9 @@ namespace NUnit.Engine.Agents
         public override ITestEngineRunner CreateRunner(TestPackage package)
         {
 #if NETFRAMEWORK
-            if (package.SubPackages.Count > 1)
-                return new MultipleTestDomainRunner(_services, package);
-            else
-                return new TestDomainRunner(_services, package);
+            return new TestDomainRunner(package);
 #else
-            return new LocalTestRunner(_services, package);
+            return new LocalTestRunner(package);
 #endif
         }
     }

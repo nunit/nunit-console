@@ -5,7 +5,8 @@ namespace NUnit.Engine.Internal.FileSystemAccess
     /// <summary>
     /// A file contained in the file-system.
     /// </summary>
-    internal interface IFile
+    // TODO: Temporarily public
+    public interface IFile
     {
         /// <summary>
         /// Gets the directory that contains the file.

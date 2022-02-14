@@ -17,12 +17,12 @@ using Path = NUnit.Engine.Internal.Backports.Path;
 using Path = System.IO.Path;
 #endif
 
-namespace NUnit.Engine.Services
+namespace NUnit.Engine.Extensibility
 {
     public sealed class ExtensionManager : IDisposable
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
-        static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
+        static readonly Version ENGINE_VERSION = typeof(ExtensionManager).Assembly.GetName().Version;
 
         private readonly IFileSystem _fileSystem;
         private readonly IAddinsFileReader _addinsReader;
@@ -39,19 +39,22 @@ namespace NUnit.Engine.Services
         {
         }
 
-        internal ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem)
+        // TODO: Temporarily public
+        public ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem)
             : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
         {
         }
 
-        internal ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        // TODO: Temporarily public
+        public ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
             _addinsReader = addinsReader;
             _fileSystem = fileSystem;
             _directoryFinder = directoryFinder;
         }
 
-        internal void FindExtensions(string startDir)
+        // TODO: Temporarily public
+        public void FindExtensions(string startDir)
         {
             // Create the list of possible extension assemblies,
             // eliminating duplicates, start in the provided directory.

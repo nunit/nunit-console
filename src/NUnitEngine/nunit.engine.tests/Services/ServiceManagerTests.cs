@@ -12,8 +12,6 @@ namespace NUnit.Engine.Services.Tests
         private IService _fakeService;
         private ServiceManager _serviceManager;
 
-        private IService _extensionService;
-
         [SetUp]
         public void SetUp()
         {
@@ -21,9 +19,7 @@ namespace NUnit.Engine.Services.Tests
 
             _fakeService = new FakeService();
             _serviceManager.AddService(_fakeService);
-
-            _extensionService = new ExtensionService();
-            _serviceManager.AddService(_extensionService);
+            _serviceManager.AddService(new ExtensionService());
         }
 
         [Test]

@@ -2,7 +2,6 @@
 
 using System;
 using System.ComponentModel;
-using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Runners
 {

@@ -11,7 +11,8 @@ namespace NUnit.Engine.Internal
     /// <remarks>
     /// The format of an addins-file can be found at https://docs.nunit.org/articles/nunit-engine/extensions/Installing-Extensions.html.
     /// </remarks>
-    internal interface IAddinsFileReader
+    // TODO: Temporarily public
+    public interface IAddinsFileReader
     {
         /// <summary>
         /// Reads all entries from an addins-file.

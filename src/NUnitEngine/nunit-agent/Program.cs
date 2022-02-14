@@ -9,7 +9,6 @@ using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Services;
 
 namespace NUnit.Agent
 {
@@ -79,22 +78,8 @@ namespace NUnit.Agent
             log.Info($"Running .NET 2.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
 #endif
 
-            // Create CoreEngine
-            var engine = new CoreEngine
-            {
-                WorkDirectory = workDirectory,
-                InternalTraceLevel = traceLevel
-            };
-
-            // Custom Service Initialization
-            engine.Services.Add(new ExtensionService());
-
-            // Initialize Services
-            log.Info("Initializing Services");
-            engine.InitializeServices();
-
             log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(engine.Services, AgentId);
+            Agent = new RemoteTestAgent(AgentId);
             Agent.Transport =
 #if NETFRAMEWORK
                 new Engine.Communication.Transports.Remoting.TestAgentRemotingTransport(Agent, AgencyUrl);

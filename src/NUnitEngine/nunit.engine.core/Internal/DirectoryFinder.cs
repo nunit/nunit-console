@@ -12,7 +12,8 @@ namespace NUnit.Engine.Internal
     /// selection of directories and files. It's less than a full-fledged
     /// Linux-style globbing utility and more than standard wildcard use.
     /// </summary>
-    internal sealed class DirectoryFinder : IDirectoryFinder
+    // TODO: Temporarily public
+    public sealed class DirectoryFinder : IDirectoryFinder
     {
         private readonly IFileSystem fileSystem;
 

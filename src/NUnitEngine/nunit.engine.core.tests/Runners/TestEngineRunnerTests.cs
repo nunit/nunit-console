@@ -12,6 +12,10 @@ using NUnit.Tests.Assemblies;
 
 namespace NUnit.Engine.Runners.Tests
 {
+    // TODO: This class now only tests those runners used by agents,
+    // defined in nunit.engine.core. We should create an equivalent
+    // test class in nunit.engine to handler the engine runners.
+
     // Temporarily commenting out Process tests due to
     // intermittent errors, probably due to the test
     // fixture rather than the engine.
@@ -19,8 +23,6 @@ namespace NUnit.Engine.Runners.Tests
 #if NETFRAMEWORK
     [TestFixture(typeof(TestDomainRunner))]
     //[TestFixture(typeof(ProcessRunner))]
-    [TestFixture(typeof(MultipleTestDomainRunner), 1)]
-    [TestFixture(typeof(MultipleTestDomainRunner), 3)]
 #endif
     //[TestFixture(typeof(MultipleTestProcessRunner), 1)]
     //[TestFixture(typeof(MultipleTestProcessRunner), 3)]
@@ -28,7 +30,6 @@ namespace NUnit.Engine.Runners.Tests
     public class TestEngineRunnerTests<TRunner> where TRunner : AbstractTestRunner
     {
         protected TestPackage _package;
-        protected ServiceContext _services;
         protected TRunner _runner;
 
         // Number of copies of mock-assembly to use in package
@@ -44,11 +45,6 @@ namespace NUnit.Engine.Runners.Tests
         [SetUp]
         public void Initialize()
         {
-            // Add all services needed by any of our TestEngineRunners
-            _services = new ServiceContext();
-            _services.Add(new Services.ExtensionService());
-            _services.ServiceManager.StartServices();
-
             var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
 
             var assemblies = new List<string>();
@@ -59,8 +55,8 @@ namespace NUnit.Engine.Runners.Tests
 
             _package = new TestPackage(assemblies);
 
-            // HACK: Depends on the fact that all TestEngineRunners support this constructor
-            _runner = (TRunner)Activator.CreateInstance(typeof(TRunner), _services, _package);
+            // HACK: Depends on the fact that all the runners we are testing here support this constructor
+            _runner = (TRunner)Activator.CreateInstance(typeof(TRunner), _package);
         }
 
         [TearDown]
@@ -68,9 +64,6 @@ namespace NUnit.Engine.Runners.Tests
         {
             if (_runner != null)
                 _runner.Dispose();
-
-            if (_services != null)
-                _services.ServiceManager.Dispose();
         }
 
         [Test]

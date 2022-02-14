@@ -10,19 +10,19 @@ using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 
-namespace NUnit.Engine.Services
+namespace NUnit.Engine.Drivers
 {
     /// <summary>
     /// The DriverService provides drivers able to load and run tests
     /// using various frameworks.
     /// </summary>
-    public class DriverService : IDriverService
+    public class DriverFactory : IDriverService
     {
         static readonly ILogger log = InternalTrace.GetLogger("DriverService");
 
         readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 
-        public DriverService()
+        public DriverFactory()
         {
             var thisAssembly = Assembly.GetExecutingAssembly();
             var extensionManager = new ExtensionManager();
