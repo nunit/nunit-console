@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Engine.Runners;
 
-namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
+namespace NUnit.Engine.Services.TestRunnerFactoryTests
 {
     public class RunnerResult
     {
-#if !NETCOREAPP
+#if NETFRAMEWORK
         public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
         public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
         public static RunnerResult MultipleTestProcessRunner(int numProcesses) =>
@@ -18,6 +18,9 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
                 GetSubRunners(RunnerResult.ProcessRunner, numProcesses));
         public static RunnerResult AggregatingTestRunner(int numSubRunners) =>
             RunnerResult.AggregatingTestRunner(RunnerResult.ProcessRunner, numSubRunners);
+#else
+        public static RunnerResult AggregatingTestRunner(int numSubRunners) =>
+            RunnerResult.AggregatingTestRunner(RunnerResult.LocalTestRunner, numSubRunners);
 #endif
         public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 

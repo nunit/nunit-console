@@ -12,7 +12,7 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
-    public class ProcessRunner : AbstractTestRunner
+    public class ProcessRunner : TestEngineRunner
     {
         // ProcessRunner is given a TestPackage containing a single assembly
         // multiple assemblies, a project, multiple projects or a mix. It loads
@@ -59,6 +59,8 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         protected override TestEngineResult LoadPackage()
         {
+            Guard.OperationValid(TestPackage!=null, "Calling LoadPackage with null TestPackage");
+
             log.Info("Loading " + TestPackage.Name);
             Unload();
 

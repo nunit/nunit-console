@@ -7,7 +7,7 @@ using System.Text;
 
 namespace NUnit.Engine.Tests.Runners.Fakes
 {
-    internal class EmptyDirectTestRunner : Engine.Runners.DirectTestRunner
+    internal class EmptyDirectTestRunner : Engine.Runners.TestAgentRunner
     {
         public EmptyDirectTestRunner(TestPackage package) : base(package)
         {

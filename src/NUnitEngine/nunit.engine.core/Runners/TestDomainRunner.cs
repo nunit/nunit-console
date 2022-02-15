@@ -7,7 +7,7 @@ namespace NUnit.Engine.Runners
     /// TestDomainRunner loads and runs tests in a separate
     /// domain whose lifetime it controls.
     /// </summary>
-    public class TestDomainRunner : DirectTestRunner
+    public class TestDomainRunner : TestAgentRunner
     {
         private DomainManager _domainManager;
 

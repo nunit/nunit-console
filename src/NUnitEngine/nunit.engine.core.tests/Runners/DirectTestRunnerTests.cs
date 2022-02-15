@@ -28,7 +28,7 @@ namespace NUnit.Engine.Runners.Tests
                 string.Empty, 
                 false).ReturnsForAnyArgs(_driver);
 
-            _directTestRunner = new EmptyDirectTestRunner(new TestPackage("mock-assembly.dll"));
+            _directTestRunner = new EmptyDirectTestRunner(new TestPackage("mock-assembly.dll").SubPackages[0]);
             _directTestRunner.DriverService = driverService;
         }
 

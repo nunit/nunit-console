@@ -15,7 +15,7 @@ namespace NUnit.Engine.Runners
     /// if a derived class sets the LevelOfParallelism
     /// property in its constructor.
     /// </summary>
-    public class AggregatingTestRunner : AbstractTestRunner
+    public class AggregatingTestRunner : TestEngineRunner
     {
         // AggregatingTestRunner combines the results from tests run by different
         // runners. It may be used as a base class or through one of it's derived

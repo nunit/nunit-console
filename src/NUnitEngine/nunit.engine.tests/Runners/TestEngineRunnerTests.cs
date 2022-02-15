@@ -10,6 +10,7 @@ using NUnit.Framework;
 using NUnit.Tests;
 using NUnit.Tests.Assemblies;
 
+#if WIP
 namespace NUnit.Engine.Runners.Tests
 {
     // TODO: This class now only tests those runners used by agents,
@@ -119,7 +120,7 @@ namespace NUnit.Engine.Runners.Tests
             // Runners that derive from DirectTestRunner should automatically load the package
             // on calls to CountTestCases, Explore, Run and RunAsync. Other runners should
             // defer the loading to subpackages.
-            if (_runner is DirectTestRunner)
+            if (_runner is TestAgentRunner)
                 Assert.That(_runner.IsPackageLoaded, "Package was not loaded automatically");
             else
                 Assert.That(_runner.IsPackageLoaded, Is.False, "Package should not be loaded automatically");
@@ -154,3 +155,4 @@ namespace NUnit.Engine.Runners.Tests
         }
     }
 }
+#endif

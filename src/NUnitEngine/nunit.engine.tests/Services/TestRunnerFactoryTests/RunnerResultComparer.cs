@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
+namespace NUnit.Engine.Services.TestRunnerFactoryTests
 {
     internal class RunnerResultComparer : IEqualityComparer<RunnerResult>
     {

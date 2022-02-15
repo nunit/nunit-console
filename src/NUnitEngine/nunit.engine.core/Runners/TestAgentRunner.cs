@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using NUnit.Common;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
@@ -10,34 +11,12 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// DirectTestRunner is the abstract base for runners
-    /// that deal directly with a framework driver.
+    /// TestAgentRunner is the abstract base for runners used by agents, which
+    /// deal directly with a framework driver. It loads and runs tests in a single 
+    /// assembly, creating an <see cref="IFrameworkDriver"/> to do so.
     /// </summary>
-    public abstract class DirectTestRunner : ITestEngineRunner
+    public abstract class TestAgentRunner : ITestEngineRunner
     {
-        // DirectTestRunner loads and runs tests in a particular AppDomain using
-        // one driver per assembly. All test assemblies are ultimately executed by
-        // one of the derived classes of DirectTestRunner, either LocalTestRunner
-        // or TestDomainRunner.
-        //
-        // DirectTestRunner creates an appropriate framework driver for each assembly
-        // included in the TestPackage. All frameworks loaded by the same DirectRunner
-        // must be compatible, i.e. runnable within the same AppDomain.
-        // 
-        // DirectTestRunner is used in the engine/runner process as well as in agent
-        // processes. It may be called with a TestPackage that specifies a single 
-        // assembly, multiple assemblies, a single project, multiple projects or
-        // a mix of projects and assemblies. This variety of potential package
-        // inputs complicates things. It arises from the fact that NUnit permits 
-        // the caller to specify that all projects and assemblies should be loaded 
-        // in the same AppDomain.
-        //
-        // TODO: When there are projects included in the TestPackage, DirectTestRunner
-        // should create intermediate result nodes for each project.
-        //
-        // TODO: We really should detect and give a meaningful message if the user 
-        // tries to load incompatible frameworks in the same AppDomain.
-
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
 
         private readonly ProvidedPathsAssemblyResolver _assemblyResolver;
@@ -65,9 +44,13 @@ namespace NUnit.Engine.Runners
             get { return LoadResult != null; }
         }
 
-        public DirectTestRunner(TestPackage package)
+        public TestAgentRunner(TestPackage package)
         {
-            TestPackage = package;
+            Guard.ArgumentNotNull(package, nameof(package));
+            var assemblyPackages = package.Select(p => !p.HasSubPackages());
+            Guard.ArgumentValid(assemblyPackages.Count == 1, "TestAgentRunner requires a package with a single assembly", nameof(package));
+
+            TestPackage = assemblyPackages[0];
 
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.

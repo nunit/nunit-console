@@ -38,9 +38,19 @@ namespace NUnit.Engine.Services
 #if !NETFRAMEWORK
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
-
-            return new LocalTestRunner(package);
-        }
+            else
+            {
+                var assemblyPackages = package.Select(p => p.IsAssemblyPackage());
+                switch (assemblyPackages.Count)
+                {
+                    default:
+                        return new AggregatingTestRunner(ServiceContext, package);
+                    case 1:
+                        return new LocalTestRunner(assemblyPackages[0]);
+                    case 0:
+                        return new LocalTestRunner(package);
+                }
+            }
 #else
 
             bool isNested = false;
@@ -58,7 +68,7 @@ namespace NUnit.Engine.Services
                 return new MultipleTestProcessRunner(ServiceContext, package);
             else
                 return new ProcessRunner(ServiceContext, package);
-        }
 #endif
+        }
     }
 }
