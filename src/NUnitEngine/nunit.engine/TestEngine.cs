@@ -75,7 +75,7 @@ namespace NUnit.Engine
                 Services.Add(new TestAgency());
 #endif
                 Services.Add(new ResultService());
-                Services.Add(new DefaultTestRunnerFactory());
+                Services.Add(new TestRunnerFactory());
             }
 
             Services.ServiceManager.StartServices();

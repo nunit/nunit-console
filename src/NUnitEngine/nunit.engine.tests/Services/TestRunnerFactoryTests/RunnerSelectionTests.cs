@@ -16,7 +16,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
     /// </summary>
     public class RunnerSelectionTests
     {
-        private DefaultTestRunnerFactory _factory;
+        private TestRunnerFactory _factory;
         private ServiceContext _services;
 
         [OneTimeSetUp]
@@ -30,7 +30,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             projectService.Add("z.nunit", "z.dll");
             _services.Add(projectService);
             Assert.That(((IService)projectService).Status, Is.EqualTo(ServiceStatus.Started));
-            _factory = new DefaultTestRunnerFactory();
+            _factory = new TestRunnerFactory();
             _services.Add(_factory);
             _factory.StartService();
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));

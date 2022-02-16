@@ -6,11 +6,11 @@ using NUnit.Engine.Runners;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// DefaultTestRunnerFactory handles creation of a suitable test
+    /// TestRunnerFactory handles creation of a suitable test
     /// runner for a given package to be loaded and run either in a
     /// separate process or within the same process.
     /// </summary>
-    public class DefaultTestRunnerFactory : Service, ITestRunnerFactory
+    public class TestRunnerFactory : Service, ITestRunnerFactory
     {
         private IProjectService _projectService;
 

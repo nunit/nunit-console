@@ -18,9 +18,9 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [Test]
-        public void DefaultTestRunnerFactory_ProjectServiceMissing()
+        public void TestRunnerFactory_ProjectServiceMissing()
         {
-            var service = new DefaultTestRunnerFactory();
+            var service = new TestRunnerFactory();
             _services.Add(service);
             service.StartService();
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Error));
