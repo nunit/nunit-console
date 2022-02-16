@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace NUnit.Engine.Tests.Runners.Fakes
+namespace NUnit.Engine.Runners
 {
-    internal class EmptyDirectTestRunner : Engine.Runners.TestAgentRunner
+    internal class FakeTestAgentRunner : Engine.Runners.TestAgentRunner
     {
-        public EmptyDirectTestRunner(TestPackage package) : base(package)
+        public FakeTestAgentRunner(TestPackage package) : base(package)
         {
             TestDomain = AppDomain.CurrentDomain;
         }

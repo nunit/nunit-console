@@ -12,12 +12,12 @@ namespace NUnit.Engine.Services.Tests
     [TestFixture]
     public class DriverServiceTests
     {
-        private DriverFactory _driverService;
+        private DriverService _driverService;
 
         [SetUp]
         public void CreateDriverFactory()
         {
-            _driverService = new DriverFactory();
+            _driverService = new DriverService();
         }
 
 #if NET5_0_OR_GREATER

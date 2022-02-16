@@ -109,7 +109,7 @@ namespace NUnit.Engine.Runners
             var packagesToLoad = TestPackage.Select(p => !p.HasSubPackages());
 
             if (DriverService == null)
-                DriverService = new DriverFactory();
+                DriverService = new DriverService();
 
             _drivers.Clear();
 

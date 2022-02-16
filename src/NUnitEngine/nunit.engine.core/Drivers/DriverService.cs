@@ -16,13 +16,13 @@ namespace NUnit.Engine.Drivers
     /// The DriverService provides drivers able to load and run tests
     /// using various frameworks.
     /// </summary>
-    public class DriverFactory : IDriverService
+    public class DriverService : IDriverService
     {
         static readonly ILogger log = InternalTrace.GetLogger("DriverService");
 
         readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 
-        public DriverFactory()
+        public DriverService()
         {
             var thisAssembly = Assembly.GetExecutingAssembly();
             var extensionManager = new ExtensionManager();
