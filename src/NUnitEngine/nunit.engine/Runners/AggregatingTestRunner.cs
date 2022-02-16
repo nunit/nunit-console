@@ -67,6 +67,7 @@ namespace NUnit.Engine.Runners
 
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
+            Guard.ArgumentValid(TestRunnerFactory != null, "TestRunnerFactory service not available", nameof(services));
         }
 
         /// <summary>
