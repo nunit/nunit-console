@@ -57,10 +57,7 @@ var PACKAGE_SOURCE = new string[]
 var BUNDLED_EXTENSIONS = new[]
 {
   "NUnit.Extension.VSProjectLoader",
-  "NUnit.Extension.NUnitProjectLoader",
-  "NUnit.Extension.NUnitV2Driver",
-  "NUnit.Extension.NUnitV2ResultWriter",
-  "NUnit.Extension.TeamCityEventListener"
+  "NUnit.Extension.NUnitProjectLoader"
 };
 
 // URLs for uploading packages

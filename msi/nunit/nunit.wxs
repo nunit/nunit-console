@@ -21,8 +21,9 @@
     <?include runner-directories.wxi ?>
 
     <!-- Components and files -->
-    <!--<?include addin-files.wxi ?>-->
     <?include console-files.wxi ?>
     <?include engine-files.wxi ?>
+    <!-- Temporarily excluding extensions until they are converted to 4.0 api -->
+    <!--<?include addin-files.wxi ?>-->
     <?include utility-files.wxi ?>
 </Wix>
