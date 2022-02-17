@@ -387,8 +387,8 @@ namespace NUnit.ConsoleRunner
             if (options.SkipNonTestAssemblies)
                 package.AddSetting(EnginePackageSettings.SkipNonTestAssemblies, true);
 
-            if (options.DefaultTimeout >= 0)
-                package.AddSetting(FrameworkPackageSettings.DefaultTimeout, options.DefaultTimeout);
+            if (options.DefaultTestCaseTimeout >= 0)
+                package.AddSetting(FrameworkPackageSettings.DefaultTimeout, options.DefaultTestCaseTimeout);
 
             if (options.InternalTraceLevelSpecified)
                 package.AddSetting(FrameworkPackageSettings.InternalTraceLevel, options.InternalTraceLevel);

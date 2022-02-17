@@ -59,8 +59,8 @@ namespace NUnit.Common
         public string WhereClause { get; private set; }
         public bool WhereClauseSpecified { get { return WhereClause != null; } }
 
-        public int DefaultTimeout { get; private set; } = -1;
-        public bool DefaultTimeoutSpecified { get { return DefaultTimeout >= 0; } }
+        public int DefaultTestCaseTimeout { get; private set; } = -1;
+        public bool DefaultTestCaseTimeoutSpecified { get { return DefaultTestCaseTimeout >= 0; } }
 
         public int RandomSeed { get; private set; } = -1;
         public bool RandomSeedSpecified { get { return RandomSeed >= 0; } }
@@ -228,8 +228,8 @@ namespace NUnit.Common
                     }
                 });
 
-            this.Add("timeout=", "Set timeout for each test case in {MILLISECONDS}.",
-                v => DefaultTimeout = parser.RequiredInt(v, "--timeout"));
+            this.Add("testCaseTimeout=", "Set timeout for each test case in {MILLISECONDS}. May be overridden with TimeoutAttribute.",
+                v => DefaultTestCaseTimeout = parser.RequiredInt(v, "--testCaseTimeout"));
 
             this.Add("seed=", "Set the random {SEED} used to generate test cases.",
                 v => RandomSeed = parser.RequiredInt(v, "--seed"));

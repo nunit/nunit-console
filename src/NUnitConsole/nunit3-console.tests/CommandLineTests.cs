@@ -243,7 +243,7 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
-        [TestCase("DefaultTimeout", "timeout")]
+        [TestCase("DefaultTestCaseTimeout", "testCaseTimeout")]
         [TestCase("RandomSeed", "seed")]
         [TestCase("NumberOfTestWorkers", "workers")]
 #if NET35
@@ -265,7 +265,7 @@ namespace NUnit.ConsoleRunner.Tests
 
         [TestCase("--where")]
         [TestCase("--config")]
-        [TestCase("--timeout")]
+        [TestCase("--testCaseTimeout")]
         [TestCase("--output")]
         [TestCase("--work")]
         [TestCase("--trace")]
@@ -323,29 +323,29 @@ namespace NUnit.ConsoleRunner.Tests
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll");
             Assert.That(options.Validate(), Is.True);
-            Assert.That(options.DefaultTimeout, Is.EqualTo(-1));
+            Assert.That(options.DefaultTestCaseTimeout, Is.EqualTo(-1));
         }
 
         [Test]
         public void TimeoutThrowsExceptionIfOptionHasNoValue()
         {
-            Assert.Throws<OptionException>(() => ConsoleMocks.Options("tests.dll", "-timeout"));
+            Assert.Throws<OptionException>(() => ConsoleMocks.Options("tests.dll", "-testCaseTimeout"));
         }
 
         [Test]
         public void TimeoutParsesIntValueCorrectly()
         {
-            ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-timeout:5000");
+            ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-testCaseTimeout:5000");
             Assert.That(options.Validate(), Is.True);
-            Assert.That(options.DefaultTimeout, Is.EqualTo(5000));
+            Assert.That(options.DefaultTestCaseTimeout, Is.EqualTo(5000));
         }
 
         [Test]
         public void TimeoutCausesErrorIfValueIsNotInteger()
         {
-            ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-timeout:abc");
+            ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-testCaseTimeout:abc");
             Assert.That(options.Validate(), Is.False);
-            Assert.That(options.DefaultTimeout, Is.EqualTo(-1));
+            Assert.That(options.DefaultTestCaseTimeout, Is.EqualTo(-1));
         }
 
         [Test]
