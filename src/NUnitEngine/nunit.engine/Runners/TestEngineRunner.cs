@@ -2,35 +2,37 @@
 
 using System;
 using System.ComponentModel;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// AbstractTestRunner is the base class for all internal runners
-    /// within the NUnit Engine. It implements the ITestEngineRunner
-    /// interface, which uses TestEngineResults to communicate back
-    /// to higher level runners.
+    /// TestEngineRunner is the base class for all TestEngineRunners
+    /// within the NUnit Engine itself.
     /// </summary>
-    public abstract class AbstractTestRunner : ITestEngineRunner
+    public abstract class TestEngineRunner : ITestEngineRunner
     {
-        public AbstractTestRunner(IServiceLocator services, TestPackage package)
+        public TestEngineRunner(IServiceLocator services, TestPackage package)
         {
+            Guard.ArgumentNotNull(services, nameof(services));
+            Guard.ArgumentNotNull(package, nameof(package));
+
+            TestPackage = package;
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
-            TestPackage = package;
         }
-
-        /// <summary>
-        /// Our Service Context
-        /// </summary>
-        protected IServiceLocator Services { get; private set; }
-
-        protected ITestRunnerFactory TestRunnerFactory { get; private set; }
 
         /// <summary>
         /// The TestPackage for which this is the runner
         /// </summary>
-        protected TestPackage TestPackage { get; set; }
+        protected TestPackage TestPackage { get; }
+
+        /// <summary>
+        /// Our Service Context
+        /// </summary>
+        protected IServiceLocator Services { get; }
+
+        protected ITestRunnerFactory TestRunnerFactory { get; }
 
         /// <summary>
         /// The result of the last call to LoadPackage
@@ -40,10 +42,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// Gets an indicator of whether the package has been loaded.
         /// </summary>
-        public bool IsPackageLoaded
-        {
-            get { return LoadResult != null;  }
-        }
+        public bool IsPackageLoaded => LoadResult != null;
 
         /// <summary>
         /// Loads the TestPackage for exploration or execution.

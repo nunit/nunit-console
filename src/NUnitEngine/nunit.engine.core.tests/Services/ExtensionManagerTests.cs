@@ -160,7 +160,7 @@ namespace NUnit.Engine.Services.Tests
             Console.WriteLine($"{assemblyName} does exist");
 
             var service = new ExtensionManager();
-            service.FindExtensionPoints(typeof(DriverFactory).Assembly);
+            service.FindExtensionPoints(typeof(DriverService).Assembly);
             service.FindExtensionPoints(typeof(ITestEngine).Assembly);
             var extensionAssembly = new ExtensionAssembly(assemblyName, false);
 

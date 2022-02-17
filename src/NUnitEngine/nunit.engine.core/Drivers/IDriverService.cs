@@ -3,7 +3,7 @@
 using System;
 using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine
+namespace NUnit.Engine.Drivers
 {
     /// <summary>
     /// The IDriverService interface is implemented by the driver service, which is able

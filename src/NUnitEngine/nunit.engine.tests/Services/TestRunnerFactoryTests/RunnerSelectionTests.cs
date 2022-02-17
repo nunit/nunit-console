@@ -7,7 +7,7 @@ using NUnit.Engine.Services;
 using NUnit.Engine.Services.Tests.Fakes;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
+namespace NUnit.Engine.Services.TestRunnerFactoryTests
 {
     /// <summary>
     /// Tests of ITestRunner tree structure for different combinations
@@ -16,7 +16,7 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
     /// </summary>
     public class RunnerSelectionTests
     {
-        private DefaultTestRunnerFactory _factory;
+        private TestRunnerFactory _factory;
         private ServiceContext _services;
 
         [OneTimeSetUp]
@@ -26,10 +26,11 @@ namespace NUnit.Engine.Tests.Services.TestRunnerFactoryTests
             _services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
             ((IService)projectService).StartService();
-            projectService.Add("a.nunit", "a.dll", "b.dll");
+            projectService.Add("xy.nunit", "x.dll", "y.dll");
+            projectService.Add("z.nunit", "z.dll");
             _services.Add(projectService);
             Assert.That(((IService)projectService).Status, Is.EqualTo(ServiceStatus.Started));
-            _factory = new DefaultTestRunnerFactory();
+            _factory = new TestRunnerFactory();
             _services.Add(_factory);
             _factory.StartService();
             Assert.That(_factory.Status, Is.EqualTo(ServiceStatus.Started));

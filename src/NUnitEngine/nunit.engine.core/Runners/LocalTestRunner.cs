@@ -7,7 +7,7 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// LocalTestRunner runs tests in the current application domain.
     /// </summary>
-    public class LocalTestRunner : DirectTestRunner
+    public class LocalTestRunner : TestAgentRunner
     {
         public LocalTestRunner(TestPackage package) : base(package)
         {

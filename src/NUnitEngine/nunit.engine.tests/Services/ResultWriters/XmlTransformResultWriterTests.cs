@@ -21,7 +21,7 @@ namespace NUnit.Engine.Tests.Services.ResultWriters
             var assemblyPath = GetLocalPath(AssemblyName);
 
             var serviceContext = new ServiceContext();
-            serviceContext.Add(new DefaultTestRunnerFactory());
+            serviceContext.Add(new TestRunnerFactory());
 #if NETFRAMEWORK
             serviceContext.Add(new TestAgency());
 #endif
