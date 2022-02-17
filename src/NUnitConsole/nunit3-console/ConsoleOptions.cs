@@ -267,25 +267,9 @@ namespace NUnit.Common
             this.Add("noresult", "Don't save any test results.",
                 v => noresult = v != null);
 
-            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, OnOutputOnly, Before, After, BeforeAndAfter",
+            this.Add("labels=", "Specify whether to write test case names to the output. Values: Off (Default), On, OnOutput, Before, After, BeforeAndAfter. On is currently an alias for OnOutput, but is subject to change.",
                 v => {
-                        string deprecationWarning = null;
-
-                        if (v.Equals("On", StringComparison.OrdinalIgnoreCase))
-                        {
-                            deprecationWarning = "labels=On is deprecated and will be removed in a future release. Please use labels=OnOutputOnly instead.";
-                            v = "OnOutputOnly";
-                        }
-                        else if (v.Equals("All", StringComparison.OrdinalIgnoreCase))
-                        {
-                            deprecationWarning = "labels=All is deprecated and will be removed in a future release. Please use labels=Before instead.";
-                            v = "Before";
-                        } 
-
-                        if (deprecationWarning != null && !WarningMessages.Contains(deprecationWarning))
-                            WarningMessages.Add(deprecationWarning);
-
-                        DisplayTestLabels = parser.RequiredValue(v, "--labels", "Off", "OnOutputOnly", "Before", "After", "BeforeAndAfter");
+                        DisplayTestLabels = parser.RequiredValue(v, "--labels", "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter");
                 });
 
             this.Add("test-name-format=", "Non-standard naming pattern to use in generating test names.",
