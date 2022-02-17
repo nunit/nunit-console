@@ -20,6 +20,9 @@ public class BuildVersion
         BranchName = _gitVersion.BranchName;
         IsReleaseBranch = BranchName.StartsWith("release-");
 
+        if (BranchName.StartsWith("support-") || BranchName.StartsWith("support/"))
+            throw new Exception("Support branches have a special meaning for GitVersion. Please rename the branch");
+
         string productVersion = context.HasArgument("productVersion")
             ? context.Argument<string>("productVersion")
             : CalculateProductVersion();
