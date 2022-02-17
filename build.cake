@@ -402,6 +402,7 @@ Task("CreateZipImage")
             var addinsDir = frameworkDir + "addins/";
             CleanDirectory(addinsDir);
 
+            // Temporarily excluding extensions until they are converted to 4.0 api
             //foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
             //    CopyPackageContents(packageDir, addinsDir);
         }

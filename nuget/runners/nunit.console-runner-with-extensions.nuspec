@@ -19,9 +19,6 @@
       The following extensions are included with this package:
       * NUnitProjectLoader     - loads tests from NUnit projects
       * VSProjectLoader        - loads tests from Visual Studio projects
-      * NUnitV2ResultWriter    - saves results in NUnit V2 format.
-      * NUnitV2FrameworkDriver - runs NUnit V2 tests.
-      * TeamCityEventListener  - supports special progress messages used by teamcity.
 
       Other extensions, if needed, must be installed separately.
     </description>
@@ -34,9 +31,6 @@
         <dependency id="NUnit.ConsoleRunner" version="$version$" />
         <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.6.0" />
         <dependency id="NUnit.Extension.VSProjectLoader" version="3.8.0" />
-        <dependency id="NUnit.Extension.NUnitV2ResultWriter" version="3.6.0" />
-        <dependency id="NUnit.Extension.NUnitV2Driver" version="3.8.0" />
-        <dependency id="NUnit.Extension.TeamCityEventListener" version="1.0.7" />
       </group>
     </dependencies>
   </metadata>
