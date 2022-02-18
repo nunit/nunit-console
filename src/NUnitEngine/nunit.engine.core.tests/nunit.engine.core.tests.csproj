@@ -19,7 +19,14 @@
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnitLite" Version="3.13.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net35'">
     <PackageReference Include="NSubstitute" Version="2.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='net35'">
+    <PackageReference Include="NSubstitute" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net35'">
