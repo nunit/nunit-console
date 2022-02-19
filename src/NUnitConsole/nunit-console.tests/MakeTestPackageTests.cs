@@ -39,7 +39,6 @@ namespace NUnit.ConsoleRunner
         [TestCase("--seed=1234", "RandomSeed", 1234)]
         [TestCase("--workers=3", "NumberOfTestWorkers", 3)]
         [TestCase("--workers=0", "NumberOfTestWorkers", 0)]
-        [TestCase("--params:X=5;Y=7", "TestParameters", "X=5;Y=7")]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
 #if NET35
         [TestCase("--x86", "RunAsX86", true)]

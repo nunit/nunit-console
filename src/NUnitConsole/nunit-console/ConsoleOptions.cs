@@ -196,30 +196,10 @@ namespace NUnit.ConsoleRunner.Options
             this.Add("where=", "Test selection {EXPRESSION} indicating what tests will be run. See description below.",
                 v => WhereClause = parser.RequiredValue(v, "--where"));
 
-            this.Add("params|p=", "Deprecated and will be removed in a future release. Please use --testparam instead.",
+            this.Add("param|p=", "Followed by a key-value pair separated by an equals sign. Test code can access the value by name. This option may be repeated.",
                 v =>
                 {
-                    const string deprecationWarning = "--params is deprecated and will be removed in a future release. Please use --testparam instead.";
-
-                    if (!WarningMessages.Contains(deprecationWarning))
-                        WarningMessages.Add(deprecationWarning);
-
-                    string parameters = parser.RequiredValue(v, "--params");
-
-                    foreach (string param in parameters.Split(new[] { ';' }))
-                    {
-                        var valuePair = parser.RequiredKeyValue(param);
-                        if (valuePair.HasValue)
-                        {
-                            TestParameters[valuePair.Value.Key] = valuePair.Value.Value;
-                        }
-                    }
-                });
-
-            this.Add("testparam|tp=", "Followed by a key-value pair separated by an equals sign. Test code can access the value by name.",
-                v =>
-                {
-                    var valuePair = parser.RequiredKeyValue(parser.RequiredValue(v, "--testparam"));
+                    var valuePair = parser.RequiredKeyValue(parser.RequiredValue(v, "--param"));
                     if (valuePair.HasValue)
                     {
                         TestParameters[valuePair.Value.Key] = valuePair.Value.Value;

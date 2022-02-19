@@ -270,7 +270,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("--work")]
         [TestCase("--trace")]
         [TestCase("--test-name-format")]
-        [TestCase("--params")]
+        [TestCase("--param")]
         [TestCase("--encoding")]
 #if NET35
         [TestCase("--framework")]
@@ -610,53 +610,9 @@ namespace NUnit.ConsoleRunner
         }
 
         [Test]
-        public void SingleDeprecatedTestParameter()
-        {
-            var options = ConsoleMocks.Options("--params=X=5");
-            Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
-        }
-
-        [Test]
-        public void TwoDeprecatedTestParametersInOneOption()
-        {
-            var options = ConsoleMocks.Options("--params:X=5;Y=7");
-            Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
-        }
-
-        [Test]
-        public void TwoDeprecatedTestParametersInSeparateOptions()
-        {
-            var options = ConsoleMocks.Options("-p:X=5", "-p:Y=7");
-            Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
-        }
-
-        [Test]
-        public void ThreeDeprecatedTestParametersInTwoOptions()
-        {
-            var options = ConsoleMocks.Options("--params:X=5;Y=7", "-p:Z=3");
-            Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" }, { "Z", "3" } }));
-        }
-
-        [Test]
-        public void DeprecatedParameterWithoutEqualSignIsInvalid()
-        {
-            var options = ConsoleMocks.Options("--params=X5");
-            Assert.That(options.WarningMessages, Has.One.Contains("deprecated").IgnoreCase);
-            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
-        }
-
-        [Test]
         public void SingleTestParameter()
         {
-            var options = ConsoleMocks.Options("--testparam=X=5");
+            var options = ConsoleMocks.Options("--param=X=5");
             Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" } }));
         }
@@ -664,7 +620,7 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void SemicolonsDoNotSplitTestParameters()
         {
-            var options = ConsoleMocks.Options("--testparam:X=5;Y=7");
+            var options = ConsoleMocks.Options("--param:X=5;Y=7");
             Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5;Y=7" } }));
         }
@@ -672,7 +628,7 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void TwoTestParametersInSeparateOptions()
         {
-            var options = ConsoleMocks.Options("--testparam:X=5", "--testparam:Y=7");
+            var options = ConsoleMocks.Options("--param:X=5", "--param:Y=7");
             Assert.That(options.ErrorMessages, Is.Empty);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { { "X", "5" }, { "Y", "7" } }));
         }
@@ -680,93 +636,104 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void ParameterWithoutEqualSignIsInvalid()
         {
-            var options = ConsoleMocks.Options("--testparam=X5");
+            var options = ConsoleMocks.Options("--param=X5");
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
         [Test]
         public void ParameterWithMissingNameIsInvalid()
         {
-            var options = ConsoleMocks.Options("--testparam:=5");
+            var options = ConsoleMocks.Options("--param:=5");
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
         [Test]
         public void ParameterWithMissingValueIsInvalid()
         {
-            var options = ConsoleMocks.Options("--testparam:X=");
+            var options = ConsoleMocks.Options("--param:X=");
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void LeadingWhitespaceIsPreservedInParameterName()
+        public void LeadingWhitespaceIsRemovedInParameterName()
         {
             // Command line examples to get in this scenario:
-            // --testparams:"  X"=5
-            // --testparams:"  X=5"
-            // "--testparams:  X=5"
+            // --param:"  X"=5
+            // --param:"  X=5"
+            // "--param:  X=5"
 
-            var options = ConsoleMocks.Options("--testparam:  X=5");
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["  X"] = "5" }));
+            var options = ConsoleMocks.Options("--param:  X=5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "5" }));
         }
 
         [Test]
-        public void TrailingWhitespaceIsPreservedInParameterName()
+        public void TrailingWhitespaceIsRemovedInParameterName()
         {
             // Command line examples to get in this scenario:
-            // --testparams:"X  "=5
-            // --testparams:"X  =5"
-            // "--testparams:X  =5"
+            // --param:"X  "=5
+            // --param:"X  =5"
+            // "--param:X  =5"
 
-            var options = ConsoleMocks.Options("--testparam:X  =5");
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X  "] = "5" }));
+            var options = ConsoleMocks.Options("--param:X  =5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "5" }));
         }
 
         [Test]
-        public void WhitespaceIsPermittedAsParameterName()
+        public void WhitespaceIsNotPermittedAsParameterName()
         {
             // Command line examples to get in this scenario:
             // --testparams:"  "=5
             // --testparams:"  =5"
             // "--testparams:  =5"
 
-            var options = ConsoleMocks.Options("--testparam:  =5");
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["  "] = "5" }));
+            var options = ConsoleMocks.Options("--param:  =5");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void LeadingWhitespaceIsPreservedInParameterValue()
+        public void LeadingWhitespaceIsRemovedInParameterValue()
         {
             // Command line examples to get in this scenario:
-            // --testparams:X="  5"
-            // --testparams:"X=  5"
-            // "--testparams:X=  5"
+            // --param:X="  5"
+            // --param:"X=  5"
+            // "--param:X=  5"
 
-            var options = ConsoleMocks.Options("--testparam:X=  5");
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "  5" }));
+            var options = ConsoleMocks.Options("--param:X=  5");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "5" }));
         }
 
         [Test]
-        public void TrailingWhitespaceIsPreservedInParameterValue()
+        public void TrailingWhitespaceIsRemovedInParameterValue()
         {
             // Command line examples to get in this scenario:
-            // --testparams:X="5  "
-            // --testparams:"X=5  "
-            // "--testparams:X=5  "
+            // --param:X="5  "
+            // --param:"X=5  "
+            // "--param:X=5  "
 
-            var options = ConsoleMocks.Options("--testparam:X=5  ");
-            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "5  " }));
+            var options = ConsoleMocks.Options("--param:X=5  ");
+            Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "5" }));
         }
 
         [Test]
-        public void WhitespaceIsPermittedAsParameterValue()
+        public void WhitespaceIsNotPermittedForNonQuotedParameterValue()
         {
             // Command line examples to get in this scenario:
-            // --testparams:X="  "
-            // --testparams:"X=  "
-            // "--testparams:X=  "
+            // --param:X="  "
+            // --param:"X=  "
+            // "--param:X=  "
 
-            var options = ConsoleMocks.Options("--testparam:X=  ");
+            var options = ConsoleMocks.Options("--param:X=  ");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void WhitespaceIsPermittedForQuotedParameterValue()
+        {
+            // Command line examples to get in this scenario:
+            // --param:X=\"  \"
+
+            var options = ConsoleMocks.Options("--param:X=\"  \"");
+            Console.WriteLine(options.TestParameters["X"]);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "  " }));
         }
 
@@ -782,17 +749,8 @@ namespace NUnit.ConsoleRunner
             Console.WriteLine("Test Parameters---");
 
             foreach (var name in TestContext.Parameters.Names)
-                Console.WriteLine("   Name: {0} Value: {1}", name, TestContext.Parameters[name]);
+                Console.WriteLine("   [{0}] = <{1}>", name, TestContext.Parameters[name]);
         }
-
-        //[TestCase("On", "OnOutput")]
-        //[TestCase("All", "Before")]
-        //public void DeprecatedLabelsOptionsAreReplacedCorrectly(string oldOption, string newOption)
-        //{
-        //    var options = ConsoleMocks.Options("--labels=" + oldOption);
-        //    options.Validate();
-        //    Assert.That(options.DisplayTestLabels, Is.EqualTo(newOption));
-        //}
 
         private static IFileSystem GetFileSystemContainingFile(string fileName)
         {
