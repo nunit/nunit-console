@@ -726,13 +726,15 @@ namespace NUnit.ConsoleRunner
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
         }
 
-        [Test]
-        public void WhitespaceIsPermittedForQuotedParameterValue()
+        [TestCase('"', TestName = "{m}_DoubleQuote")]
+        [TestCase('\'', TestName = "{m}_SingleQuote")]
+        public void WhitespaceIsPermittedForQuotedParameterValue(char quoteChar)
         {
             // Command line examples to get in this scenario:
             // --param:X=\"  \"
+            // --param:X='  '
 
-            var options = ConsoleMocks.Options("--param:X=\"  \"");
+            var options = ConsoleMocks.Options($"--param:X={quoteChar}  {quoteChar}");
             Console.WriteLine(options.TestParameters["X"]);
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "  " }));
         }

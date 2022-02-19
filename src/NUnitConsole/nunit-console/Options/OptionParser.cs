@@ -70,17 +70,29 @@ namespace NUnit.ConsoleRunner.Options
                 if (name != string.Empty)
                 {
                     string value = testParameterSpecification.Substring(equalsIndex + 1).Trim();
-                    int length = value.Length;
-                    if (length > 2 && value[0] == '"' && value[length - 1] == '"')
-                        value = value.Substring(1, length - 2);
+                    if (IsQuotedString(value))
+                        value = value.Substring(1, value.Length - 2);
 
-                    if (name != string.Empty && value != string.Empty)
+                    if (value != string.Empty)
                         return new KeyValuePair<string, string>(name, value);
                     }
             }
 
             _logError("Invalid format for test parameter. Use NAME=VALUE.");
             return null;
+        }
+
+        private bool IsQuotedString(string value)
+        {
+            var length = value.Length;
+            if (length > 2)
+            {
+                var quoteChar = value[0];
+                if (quoteChar == '"' || quoteChar == '\'')
+                    return value[length - 1] == quoteChar;
+            }
+
+            return false;
         }
 
         public OutputSpecification ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications, IFileSystem fileSystem, string currentDir)
