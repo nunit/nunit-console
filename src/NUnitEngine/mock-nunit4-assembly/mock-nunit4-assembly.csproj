@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>NUnit.Tests</RootNamespace>
+    <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <RestoreAdditionalProjectSource>
+        https://www.myget.org/F/nunit/api/v3/index.json
+    </RestoreAdditionalProjectSource>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="4.0.0-dev-07273" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\EngineVersion.cs" LinkBase="Properties" />
+    <Compile Include="..\mock-assembly\*.cs" />
+    <None Include="..\..\nunit.snk" Link="nunit.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+</Project>

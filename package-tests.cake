@@ -202,6 +202,20 @@ public abstract class NetFXPackageTester : PackageTester
             }));
 
         PackageTests.Add(new PackageTest(
+            "net40",
+            "Run mock-nunit4-assembly.dll under .NET 4.x",
+            "net45/mock-nunit4-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 1,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
+        PackageTests.Add(new PackageTest(
             "netcoreapp3.1",
             "Run mock-assembly.dll under .NET Core 3.1",
             "netcoreapp3.1/mock-assembly.dll",
@@ -229,6 +243,20 @@ public abstract class NetFXPackageTester : PackageTester
                     Inconclusive = 1,
                     Skipped = 7
                 }));
+
+        PackageTests.Add(new PackageTest(
+            "netcoreapp3.1",
+            "Run mock-nunit4-assembly.dll under .NET Core 3.1",
+            "netcoreapp3.1/mock-nunit4-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 1,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
     }
 }
 
@@ -279,6 +307,21 @@ public abstract class NetCorePackageTester : PackageTester
                 Inconclusive = 2 * 1,
                 Skipped = 2 * 7
             }));
+
+        PackageTests.Add(new PackageTest(
+            "netcoreapp3.1",
+            "Run mock-nunit4-assembly targeting .NET Core 3.1",
+            "netcoreapp3.1/mock-nunit4-assembly.dll",
+            new ExpectedResult("Failed")
+            {
+                Total = 37,
+                Passed = 23,
+                Failed = 5,
+                Warnings = 1,
+                Inconclusive = 1,
+                Skipped = 7
+            }));
+
     }
 }
 
