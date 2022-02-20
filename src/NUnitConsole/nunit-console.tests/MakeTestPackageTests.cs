@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System.IO;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.ConsoleRunner.Options;
 
@@ -60,6 +61,23 @@ namespace NUnit.ConsoleRunner
 
             Assert.That(package.Settings.ContainsKey(key), "Setting not included for {0}", option);
             Assert.That(package.Settings[key], Is.EqualTo(val), "NumberOfTestWorkers not set correctly for {0}", option);
+        }
+
+        [Test]
+        public void TestRunParametersAreIncludedInSettings()
+        {
+            var options = ConsoleMocks.Options("test.dll", "--param:X=5", "--param:Y=7");
+            var settings = ConsoleRunner.MakeTestPackage(options).Settings;
+
+            Assert.That(settings.ContainsKey("TestParametersDictionary"), "TestParametersDictionary setting not included.");
+            var paramDictionary = settings["TestParametersDictionary"] as IDictionary<string, string>;
+            Assert.That(paramDictionary.Keys, Is.EqualTo(new[] { "X", "Y" }));
+            Assert.That(paramDictionary["X"], Is.EqualTo("5"));
+            Assert.That(paramDictionary["Y"], Is.EqualTo("7"));
+
+            Assert.That(settings.ContainsKey("TestParameters"), "TestParameters setting not included.");
+            var paramString = settings["TestParameters"] as string;
+            Assert.That(paramString, Is.EqualTo("X=5;Y=7"));
         }
 
 #if NET35

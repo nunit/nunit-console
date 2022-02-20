@@ -75,7 +75,7 @@ namespace NUnit.ConsoleRunner.Options
 
                     if (value != string.Empty)
                         return new KeyValuePair<string, string>(name, value);
-                    }
+                }
             }
 
             _logError("Invalid format for test parameter. Use NAME=VALUE.");
