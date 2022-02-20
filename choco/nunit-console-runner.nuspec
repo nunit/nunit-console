@@ -49,7 +49,6 @@
     <file src = "$BIN_DIR$agents/net20/testcentric.engine.metadata.dll" target="tools/agents/net20" />
     <file src = "nunit-agent.exe.ignore" target="tools/agents/net20" />
     <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net20" />
-    <file src = "nunit.agent.addins" target = "tools/agents/net20" />
 
     <file src = "$BIN_DIR$agents/net40/nunit-agent.exe" target="tools/agents/net40" />
     <file src = "$BIN_DIR$agents/net40/nunit-agent.exe.config" target="tools/agents/net40" />
@@ -61,7 +60,6 @@
     <file src = "$BIN_DIR$agents/net40/testcentric.engine.metadata.dll" target="tools/agents/net40" />
     <file src = "nunit-agent.exe.ignore" target="tools/agents/net40" />
     <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net40" />
-    <file src = "nunit.agent.addins" target = "tools/agents/net40" />
 
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent.dll" target="tools/agents/netcoreapp3.1" />
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent.dll.config" target="tools/agents/netcoreapp3.1" />
@@ -71,7 +69,6 @@
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit.engine.api.xml" target="tools/agents/netcoreapp3.1" />
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit.engine.core.dll" target="tools/agents/netcoreapp3.1" />
     <file src = "$BIN_DIR$agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/agents/netcoreapp3.1" />
-    <file src = "nunit.agent.addins" target = "tools/agents/netcoreapp3.1" />
 
     <file src = "$BIN_DIR$agents/net5.0/nunit-agent.dll" target="tools/agents/net5.0" />
     <file src = "$BIN_DIR$agents/net5.0/nunit-agent.dll.config" target="tools/agents/net5.0" />
@@ -81,7 +78,6 @@
     <file src = "$BIN_DIR$agents/net5.0/nunit.engine.api.xml" target="tools/agents/net5.0" />
     <file src = "$BIN_DIR$agents/net5.0/nunit.engine.core.dll" target="tools/agents/net5.0" />
     <file src = "$BIN_DIR$agents/net5.0/testcentric.engine.metadata.dll" target="tools/agents/net5.0" />
-    <file src = "nunit.agent.addins" target = "tools/agents/net5.0" />
 
     <file src = "$BIN_DIR$agents/net6.0/nunit-agent.dll" target="tools/agents/net6.0" />
     <file src = "$BIN_DIR$agents/net6.0/nunit-agent.dll.config" target="tools/agents/net6.0" />
@@ -91,6 +87,5 @@
     <file src = "$BIN_DIR$agents/net6.0/nunit.engine.api.xml" target="tools/agents/net6.0" />
     <file src = "$BIN_DIR$agents/net6.0/nunit.engine.core.dll" target="tools/agents/net6.0" />
     <file src = "$BIN_DIR$agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
-    <file src = "nunit.agent.addins" target = "tools/agents/net6.0" />
   </files>
 </package>
