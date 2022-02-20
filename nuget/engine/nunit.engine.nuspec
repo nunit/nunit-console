@@ -79,9 +79,6 @@
     <file src="agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="contentFiles/any/agents/netcoreapp3.1" />
     
     <file src="../../nuget/engine/nunit.engine.nuget.addins" target="contentFiles/any/lib/net20"/>
-    <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/net20"/>
-    <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/net40"/>
-    <file src="../../nuget/engine/nunit.agent.addins" target="contentFiles/any/agents/netcoreapp3.1"/>
 
     <file src="netstandard2.0/nunit.engine.dll" target="lib/netstandard2.0" />
     <file src="netstandard2.0/nunit.engine.pdb" target="lib/netstandard2.0" />

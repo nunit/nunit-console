@@ -64,7 +64,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit3-console.tests", "src
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219A8-2995-4884-806F-FDB9CD25D403}"
 	ProjectSection(SolutionItems) = preProject
-		nuget\engine\nunit.agent.addins = nuget\engine\nunit.agent.addins
 		nuget\engine\nunit.engine.api.nuspec = nuget\engine\nunit.engine.api.nuspec
 		nuget\engine\nunit.engine.nuget.addins = nuget\engine\nunit.engine.nuget.addins
 		nuget\engine\nunit.engine.nuspec = nuget\engine\nunit.engine.nuspec
@@ -72,7 +71,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E}"
 	ProjectSection(SolutionItems) = preProject
-		nuget\runners\nunit.agent.addins = nuget\runners\nunit.agent.addins
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
 		nuget\runners\nunit.console-runner.netcore.nuspec = nuget\runners\nunit.console-runner.netcore.nuspec
 		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
@@ -88,7 +86,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA
 		choco\nunit-agent-x86.exe.ignore = choco\nunit-agent-x86.exe.ignore
 		choco\nunit-agent.exe.ignore = choco\nunit-agent.exe.ignore
 		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
-		choco\nunit.agent.addins = choco\nunit.agent.addins
 		choco\nunit.choco.addins = choco\nunit.choco.addins
 		choco\VERIFICATION.txt = choco\VERIFICATION.txt
 	EndProjectSection
