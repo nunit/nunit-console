@@ -739,21 +739,6 @@ namespace NUnit.ConsoleRunner
             Assert.That(options.TestParameters, Is.EqualTo(new Dictionary<string, string> { ["X"] = "  " }));
         }
 
-        [Test]
-        public void DisplayTestParameters()
-        {
-            if (TestContext.Parameters.Count == 0)
-            {
-                Console.WriteLine("No Test Parameters were passed");
-                return;
-            }
-
-            Console.WriteLine("Test Parameters---");
-
-            foreach (var name in TestContext.Parameters.Names)
-                Console.WriteLine("   [{0}] = <{1}>", name, TestContext.Parameters[name]);
-        }
-
         private static IFileSystem GetFileSystemContainingFile(string fileName)
         {
             var fileSystem = new VirtualFileSystem();
