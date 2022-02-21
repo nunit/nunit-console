@@ -349,7 +349,9 @@ Task("FetchBundledExtensions")
             NuGetInstall(extension, new NuGetInstallSettings
             {
                 OutputDirectory = EXTENSIONS_DIR,
-                Source = new[] { "https://www.nuget.org/api/v2" }
+                Source = new[] { "https://www.myget.org/F/nunit/api/v2" },
+                Prerelease = true
+                //Source = new[] { "https://www.nuget.org/api/v2" }
             });
         }
     });
@@ -402,9 +404,8 @@ Task("CreateZipImage")
             var addinsDir = frameworkDir + "addins/";
             CleanDirectory(addinsDir);
 
-            // Temporarily excluding extensions until they are converted to 4.0 api
-            //foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-            //    CopyPackageContents(packageDir, addinsDir);
+            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+                CopyPackageContents(packageDir, addinsDir);
         }
     });
 

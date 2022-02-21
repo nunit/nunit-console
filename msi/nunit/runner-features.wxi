@@ -13,14 +13,14 @@
                Title="NUnit Engine"
                Description="Installs the NUnit engine">
         <ComponentGroupRef Id="NUNIT.ENGINE" />
-          <!-- Temporarily excluding extensions until they are converted to 4.0 api -->
-          <!--<Feature Id="ADDINS.NUNIT.PROJECT.LOADER"
+        <Feature Id="ADDINS.NUNIT.PROJECT.LOADER"
                     Level="1"
                     Title="NUnit Project Loader"
                     Description="Allows you to load NUnit Project files">
           <ComponentGroupRef Id="ADDINS.NUNIT.PROJECT.LOADER" />
         </Feature>
-        <Feature Id="ADDINS.VS.PROJECT.LOADER"
+        <!-- Temporarily excluding extension until it's converted to 4.0 api -->
+        <!---<Feature Id="ADDINS.VS.PROJECT.LOADER"
                     Level="1"
                     Title="Visual Studio Project Loader"
                     Description="Allows you to load Visual Studio Solution and Project files">

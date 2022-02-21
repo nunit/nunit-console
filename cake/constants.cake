@@ -56,7 +56,8 @@ var PACKAGE_SOURCE = new string[]
 // Extensions we bundle
 var BUNDLED_EXTENSIONS = new[]
 {
-  "NUnit.Extension.VSProjectLoader",
+  // TODO: Not yet available for 4.0 API
+  //"NUnit.Extension.VSProjectLoader",
   "NUnit.Extension.NUnitProjectLoader"
 };
 
