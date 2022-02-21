@@ -8,11 +8,12 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ADDINS.VS.PROJECT.LOADER" Directory="ADDINS">
+        <!-- TODO: Include once it's available for 4.0 API -->
+        <!--<ComponentGroup Id="ADDINS.VS.PROJECT.LOADER" Directory="ADDINS">
             <Component Id="ADDINS.VS.PROJECT.LOADER" Location="local" Guid="98CB680E-EAFA-4DC6-A0C1-030734A4C949">
                 <File Id="vs_project_loader.dll"
                       Source="$(var.InstallImage)bin/net20/addins/vs-project-loader.dll" />
             </Component>
-        </ComponentGroup>
+        </ComponentGroup>-->
     </Fragment>
 </Include>
