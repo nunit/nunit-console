@@ -67,17 +67,17 @@ MSBuildSettings CreateMSBuildSettings(string target)
 
     if (IsRunningOnWindows())
     {
-        // The fallback is in case only a preview of VS is installed.
         var vsInstallation =
-            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" })
-            ?? VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
+            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" });
+
+        if (vsInstallation == null || !vsInstallation.FullPath.Contains("2022"))
+        {
+            vsInstallation = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
+        }
 
         if (vsInstallation != null)
         {
             var msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\Current\Bin\MSBuild.exe");
-
-            if (!FileExists(msBuildPath))
-                msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
 
             if (FileExists(msBuildPath))
                 settings.ToolPath = msBuildPath;
