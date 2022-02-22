@@ -15,9 +15,8 @@ See also [Building and testing for Linux on a Windows machine](#building-and-tes
 
 ## Prerequisites
 
-- Visual Studio 2017 Update 5 or newer to build on Windows
-- .NET 4.5+ or Mono 5.10.0+
-- .NET Core 1.1.6 or newer
+- Visual Studio 2022 or newer to build on Windows
+- .NET 6.0.100 or newer
 
 ## Solution Build
 
