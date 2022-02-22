@@ -23,6 +23,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net35X86Test,
         Net40Test,
         Net40X86Test,
+        Net45NUnit4Test,
         Net35PlusNet40Test,
         NetCore21Test,
         NetCore31Test,
@@ -30,7 +31,11 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net60Test,
         NetCore21PlusNetCore31Test,
         NetCore21PlusNetCore31PlusNet50PlusNet60Test,
-        Net40PlusNet60Test
+        Net40PlusNet60Test,
+        NetCore31NUnit4Test,
+        Net50NUnit4Test,
+        Net60NUnit4Test,
+        Net45PlusNet60NUnit4Test
     };
 
     if (dotnetX86Available)
@@ -47,7 +52,10 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net50Test,
         Net60Test,
         NetCore21PlusNetCore31Test,
-        NetCore21PlusNetCore31PlusNet50PlusNet60Test
+        NetCore21PlusNetCore31PlusNet50PlusNet60Test,
+        NetCore31NUnit4Test,
+        Net50NUnit4Test,
+        Net60NUnit4Test,
     };
 
     AllPackages.AddRange(new PackageDefinition[] {

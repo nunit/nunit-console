@@ -36,6 +36,12 @@ static PackageTest Net40X86Test = new PackageTest(
     "net40/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
+static PackageTest Net45NUnit4Test = new PackageTest(
+    "Net45NUnit4Test",
+    "Run mock-assembly-nunit4.dll under .NET 4.x",
+    "net45/mock-assembly-nunit4.dll",
+    MockAssemblyExpectedResult(1));
+
 static PackageTest Net35PlusNet40Test = new PackageTest(
     "Net35PlusNet40Test",
     "Run both copies of mock-assembly together",
@@ -66,6 +72,24 @@ static PackageTest NetCore31X86Test = new PackageTest(
     "netcoreapp3.1/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
+static PackageTest Net60NUnit4Test = new PackageTest(
+    "Net60NUnit4Test",
+    "Run mock-assembly-nunit4.dll under .NET 6.0",
+    "net6.0/mock-assembly-nunit4.dll",
+    MockAssemblyExpectedResult(1));
+
+static PackageTest Net50NUnit4Test = new PackageTest(
+    "Net50NUnit4Test",
+    "Run mock-assembly-nunit4.dll under .NET 5.0",
+    "net5.0/mock-assembly-nunit4.dll",
+    MockAssemblyExpectedResult(1));
+
+static PackageTest NetCore31NUnit4Test = new PackageTest(
+    "NetCore31NUnit4Test",
+    "Run mock-assembly-nunit4.dll under .NET Core 3.1",
+    "netcoreapp3.1/mock-assembly-nunit4.dll",
+    MockAssemblyExpectedResult(1));
+
 static PackageTest NetCore21Test = new PackageTest(
     "NetCore21Test",
     "Run mock-assembly.dll targeting .NET Core 2.1",
@@ -94,6 +118,12 @@ static PackageTest Net40PlusNet60Test = new PackageTest(
     "Net40PlusNet60Test",
     "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
     "net40/mock-assembly.dll net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(2));
+
+static PackageTest Net45PlusNet60NUnit4Test = new PackageTest(
+    "Net45PlusNet60Test",
+    "Run mock-assembly-nunit4 under .Net Framework 4.0 and .Net 6.0 together",
+    "net45/mock-assembly-nunit4.dll net6.0/mock-assembly-nunit4.dll",
     MockAssemblyExpectedResult(2));
 
 static PackageTest NUnitProjectTest;
