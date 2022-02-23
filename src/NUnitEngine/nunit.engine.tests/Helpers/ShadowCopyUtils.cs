@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace NUnit.Engine.Tests.Helpers
+namespace NUnit.Engine.TestHelpers
 {
     public static class ShadowCopyUtils
     {

@@ -3,7 +3,7 @@
 using System;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Api
+namespace NUnit.Engine.Api
 {
     public class ServiceLocatorTests
     {

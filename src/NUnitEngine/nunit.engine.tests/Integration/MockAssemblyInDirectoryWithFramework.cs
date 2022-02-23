@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Integration
+namespace NUnit.Engine.Integration
 {
     internal sealed class MockAssemblyInDirectoryWithFramework : IDisposable
     {

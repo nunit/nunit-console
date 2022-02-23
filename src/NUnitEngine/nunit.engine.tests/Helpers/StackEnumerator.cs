@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace NUnit.Engine.Tests.Helpers
+namespace NUnit.Engine.TestHelpers
 {
     public static class StackEnumerator
     {

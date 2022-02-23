@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine.Services
 {
     public class TokenizerTests
     {

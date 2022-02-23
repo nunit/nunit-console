@@ -2,10 +2,10 @@
 
 #if NETFRAMEWORK
 using System.Diagnostics;
-using NUnit.Engine.Tests.Helpers;
+using NUnit.Engine.TestHelpers;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Integration
+namespace NUnit.Engine.Integration
 {
     public sealed class RemoteAgentTests : IntegrationTests
     {

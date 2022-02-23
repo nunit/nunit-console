@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Integration
+namespace NUnit.Engine.Integration
 {
     internal sealed class RunnerInDirectoryWithoutFramework : IDisposable
     {

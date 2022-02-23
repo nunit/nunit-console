@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     public static partial class AgentStoreTests
     {

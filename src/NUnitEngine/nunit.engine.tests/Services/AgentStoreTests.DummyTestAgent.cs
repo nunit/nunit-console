@@ -2,7 +2,7 @@
 
 using System;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     public partial class AgentStoreTests
     {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine.Services
 {
     public class TestSelectionParserTests
     {

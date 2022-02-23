@@ -2,9 +2,9 @@
 
 using System;
 using System.IO;
-using NUnit.Engine.Tests.Helpers;
+using NUnit.Engine.TestHelpers;
 
-namespace NUnit.Engine.Tests.Integration
+namespace NUnit.Engine.Integration
 {
     internal sealed class DirectoryWithNeededAssemblies : IDisposable
     {

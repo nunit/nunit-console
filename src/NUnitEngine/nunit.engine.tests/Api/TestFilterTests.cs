@@ -5,7 +5,7 @@ using System.Xml;
 using NUnit.Engine;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Api.Tests
+namespace NUnit.Engine.Api
 {
     public class TestFilterTests
     {

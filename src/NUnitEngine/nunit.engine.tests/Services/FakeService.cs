@@ -2,7 +2,7 @@
 
 using System;
 
-namespace NUnit.Engine.Services.Tests.Fakes
+namespace NUnit.Engine.Services
 {
     interface IFakeService
     { }
