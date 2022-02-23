@@ -3,7 +3,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Api.Tests
+namespace NUnit.Engine.Api
 {
     [TestFixture("test.dll")]
     [TestFixture("test1.dll,test2.dll,test3.dll")]

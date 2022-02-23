@@ -8,7 +8,7 @@ using System.Text;
 using NUnit.Framework;
 using NUnit.Tests;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     public class RuntimeFrameworkServiceTests
     {

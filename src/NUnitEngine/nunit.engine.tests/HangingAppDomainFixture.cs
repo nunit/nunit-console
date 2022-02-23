@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine
 {
     [Explicit]
     public class HangingAppDomainFixture

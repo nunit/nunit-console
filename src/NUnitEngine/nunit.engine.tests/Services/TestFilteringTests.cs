@@ -6,7 +6,7 @@ using System.Text;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     using Drivers;
 

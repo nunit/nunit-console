@@ -3,10 +3,8 @@
 using System;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
-    using Fakes;
-
     public class ServiceDependencyTests
     {
         private ServiceContext _services;

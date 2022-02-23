@@ -3,7 +3,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine
 {
     [NonParallelizable]
     class WorkingDirectoryTests

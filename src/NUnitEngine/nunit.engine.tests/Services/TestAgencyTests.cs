@@ -2,10 +2,9 @@
 
 #if NETFRAMEWORK
 using NUnit.Engine.Services;
-using NUnit.Engine.Services.Tests.Fakes;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Services
+namespace NUnit.Engine.Services
 {
     public class TestAgencyTests
     {

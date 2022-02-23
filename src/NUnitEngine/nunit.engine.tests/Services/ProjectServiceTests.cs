@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     public class ProjectServiceTests
     {

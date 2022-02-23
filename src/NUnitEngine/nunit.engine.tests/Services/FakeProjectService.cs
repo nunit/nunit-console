@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Services.Tests.Fakes
+namespace NUnit.Engine.Services
 {
     public class FakeProjectService : FakeService, IProjectService
     {

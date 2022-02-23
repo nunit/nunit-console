@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace NUnit.Engine.Tests.Helpers
+namespace NUnit.Engine.TestHelpers
 {
     public static class ProcessTester
     {

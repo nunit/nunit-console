@@ -4,10 +4,9 @@ using System.IO;
 using System.Xml;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services;
-using NUnit.Engine.Services.Tests.Fakes;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests.Services.ResultWriters
+namespace NUnit.Engine.Services.ResultWriters
 {
     [Ignore("Temporarily ignoring this fixture")]
     public class XmlTransformResultWriterTests
