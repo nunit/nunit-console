@@ -5,7 +5,7 @@ using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Framework;
 using System.IO;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Internal
 {
     /// <summary>
     /// Tests the implementation of <see cref="AddinsFileReader"/>.

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Xml;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {

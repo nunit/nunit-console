@@ -2,7 +2,7 @@
 
 using NUnit.Framework;
 
-namespace NUnit.Engine.Internal.Backports.Tests
+namespace NUnit.Engine.Internal.Backports
 {
     [TestFixture]
     public sealed class PathTests

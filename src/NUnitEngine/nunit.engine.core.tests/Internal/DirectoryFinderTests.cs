@@ -7,7 +7,7 @@ using NUnit.Framework;
 using NSubstitute;
 using NUnit.Engine.Internal.FileSystemAccess;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Internal
 {
     public class DirectoryFinderTests
     {

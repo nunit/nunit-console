@@ -3,7 +3,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Internal
 {
     [TestFixture]
     public class AssemblyHelperTests

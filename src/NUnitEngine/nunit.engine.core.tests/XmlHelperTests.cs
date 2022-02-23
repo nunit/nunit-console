@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Xml;
 using NUnit.Framework;
 
-namespace NUnit.Tests
+namespace NUnit.Engine.Internal
 {
     public class XmlHelperTests
     {

@@ -5,7 +5,7 @@ using NUnit.Framework;
 using System;
 using System.Reflection;
 
-namespace NUnit.Engine.Tests.Drivers
+namespace NUnit.Engine.Drivers
 {
     public class NUnit3DriverFactoryTests
     {

@@ -8,8 +8,9 @@ using System.Xml;
 using NUnit.Tests.Assemblies;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using NUnit.Engine.Internal;
 
-namespace NUnit.Engine.Drivers.Tests
+namespace NUnit.Engine.Drivers
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
     public class NUnit3FrameworkDriverTests

@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Internal
 {
     [TestFixture]
     public class PathUtilsTests
@@ -77,7 +77,7 @@ namespace NUnit.Engine.Internal.Tests
 	}
 
 	// Local Assert extension
-	internal class Assert : NUnit.Framework.Assert
+	internal class PathAssert : NUnit.Framework.Assert
 	{
 		public static void SamePathOrUnder( string path1, string path2 )
 		{
@@ -167,15 +167,14 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void SamePathOrUnder()
 		{
-			Assert.SamePathOrUnder( @"C:\folder1\folder2\folder3", @"C:\folder1\.\folder2\junk\..\folder3" );
-			Assert.SamePathOrUnder( @"C:\folder1\folder2\", @"C:\folder1\.\folder2\junk\..\folder3" );
-			Assert.SamePathOrUnder( @"C:\folder1\folder2", @"C:\folder1\.\folder2\junk\..\folder3" );
-			Assert.NotSamePathOrUnder( @"C:\folder1\folder2", @"C:\folder1\.\folder22\junk\..\folder3" );
-			Assert.NotSamePathOrUnder( @"C:\folder1\folder2ile.tmp", @"D:\folder1\.\folder2\folder3\file.tmp" );
-			Assert.NotSamePathOrUnder( @"C:\", @"D:\" );
-			Assert.SamePathOrUnder( @"C:\", @"C:\" );
-			Assert.SamePathOrUnder( @"C:\", @"C:\bin\debug" );
-
+            PathAssert.SamePathOrUnder( @"C:\folder1\folder2\folder3", @"C:\folder1\.\folder2\junk\..\folder3" );
+            PathAssert.SamePathOrUnder( @"C:\folder1\folder2\", @"C:\folder1\.\folder2\junk\..\folder3" );
+            PathAssert.SamePathOrUnder( @"C:\folder1\folder2", @"C:\folder1\.\folder2\junk\..\folder3" );
+            PathAssert.NotSamePathOrUnder( @"C:\folder1\folder2", @"C:\folder1\.\folder22\junk\..\folder3" );
+            PathAssert.NotSamePathOrUnder( @"C:\folder1\folder2ile.tmp", @"D:\folder1\.\folder2\folder3\file.tmp" );
+            PathAssert.NotSamePathOrUnder( @"C:\", @"D:\" );
+            PathAssert.SamePathOrUnder( @"C:\", @"C:\" );
+            PathAssert.SamePathOrUnder( @"C:\", @"C:\bin\debug" );
 		}
 	}
 
@@ -232,13 +231,13 @@ namespace NUnit.Engine.Internal.Tests
 		[Test]
 		public void SamePathOrUnder()
 		{
-			Assert.SamePathOrUnder( "/folder1/folder2/folder3", "/folder1/./folder2/junk/../folder3" );
-			Assert.SamePathOrUnder( "/folder1/folder2/", "/folder1/./folder2/junk/../folder3" );
-			Assert.SamePathOrUnder( "/folder1/folder2", "/folder1/./folder2/junk/../folder3" );
-			Assert.NotSamePathOrUnder( "/folder1/folder2", "/folder1/./Folder2/junk/../folder3" );
-			Assert.NotSamePathOrUnder( "/folder1/folder2", "/folder1/./folder22/junk/../folder3" );
-			Assert.SamePathOrUnder( "/", "/" );
-			Assert.SamePathOrUnder( "/", "/bin/debug" );
+            PathAssert.SamePathOrUnder( "/folder1/folder2/folder3", "/folder1/./folder2/junk/../folder3" );
+            PathAssert.SamePathOrUnder( "/folder1/folder2/", "/folder1/./folder2/junk/../folder3" );
+            PathAssert.SamePathOrUnder( "/folder1/folder2", "/folder1/./folder2/junk/../folder3" );
+            PathAssert.NotSamePathOrUnder( "/folder1/folder2", "/folder1/./Folder2/junk/../folder3" );
+            PathAssert.NotSamePathOrUnder( "/folder1/folder2", "/folder1/./folder22/junk/../folder3" );
+            PathAssert.SamePathOrUnder( "/", "/" );
+            PathAssert.SamePathOrUnder( "/", "/bin/debug" );
 		}
 	}
 }

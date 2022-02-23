@@ -2,7 +2,7 @@
 
 using System.Xml;
 
-namespace NUnit.Engine.Internal.Tests
+namespace NUnit.Engine.Internal
 {
     using Framework;
 
