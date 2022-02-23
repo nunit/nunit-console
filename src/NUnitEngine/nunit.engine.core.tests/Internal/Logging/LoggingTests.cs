@@ -4,7 +4,7 @@ using System.IO;
 using NUnit.Engine.Internal;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Core.Tests.Internal.Logging
+namespace NUnit.Engine.Internal.Logging
 {
     public class LoggingTests
     {

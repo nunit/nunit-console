@@ -4,7 +4,7 @@ using System;
 using System.Xml;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine
 {
     public class AsyncTestEngineResultTests
     {

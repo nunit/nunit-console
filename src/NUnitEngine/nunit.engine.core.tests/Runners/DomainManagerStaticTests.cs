@@ -7,7 +7,7 @@ using System.Configuration;
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Runners
 {
     public static class DomainManagerStaticTests
     {

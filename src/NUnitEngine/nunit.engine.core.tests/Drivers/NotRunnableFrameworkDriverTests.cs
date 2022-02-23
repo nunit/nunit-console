@@ -6,9 +6,10 @@ using System.Xml;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using NUnit.Engine.Extensibility;
+using NUnit.Engine.Internal;
 using System;
 
-namespace NUnit.Engine.Drivers.Tests
+namespace NUnit.Engine.Drivers
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
     public abstract class NotRunnableFrameworkDriverTests

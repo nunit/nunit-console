@@ -12,7 +12,7 @@ using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NSubstitute;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     public class ExtensionManagerTests
     {
@@ -95,16 +95,14 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
         }
 
-#pragma warning disable 414
         private static readonly string[] KnownExtensions = {
-            "NUnit.Engine.Tests.DummyFrameworkDriverExtension",
-            "NUnit.Engine.Tests.DummyProjectLoaderExtension",
-            "NUnit.Engine.Tests.DummyResultWriterExtension",
-            "NUnit.Engine.Tests.DummyEventListenerExtension",
-            "NUnit.Engine.Tests.DummyServiceExtension",
-            "NUnit.Engine.Tests.V2DriverExtension"
+            typeof(DummyFrameworkDriverExtension).FullName,
+            typeof(DummyProjectLoaderExtension).FullName,
+            typeof(DummyResultWriterExtension).FullName,
+            typeof(DummyEventListenerExtension).FullName,
+            typeof(DummyServiceExtension).FullName,
+            typeof(V2DriverExtension).FullName
         };
-#pragma warning restore 414
 
         [TestCaseSource(nameof(KnownExtensions))]
         public void CanListExtensions(string typeName)
@@ -129,17 +127,18 @@ namespace NUnit.Engine.Services.Tests
         public void ExtensionMayBeDisabledByDefault()
         {
             Assert.That(_extensionManager.Extensions,
-                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo("NUnit.Engine.Tests.DummyDisabledExtension")
+                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(typeof(DummyDisabledExtension).FullName)
                    .And.Property(nameof(ExtensionNode.Enabled)).False);
         }
 
         [Test]
         public void DisabledExtensionMayBeEnabled()
         {
-            _extensionManager.EnableExtension("NUnit.Engine.Tests.DummyDisabledExtension", true);
+            string fullName = typeof(DummyDisabledExtension).FullName;
+            _extensionManager.EnableExtension(fullName, true);
 
             Assert.That(_extensionManager.Extensions,
-                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo("NUnit.Engine.Tests.DummyDisabledExtension")
+                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(fullName)
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
         }
 

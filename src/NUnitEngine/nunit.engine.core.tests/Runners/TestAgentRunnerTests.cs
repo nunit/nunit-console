@@ -10,7 +10,7 @@ using NUnit.Framework;
 using NUnit.Tests;
 using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Runners
 {
     [TestFixture(typeof(LocalTestRunner))]
 #if NETFRAMEWORK

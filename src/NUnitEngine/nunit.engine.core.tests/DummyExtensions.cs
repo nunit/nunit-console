@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Xml;
 using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Tests
+namespace NUnit.Engine
 {
     [Extension]
     public class DummyFrameworkDriverExtension : IDriverFactory

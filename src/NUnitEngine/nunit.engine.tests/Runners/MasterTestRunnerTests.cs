@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
+using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 using NUnit.Engine.Services.Tests.Fakes;
 

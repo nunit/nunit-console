@@ -6,7 +6,7 @@ using System.IO;
 using NUnit.Framework;
 using NUnit.Tests.Assemblies;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Runners
 {
     public class DomainManagerTests
     {

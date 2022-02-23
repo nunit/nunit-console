@@ -7,7 +7,7 @@ using NUnit.Framework;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     [TestFixture]
     public class DriverServiceTests

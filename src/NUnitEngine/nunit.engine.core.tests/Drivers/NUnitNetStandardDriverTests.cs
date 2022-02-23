@@ -8,6 +8,7 @@ using System.Xml;
 using NUnit.Tests.Assemblies;
 using NUnit.Framework;
 using NUnit.Engine.Extensibility;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Drivers.Tests
 {
