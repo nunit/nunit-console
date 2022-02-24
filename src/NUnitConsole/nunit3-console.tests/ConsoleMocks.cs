@@ -3,7 +3,7 @@
 using NSubstitute;
 using NUnit.Common;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner.Options
 {
     internal static class ConsoleMocks
     {

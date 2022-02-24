@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     public class ExtendedTextWrapperTests
     {

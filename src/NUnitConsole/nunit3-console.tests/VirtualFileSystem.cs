@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Common;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     using System.IO;
 

@@ -2,13 +2,13 @@
 
 using System.IO;
 using System.Text;
-using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     [Ignore("Temporarily ignoring this fixture")]
     public class BadFileTests : ITestEventListener

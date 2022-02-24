@@ -13,7 +13,7 @@ using NUnit.Engine;
 using System.Linq;
 #endif
 
-using NUnit.Options;
+using NUnit.ConsoleRunner.Options;
 
 namespace NUnit.ConsoleRunner
 {

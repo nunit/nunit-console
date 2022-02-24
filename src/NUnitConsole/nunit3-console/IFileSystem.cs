@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace NUnit.Common
+namespace NUnit.ConsoleRunner
 {
     public interface IFileSystem
     {

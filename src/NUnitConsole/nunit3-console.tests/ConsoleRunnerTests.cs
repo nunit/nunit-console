@@ -4,13 +4,13 @@ using System;
 using System.IO;
 using System.Xml;
 using NSubstitute;
-using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Services;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     class ConsoleRunnerTests
     {

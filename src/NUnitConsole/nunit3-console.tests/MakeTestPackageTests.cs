@@ -2,8 +2,9 @@
 
 using System.IO;
 using NUnit.Framework;
+using NUnit.ConsoleRunner.Options;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     public class MakeTestPackageTests
     {

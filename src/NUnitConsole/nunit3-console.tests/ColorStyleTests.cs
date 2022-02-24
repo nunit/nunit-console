@@ -4,7 +4,7 @@ using System;
 using NUnit.Common;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Utilities.Tests
+namespace NUnit.ConsoleRunner
 {
     [TestFixture]
     public class ColorStyleTests
