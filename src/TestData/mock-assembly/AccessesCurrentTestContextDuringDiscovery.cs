@@ -2,7 +2,7 @@
 
 using NUnit.Framework;
 
-namespace NUnit.Tests
+namespace NUnit.TestData
 {
     public class AccessesCurrentTestContextDuringDiscovery
     {

@@ -9,7 +9,7 @@ using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
-using NUnit.Tests.Assemblies;
+using NUnit.TestData.Assemblies;
 using NUnit.Engine.Internal;
 
 namespace NUnit.ConsoleRunner
@@ -102,17 +102,17 @@ namespace NUnit.ConsoleRunner
 
             var expected = new[] {
                 "Errors, Failures and Warnings",
-                "1) Failed : NUnit.Tests.Assemblies.MockTestFixture.FailingTest" + nl +
+                "1) Failed : NUnit.TestData.Assemblies.MockTestFixture.FailingTest" + nl +
                 "Intentional failure",
-                "2) Invalid : NUnit.Tests.Assemblies.MockTestFixture.NonPublicTest" + nl +
+                "2) Invalid : NUnit.TestData.Assemblies.MockTestFixture.NonPublicTest" + nl +
                 "Method is not public",
-                "3) Invalid : NUnit.Tests.Assemblies.MockTestFixture.NotRunnableTest" + nl +
+                "3) Invalid : NUnit.TestData.Assemblies.MockTestFixture.NotRunnableTest" + nl +
                 "No arguments were provided",
-                "4) Error : NUnit.Tests.Assemblies.MockTestFixture.TestWithException" + nl +
+                "4) Error : NUnit.TestData.Assemblies.MockTestFixture.TestWithException" + nl +
                 "System.Exception : Intentional Exception",
-                "5) Warning : NUnit.Tests.Assemblies.MockTestFixture.WarningTest" + nl +
+                "5) Warning : NUnit.TestData.Assemblies.MockTestFixture.WarningTest" + nl +
                 "Warning Message",
-                "6) Invalid : NUnit.Tests.BadFixture" + nl +
+                "6) Invalid : NUnit.TestData.BadFixture" + nl +
                 "No suitable constructor was found"
             };
 
@@ -130,24 +130,24 @@ namespace NUnit.ConsoleRunner
             var expected = new[] {
                 "Tests Not Run",
                 "",
-                "1) Explicit : NUnit.Tests.Assemblies.MockTestFixture.ExplicitTest",
+                "1) Explicit : NUnit.TestData.Assemblies.MockTestFixture.ExplicitTest",
                 "",
-                "2) Ignored : NUnit.Tests.Assemblies.MockTestFixture.IgnoreTest",
+                "2) Ignored : NUnit.TestData.Assemblies.MockTestFixture.IgnoreTest",
                 "Ignore Message",
                 "",
-                "3) Explicit : NUnit.Tests.ExplicitFixture.Test1",
+                "3) Explicit : NUnit.TestData.ExplicitFixture.Test1",
                 "OneTimeSetUp: ",
                 "",
-                "4) Explicit : NUnit.Tests.ExplicitFixture.Test2",
+                "4) Explicit : NUnit.TestData.ExplicitFixture.Test2",
                 "OneTimeSetUp: ",
                 "",
-                "5) Ignored : NUnit.Tests.IgnoredFixture.Test1",
+                "5) Ignored : NUnit.TestData.IgnoredFixture.Test1",
                 "OneTimeSetUp: BECAUSE",
                 "",
-                "6) Ignored : NUnit.Tests.IgnoredFixture.Test2",
+                "6) Ignored : NUnit.TestData.IgnoredFixture.Test2",
                 "OneTimeSetUp: BECAUSE",
                 "",
-                "7) Ignored : NUnit.Tests.IgnoredFixture.Test3",
+                "7) Ignored : NUnit.TestData.IgnoredFixture.Test3",
                 "OneTimeSetUp: BECAUSE",
                 ""
             };

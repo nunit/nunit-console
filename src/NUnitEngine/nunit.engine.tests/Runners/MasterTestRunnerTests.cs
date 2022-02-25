@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using NUnit.Framework;
-using NUnit.Tests.Assemblies;
+using NUnit.TestData.Assemblies;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 

@@ -1,29 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>NUnit.Tests</RootNamespace>
-    <TargetFrameworks>net35;net40;netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <RootNamespace>NUnit.TestData</RootNamespace>
+    <TargetFrameworks>net45;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <RestoreAdditionalProjectSource>https://www.myget.org/F/nunit/api/v3/index.json</RestoreAdditionalProjectSource>
   </PropertyGroup>
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
-    <AssemblyTitle>Mock Assembly ($(TargetFramework))</AssemblyTitle>
+    <AssemblyTitle>NUnit4 Mock Assembly ($(TargetFramework))</AssemblyTitle>
     <Description>Assembly used in testing the engine</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit" Version="4.0.0-dev-07273" />
   </ItemGroup>
-
   <ItemGroup>
+    <Compile Include="..\mock-assembly\*.cs" />
     <None Include="..\..\nunit.snk" Link="nunit.snk" />
   </ItemGroup>
-  
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-
 </Project>
