@@ -9,7 +9,7 @@ using NUnit.Engine;
 using NUnit.Engine.Internal;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     class ExceptionHelperTests
     {

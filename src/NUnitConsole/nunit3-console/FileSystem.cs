@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace NUnit.Common
+namespace NUnit.ConsoleRunner
 {
     using System;
 

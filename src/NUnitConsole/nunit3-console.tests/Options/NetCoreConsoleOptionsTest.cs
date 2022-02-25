@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner.Options
 {
 #if !NET35
     class NetCoreConsoleOptionsTest

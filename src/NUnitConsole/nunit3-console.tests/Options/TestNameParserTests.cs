@@ -3,7 +3,7 @@
 using System;
 using NUnit.Framework;
 
-namespace NUnit.Common.Tests
+namespace NUnit.ConsoleRunner.Options
 {
     public class TestNameParserTests
     {

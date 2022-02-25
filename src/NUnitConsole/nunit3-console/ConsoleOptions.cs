@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using NUnit.Options;
-using NUnit.ConsoleRunner.OptionsUtils;
 
-namespace NUnit.Common
+namespace NUnit.ConsoleRunner.Options
 {
     /// <summary>
     /// <c>ConsoleOptions</c> encapsulates the option settings for

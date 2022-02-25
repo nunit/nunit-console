@@ -1,6 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-namespace NUnit
+namespace NUnit.ConsoleRunner
 {
     /// <summary>
     /// FrameworkPackageSettings is a static class containing constant values that

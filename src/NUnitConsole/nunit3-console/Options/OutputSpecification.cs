@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace NUnit.Common
+namespace NUnit.ConsoleRunner.Options
 {
     /// <summary>
     /// OutputSpecification encapsulates a file output path and format

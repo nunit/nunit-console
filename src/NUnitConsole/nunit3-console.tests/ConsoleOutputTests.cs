@@ -3,7 +3,7 @@
 using NUnit.Framework;
 using System;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     [TestFixture, Explicit]
     public class ConsoleOutputTests

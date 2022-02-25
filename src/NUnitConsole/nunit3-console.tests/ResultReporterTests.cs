@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
 using NUnit.Tests.Assemblies;
 using NUnit.Engine.Internal;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
 
     public class ResultReporterTests

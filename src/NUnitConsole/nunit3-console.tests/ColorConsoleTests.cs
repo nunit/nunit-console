@@ -4,7 +4,7 @@ using System;
 using NUnit.Common;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     using Utilities;
 

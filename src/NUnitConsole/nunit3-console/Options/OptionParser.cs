@@ -2,9 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Common;
 
-namespace NUnit.ConsoleRunner.OptionsUtils
+namespace NUnit.ConsoleRunner.Options
 {
     internal class OptionParser
     {

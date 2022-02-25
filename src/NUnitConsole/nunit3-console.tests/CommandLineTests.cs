@@ -7,9 +7,9 @@ using NUnit.Common;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-using NUnit.Options;
+using NUnit.ConsoleRunner.Options;
 
-namespace NUnit.ConsoleRunner.Tests
+namespace NUnit.ConsoleRunner
 {
     [TestFixture]
     public class CommandLineTests
