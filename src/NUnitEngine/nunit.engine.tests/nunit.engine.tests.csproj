@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <RootNamespace>NUnit.Engine.Tests</RootNamespace>
+    <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net35;netcoreapp2.1</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
@@ -40,7 +40,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\mock-assembly\mock-assembly.csproj" />
+    <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>

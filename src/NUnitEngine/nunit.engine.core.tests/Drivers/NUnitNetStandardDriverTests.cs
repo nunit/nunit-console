@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using NUnit.Tests.Assemblies;
+using NUnit.TestData.Assemblies;
 using NUnit.Framework;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;

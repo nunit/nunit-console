@@ -7,8 +7,8 @@ using System.Linq;
 using System.Xml;
 using NUnit.Engine.Internal;
 using NUnit.Framework;
-using NUnit.Tests;
-using NUnit.Tests.Assemblies;
+using NUnit.TestData;
+using NUnit.TestData.Assemblies;
 
 #if WIP
 namespace NUnit.Engine.Runners.Tests

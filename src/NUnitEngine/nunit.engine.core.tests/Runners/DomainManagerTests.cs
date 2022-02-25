@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using NUnit.Tests.Assemblies;
+using NUnit.TestData.Assemblies;
 
 namespace NUnit.Engine.Runners
 {
