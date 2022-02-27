@@ -31,21 +31,21 @@ var ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine
 var ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
 var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
 var ENGINE_CORE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core.tests/nunit.engine.core.tests.csproj";
-var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
-var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nunit3-console.tests.csproj";
+var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console/nunit-console.csproj";
+var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console.tests/nunit-console.tests.csproj";
 var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";
 var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock-assembly-x86.csproj";
 var MOCK_ASSEMBLY_NUNIT4_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-nunit4/mock-assembly-nunit4.csproj";
 var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
 // Console Runner
-var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
-var NET60_CONSOLE = BIN_DIR + "net6.0/nunit3-console.dll";
+var NET20_CONSOLE = BIN_DIR + "net20/nunit-console.exe";
+var NET60_CONSOLE = BIN_DIR + "net6.0/nunit-console.dll";
 // Unit Tests
 var NETFX_ENGINE_CORE_TESTS = "nunit.engine.core.tests.exe";
 var NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
 var NETFX_ENGINE_TESTS = "nunit.engine.tests.exe";
 var NETCORE_ENGINE_TESTS = "nunit.engine.tests.dll";
-var CONSOLE_TESTS = "nunit3-console.tests.dll";
+var CONSOLE_TESTS = "nunit-console.tests.dll";
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]

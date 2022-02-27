@@ -88,9 +88,9 @@
     <file src="agents/net6.0/nunit.engine.core.pdb" target="tools/agents/net6.0" />
     <file src="agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
 
-    <file src="net20/nunit3-console.exe" target="tools" />
-    <file src="net20/nunit3-console.pdb" target="tools" />
-    <file src="net20/nunit3-console.exe.config" target="tools" />
+    <file src="net20/nunit-console.exe" target="tools" />
+    <file src="net20/nunit-console.pdb" target="tools" />
+    <file src="net20/nunit-console.exe.config" target="tools" />
     <file src="net20/nunit.engine.api.dll" target="tools" />
     <file src="net20/nunit.engine.api.pdb" target="tools" />
     <file src="net20/nunit.engine.api.xml" target="tools" />

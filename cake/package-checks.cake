@@ -22,9 +22,9 @@ string[] AGENT_PDB_FILES = {
 string[] AGENT_PDB_FILES_NETCORE = {
         "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] CONSOLE_FILES = {
-        "nunit3-console.exe", "nunit3-console.exe.config" };
+        "nunit-console.exe", "nunit-console.exe.config" };
 string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
+        "nunit-console.exe", "nunit-console.dll", "nunit-console.dll.config" };
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE CHECK IMPLEMENTATION

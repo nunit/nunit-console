@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <AssemblyName>nunit3-console</AssemblyName>
+    <AssemblyName>nunit-console</AssemblyName>
     <TargetFrameworks>net20;net6.0</TargetFrameworks>
     <RollForward>Major</RollForward>
   </PropertyGroup>
