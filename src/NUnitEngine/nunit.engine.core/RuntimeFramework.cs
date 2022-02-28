@@ -8,6 +8,8 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Win32;
 using NUnit.Engine.Internal.RuntimeFrameworks;
+using NUnit.Common;
+using NUnit.Engine.Compatibility;
 
 namespace NUnit.Engine
 {
@@ -128,17 +130,14 @@ namespace NUnit.Engine
         /// <param name="profile">The profile of the framework. Null if unspecified.</param>
         public RuntimeFramework(RuntimeType runtime, Version version, string profile)
         {
+            Guard.ArgumentValid(IsFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
+
             Runtime = runtime;
             FrameworkVersion = ClrVersion = version;
 
             // Version 0.0 means any version so we can't deduce anything
             if (version != DefaultVersion)
-            {
-                if (IsFrameworkVersion(version))
-                    ClrVersion = GetClrVersionForFramework(version);
-                else
-                    FrameworkVersion = GetFrameworkVersionForClr(version);
-            }
+                ClrVersion = GetClrVersionForFramework(version);
 
             Profile = profile;
 
@@ -206,13 +205,6 @@ namespace NUnit.Engine
             }
 
             throw new ArgumentException("Unknown framework version " + frameworkVersion.ToString(), "version");
-        }
-
-        private Version GetFrameworkVersionForClr(Version clrVersion)
-        {
-            return Runtime == RuntimeType.Mono && clrVersion.Major == 1
-                ? new Version(1, 0)
-                : new Version(clrVersion.Major, clrVersion.Minor);
         }
 
         /// <summary>
@@ -418,6 +410,32 @@ namespace NUnit.Engine
                 runtimeFramework = null;
                 return false;
             }
+        }
+
+        public static RuntimeFramework FromFrameworkName(string frameworkName)
+        {
+            return FromFrameworkName(new FrameworkName(frameworkName));
+        }
+
+        public static RuntimeFramework FromFrameworkName(FrameworkName frameworkName)
+        {
+            return new RuntimeFramework(GetRuntimeTypeFromFrameworkIdentifier(frameworkName.Identifier), frameworkName.Version, frameworkName.Profile);
+        }
+
+        private static RuntimeType GetRuntimeTypeFromFrameworkIdentifier(string identifier)
+        {
+            switch (identifier)
+            {
+                case FrameworkIdentifiers.NetFramework:
+                    return RuntimeType.Net;
+                case FrameworkIdentifiers.NetCoreApp:
+                    return RuntimeType.NetCore;
+                case FrameworkIdentifiers.NetStandard:
+                    throw new NUnitEngineException(
+                        "Test assemblies must target a specific platform, rather than .NETStandard.");
+            }
+
+            throw new NUnitEngineException("Unrecognized Target Framework Identifier: " + identifier);
         }
 
         /// <summary>

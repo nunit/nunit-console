@@ -75,15 +75,15 @@ namespace NUnit.Engine.Services
         public void RuntimeFrameworkIsSetForSubpackages()
         {
             //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available
-            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("2.0.50727")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
-            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("4.0.30319")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
+            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("2.0")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
+            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("4.0")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
 
             var topLevelPackage = new TestPackage(new [] {"a.dll", "b.dll"});
 
             var net20Package = topLevelPackage.SubPackages[0];
-            net20Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("2.0.50727"));
+            net20Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("2.0"));
             var net40Package = topLevelPackage.SubPackages[1];
-            net40Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("4.0.30319"));
+            net40Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("4.0"));
 
             _runtimeService.SelectRuntimeFramework(topLevelPackage);
 

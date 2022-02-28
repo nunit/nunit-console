@@ -38,11 +38,20 @@ namespace NUnit.Engine.Extensibility
 #if NETFRAMEWORK
         public RuntimeFramework TargetFramework
         {
-            get { return new RuntimeFramework(RuntimeType.Any, Assembly.GetRuntimeVersion()); }
+            get
+            {
+                var frameworkName = Assembly.GetFrameworkName();
+                if (frameworkName != null)
+                    return RuntimeFramework.FromFrameworkName(frameworkName);
+
+                // No TargetFrameworkAttribute - Assume .NET Framework
+                var runtimeVersion = Assembly.GetRuntimeVersion();
+                return new RuntimeFramework(RuntimeType.Net, new Version(runtimeVersion.Major, runtimeVersion.Minor));
+            }
         }
 #endif
 
-        private AssemblyDefinition GetAssemblyDefinition()
+    private AssemblyDefinition GetAssemblyDefinition()
         {
             var resolver = new DefaultAssemblyResolver();
             resolver.AddSearchDirectory(Path.GetDirectoryName(FilePath));

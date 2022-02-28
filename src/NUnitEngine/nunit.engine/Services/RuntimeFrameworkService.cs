@@ -138,7 +138,8 @@ namespace NUnit.Engine.Services
             {
                 // Assume .NET Framework
                 targetRuntime = currentFramework.Runtime;
-                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
+                var trialVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
+                targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
             else
             {
