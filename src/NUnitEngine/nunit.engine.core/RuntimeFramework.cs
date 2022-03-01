@@ -40,12 +40,6 @@ namespace NUnit.Engine
         // move all this functionality to services, eliminating the
         // use of public static properties here.
 
-        /// <summary>
-        /// DefaultVersion is an empty Version, used to indicate that
-        /// NUnit should select the CLR version to use for the test.
-        /// </summary>
-        public static readonly Version DefaultVersion = new Version(0, 0);
-
         #region IRuntimeFramework Implementation
 
         /// <summary>
@@ -55,18 +49,11 @@ namespace NUnit.Engine
         {
             get
             {
-                if (FrameworkVersion == DefaultVersion)
-                {
-                    return Runtime.ToString().ToLower();
-                }
+                string vstring = FrameworkVersion.ToString();
+                if (Runtime == RuntimeType.Any)
+                    return "v" + vstring;
                 else
-                {
-                    string vstring = FrameworkVersion.ToString();
-                    if (Runtime == RuntimeType.Any)
-                        return "v" + vstring;
-                    else
-                        return Runtime.ToString().ToLower() + "-" + vstring;
-                }
+                    return Runtime.ToString().ToLower() + "-" + vstring;
             }
         }
 
@@ -134,10 +121,7 @@ namespace NUnit.Engine
 
             Runtime = runtime;
             FrameworkVersion = ClrVersion = version;
-
-            // Version 0.0 means any version so we can't deduce anything
-            if (version != DefaultVersion)
-                ClrVersion = GetClrVersionForFramework(version);
+            ClrVersion = GetClrVersionForFramework(version);
 
             Profile = profile;
 
@@ -148,7 +132,7 @@ namespace NUnit.Engine
         {
             // All known framework versions have either two components or
             // three. If three, then the Build is currently less than 3.
-            return v.Build < 3 && v.Revision == -1;
+            return v.Major > 0 && v.Minor >= 0 && v.Build < 3 && v.Revision == -1;
         }
 
         private Version GetClrVersionForFramework(Version frameworkVersion)
@@ -372,7 +356,7 @@ namespace NUnit.Engine
         public static RuntimeFramework Parse(string s)
         {
             RuntimeType runtime = RuntimeType.Any;
-            Version version = DefaultVersion;
+            Version version = new Version();
 
             string[] parts = s.Split(new char[] { '-' });
             if (parts.Length == 2)
@@ -467,9 +451,6 @@ namespace NUnit.Engine
             if (!this.Supports(target.Runtime))
                 return false;
 
-            if (FrameworkVersion == DefaultVersion || target.FrameworkVersion == DefaultVersion)
-                return true;
-
             return VersionsMatch(this.ClrVersion, target.ClrVersion)
                 && this.FrameworkVersion.Major >= target.FrameworkVersion.Major
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
@@ -510,9 +491,7 @@ namespace NUnit.Engine
         {
             string displayName;
 
-            if (version == DefaultVersion)
-                displayName = GetRuntimeDisplayName(runtime);
-            else if (runtime == RuntimeType.Any)
+            if (runtime == RuntimeType.Any)
                 displayName = "v" + version.ToString();
             else
                 displayName = GetRuntimeDisplayName(runtime) + " " + version.ToString();

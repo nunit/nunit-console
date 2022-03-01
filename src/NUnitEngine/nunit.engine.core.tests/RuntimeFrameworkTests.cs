@@ -161,22 +161,6 @@ namespace NUnit.Engine
                 new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
                 new RuntimeFramework(RuntimeType.Any, new Version(4,0)))
                 .Returns(false),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Net, RuntimeFramework.DefaultVersion),
-                new RuntimeFramework(RuntimeType.Net, new Version(2,0)))
-                .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Net, RuntimeFramework.DefaultVersion))
-                .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion),
-                new RuntimeFramework(RuntimeType.Net, new Version(2,0)))
-                .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Any, RuntimeFramework.DefaultVersion))
-                .Returns(true)
             };
 
         private static readonly TestCaseData[] CanLoadData = {
@@ -237,17 +221,14 @@ namespace NUnit.Engine
             new FrameworkData(RuntimeType.Net, new Version(4,7,1), new Version(4,0,30319), "net-4.7.1", ".NET 4.7.1"),
             new FrameworkData(RuntimeType.Net, new Version(4,7,2), new Version(4,0,30319), "net-4.7.2", ".NET 4.7.2"),
             new FrameworkData(RuntimeType.Net, new Version(4,8), new Version(4,0,30319), "net-4.8", ".NET 4.8"),
-            new FrameworkData(RuntimeType.Net, RuntimeFramework.DefaultVersion, RuntimeFramework.DefaultVersion, "net", ".NET"),
             new FrameworkData(RuntimeType.Mono, new Version(1,0), new Version(1,1,4322), "mono-1.0", "Mono 1.0"),
             new FrameworkData(RuntimeType.Mono, new Version(2,0), new Version(2,0,50727), "mono-2.0", "Mono 2.0"),
             new FrameworkData(RuntimeType.Mono, new Version(3,5), new Version(2,0,50727), "mono-3.5", "Mono 3.5"),
             new FrameworkData(RuntimeType.Mono, new Version(4,0), new Version(4,0,30319), "mono-4.0", "Mono 4.0"),
-            new FrameworkData(RuntimeType.Mono, RuntimeFramework.DefaultVersion, RuntimeFramework.DefaultVersion, "mono", "Mono"),
             new FrameworkData(RuntimeType.Any, new Version(1,1), new Version(1,1,4322), "v1.1", "v1.1"),
             new FrameworkData(RuntimeType.Any, new Version(2,0), new Version(2,0,50727), "v2.0", "v2.0"),
             new FrameworkData(RuntimeType.Any, new Version(3,5), new Version(2,0,50727), "v3.5", "v3.5"),
             new FrameworkData(RuntimeType.Any, new Version(4,0), new Version(4,0,30319), "v4.0", "v4.0"),
-            new FrameworkData(RuntimeType.Any, RuntimeFramework.DefaultVersion, RuntimeFramework.DefaultVersion, "any", "Any")
         };
 #pragma warning restore 414
     }
