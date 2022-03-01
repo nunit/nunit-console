@@ -105,13 +105,11 @@ namespace NUnit.Engine
             }
         }
 
-        private class MonoRuntime : Runtime
+        private class MonoRuntime : NetFrameworkRuntime
         {
             public override string DisplayName => "Mono";
-            public override string FrameworkIdentifier => FrameworkIdentifiers.NetFramework;
 
             public override string ToString() => "Mono";
-            public override bool Matches(Runtime targetRuntime) => targetRuntime is NetFrameworkRuntime;
 
             public override Version GetClrVersionForFramework(Version frameworkVersion)
             {

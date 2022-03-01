@@ -40,6 +40,49 @@ namespace NUnit.Engine
         // move all this functionality to services, eliminating the
         // use of public static properties here.
 
+        #region Constructors
+
+        /// <summary>
+        /// Construct from a Runtime and Version.
+        /// </summary>
+        /// <param name="runtime">A Runtime instance</param>
+        /// <param name="version">The Version of the framework</param>
+        public RuntimeFramework(Runtime runtime, Version version)
+            : this(runtime, version, null)
+        {
+        }
+
+        /// <summary>
+        /// Construct from a Runtime, Version and profile.
+        /// </summary>
+        /// <param name="runtime">A Runtime instance.</param>
+        /// <param name="version">The Version of the framework.</param>
+        /// <param name="profile">A string representing the profile of the framework. Null if unspecified.</param>
+        public RuntimeFramework(Runtime runtime, Version version, string profile)
+        {
+            Guard.ArgumentNotNull(runtime, nameof(runtime));
+            Guard.ArgumentValid(IsFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
+
+            Runtime = runtime;
+            FrameworkVersion = ClrVersion = version;
+            ClrVersion = runtime.GetClrVersionForFramework(version);
+
+            Profile = profile;
+
+            DisplayName = GetDefaultDisplayName(runtime, FrameworkVersion, profile);
+
+            FrameworkName = new FrameworkName(runtime.FrameworkIdentifier, FrameworkVersion);
+        }
+
+        private bool IsFrameworkVersion(Version v)
+        {
+            // All known framework versions have either two components or
+            // three. If three, then the Build is currently less than 3.
+            return v.Major > 0 && v.Minor >= 0 && v.Build < 3 && v.Revision == -1;
+        }
+
+        #endregion
+
         #region IRuntimeFramework Implementation
 
         /// <summary>
@@ -52,7 +95,7 @@ namespace NUnit.Engine
         /// <summary>
         /// The type of this runtime framework
         /// </summary>
-        public Runtime Runtime { get; private set; }
+        public Runtime Runtime { get; }
 
         /// <summary>
         /// The framework version for this runtime framework
@@ -83,51 +126,6 @@ namespace NUnit.Engine
 
         private static readonly string DEFAULT_WINDOWS_MONO_DIR =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
-
-        /// <summary>
-        /// Construct from a runtime type and version. If the version has
-        /// two parts, it is taken as a framework version. If it has three
-        /// or more, it is taken as a CLR version. In either case, the other
-        /// version is deduced based on the runtime type and provided version.
-        /// </summary>
-        /// <param name="runtime">The runtime type of the framework</param>
-        /// <param name="version">The version of the framework</param>
-        public RuntimeFramework(Runtime runtime, Version version)
-            : this(runtime, version, null)
-        {
-        }
-
-        /// <summary>
-        /// Construct from a runtime type, version and profile. The version
-        /// may be either a framework version or a CLR version. If a CLR
-        /// version is provided, we try to deduce the framework version but
-        /// this may not always be successful, in which case a version of
-        /// 0.0 is used.
-        /// </summary>
-        /// <param name="runtime">The runtime type of the framework.</param>
-        /// <param name="version">The version of the framework.</param>
-        /// <param name="profile">The profile of the framework. Null if unspecified.</param>
-        public RuntimeFramework(Runtime runtime, Version version, string profile)
-        {
-            Guard.ArgumentValid(IsFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
-
-            Runtime = runtime;
-            FrameworkVersion = ClrVersion = version;
-            ClrVersion = runtime.GetClrVersionForFramework(version);
-
-            Profile = profile;
-
-            DisplayName = GetDefaultDisplayName(runtime, FrameworkVersion, profile);
-
-            FrameworkName = new FrameworkName(runtime.FrameworkIdentifier, FrameworkVersion);
-        }
-
-        private bool IsFrameworkVersion(Version v)
-        {
-            // All known framework versions have either two components or
-            // three. If three, then the Build is currently less than 3.
-            return v.Major > 0 && v.Minor >= 0 && v.Build < 3 && v.Revision == -1;
-        }
 
         /// <summary>
         /// Static method to return a RuntimeFramework object
@@ -324,33 +322,14 @@ namespace NUnit.Engine
 
         public static RuntimeFramework FromFrameworkName(FrameworkName frameworkName)
         {
-            return new RuntimeFramework(GetRuntimeTypeFromFrameworkIdentifier(frameworkName.Identifier), frameworkName.Version, frameworkName.Profile);
-        }
-
-        private static Runtime GetRuntimeTypeFromFrameworkIdentifier(string identifier)
-        {
-            switch (identifier)
-            {
-                case FrameworkIdentifiers.NetFramework:
-                    return Runtime.Net;
-                case FrameworkIdentifiers.NetCoreApp:
-                    return Runtime.NetCore;
-                case FrameworkIdentifiers.NetStandard:
-                    throw new NUnitEngineException(
-                        "Test assemblies must target a specific platform, rather than .NETStandard.");
-            }
-
-            throw new NUnitEngineException("Unrecognized Target Framework Identifier: " + identifier);
+            return new RuntimeFramework(Runtime.FromFrameworkIdentifier(frameworkName.Identifier), frameworkName.Version, frameworkName.Profile);
         }
 
         /// <summary>
         /// Overridden to return the short name of the framework
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
-            return this.Id;
-        }
+        public override string ToString() => Id;
 
         /// <summary>
         /// Returns true if the current framework matches the
@@ -369,7 +348,7 @@ namespace NUnit.Engine
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
         public bool Supports(RuntimeFramework target)
         {
-            if (!this.Supports(target.Runtime))
+            if (!Runtime.Matches(target.Runtime))
                 return false;
 
             return VersionsMatch(this.ClrVersion, target.ClrVersion)
@@ -377,32 +356,9 @@ namespace NUnit.Engine
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
         }
 
-        private bool Supports(Runtime targetRuntime)
-        {
-            if (this.Runtime == targetRuntime)
-                return true;
-
-            if (this.Runtime == Runtime.Net && targetRuntime == Runtime.Mono)
-                return true;
-
-            if (this.Runtime == Runtime.Mono && targetRuntime == Runtime.Net)
-                return true;
-
-            return false;
-        }
-
         public bool CanLoad(IRuntimeFramework requested)
         {
             return FrameworkVersion >= requested.FrameworkVersion;
-        }
-
-        private static bool IsRuntimeTypeName(string name)
-        {
-            foreach (string item in Enum.GetNames(typeof(Runtime)))
-                if (item.ToLower() == name.ToLower())
-                    return true;
-
-            return false;
         }
 
         private static string GetDefaultDisplayName(Runtime runtime, Version version, string profile)
