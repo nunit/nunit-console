@@ -69,15 +69,15 @@ namespace NUnit.Engine.Services
                    (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision);
         }
 
-        private static bool RuntimesMatch(RuntimeType requested, RuntimeType available)
+        private static bool RuntimesMatch(Runtime requested, Runtime available)
         {
             if (requested == available)
                 return true;
 
-            if (requested == RuntimeType.Net && available == RuntimeType.Mono)
+            if (requested == Runtime.Net && available == Runtime.Mono)
                 return true;
 
-            if (requested == RuntimeType.Mono && available == RuntimeType.Net)
+            if (requested == Runtime.Mono && available == Runtime.Net)
                 return true;
 
             return false;
@@ -131,7 +131,7 @@ namespace NUnit.Engine.Services
             log.Debug($"No specific framework requested for {package.Name}");
 
             string imageTargetFrameworkNameSetting = package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
-            RuntimeType targetRuntime;
+            Runtime targetRuntime;
             Version targetVersion;
 
             if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
@@ -148,10 +148,10 @@ namespace NUnit.Engine.Services
                 switch (frameworkName.Identifier)
                 {
                     case ".NETFramework":
-                        targetRuntime = RuntimeType.Net;
+                        targetRuntime = Runtime.Net;
                         break;
                     case ".NETCoreApp":
-                        targetRuntime = RuntimeType.NetCore;
+                        targetRuntime = Runtime.NetCore;
                         break;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);

@@ -46,7 +46,7 @@ namespace NUnit.Engine.Extensibility
 
                 // No TargetFrameworkAttribute - Assume .NET Framework
                 var runtimeVersion = Assembly.GetRuntimeVersion();
-                return new RuntimeFramework(RuntimeType.Net, new Version(runtimeVersion.Major, runtimeVersion.Minor));
+                return new RuntimeFramework(Runtime.Net, new Version(runtimeVersion.Major, runtimeVersion.Minor));
             }
         }
 #endif

@@ -53,7 +53,7 @@ namespace NUnit.Engine.Tests.Extensibility
         {
             Assert.Multiple(() =>
             {
-                Assert.That(_ea.TargetFramework.Runtime, Is.EqualTo(RuntimeType.Net));
+                Assert.That(_ea.TargetFramework.Runtime, Is.EqualTo(Runtime.Net));
                 Assert.That(_ea.TargetFramework.FrameworkVersion, Is.EqualTo(new Version(2, 0)));
             });
         }

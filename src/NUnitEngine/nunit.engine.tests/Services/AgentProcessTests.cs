@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services
             Assert.False(startInfo.LoadUserProfile, "LoadUserProfile");
 
             var targetRuntime = RuntimeFramework.Parse(framework);
-            if (targetRuntime.Runtime == RuntimeType.Mono)
+            if (targetRuntime.Runtime == Runtime.Mono)
             {
                 string monoOptions = "--runtime=v" + targetRuntime.ClrVersion.ToString(3);
                 monoOptions += " --debug";

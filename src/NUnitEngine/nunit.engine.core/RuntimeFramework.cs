@@ -47,10 +47,12 @@ namespace NUnit.Engine
         /// </summary>
         public string Id => Runtime.ToString().ToLower() + "-" + FrameworkVersion.ToString();
 
+        public FrameworkName FrameworkName { get; }
+
         /// <summary>
         /// The type of this runtime framework
         /// </summary>
-        public RuntimeType Runtime { get; private set; }
+        public Runtime Runtime { get; private set; }
 
         /// <summary>
         /// The framework version for this runtime framework
@@ -90,7 +92,7 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="runtime">The runtime type of the framework</param>
         /// <param name="version">The version of the framework</param>
-        public RuntimeFramework(RuntimeType runtime, Version version)
+        public RuntimeFramework(Runtime runtime, Version version)
             : this(runtime, version, null)
         {
         }
@@ -105,17 +107,19 @@ namespace NUnit.Engine
         /// <param name="runtime">The runtime type of the framework.</param>
         /// <param name="version">The version of the framework.</param>
         /// <param name="profile">The profile of the framework. Null if unspecified.</param>
-        public RuntimeFramework(RuntimeType runtime, Version version, string profile)
+        public RuntimeFramework(Runtime runtime, Version version, string profile)
         {
             Guard.ArgumentValid(IsFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
 
             Runtime = runtime;
             FrameworkVersion = ClrVersion = version;
-            ClrVersion = GetClrVersionForFramework(version);
+            ClrVersion = runtime.GetClrVersionForFramework(version);
 
             Profile = profile;
 
             DisplayName = GetDefaultDisplayName(runtime, FrameworkVersion, profile);
+
+            FrameworkName = new FrameworkName(runtime.FrameworkIdentifier, FrameworkVersion);
         }
 
         private bool IsFrameworkVersion(Version v)
@@ -123,61 +127,6 @@ namespace NUnit.Engine
             // All known framework versions have either two components or
             // three. If three, then the Build is currently less than 3.
             return v.Major > 0 && v.Minor >= 0 && v.Build < 3 && v.Revision == -1;
-        }
-
-        private Version GetClrVersionForFramework(Version frameworkVersion)
-        {
-            switch (Runtime)
-            {
-                case RuntimeType.Net:
-                    switch (frameworkVersion.Major)
-                    {
-                        case 1:
-                            switch (frameworkVersion.Minor)
-                            {
-                                case 0:
-                                    return new Version(1, 0, 3705);
-                                case 1:
-                                    return new Version(1, 1, 4322);
-                            }
-                            break;
-                        case 2:
-                        case 3:
-                            return new Version(2, 0, 50727);
-                        case 4:
-                            return new Version(4, 0, 30319);
-                    }
-                    break;
-                case RuntimeType.Mono:
-                    switch (frameworkVersion.Major)
-                    {
-                        case 1:
-                            return new Version(1, 1, 4322);
-                        case 2:
-                        case 3:
-                            return new Version(2, 0, 50727);
-                        case 4:
-                            return new Version(4, 0, 30319);
-                    }
-                    break;
-                case RuntimeType.NetCore:
-                    switch (frameworkVersion.Major)
-                    {
-                        case 1:
-                        case 2:
-                            // For pre-3.0 versions of .NET Core, Environment.Version returns 4.0.30319.42000
-                            return new Version(4, 0, 30319);
-                        case 3:
-                            return new Version(3, 1, 10);
-                        case 5:
-                            return new Version(5, 0, 1);
-                        case 6:
-                            return new Version(6, 0, 0);
-                    }
-                    break;
-            }
-
-            throw new ArgumentException("Unknown framework version " + frameworkVersion.ToString(), "version");
         }
 
         /// <summary>
@@ -193,9 +142,9 @@ namespace NUnit.Engine
                     Type monoRuntimeType = Type.GetType("Mono.Runtime", false);
                     bool isMono = monoRuntimeType != null;
 
-                    RuntimeType runtime = isMono
-                        ? RuntimeType.Mono
-                        : RuntimeType.Net;
+                    Runtime runtime = isMono
+                        ? Runtime.Mono
+                        : Runtime.Net;
 
                     int major = Environment.Version.Major;
                     int minor = Environment.Version.Minor;
@@ -344,30 +293,13 @@ namespace NUnit.Engine
         /// <returns></returns>
         public static RuntimeFramework Parse(string s)
         {
-            RuntimeType runtime = RuntimeType.Net;
-            Version version = new Version();
+            Guard.ArgumentNotNullOrEmpty(s, nameof(s));
 
             string[] parts = s.Split(new char[] { '-' });
-            if (parts.Length == 2)
-            {
-                runtime = (RuntimeType)System.Enum.Parse(typeof(RuntimeType), parts[0], true);
-                string vstring = parts[1];
-                if (vstring != "")
-                    version = new Version(vstring);
-            }
-            else if (char.ToLower(s[0]) == 'v')
-            {
-                version = new Version(s.Substring(1));
-            }
-            else if (IsRuntimeTypeName(s))
-            {
-                runtime = (RuntimeType)System.Enum.Parse(typeof(RuntimeType), s, true);
-            }
-            else
-            {
-                version = new Version(s);
-            }
+            Guard.ArgumentValid(parts.Length == 2 && parts[0].Length > 0 && parts[1].Length > 0, "RuntimeFramework id not in correct format", nameof(s));
 
+            var runtime = Runtime.Parse(parts[0]);
+            var version = new Version(parts[1]);
             return new RuntimeFramework(runtime, version);
         }
 
@@ -395,14 +327,14 @@ namespace NUnit.Engine
             return new RuntimeFramework(GetRuntimeTypeFromFrameworkIdentifier(frameworkName.Identifier), frameworkName.Version, frameworkName.Profile);
         }
 
-        private static RuntimeType GetRuntimeTypeFromFrameworkIdentifier(string identifier)
+        private static Runtime GetRuntimeTypeFromFrameworkIdentifier(string identifier)
         {
             switch (identifier)
             {
                 case FrameworkIdentifiers.NetFramework:
-                    return RuntimeType.Net;
+                    return Runtime.Net;
                 case FrameworkIdentifiers.NetCoreApp:
-                    return RuntimeType.NetCore;
+                    return Runtime.NetCore;
                 case FrameworkIdentifiers.NetStandard:
                     throw new NUnitEngineException(
                         "Test assemblies must target a specific platform, rather than .NETStandard.");
@@ -445,15 +377,15 @@ namespace NUnit.Engine
                 && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
         }
 
-        private bool Supports(RuntimeType targetRuntime)
+        private bool Supports(Runtime targetRuntime)
         {
             if (this.Runtime == targetRuntime)
                 return true;
 
-            if (this.Runtime == RuntimeType.Net && targetRuntime == RuntimeType.Mono)
+            if (this.Runtime == Runtime.Net && targetRuntime == Runtime.Mono)
                 return true;
 
-            if (this.Runtime == RuntimeType.Mono && targetRuntime == RuntimeType.Net)
+            if (this.Runtime == Runtime.Mono && targetRuntime == Runtime.Net)
                 return true;
 
             return false;
@@ -466,34 +398,21 @@ namespace NUnit.Engine
 
         private static bool IsRuntimeTypeName(string name)
         {
-            foreach (string item in Enum.GetNames(typeof(RuntimeType)))
+            foreach (string item in Enum.GetNames(typeof(Runtime)))
                 if (item.ToLower() == name.ToLower())
                     return true;
 
             return false;
         }
 
-        private static string GetDefaultDisplayName(RuntimeType runtime, Version version, string profile)
+        private static string GetDefaultDisplayName(Runtime runtime, Version version, string profile)
         {
-            string displayName = GetRuntimeDisplayName(runtime) + " " + version.ToString();
+            string displayName = $"{runtime.DisplayName} {version}";
 
             if (!string.IsNullOrEmpty(profile) && profile != "Full")
                 displayName += " - " + profile;
 
             return displayName;
-        }
-
-        private static string GetRuntimeDisplayName(RuntimeType runtime)
-        {
-            switch (runtime)
-            {
-                case RuntimeType.Net:
-                    return ".NET";
-                case RuntimeType.NetCore:
-                    return ".NETCore";
-                default:
-                    return runtime.ToString();
-            }
         }
 
         private static bool VersionsMatch(Version v1, Version v2)
@@ -535,7 +454,7 @@ namespace NUnit.Engine
 
         private static void FindDefaultMonoFramework()
         {
-            if (CurrentFramework.Runtime == RuntimeType.Mono)
+            if (CurrentFramework.Runtime == Runtime.Mono)
                 UseCurrentMonoFramework();
             else
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -544,7 +463,7 @@ namespace NUnit.Engine
 
         private static void UseCurrentMonoFramework()
         {
-            Debug.Assert(CurrentFramework.Runtime == RuntimeType.Mono && MonoPrefix != null && MonoVersion != null);
+            Debug.Assert(CurrentFramework.Runtime == Runtime.Mono && MonoPrefix != null && MonoVersion != null);
 
             // Multiple profiles are no longer supported with Mono 4.0
             if (MonoVersion.Major < 4 && FindAllMonoProfiles() > 0)
@@ -642,7 +561,7 @@ namespace NUnit.Engine
 
         private static void AddMonoFramework(Version frameworkVersion, string profile)
         {
-            var framework = new RuntimeFramework(RuntimeType.Mono, frameworkVersion)
+            var framework = new RuntimeFramework(Runtime.Mono, frameworkVersion)
             {
                 Profile = profile,
                 DisplayName = MonoVersion != null
@@ -714,7 +633,7 @@ namespace NUnit.Engine
                 if (count > 0 && runtimes[count - 1].FrameworkVersion == newVersion)
                     continue;
 
-                runtimes.Add(new RuntimeFramework(RuntimeType.NetCore, newVersion));
+                runtimes.Add(new RuntimeFramework(Runtime.NetCore, newVersion));
             }
 
             return runtimes;

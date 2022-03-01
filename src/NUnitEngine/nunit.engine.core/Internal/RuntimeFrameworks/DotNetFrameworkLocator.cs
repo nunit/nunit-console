@@ -39,7 +39,7 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
                         else if (CheckInstallDword(versionKey))
                         {
                             // Versions 1.1, 2.0, 3.0 and 3.5 are possible here
-                            yield return new RuntimeFramework(RuntimeType.Net, new Version(name.Substring(1, 3)));
+                            yield return new RuntimeFramework(Runtime.Net, new Version(name.Substring(1, 3)));
                         }
                     }
                 }
@@ -53,7 +53,7 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
                 yield break;
 
             foreach (var build in key.GetValueNames())
-                yield return new RuntimeFramework(RuntimeType.Net, new Version("1.0." + build));
+                yield return new RuntimeFramework(Runtime.Net, new Version("1.0." + build));
         }
 
         private struct MinimumRelease
@@ -91,12 +91,12 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
 
                 if (CheckInstallDword(profileKey))
                 {
-                    yield return new RuntimeFramework(RuntimeType.Net, new Version(4, 0), profile);
+                    yield return new RuntimeFramework(Runtime.Net, new Version(4, 0), profile);
 
                     var release = (int)profileKey.GetValue("Release", 0);
                     foreach (var entry in ReleaseTable)
                         if (release >= entry.Release)
-                            yield return new RuntimeFramework(RuntimeType.Net, entry.Version);
+                            yield return new RuntimeFramework(Runtime.Net, entry.Version);
 
 
                     yield break;     //If full profile found don't check for client profile
