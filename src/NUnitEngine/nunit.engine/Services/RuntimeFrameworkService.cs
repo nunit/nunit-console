@@ -71,7 +71,7 @@ namespace NUnit.Engine.Services
 
         private static bool RuntimesMatch(RuntimeType requested, RuntimeType available)
         {
-            if (requested == available || requested == RuntimeType.Any)
+            if (requested == available)
                 return true;
 
             if (requested == RuntimeType.Net && available == RuntimeType.Mono)

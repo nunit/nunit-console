@@ -8,8 +8,6 @@ namespace NUnit.Engine
     /// </summary>
     public enum RuntimeType
     {
-        /// <summary>Any supported runtime framework</summary>
-        Any,
         /// <summary>Microsoft .NET Framework</summary>
         Net,
         /// <summary>Mono</summary>

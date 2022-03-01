@@ -45,17 +45,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the unique Id for this runtime, such as "net-4.5"
         /// </summary>
-        public string Id
-        {
-            get
-            {
-                string vstring = FrameworkVersion.ToString();
-                if (Runtime == RuntimeType.Any)
-                    return "v" + vstring;
-                else
-                    return Runtime.ToString().ToLower() + "-" + vstring;
-            }
-        }
+        public string Id => Runtime.ToString().ToLower() + "-" + FrameworkVersion.ToString();
 
         /// <summary>
         /// The type of this runtime framework
@@ -140,7 +130,6 @@ namespace NUnit.Engine
             switch (Runtime)
             {
                 case RuntimeType.Net:
-                case RuntimeType.Any:
                     switch (frameworkVersion.Major)
                     {
                         case 1:
@@ -355,7 +344,7 @@ namespace NUnit.Engine
         /// <returns></returns>
         public static RuntimeFramework Parse(string s)
         {
-            RuntimeType runtime = RuntimeType.Any;
+            RuntimeType runtime = RuntimeType.Net;
             Version version = new Version();
 
             string[] parts = s.Split(new char[] { '-' });
@@ -461,9 +450,6 @@ namespace NUnit.Engine
             if (this.Runtime == targetRuntime)
                 return true;
 
-            if (this.Runtime == RuntimeType.Any || targetRuntime == RuntimeType.Any)
-                return true;
-
             if (this.Runtime == RuntimeType.Net && targetRuntime == RuntimeType.Mono)
                 return true;
 
@@ -489,12 +475,7 @@ namespace NUnit.Engine
 
         private static string GetDefaultDisplayName(RuntimeType runtime, Version version, string profile)
         {
-            string displayName;
-
-            if (runtime == RuntimeType.Any)
-                displayName = "v" + version.ToString();
-            else
-                displayName = GetRuntimeDisplayName(runtime) + " " + version.ToString();
+            string displayName = GetRuntimeDisplayName(runtime) + " " + version.ToString();
 
             if (!string.IsNullOrEmpty(profile) && profile != "Full")
                 displayName += " - " + profile;

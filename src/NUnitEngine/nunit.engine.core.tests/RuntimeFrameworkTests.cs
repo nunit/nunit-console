@@ -145,36 +145,20 @@ namespace NUnit.Engine
                 new RuntimeFramework(RuntimeType.Mono, new Version(1,1)), // non-existent version but it works
                 new RuntimeFramework(RuntimeType.Mono, new Version(1,0)))
                 .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Mono, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)))
-                .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Mono, new Version(2,0)))
-                .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)))
-                .Returns(true),
-            new TestCaseData(
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Any, new Version(4,0)))
-                .Returns(false),
             };
 
         private static readonly TestCaseData[] CanLoadData = {
             new TestCaseData(
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
-                new RuntimeFramework(RuntimeType.Any, new Version(2,0)))
+                new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
+                new RuntimeFramework(RuntimeType.Net, new Version(2,0)))
                 .Returns(true),
             new TestCaseData(
-                    new RuntimeFramework(RuntimeType.Any, new Version(2,0)),
-                    new RuntimeFramework(RuntimeType.Any, new Version(4,0)))
+                    new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
+                    new RuntimeFramework(RuntimeType.Net, new Version(4,0)))
                 .Returns(false),
             new TestCaseData(
-                    new RuntimeFramework(RuntimeType.Any, new Version(4,0)),
-                    new RuntimeFramework(RuntimeType.Any, new Version(2,0)))
+                    new RuntimeFramework(RuntimeType.Net, new Version(4,0)),
+                    new RuntimeFramework(RuntimeType.Net, new Version(2,0)))
                 .Returns(true)
             };
 #pragma warning restore 414
@@ -225,10 +209,6 @@ namespace NUnit.Engine
             new FrameworkData(RuntimeType.Mono, new Version(2,0), new Version(2,0,50727), "mono-2.0", "Mono 2.0"),
             new FrameworkData(RuntimeType.Mono, new Version(3,5), new Version(2,0,50727), "mono-3.5", "Mono 3.5"),
             new FrameworkData(RuntimeType.Mono, new Version(4,0), new Version(4,0,30319), "mono-4.0", "Mono 4.0"),
-            new FrameworkData(RuntimeType.Any, new Version(1,1), new Version(1,1,4322), "v1.1", "v1.1"),
-            new FrameworkData(RuntimeType.Any, new Version(2,0), new Version(2,0,50727), "v2.0", "v2.0"),
-            new FrameworkData(RuntimeType.Any, new Version(3,5), new Version(2,0,50727), "v3.5", "v3.5"),
-            new FrameworkData(RuntimeType.Any, new Version(4,0), new Version(4,0,30319), "v4.0", "v4.0"),
         };
 #pragma warning restore 414
     }
