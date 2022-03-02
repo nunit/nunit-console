@@ -416,17 +416,19 @@ namespace NUnit.Engine.Extensibility
 
             IRuntimeFramework assemblyTargetFramework = null;
 #if NETFRAMEWORK
-            var currentFramework = RuntimeFramework.CurrentFramework;
-            assemblyTargetFramework = assembly.TargetFramework;
-            if (!currentFramework.CanLoad(assemblyTargetFramework))
+            // Use special properties provided by our backport of RuntimeInformation
+            Version currentVersion = RuntimeInformation.FrameworkVersion;
+
+            var assemblyFrameworkName = assembly.TargetFramework.FrameworkName;
+            if (assemblyFrameworkName.Identifier != FrameworkIdentifiers.NetFramework || assemblyFrameworkName.Version > currentVersion)
             {
                 if (!assembly.FromWildCard)
                 {
-                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assembly.TargetFramework.DisplayName}, which is not available.");
                 }
                 else
                 {
-                    log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                    log.Info($"Assembly {assembly.FilePath} targets {assembly.TargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
                     return;
                 }
             }
