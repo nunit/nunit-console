@@ -13,22 +13,18 @@ using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
 
 namespace NUnit.Engine.Services
 {
+    using RuntimeLocators;
+
     public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
-        // HACK: This line forces RuntimeFramework to initialize the static property
-        // AvailableFrameworks before it is accessed by multiple threads. See comment
-        // on RuntimeFramework class for a more detailled explanation.
-        static readonly RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
+        private List<RuntimeFramework> _availableRuntimes = new List<RuntimeFramework>();
 
         /// <summary>
         /// Gets a list of available runtimes.
         /// </summary>
-        public IList<IRuntimeFramework> AvailableRuntimes
-        {
-            get { return _availableRuntimes; }
-        }
+        public IList<IRuntimeFramework> AvailableRuntimes => _availableRuntimes.ToArray();
 
         /// <summary>
         /// Returns true if the runtime framework represented by
@@ -43,7 +39,7 @@ namespace NUnit.Engine.Services
             if (!RuntimeFramework.TryParse(name, out RuntimeFramework requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
 
-            foreach (var framework in RuntimeFramework.AvailableFrameworks)
+            foreach (var framework in _availableRuntimes)
                 if (FrameworksMatch(requestedFramework, framework))
                     return true;
 
@@ -160,7 +156,7 @@ namespace NUnit.Engine.Services
                 targetVersion = frameworkName.Version;
             }
 
-            if (!new RuntimeFramework(targetRuntime, targetVersion).IsAvailable)
+            if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id))
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
                 if (targetVersion < currentFramework.FrameworkVersion)
@@ -174,6 +170,26 @@ namespace NUnit.Engine.Services
             return targetFramework;
         }
 
+        public override void StartService()
+        {
+            try
+            {
+                _availableRuntimes = new List<RuntimeFramework>();
+
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    _availableRuntimes.AddRange(NetFxRuntimeLocator.FindRuntimes());
+
+                //FindDefaultMonoFramework();
+                _availableRuntimes.AddRange(NetCoreRuntimeLocator.FindRuntimes());
+            }
+            catch
+            {
+                Status = ServiceStatus.Error;
+                throw;
+            }
+
+            Status = ServiceStatus.Started;
+        }
 
         /// <summary>
         /// Returns the best available framework that matches a target framework.

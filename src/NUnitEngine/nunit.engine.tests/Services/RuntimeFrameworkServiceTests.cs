@@ -56,6 +56,14 @@ namespace NUnit.Engine.Services
                 Console.WriteLine("Available: {0}", framework.DisplayName);
         }
 
+        [Test]
+        public void CurrentFrameworkMustBeAvailable()
+        {
+            var current = RuntimeFramework.CurrentFramework;
+            Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
+            Assert.That(_runtimeService.IsAvailable(current.Id), "{0} not available", current);
+        }
+
         [TestCase("mono", 2, 0, "net-4.0")]
         [TestCase("net", 2, 0, "net-4.0")]
         [TestCase("net", 3, 5, "net-4.0")]
@@ -75,8 +83,8 @@ namespace NUnit.Engine.Services
         public void RuntimeFrameworkIsSetForSubpackages()
         {
             //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available
-            Assume.That(new RuntimeFramework(Runtime.Net, new Version("2.0")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
-            Assume.That(new RuntimeFramework(Runtime.Net, new Version("4.0")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
+            Assume.That(_runtimeService.IsAvailable("net-2.0"));
+            Assume.That(_runtimeService.IsAvailable("net-4.0"));
 
             var topLevelPackage = new TestPackage(new [] {"a.dll", "b.dll"});
 

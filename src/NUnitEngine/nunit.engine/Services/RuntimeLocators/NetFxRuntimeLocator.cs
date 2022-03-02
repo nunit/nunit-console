@@ -5,14 +5,14 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Win32;
 
-namespace NUnit.Engine.Internal.RuntimeFrameworks
+namespace NUnit.Engine.Services.RuntimeLocators
 {
-    internal static class DotNetFrameworkLocator
+    public static class NetFxRuntimeLocator
     {
         // Note: this method cannot be generalized past V4, because (a)  it has
         // specific code for detecting .NET 4.5 and (b) we don't know what
         // microsoft will do in the future
-        public static IEnumerable<RuntimeFramework> FindDotNetFrameworks()
+        public static IEnumerable<RuntimeFramework> FindRuntimes()
         {
             // Handle Version 1.0, using a different registry key
             foreach (var framework in FindExtremelyOldDotNetFrameworkVersions())
