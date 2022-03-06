@@ -418,23 +418,23 @@ namespace NUnit.Engine.Extensibility
 #if NETFRAMEWORK
             // Use special properties provided by our backport of RuntimeInformation
             Version currentVersion = RuntimeInformation.FrameworkVersion;
+            var frameworkName = assembly.TargetRuntime;
 
-            var assemblyFrameworkName = assembly.TargetFramework.FrameworkName;
-            if (assemblyFrameworkName.Identifier != FrameworkIdentifiers.NetFramework || assemblyFrameworkName.Version > currentVersion)
+            if (frameworkName.Identifier != FrameworkIdentifiers.NetFramework || frameworkName.Version > currentVersion)
             {
                 if (!assembly.FromWildCard)
                 {
-                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assembly.TargetFramework.DisplayName}, which is not available.");
+                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {frameworkName}, which is not available.");
                 }
                 else
                 {
-                    log.Info($"Assembly {assembly.FilePath} targets {assembly.TargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                    log.Info($"Assembly {assembly.FilePath} targets {frameworkName}, which is not available. Assembly found via wildcard.");
                     return;
                 }
             }
 #endif
 
-            foreach (var type in assembly.MainModule.GetTypes())
+            foreach (var type in assembly.GetTypes())
             {
                 CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
 
