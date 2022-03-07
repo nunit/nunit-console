@@ -13,6 +13,16 @@ namespace NUnit.Engine.Services
     {
         private RuntimeFrameworkService _runtimeService;
 
+        // We can do this because we currently only build under NETFRAMEWORK
+        private static Runtime _currentRuntime =
+            Type.GetType("Mono.Runtime", false) != null
+                ? Runtime.Mono
+                : Runtime.Net;
+
+        // TODO: We cast IRuntimeFramework to RuntimeFramework in several
+        // places here. Ideally, we should deal with the interfaces but
+        // they would need to be changed to do that. For now, the casts are
+        // used since we may end up eliminating the RuntimeFramework class.
         [SetUp]
         public void CreateServiceContext()
         {
@@ -48,12 +58,55 @@ namespace NUnit.Engine.Services
         }
 
         [Test]
+        public void CanGetCurrentFramework()
+        {
+            var framework = _runtimeService.CurrentFramework as RuntimeFramework;
+
+            Assert.That(framework.Runtime, Is.EqualTo(_currentRuntime));
+            Assert.That(framework.ClrVersion, Is.EqualTo(Environment.Version));
+        }
+
+        [Test]
+        public void CurrentFrameworkHasBuildSpecified()
+        {
+            Assert.That(_runtimeService.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
+        }
+
+        [Test]
         public void AvailableFrameworks()
         {
             var available = _runtimeService.AvailableRuntimes;
             Assert.That(available.Count, Is.GreaterThan(0));
             foreach (var framework in available)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
+        }
+
+        [Test]
+        public void CurrentFrameworkMustBeAvailable()
+        {
+            var current = _runtimeService.CurrentFramework;
+            Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
+            Assert.That(_runtimeService.IsAvailable(current.Id), "{0} not available", current);
+        }
+
+        [Test]
+        public void AvailableFrameworksList_IncludesCurrentFramework()
+        {
+            var current = _runtimeService.CurrentFramework as RuntimeFramework;
+            foreach (var framework in _runtimeService.AvailableRuntimes)
+                if (current.Supports(framework as RuntimeFramework))
+                    return;
+
+            Assert.Fail("CurrentFramework not listed as available");
+        }
+
+        [Test]
+        public void AvailableFrameworksList_ContainsNoDuplicates()
+        {
+            var names = new List<string>();
+            foreach (var framework in _runtimeService.AvailableRuntimes)
+                names.Add(framework.DisplayName);
+            Assert.That(names, Is.Unique);
         }
 
         [TestCase("mono", 2, 0, "net-4.0")]
@@ -75,15 +128,15 @@ namespace NUnit.Engine.Services
         public void RuntimeFrameworkIsSetForSubpackages()
         {
             //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available
-            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("2.0.50727")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
-            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("4.0.30319")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
+            Assume.That(_runtimeService.IsAvailable("net-2.0"));
+            Assume.That(_runtimeService.IsAvailable("net-4.0"));
 
             var topLevelPackage = new TestPackage(new [] {"a.dll", "b.dll"});
 
             var net20Package = topLevelPackage.SubPackages[0];
-            net20Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("2.0.50727"));
+            net20Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("2.0"));
             var net40Package = topLevelPackage.SubPackages[1];
-            net40Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("4.0.30319"));
+            net40Package.Settings.Add(InternalEnginePackageSettings.ImageRuntimeVersion, new Version("4.0"));
 
             _runtimeService.SelectRuntimeFramework(topLevelPackage);
 

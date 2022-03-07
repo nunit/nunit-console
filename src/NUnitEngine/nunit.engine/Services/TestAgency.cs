@@ -29,6 +29,7 @@ namespace NUnit.Engine.Services
         private readonly AgentStore _agentStore = new AgentStore();
 
         private IRuntimeFrameworkService _runtimeService;
+        private IAvailableRuntimes _availableRuntimeService;
 
         // Transports used for various target runtimes
         private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
@@ -62,7 +63,7 @@ namespace NUnit.Engine.Services
             if (!_runtimeService.IsAvailable(targetRuntime.Id))
             {
                 string msg = $"The {targetRuntime} framework is not available.\r\nAvailable frameworks:";
-                foreach (var runtime in RuntimeFramework.AvailableFrameworks)
+                foreach (var runtime in _availableRuntimeService.AvailableRuntimes)
                     msg += $" {runtime}";
                 throw new ArgumentException(msg);
             }
@@ -179,14 +180,19 @@ namespace NUnit.Engine.Services
         public void StartService()
         {
             _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();
-            if (_runtimeService == null)
+            _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>();
+
+            if (_runtimeService == null || _availableRuntimeService == null)
+            {
                 Status = ServiceStatus.Error;
-            else
-                try
-                {
+                return;
+            }
+
+            try
+            {
                 _remotingTransport.Start();
-                    _tcpTransport.Start();
-                    Status = ServiceStatus.Started;
+                _tcpTransport.Start();
+                Status = ServiceStatus.Started;
             }
             catch
             {

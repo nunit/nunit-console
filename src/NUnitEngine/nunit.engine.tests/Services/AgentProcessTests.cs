@@ -72,11 +72,11 @@ namespace NUnit.Engine.Services
             Assert.False(startInfo.LoadUserProfile, "LoadUserProfile");
 
             var targetRuntime = RuntimeFramework.Parse(framework);
-            if (targetRuntime.Runtime == RuntimeType.Mono)
+            if (targetRuntime.Runtime == Runtime.Mono)
             {
                 string monoOptions = "--runtime=v" + targetRuntime.ClrVersion.ToString(3);
                 monoOptions += " --debug";
-                Assert.That(startInfo.FileName, Is.EqualTo(RuntimeFramework.MonoExePath));
+                Assert.That(startInfo.FileName, Is.EqualTo(RuntimeFrameworkService.MonoExePath));
                 Assert.That(startInfo.Arguments, Is.EqualTo(
                     $"{monoOptions} \"{process.AgentExePath}\" {process.AgentArgs}"));
             }

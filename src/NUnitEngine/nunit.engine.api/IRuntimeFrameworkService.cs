@@ -12,6 +12,12 @@ namespace NUnit.Engine
     public interface IRuntimeFrameworkService
     {
         /// <summary>
+        /// Gets a RuntimeFramework instance representing the runtime under
+        /// which the code is currently running.
+        /// </summary>
+        IRuntimeFramework CurrentFramework { get; }
+
+        /// <summary>
         /// Returns true if the runtime framework represented by
         /// the string passed as an argument is available.
         /// </summary>

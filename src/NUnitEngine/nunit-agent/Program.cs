@@ -5,15 +5,34 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
+using Microsoft.Win32;
 using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 
+#if NETFRAMEWORK
+using RuntimeInformation = NUnit.Engine.Internal.Backports.RuntimeInformation;
+#endif
+
 namespace NUnit.Agent
 {
     public class NUnitTestAgent
     {
+        static readonly string CURRENT_RUNTIME = RuntimeInformation.FrameworkDescription;
+        const string AGENT_RUNTIME =
+#if NET6_0
+                ".NET 6.0";
+#elif NET5_0
+                ".NET 5.0";
+#elif NETCOREAPP3_1
+                ".NET Core 3.1";
+#elif NET40
+                ".NET 4.0";
+#elif NET20
+                ".NET 2.0";
+#endif
+
         static Guid AgentId;
         static string AgencyUrl;
         static Process AgencyProcess;
@@ -63,20 +82,13 @@ namespace NUnit.Agent
             InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
             log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
-            log.Info("Agent process {0} starting", pid);
+            log.Info($"Agent process {pid} starting");
+            log.Info($"Running {AGENT_RUNTIME} agent under {CURRENT_RUNTIME}");
 
             if (debugArgPassed)
                 TryLaunchDebugger();
 
             LocateAgencyProcess(agencyPid);
-
-#if NETCOREAPP3_1
-            log.Info($"Running .NET Core 3.1 agent under {RuntimeInformation.FrameworkDescription}");
-#elif NET40
-            log.Info($"Running .NET 4.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
-#elif NET20
-            log.Info($"Running .NET 2.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
-#endif
 
             log.Info("Starting RemoteTestAgent");
             Agent = new RemoteTestAgent(AgentId);

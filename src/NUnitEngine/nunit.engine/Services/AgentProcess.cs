@@ -27,7 +27,7 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
-            string agencyUrl = TargetRuntime.Runtime == RuntimeType.NetCore ? agency.TcpEndPoint : agency.RemotingUrl;
+            string agencyUrl = TargetRuntime.Runtime == Runtime.NetCore ? agency.TcpEndPoint : agency.RemotingUrl;
             AgentArgs = new StringBuilder($"{agentId} {agencyUrl} --pid={Process.GetCurrentProcess().Id}");
 
             // Set options that need to be in effect before the package
@@ -48,20 +48,20 @@ namespace NUnit.Engine.Services
             StartInfo.WorkingDirectory = Environment.CurrentDirectory;
             EnableRaisingEvents = true;
 
-            if (TargetRuntime.Runtime == RuntimeType.Mono)
+            if (TargetRuntime.Runtime == Runtime.Mono)
             {
-                StartInfo.FileName = RuntimeFramework.MonoExePath;
+                StartInfo.FileName = RuntimeFrameworkService.MonoExePath;
                 string monoOptions = "--runtime=v" + TargetRuntime.ClrVersion.ToString(3);
                 monoOptions += " --debug";
                 StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monoOptions, AgentExePath, AgentArgs);
             }
-            else if (TargetRuntime.Runtime == RuntimeType.Net)
+            else if (TargetRuntime.Runtime == Runtime.Net)
             {
                 StartInfo.FileName = AgentExePath;
                 StartInfo.Arguments = AgentArgs.ToString();
                 StartInfo.LoadUserProfile = loadUserProfile;
             }
-            else if (TargetRuntime.Runtime == RuntimeType.NetCore)
+            else if (TargetRuntime.Runtime == Runtime.NetCore)
             {
                 StartInfo.FileName = "dotnet";
                 StartInfo.Arguments = $"{AgentExePath} {AgentArgs}";
@@ -117,15 +117,14 @@ namespace NUnit.Engine.Services
             string agentName;
             string agentExtension;
             int major = targetRuntime.FrameworkVersion.Major;
-            switch (targetRuntime.Runtime)
+            switch (targetRuntime.Runtime.FrameworkIdentifier)
             {
-                case RuntimeType.Net:
-                case RuntimeType.Mono:
+                case FrameworkIdentifiers.NetFramework:
                     runtimeDir = major >= 4 ? "net40" : "net20";
                     agentName = requires32Bit ? "nunit-agent-x86" : "nunit-agent";
                     agentExtension = ".exe";
                     break;
-                case RuntimeType.NetCore:
+                case FrameworkIdentifiers.NetCoreApp:
                     runtimeDir = major >= 6 ? "net6.0" : major == 5 ? "net5.0" : "netcoreapp3.1";
                     agentName = "nunit-agent";
                     agentExtension = ".dll";

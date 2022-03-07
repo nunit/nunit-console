@@ -4,6 +4,7 @@
 #if NETFRAMEWORK
 using System;
 using NSubstitute;
+using NUnit.Engine.Compatibility;
 using NUnit.Engine.Extensibility;
 using NUnit.Framework;
 
@@ -112,7 +113,7 @@ namespace NUnit.Engine.Tests.Extensibility
             sub.AssemblyName.Returns(assemblyName);
             sub.AssemblyVersion.Returns(assemblyVersion ?? new Version(1, 0));
             targetFramework = targetFramework ?? new Version(2, 0);
-            sub.TargetFramework.Returns(new RuntimeFramework(RuntimeType.Any, targetFramework));
+            sub.TargetRuntime.Returns(new FrameworkName(FrameworkIdentifiers.NetFramework, targetFramework));
             sub.FromWildCard.Returns(fromWildcard);
             return sub;
         }

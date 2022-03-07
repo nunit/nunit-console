@@ -33,10 +33,10 @@ var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.en
 var ENGINE_CORE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core.tests/nunit.engine.core.tests.csproj";
 var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console/nunit-console.csproj";
 var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console.tests/nunit-console.tests.csproj";
-var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";
-var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock-assembly-x86.csproj";
-var MOCK_ASSEMBLY_NUNIT4_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-nunit4/mock-assembly-nunit4.csproj";
-var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
+var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "TestData/mock-assembly/mock-assembly.csproj";
+var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "TestData/mock-assembly-x86/mock-assembly-x86.csproj";
+var MOCK_ASSEMBLY_NUNIT4_PROJECT = SOURCE_DIR + "TestData/mock-assembly-nunit4/mock-assembly-nunit4.csproj";
+var NOTEST_PROJECT = SOURCE_DIR + "TestData/notest-assembly/notest-assembly.csproj";
 // Console Runner
 var NET20_CONSOLE = BIN_DIR + "net20/nunit-console.exe";
 var NET60_CONSOLE = BIN_DIR + "net6.0/nunit-console.dll";

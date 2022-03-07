@@ -2,6 +2,12 @@
 
 using System;
 
+#if NETFRAMEWORK
+using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
+#else
+using FrameworkName = System.Runtime.Versioning.FrameworkName;
+#endif
+
 namespace NUnit.Engine.Extensibility
 {
     internal interface IExtensionAssembly
@@ -9,8 +15,6 @@ namespace NUnit.Engine.Extensibility
         bool FromWildCard { get; }
         string AssemblyName { get; }
         Version AssemblyVersion { get; }
-#if NETFRAMEWORK
-        RuntimeFramework TargetFramework { get; }
-#endif
+        FrameworkName TargetRuntime { get; }
     }
 }

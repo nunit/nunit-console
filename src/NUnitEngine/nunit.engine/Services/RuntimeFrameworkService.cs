@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
@@ -13,22 +14,34 @@ using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
 
 namespace NUnit.Engine.Services
 {
+    using Microsoft.Win32;
+    using RuntimeLocators;
+
     public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
-        // HACK: This line forces RuntimeFramework to initialize the static property
-        // AvailableFrameworks before it is accessed by multiple threads. See comment
-        // on RuntimeFramework class for a more detailled explanation.
-        static readonly RuntimeFramework[] _availableRuntimes = RuntimeFramework.AvailableFrameworks;
+        private List<RuntimeFramework> _availableRuntimes = new List<RuntimeFramework>();
+
+        /// <summary>
+        /// Gets a RuntimeFramework instance representing the runtime under
+        /// which the code is currently running.
+        /// </summary>
+        public IRuntimeFramework CurrentFramework { get; private set; }
+
+        private static string MonoPrefix;
+
+        /// <summary>
+        /// The path to the mono executable, if we are running on Mono.
+        /// </summary>
+        public static string MonoExePath => MonoPrefix != null && Environment.OSVersion.Platform == PlatformID.Win32NT
+                    ? Path.Combine(MonoPrefix, "bin/mono.exe")
+                    : "mono";
 
         /// <summary>
         /// Gets a list of available runtimes.
         /// </summary>
-        public IList<IRuntimeFramework> AvailableRuntimes
-        {
-            get { return _availableRuntimes; }
-        }
+        public IList<IRuntimeFramework> AvailableRuntimes => _availableRuntimes.ToArray();
 
         /// <summary>
         /// Returns true if the runtime framework represented by
@@ -43,7 +56,7 @@ namespace NUnit.Engine.Services
             if (!RuntimeFramework.TryParse(name, out RuntimeFramework requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
 
-            foreach (var framework in RuntimeFramework.AvailableFrameworks)
+            foreach (var framework in _availableRuntimes)
                 if (FrameworksMatch(requestedFramework, framework))
                     return true;
 
@@ -69,15 +82,15 @@ namespace NUnit.Engine.Services
                    (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision);
         }
 
-        private static bool RuntimesMatch(RuntimeType requested, RuntimeType available)
+        private static bool RuntimesMatch(Runtime requested, Runtime available)
         {
-            if (requested == available || requested == RuntimeType.Any)
+            if (requested == available)
                 return true;
 
-            if (requested == RuntimeType.Net && available == RuntimeType.Mono)
+            if (requested == Runtime.Net && available == Runtime.Mono)
                 return true;
 
-            if (requested == RuntimeType.Mono && available == RuntimeType.Net)
+            if (requested == Runtime.Mono && available == Runtime.Net)
                 return true;
 
             return false;
@@ -108,7 +121,7 @@ namespace NUnit.Engine.Services
             }
 
             // Examine the provided settings
-            RuntimeFramework currentFramework = RuntimeFramework.CurrentFramework;
+            IRuntimeFramework currentFramework = CurrentFramework;
             log.Debug("Current framework is " + currentFramework);
 
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
@@ -131,14 +144,15 @@ namespace NUnit.Engine.Services
             log.Debug($"No specific framework requested for {package.Name}");
 
             string imageTargetFrameworkNameSetting = package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
-            RuntimeType targetRuntime;
+            Runtime targetRuntime;
             Version targetVersion;
 
             if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
             {
                 // Assume .NET Framework
-                targetRuntime = currentFramework.Runtime;
-                targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
+                targetRuntime = Runtime.Net;
+                var trialVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
+                targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
             else
             {
@@ -147,10 +161,10 @@ namespace NUnit.Engine.Services
                 switch (frameworkName.Identifier)
                 {
                     case ".NETFramework":
-                        targetRuntime = RuntimeType.Net;
+                        targetRuntime = Runtime.Net;
                         break;
                     case ".NETCoreApp":
-                        targetRuntime = RuntimeType.NetCore;
+                        targetRuntime = Runtime.NetCore;
                         break;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
@@ -159,7 +173,7 @@ namespace NUnit.Engine.Services
                 targetVersion = frameworkName.Version;
             }
 
-            if (!new RuntimeFramework(targetRuntime, targetVersion).IsAvailable)
+            if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id))
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
                 if (targetVersion < currentFramework.FrameworkVersion)
@@ -173,6 +187,21 @@ namespace NUnit.Engine.Services
             return targetFramework;
         }
 
+        public override void StartService()
+        {
+            try
+            {
+                SetCurrentFramework();
+                FindAvailableRuntimes();
+            }
+            catch
+            {
+                Status = ServiceStatus.Error;
+                throw;
+            }
+
+            Status = ServiceStatus.Started;
+        }
 
         /// <summary>
         /// Returns the best available framework that matches a target framework.
@@ -192,6 +221,118 @@ namespace NUnit.Engine.Services
                 }
 
             return result;
+        }
+
+        private void SetCurrentFramework()
+        {
+            Type monoRuntimeType = Type.GetType("Mono.Runtime", false);
+            bool isMono = monoRuntimeType != null;
+
+            Runtime runtime = isMono
+                ? Runtime.Mono
+                : Runtime.Net;
+
+            int major = Environment.Version.Major;
+            int minor = Environment.Version.Minor;
+
+            if (isMono)
+            {
+                switch (major)
+                {
+                    case 1:
+                        minor = 0;
+                        break;
+                    case 2:
+                        major = 3;
+                        minor = 5;
+                        break;
+                }
+            }
+            else /* It's windows */
+                if (major == 2)
+            {
+                RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
+                if (key != null)
+                {
+                    string installRoot = key.GetValue("InstallRoot") as string;
+                    if (installRoot != null)
+                    {
+                        if (Directory.Exists(Path.Combine(installRoot, "v3.5")))
+                        {
+                            major = 3;
+                            minor = 5;
+                        }
+                        else if (Directory.Exists(Path.Combine(installRoot, "v3.0")))
+                        {
+                            major = 3;
+                            minor = 0;
+                        }
+                    }
+                }
+            }
+            else if (major == 4 && Type.GetType("System.Reflection.AssemblyMetadataAttribute") != null)
+            {
+                minor = 5;
+            }
+
+            var currentFramework = new RuntimeFramework(runtime, new Version(major, minor))
+            {
+                ClrVersion = Environment.Version
+            };
+
+            if (isMono)
+            {
+                MonoPrefix = GetMonoPrefixFromAssembly(monoRuntimeType.Assembly);
+
+                MethodInfo getDisplayNameMethod = monoRuntimeType.GetMethod(
+                    "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
+                if (getDisplayNameMethod != null)
+                {
+                    string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0]);
+
+                    int space = displayName.IndexOf(' ');
+                    if (space >= 3) // Minimum length of a version
+                    {
+                        string version = displayName.Substring(0, space);
+                        displayName = "Mono " + version;
+                    }
+                    else
+                        displayName = "Mono " + displayName;
+
+                    currentFramework.DisplayName = displayName;
+                }
+            }
+
+            CurrentFramework = currentFramework;
+        }
+
+        private static string GetMonoPrefixFromAssembly(Assembly assembly)
+        {
+            string prefix = assembly.Location;
+
+            // In all normal mono installations, there will be sufficient
+            // levels to complete the four iterations. But just in case
+            // files have been copied to some non-standard place, we check.
+            for (int i = 0; i < 4; i++)
+            {
+                string dir = Path.GetDirectoryName(prefix);
+                if (string.IsNullOrEmpty(dir)) break;
+
+                prefix = dir;
+            }
+
+            return prefix;
+        }
+
+        private void FindAvailableRuntimes()
+        {
+            _availableRuntimes = new List<RuntimeFramework>();
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                _availableRuntimes.AddRange(NetFxRuntimeLocator.FindRuntimes());
+
+            //FindDefaultMonoFramework();
+            _availableRuntimes.AddRange(NetCoreRuntimeLocator.FindRuntimes());
         }
 
         /// <summary>
