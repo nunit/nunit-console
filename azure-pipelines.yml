@@ -1,8 +1,8 @@
 trigger:
   branches:
     include: [ 'azure-*' ]
-    exclude: [ '*' ]
-    exclude: [ 'refs/tags/*' ]
+    exclude: [ '*' ] # temporarily stop most azure builds
+    # exclude: [ 'refs/tags/*' ]
 
 jobs:
 
