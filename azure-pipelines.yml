@@ -1,6 +1,7 @@
 trigger:
   branches:
     include: [ 'azure-*' ]
+    exclude: [ '*' ]
     exclude: [ 'refs/tags/*' ]
 
 jobs:
