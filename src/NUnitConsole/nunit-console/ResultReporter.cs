@@ -78,13 +78,13 @@ namespace NUnit.ConsoleRunner
             var name = node.GetAttribute("name");
             var val = node.GetAttribute("value") ?? string.Empty;
 
-            Writer.WriteLabelLine($"    {name}:", items.Count > 0 ? string.Empty : $" {val}");
+            Writer.WriteLabelLine($"    {name}:", items.Count > 0 ? string.Empty : $" |{val}|");
 
             foreach (XmlNode item in items)
             {
                 var key = item.GetAttribute("key");
                 var value = item.GetAttribute("value");
-                Writer.WriteLine(ColorStyle.Value, $"        {key} -> {value}");
+                Writer.WriteLine(ColorStyle.Value, $"        {key} -> |{value}|");
             }
         }
 

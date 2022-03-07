@@ -166,10 +166,10 @@ namespace NUnit.ConsoleRunner
         public void TestParameterSettingsWrittenCorrectly()
         {
             var expected = new[] {
-                "    TestParameters: 1=d;2=c",
+                "    TestParameters: |1=d;2=c|",
                 "    TestParametersDictionary:",
-                "        1 -> d",
-                "        2 -> c"
+                "        1 -> |d|",
+                "        2 -> |c|"
             };
 
             var report = GetReportLines(_reporter.WriteRunSettingsReport);

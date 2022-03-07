@@ -64,18 +64,35 @@ namespace NUnit.ConsoleRunner.Options
         {
             var equalsIndex = testParameterSpecification.IndexOf("=");
 
-            if (equalsIndex <= 0 || equalsIndex == testParameterSpecification.Length - 1)
+            if (equalsIndex > 0 && equalsIndex < testParameterSpecification.Length - 1)
             {
-                _logError("Invalid format for test parameter. Use NAME=VALUE.");
-                return null;
-            }
-            else
-            {
-                string name = testParameterSpecification.Substring(0, equalsIndex);
-                string value = testParameterSpecification.Substring(equalsIndex + 1);
+                string name = testParameterSpecification.Substring(0, equalsIndex).Trim();
+                if (name != string.Empty)
+                {
+                    string value = testParameterSpecification.Substring(equalsIndex + 1).Trim();
+                    if (IsQuotedString(value))
+                        value = value.Substring(1, value.Length - 2);
 
-                return new KeyValuePair<string, string>(name, value);
+                    if (value != string.Empty)
+                        return new KeyValuePair<string, string>(name, value);
+                }
             }
+
+            _logError("Invalid format for test parameter. Use NAME=VALUE.");
+            return null;
+        }
+
+        private bool IsQuotedString(string value)
+        {
+            var length = value.Length;
+            if (length > 2)
+            {
+                var quoteChar = value[0];
+                if (quoteChar == '"' || quoteChar == '\'')
+                    return value[length - 1] == quoteChar;
+            }
+
+            return false;
         }
 
         public OutputSpecification ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications, IFileSystem fileSystem, string currentDir)
