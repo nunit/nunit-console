@@ -6,6 +6,8 @@ namespace NUnit.Engine.Services
 {
     public class FakeRuntimeService : FakeService, IRuntimeFrameworkService, IAvailableRuntimes
     {
+        public IRuntimeFramework CurrentFramework => throw new System.NotImplementedException();
+
         bool IRuntimeFrameworkService.IsAvailable(string framework)
         {
             return true;

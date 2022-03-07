@@ -76,7 +76,7 @@ namespace NUnit.Engine.Services
             {
                 string monoOptions = "--runtime=v" + targetRuntime.ClrVersion.ToString(3);
                 monoOptions += " --debug";
-                Assert.That(startInfo.FileName, Is.EqualTo(RuntimeFramework.MonoExePath));
+                Assert.That(startInfo.FileName, Is.EqualTo(RuntimeFrameworkService.MonoExePath));
                 Assert.That(startInfo.Arguments, Is.EqualTo(
                     $"{monoOptions} \"{process.AgentExePath}\" {process.AgentArgs}"));
             }

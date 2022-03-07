@@ -10,54 +10,6 @@ namespace NUnit.Engine
     [TestFixture]
     public class RuntimeFrameworkTests
     {
-        static Runtime currentRuntime =
-            Type.GetType("Mono.Runtime", false) != null
-                ? Runtime.Mono
-                : Runtime.Net;
-
-        [Test]
-        public void CanGetCurrentFramework()
-        {
-            RuntimeFramework framework = RuntimeFramework.CurrentFramework;
-
-            Assert.That(framework.Runtime, Is.EqualTo(currentRuntime));
-            Assert.That(framework.ClrVersion, Is.EqualTo(Environment.Version));
-        }
-
-        [Test]
-        public void CurrentFrameworkHasBuildSpecified()
-        {
-            Assert.That(RuntimeFramework.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
-        }
-
-        //[Test]
-        //public void AvailableFrameworksList()
-        //{
-        //    RuntimeFramework[] available = RuntimeFramework.AvailableFrameworks;
-        //    Assert.That(RuntimeFramework.AvailableFrameworks.Length, Is.GreaterThan(0) );
-        //    foreach (var framework in RuntimeFramework.AvailableFrameworks)
-        //        Console.WriteLine("Available: {0}", framework.DisplayName);
-        //}
-
-        //[Test]
-        //public void AvailableFrameworksList_IncludesCurrentFramework()
-        //{
-        //    foreach (var framework in RuntimeFramework.AvailableFrameworks)
-        //        if (RuntimeFramework.CurrentFramework.Supports(framework))
-        //            return;
-
-        //    Assert.Fail("CurrentFramework not listed as available");
-        //}
-
-        //[Test]
-        //public void AvailableFrameworksList_ContainsNoDuplicates()
-        //{
-        //    var names = new List<string>();
-        //    foreach (var framework in RuntimeFramework.AvailableFrameworks)
-        //        names.Add(framework.DisplayName);
-        //    Assert.That(names, Is.Unique);
-        //}
-
         [TestCaseSource(nameof(frameworkData))]
         public void CanCreateUsingFrameworkVersion(FrameworkData data)
         {

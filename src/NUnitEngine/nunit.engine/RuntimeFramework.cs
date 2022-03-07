@@ -84,7 +84,7 @@ namespace NUnit.Engine
         /// <summary>
         /// The CLR version for this runtime framework
         /// </summary>
-        public Version ClrVersion { get; private set; }
+        public Version ClrVersion { get; set; }
 
         /// <summary>
         /// The Profile for this framework, where relevant.
@@ -96,136 +96,9 @@ namespace NUnit.Engine
         /// <summary>
         /// Returns the Display name for this framework
         /// </summary>
-        public string DisplayName { get; private set; }
+        public string DisplayName { get; set; }
 
         #endregion
-
-        private static RuntimeFramework _currentFramework;
-
-        private static readonly string DEFAULT_WINDOWS_MONO_DIR =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Mono");
-
-        /// <summary>
-        /// Static method to return a RuntimeFramework object
-        /// for the framework that is currently in use.
-        /// </summary>
-        public static RuntimeFramework CurrentFramework
-        {
-            get
-            {
-                if (_currentFramework == null)
-                {
-                    Type monoRuntimeType = Type.GetType("Mono.Runtime", false);
-                    bool isMono = monoRuntimeType != null;
-
-                    Runtime runtime = isMono
-                        ? Runtime.Mono
-                        : Runtime.Net;
-
-                    int major = Environment.Version.Major;
-                    int minor = Environment.Version.Minor;
-
-                    if (isMono)
-                    {
-                        switch (major)
-                        {
-                            case 1:
-                                minor = 0;
-                                break;
-                            case 2:
-                                major = 3;
-                                minor = 5;
-                                break;
-                        }
-                    }
-                    else /* It's windows */
-                        if (major == 2)
-                        {
-                            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
-                            if (key != null)
-                            {
-                                string installRoot = key.GetValue("InstallRoot") as string;
-                                if (installRoot != null)
-                                {
-                                    if (Directory.Exists(Path.Combine(installRoot, "v3.5")))
-                                    {
-                                        major = 3;
-                                        minor = 5;
-                                    }
-                                    else if (Directory.Exists(Path.Combine(installRoot, "v3.0")))
-                                    {
-                                        major = 3;
-                                        minor = 0;
-                                    }
-                                }
-                            }
-                        }
-                        else if (major == 4 && Type.GetType("System.Reflection.AssemblyMetadataAttribute") != null)
-                        {
-                            minor = 5;
-                        }
-
-                    _currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
-                    _currentFramework.ClrVersion = Environment.Version;
-
-                    if (isMono)
-                    {
-                        if (MonoPrefix == null)
-                            MonoPrefix = GetMonoPrefixFromAssembly(monoRuntimeType.Assembly);
-
-                        MethodInfo getDisplayNameMethod = monoRuntimeType.GetMethod(
-                            "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
-                        if (getDisplayNameMethod != null)
-                        {
-                            string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0]);
-
-                            int space = displayName.IndexOf(' ');
-                            if (space >= 3) // Minimum length of a version
-                            {
-                                string version = displayName.Substring(0, space);
-                                displayName = "Mono " + version;
-                                if (MonoVersion == null)
-                                    MonoVersion = new Version(version);
-                            }
-                            else
-                                displayName = "Mono " + displayName;
-
-                            _currentFramework.DisplayName = displayName;
-                        }
-                    }
-                }
-
-                return _currentFramework;
-            }
-        }
-
-        /// <summary>
-        /// The version of Mono in use or null if no Mono runtime
-        /// is available on this machine.
-        /// </summary>
-        /// <value>The mono version.</value>
-        private static Version MonoVersion { get; set; }
-
-        /// <summary>
-        /// The install directory where the version of mono in
-        /// use is located. Null if no Mono runtime is present.
-        /// </summary>
-        private static string MonoPrefix { get; set; }
-
-        /// <summary>
-        /// The path to the mono executable, based on the
-        /// Mono prefix if available. Otherwise, uses "mono",
-        /// to invoke a script of that name.
-        /// </summary>
-        public static string MonoExePath
-        {
-            get
-            {
-                return MonoPrefix != null && Environment.OSVersion.Platform == PlatformID.Win32NT
-                    ? Path.Combine(MonoPrefix, "bin/mono.exe")
-                    : "mono";
-            }
-        }
 
         /// <summary>
         /// Parses a string representing a RuntimeFramework.
