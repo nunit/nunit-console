@@ -10,9 +10,12 @@ namespace NUnit.Engine.Runners
 {
     public class DomainManagerTests
     {
+        private const string DUMMY_ASSEMBLY = "test.dll";
+        private const string DUMMY_ASSEMBLY_PATH = @"C:\A\B\C\";
+
         private DomainManager _domainManager;
         // We use a sub-package, because that's what DomainManager normally gets
-        private TestPackage _package = new TestPackage(MockAssembly.AssemblyPath).SubPackages[0];
+        private TestPackage _package = new TestPackage(DUMMY_ASSEMBLY_PATH + DUMMY_ASSEMBLY).SubPackages[0];
 
         [SetUp]
         public void CreateDomainManager()
@@ -29,14 +32,14 @@ namespace NUnit.Engine.Runners
             var setup = domain.SetupInformation;
 
             Assert.That(setup.ApplicationName, Does.StartWith("Tests_"));
-            Assert.That(setup.ApplicationBase, Is.SamePath(Path.GetDirectoryName(MockAssembly.AssemblyPath)), "ApplicationBase");
+            Assert.That(setup.ApplicationBase, Is.SamePath(DUMMY_ASSEMBLY_PATH), "ApplicationBase");
             Assert.That(
                 Path.GetFileName(setup.ConfigurationFile),
-                Is.EqualTo("mock-assembly.dll.config").IgnoreCase,
+                Is.EqualTo(DUMMY_ASSEMBLY + ".config").IgnoreCase,
                 "ConfigurationFile");
             Assert.That(setup.PrivateBinPath, Is.EqualTo(null), "PrivateBinPath");
             Assert.That(setup.ShadowCopyFiles, Is.Null.Or.EqualTo("false"));
-            //Assert.That(setup.ShadowCopyDirectories, Is.SamePath(Path.GetDirectoryName(MockAssembly.AssemblyPath)), "ShadowCopyDirectories" );
+            //Assert.That(setup.ShadowCopyDirectories, Is.SamePath(DUMMY_ASSEMBLY_PATH), "ShadowCopyDirectories" );
         }
 
         [Test, Platform("Linux,Net", Reason = "get_SetupInformation() fails on Windows+Mono")]
@@ -56,7 +59,7 @@ namespace NUnit.Engine.Runners
             Assert.That(setup.ApplicationBase, Is.SamePath(basePath), "ApplicationBase");
             Assert.That(
                 Path.GetFileName(setup.ConfigurationFile),
-                Is.EqualTo("mock-assembly.dll.config").IgnoreCase,
+                Is.EqualTo(DUMMY_ASSEMBLY + ".config").IgnoreCase,
                 "ConfigurationFile");
             Assert.That(setup.PrivateBinPath, Is.SamePath(relPath), "PrivateBinPath");
             Assert.That(setup.ShadowCopyFiles, Is.Null.Or.EqualTo("false"));
