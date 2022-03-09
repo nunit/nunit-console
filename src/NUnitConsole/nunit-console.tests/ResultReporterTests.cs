@@ -81,11 +81,11 @@ namespace NUnit.ConsoleRunner
         {
             var expected = new[] {
                 "Test Run Summary",
-                "  Overall result: Failed",
-               $"  Test Count: {MockAssembly.Tests}, Passed: {MockAssembly.Passed}, Failed: 11, Warnings: 1, Inconclusive: 1, Skipped: 7",
-                "    Failed Tests - Failures: 1, Errors: 7, Invalid: 3",
-                "    Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
-                "  Start time: 2015-10-19 02:12:28Z",
+                "    Overall result: Failed",
+               $"    Test Count: {MockAssembly.Tests}, Pass: {MockAssembly.Passed}, Fail: 11, Warn: 1, Inconclusive: 1, Skip: 7",
+                "        Failed Tests - Failures: 1, Errors: 7, Invalid: 3",
+                "        Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
+                "    Start time: 2015-10-19 02:12:28Z",
                 "    End time: 2015-10-19 02:12:29Z",
                 "    Duration: 0.349 seconds",
                 ""
