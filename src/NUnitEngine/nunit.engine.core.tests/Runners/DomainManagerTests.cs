@@ -11,7 +11,9 @@ namespace NUnit.Engine.Runners
     public class DomainManagerTests
     {
         private const string DUMMY_ASSEMBLY = "test.dll";
-        private const string DUMMY_ASSEMBLY_PATH = @"C:\A\B\C\";
+        private static readonly string DUMMY_ASSEMBLY_PATH = Environment.OSVersion.Platform == PlatformID.Win32NT
+            ? @"C:\A\B\C\"
+            : "/A/B/C/";
 
         private DomainManager _domainManager;
         // We use a sub-package, because that's what DomainManager normally gets
