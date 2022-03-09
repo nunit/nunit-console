@@ -25,6 +25,10 @@ namespace NUnit.ConsoleRunner
         // ourselves so as to stay in that range.
         private const int MAXIMUM_RETURN_CODE_ALLOWED = 100; // In case we are running on Unix
 
+        private const string INDENT4 = "    ";
+        private const string INDENT6 = "      ";
+        private const string INDENT8 = "        ";
+
         public static readonly int OK = 0;
         public static readonly int INVALID_ARG = -1;
         public static readonly int INVALID_ASSEMBLY = -2;
@@ -104,7 +108,7 @@ namespace NUnit.ConsoleRunner
         {
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Test Files");
             foreach (string file in _options.InputFiles)
-                _outWriter.WriteLine(ColorStyle.Default, "    " + file);
+                _outWriter.WriteLine(ColorStyle.Default, INDENT4 + file);
             _outWriter.WriteLine();
         }
 
@@ -257,11 +261,11 @@ namespace NUnit.ConsoleRunner
         private void DisplayRuntimeEnvironment(ExtendedTextWriter OutWriter)
         {
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Runtime Environment");
-            OutWriter.WriteLabelLine("   OS Version: ", GetOSVersion());
+            OutWriter.WriteLabelLine(INDENT4 + "OS Version: ", GetOSVersion());
 #if NET20
-            OutWriter.WriteLabelLine("   Runtime: ", ".NET Framework CLR v" + Environment.Version.ToString());
+            OutWriter.WriteLabelLine(INDENT4 + "Runtime: ", ".NET Framework CLR v" + Environment.Version.ToString());
 #else
-            OutWriter.WriteLabelLine("  Runtime: ", RuntimeInformation.FrameworkDescription);
+            OutWriter.WriteLabelLine(INDENT4 + "Runtime: ", RuntimeInformation.FrameworkDescription);
 #endif
 
 
@@ -301,24 +305,24 @@ namespace NUnit.ConsoleRunner
 
             foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])
             {
-                _outWriter.WriteLabelLine("  Extension Point: ", ep.Path);
+                _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
                 foreach (var node in ep.Extensions)
                 {
-                    _outWriter.Write("    Extension: ");
+                    _outWriter.Write(INDENT6 + "Extension: ");
                     _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
                     if(node.TargetFramework != null)
                         _outWriter.Write(ColorStyle.Value, $"(.NET {node.TargetFramework?.FrameworkVersion})");
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
 
-                    _outWriter.Write("      Version: ");
+                    _outWriter.Write(INDENT8 + "Version: ");
                     _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
 
-                    _outWriter.Write("      Path: ");
+                    _outWriter.Write(INDENT8 + "Path: ");
                     _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
 
                     foreach (var prop in node.PropertyNames)
                     {
-                        _outWriter.Write("      " + prop + ":");
+                        _outWriter.Write(INDENT8 + prop + ":");
                         foreach (var val in node.GetValues(prop))
                             _outWriter.Write(ColorStyle.Value, " " + val);
                         _outWriter.WriteLine();
@@ -337,10 +341,10 @@ namespace NUnit.ConsoleRunner
 
                 if (_options.TestList.Count > 0)
                     foreach (string testName in _options.TestList)
-                        _outWriter.WriteLabelLine("    Test: ", testName);
+                        _outWriter.WriteLabelLine(INDENT4 + "Test: ", testName);
 
                 if (_options.WhereClauseSpecified)
-                    _outWriter.WriteLabelLine("    Where: ", _options.WhereClause.Trim());
+                    _outWriter.WriteLabelLine(INDENT4 + "Where: ", _options.WhereClause.Trim());
 
                 _outWriter.WriteLine();
             }

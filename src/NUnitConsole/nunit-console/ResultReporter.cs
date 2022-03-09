@@ -90,6 +90,9 @@ namespace NUnit.ConsoleRunner
 
         public void WriteSummaryReport()
         {
+            const string INDENT4 = "    ";
+            const string INDENT8 = "        ";
+
             ColorStyle overall = OverallResult == "Passed"
                 ? ColorStyle.Pass
                 : OverallResult == "Failed"  || OverallResult == "Unknown"
@@ -99,26 +102,26 @@ namespace NUnit.ConsoleRunner
                         : ColorStyle.Output;
             
             Writer.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
-            Writer.WriteLabelLine("  Overall result: ", OverallResult, overall);
+            Writer.WriteLabelLine(INDENT4 + "Overall result: ", OverallResult, overall);
 
-            WriteSummaryCount("  Test Count: ", Summary.TestCount);
-            WriteSummaryCount(", Passed: ", Summary.PassCount);
-            WriteSummaryCount(", Failed: ", Summary.FailedCount, ColorStyle.Failure);
-            WriteSummaryCount(", Warnings: ", Summary.WarningCount, ColorStyle.Warning);
+            WriteSummaryCount(INDENT4 + "Test Count: ", Summary.TestCount);
+            WriteSummaryCount(", Pass: ", Summary.PassCount);
+            WriteSummaryCount(", Fail: ", Summary.FailedCount, ColorStyle.Failure);
+            WriteSummaryCount(", Warn: ", Summary.WarningCount, ColorStyle.Warning);
             WriteSummaryCount(", Inconclusive: ", Summary.InconclusiveCount);
-            WriteSummaryCount(", Skipped: ", Summary.TotalSkipCount);
+            WriteSummaryCount(", Skip: ", Summary.TotalSkipCount);
             Writer.WriteLine();
 
             if (Summary.FailedCount > 0)
             {
-                WriteSummaryCount("    Failed Tests - Failures: ", Summary.FailureCount);
+                WriteSummaryCount(INDENT8 + "Failed Tests - Failures: ", Summary.FailureCount);
                 WriteSummaryCount(", Errors: ", Summary.ErrorCount, ColorStyle.Error);
                 WriteSummaryCount(", Invalid: ", Summary.InvalidCount);
                 Writer.WriteLine();
             }
             if (Summary.TotalSkipCount > 0)
             {
-                WriteSummaryCount("    Skipped Tests - Ignored: ", Summary.IgnoreCount);
+                WriteSummaryCount(INDENT8 + "Skipped Tests - Ignored: ", Summary.IgnoreCount);
                 WriteSummaryCount(", Explicit: ", Summary.ExplicitCount);
                 WriteSummaryCount(", Other: ", Summary.SkipCount);
                 Writer.WriteLine();
@@ -128,9 +131,9 @@ namespace NUnit.ConsoleRunner
             var startTime = ResultNode.GetAttribute("start-time", DateTime.MinValue);
             var endTime = ResultNode.GetAttribute("end-time", DateTime.MaxValue);
 
-            Writer.WriteLabelLine("  Start time: ", startTime.ToString("u"));
-            Writer.WriteLabelLine("    End time: ", endTime.ToString("u"));
-            Writer.WriteLabelLine("    Duration: ", string.Format(NumberFormatInfo.InvariantInfo, "{0:0.000} seconds", duration));
+            Writer.WriteLabelLine(INDENT4 + "Start time: ", startTime.ToString("u"));
+            Writer.WriteLabelLine(INDENT4 + "End time: ", endTime.ToString("u"));
+            Writer.WriteLabelLine(INDENT4 + "Duration: ", string.Format(NumberFormatInfo.InvariantInfo, "{0:0.000} seconds", duration));
             Writer.WriteLine();
         }
 
