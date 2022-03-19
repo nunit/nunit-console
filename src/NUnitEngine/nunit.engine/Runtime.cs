@@ -149,6 +149,8 @@ namespace NUnit.Engine
                         return new Version(5, 0, 1);
                     case 6:
                         return new Version(6, 0, 0);
+                    case 7:
+                        return new Version(7, 0, 0);
                 }
 
                 throw new ArgumentException($"Unknown .NET Core version: {frameworkVersion}", "version");
