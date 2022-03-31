@@ -5,18 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.Win32;
 using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
+using NUnit.Engine.Services.RuntimeLocators;
 #if NET20
 using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
 #endif
 
 namespace NUnit.Engine.Services
 {
-    using Microsoft.Win32;
-    using RuntimeLocators;
-
     public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
@@ -203,26 +202,6 @@ namespace NUnit.Engine.Services
             Status = ServiceStatus.Started;
         }
 
-        /// <summary>
-        /// Returns the best available framework that matches a target framework.
-        /// If the target framework has a build number specified, then an exact
-        /// match is needed. Otherwise, the matching framework with the highest
-        /// build number is used.
-        /// </summary>
-        public RuntimeFramework GetBestAvailableFramework(RuntimeFramework target)
-        {
-            RuntimeFramework result = target;
-
-            foreach (RuntimeFramework framework in _availableRuntimes)
-                if (framework.Supports(target))
-                {
-                    if (framework.ClrVersion.Build > result.ClrVersion.Build)
-                        result = framework;
-                }
-
-            return result;
-        }
-
         private void SetCurrentFramework()
         {
             Type monoRuntimeType = Type.GetType("Mono.Runtime", false);
@@ -275,10 +254,7 @@ namespace NUnit.Engine.Services
                 minor = 5;
             }
 
-            var currentFramework = new RuntimeFramework(runtime, new Version(major, minor))
-            {
-                ClrVersion = Environment.Version
-            };
+            var currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
 
             if (isMono)
             {

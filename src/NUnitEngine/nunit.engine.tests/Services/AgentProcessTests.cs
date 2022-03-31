@@ -74,7 +74,7 @@ namespace NUnit.Engine.Services
             var targetRuntime = RuntimeFramework.Parse(framework);
             if (targetRuntime.Runtime == Runtime.Mono)
             {
-                string monoOptions = "--runtime=v" + targetRuntime.ClrVersion.ToString(3);
+                string monoOptions = "--runtime=v" + targetRuntime.FrameworkVersion.ToString(2);
                 monoOptions += " --debug";
                 Assert.That(startInfo.FileName, Is.EqualTo(RuntimeFrameworkService.MonoExePath));
                 Assert.That(startInfo.Arguments, Is.EqualTo(

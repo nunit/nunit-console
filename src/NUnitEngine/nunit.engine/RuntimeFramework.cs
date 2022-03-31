@@ -43,8 +43,7 @@ namespace NUnit.Engine
             Guard.ArgumentValid(IsValidFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
 
             Runtime = runtime;
-            FrameworkVersion = ClrVersion = version;
-            ClrVersion = runtime.GetClrVersionForFramework(version);
+            FrameworkVersion = version;
 
             Profile = profile;
 
@@ -80,11 +79,6 @@ namespace NUnit.Engine
         /// The framework version for this runtime framework
         /// </summary>
         public Version FrameworkVersion { get; private set; }
-
-        /// <summary>
-        /// The CLR version for this runtime framework
-        /// </summary>
-        public Version ClrVersion { get; set; }
 
         /// <summary>
         /// The Profile for this framework, where relevant.
@@ -158,10 +152,6 @@ namespace NUnit.Engine
         /// Two RuntimeTypes match if they are equal, if either one
         /// is RuntimeType.Any or if one is RuntimeType.Net and
         /// the other is RuntimeType.Mono.
-        /// 
-        /// Two versions match if all specified version components
-        /// are equal. Negative (i.e. unspecified) version
-        /// components are ignored.
         /// </summary>
         /// <param name="target">The RuntimeFramework to be matched.</param>
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
@@ -170,9 +160,7 @@ namespace NUnit.Engine
             if (!Runtime.Matches(target.Runtime))
                 return false;
 
-            return VersionsMatch(this.ClrVersion, target.ClrVersion)
-                && this.FrameworkVersion.Major >= target.FrameworkVersion.Major
-                && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
+            return Runtime.Supports(this.FrameworkVersion, target.FrameworkVersion);
         }
 
         public bool CanLoad(IRuntimeFramework requested)
@@ -188,14 +176,6 @@ namespace NUnit.Engine
                 displayName += " - " + profile;
 
             return displayName;
-        }
-
-        private static bool VersionsMatch(Version v1, Version v2)
-        {
-            return v1.Major == v2.Major &&
-                   v1.Minor == v2.Minor &&
-                  (v1.Build < 0 || v2.Build < 0 || v1.Build == v2.Build) &&
-                  (v1.Revision < 0 || v2.Revision < 0 || v1.Revision == v2.Revision);
         }
 
         private static string GetMonoPrefixFromAssembly(Assembly assembly)
