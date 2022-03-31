@@ -26,11 +26,6 @@ namespace NUnit.Engine
         Version FrameworkVersion { get; }
 
         /// <summary>
-        /// Gets the Version of the CLR for this framework
-        /// </summary>
-        Version ClrVersion { get; }
-
-        /// <summary>
         /// Gets a string representing the particular profile installed,
         /// or null if there is no profile. Currently. the only defined 
         /// values are Full and Client.

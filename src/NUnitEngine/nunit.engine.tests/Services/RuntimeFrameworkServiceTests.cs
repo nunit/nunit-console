@@ -63,13 +63,6 @@ namespace NUnit.Engine.Services
             var framework = _runtimeService.CurrentFramework as RuntimeFramework;
 
             Assert.That(framework.Runtime, Is.EqualTo(_currentRuntime));
-            Assert.That(framework.ClrVersion, Is.EqualTo(Environment.Version));
-        }
-
-        [Test]
-        public void CurrentFrameworkHasBuildSpecified()
-        {
-            Assert.That(_runtimeService.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
         }
 
         [Test]
