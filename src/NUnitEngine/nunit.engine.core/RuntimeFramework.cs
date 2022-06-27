@@ -151,11 +151,13 @@ namespace NUnit.Engine
                             return new Version(5, 0, 1);
                         case 6:
                             return new Version(6, 0, 0);
+                        case 7:
+                            return new Version(7, 0, 0);
                     }
                     break;
             }
 
-            throw new ArgumentException("Unknown framework version " + frameworkVersion.ToString(), "version");
+            throw new ArgumentException($"Unknown framework version {frameworkVersion}.\nIf Microsoft is releasing a new major version, that version has to be inserted into the GetClrVersionForFramework method in the RuntimeFramework class.\nVersion 1-7 is supported now.", "version");
         }
 
         private Version GetFrameworkVersionForClr(Version clrVersion)
@@ -225,8 +227,10 @@ namespace NUnit.Engine
                             minor = 5;
                         }
 
-                    _currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
-                    _currentFramework.ClrVersion = Environment.Version;
+                    _currentFramework = new RuntimeFramework(runtime, new Version(major, minor))
+                    {
+                        ClrVersion = Environment.Version
+                    };
 
                     if (isMono)
                     {
