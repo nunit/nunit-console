@@ -77,6 +77,10 @@ public class BuildVersion
 
         string branchName = _gitVersion.BranchName;
 
+        // Treat version3 branch as an alternate "main"
+        if (branchName == "version3")
+            label = "dev";
+
         // We don't currently use this pattern, but check in case we do later.
         if (branchName.StartsWith("feature/"))
             branchName = branchName.Substring(8);
