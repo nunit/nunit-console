@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services
                 StartInfo.FileName = RuntimeFrameworkService.MonoExePath;
                 string monoOptions = "--runtime=v" + TargetRuntime.FrameworkVersion.ToString(2);
                 monoOptions += " --debug";
-                StartInfo.Arguments = string.Format("{0} \"{1}\" {2}", monoOptions, AgentExePath, AgentArgs);
+                StartInfo.Arguments = $"{monoOptions} \"{AgentExePath}\" {AgentArgs}";
             }
             else if (TargetRuntime.Runtime == Runtime.Net)
             {
@@ -64,7 +64,7 @@ namespace NUnit.Engine.Services
             else if (TargetRuntime.Runtime == Runtime.NetCore)
             {
                 StartInfo.FileName = "dotnet";
-                StartInfo.Arguments = $"{AgentExePath} {AgentArgs}";
+                StartInfo.Arguments = $"\"{AgentExePath}\" {AgentArgs}";
                 StartInfo.LoadUserProfile = loadUserProfile;
 
                 // TODO: Remove the windows limitation and the use of a hard-coded path.
