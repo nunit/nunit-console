@@ -770,7 +770,7 @@ Task("BuildTestAndPackage")
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
     .IsDependentOn("BuildTestAndPackage")
-    .IsDependentOn("PublishPackages")
+    //.IsDependentOn("PublishPackages")
     .IsDependentOn("CreateDraftRelease")
     .IsDependentOn("CreateProductionRelease");
 
