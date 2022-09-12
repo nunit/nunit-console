@@ -79,7 +79,7 @@ namespace NUnit.Agent
             }
 
             var logName = $"nunit-agent_{pid}.log";
-            InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
+            //InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
             log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
             log.Info($"Agent process {pid} starting");
