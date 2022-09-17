@@ -5,9 +5,9 @@
     <RootNamespace>nunit.agent</RootNamespace>
     <TargetFrameworks>net20;net40</TargetFrameworks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
-    <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
+    <OutputPath>..\..\..\..\bin\$(Configuration)\agents\</OutputPath>
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
   </PropertyGroup>
 
@@ -24,18 +24,18 @@
   <ItemGroup>
     <Compile Include="..\nunit-agent\AgentExitCodes.cs" Link="AgentExitCodes.cs" />
     <Compile Include="..\nunit-agent\Program.cs" Link="Program.cs" />
-    <Compile Include="..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
+    <Compile Include="..\..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\..\..\nunit.ico">
+    <Content Include="..\..\..\..\nunit.ico">
       <Link>nunit.ico</Link>
     </Content>
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
-    <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
+    <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
 
 </Project>
