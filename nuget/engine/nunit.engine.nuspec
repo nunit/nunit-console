@@ -46,9 +46,9 @@
     <file src="agents/net20/nunit-agent.exe" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/nunit-agent.pdb" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/nunit-agent.exe.config" target="contentFiles/any/agents/net20" />
-    <file src="agents/net20/nunit-agent-x86.exe" target="contentFiles/any/agents/net20" />
-    <file src="agents/net20/nunit-agent-x86.pdb" target="contentFiles/any/agents/net20" />
-    <file src="agents/net20/nunit-agent-x86.exe.config" target="contentFiles/any/agents/net20" />
+    <file src="agents/net20/nunit-agent-net20-x86.exe" target="contentFiles/any/agents/net20" />
+    <file src="agents/net20/nunit-agent-net20-x86.pdb" target="contentFiles/any/agents/net20" />
+    <file src="agents/net20/nunit-agent-net20-x86.exe.config" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/nunit.engine.core.dll" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/nunit.engine.core.pdb" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/nunit.engine.api.dll" target="contentFiles/any/agents/net20" />
@@ -58,9 +58,9 @@
     <file src="agents/net40/nunit-agent.exe" target="contentFiles/any/agents/net40" />
     <file src="agents/net40/nunit-agent.pdb" target="contentFiles/any/agents/net40" />
     <file src="agents/net40/nunit-agent.exe.config" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-x86.exe" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-x86.pdb" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-x86.exe.config" target="contentFiles/any/agents/net40" />
+    <file src="agents/net40/nunit-agent-net40-x86.exe" target="contentFiles/any/agents/net40" />
+    <file src="agents/net40/nunit-agent-net40-x86.pdb" target="contentFiles/any/agents/net40" />
+    <file src="agents/net40/nunit-agent-net40-x86.exe.config" target="contentFiles/any/agents/net40" />
     <file src="agents/net40/nunit.engine.core.dll" target="contentFiles/any/agents/net40" />
     <file src="agents/net40/nunit.engine.core.pdb" target="contentFiles/any/agents/net40" />
     <file src="agents/net40/nunit.engine.api.dll" target="contentFiles/any/agents/net40" />

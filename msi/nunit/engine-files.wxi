@@ -63,9 +63,9 @@
             <Component Id="NUNIT_AGENT_NET20_X86" Location="local" Guid="39468421-A203-469C-BE38-86EE4EC37A6E">
                 <File Id="nunit_agent_net20_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe" />
+                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20-x86.exe" />
                 <File Id="nunit_agent_net20_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20-x86.exe.config" />
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="NET40_AGENT" Directory="NET40_AGENT_DIR">
@@ -79,9 +79,9 @@
             <Component Id="NUNIT_AGENT_NET40_X86" Location="local" Guid="8EB0C529-56D8-4746-804E-6679744699F6">
                 <File Id="nunit_agent_net40_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40-x86.exe" />
                 <File Id="nunit_agent_net40_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40-x86.exe.config" />
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="NETCORE31_AGENT" Directory="NETCORE31_AGENT_DIR">

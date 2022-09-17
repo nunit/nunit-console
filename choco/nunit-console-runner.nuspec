@@ -41,8 +41,8 @@
 
     <file src = "$BIN_DIR$agents/net20/nunit-agent.exe" target="tools/agents/net20" />
     <file src = "$BIN_DIR$agents/net20/nunit-agent.exe.config" target="tools/agents/net20" />
-    <file src = "$BIN_DIR$agents/net20/nunit-agent-x86.exe" target="tools/agents/net20" />
-    <file src = "$BIN_DIR$agents/net20/nunit-agent-x86.exe.config" target="tools/agents/net20" />
+    <file src = "$BIN_DIR$agents/net20/nunit-agent-net20-x86.exe" target="tools/agents/net20" />
+    <file src = "$BIN_DIR$agents/net20/nunit-agent-net20-x86.exe.config" target="tools/agents/net20" />
     <file src = "$BIN_DIR$agents/net20/nunit.engine.api.dll" target="tools/agents/net20" />
     <file src = "$BIN_DIR$agents/net20/nunit.engine.api.xml" target="tools/agents/net20" />
     <file src = "$BIN_DIR$agents/net20/nunit.engine.core.dll" target="tools/agents/net20" />
@@ -52,8 +52,8 @@
 
     <file src = "$BIN_DIR$agents/net40/nunit-agent.exe" target="tools/agents/net40" />
     <file src = "$BIN_DIR$agents/net40/nunit-agent.exe.config" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit-agent-x86.exe" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit-agent-x86.exe.config" target="tools/agents/net40" />
+    <file src = "$BIN_DIR$agents/net40/nunit-agent-net40-x86.exe" target="tools/agents/net40" />
+    <file src = "$BIN_DIR$agents/net40/nunit-agent-net40-x86.exe.config" target="tools/agents/net40" />
     <file src = "$BIN_DIR$agents/net40/nunit.engine.api.dll" target="tools/agents/net40" />
     <file src = "$BIN_DIR$agents/net40/nunit.engine.api.xml" target="tools/agents/net40" />
     <file src = "$BIN_DIR$agents/net40/nunit.engine.core.dll" target="tools/agents/net40" />
