@@ -11,22 +11,32 @@ string[] ENGINE_CORE_FILES = {
 string[] ENGINE_CORE_PDB_FILES = {
         "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_FILES_NET20 = {
-        "nunit-agent.exe", "nunit-agent.exe.config",
+        "nunit-agent-net20.exe", "nunit-agent-net20.exe.config",
         "nunit-agent-net20-x86.exe", "nunit-agent-net20-x86.exe.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
 string[] AGENT_FILES_NET40 = {
-        "nunit-agent.exe", "nunit-agent.exe.config",
+        "nunit-agent-net40.exe", "nunit-agent-net40.exe.config",
         "nunit-agent-net40-x86.exe", "nunit-agent-net40-x86.exe.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_FILES_NETCORE = {
-        "nunit-agent.dll", "nunit-agent.dll.config",
+string[] AGENT_FILES_NETCORE_3_1 = {
+        "nunit-agent-netcore31.dll", "nunit-agent-netcore31.dll.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+string[] AGENT_FILES_NET_5_0 = {
+        "nunit-agent-net50.dll", "nunit-agent-net50.dll.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+string[] AGENT_FILES_NET_6_0 = {
+        "nunit-agent-net60.dll", "nunit-agent-net60.dll.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
 string[] AGENT_PDB_FILES_NET20 = {
-        "nunit-agent.pdb", "nunit-agent-net20-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+        "nunit-agent-net20.pdb", "nunit-agent-net20-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_PDB_FILES_NET40 = {
-        "nunit-agent.pdb", "nunit-agent-net40-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_PDB_FILES_NETCORE = {
-        "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+        "nunit-agent-net40.pdb", "nunit-agent-net40-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+string[] AGENT_PDB_FILES_NETCORE_3_1 = {
+        "nunit-agent-netcore31.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+string[] AGENT_PDB_FILES_NET_5_0 = {
+        "nunit-agent-net50.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+string[] AGENT_PDB_FILES_NET_6_0 = {
+        "nunit-agent-net60.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] CONSOLE_FILES = {
         "nunit-console.exe", "nunit-console.exe.config" };
 string[] CONSOLE_FILES_NETCORE = {

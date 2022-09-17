@@ -121,12 +121,27 @@ namespace NUnit.Engine.Services
             {
                 case FrameworkIdentifiers.NetFramework:
                     runtimeIdentifier = major >= 4 ? "net40" : "net20";
-                    agentName = requires32Bit ? $"nunit-agent-{runtimeIdentifier}-x86" : "nunit-agent";
+                    agentName = "nunit-agent-" + runtimeIdentifier;
+                    if (requires32Bit)
+                        agentName += "-x86";
                     agentExtension = ".exe";
                     break;
                 case FrameworkIdentifiers.NetCoreApp:
-                    runtimeIdentifier = major >= 6 ? "net6.0" : major == 5 ? "net5.0" : "netcoreapp3.1";
-                    agentName = "nunit-agent";
+                    switch (major)
+                    {
+                        case 6:
+                            runtimeIdentifier = "net6.0";
+                            agentName = "nunit-agent-net60";
+                            break;
+                        case 5:
+                            runtimeIdentifier = "net5.0";
+                            agentName = "nunit-agent-net50";
+                            break;
+                        default:
+                            runtimeIdentifier = "netcoreapp3.1";
+                            agentName = "nunit-agent-netcore31";
+                            break;
+                    }
                     agentExtension = ".dll";
                     break;
                 default:

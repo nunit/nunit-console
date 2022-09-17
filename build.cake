@@ -120,13 +120,13 @@ public void BuildSolution()
         .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 
     // TODO: May not be needed
-    foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
+    /*foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
     {
         DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
         MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
-    }
+    }*/
 }
 
 private void BuildEachProjectSeparately()
