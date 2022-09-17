@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>nunit.agent</RootNamespace>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
+    <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <OutputPath>..\..\..\..\bin\$(Configuration)\agents\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>NUnit Engine</Product>
+    <AssemblyTitle>NUnit Agent ($(TargetFramework))</AssemblyTitle>
+    <Description>Agent used to run tests out of process</Description>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
+    <Reference Include="System.Runtime.Remoting" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\AgentExitCodes.cs" Link="AgentExitCodes.cs" />
+    <Compile Include="..\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="..\..\..\..\nunit.ico">
+      <Link>nunit.ico</Link>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\nunit.engine.core\nunit.engine.core.csproj" />
+  </ItemGroup>
+
+</Project>

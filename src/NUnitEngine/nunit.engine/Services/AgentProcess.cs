@@ -113,20 +113,35 @@ namespace NUnit.Engine.Services
 
             log.Debug($"Checking for agents at {agentsDir}");
 
-            string runtimeDir;
+            string runtimeIdentifier;
             string agentName;
             string agentExtension;
             int major = targetRuntime.FrameworkVersion.Major;
             switch (targetRuntime.Runtime.FrameworkIdentifier)
             {
                 case FrameworkIdentifiers.NetFramework:
-                    runtimeDir = major >= 4 ? "net40" : "net20";
-                    agentName = requires32Bit ? "nunit-agent-x86" : "nunit-agent";
+                    runtimeIdentifier = major >= 4 ? "net40" : "net20";
+                    agentName = "nunit-agent-" + runtimeIdentifier;
+                    if (requires32Bit)
+                        agentName += "-x86";
                     agentExtension = ".exe";
                     break;
                 case FrameworkIdentifiers.NetCoreApp:
-                    runtimeDir = major >= 6 ? "net6.0" : major == 5 ? "net5.0" : "netcoreapp3.1";
-                    agentName = "nunit-agent";
+                    switch (major)
+                    {
+                        case 6:
+                            runtimeIdentifier = "net6.0";
+                            agentName = "nunit-agent-net60";
+                            break;
+                        case 5:
+                            runtimeIdentifier = "net5.0";
+                            agentName = "nunit-agent-net50";
+                            break;
+                        default:
+                            runtimeIdentifier = "netcoreapp3.1";
+                            agentName = "nunit-agent-netcore31";
+                            break;
+                    }
                     agentExtension = ".dll";
                     break;
                 default:
@@ -134,7 +149,7 @@ namespace NUnit.Engine.Services
                     return null;
             }
 
-            return Path.Combine(Path.Combine(agentsDir, runtimeDir), agentName + agentExtension);
+            return Path.Combine(Path.Combine(agentsDir, runtimeIdentifier), agentName + agentExtension);
         }
     }
 }

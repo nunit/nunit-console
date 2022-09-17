@@ -56,43 +56,43 @@
             <Component Id="NUNIT_AGENT_NET20" Location="local" Guid="A43CEE53-AFE3-4421-8AF5-0FA529E2D93F">
                 <File Id="nunit_agent_net20.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent.exe" />
+                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20.exe" />
                 <File Id="nunit_agent_net20.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20.exe.config" />
             </Component>
             <Component Id="NUNIT_AGENT_NET20_X86" Location="local" Guid="39468421-A203-469C-BE38-86EE4EC37A6E">
                 <File Id="nunit_agent_net20_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe" />
+                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20-x86.exe" />
                 <File Id="nunit_agent_net20_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20-x86.exe.config" />
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="NET40_AGENT" Directory="NET40_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NET40" Location="local" Guid="B35CC9EE-69FA-4CBB-A6A5-DA102FEBC485">
                 <File Id="nunit_agent_net40.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent.exe" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40.exe" />
                 <File Id="nunit_agent_net40.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40.exe.config" />
             </Component>
             <Component Id="NUNIT_AGENT_NET40_X86" Location="local" Guid="8EB0C529-56D8-4746-804E-6679744699F6">
                 <File Id="nunit_agent_net40_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40-x86.exe" />
                 <File Id="nunit_agent_net40_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40-x86.exe.config" />
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="NETCORE31_AGENT" Directory="NETCORE31_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NETCORE31" Location="local" Guid="21E39B4C-07E4-4C38-8F91-7030516127E2">
                 <File Id="nunit_agent_netcore31.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.dll" />
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent-netcore31.dll" />
                 <File Id="nunit_agent_netcore31.deps.json"
-                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.deps.json" />
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent-netcore31.deps.json" />
                 <File Id="nunit_agent_netcore31.runtimeconfig.json"
-                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.runtimeconfig.json" />
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent-netcore31.runtimeconfig.json" />
             </Component>
             <Component Id="NUNIT_AGENT_NETCORE31_ENGINE_API" Location="local" Guid="E176F594-2DDE-409A-9661-4DF0B81D7A36">
                 <File Id="nunit.agent.netcore31.engine.api.dll"
@@ -116,11 +116,11 @@
             <Component Id="NUNIT_AGENT_NET50" Location="local" Guid="6B5C423E-5EDB-4DD4-8B7F-626C8F4EAF06">
                 <File Id="nunit_agent_net50.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent.dll" />
+                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent-net50.dll" />
                 <File Id="nunit_agent_net50.deps.json"
-                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent.deps.json" />
+                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent-net50.deps.json" />
                 <File Id="nunit_agent_net50.runtimeconfig.json"
-                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent.runtimeconfig.json" />
+                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent-net50.runtimeconfig.json" />
             </Component>
             <Component Id="NUNIT_AGENT_NET50_ENGINE_API" Location="local" Guid="24A4E38A-E09D-497D-AB9D-23252CB02215">
                 <File Id="nunit.agent.net50.engine.api.dll"
@@ -144,11 +144,11 @@
             <Component Id="NUNIT_AGENT_NET60" Location="local" Guid="8AFA7F03-96EA-4F80-8B79-7AFB59B67786">
                 <File Id="nunit_agent_net60.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent.dll" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent-net60.dll" />
                 <File Id="nunit_agent_net60.deps.json"
-                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent.deps.json" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent-net60.deps.json" />
                 <File Id="nunit_agent_net60.runtimeconfig.json"
-                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent.runtimeconfig.json" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent-net60.runtimeconfig.json" />
             </Component>
             <Component Id="NUNIT_AGENT_NET60_ENGINE_API" Location="local" Guid="393F8699-4F44-479B-916D-34F506F089D1">
                 <File Id="nunit.agent.net60.engine.api.dll"

@@ -27,14 +27,14 @@ namespace NUnit.Engine.Services
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = "net-4.5";
         }
 
-        [TestCase("net-4.5", false, "../agents/net40/nunit-agent.exe")]
-        [TestCase("net-4.5", true, "../agents/net40/nunit-agent-x86.exe")]
-        [TestCase("net-4.0", false, "../agents/net40/nunit-agent.exe")]
-        [TestCase("net-4.0", true, "../agents/net40/nunit-agent-x86.exe")]
-        [TestCase("net-3.5", false, "../agents/net20/nunit-agent.exe")]
-        [TestCase("net-3.5", true, "../agents/net20/nunit-agent-x86.exe")]
-        [TestCase("net-2.0", false, "../agents/net20/nunit-agent.exe")]
-        [TestCase("net-2.0", true, "../agents/net20/nunit-agent-x86.exe")]
+        [TestCase("net-4.5", false, "../agents/net40/nunit-agent-net40.exe")]
+        [TestCase("net-4.5", true, "../agents/net40/nunit-agent-net40-x86.exe")]
+        [TestCase("net-4.0", false, "../agents/net40/nunit-agent-net40.exe")]
+        [TestCase("net-4.0", true, "../agents/net40/nunit-agent-net40-x86.exe")]
+        [TestCase("net-3.5", false, "../agents/net20/nunit-agent-net20.exe")]
+        [TestCase("net-3.5", true, "../agents/net20/nunit-agent-net20-x86.exe")]
+        [TestCase("net-2.0", false, "../agents/net20/nunit-agent-net20.exe")]
+        [TestCase("net-2.0", true, "../agents/net20/nunit-agent-net20-x86.exe")]
         //[TestCase("netcore-2.1", false, "agents/netcoreapp2.1/testcentric-agent.dll")]
         //[TestCase("netcore-2.1", true, "agents/netcoreapp2.1/testcentric-agent-x86.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)

@@ -25,8 +25,8 @@ static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions
 // Solution and Projects
 var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 var ENGINE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
-var AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/nunit-agent/nunit-agent.csproj";
-var AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/nunit-agent-x86/nunit-agent-x86.csproj";
+var AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent/nunit-agent.csproj";
+var AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-x86/nunit-agent-x86.csproj";
 var ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
 var ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
 var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
