@@ -5,6 +5,21 @@ branches:
   except:
   - /^azure-/
 
+install:
+  - ps: $urlNet70RC = "https://download.visualstudio.microsoft.com/download/pr/b3b5dce4-d810-4477-a8a3-97cbb0bdf3ea/91d0dd167239cfdfb48ae18166f444d4/dotnet-sdk-7.0.100-rc.1.22431.12-win-x64.zip"
+  - ps: echo "Download from $urlNet70RC"
+  - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+  - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+  - ps: echo "Created directory $env:DOTNET_INSTALL_DIR"
+  - ps: echo "Starting download"
+  - ps: $tempFileNet70RC = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), [System.IO.Path]::GetRandomFileName())
+  - ps: (New-Object System.Net.WebClient).DownloadFile($urlNet70RC, $tempFileNet70RC)
+  - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileNet70RC, $env:DOTNET_INSTALL_DIR)
+  - ps: echo "Download complete"
+  - ps: echo "Original Path: $env:Path"
+  - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: echo "Current Path: $env:Path"
+
 build_script:
   - ps: .\build.ps1 --target=Appveyor --configuration=Release
 
