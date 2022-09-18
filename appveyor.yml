@@ -16,9 +16,7 @@ install:
   - ps: (New-Object System.Net.WebClient).DownloadFile($urlNet70RC, $tempFileNet70RC)
   - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileNet70RC, $env:DOTNET_INSTALL_DIR)
   - ps: echo "Download complete"
-  - ps: echo "Original Path: $env:Path"
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
-  - ps: echo "Current Path: $env:Path"
 
 build_script:
   - ps: .\build.ps1 --target=Appveyor --configuration=Release
