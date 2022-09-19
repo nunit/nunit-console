@@ -93,6 +93,19 @@
     <file src="agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
     <file src="../../nuget/engine/nunit.agent.addins" target="tools/agents/net6.0"/>
 
+    <file src="agents/net7.0/nunit-agent.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent.dll.config" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent.deps.json" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent.runtimeconfig.json" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.api.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.api.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.api.xml" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.core.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.core.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/testcentric.engine.metadata.dll" target="tools/agents/net7.0" />
+    <file src="../../nuget/engine/nunit.agent.addins" target="tools/agents/net7.0"/>
+
     <file src="net20/nunit3-console.exe" target="tools" />
     <file src="net20/nunit3-console.pdb" target="tools" />
     <file src="net20/nunit3-console.exe.config" target="tools" />

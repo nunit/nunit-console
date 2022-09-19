@@ -28,6 +28,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        // Net70Test,
         NetCore21PlusNetCore31Test,
         NetCore21PlusNetCore31PlusNet50PlusNet60Test,
         Net40PlusNet60Test
@@ -71,7 +72,8 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
+                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
+                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             symbols: new PackageCheck[] {
                 HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
@@ -79,7 +81,8 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
                 HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
                 HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE)
+                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
+                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "tools/nunit3-console.exe",
             tests: StandardRunnerTests),
@@ -110,7 +113,8 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
+                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
+                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             executable: "tools/nunit3-console.exe",
             tests: StandardRunnerTests),
@@ -123,6 +127,12 @@ public void InitializePackageDefinitions(ICakeContext context)
             checks: new PackageCheck[] {
                 HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
                 HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
+                HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles("nunit-agent.exe", "nunit-agent.exe.config"),
+                HasDirectory("NUnit.org/nunit-console/agents/net40").WithFiles("nunit-agent.exe", "nunit-agent.exe.config"),
+                HasDirectory("NUnit.org/nunit-console/agents/netcoreapp3.1").WithFile("nunit-agent.dll"),
+                HasDirectory("NUnit.org/nunit-console/agents/net5.0").WithFile("nunit-agent.dll"),
+                HasDirectory("NUnit.org/nunit-console/agents/net6.0").WithFile("nunit-agent.dll"),
+                //HasDirectory("NUnit.org/nunit-console/agents/net7.0").WithFile("nunit-agent.dll"),
                 HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
             },
             executable: "NUnit.org/nunit-console/nunit3-console.exe",

@@ -119,8 +119,13 @@ public void BuildSolution()
         .WithProperty("TargetFramework", "netcoreapp2.1")
         .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 
+    DisplayBanner("Publishing MOCK ASSEMBLY Project for NET7.0");
+    MSBuild(MOCK_ASSEMBLY_PROJECT, CreateMSBuildSettings("Publish")
+        .WithProperty("TargetFramework", "net7.0")
+        .WithProperty("PublishDir", BIN_DIR + "net7.0"));
+
     // TODO: May not be needed
-    foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
+    foreach (var framework in new[] { "netcoreapp3.1", "net5.0", "net7.0" })
     {
         DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
         MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
