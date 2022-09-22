@@ -679,18 +679,13 @@ namespace NUnit.Engine
 
         private static void FindDotNetCoreFrameworks()
         {
-            const string WINDOWS_INSTALL_DIR = "C:\\Program Files\\dotnet\\";
-            const string LINUX_INSTALL_DIR = "/usr/shared/dotnet/";
-            string INSTALL_DIR = Path.DirectorySeparatorChar == '\\'
-                ? WINDOWS_INSTALL_DIR
-                : LINUX_INSTALL_DIR;
+            string installDir = GetDotNetInstallDirectory();
 
-            if (!Directory.Exists(INSTALL_DIR))
-                return;
-            if (!File.Exists(Path.Combine(INSTALL_DIR, "dotnet.exe")))
-                return;
+            if (installDir == null || !Directory.Exists(installDir) ||
+                !File.Exists(Path.Combine(installDir, "dotnet.exe")))
+                    return;
 
-            string runtimeDir = Path.Combine(INSTALL_DIR, Path.Combine("shared", "Microsoft.NETCore.App"));
+            string runtimeDir = Path.Combine(installDir, Path.Combine("shared", "Microsoft.NETCore.App"));
             if (!Directory.Exists(runtimeDir))
                 return;
 
@@ -701,6 +696,18 @@ namespace NUnit.Engine
             var runtimes = GetNetCoreRuntimesFromDirectoryNames(dirNames);
 
             _availableFrameworks.AddRange(runtimes);
+        }
+
+        internal static string GetDotNetInstallDirectory()
+        {
+            if (Path.DirectorySeparatorChar == '\\')
+            {
+                // Running on Windows so use registry
+                RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
+                return (string)key?.GetValue("Path");
+            }
+            else
+                return "/usr/shared/dotnet/";
         }
 
         // Deal with oddly named directories, which may sometimes appear when previews are installed
