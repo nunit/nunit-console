@@ -17,6 +17,7 @@ install:
   - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFileNet70RC, $env:DOTNET_INSTALL_DIR)
   - ps: echo "Download complete"
   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+  - ps: dotnet --info
 
 build_script:
   - ps: .\build.ps1 --target=Appveyor --configuration=Release
