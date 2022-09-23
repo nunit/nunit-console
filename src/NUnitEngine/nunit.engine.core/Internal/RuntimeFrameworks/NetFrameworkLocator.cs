@@ -7,7 +7,7 @@ using Microsoft.Win32;
 
 namespace NUnit.Engine.Internal.RuntimeFrameworks
 {
-    internal static class DotNetFrameworkLocator
+    internal static class NetFrameworkLocator
     {
         // Note: this method cannot be generalized past V4, because (a)  it has
         // specific code for detecting .NET 4.5 and (b) we don't know what

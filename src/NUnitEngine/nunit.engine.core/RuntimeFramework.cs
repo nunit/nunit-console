@@ -551,10 +551,10 @@ namespace NUnit.Engine
             _availableFrameworks = new List<RuntimeFramework>();
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                _availableFrameworks.AddRange(DotNetFrameworkLocator.FindDotNetFrameworks());
+                _availableFrameworks.AddRange(NetFrameworkLocator.FindDotNetFrameworks());
 
             FindDefaultMonoFramework();
-            FindDotNetCoreFrameworks();
+            _availableFrameworks.AddRange(NetCoreFrameworkLocator.FindDotNetCoreFrameworks());
         }
 
         private static void FindDefaultMonoFramework()
@@ -675,73 +675,6 @@ namespace NUnit.Engine
             };
 
             _availableFrameworks.Add(framework);
-        }
-
-        private static void FindDotNetCoreFrameworks()
-        {
-            const string WINDOWS_INSTALL_DIR = "C:\\Program Files\\dotnet\\";
-            const string LINUX_INSTALL_DIR = "/usr/shared/dotnet/";
-            string INSTALL_DIR = Path.DirectorySeparatorChar == '\\'
-                ? WINDOWS_INSTALL_DIR
-                : LINUX_INSTALL_DIR;
-
-            if (!Directory.Exists(INSTALL_DIR))
-                return;
-            if (!File.Exists(Path.Combine(INSTALL_DIR, "dotnet.exe")))
-                return;
-
-            string runtimeDir = Path.Combine(INSTALL_DIR, Path.Combine("shared", "Microsoft.NETCore.App"));
-            if (!Directory.Exists(runtimeDir))
-                return;
-
-            var dirList = new DirectoryInfo(runtimeDir).GetDirectories();
-            var dirNames = new List<string>();
-            foreach (var dir in dirList)
-                dirNames.Add(dir.Name);
-            var runtimes = GetNetCoreRuntimesFromDirectoryNames(dirNames);
-
-            _availableFrameworks.AddRange(runtimes);
-        }
-
-        // Deal with oddly named directories, which may sometimes appear when previews are installed
-        internal static IList<RuntimeFramework> GetNetCoreRuntimesFromDirectoryNames(IEnumerable<string> dirNames)
-        {
-            const string VERSION_CHARS = ".0123456789";
-            var runtimes = new List<RuntimeFramework>();
-
-            foreach (string dirName in dirNames)
-            {
-                int len = 0;
-                foreach (char c in dirName)
-                {
-                    if (VERSION_CHARS.IndexOf(c) >= 0)
-                        len++;
-                    else
-                        break;
-                }
-
-                if (len == 0)
-                    continue;
-
-                Version fullVersion = null;
-                try
-                {
-                    fullVersion = new Version(dirName.Substring(0, len));
-                }
-                catch
-                {
-                    continue;
-                }
-
-                var newVersion = new Version(fullVersion.Major, fullVersion.Minor);
-                int count = runtimes.Count;
-                if (count > 0 && runtimes[count - 1].FrameworkVersion == newVersion)
-                    continue;
-
-                runtimes.Add(new RuntimeFramework(RuntimeType.NetCore, newVersion));
-            }
-
-            return runtimes;
         }
     }
 }
