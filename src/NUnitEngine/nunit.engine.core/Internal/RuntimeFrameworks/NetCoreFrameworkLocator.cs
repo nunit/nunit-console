@@ -12,6 +12,8 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
 {
     internal static class NetCoreFrameworkLocator
     {
+        static Logger log = InternalTrace.GetLogger(typeof(NetCoreFrameworkLocator));
+
         public static IEnumerable<RuntimeFramework> FindDotNetCoreFrameworks()
         {
             List<Version> alreadyFound = new List<Version>();
@@ -22,7 +24,12 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
                 if (TryGetVersionFromString(dirName, out newVersion) && !alreadyFound.Contains(newVersion))
                 {
                     alreadyFound.Add(newVersion);
-                    yield return new RuntimeFramework(RuntimeType.NetCore, newVersion);
+                    // HACK: Avoid Exception for an unknown version - see issue #1223
+                    // Requires change in RuntimeFramework.GetClrVersionForFramework()
+                    if (newVersion.Major <= 7)
+                        yield return new RuntimeFramework(RuntimeType.NetCore, newVersion);
+                    else
+                        log.Error($"Found .NET {newVersion.ToString(2)}, which is not yet supported.");
                 }
             }
 

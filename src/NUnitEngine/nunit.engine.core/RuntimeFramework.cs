@@ -134,6 +134,7 @@ namespace NUnit.Engine
             // Version 0.0 means any version so we can't deduce anything
             if (version != DefaultVersion)
             {
+                Debug.Assert(IsFrameworkVersion(version));
                 if (IsFrameworkVersion(version))
                     ClrVersion = GetClrVersionForFramework(version);
                 else
