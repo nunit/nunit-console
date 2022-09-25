@@ -13,6 +13,12 @@ jobs:
   steps:
 
   - task: UseDotNet@2
+    displayName: 'Install .NET 7.0'
+    inputs:
+      version: 7.x
+      includePreviewVersions: true
+
+  - task: UseDotNet@2
     displayName: 'Install .NET 6.0'
     inputs:
       version: 6.x
@@ -70,6 +76,12 @@ jobs:
   steps:
 
   - task: UseDotNet@2
+    displayName: 'Install .NET 7.0'
+    inputs:
+      version: 7.x
+      includePreviewVersions: true
+
+  - task: UseDotNet@2
     displayName: 'Install .NET 6.0'
     inputs:
       version: 6.x
@@ -117,6 +129,12 @@ jobs:
   pool:
     vmImage: macOS-11
   steps:
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 7.0'
+    inputs:
+      version: 7.x
+      includePreviewVersions: true
 
   - task: UseDotNet@2
     displayName: 'Install .NET 6.0'
