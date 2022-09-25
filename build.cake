@@ -109,15 +109,17 @@ public void BuildSolution()
         .WithProperty("TargetFramework", "netstandard2.0")
         .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
 
-    DisplayBanner("Publishing ENGINE Project for NETSTANDARD2.0");
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netstandard2.0")
-        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
+    DisplayBanner("Publishing ENGINE Project");
+    foreach (var framework in new[] { "netstandard2.0", "netcoreapp3.1" })
+        MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + framework));
 
-    DisplayBanner("Publishing ENGINE TESTS Project for NETCOREAPP2.1");
-    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netcoreapp2.1")
-        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+    DisplayBanner("Publishing ENGINE TESTS Project");
+    foreach (var framework in new[] { "netcoreapp2.1", "netcoreapp3.1" })
+        MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+            .WithProperty("TargetFramework", framework)
+            .WithProperty("PublishDir", BIN_DIR + framework));
 
     DisplayBanner("Publishing MOCK ASSEMBLY Project for NET7.0");
     MSBuild(MOCK_ASSEMBLY_PROJECT, CreateMSBuildSettings("Publish")
@@ -143,7 +145,7 @@ private void BuildEachProjectSeparately()
     BuildProject(AGENT_PROJECT);
     BuildProject(AGENT_X86_PROJECT);
 
-    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1");
+    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
     BuildProject(CONSOLE_TESTS_PROJECT, "net35", "net6.0");
 
@@ -310,6 +312,19 @@ Task("TestNetStandard20Engine")
         RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp2.1");
     });
 
+//////////////////////////////////////////////////////////////////////
+// TEST NETCORE 3.1 ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore31Engine")
+    .Description("Tests the .NET Core 3.1 Engine")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
+    });
+    
 //////////////////////////////////////////////////////////////////////
 // TEST .NET 2.0 CONSOLE
 //////////////////////////////////////////////////////////////////////
@@ -744,7 +759,8 @@ Task("TestEngineCore")
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
     .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNetStandard20Engine");
+    .IsDependentOn("TestNetStandard20Engine")
+    .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")
     .Description("Builds and tests the engine and console runner")
