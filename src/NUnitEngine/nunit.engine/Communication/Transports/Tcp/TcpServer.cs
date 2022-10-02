@@ -14,7 +14,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         private const int GUID_BUFFER_SIZE = 16;
 
-        TcpListener _listenerSocket;
+        TcpListener _tcpListener;
         Thread _listenerThread;
         volatile bool _running;
 
@@ -24,17 +24,21 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public TcpServer(int port = 0)
         {
-            _listenerSocket = new TcpListener(IPAddress.Loopback, port);
+            _tcpListener = new TcpListener(IPAddress.Loopback, port);
         }
 
-        public IPEndPoint EndPoint => (IPEndPoint)_listenerSocket.LocalEndpoint;
+        public IPEndPoint EndPoint => (IPEndPoint)_tcpListener.LocalEndpoint;
 
         public void Start()
         {
-            _listenerSocket.Start();
+            _tcpListener.Start();
             _running = true;
 
-            _listenerThread = new Thread(WaitForClientConnections);
+            _listenerThread = new Thread(WaitForClientConnections)
+            {
+                Name = "TcpListenerTread",
+                IsBackground = true
+            };
             _listenerThread.Start();
         }
 
@@ -43,7 +47,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             try
             {
                 _running = false;
-                _listenerSocket.Stop();
+                _tcpListener.Stop();
             }
             catch (Exception exception)
             {
@@ -57,7 +61,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             {
                 try
                 {
-                    var clientSocket = _listenerSocket.AcceptSocket();
+                    var clientSocket = _tcpListener.AcceptSocket();
                     if (clientSocket.Connected)
                     {
                         // Upon connection, remote agent must immediately send its Id as identification.
@@ -74,7 +78,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                     //   1. We were trying to stop the socket
                     //   2. The connection was dropped due to some external event
                     // In either case, we stop the socket and wait a while
-                    _listenerSocket.Stop();
+                    _tcpListener.Stop();
 
                     // If we were trying to stop, that's all
                     if (!_running)
@@ -84,7 +88,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                     Thread.Sleep(500);
                     try
                     {
-                        _listenerSocket.Start();
+                        _tcpListener.Start();
                     }
                     catch (Exception exception)
                     {
