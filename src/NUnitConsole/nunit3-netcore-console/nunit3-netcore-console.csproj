@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
+    <AssemblyName>nunit3-netcore-console</AssemblyName>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>NUnit Console</Product>
+    <AssemblyTitle>NUnit Console Runner ($(TargetFramework))</AssemblyTitle>
+    <Description>The console command-line runner for NUnit</Description>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\NUnitEngine\nunit.engine.core\Guard.cs" Link="Utilities\Guard.cs" />
+    <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
+    <Compile Include="..\nunit3-console\ColorConsole.cs" Link="ColorConsole.cs" />
+    <Compile Include="..\nunit3-console\ColorConsoleWriter.cs" Link="ColorConsoleWriter.cs" />
+    <Compile Include="..\nunit3-console\ColorStyle.cs" Link="ColorStyle.cs" />
+    <Compile Include="..\nunit3-console\ConsoleOptions.cs" Link="ConsoleOptions.cs" />
+    <Compile Include="..\nunit3-console\ConsoleRunner.cs" Link="ConsoleRunner.cs" />
+    <Compile Include="..\nunit3-console\ConsoleTestResult.cs" Link="ConsoleTestResult.cs" />
+    <Compile Include="..\nunit3-console\EnginePackageSettings.cs" Link="EnginePackageSettings.cs" />
+    <Compile Include="..\nunit3-console\ExtendedTextWrapper.cs" Link="ExtendedTextWrapper.cs" />
+    <Compile Include="..\nunit3-console\ExtendedTextWriter.cs" Link="ExtendedTextWriter.cs" />
+    <Compile Include="..\nunit3-console\FileSystem.cs" Link="FileSystem.cs" />
+    <Compile Include="..\nunit3-console\FrameworkPackageSettings.cs" Link="FrameworkPackageSettings.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\DefaultOptionsProvider.cs" Link="OptionsUtils\DefaultOptionsProvider.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\IDefaultOptionsProvider.cs" Link="OptionsUtils\IDefaultOptionsProvider.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\IFileSystem.cs" Link="OptionsUtils\IFileSystem.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\OptionParser.cs" Link="OptionsUtils\OptionParser.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\Options.cs" Link="OptionsUtils\Options.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\OutputSpecification.cs" Link="OptionsUtils\OutputSpecification.cs" />
+    <Compile Include="..\nunit3-console\OptionsUtils\TestNameParser.cs" Link="OptionsUtils\TestNameParser.cs" />
+    <Compile Include="..\nunit3-console\Program.cs" Link="Program.cs" />
+    <Compile Include="..\nunit3-console\ResultReporter.cs" Link="ResultReporter.cs" />
+    <Compile Include="..\nunit3-console\ResultSummary.cs" Link="ResultSummary.cs" />
+    <Compile Include="..\nunit3-console\SafeAttributeAccess.cs" Link="SafeAttributeAccess.cs" />
+    <Compile Include="..\nunit3-console\TestEventHandler.cs" Link="TestEventHandler.cs" />
+    <Compile Include="..\nunit3-console\Utilities\SaveConsoleOutput.cs" Link="Utilities\SaveConsoleOutput.cs" />
+    <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+  </ItemGroup>
+
+</Project>

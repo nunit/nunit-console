@@ -97,9 +97,9 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/net6.0/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
             },
             symbols: new PackageCheck[] {
-                HasDirectory("tools/net6.0/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+                HasDirectory("tools/net6.0/any").WithFile("nunit3-netcore-console.pdb").AndFiles(ENGINE_PDB_FILES)
             },
-            executable: "tools/net6.0/any/nunit3-console.exe",
+            executable: "tools/net6.0/any/nunit3-netcore-console.exe",
             tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
