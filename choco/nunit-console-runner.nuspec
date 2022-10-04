@@ -31,8 +31,8 @@
     <file src = "VERIFICATION.txt" target = "tools" />
     <file src = "nunit.choco.addins" target = "tools" />
 
-    <file src = "$BIN_DIR$net20/nunit3-console.exe" target="tools" />
-    <file src = "$BIN_DIR$net20/nunit3-console.exe.config" target="tools" />
+    <file src = "$BIN_DIR$net462/nunit3-console.exe" target="tools" />
+    <file src = "$BIN_DIR$net462/nunit3-console.exe.config" target="tools" />
     <file src = "$BIN_DIR$net20/nunit.engine.api.dll" target="tools" />
     <file src = "$BIN_DIR$net20/nunit.engine.api.xml" target="tools" />
     <file src = "$BIN_DIR$net20/nunit.engine.core.dll" target="tools" />

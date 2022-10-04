@@ -106,9 +106,9 @@
     <file src="agents/net7.0/testcentric.engine.metadata.dll" target="tools/agents/net7.0" />
     <file src="../../nuget/engine/nunit.agent.addins" target="tools/agents/net7.0"/>
 
-    <file src="net20/nunit3-console.exe" target="tools" />
-    <file src="net20/nunit3-console.pdb" target="tools" />
-    <file src="net20/nunit3-console.exe.config" target="tools" />
+    <file src="net462/nunit3-console.exe" target="tools" />
+    <file src="net462/nunit3-console.pdb" target="tools" />
+    <file src="net462/nunit3-console.exe.config" target="tools" />
     <file src="net20/nunit.engine.api.dll" target="tools" />
     <file src="net20/nunit.engine.api.pdb" target="tools" />
     <file src="net20/nunit.engine.api.xml" target="tools" />

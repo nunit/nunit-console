@@ -144,7 +144,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DisposeRunners", "dispose-runners")]
         [TestCase("TeamCity", "teamcity")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase("DebugTests", "debug")]
@@ -195,7 +195,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
         [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
@@ -228,7 +228,7 @@ namespace NUnit.ConsoleRunner.Tests
             }
         }
 
-#if NET35
+#if NETFRAMEWORK
         [Test]
         public void CanRecognizeInProcessOption()
         {
@@ -238,7 +238,7 @@ namespace NUnit.ConsoleRunner.Tests
         }
 #endif
 
-#if NET35
+#if NETFRAMEWORK
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" })]
 #endif
@@ -262,7 +262,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DefaultTimeout", "timeout")]
         [TestCase("RandomSeed", "seed")]
         [TestCase("NumberOfTestWorkers", "workers")]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("MaxAgents", "agents")]
 #endif
         public void CanRecognizeIntOptions(string propertyName, string pattern)
@@ -288,7 +288,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--test-name-format")]
         [TestCase("--params")]
         [TestCase("--encoding")]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("--process")]
         [TestCase("--domain")]
         [TestCase("--framework")]
@@ -317,7 +317,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
-#if NET35
+#if NETFRAMEWORK
         [Test]
         public void X86AndInProcessAreCompatibleIn32BitProcess()
         {

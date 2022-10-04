@@ -326,23 +326,23 @@ Task("TestNetCore31Engine")
     });
     
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 CONSOLE
+// TEST .NET FRAMEWORK CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20Console")
-    .Description("Tests the .NET 2.0 console runner")
+Task("TestNetFxConsole")
+    .Description("Tests the .NET 4.6.2 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNet20Console(CONSOLE_TESTS, "net35");
+        RunNetFxConsole(CONSOLE_TESTS, "net462");
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 6.0 CONSOLE
+// TEST .NET CORE CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet60Console")
+Task("TestNetCoreConsole")
     .Description("Tests the .NET 6.0 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
@@ -414,7 +414,7 @@ Task("CreateZipImage")
             ZIP_IMG_DIR);
         CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net20", "net35" })
+        foreach (var framework in new[] { "net462" })
         {
             var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
             CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
@@ -745,8 +745,8 @@ Task("CreateProductionRelease")
 
 Task("TestConsole")
     .Description("Builds and tests the console runner")
-    .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNet60Console");
+    .IsDependentOn("TestNetFxConsole")
+    .IsDependentOn("TestNetCoreConsole");
 
 Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")

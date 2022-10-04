@@ -150,14 +150,14 @@ void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNet20Console(string testAssembly, string targetRuntime)
+void RunNetFxConsole(string testAssembly, string targetRuntime)
 {
     var workingDir = BIN_DIR + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
-        NET20_CONSOLE,
+        NETFX_CONSOLE,
         new ProcessSettings()
         {
             Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
@@ -180,7 +180,7 @@ void RunNetCoreConsole(string testAssembly, string targetRuntime)
         "dotnet",
         new ProcessSettings
         {
-            Arguments = $"\"{NET60_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{NETCORE_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 

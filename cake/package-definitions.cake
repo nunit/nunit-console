@@ -145,8 +145,8 @@ public void InitializePackageDefinitions(ICakeContext context)
             source: ZIP_IMG_DIR,
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-                HasDirectory("bin/net20").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
-                HasDirectory("bin/net35").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+                HasDirectory("bin/net462").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+                HasDirectory("bin/net462").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
                 HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
                 HasDirectory("bin/netcoreapp2.1").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
                 HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
@@ -156,7 +156,7 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
                 HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
             },
-            executable: "bin/net20/nunit3-console.exe",
+            executable: "bin/net462/nunit3-console.exe",
             tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
 
         // NOTE: Packages below this point have no direct tests
