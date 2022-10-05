@@ -114,8 +114,8 @@
     <file src="net20/nunit.engine.api.xml" target="tools" />
     <file src="net20/nunit.engine.core.dll" target="tools" />
     <file src="net20/nunit.engine.core.pdb" target="tools" />
-    <file src="net20/nunit.engine.dll" target="tools" />
-    <file src="net20/nunit.engine.pdb" target="tools" />
+    <file src="net462/nunit.engine.dll" target="tools" />
+    <file src="net462/nunit.engine.pdb" target="tools" />
     <file src="net20/testcentric.engine.metadata.dll" target="tools" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
     <file src="../../nunit_256.png" target="images"/>

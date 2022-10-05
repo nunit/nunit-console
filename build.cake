@@ -287,16 +287,16 @@ Task("TestNet60EngineCore")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE
+// TEST .NET 4.6.2 ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20Engine")
-    .Description("Tests the engine")
+Task("TestNetFxEngine")
+    .Description("Tests the .NET Framework build of the engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net35");
+        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net462");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -335,7 +335,7 @@ Task("TestNetFxConsole")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNetFxConsole(CONSOLE_TESTS, "net462");
+        RunNetFxConsole(CONSOLE_TESTS, NETFX_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -388,7 +388,7 @@ Task("CreateMsiImage")
             MSI_IMG_DIR);
         CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net20", "net35" })
+        foreach (var framework in new[] { NETFX_CONSOLE_TARGET })
         {
             var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
 
@@ -414,7 +414,8 @@ Task("CreateZipImage")
             ZIP_IMG_DIR);
         CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net462" })
+        // Currently, only the .NET Framework runner accepts extensions
+        foreach (var framework in new[] { NETFX_CONSOLE_TARGET })
         {
             var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
             CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
@@ -758,7 +759,7 @@ Task("TestEngineCore")
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
-    .IsDependentOn("TestNet20Engine")
+    .IsDependentOn("TestNetFxEngine")
     .IsDependentOn("TestNetStandard20Engine")
     .IsDependentOn("TestNetCore31Engine");
 

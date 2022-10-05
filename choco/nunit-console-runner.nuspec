@@ -36,7 +36,7 @@
     <file src = "$BIN_DIR$net20/nunit.engine.api.dll" target="tools" />
     <file src = "$BIN_DIR$net20/nunit.engine.api.xml" target="tools" />
     <file src = "$BIN_DIR$net20/nunit.engine.core.dll" target="tools" />
-    <file src = "$BIN_DIR$net20/nunit.engine.dll" target="tools" />
+    <file src = "$BIN_DIR$net462/nunit.engine.dll" target="tools" />
     <file src = "$BIN_DIR$net20/testcentric.engine.metadata.dll" target="tools" />
 
     <file src = "$BIN_DIR$agents/net20/nunit-agent.exe" target="tools/agents/net20" />

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Runners
 {
     public class WorkItemTrackerTests : ITestEventListener
     {

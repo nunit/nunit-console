@@ -36,9 +36,20 @@ var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console.tests/nuni
 var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";
 var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock-assembly-x86.csproj";
 var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
+
 // Console Runner
-var NETFX_CONSOLE = BIN_DIR + "net462/nunit3-console.exe";
-var NETCORE_CONSOLE = BIN_DIR + "net6.0/nunit3-netcore-console.dll";
+// We build two console runners. If version of either is upgraded, change it here
+var NETFX_CONSOLE_TARGET = "net462";
+var NETFX_CONSOLE_DIR = BIN_DIR + NETFX_CONSOLE_TARGET + "/";
+var NETFX_CONSOLE = NETFX_CONSOLE_DIR + "nunit3-console.exe";
+var NETCORE_CONSOLE_TARGET = "net6.0";
+var NETCORE_CONSOLE_DIR = BIN_DIR + NETCORE_CONSOLE_TARGET + "/";
+var NETCORE_CONSOLE = NETCORE_CONSOLE_DIR + "nunit3-netcore-console.dll";
+
+// Currently, the engine uses the same versions as the console runner but this may not always be true
+var NETFX_ENGINE_TARGET = NETFX_CONSOLE_TARGET;
+var NETCORE_ENGINE_TARGET = NETCORE_CONSOLE_TARGET;
+
 // Unit Tests
 var NETFX_ENGINE_CORE_TESTS = "nunit.engine.core.tests.exe";
 var NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
