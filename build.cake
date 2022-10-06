@@ -149,7 +149,7 @@ private void BuildEachProjectSeparately()
     BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
     BuildProject(CONSOLE_TESTS_PROJECT, "net35", "net6.0");
 
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
 
 
@@ -283,7 +283,7 @@ Task("TestNet60EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net6.0");
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, NETCORE_ENGINE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -296,7 +296,7 @@ Task("TestNetFxEngine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net462");
+        RunNUnitLiteTests(NETFX_ENGINE_TESTS, NETFX_ENGINE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////

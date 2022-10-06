@@ -167,17 +167,17 @@ public void InitializePackageDefinitions(ICakeContext context)
             source: NUGET_DIR + "engine/nunit.engine.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
+                HasDirectory($"lib/{NETFX_ENGINE_TARGET}").WithFiles(ENGINE_FILES),
                 HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
                 HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_FILES),
-                HasDirectory("contentFiles/any/lib/net462").WithFile("nunit.engine.nuget.addins"),
+                HasDirectory($"contentFiles/any/lib/{NETFX_ENGINE_TARGET}").WithFile("nunit.engine.nuget.addins"),
                 HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
                 HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
                 HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
                 HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
             },
             symbols: new PackageCheck[] {
-                HasDirectory("lib/net462").WithFiles(ENGINE_PDB_FILES),
+                HasDirectory($"lib/{NETFX_ENGINE_TARGET}").WithFiles(ENGINE_PDB_FILES),
                 HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
                 HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_PDB_FILES),
                 HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_PDB_FILES),
