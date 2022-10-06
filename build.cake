@@ -145,9 +145,9 @@ private void BuildEachProjectSeparately()
     BuildProject(AGENT_PROJECT);
     BuildProject(AGENT_X86_PROJECT);
 
-    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
-    BuildProject(CONSOLE_TESTS_PROJECT, "net35", "net6.0");
+    BuildProject(ENGINE_TESTS_PROJECT, "net462", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net462", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
+    BuildProject(CONSOLE_TESTS_PROJECT, "net462", "net6.0");
 
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
