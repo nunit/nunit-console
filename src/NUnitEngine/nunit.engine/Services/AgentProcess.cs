@@ -121,7 +121,7 @@ namespace NUnit.Engine.Services
             {
                 case RuntimeType.Net:
                 case RuntimeType.Mono:
-                    runtimeDir = major >= 4 ? "net40" : "net20";
+                    runtimeDir = major >= 4 ? "net462" : "net20";
                     agentName = requires32Bit ? "nunit-agent-x86.exe" : "nunit-agent.exe";
                     break;
                 case RuntimeType.NetCore:

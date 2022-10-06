@@ -51,17 +51,17 @@
     <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net20" />
     <file src = "nunit.agent.addins" target = "tools/agents/net20" />
 
-    <file src = "$BIN_DIR$agents/net40/nunit-agent.exe" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit-agent.exe.config" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit-agent-x86.exe" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit-agent-x86.exe.config" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit.engine.api.dll" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit.engine.api.xml" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/nunit.engine.core.dll" target="tools/agents/net40" />
-    <file src = "$BIN_DIR$agents/net40/testcentric.engine.metadata.dll" target="tools/agents/net40" />
-    <file src = "nunit-agent.exe.ignore" target="tools/agents/net40" />
-    <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net40" />
-    <file src = "nunit.agent.addins" target = "tools/agents/net40" />
+    <file src = "$BIN_DIR$agents/net462/nunit-agent.exe" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit-agent.exe.config" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit-agent-x86.exe" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit-agent-x86.exe.config" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit.engine.api.dll" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit.engine.core.dll" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/testcentric.engine.metadata.dll" target="tools/agents/net462" />
+    <file src = "nunit-agent.exe.ignore" target="tools/agents/net462" />
+    <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net462" />
+    <file src = "nunit.agent.addins" target = "tools/agents/net462" />
 
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent.dll" target="tools/agents/netcoreapp3.1" />
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent.dll.config" target="tools/agents/netcoreapp3.1" />
