@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORKX
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Runners
 {
     [TestFixture(1)]
     [TestFixture(2)]

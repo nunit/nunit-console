@@ -5,7 +5,7 @@
             <Component Id="NUNIT.ENGINE" Location="local" Guid="033DE5BC-4AC4-4F98-9E5D-E5F3221FCD46">
                 <File Id="nunit.engine.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net20/nunit.engine.dll" />
+                      Source="$(var.InstallImage)bin/net462/nunit.engine.dll" />
             </Component>
             <Component Id="NUNIT.ENGINE.CORE" Location="local" Guid="F4F14D75-6096-467E-82E1-BD513645C0EF">
                 <File Id="nunit.engine.core.dll"
@@ -76,16 +76,16 @@
             <Component Id="NUNIT_AGENT_NET40" Location="local" Guid="B35CC9EE-69FA-4CBB-A6A5-DA102FEBC485">
                 <File Id="nunit_agent_net40.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent.exe" />
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent.exe" />
                 <File Id="nunit_agent_net40.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent.exe.config" />
             </Component>
             <Component Id="NUNIT_AGENT_NET40_X86" Location="local" Guid="8EB0C529-56D8-4746-804E-6679744699F6">
                 <File Id="nunit_agent_net40_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe" />
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent-x86.exe" />
                 <File Id="nunit_agent_net40_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent-x86.exe.config" />
             </Component>
             <Component Id="NUNIT_AGENT_ADDINS_NET40" Location="local" Guid="">
                 <File Id="nunit.agent.net40.addins" Source="$(var.InstallImage)nunit.agent.addins" />

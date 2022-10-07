@@ -235,7 +235,7 @@ namespace NUnit.Engine.Services.Tests
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
             var extNetCore = new ExtensionAssembly(netcore.Location, false);
-            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.dll"), false);
+            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net462"), "nunit.engine.dll"), false);
 
             yield return new TestCaseData(new FrameworkCombo(netcore, extNetFramework)).SetName("InvalidCombo(.NET Core, .NET Framework)");
 #else
@@ -257,7 +257,7 @@ namespace NUnit.Engine.Services.Tests
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
             var extNetCore = new ExtensionAssembly(netcore.Location, false);
-            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.dll"), false);
+            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net462"), "nunit.engine.dll"), false);
 
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetStandard)).SetName("InvalidCombo(.NET Standard, .NET Standard)");
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetCore)).SetName("InvalidCombo(.NET Standard, .NET Core)");

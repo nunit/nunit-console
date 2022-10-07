@@ -27,19 +27,19 @@ static PackageTest Net35X86Test = new PackageTest(
 static PackageTest Net40Test = new PackageTest(
     "Net40Test",
     "Run mock-assembly.dll under .NET 4.x",
-    "net40/mock-assembly.dll",
+    "net462/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net40X86Test = new PackageTest(
     "Net40X86Test",
     "Run mock-assembly-x86.dll under .NET 4.x",
-    "net40/mock-assembly-x86.dll",
+    "net462/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net35PlusNet40Test = new PackageTest(
     "Net35PlusNet40Test",
     "Run both copies of mock-assembly together",
-    "net35/mock-assembly.dll net40/mock-assembly.dll",
+    "net35/mock-assembly.dll net462/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
 
 static PackageTest Net60Test = new PackageTest(
@@ -99,7 +99,7 @@ static PackageTest NetCore21PlusNetCore31PlusNet50PlusNet60Test = new PackageTes
 static PackageTest Net40PlusNet60Test = new PackageTest(
     "Net40PlusNet60Test",
     "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
-    "net40/mock-assembly.dll net6.0/mock-assembly.dll",
+    "net462/mock-assembly.dll net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
 
 static PackageTest NUnitProjectTest;

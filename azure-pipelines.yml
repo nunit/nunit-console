@@ -70,7 +70,8 @@ jobs:
   #     ArtifactName: Package
 
 - job: Linux
-  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
+  condition: false # temporarily disabled
+  # condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
     vmImage: ubuntu-20.04
   steps:
@@ -125,7 +126,8 @@ jobs:
     condition: succeededOrFailed()
 
 - job: macOS
-  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
+  condition: false # temporarily disabled
+  # condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
   pool:
     vmImage: macOS-11
   steps:

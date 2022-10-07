@@ -4,12 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
-#if NET20
-using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
-#endif
 
 namespace NUnit.Engine.Services
 {

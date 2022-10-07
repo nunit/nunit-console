@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit3-console</AssemblyName>
-    <TargetFrameworks>net20</TargetFrameworks>
+    <TargetFrameworks>net462</TargetFrameworks>
     <RollForward>Major</RollForward>
   </PropertyGroup>
 
