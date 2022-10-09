@@ -37,7 +37,7 @@ Earlier versions of NUnit were developed by Charlie Poole, James W. Newkirk, Ale
 
 ## License ##
 
-NUnit is Open Source software and NUnit 3 is released under the [MIT license](https://github.com/nunit/docs/wiki/License). Earlier releases used the [NUnit license](http://www.nunit.org/nuget/license.html). Both of these licenses allow the use of NUnit in free and commercial applications and libraries without restrictions.
+NUnit is Open Source software and NUnit 3 is released under the [MIT license](https://github.com/nunit/docs/wiki/License). Earlier releases used the [NUnit license](https://www.nunit.org/nuget/license.html). Both of these licenses allow the use of NUnit in free and commercial applications and libraries without restrictions.
 
 ## NUnit Projects ##
 
