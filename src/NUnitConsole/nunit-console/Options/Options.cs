@@ -6,10 +6,10 @@
 //  Federico Di Gregorio <fog@initd.org>
 //  Rolf Bjarne Kvinge <rolf@xamarin.com>
 //
-// Copyright (C) 2008 Novell (http://www.novell.com)
+// Copyright (C) 2008 Novell (https://www.novell.com)
 // Copyright (C) 2009 Federico Di Gregorio.
-// Copyright (C) 2012 Xamarin Inc (http://www.xamarin.com)
-// Copyright (C) 2017 Microsoft Corporation (http://www.microsoft.com)
+// Copyright (C) 2012 Xamarin Inc (https://www.xamarin.com)
+// Copyright (C) 2017 Microsoft Corporation (https://www.microsoft.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
