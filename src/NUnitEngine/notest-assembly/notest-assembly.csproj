@@ -4,6 +4,7 @@
     <RootNamespace>notest_assembly</RootNamespace>
     <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>

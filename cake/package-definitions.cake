@@ -4,7 +4,7 @@
 
 PackageDefinition NUnitConsoleNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNuGetPackage;
-PackageDefinition NUnitConsoleRunnerNet60Package;
+PackageDefinition NUnitNetCoreConsoleRunnerPackage;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
@@ -58,6 +58,7 @@ public void InitializePackageDefinitions(ICakeContext context)
             id: "NUnit.Console",
             version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner-with-extensions.nuspec",
+            basepath: PROJECT_DIR,
             checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
 
         NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
@@ -65,6 +66,7 @@ public void InitializePackageDefinitions(ICakeContext context)
             id: "NUnit.ConsoleRunner",
             version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.nuspec",
+            basepath: NETFX_CONSOLE_DIR,
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
@@ -87,11 +89,12 @@ public void InitializePackageDefinitions(ICakeContext context)
             executable: "tools/nunit3-console.exe",
             tests: StandardRunnerTests),
 
-        NUnitConsoleRunnerNet60Package = new NuGetPackage(
+        NUnitNetCoreConsoleRunnerPackage = new NuGetPackage(
             context: context,
             id: "NUnit.ConsoleRunner.NetCore",
             version: ProductVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
+            basepath: NETCORE_CONSOLE_DIR,
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
@@ -107,6 +110,7 @@ public void InitializePackageDefinitions(ICakeContext context)
             id: "nunit-console-runner",
             version: ProductVersion,
             source: CHOCO_DIR + "nunit-console-runner.nuspec",
+            basepath: NETFX_CONSOLE_DIR,
             checks: new PackageCheck[] {
                 HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
                 HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
@@ -124,6 +128,7 @@ public void InitializePackageDefinitions(ICakeContext context)
             id: "NUnit.Console",
             version: SemVer,
             source: MSI_DIR + "nunit/nunit.wixproj",
+            basepath: NETFX_CONSOLE_DIR,
             checks: new PackageCheck[] {
                 HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
                 HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
@@ -138,26 +143,24 @@ public void InitializePackageDefinitions(ICakeContext context)
             executable: "NUnit.org/nunit-console/nunit3-console.exe",
             tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
 
-        NUnitConsoleZipPackage = new ZipPackage(
+       NUnitConsoleZipPackage = new ZipPackage(
             context: context,
             id: "NUnit.Console",
             version: ProductVersion,
             source: ZIP_IMG_DIR,
+            basepath: ZIP_IMG_DIR,
             checks: new PackageCheck[] {
-                HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-                HasDirectory($"bin/{NETFX_CONSOLE_TARGET}").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
-                HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-                HasDirectory("bin/netcoreapp2.1").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-                HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-                //HasDirectory("bin/net5.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+                HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico"),
+                HasDirectory("bin").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
                 HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
                 HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
                 HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
+                HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
+                HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
             },
-            executable: $"bin/{NETFX_CONSOLE_TARGET}/nunit3-console.exe",
+            executable: $"bin/nunit3-console.exe",
             tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
-
+ 
         // NOTE: Packages below this point have no direct tests
 
         NUnitEnginePackage = new NuGetPackage(
@@ -165,6 +168,7 @@ public void InitializePackageDefinitions(ICakeContext context)
             id: "NUnit.Engine",
             version: ProductVersion,
             source: NUGET_DIR + "engine/nunit.engine.nuspec",
+            basepath: ENGINE_PROJECT_BIN_DIR,
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory($"lib/{NETFX_ENGINE_TARGET}").WithFiles(ENGINE_FILES),
@@ -189,6 +193,7 @@ public void InitializePackageDefinitions(ICakeContext context)
             id: "NUnit.Engine.Api",
             version: ProductVersion,
             source: NUGET_DIR + "engine/nunit.engine.api.nuspec",
+            basepath: ENGINE_API_PROJECT_BIN_DIR,
             checks: new PackageCheck[] {
                 HasFile("LICENSE.txt"),
                 HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
@@ -243,6 +248,7 @@ public abstract class PackageDefinition
         string id,
         string version,
         string source,
+        string basepath,
         string executable = null,
         PackageCheck[] checks = null,
         PackageCheck[] symbols = null,
@@ -257,6 +263,7 @@ public abstract class PackageDefinition
         PackageId = id;
         PackageVersion = version;
         PackageSource = source;
+        BasePath = basepath;
         TestExecutable = executable;
         PackageChecks = checks;
         PackageTests = tests;
@@ -267,6 +274,7 @@ public abstract class PackageDefinition
 	public string PackageId { get; }
     public string PackageVersion { get; }
 	public string PackageSource { get; }
+    public string BasePath { get; }
     public string TestExecutable { get; }
     public PackageCheck[] PackageChecks { get; }
     public PackageCheck[] SymbolChecks { get; protected set; }
@@ -284,9 +292,9 @@ public abstract class PackageDefinition
 // PackageDefinition with an unknown package type.
 public class NuGetPackage : PackageDefinition
 {
-    public NuGetPackage(ICakeContext context, string id, string version, string source, string executable = null,
+    public NuGetPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
         PackageCheck[] checks = null, PackageCheck[] symbols = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.NuGet, id, version, source, executable: executable, checks: checks, symbols: symbols, tests: tests)
+        : base(context, PackageType.NuGet, id, version, source, basepath, executable: executable, checks: checks, symbols: symbols, tests: tests)
     {
         if (symbols != null)
         {
@@ -303,8 +311,8 @@ public class NuGetPackage : PackageDefinition
         var nugetPackSettings = new NuGetPackSettings()
         {
             Version = PackageVersion,
-            BasePath = BIN_DIR,
             OutputDirectory = PACKAGE_DIR,
+            BasePath = BasePath,
             NoPackageAnalysis = true,
             Symbols = HasSymbols
         };
@@ -318,9 +326,9 @@ public class NuGetPackage : PackageDefinition
 
 public class ChocolateyPackage : PackageDefinition
 {
-    public ChocolateyPackage(ICakeContext context, string id, string version, string source, string executable = null, 
+    public ChocolateyPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null, 
         PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.Chocolatey, id, version, source, executable: executable, checks: checks, tests: tests) { }
+        : base(context, PackageType.Chocolatey, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
 
     public override string PackageName => $"{PackageId}.{PackageVersion}.nupkg";
     
@@ -331,16 +339,16 @@ public class ChocolateyPackage : PackageDefinition
             {
                 Version = PackageVersion,
                 OutputDirectory = PACKAGE_DIR,
-                ArgumentCustomization = args => args.Append($"BIN_DIR={BIN_DIR}")
+                ArgumentCustomization = args => args.Append($"BASE={BasePath}")
             });
     }
 }
 
 public class MsiPackage : PackageDefinition
 {
-    public MsiPackage(ICakeContext context, string id, string version, string source, string executable = null,
+    public MsiPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
         PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.Msi, id, version, source, executable: executable, checks: checks, tests: tests) { }
+        : base(context, PackageType.Msi, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
 
     public override string PackageName => $"{PackageId}-{PackageVersion}.msi";
 
@@ -352,7 +360,7 @@ public class MsiPackage : PackageDefinition
             .WithProperty("Version", PackageVersion)
             .WithProperty("DisplayVersion", PackageVersion)
             .WithProperty("OutDir", PACKAGE_DIR)
-            .WithProperty("Image", MSI_IMG_DIR)
+            .WithProperty("Image", BasePath)
             .SetMSBuildPlatform(MSBuildPlatform.x86)
             .SetNodeReuse(false));
     }
@@ -360,9 +368,9 @@ public class MsiPackage : PackageDefinition
 
 public class ZipPackage : PackageDefinition
 {
-    public ZipPackage(ICakeContext context, string id, string version, string source, string executable = null,
+    public ZipPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
         PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.Zip, id, version, source, executable: executable, checks: checks, tests: tests) { }
+        : base(context, PackageType.Zip, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
 
     public override string PackageName => $"{PackageId}-{PackageVersion}.zip";
     

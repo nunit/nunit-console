@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
@@ -36,8 +37,11 @@ namespace NUnit.Engine.Services.Tests
         }
 
         [TestCase("mock-assembly.dll", false)]
-        [TestCase("../agents/net20/nunit-agent.exe", false)]
-        [TestCase("../agents/net20/nunit-agent-x86.exe", true)]
+#if DEBUG
+        [TestCase("../../../../mock-assembly-x86/bin/Debug/net462/mock-assembly-x86.dll", true)]
+#else
+        [TestCase("../../../../mock-assembly-x86/bin/Release/net462/mock-assembly-x86.dll", true)]
+#endif
         public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
         {
             var package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, assemblyName));

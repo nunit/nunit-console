@@ -5,6 +5,7 @@
     <TargetFrameworks>net462;net6.0</TargetFrameworks>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>

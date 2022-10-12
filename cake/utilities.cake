@@ -29,6 +29,29 @@ bool CheckIfDotNetCoreInstalled()
     return true;
 }
 
+public List<string> GetInstalledNetCoreRuntimes()
+{
+    var list = new List<string>();
+
+    var process = StartProcess("dotnet",
+            new ProcessSettings
+            {
+                Arguments = "--list-runtimes",
+                RedirectStandardOutput = true,
+                RedirectedStandardOutputHandler =
+                s => {
+                    if (s == null || !s.StartsWith("Microsoft.NETCore.App"))
+                        return s;
+
+                    var version = s.Split(' ')[1];
+
+                    list.Add(version);
+                    return s;
+                }
+            });
+    return list;
+}
+
 void DisplayUnreportedErrors()
 {
     if (UnreportedErrors.Count > 0)
@@ -96,6 +119,15 @@ DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
         .WithTarget(target);
 }
 
+void CopyAgentsToDirectory(string targetDir)
+{
+    DisplayBanner($"Copying agents to {targetDir}");
+    CreateDirectory( targetDir + "agents");
+    CopyDirectory(AGENT_PROJECT_BIN_DIR,  targetDir + "agents");
+    CopyDirectory(AGENT_X86_PROJECT_BIN_DIR,  targetDir + "agents");
+    CopyFiles(AGENT_X86_PROJECT_BIN_DIR + "**/nunit-agent-x86.*", targetDir + "agents", true);
+}
+
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - TEST
 //////////////////////////////////////////////////////////////////////
@@ -110,14 +142,25 @@ FilePath GetResultXmlPath(string testAssembly, string targetRuntime)
     return MakeAbsolute(new FilePath($@"test-results\{targetRuntime}\{assemblyName}.xml"));
 }
 
-void RunNUnitLiteTests(string testAssembly, string targetRuntime)
+string GetProjectBinDir(string projectPath)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
-    var assemblyPath = workingDir + testAssembly;
-    var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
+    var projectDir = System.IO.Path.GetDirectoryName(projectPath);
+    return projectDir + $"/bin/{Configuration}/";
+}
+
+string GetProjectBinDir(string projectPath, string targetRuntime)
+{
+    return GetProjectBinDir(projectPath) + targetRuntime + "/";
+}
+
+void RunNUnitLiteTests(string projectPath, string targetRuntime)
+{
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".exe";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var resultPath = GetResultXmlPath( testAssembly, targetRuntime).FullPath;
 
     int rc = StartProcess(
-        assemblyPath,
+        workingDir + testAssembly,
         new ProcessSettings()
         {
             Arguments = $"--result:{resultPath}",
@@ -130,9 +173,10 @@ void RunNUnitLiteTests(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
+void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -150,9 +194,10 @@ void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetFxConsole(string testAssembly, string targetRuntime)
+void RunNetFxConsole(string projectPath, string targetRuntime)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -170,9 +215,10 @@ void RunNetFxConsole(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetCoreConsole(string testAssembly, string targetRuntime)
+void RunNetCoreConsole(string projectPath, string targetRuntime)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -188,29 +234,6 @@ void RunNetCoreConsole(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}): {rc} tests failed");
     else if (rc < 0)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
-}
-
-public List<string> GetInstalledNetCoreRuntimes()
-{
-    var list = new List<string>();
-
-    var process = StartProcess("dotnet",
-            new ProcessSettings
-            {
-                Arguments = "--list-runtimes",
-                RedirectStandardOutput = true,
-                RedirectedStandardOutputHandler =
-                s => {
-                    if (s == null || !s.StartsWith("Microsoft.NETCore.App"))
-                        return s;
-
-                    var version = s.Split(' ')[1];
-
-                    list.Add(version);
-                    return s;
-                }
-            });
-    return list;
 }
 
 //////////////////////////////////////////////////////////////////////
