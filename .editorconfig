@@ -2,7 +2,7 @@
 # maintain consistent coding styles between 
 # different editors and IDEs
 
-# http://EditorConfig.org
+# https://EditorConfig.org
 
 # top-most EditorConfig file
 root = true
