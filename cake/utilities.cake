@@ -240,6 +240,20 @@ void RunNetCoreConsole(string projectPath, string targetRuntime)
 // HELPER METHODS - PACKAGING
 //////////////////////////////////////////////////////////////////////
 
+public int VerifyPackage(PackageDefinition package)
+{
+    int failures = 0;
+
+    if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
+        ++failures;
+
+    if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
+        ++failures;
+
+    return failures;
+}
+
+
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
     var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));

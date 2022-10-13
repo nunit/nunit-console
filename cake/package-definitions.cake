@@ -283,6 +283,11 @@ public abstract class PackageDefinition
     public abstract string PackageName { get; }
     public abstract void BuildPackage();
 
+    public void DisplayAction(string action)
+    {
+        DisplayBanner($"{action} package {PackageName}");
+    }
+
     public bool HasSymbols { get; protected set; } = false;
     public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {PackageType} packages.");
 }
@@ -308,6 +313,8 @@ public class NuGetPackage : PackageDefinition
 
     public override void BuildPackage()
     {
+        DisplayAction("Building");
+
         var nugetPackSettings = new NuGetPackSettings()
         {
             Version = PackageVersion,
@@ -334,6 +341,8 @@ public class ChocolateyPackage : PackageDefinition
     
     public override void BuildPackage()
     {
+        DisplayAction("Building");
+
         _context.ChocolateyPack(PackageSource,
             new ChocolateyPackSettings()
             {
@@ -354,6 +363,8 @@ public class MsiPackage : PackageDefinition
 
     public override void BuildPackage()
     {
+        DisplayAction("Building");
+
         _context.MSBuild(PackageSource, new MSBuildSettings()
             .WithTarget("Rebuild")
             .SetConfiguration(Configuration)
@@ -376,6 +387,8 @@ public class ZipPackage : PackageDefinition
     
     public override void BuildPackage()
     {
+        DisplayAction("Building");
+
         _context.Zip(ZIP_IMG_DIR, $"{PACKAGE_DIR}{PackageName}");
     }
 }

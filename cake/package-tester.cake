@@ -4,6 +4,7 @@
 public class PackageTester
 {
     private ICakeContext _context;
+    private PackageDefinition _package;
 
     private PackageType _packageType;
     private string _packageName;
@@ -16,6 +17,7 @@ public class PackageTester
     public PackageTester(ICakeContext context, PackageDefinition package)
     {
         _context = context;
+        _package = package;
 
         _packageType = package.PackageType;
         _packageName = package.PackageName;
@@ -29,7 +31,7 @@ public class PackageTester
 
     public void RunTests()
     {
-        DisplayBanner("Testing package " + _packageName);
+        _package.DisplayAction("Testing");
 
         Console.WriteLine("Creating Test Directory...");
         CreatePackageInstallDirectory();

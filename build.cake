@@ -388,11 +388,7 @@ Task("BuildPackages")
         EnsureDirectoryExists(PACKAGE_DIR);
 
         foreach (var package in AllPackages)
-        {
-            DisplayBanner($"Building package {package.PackageName}");
-
             package.BuildPackage();
-        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -406,13 +402,7 @@ Task("VerifyPackages")
         int failures = 0;
 
         foreach (var package in AllPackages)
-        {
-            if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
-                ++failures;
-
-            if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
-                ++failures;
-        }
+            failures += VerifyPackage(package);
 
         if (failures == 0)
             Information("\nAll packages passed verification.");
@@ -449,25 +439,13 @@ Task("PackageMsi")
             {
                 EnsureDirectoryExists(PACKAGE_DIR);
 
-                DisplayBanner($"Building MSI package {package.PackageId}");
                 package.BuildPackage();
 
                 DisplayBanner("Checking package content");
-                if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
-                    throw new System.Exception($"Package failed verification.");
-
-                if (package.HasSymbols)
-                {
-                    DisplayBanner("Checking symbol package content");
-                    if (!CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
-                        throw new System.Exception($"Symbol package failed verification.");
-                }
+                VerifyPackage(package);
 
                 if (package.PackageTests != null)
-                {
-                    DisplayBanner("Testing package");
                     new PackageTester(Context, package).RunTests();
-                }
             }
         }
     });

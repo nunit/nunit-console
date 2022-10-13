@@ -15,7 +15,7 @@ jobs:
   - task: UseDotNet@2
     displayName: 'Install .NET 7.0'
     inputs:
-      version: 7.x
+      version: 7.0.0-rc.1.22427.1
       includePreviewVersions: true
 
   - task: UseDotNet@2
