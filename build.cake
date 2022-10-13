@@ -24,7 +24,6 @@ string PreReleaseLabel => _buildVersion.PreReleaseLabel;
 bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
 
 var UnreportedErrors = new List<string>();
-var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
@@ -58,10 +57,13 @@ Task("Clean")
     .Description("Cleans directories.")
     .Does(() =>
     {
-        CleanDirectory(BIN_DIR);
-        CleanDirectory(PACKAGE_DIR);
-        CleanDirectory(IMAGE_DIR);
+        Information($"Cleaning bin/{Configuration} directories");
+        foreach (var dir in GetDirectories($"src/**/bin/{Configuration}"))
+            CleanDirectory(dir);
+        
+        Information("Cleaning Extensions Directory");
         CleanDirectory(EXTENSIONS_DIR);
+        Information("Cleaning Package Directory");
         CleanDirectory(PACKAGE_DIR);
     });
 
@@ -69,11 +71,13 @@ Task("CleanAll")
     .Description("Cleans both Debug and Release Directories followed by deleting object directories")
     .Does(() =>
     {
-        Information("Cleaning both Debug and Release");
-        CleanDirectory(PROJECT_DIR + "bin");
-        CleanDirectory(PACKAGE_DIR);
-        CleanDirectory(IMAGE_DIR);
+        Information("Cleaning both Debug and Release Directories");
+        foreach (var dir in GetDirectories("src/**/bin/"))
+            CleanDirectory(dir);
+        
+        Information("Cleaning Extensions Directory");
         CleanDirectory(EXTENSIONS_DIR);
+        Information("Cleaning Package Directory");
         CleanDirectory(PACKAGE_DIR);
 
         Information("Deleting object directories");
@@ -101,39 +105,11 @@ public void BuildSolution()
 {
     MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
 
-    // Publishing in place where needed to ensure that all references are present.
-
-    // TODO: May not be needed
-    DisplayBanner("Publishing ENGINE API Project for NETSTANDARD_2.0");
-    MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netstandard2.0")
-        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-
-    DisplayBanner("Publishing ENGINE Project");
-    foreach (var framework in new[] { "netstandard2.0", "netcoreapp3.1" })
-        MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", framework)
-            .WithProperty("PublishDir", BIN_DIR + framework));
-
-    DisplayBanner("Publishing ENGINE TESTS Project");
-    foreach (var framework in new[] { "netcoreapp2.1", "netcoreapp3.1" })
-        MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", framework)
-            .WithProperty("PublishDir", BIN_DIR + framework));
-
-    DisplayBanner("Publishing MOCK ASSEMBLY Project for NET7.0");
-    MSBuild(MOCK_ASSEMBLY_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "net7.0")
-        .WithProperty("PublishDir", BIN_DIR + "net7.0"));
-
-    // TODO: May not be needed
-    foreach (var framework in new[] { "netcoreapp3.1", "net5.0", "net7.0" })
-    {
-        DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
-        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", framework)
-            .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
-    }
+    DisplayBanner("Copying agents to console runner directory");
+    CopyAgentsToDirectory(NETFX_CONSOLE_DIR);
+    
+    DisplayBanner("Copying agents to engine directory");
+    CopyAgentsToDirectory(ENGINE_PROJECT_BIN_DIR);
 }
 
 private void BuildEachProjectSeparately()
@@ -141,7 +117,8 @@ private void BuildEachProjectSeparately()
     DotNetRestore(SOLUTION_FILE);
 
     BuildProject(ENGINE_PROJECT);
-    BuildProject(CONSOLE_PROJECT);
+    BuildProject(NETFX_CONSOLE_PROJECT);
+    BuildProject(NETCORE_CONSOLE_PROJECT);
     BuildProject(AGENT_PROJECT);
     BuildProject(AGENT_X86_PROJECT);
 
@@ -152,7 +129,7 @@ private void BuildEachProjectSeparately()
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
 
-
+    /*
     DisplayBanner("Publish .NET Core & Standard projects");
 
     MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
@@ -167,6 +144,7 @@ private void BuildEachProjectSeparately()
     MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
        .WithProperty("TargetFramework", "netcoreapp2.1")
        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+    */
 }
 
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
@@ -231,7 +209,7 @@ Task("TestNet20EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_CORE_TESTS, "net35");
+        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "net35");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -244,7 +222,7 @@ Task("TestNetStandard20EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -257,7 +235,7 @@ Task("TestNetCore31EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -270,7 +248,7 @@ Task("TestNet50EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net5.0");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "net5.0");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -283,7 +261,7 @@ Task("TestNet60EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, NETCORE_ENGINE_TARGET);
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, NETCORE_ENGINE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -296,7 +274,7 @@ Task("TestNetFxEngine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_TESTS, NETFX_ENGINE_TARGET);
+        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, NETFX_ENGINE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -309,7 +287,7 @@ Task("TestNetStandard20Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -322,7 +300,7 @@ Task("TestNetCore31Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp3.1");
     });
     
 //////////////////////////////////////////////////////////////////////
@@ -335,7 +313,7 @@ Task("TestNetFxConsole")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNetFxConsole(CONSOLE_TESTS, NETFX_CONSOLE_TARGET);
+        RunNetFxConsole(CONSOLE_TESTS_PROJECT, NETFX_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -348,7 +326,7 @@ Task("TestNetCoreConsole")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNetCoreConsole(CONSOLE_TESTS, "net6.0");
+        RunNetCoreConsole(CONSOLE_TESTS_PROJECT, NETCORE_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -375,35 +353,8 @@ Task("FetchBundledExtensions")
     });
 
 //////////////////////////////////////////////////////////////////////
-// CREATE MSI IMAGE
-//////////////////////////////////////////////////////////////////////
-
-Task("CreateMsiImage")
-    .IsDependentOn("FetchBundledExtensions")
-    .Does(() =>
-    {
-        CleanDirectory(MSI_IMG_DIR);
-        CopyFiles(
-            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
-            MSI_IMG_DIR);
-        CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
-
-        foreach (var framework in new[] { NETFX_CONSOLE_TARGET })
-        {
-            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
-
-            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
-            CleanDirectory(addinsImgDir);
-
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsImgDir);
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
 // CREATE ZIP IMAGE
 //////////////////////////////////////////////////////////////////////
-
 Task("CreateZipImage")
     .IsDependentOn("FetchBundledExtensions")
     .Does(() =>
@@ -412,15 +363,13 @@ Task("CreateZipImage")
         CopyFiles(
             new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
             ZIP_IMG_DIR);
-        CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
+        CopyDirectory(NETFX_CONSOLE_DIR, ZIP_IMG_DIR + "bin/");
+        CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", ZIP_IMG_DIR + "bin/");
 
         // Currently, only the .NET Framework runner accepts extensions
         foreach (var framework in new[] { NETFX_CONSOLE_TARGET })
         {
-            var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
-            CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
-
-            var addinsDir = frameworkDir + "addins/";
+            var addinsDir = ZIP_IMG_DIR + "bin/addins/";
             CleanDirectory(addinsDir);
 
             foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
@@ -428,19 +377,18 @@ Task("CreateZipImage")
         }
     });
 
+//////////////////////////////////////////////////////////////////////
+// BUILD PACKAGES
+//////////////////////////////////////////////////////////////////////
 Task("BuildPackages")
-    .IsDependentOn("CreateMsiImage")
+    .IsDependentOn("FetchBundledExtensions")
     .IsDependentOn("CreateZipImage")
     .Does(() =>
     {
         EnsureDirectoryExists(PACKAGE_DIR);
 
         foreach (var package in AllPackages)
-        {
-            DisplayBanner($"Building package {package.PackageName}");
-
             package.BuildPackage();
-        }
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -454,13 +402,7 @@ Task("VerifyPackages")
         int failures = 0;
 
         foreach (var package in AllPackages)
-        {
-            if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
-                ++failures;
-
-            if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
-                ++failures;
-        }
+            failures += VerifyPackage(package);
 
         if (failures == 0)
             Information("\nAll packages passed verification.");
@@ -479,6 +421,32 @@ Task("TestPackages")
         {
             if (package.PackageTests != null)
                 new PackageTester(Context, package).RunTests();
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
+// PACKAGE DEVELOPMENT - Tasks for working on individual packages
+//////////////////////////////////////////////////////////////////////
+
+Task("PackageMsi")
+    .Description("Build Check and Test the MSI package")
+    .IsDependentOn("FetchBundledExtensions")
+    .Does(() =>
+    {
+        foreach(var package in AllPackages)
+        {
+            if (package.PackageType == PackageType.Msi)
+            {
+                EnsureDirectoryExists(PACKAGE_DIR);
+
+                package.BuildPackage();
+
+                DisplayBanner("Checking package content");
+                VerifyPackage(package);
+
+                if (package.PackageTests != null)
+                    new PackageTester(Context, package).RunTests();
+            }
         }
     });
 
@@ -544,10 +512,6 @@ Task("SignPackages")
             }
         }
     });
-
-//////////////////////////////////////////////////////////////////////
-// PUBLISH PACKAGES
-//////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
 // PUBLISH PACKAGES
@@ -649,11 +613,10 @@ Task("PublishToChocolatey")
     });
 
 Task("ListInstalledNetCoreRuntimes")
-    .Description("Lists all installed .NET Core Runtimes")
+    .Description("Lists all installed .NET Core Runtimes visible to the script")
     .Does(() => 
     {
-        var runtimes = GetInstalledNetCoreRuntimes();
-        foreach (var runtime in runtimes)
+        foreach (var runtime in GetInstalledNetCoreRuntimes())
         {
             Information(runtime);            
         }

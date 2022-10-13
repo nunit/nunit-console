@@ -8,6 +8,7 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>Full</DebugType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>

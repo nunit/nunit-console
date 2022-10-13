@@ -4,6 +4,7 @@
 public class PackageTester
 {
     private ICakeContext _context;
+    private PackageDefinition _package;
 
     private PackageType _packageType;
     private string _packageName;
@@ -16,6 +17,7 @@ public class PackageTester
     public PackageTester(ICakeContext context, PackageDefinition package)
     {
         _context = context;
+        _package = package;
 
         _packageType = package.PackageType;
         _packageName = package.PackageName;
@@ -29,7 +31,7 @@ public class PackageTester
 
     public void RunTests()
     {
-        DisplayBanner("Testing package " + _packageName);
+        _package.DisplayAction("Testing");
 
         Console.WriteLine("Creating Test Directory...");
         CreatePackageInstallDirectory();
@@ -50,21 +52,6 @@ public class PackageTester
             int rc = _context.StartProcess("msiexec", $"/a {package} TARGETDIR={testDir} /q");
             if (rc != 0)
                 Console.WriteLine($"  ERROR: Installer returned {rc.ToString()}");
-            else
-            {
-                var binDir = _installDirectory + "NUnit.org/nunit-console/";
-                var dlls = _context.GetFiles(binDir + "*.dll");
-                var pdbs = _context.GetFiles(binDir + "*.pdb");
-                var filesToCopy = dlls.Concat(pdbs);
-
-                // Administrative install is used to create a file image, from which
-                // users may do their own installls. For security reasons, we can't
-                // do a full install so we simulate the user portion of the install,
-                // copying certain files to their final destination.
-                Console.WriteLine("Copying agent files");
-                _context.CopyFiles(filesToCopy, binDir + "agents/net20");
-                _context.CopyFiles(filesToCopy, binDir + "agents/net462");
-            }
         }
         else
         {
@@ -88,14 +75,11 @@ public class PackageTester
 
             Console.WriteLine($"Running {_installDirectory + _testExecutable}");
 
-            var outputDir = System.IO.Path.GetFullPath(
-                $"bin/{Configuration}/");
             int rc = _context.StartProcess(
                 _installDirectory + _testExecutable,
                 new ProcessSettings()
                 {
                     Arguments = $"{packageTest.Arguments} --work={testResultDir}",
-                    WorkingDirectory = outputDir
                 });
 
             try

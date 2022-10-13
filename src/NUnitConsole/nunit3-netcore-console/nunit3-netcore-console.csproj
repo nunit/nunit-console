@@ -6,6 +6,7 @@
     <AssemblyName>nunit3-netcore-console</AssemblyName>
     <TargetFrameworks>net6.0</TargetFrameworks>
     <RollForward>Major</RollForward>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -25,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\NUnitEngine\nunit.engine.core\Guard.cs" Link="Utilities\Guard.cs" />
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
     <Compile Include="..\nunit3-console\ColorConsole.cs" Link="ColorConsole.cs" />
     <Compile Include="..\nunit3-console\ColorConsoleWriter.cs" Link="ColorConsoleWriter.cs" />
@@ -56,6 +56,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>
 
 </Project>

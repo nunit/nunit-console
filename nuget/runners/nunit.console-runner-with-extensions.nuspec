@@ -41,7 +41,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../../LICENSE.txt" />
-    <file src="../../nunit_256.png" target="images" />
+    <file src="LICENSE.txt" />
+    <file src="nunit_256.png" target="images" />
   </files>
 </package>
