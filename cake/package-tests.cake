@@ -12,16 +12,12 @@ static ExpectedResult MockAssemblyExpectedResult(int nCopies = 1) => new Expecte
     Skipped = 7 * nCopies
 };
 
+//Single Assembly Tests using each agent
+
 static PackageTest Net35Test = new PackageTest(
     "Net35Test",
     "Run mock-assembly.dll under .NET 3.5",
     "src/NUnitEngine/mock-assembly/bin/Release/net35/mock-assembly.dll",
-    MockAssemblyExpectedResult(1));
-
-static PackageTest Net35X86Test = new PackageTest(
-    "Net35X86Test",
-    "Run mock-assembly-x86.dll under .NET 3.5",
-    "src/NUnitEngine/mock-assembly-x86/bin/Release/net35/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net40Test = new PackageTest(
@@ -30,17 +26,23 @@ static PackageTest Net40Test = new PackageTest(
     "src/NUnitEngine/mock-assembly/bin/Release/net462/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
-static PackageTest Net40X86Test = new PackageTest(
-    "Net40X86Test",
-    "Run mock-assembly-x86.dll under .NET 4.x",
-    "src/NUnitEngine/mock-assembly-x86/bin/Release/net462/mock-assembly-x86.dll",
+static PackageTest NetCore21Test = new PackageTest(
+    "NetCore21Test",
+    "Run mock-assembly.dll targeting .NET Core 2.1",
+    "src/NUnitEngine/mock-assembly/bin/Release/netcoreapp2.1/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
-static PackageTest Net35PlusNet40Test = new PackageTest(
-    "Net35PlusNet40Test",
-    "Run both copies of mock-assembly together",
-    "src/NUnitEngine/mock-assembly/bin/Release/net35/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net462/mock-assembly.dll",
-    MockAssemblyExpectedResult(2));
+static PackageTest NetCore31Test = new PackageTest(
+    "NetCore31Test",
+    "Run mock-assembly.dll under .NET Core 3.1",
+    "src/NUnitEngine/mock-assembly/bin/Release/netcoreapp3.1/mock-assembly.dll",
+    MockAssemblyExpectedResult(1));
+
+static PackageTest Net50Test = new PackageTest(
+    "Net50Test",
+    "Run mock-assembly.dll under .NET 5.0",
+    "src/NUnitEngine/mock-assembly/bin/Release/net5.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(1));
 
 static PackageTest Net60Test = new PackageTest(
     "Net60Test",
@@ -54,16 +56,18 @@ static PackageTest Net70Test = new PackageTest(
     "src/NUnitEngine/mock-assembly/bin/Release/net7.0/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
-static PackageTest Net50Test = new PackageTest(
-    "Net50Test",
-    "Run mock-assembly.dll under .NET 5.0",
-    "src/NUnitEngine/mock-assembly/bin/Release/net5.0/mock-assembly.dll",
+// X86 Tests
+
+static PackageTest Net35X86Test = new PackageTest(
+    "Net35X86Test",
+    "Run mock-assembly-x86.dll under .NET 3.5",
+    "src/NUnitEngine/mock-assembly-x86/bin/Release/net35/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
-static PackageTest NetCore31Test = new PackageTest(
-    "NetCore31Test",
-    "Run mock-assembly.dll under .NET Core 3.1",
-    "src/NUnitEngine/mock-assembly/bin/Release/netcoreapp3.1/mock-assembly.dll",
+static PackageTest Net40X86Test = new PackageTest(
+    "Net40X86Test",
+    "Run mock-assembly-x86.dll under .NET 4.x",
+    "src/NUnitEngine/mock-assembly-x86/bin/Release/net462/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest NetCore31X86Test = new PackageTest(
@@ -72,35 +76,35 @@ static PackageTest NetCore31X86Test = new PackageTest(
     "src/NUnitEngine/mock-assembly-x86/bin/Release/netcoreapp3.1/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
-static PackageTest NetCore21Test = new PackageTest(
-    "NetCore21Test",
-    "Run mock-assembly.dll targeting .NET Core 2.1",
-    "src/NUnitEngine/mock-assembly/bin/Release/netcoreapp2.1/mock-assembly.dll",
-    MockAssemblyExpectedResult(1));
+// Special Test Situations
 
-static PackageTest NetCore21X86Test = new PackageTest(
-    "NetCore21X86Test",
-    "Run mock-assembly-x86.dll under .NET Core 2.1",
-    "src/NUnitEngine/mock-assembly-x86/bin/Release/netcoreapp2.1/mock-assembly-x86.dll",
-    MockAssemblyExpectedResult(1));
+static PackageTest Net60WindowsFormsTest = new PackageTest(
+    "Net60WindowsFormsTest",
+    "Run test using windows forms under .NET 6.0",
+    "src/NUnitEngine/windows-test/bin/Release/net6.0-windows/windows-test.dll",
+    new ExpectedResult("Passed"));
 
-static PackageTest NetCore21PlusNetCore31Test = new PackageTest(
-    "NetCore21PlusNetCore31Test",
-    "Run two copies of mock-assembly together",
-    "src/NUnitEngine/mock-assembly/bin/Release/netcoreapp2.1/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/netcoreapp3.1/mock-assembly.dll",
+static PackageTest Net60AspNetCoreTest = new PackageTest(
+    "Net60AspNetCoreTest",
+    "Run test using AspNetCore under .NET 6.0",
+    "src/NUnitEngine/aspnetcore-test/bin/Release/net6.0/aspnetcore-test.dll",
+    new ExpectedResult("Passed"));
+
+// Multiple Assemblies
+
+static PackageTest Net35PlusNet40Test = new PackageTest(
+    "Net35PlusNet40Test",
+    "Run both copies of mock-assembly together",
+    "src/NUnitEngine/mock-assembly/bin/Release/net35/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net462/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
-
-static PackageTest NetCore21PlusNetCore31PlusNet50PlusNet60Test = new PackageTest(
-    "NetCore21PlusNetCore31PlusNet50PlusNet60Test",
-    "Run four copies of mock-assembly together",
-    "src/NUnitEngine/mock-assembly/bin/Release/netcoreapp2.1/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/netcoreapp3.1/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net5.0/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net6.0/mock-assembly.dll",
-    MockAssemblyExpectedResult(4));
 
 static PackageTest Net40PlusNet60Test = new PackageTest(
     "Net40PlusNet60Test",
     "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
     "src/NUnitEngine/mock-assembly/bin/Release/net462/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
+
+// NUnit Project
 
 static PackageTest NUnitProjectTest;
 NUnitProjectTest = new PackageTest(
