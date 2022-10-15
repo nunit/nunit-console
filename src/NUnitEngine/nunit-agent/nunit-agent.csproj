@@ -10,6 +10,11 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)'!='net20' and '$(TargetFramework)'!='net462'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Agent ($(TargetFramework))</AssemblyTitle>
