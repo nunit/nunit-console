@@ -140,6 +140,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit3-netcore-console", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "windows-test", "src\NUnitEngine\windows-test\windows-test.csproj", "{D3A28EEB-A7C4-4A03-B958-4D161C208963}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore-test", "src\NUnitEngine\aspnetcore-test\aspnetcore-test.csproj", "{25FFAF61-C456-4BF9-87BE-34930F22B669}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -202,6 +204,10 @@ Global
 		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,6 +236,7 @@ Global
 		{CACC0520-B452-4310-A33C-DC944129ACDD} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{472314FE-1F18-4359-B620-FF20BF3AF553} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
 		{D3A28EEB-A7C4-4A03-B958-4D161C208963} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{25FFAF61-C456-4BF9-87BE-34930F22B669} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

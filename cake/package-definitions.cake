@@ -30,7 +30,8 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net40PlusNet60Test,
         Net35X86Test,
         Net40X86Test,
-        Net60WindowsFormsTest
+        Net60WindowsFormsTest,
+        Net60AspNetCoreTest
     };
 
     if (dotnetX86Available)

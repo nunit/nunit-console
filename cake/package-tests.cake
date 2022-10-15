@@ -79,9 +79,15 @@ static PackageTest NetCore31X86Test = new PackageTest(
 // Special Test Situations
 
 static PackageTest Net60WindowsFormsTest = new PackageTest(
-    "Net60WindowsTest",
+    "Net60WindowsFormsTest",
     "Run test using windows forms under .NET 6.0",
     "src/NUnitEngine/windows-test/bin/Release/net6.0-windows/windows-test.dll",
+    new ExpectedResult("Passed"));
+
+static PackageTest Net60AspNetCoreTest = new PackageTest(
+    "Net60AspNetCoreTest",
+    "Run test using AspNetCore under .NET 6.0",
+    "src/NUnitEngine/aspnetcore-test/bin/Release/net6.0/aspnetcore-test.dll",
     new ExpectedResult("Passed"));
 
 // Multiple Assemblies
