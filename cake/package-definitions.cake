@@ -20,25 +20,20 @@ public void InitializePackageDefinitions(ICakeContext context)
     var StandardRunnerTests = new List<PackageTest>
     {
         Net35Test,
-        Net35X86Test,
         Net40Test,
-        Net40X86Test,
-        Net35PlusNet40Test,
         NetCore21Test,
         NetCore31Test,
         Net50Test,
         Net60Test,
         Net70Test,
-        NetCore21PlusNetCore31Test,
-        NetCore21PlusNetCore31PlusNet50PlusNet60Test,
-        Net40PlusNet60Test
+        Net35PlusNet40Test,
+        Net40PlusNet60Test,
+        Net35X86Test,
+        Net40X86Test
     };
 
     if (dotnetX86Available)
-    {
-        StandardRunnerTests.Add(NetCore21X86Test);
         StandardRunnerTests.Add(NetCore31X86Test);
-    }
 
     // Tests run for the NETCORE runner package
     var NetCoreRunnerTests = new List<PackageTest>
@@ -47,8 +42,6 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
-        NetCore21PlusNetCore31Test,
-        NetCore21PlusNetCore31PlusNet50PlusNet60Test
     };
 
     AllPackages.AddRange(new PackageDefinition[] {
