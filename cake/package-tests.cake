@@ -76,6 +76,14 @@ static PackageTest NetCore31X86Test = new PackageTest(
     "src/NUnitEngine/mock-assembly-x86/bin/Release/netcoreapp3.1/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
+// Special Test Situations
+
+static PackageTest Net60WindowsFormsTest = new PackageTest(
+    "Net60WindowsTest",
+    "Run test using windows forms under .NET 6.0",
+    "src/NUnitEngine/windows-test/bin/Release/net6.0-windows/windows-test.dll",
+    new ExpectedResult("Passed"));
+
 // Multiple Assemblies
 
 static PackageTest Net35PlusNet40Test = new PackageTest(

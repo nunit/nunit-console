@@ -138,6 +138,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.core.tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit3-netcore-console", "src\NUnitConsole\nunit3-netcore-console\nunit3-netcore-console.csproj", "{472314FE-1F18-4359-B620-FF20BF3AF553}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "windows-test", "src\NUnitEngine\windows-test\windows-test.csproj", "{D3A28EEB-A7C4-4A03-B958-4D161C208963}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,10 @@ Global
 		{472314FE-1F18-4359-B620-FF20BF3AF553}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{472314FE-1F18-4359-B620-FF20BF3AF553}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{472314FE-1F18-4359-B620-FF20BF3AF553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3A28EEB-A7C4-4A03-B958-4D161C208963}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -223,6 +229,7 @@ Global
 		{20005864-BE82-412D-99BF-288E2D8370E9} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 		{CACC0520-B452-4310-A33C-DC944129ACDD} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{472314FE-1F18-4359-B620-FF20BF3AF553} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
+		{D3A28EEB-A7C4-4A03-B958-4D161C208963} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

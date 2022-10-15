@@ -29,7 +29,8 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net35PlusNet40Test,
         Net40PlusNet60Test,
         Net35X86Test,
-        Net40X86Test
+        Net40X86Test,
+        Net60WindowsFormsTest
     };
 
     if (dotnetX86Available)
