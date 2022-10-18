@@ -98,9 +98,9 @@ MSBuildSettings CreateMSBuildSettings(string target)
     else 
     if (IsRunningOnWindows())
     {
-        // The fallback is in case only a preview of VS is installed.
+        // Originally, we only used previews when no other version is installed.
+        // Currently we use the latest version, even if it is a preview.
         var vsInstallation =
-            //VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" })
             VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
 
         if (vsInstallation != null)
@@ -136,9 +136,9 @@ private void BuildEachProjectSeparately()
 
     BuildProject(ENGINE_API_PROJECT);
 
-    BuildProject(MOCK_ASSEMBLY_PROJECT);//, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0", "net7.0");
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT);//, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(NOTEST_PROJECT);//, "net35", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(MOCK_ASSEMBLY_PROJECT);
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT);
+    BuildProject(NOTEST_PROJECT);
     BuildProject(WINDOWS_TEST_PROJECT);
     BuildProject(ASPNETCORE_TEST_PROJECT);
 
@@ -150,26 +150,9 @@ private void BuildEachProjectSeparately()
     BuildProject(NETFX_CONSOLE_PROJECT);
     BuildProject(NETCORE_CONSOLE_PROJECT);
 
-    BuildProject(ENGINE_TESTS_PROJECT);//, "net462", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT);//, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
-    BuildProject(CONSOLE_TESTS_PROJECT);//, "net462", "net6.0");
-
-    /*
-    DisplayBanner("Publish .NET Core & Standard projects");
-
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
-       .WithProperty("TargetFramework", "netstandard2.0")
-       .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-    CopyFileToDirectory(
-       BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
-       BIN_DIR + "netcoreapp2.1");
-    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-       .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-    MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-       .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-    */
+    BuildProject(ENGINE_TESTS_PROJECT);
+    BuildProject(ENGINE_CORE_TESTS_PROJECT);
+    BuildProject(CONSOLE_TESTS_PROJECT);
 }
 
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
