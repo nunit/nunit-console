@@ -6,7 +6,7 @@ branches:
   - /^azure-/
 
 install:
-  - ps: $urlNet70RC = "https://download.visualstudio.microsoft.com/download/pr/b3b5dce4-d810-4477-a8a3-97cbb0bdf3ea/91d0dd167239cfdfb48ae18166f444d4/dotnet-sdk-7.0.100-rc.1.22431.12-win-x64.zip"
+  - ps: $urlNet70RC = "https://download.visualstudio.microsoft.com/download/pr/49b8a5b8-baca-4711-b24d-11c9b9840f95/e764347d9a2a1668db104034b01017e3/dotnet-sdk-7.0.100-rc.2.22477.23-win-x64.zip"
   - ps: echo "Download from $urlNet70RC"
   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null

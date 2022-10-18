@@ -95,80 +95,19 @@ Task("Build")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        if (IsRunningOnWindows())
-            BuildSolution();
-        else
+        // TEMP change for use with .NET 7.0 RC 2
+        // We must build one project at a time
+        //if (IsRunningOnWindows())
+        //    BuildSolution();
+        //else
             BuildEachProjectSeparately();
-    });
 
-public void BuildSolution()
-{
-    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
-
-    DisplayBanner("Copying agents to console runner directory");
-    CopyAgentsToDirectory(NETFX_CONSOLE_DIR);
+        DisplayBanner("Copying agents to console runner directory");
+        CopyAgentsToDirectory(NETFX_CONSOLE_DIR);
     
-    DisplayBanner("Copying agents to engine directory");
-    CopyAgentsToDirectory(ENGINE_PROJECT_BIN_DIR);
-}
-
-private void BuildEachProjectSeparately()
-{
-    DotNetRestore(SOLUTION_FILE);
-
-    BuildProject(ENGINE_PROJECT);
-    BuildProject(NETFX_CONSOLE_PROJECT);
-    BuildProject(NETCORE_CONSOLE_PROJECT);
-    BuildProject(AGENT_PROJECT);
-    BuildProject(AGENT_X86_PROJECT);
-
-    BuildProject(ENGINE_TESTS_PROJECT, "net462", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net462", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
-    BuildProject(CONSOLE_TESTS_PROJECT, "net462", "net6.0");
-
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
-
-    /*
-    DisplayBanner("Publish .NET Core & Standard projects");
-
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
-       .WithProperty("TargetFramework", "netstandard2.0")
-       .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-    CopyFileToDirectory(
-       BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
-       BIN_DIR + "netcoreapp2.1");
-    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-       .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-    MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-       .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-    */
-}
-
-// NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
-// If we use MSBuild, then the net5.0 projects fail. So we build each project
-// differently depending on whether it has net35 as one of its targets. 
-private void BuildProject(string project, params string[] targetFrameworks)
-{
-    if (targetFrameworks.Length == 0)
-    {
-        DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
-        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
-    }
-    else
-    {
-        foreach (var framework in targetFrameworks)
-        {
-            DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
-            if (framework == "net35")
-                MSBuild(project, CreateMSBuildSettings("Build").WithProperty("TargetFramework", framework));
-            else
-                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
-        }
-    }
-}
+        DisplayBanner("Copying agents to engine directory");
+        CopyAgentsToDirectory(ENGINE_PROJECT_BIN_DIR);
+    });
 
 //////////////////////////////////////////////////////////////////////
 // BUILD C++ TESTS
