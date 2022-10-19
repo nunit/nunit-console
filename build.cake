@@ -178,32 +178,6 @@ Task("TestNetCore31EngineCore")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NET 5.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet50EngineCore")
-    .Description("Tests the .NET 5.0 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "net5.0");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NET 6.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet60EngineCore")
-    .Description("Tests the .NET 6.0 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, NETCORE_ENGINE_TARGET);
-    });
-
-//////////////////////////////////////////////////////////////////////
 // TEST .NET 4.6.2 ENGINE
 //////////////////////////////////////////////////////////////////////
 
@@ -655,9 +629,7 @@ Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
     .IsDependentOn("TestNet20EngineCore")
     .IsDependentOn("TestNetStandard20EngineCore")
-    .IsDependentOn("TestNetCore31EngineCore")
-    .IsDependentOn("TestNet50EngineCore")
-    .IsDependentOn("TestNet60EngineCore");
+    .IsDependentOn("TestNetCore31EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
