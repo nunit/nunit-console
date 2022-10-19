@@ -37,6 +37,8 @@ static string ENGINE_CORE_TESTS_PROJECT; ENGINE_CORE_TESTS_PROJECT = SOURCE_DIR 
 static string MOCK_ASSEMBLY_PROJECT; MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";
 static string MOCK_ASSEMBLY_X86_PROJECT; MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock-assembly-x86.csproj";
 static string NOTEST_PROJECT; NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";
+static string WINDOWS_TEST_PROJECT; WINDOWS_TEST_PROJECT = SOURCE_DIR + "NUnitEngine/windows-test/windows-test.csproj";
+static string ASPNETCORE_TEST_PROJECT; ASPNETCORE_TEST_PROJECT = SOURCE_DIR + "NUnitEngine/aspnetcore-test/aspnetcore-test.csproj";
 
 // Bin directories for projecs
 static string NETFX_CONSOLE_PROJECT_BIN_DIR; NETFX_CONSOLE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit3-console/bin/{Configuration}/";

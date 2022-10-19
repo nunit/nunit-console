@@ -77,6 +77,11 @@ public static void DisplayBanner(string message)
 // HELPER METHODS - BUILD
 //////////////////////////////////////////////////////////////////////
 
+void BuildSolution()
+{
+    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
+}
+
 MSBuildSettings CreateMSBuildSettings(string target)
 {
     var settings = new MSBuildSettings()
@@ -88,12 +93,15 @@ MSBuildSettings CreateMSBuildSettings(string target)
         // Workaround for https://github.com/Microsoft/msbuild/issues/3626
         .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
 
+    if (BuildSystem.IsRunningOnAppVeyor)
+        settings.ToolPath = System.IO.Path.GetFullPath(@".dotnetsdk\sdk\7.0.100-rc.2.22477.23\MSBuild.dll");
+    else 
     if (IsRunningOnWindows())
     {
-        // The fallback is in case only a preview of VS is installed.
+        // Originally, we only used previews when no other version is installed.
+        // Currently we use the latest version, even if it is a preview.
         var vsInstallation =
-            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" })
-            ?? VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
+            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
 
         if (vsInstallation != null)
         {
@@ -103,7 +111,10 @@ MSBuildSettings CreateMSBuildSettings(string target)
                 msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
 
             if (FileExists(msBuildPath))
+            {
                 settings.ToolPath = msBuildPath;
+                Information("Using MSBuild at " + msBuildPath);
+            }
         }
     }
 
@@ -119,12 +130,58 @@ DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
         .WithTarget(target);
 }
 
+private void BuildEachProjectSeparately()
+{
+    DotNetRestore(SOLUTION_FILE);
+
+    BuildProject(ENGINE_API_PROJECT);
+
+    BuildProject(MOCK_ASSEMBLY_PROJECT);
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT);
+    BuildProject(NOTEST_PROJECT);
+    BuildProject(WINDOWS_TEST_PROJECT);
+    BuildProject(ASPNETCORE_TEST_PROJECT);
+
+    BuildProject(ENGINE_CORE_PROJECT);
+    BuildProject(AGENT_PROJECT);
+    BuildProject(AGENT_X86_PROJECT);
+    BuildProject(ENGINE_PROJECT);
+    
+    BuildProject(NETFX_CONSOLE_PROJECT);
+    BuildProject(NETCORE_CONSOLE_PROJECT);
+
+    BuildProject(ENGINE_TESTS_PROJECT);
+    BuildProject(ENGINE_CORE_TESTS_PROJECT);
+    BuildProject(CONSOLE_TESTS_PROJECT);
+}
+
+// NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
+// If we use MSBuild, then the net5.0 projects fail. So we build each project
+// differently depending on whether it has net35 as one of its targets. 
+void BuildProject(string project, params string[] targetFrameworks)
+{
+    if (targetFrameworks.Length == 0)
+    {
+        DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
+        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
+    }
+    else
+    {
+        foreach (var framework in targetFrameworks)
+        {
+            DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
+            if (framework == "net35" || framework.StartsWith("net4"))
+                MSBuild(project, CreateMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+            else
+                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+        }
+    }
+}
+
 void CopyAgentsToDirectory(string targetDir)
 {
-    DisplayBanner($"Copying agents to {targetDir}");
     CreateDirectory( targetDir + "agents");
     CopyDirectory(AGENT_PROJECT_BIN_DIR,  targetDir + "agents");
-    CopyDirectory(AGENT_X86_PROJECT_BIN_DIR,  targetDir + "agents");
     CopyFiles(AGENT_X86_PROJECT_BIN_DIR + "**/nunit-agent-x86.*", targetDir + "agents", true);
 }
 
