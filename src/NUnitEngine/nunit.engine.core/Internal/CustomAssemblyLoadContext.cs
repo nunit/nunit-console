@@ -5,6 +5,8 @@
 using System.Reflection;
 using System.Runtime.Loader;
 using System.IO;
+using System;
+using System.Linq;
 
 namespace NUnit.Engine.Internal
 {
@@ -21,6 +23,11 @@ namespace NUnit.Engine.Internal
 
         protected override Assembly Load(AssemblyName name)
         {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var loaded = assemblies.FirstOrDefault(x => x.GetName().Name == name.Name);
+            if (loaded != null)
+                return loaded;
+
             var assemblyPath = _resolver.ResolveAssemblyToPath(name);
             return assemblyPath != null ? LoadFromAssemblyPath(assemblyPath) : null;
         }

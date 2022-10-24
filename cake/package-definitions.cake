@@ -28,6 +28,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net70Test,
         Net35PlusNet40Test,
         Net40PlusNet60Test,
+        Net50PlusNet60Test,
         Net35X86Test,
         Net40X86Test,
         Net60WindowsFormsTest,
@@ -44,6 +45,8 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        Net50PlusNet60Test,
+        Net60AspNetCoreTest
     };
 
     AllPackages.AddRange(new PackageDefinition[] {
