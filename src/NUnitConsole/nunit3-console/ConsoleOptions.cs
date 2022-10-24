@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Options;
 using NUnit.ConsoleRunner.OptionsUtils;
+using NUnit.Engine;
+using System.Xml.Linq;
 
 namespace NUnit.Common
 {
@@ -412,6 +414,11 @@ namespace NUnit.Common
 
         public bool Validate()
         {
+#if NETFRAMEWORK
+            if (FrameworkSpecified)
+                ValidateFrameworkOption();
+#endif
+
             if (!validated)
             {
                 CheckOptionCombinations();
@@ -422,6 +429,19 @@ namespace NUnit.Common
             return ErrorMessages.Count == 0;
         }
 
+#if NETFRAMEWORK
+        private void ValidateFrameworkOption()
+        {
+            if (!RuntimeFramework.TryParse(Framework, out RuntimeFramework requestedFramework))
+                ErrorMessages.Add("Invalid or unknown framework requested: " + Framework);
+
+            foreach (var framework in RuntimeFramework.AvailableFrameworks)
+                if (framework.ToString() == Framework)
+                    return;
+
+            ErrorMessages.Add("Unavailable framework requested: " + Framework);
+        }
+#endif
         private void CheckOptionCombinations()
         {
             // Normally, console is run in a 64-bit process on a 64-bit machine
