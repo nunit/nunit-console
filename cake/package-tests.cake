@@ -104,6 +104,12 @@ static PackageTest Net40PlusNet60Test = new PackageTest(
     "src/NUnitEngine/mock-assembly/bin/Release/net462/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
 
+static PackageTest Net50PlusNet60Test = new PackageTest(
+    "Net50PlusNet60Test",
+    "Run mock-assembly under .Net 5.0 and .Net 6.0 together",
+    "src/NUnitEngine/mock-assembly/bin/Release/net5.0/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/Release/net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(2));
+
 // NUnit Project
 
 static PackageTest NUnitProjectTest;
