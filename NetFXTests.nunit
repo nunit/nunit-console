@@ -1,6 +1,6 @@
 ﻿<NUnitProject>
   <Settings processModel="Default" domainUsage="Default" />
-  <Config name="Debug" appbase="src/NUnitEngine/mock-assembly/bin/Debig/">
+  <Config name="Debug" appbase="src/NUnitEngine/mock-assembly/bin/Debug/">
       <assembly path="net35/mock-assembly.dll" />
       <assembly path="net462/mock-assembly.dll" />
   </Config>

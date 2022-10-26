@@ -17,6 +17,7 @@
 
   <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>

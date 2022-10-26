@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
@@ -19,6 +20,7 @@
     <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Agent ($(TargetFramework))</AssemblyTitle>
     <Description>Agent used to run tests out of process</Description>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net462'">
@@ -39,5 +41,10 @@
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call ..\..\..\CopyAgentFiles &quot;$(TargetDir)*.*&quot; &quot;..\..\NUnitConsole\nunit3-console\bin\$(Configuration)\net462\agents\$(TargetFramework)\&quot;" />
+    <Exec Command="call ..\..\..\CopyAgentFiles &quot;$(TargetDir)*.*&quot; &quot;..\..\NUnitEngine\nunit.engine\bin\$(Configuration)\agents\$(TargetFramework)\&quot;" />
+  </Target>
 
 </Project>
