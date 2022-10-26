@@ -101,12 +101,6 @@ Task("Build")
         //    BuildSolution();
         //else
             BuildEachProjectSeparately();
-
-        DisplayBanner("Copying agents to console runner directory");
-        CopyAgentsToDirectory(NETFX_CONSOLE_DIR);
-    
-        DisplayBanner("Copying agents to engine directory");
-        CopyAgentsToDirectory(ENGINE_PROJECT_BIN_DIR);
     });
 
 //////////////////////////////////////////////////////////////////////

@@ -178,13 +178,6 @@ void BuildProject(string project, params string[] targetFrameworks)
     }
 }
 
-void CopyAgentsToDirectory(string targetDir)
-{
-    CreateDirectory( targetDir + "agents");
-    CopyDirectory(AGENT_PROJECT_BIN_DIR,  targetDir + "agents");
-    CopyFiles(AGENT_X86_PROJECT_BIN_DIR + "**/nunit-agent-x86.*", targetDir + "agents", true);
-}
-
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - TEST
 //////////////////////////////////////////////////////////////////////
