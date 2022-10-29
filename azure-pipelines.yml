@@ -125,8 +125,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: macOS
-  condition: false # temporarily disabled
-  # condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
   pool:
     vmImage: macOS-11
   steps:
@@ -159,8 +158,8 @@ jobs:
       version: 2.1.x
 
   - bash:
-     ./build.sh --target=Test --configuration=Release
-    displayName: Build and test
+     ./build.sh --target=Build --configuration=Release
+    displayName: Build
 
   # Workaround for https://github.com/nunit/nunit/issues/3012#issuecomment-441517922
   - task: PublishTestResults@2
