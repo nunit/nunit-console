@@ -194,7 +194,7 @@ Task("TestNetStandard20Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp2.1", "--labels:Before");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ Task("TestNetCore31Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp3.1", "--labels:Before");
     });
     
 //////////////////////////////////////////////////////////////////////

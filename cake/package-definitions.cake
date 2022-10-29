@@ -31,9 +31,11 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net50PlusNet60Test,
         Net35X86Test,
         Net40X86Test,
-        Net60WindowsFormsTest,
         Net60AspNetCoreTest
     };
+
+    if (IsRunningOnWindows())
+        StandardRunnerTests.Add(Net60WindowsFormsTest);
 
     if (dotnetX86Available)
         StandardRunnerTests.Add(NetCore31X86Test);

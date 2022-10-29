@@ -1,0 +1,244 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		azure-pipelines.yml = azure-pipelines.yml
+		build.cake = build.cake
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		BUILDING.md = BUILDING.md
+		CHANGES.txt = CHANGES.txt
+		ci.cake = ci.cake
+		CONTRIBUTING.md = CONTRIBUTING.md
+		CopyAgentFiles.bat = CopyAgentFiles.bat
+		src\Directory.Build.props = src\Directory.Build.props
+		GitReleaseManager.yaml = GitReleaseManager.yaml
+		GitVersion.yml = GitVersion.yml
+		global.json = global.json
+		header-check.cake = header-check.cake
+		LICENSE.txt = LICENSE.txt
+		NetFXTests.nunit = NetFXTests.nunit
+		NOTICES.txt = NOTICES.txt
+		NuGet.config = NuGet.config
+		nunit.ico = nunit.ico
+		package-checks.cake = package-checks.cake
+		package-tests.cake = package-tests.cake
+		README.md = README.md
+		test-results.cake = test-results.cake
+		VERSIONING.md = VERSIONING.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{A972031D-2F61-4183-AF75-99EE1A9F6B32}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\nunit.agent.addins = nuget\nunit.agent.addins
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitEngine", "NUnitEngine", "{31B45C4C-206F-4F31-9CC6-33BF11DFEE39}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.api", "src\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj", "{775FAD50-3623-4922-97C4-DFB29A8BE4C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine", "src\NUnitEngine\nunit.engine\nunit.engine.csproj", "{372A3447-D657-40FF-A089-77C19FEC30C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.tests", "src\NUnitEngine\nunit.engine.tests\nunit.engine.tests.csproj", "{D694CB69-6CFB-4762-86C2-EB27B808B282}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {B1D90742-39BD-429C-8E87-C5CD2991DF27}
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8} = {C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}
+		{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46} = {0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent", "src\NUnitEngine\nunit-agent\nunit-agent.csproj", "{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitConsole", "NUnitConsole", "{576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit3-console", "src\NUnitConsole\nunit3-console\nunit3-console.csproj", "{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit3-console.tests", "src\NUnitConsole\nunit3-console.tests\nunit3-console.tests.csproj", "{B310A760-8AE1-41CA-81F8-03B12E2FCE30}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {B1D90742-39BD-429C-8E87-C5CD2991DF27}
+		{D694CB69-6CFB-4762-86C2-EB27B808B282} = {D694CB69-6CFB-4762-86C2-EB27B808B282}
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8} = {C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219A8-2995-4884-806F-FDB9CD25D403}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\engine\nunit.engine.api.nuspec = nuget\engine\nunit.engine.api.nuspec
+		nuget\engine\nunit.engine.nuget.addins = nuget\engine\nunit.engine.nuget.addins
+		nuget\engine\nunit.engine.nuspec = nuget\engine\nunit.engine.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
+		nuget\runners\nunit.console-runner.netcore.nuspec = nuget\runners\nunit.console-runner.netcore.nuspec
+		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
+		nuget\runners\nunit.console.nuget.addins = nuget\runners\nunit.console.nuget.addins
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\NUnitEngine\mock-assembly\mock-assembly.csproj", "{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "notest-assembly", "src\NUnitEngine\notest-assembly\notest-assembly.csproj", "{B1D90742-39BD-429C-8E87-C5CD2991DF27}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA-A337-41D3-898D-C6A98278E6AD}"
+	ProjectSection(SolutionItems) = preProject
+		choco\nunit-agent-x86.exe.ignore = choco\nunit-agent-x86.exe.ignore
+		choco\nunit-agent.exe.ignore = choco\nunit-agent.exe.ignore
+		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
+		choco\nunit.agent.addins = choco\nunit.agent.addins
+		choco\nunit.choco.addins = choco\nunit.choco.addins
+		choco\VERIFICATION.txt = choco\VERIFICATION.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", "{9A7C8370-ED1F-486F-A8F5-C5BF4221464E}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\deprecated\nunit.engine.netstandard.nuspec = nuget\deprecated\nunit.engine.netstandard.nuspec
+		nuget\deprecated\nunit.runners.nuspec = nuget\deprecated\nunit.runners.nuspec
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.core", "src\NUnitEngine\nunit.engine.core\nunit.engine.core.csproj", "{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-x86", "src\NUnitEngine\nunit-agent-x86\nunit-agent-x86.csproj", "{333D2FBC-CCA7-46AF-9453-C310671A67B0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly-x86", "src\NUnitEngine\mock-assembly-x86\mock-assembly-x86.csproj", "{9D3015EE-5B84-41B3-A1D3-1A439370C392}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", "{068F6CA9-6108-4F45-8540-351AA5227259}"
+	ProjectSection(SolutionItems) = preProject
+		choco\deprecated\nunit-console-with-extensions.nuspec = choco\deprecated\nunit-console-with-extensions.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D072-424B-A6DF-5BECF719C1FB}"
+	ProjectSection(SolutionItems) = preProject
+		cake\constants.cake = cake\constants.cake
+		cake\header-check.cake = cake\header-check.cake
+		cake\package-checks.cake = cake\package-checks.cake
+		cake\package-definitions.cake = cake\package-definitions.cake
+		cake\package-tester.cake = cake\package-tester.cake
+		cake\package-tests.cake = cake\package-tests.cake
+		cake\test-results.cake = cake\test-results.cake
+		cake\utilities.cake = cake\utilities.cake
+		cake\versioning.cake = cake\versioning.cake
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "msi", "msi", "{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A}"
+	ProjectSection(SolutionItems) = preProject
+		msi\resources\nunit.bundle.addins = msi\resources\nunit.bundle.addins
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zip", "zip", "{20005864-BE82-412D-99BF-288E2D8370E9}"
+	ProjectSection(SolutionItems) = preProject
+		zip\nunit.bundle.addins = zip\nunit.bundle.addins
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.core.tests", "src\NUnitEngine\nunit.engine.core.tests\nunit.engine.core.tests.csproj", "{CACC0520-B452-4310-A33C-DC944129ACDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit3-netcore-console", "src\NUnitConsole\nunit3-netcore-console\nunit3-netcore-console.csproj", "{472314FE-1F18-4359-B620-FF20BF3AF553}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore-test", "src\NUnitEngine\aspnetcore-test\aspnetcore-test.csproj", "{25FFAF61-C456-4BF9-87BE-34930F22B669}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{372A3447-D657-40FF-A089-77C19FEC30C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{372A3447-D657-40FF-A089-77C19FEC30C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{372A3447-D657-40FF-A089-77C19FEC30C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{372A3447-D657-40FF-A089-77C19FEC30C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D694CB69-6CFB-4762-86C2-EB27B808B282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D694CB69-6CFB-4762-86C2-EB27B808B282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D694CB69-6CFB-4762-86C2-EB27B808B282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D694CB69-6CFB-4762-86C2-EB27B808B282}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B310A760-8AE1-41CA-81F8-03B12E2FCE30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B310A760-8AE1-41CA-81F8-03B12E2FCE30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B310A760-8AE1-41CA-81F8-03B12E2FCE30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B310A760-8AE1-41CA-81F8-03B12E2FCE30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{333D2FBC-CCA7-46AF-9453-C310671A67B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{333D2FBC-CCA7-46AF-9453-C310671A67B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{333D2FBC-CCA7-46AF-9453-C310671A67B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{333D2FBC-CCA7-46AF-9453-C310671A67B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D3015EE-5B84-41B3-A1D3-1A439370C392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D3015EE-5B84-41B3-A1D3-1A439370C392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D3015EE-5B84-41B3-A1D3-1A439370C392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D3015EE-5B84-41B3-A1D3-1A439370C392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CACC0520-B452-4310-A33C-DC944129ACDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CACC0520-B452-4310-A33C-DC944129ACDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CACC0520-B452-4310-A33C-DC944129ACDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CACC0520-B452-4310-A33C-DC944129ACDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{472314FE-1F18-4359-B620-FF20BF3AF553}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{472314FE-1F18-4359-B620-FF20BF3AF553}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{472314FE-1F18-4359-B620-FF20BF3AF553}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{472314FE-1F18-4359-B620-FF20BF3AF553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25FFAF61-C456-4BF9-87BE-34930F22B669}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A972031D-2F61-4183-AF75-99EE1A9F6B32} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{775FAD50-3623-4922-97C4-DFB29A8BE4C7} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{372A3447-D657-40FF-A089-77C19FEC30C8} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{D694CB69-6CFB-4762-86C2-EB27B808B282} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{C2A8FC7A-FA64-46EA-AF6D-73D6B371DBF8} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{0DE218CA-AFB8-423A-9CD2-E22DEAC55C46} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
+		{B310A760-8AE1-41CA-81F8-03B12E2FCE30} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
+		{43A219A8-2995-4884-806F-FDB9CD25D403} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
+		{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
+		{D2C80E4B-1117-4F02-AB02-E453BDA0C58E} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{B1D90742-39BD-429C-8E87-C5CD2991DF27} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{4FDF7BFA-A337-41D3-898D-C6A98278E6AD} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{9A7C8370-ED1F-486F-A8F5-C5BF4221464E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
+		{A19C026B-1C0F-4AA3-AC49-7D8B4C7231CF} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{333D2FBC-CCA7-46AF-9453-C310671A67B0} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{9D3015EE-5B84-41B3-A1D3-1A439370C392} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{068F6CA9-6108-4F45-8540-351AA5227259} = {4FDF7BFA-A337-41D3-898D-C6A98278E6AD}
+		{9BCA00E2-D072-424B-A6DF-5BECF719C1FB} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{20005864-BE82-412D-99BF-288E2D8370E9} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
+		{CACC0520-B452-4310-A33C-DC944129ACDD} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{472314FE-1F18-4359-B620-FF20BF3AF553} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
+		{25FFAF61-C456-4BF9-87BE-34930F22B669} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = src\NUnitFramework\tests\nunitlite.tests-2.0.csproj
+		{28B605B2-E2E9-417E-8369-49E263F1F31B} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{FFF45826-991F-465B-8A03-0E1DB7E8F38C} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+		{11640C9F-03A3-456B-848D-9B4A126F9506} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
+	EndGlobalSection
+EndGlobal

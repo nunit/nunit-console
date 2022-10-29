@@ -5,6 +5,7 @@
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit3-console</AssemblyName>
     <TargetFrameworks>net462</TargetFrameworks>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <RollForward>Major</RollForward>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
