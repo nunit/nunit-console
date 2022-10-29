@@ -3,9 +3,10 @@
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
     <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>
