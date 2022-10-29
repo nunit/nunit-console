@@ -39,7 +39,7 @@
     <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework'=='net20' OR '$(TargetFramework'=='net462'">
     <Exec Command="call ..\..\..\CopyAgentFiles &quot;$(TargetDir)nunit-agent-x86.*&quot; &quot;..\..\NUnitConsole\nunit3-console\bin\$(Configuration)\net462\agents\$(TargetFramework)\&quot;" />
     <Exec Command="call ..\..\..\CopyAgentFiles &quot;$(TargetDir)nunit-agent-x86.*&quot; &quot;..\..\NUnitEngine\nunit.engine\bin\$(Configuration)\agents\$(TargetFramework)\&quot;" />
   </Target>

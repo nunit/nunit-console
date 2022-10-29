@@ -23,7 +23,10 @@ static string SOURCE_DIR; SOURCE_DIR = PROJECT_DIR + "src/";
 static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 
 // Solution and Projects
-static string SOLUTION_FILE; SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
+static string SOLUTION_FILE;
+SOLUTION_FILE = IsRunningOnWindows()
+    ? PROJECT_DIR + "NUnitConsole.sln"
+    : PROJECT_DIR + "NUnitConsole_Linux.sln";
 static string NETFX_CONSOLE_PROJECT; NETFX_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-console/nunit3-console.csproj";
 static string NETCORE_CONSOLE_PROJECT; NETCORE_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit3-netcore-console/nunit3-netcore-console.csproj";
 static string ENGINE_PROJECT; ENGINE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";

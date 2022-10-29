@@ -132,6 +132,7 @@ DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
 
 private void BuildEachProjectSeparately()
 {
+    Information($"Restoring {SOLUTION_FILE}");
     DotNetRestore(SOLUTION_FILE);
 
     BuildProject(ENGINE_API_PROJECT);
@@ -139,7 +140,8 @@ private void BuildEachProjectSeparately()
     BuildProject(MOCK_ASSEMBLY_PROJECT);
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT);
     BuildProject(NOTEST_PROJECT);
-    BuildProject(WINDOWS_TEST_PROJECT);
+    if (IsRunningOnWindows())
+        BuildProject(WINDOWS_TEST_PROJECT);
     BuildProject(ASPNETCORE_TEST_PROJECT);
 
     BuildProject(ENGINE_CORE_PROJECT);
@@ -203,7 +205,7 @@ string GetProjectBinDir(string projectPath, string targetRuntime)
     return GetProjectBinDir(projectPath) + targetRuntime + "/";
 }
 
-void RunNUnitLiteTests(string projectPath, string targetRuntime)
+void RunNUnitLiteTests(string projectPath, string targetRuntime, string additionalArgs="")
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".exe";
     var workingDir = GetProjectBinDir(projectPath, targetRuntime);
@@ -213,7 +215,7 @@ void RunNUnitLiteTests(string projectPath, string targetRuntime)
         workingDir + testAssembly,
         new ProcessSettings()
         {
-            Arguments = $"--result:{resultPath}",
+            Arguments = $"--result:{resultPath} {additionalArgs}",
             WorkingDirectory = workingDir
         });
 
@@ -223,7 +225,7 @@ void RunNUnitLiteTests(string projectPath, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime)
+void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime, string additionalArgs="")
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
     var workingDir = GetProjectBinDir(projectPath, targetRuntime);
@@ -234,7 +236,7 @@ void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime)
         "dotnet",
         new ProcessSettings
         {
-            Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{assemblyPath}\" --result:\"{resultPath}\" {additionalArgs}",
             WorkingDirectory = workingDir
         });
 

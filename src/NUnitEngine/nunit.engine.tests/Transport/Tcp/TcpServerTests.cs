@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             }
         }
 
-        [Test]
+        [Test, Platform(Exclude = "Linux")]
         public void MultipleClientConnections()
         {
             TcpClient[] clients = new[] { new TcpClient(), new TcpClient(), new TcpClient() };
@@ -69,3 +70,4 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         }
     }
 }
+#endif
