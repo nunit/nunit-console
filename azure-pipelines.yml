@@ -125,8 +125,7 @@ jobs:
     condition: succeededOrFailed()
 
 - job: macOS
-  condition: false # temporarily disabled
-  # condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
+  condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-windows-'),startsWith(variables['Build.SourceBranchName'], 'azure-linux-')))
   pool:
     vmImage: macOS-11
   steps:
