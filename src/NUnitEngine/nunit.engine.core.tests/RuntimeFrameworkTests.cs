@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests
@@ -162,6 +163,10 @@ namespace NUnit.Engine.Tests
             new TestCaseData(
                 new RuntimeFramework(RuntimeType.Mono, new Version(4,0)),
                 new RuntimeFramework(RuntimeType.Net, new Version(4,0)))
+                .Returns(true),
+            new TestCaseData(
+                new RuntimeFramework(RuntimeType.Mono, new Version(4,0)),
+                new RuntimeFramework(RuntimeType.Net, new Version(4,6,2)))
                 .Returns(true),
             new TestCaseData(
                 new RuntimeFramework(RuntimeType.Net, new Version(2,0)),
