@@ -41,11 +41,7 @@ namespace NUnit.Engine.Services
             if (!RuntimeFramework.TryParse(name, out RuntimeFramework requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
 
-            foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                if (FrameworksMatch(requestedFramework, framework))
-                    return true;
-
-            return false;
+            return requestedFramework.IsAvailable;
         }
 
         private static readonly Version AnyVersion = new Version(0, 0);

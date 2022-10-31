@@ -246,7 +246,7 @@ void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime, string ad
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetFxConsole(string projectPath, string targetRuntime)
+void RunNetFxConsole(string projectPath, string targetRuntime, string additionalArgs="")
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
     var workingDir = GetProjectBinDir(projectPath, targetRuntime);
@@ -257,7 +257,7 @@ void RunNetFxConsole(string projectPath, string targetRuntime)
         NETFX_CONSOLE,
         new ProcessSettings()
         {
-            Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{assemblyPath}\" --result:{resultPath} {additionalArgs}",
             WorkingDirectory = workingDir
         });
 

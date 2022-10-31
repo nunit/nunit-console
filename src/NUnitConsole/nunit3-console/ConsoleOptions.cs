@@ -436,7 +436,7 @@ namespace NUnit.Common
                 ErrorMessages.Add("Invalid or unknown framework requested: " + Framework);
 
             foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                if (framework.ToString() == Framework)
+                if (framework.Id == Framework)
                     return;
 
             ErrorMessages.Add("Unavailable framework requested: " + Framework);
