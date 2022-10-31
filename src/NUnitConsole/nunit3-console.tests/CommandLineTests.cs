@@ -198,7 +198,9 @@ namespace NUnit.ConsoleRunner.Tests
 #if NETFRAMEWORK
         [TestCase("ProcessModel", "process", new string[] { "InProcess", "Separate", "Multiple" }, new string[] { "JUNK" })]
         [TestCase("DomainUsage", "domain", new string[] { "None", "Single", "Multiple" }, new string[] { "JUNK" })]
-        [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
+        // We can't predict which runtimes are available on the test machine, so we don't
+        // test for any good or bad values. TODO: Create a fake list of availble runtimes.
+        [TestCase("Framework", "framework", new string[0], new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
 #endif
@@ -215,7 +217,7 @@ namespace NUnit.ConsoleRunner.Tests
                 {
                     string optionPlusValue = string.Format("--{0}:{1}", option, value);
                     ConsoleOptions options = ConsoleMocks.Options(optionPlusValue);
-                    Assert.That(options.Validate(), Is.True, "Should be valid: " + optionPlusValue);
+                    Assert.That(options.Validate(), Is.True, $"The option {optionPlusValue} should be valid.");
                     Assert.That((string)property.GetValue(options, null), Is.EqualTo(value), "Didn't recognize " + optionPlusValue);
                 }
 
