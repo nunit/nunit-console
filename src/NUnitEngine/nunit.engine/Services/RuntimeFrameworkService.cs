@@ -10,7 +10,7 @@ using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services.RuntimeLocators;
-#if NET20
+#if NETFRAMEWORK
 using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
 #endif
 

@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
-    <TargetFrameworks>net35;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net462;netcoreapp2.1</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
@@ -29,7 +29,7 @@
     <PackageReference Include="NSubstitute" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net35'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />

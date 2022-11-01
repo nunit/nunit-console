@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
-    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>portable</DebugType>
@@ -15,7 +15,7 @@
     <Description>Provides for loading, exploring and running NUnit tests</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -30,7 +30,7 @@
     <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
   
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <Content Include="nunit.engine.addins">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
