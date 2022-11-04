@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORKX
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Runners.Tests
+namespace NUnit.Engine.Runners
 {
     [TestFixture(1)]
     [TestFixture(2)]
@@ -13,10 +13,18 @@ namespace NUnit.Engine.Runners.Tests
     public class MultipleTestProcessRunnerTests
     {
         private int _processorCount;
+        private ServiceContext _serviceContext;
 
         public MultipleTestProcessRunnerTests(int processorCount)
         {
             _processorCount = processorCount;
+        }
+
+        [SetUp]
+        public void CreateServiceContext()
+        {
+            _serviceContext = new ServiceContext();
+            _serviceContext.Add(new Services.TestRunnerFactory());
         }
 
         [TestCase(1, null, 1)]
@@ -43,7 +51,7 @@ namespace NUnit.Engine.Runners.Tests
             var package = new TestPackage(assemblies);
             if (maxAgents != null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
-            var runner = new MultipleTestProcessRunner(new ServiceContext(), package, _processorCount);
+            var runner = new MultipleTestProcessRunner(_serviceContext, package, _processorCount);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
         }
 
@@ -51,7 +59,7 @@ namespace NUnit.Engine.Runners.Tests
         public void CheckLevelOfParallelism_SingleAssembly()
         {
             var package = new TestPackage(new string[] { "junk.dll" });
-            Assert.That(new MultipleTestProcessRunner(new ServiceContext(), package).LevelOfParallelism, Is.EqualTo(1));
+            Assert.That(new MultipleTestProcessRunner(_serviceContext, package).LevelOfParallelism, Is.EqualTo(1));
         }
 
         [TestCase(1, null, 1)]
@@ -70,7 +78,7 @@ namespace NUnit.Engine.Runners.Tests
                 package.SubPackages[0].AddSubPackage(new TestPackage($"test{i}.dll"));
             if (maxAgents != null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
-            var runner = new MultipleTestProcessRunner(new ServiceContext(), package);
+            var runner = new MultipleTestProcessRunner(_serviceContext, package);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
         }
     }

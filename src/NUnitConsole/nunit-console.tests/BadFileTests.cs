@@ -22,7 +22,7 @@ namespace NUnit.ConsoleRunner
             var services = new ServiceContext();
             services.Add(new TestRunnerFactory());
             services.Add(new ExtensionService());
-#if NET35
+#if NETFRAMEWORK
             services.Add(new RuntimeFrameworkService());
             services.Add(new TestAgency());
 #endif

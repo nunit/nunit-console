@@ -63,7 +63,7 @@ public class PackageTester
                 // copying certain files to their final destination.
                 Console.WriteLine("Copying agent files");
                 _context.CopyFiles(filesToCopy, binDir + "agents/net20");
-                _context.CopyFiles(filesToCopy, binDir + "agents/net40");
+                _context.CopyFiles(filesToCopy, binDir + "agents/net462");
             }
         }
         else

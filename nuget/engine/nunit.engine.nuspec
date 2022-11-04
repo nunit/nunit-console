@@ -35,13 +35,13 @@
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
 
-    <file src="net20/nunit.engine.dll" target="lib/net20" />
-    <file src="net20/nunit.engine.pdb" target="lib/net20" />
-    <file src="net20/nunit.engine.core.dll" target="lib/net20" />
-    <file src="net20/nunit.engine.core.pdb" target="lib/net20" />
-    <file src="net20/nunit.engine.api.dll" target="lib/net20" />
-    <file src="net20/nunit.engine.api.pdb" target="lib/net20" />
-    <file src="net20/testcentric.engine.metadata.dll" target="lib/net20" />
+    <file src="net462/nunit.engine.dll" target="lib/net462" />
+    <file src="net462/nunit.engine.pdb" target="lib/net462" />
+    <file src="net462/nunit.engine.core.dll" target="lib/net462" />
+    <file src="net462/nunit.engine.core.pdb" target="lib/net462" />
+    <file src="net462/nunit.engine.api.dll" target="lib/net462" />
+    <file src="net462/nunit.engine.api.pdb" target="lib/net462" />
+    <file src="net462/testcentric.engine.metadata.dll" target="lib/net462" />
 
     <file src="agents/net20/nunit-agent-net20.exe" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/nunit-agent-net20.pdb" target="contentFiles/any/agents/net20" />
@@ -55,17 +55,17 @@
     <file src="agents/net20/nunit.engine.api.pdb" target="contentFiles/any/agents/net20" />
     <file src="agents/net20/testcentric.engine.metadata.dll" target="contentFiles/any/agents/net20" />
 
-    <file src="agents/net40/nunit-agent-net40.exe" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40.pdb" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40.exe.config" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40-x86.exe" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40-x86.pdb" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40-x86.exe.config" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit.engine.core.dll" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit.engine.core.pdb" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit.engine.api.dll" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/nunit.engine.api.pdb" target="contentFiles/any/agents/net40" />
-    <file src="agents/net40/testcentric.engine.metadata.dll" target="contentFiles/any/agents/net40" />
+    <file src="agents/net462/nunit-agent-net462.exe" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462.pdb" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462.exe.config" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.exe" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.pdb" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.exe.config" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit.engine.core.dll" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit.engine.core.pdb" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.dll" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.pdb" target="contentFiles/any/agents/net462" />
+    <file src="agents/net462/testcentric.engine.metadata.dll" target="contentFiles/any/agents/net462" />
 
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll" target="contentFiles/any/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.pdb" target="contentFiles/any/agents/netcoreapp3.1" />

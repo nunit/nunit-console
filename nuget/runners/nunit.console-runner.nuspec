@@ -39,18 +39,18 @@
     <file src="agents/net20/nunit.engine.core.pdb" target="tools/agents/net20" />
     <file src="agents/net20/testcentric.engine.metadata.dll" target="tools/agents/net20" />
 
-    <file src="agents/net40/nunit-agent-net40.exe" target="tools/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40.pdb" target="tools/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40.exe.config" target="tools/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40-x86.exe" target="tools/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40-x86.pdb" target="tools/agents/net40" />
-    <file src="agents/net40/nunit-agent-net40-x86.exe.config" target="tools/agents/net40" />
-    <file src="agents/net40/nunit.engine.api.dll" target="tools/agents/net40" />
-    <file src="agents/net40/nunit.engine.api.pdb" target="tools/agents/net40" />
-    <file src="agents/net40/nunit.engine.api.xml" target="tools/agents/net40" />
-    <file src="agents/net40/nunit.engine.core.dll" target="tools/agents/net40" />
-    <file src="agents/net40/nunit.engine.core.pdb" target="tools/agents/net40" />
-    <file src="agents/net40/testcentric.engine.metadata.dll" target="tools/agents/net40" />
+    <file src="agents/net462/nunit-agent-net462.exe" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462.exe.config" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.exe" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.exe.config" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.dll" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.core.dll" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.core.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/testcentric.engine.metadata.dll" target="tools/agents/net462" />
 
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.pdb" target="tools/agents/netcoreapp3.1" />
@@ -88,17 +88,17 @@
     <file src="agents/net6.0/nunit.engine.core.pdb" target="tools/agents/net6.0" />
     <file src="agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
 
-    <file src="net20/nunit-console.exe" target="tools" />
-    <file src="net20/nunit-console.pdb" target="tools" />
-    <file src="net20/nunit-console.exe.config" target="tools" />
-    <file src="net20/nunit.engine.api.dll" target="tools" />
-    <file src="net20/nunit.engine.api.pdb" target="tools" />
-    <file src="net20/nunit.engine.api.xml" target="tools" />
-    <file src="net20/nunit.engine.core.dll" target="tools" />
-    <file src="net20/nunit.engine.core.pdb" target="tools" />
-    <file src="net20/nunit.engine.dll" target="tools" />
-    <file src="net20/nunit.engine.pdb" target="tools" />
-    <file src="net20/testcentric.engine.metadata.dll" target="tools" />
+    <file src="net462/nunit-console.exe" target="tools" />
+    <file src="net462/nunit-console.pdb" target="tools" />
+    <file src="net462/nunit-console.exe.config" target="tools" />
+    <file src="net462/nunit.engine.api.dll" target="tools" />
+    <file src="net462/nunit.engine.api.pdb" target="tools" />
+    <file src="net462/nunit.engine.api.xml" target="tools" />
+    <file src="net462/nunit.engine.core.dll" target="tools" />
+    <file src="net462/nunit.engine.core.pdb" target="tools" />
+    <file src="net462/nunit.engine.dll" target="tools" />
+    <file src="net462/nunit.engine.pdb" target="tools" />
+    <file src="net462/testcentric.engine.metadata.dll" target="tools" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
     <file src="../../nunit_256.png" target="images"/>
   </files>

@@ -331,7 +331,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AddNetFxOnlyOption(string prototype, string description, Action<string> action)
         {
-#if NET20
+#if NETFRAMEWORK
             var isHidden = false;
 #else
             var isHidden = true;
@@ -341,7 +341,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private Action<string> NetFxOnlyOption(string optionName, Action<string> action)
         {
-#if NET20
+#if NETFRAMEWORK
             return action;
 #else
             return s => ErrorMessages.Add($"The {optionName} option is not available on this platform.");

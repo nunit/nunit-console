@@ -10,7 +10,7 @@ namespace NUnit.ConsoleRunner
     /// TestEventHandler processes events from the running
     /// test for the console runner.
     /// </summary>
-#if NET20
+#if NETFRAMEWORK
     public class TestEventHandler : MarshalByRefObject, ITestEventListener
 #else
     public class TestEventHandler : ITestEventListener
@@ -195,7 +195,7 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-#if NET20
+#if NETFRAMEWORK
         public override object InitializeLifetimeService()
         {
             return null;

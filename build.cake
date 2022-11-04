@@ -138,9 +138,9 @@ private void BuildEachProjectSeparately()
     BuildProject(AGENT_PROJECT);
     BuildProject(AGENT_X86_PROJECT);
 
-    BuildProject(ENGINE_TESTS_PROJECT, "net462", "netcoreapp2.1");
+    BuildProject(ENGINE_TESTS_PROJECT, NETFX_ENGINE_TARGET, "netcoreapp2.1");
     BuildProject(ENGINE_CORE_TESTS_PROJECT, "net462", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
-    BuildProject(CONSOLE_TESTS_PROJECT, "net462", "net6.0");
+    BuildProject(CONSOLE_TESTS_PROJECT, NETFX_CONSOLE_TARGET, "net6.0");
 
     BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
@@ -280,16 +280,16 @@ Task("TestNet60EngineCore")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE
+// TEST .NET Framework ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20Engine")
-    .Description("Tests the engine")
+Task("TestNetFxEngine")
+    .Description("Tests the NETFX 4.6.2 engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net35");
+        RunNUnitLiteTests(NETFX_ENGINE_TESTS, NETFX_ENGINE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -306,29 +306,29 @@ Task("TestNetStandard20Engine")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 CONSOLE
+// TEST .NET FRAMEWORK  CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20Console")
-    .Description("Tests the .NET 2.0 console runner")
+Task("TestNetFxConsole")
+    .Description("Tests the .NET Framework console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNet20Console(CONSOLE_TESTS, "net35");
+        RunNetFxConsole(CONSOLE_TESTS, NETFX_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 6.0 CONSOLE
+// TEST .NET CORE CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet60Console")
-    .Description("Tests the .NET 6.0 console runner")
+Task("TestNetCoreConsole")
+    .Description("Tests the .NET Core console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNetCoreConsole(CONSOLE_TESTS, "net6.0");
+        RunNetCoreConsole(CONSOLE_TESTS, NETCORE_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -370,16 +370,13 @@ Task("CreateMsiImage")
             MSI_IMG_DIR);
         CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net20", "net35" })
-        {
-            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
+        var addinsImgDir = MSI_IMG_DIR + "bin/" + NETFX_ENGINE_TARGET + "/addins/";
 
-            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
-            CleanDirectory(addinsImgDir);
+        CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
+        CleanDirectory(addinsImgDir);
 
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsImgDir);
-        }
+        foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+            CopyPackageContents(packageDir, addinsImgDir);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -396,17 +393,14 @@ Task("CreateZipImage")
             ZIP_IMG_DIR);
         CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net20", "net35" })
-        {
-            var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
-            CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
+        var frameworkDir = ZIP_IMG_DIR + "bin/net462/";
+        CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
 
-            var addinsDir = frameworkDir + "addins/";
-            CleanDirectory(addinsDir);
+        var addinsDir = frameworkDir + "addins/";
+        CleanDirectory(addinsDir);
 
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsDir);
-        }
+        foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+            CopyPackageContents(packageDir, addinsDir);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -768,8 +762,8 @@ Task("CreateProductionRelease")
 
 Task("TestConsole")
     .Description("Builds and tests the console runner")
-    .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNet60Console");
+    .IsDependentOn("TestNetFxConsole")
+    .IsDependentOn("TestNetCoreConsole");
 
 Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
@@ -781,7 +775,7 @@ Task("TestEngineCore")
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
-    .IsDependentOn("TestNet20Engine")
+    .IsDependentOn("TestNetFxEngine")
     .IsDependentOn("TestNetStandard20Engine");
 
 Task("Test")
