@@ -262,7 +262,7 @@ namespace NUnit.ConsoleRunner
         {
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Runtime Environment");
             OutWriter.WriteLabelLine(INDENT4 + "OS Version: ", GetOSVersion());
-#if NET20
+#if NETFRAMEWORK
             OutWriter.WriteLabelLine(INDENT4 + "Runtime: ", ".NET Framework CLR v" + Environment.Version.ToString());
 #else
             OutWriter.WriteLabelLine(INDENT4 + "Runtime: ", RuntimeInformation.FrameworkDescription);
@@ -274,7 +274,7 @@ namespace NUnit.ConsoleRunner
 
         private static string GetOSVersion()
         {
-#if NET20
+#if NETFRAMEWORK
             OperatingSystem os = Environment.OSVersion;
             string osString = os.ToString();
             if (os.Platform == PlatformID.Unix)

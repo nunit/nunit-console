@@ -41,10 +41,10 @@ namespace NUnit.ConsoleRunner
         [TestCase("--workers=3", "NumberOfTestWorkers", 3)]
         [TestCase("--workers=0", "NumberOfTestWorkers", 0)]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--shadowcopy", "ShadowCopyFiles", true)]
-        [TestCase("--framework=net-4.0", "RequestedRuntimeFramework", "net-4.0")]
+        [TestCase("--framework=net-4.6.2", "RequestedRuntimeFramework", "net-4.6.2")]
         [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
         [TestCase("--agents=5", "MaxAgents", 5)]
         [TestCase("--debug", "DebugTests", true)]
@@ -80,7 +80,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(paramString, Is.EqualTo("X=5;Y=7"));
         }
 
-#if NET35
+#if NETFRAMEWORK
         [Test]
         public void WhenDebugging_NumberOfTestWorkersDefaultsToZero()
         {

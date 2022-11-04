@@ -144,7 +144,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("DisposeRunners", "dispose-runners")]
         [TestCase("TeamCity", "teamcity")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase("DebugTests", "debug")]
@@ -195,8 +195,8 @@ namespace NUnit.ConsoleRunner
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
-#if NET35
-        [TestCase("Framework", "framework", new string[] { "net-4.0" }, new string[0])]
+#if NETFRAMEWORK
+        [TestCase("Framework", "framework", new string[] { "net-4.6.2" }, new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
 #endif
@@ -246,7 +246,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("DefaultTestCaseTimeout", "testCaseTimeout")]
         [TestCase("RandomSeed", "seed")]
         [TestCase("NumberOfTestWorkers", "workers")]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("MaxAgents", "agents")]
 #endif
         public void CanRecognizeIntOptions(string propertyName, string pattern)
@@ -272,7 +272,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("--test-name-format")]
         [TestCase("--param")]
         [TestCase("--encoding")]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("--framework")]
 #endif
         public void MissingValuesAreReported(string option)

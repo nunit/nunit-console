@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.TestData</RootNamespace>
-    <TargetFrameworks>net35;net40;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net35;net462;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>x86</PlatformTarget>

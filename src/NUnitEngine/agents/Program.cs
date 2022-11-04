@@ -27,8 +27,8 @@ namespace NUnit.Agent
                 ".NET 5.0";
 #elif NETCOREAPP3_1
                 ".NET Core 3.1";
-#elif NET40
-                ".NET 4.0";
+#elif NET462
+                ".NET 4.6.2";
 #elif NET20
                 ".NET 2.0";
 #endif

@@ -5,14 +5,14 @@
             <Component Id="NUNIT.ENGINE" Location="local" Guid="033DE5BC-4AC4-4F98-9E5D-E5F3221FCD46">
                 <File Id="nunit.engine.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net20/nunit.engine.dll" />
+                      Source="$(var.InstallImage)bin/net462/nunit.engine.dll" />
             </Component>
             <Component Id="NUNIT.ENGINE.CORE" Location="local" Guid="F4F14D75-6096-467E-82E1-BD513645C0EF">
                 <File Id="nunit.engine.core.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net20/nunit.engine.core.dll">
+                      Source="$(var.InstallImage)bin/net462/nunit.engine.core.dll">
                     <CopyFile Id="nunit.agent.net20.engine.core.dll" DestinationDirectory="NET20_AGENT_DIR" />
-                    <CopyFile Id="nunit.agent.net40.engine.core.dll" DestinationDirectory="NET40_AGENT_DIR" />
+                    <CopyFile Id="nunit.agent.net462.engine.core.dll" DestinationDirectory="NET462_AGENT_DIR" />
                 </File>
             </Component>
             <Component Id="NUNIT.BUNDLE.ADDINS" Location="local" Guid="AE849966-843E-43E7-B3B0-95CD5A12C2C4">
@@ -24,19 +24,19 @@
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/net20/nunit.engine.api.dll">
                     <CopyFile Id="nunit.agent.net20.engine.api.dll" DestinationDirectory="NET20_AGENT_DIR" />
-                    <CopyFile Id="nunit.agent.net40.engine.api.dll" DestinationDirectory="NET40_AGENT_DIR" />
+                    <CopyFile Id="nunit.agent.net462.engine.api.dll" DestinationDirectory="NET462_AGENT_DIR" />
                 </File>
                 <File Id="nunit.engine.api.xml"
                       Source="$(var.InstallImage)bin/net20/nunit.engine.api.xml">
                     <CopyFile Id="nunit.agent.net20.engine.api.xml" DestinationDirectory="NET20_AGENT_DIR" />
-                    <CopyFile Id="nunit.agent.net40.engine.api.xml" DestinationDirectory="NET40_AGENT_DIR" />
+                    <CopyFile Id="nunit.agent.net462.engine.api.xml" DestinationDirectory="NET462_AGENT_DIR" />
                 </File>
             </Component>
             <Component Id="NUNIT.ENGINE.METADATA" Location="local" Guid="B3C60328-0486-4297-A3DB-39B5EFB497FE">
                 <File Id="nunit.engine.metadata.dll"
                       Source="$(var.InstallImage)bin/net20/testcentric.engine.metadata.dll">
                     <CopyFile Id="nunit.agent.net20.testcentric.engine.metadata.dll" DestinationDirectory="NET20_AGENT_DIR" />
-                    <CopyFile Id="nunit.agent.net40.testcentric.engine.metadata.dll" DestinationDirectory="NET40_AGENT_DIR" />
+                    <CopyFile Id="nunit.agent.net462.testcentric.engine.metadata.dll" DestinationDirectory="NET462_AGENT_DIR" />
                 </File>
             </Component>
             <Component Id="NUNIT.ENGINE.REGISTRY">
@@ -45,7 +45,7 @@
                 </RegistryKey>
             </Component>
             <ComponentGroupRef Id="NET20_AGENT" />
-            <ComponentGroupRef Id="NET40_AGENT" />
+            <ComponentGroupRef Id="NET462_AGENT" />
             <ComponentGroupRef Id="NETCORE31_AGENT" />
             <ComponentGroupRef Id="NET50_AGENT" />
             <ComponentGroupRef Id="NET60_AGENT" />
@@ -68,20 +68,20 @@
                       Source="$(var.InstallImage)bin/agents/net20/nunit-agent-net20-x86.exe.config" />
             </Component>
         </ComponentGroup>
-        <ComponentGroup Id="NET40_AGENT" Directory="NET40_AGENT_DIR">
-            <Component Id="NUNIT_AGENT_NET40" Location="local" Guid="B35CC9EE-69FA-4CBB-A6A5-DA102FEBC485">
-                <File Id="nunit_agent_net40.exe"
+        <ComponentGroup Id="NET462_AGENT" Directory="NET462_AGENT_DIR">
+            <Component Id="NUNIT_AGENT_NET462" Location="local" Guid="B35CC9EE-69FA-4CBB-A6A5-DA102FEBC485">
+                <File Id="nunit_agent_net462.exe"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40.exe" />
-                <File Id="nunit_agent_net40.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent-net462.exe" />
+                <File Id="nunit_agent_net462.exe.config"
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent-net462.exe.config" />
             </Component>
-            <Component Id="NUNIT_AGENT_NET40_X86" Location="local" Guid="8EB0C529-56D8-4746-804E-6679744699F6">
-                <File Id="nunit_agent_net40_x86.exe"
+            <Component Id="NUNIT_AGENT_NET462_X86" Location="local" Guid="8EB0C529-56D8-4746-804E-6679744699F6">
+                <File Id="nunit_agent_net462_x86.exe"
                       ProcessorArchitecture="x86"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40-x86.exe" />
-                <File Id="nunit_agent_net40_x86.exe.config"
-                      Source="$(var.InstallImage)bin/agents/net40/nunit-agent-net40-x86.exe.config" />
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent-net462-x86.exe" />
+                <File Id="nunit_agent_net462_x86.exe.config"
+                      Source="$(var.InstallImage)bin/agents/net462/nunit-agent-net462-x86.exe.config" />
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="NETCORE31_AGENT" Directory="NETCORE31_AGENT_DIR">

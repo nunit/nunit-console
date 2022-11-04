@@ -4,14 +4,11 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using NUnit.Common;
 using NUnit.Engine;
-
-#if !NET20
-using System.Linq;
-#endif
 
 using NUnit.ConsoleRunner.Options;
 
@@ -162,11 +159,7 @@ namespace NUnit.ConsoleRunner
 
             var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
 
-#if NET20
-            object[] configurationAttributes = entryAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
-#else
             var configurationAttributes = entryAssembly.GetCustomAttributes<AssemblyConfigurationAttribute>().ToArray();
-#endif
 
             if (configurationAttributes.Length > 0)
             {

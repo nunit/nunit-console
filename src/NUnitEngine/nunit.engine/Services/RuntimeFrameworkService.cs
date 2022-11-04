@@ -5,14 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services.RuntimeLocators;
-#if NET20
-using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
-#endif
 
 namespace NUnit.Engine.Services
 {

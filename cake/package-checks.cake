@@ -14,9 +14,9 @@ string[] AGENT_FILES_NET20 = {
         "nunit-agent-net20.exe", "nunit-agent-net20.exe.config",
         "nunit-agent-net20-x86.exe", "nunit-agent-net20-x86.exe.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_FILES_NET40 = {
-        "nunit-agent-net40.exe", "nunit-agent-net40.exe.config",
-        "nunit-agent-net40-x86.exe", "nunit-agent-net40-x86.exe.config",
+string[] AGENT_FILES_NET462 = {
+        "nunit-agent-net462.exe", "nunit-agent-net462.exe.config",
+        "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
 string[] AGENT_FILES_NETCORE_3_1 = {
         "nunit-agent-netcore31.dll", "nunit-agent-netcore31.dll.config",
@@ -29,8 +29,8 @@ string[] AGENT_FILES_NET_6_0 = {
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
 string[] AGENT_PDB_FILES_NET20 = {
         "nunit-agent-net20.pdb", "nunit-agent-net20-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_PDB_FILES_NET40 = {
-        "nunit-agent-net40.pdb", "nunit-agent-net40-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+string[] AGENT_PDB_FILES_NET462 = {
+        "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_PDB_FILES_NETCORE_3_1 = {
         "nunit-agent-netcore31.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_PDB_FILES_NET_5_0 = {

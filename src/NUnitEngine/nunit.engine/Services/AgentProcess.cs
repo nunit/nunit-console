@@ -120,7 +120,7 @@ namespace NUnit.Engine.Services
             switch (targetRuntime.Runtime.FrameworkIdentifier)
             {
                 case FrameworkIdentifiers.NetFramework:
-                    runtimeIdentifier = major >= 4 ? "net40" : "net20";
+                    runtimeIdentifier = major >= 4 ? "net462" : "net20";
                     agentName = "nunit-agent-" + runtimeIdentifier;
                     if (requires32Bit)
                         agentName += "-x86";

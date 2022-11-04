@@ -1,10 +1,10 @@
 ﻿<NUnitProject>
   <Config name="Debug" appbase="bin/Debug">
       <assembly path="net35/mock-assembly.dll" />
-      <assembly path="net40/mock-assembly.dll" />
+      <assembly path="net462/mock-assembly.dll" />
   </Config>
   <Config name="Release" appbase="bin/Release">
       <assembly path="net35/mock-assembly.dll" />
-      <assembly path="net40/mock-assembly.dll" />
+      <assembly path="net462/mock-assembly.dll" />
   </Config>
 </NUnitProject>
