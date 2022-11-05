@@ -104,7 +104,7 @@ public void BuildSolution()
     // Publishing in place where needed to ensure that all references are present.
 
     // TODO: May not be needed
-    DisplayBanner("Publishing ENGINE API Project for NETSTANDARD_2.0");
+    /*DisplayBanner("Publishing ENGINE API Project for NETSTANDARD_2.0");
     MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
         .WithProperty("TargetFramework", "netstandard2.0")
         .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
@@ -117,16 +117,7 @@ public void BuildSolution()
     DisplayBanner("Publishing ENGINE TESTS Project for NETCOREAPP2.1");
     MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
         .WithProperty("TargetFramework", "netcoreapp2.1")
-        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-
-    // TODO: May not be needed
-    /*foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
-    {
-        DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
-        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
-            .WithProperty("TargetFramework", framework)
-            .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
-    }*/
+        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));*/
 }
 
 private void BuildEachProjectSeparately()
@@ -146,7 +137,7 @@ private void BuildEachProjectSeparately()
     BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
 
 
-    DisplayBanner("Publish .NET Core & Standard projects");
+    /*DisplayBanner("Publish .NET Core & Standard projects");
 
     MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
        .WithProperty("TargetFramework", "netstandard2.0")
@@ -159,7 +150,7 @@ private void BuildEachProjectSeparately()
        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
     MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
        .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));*/
 }
 
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
@@ -251,32 +242,6 @@ Task("TestNetCore31EngineCore")
     .Does(() =>
     {
         RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp3.1");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NET 5.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet50EngineCore")
-    .Description("Tests the .NET 5.0 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net5.0");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NET 6.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet60EngineCore")
-    .Description("Tests the .NET 6.0 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net6.0");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -769,9 +734,7 @@ Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
     .IsDependentOn("TestNet20EngineCore")
     .IsDependentOn("TestNetStandard20EngineCore")
-    .IsDependentOn("TestNetCore31EngineCore")
-    .IsDependentOn("TestNet50EngineCore")
-    .IsDependentOn("TestNet60EngineCore");
+    .IsDependentOn("TestNetCore31EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
