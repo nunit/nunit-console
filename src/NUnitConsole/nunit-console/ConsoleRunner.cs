@@ -373,8 +373,8 @@ namespace NUnit.ConsoleRunner
         {
             TestPackage package = new TestPackage(options.InputFiles);
 
-            if (options.FrameworkSpecified)
-                package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, options.Framework);
+            if (options.RuntimeFrameworkSpecified)
+                package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, options.RuntimeFramework);
 
             if (options.RunAsX86)
                 package.AddSetting(EnginePackageSettings.RunAsX86, true);

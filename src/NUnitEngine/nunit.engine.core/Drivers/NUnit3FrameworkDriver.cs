@@ -57,10 +57,20 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver constructor called with a file name that doesn't exist.", "testAssemblyPath");
 
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
+
+            // Normally, the runner should check for an invalid requested runtime, but we make sure here
+            var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
+                ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
+            
             _testAssemblyPath = testAssemblyPath;
+
             try
             {
                 _frameworkController = CreateObject(CONTROLLER_TYPE, testAssemblyPath, idPrefix, settings);
+            }
+            catch (BadImageFormatException ex) when (requestedRuntime != null)
+            {
+                throw new NUnitEngineException($"Requested runtime {requestedRuntime} is not suitable for use with test assembly {testAssemblyPath}", ex);
             }
             catch (SerializationException ex)
             {

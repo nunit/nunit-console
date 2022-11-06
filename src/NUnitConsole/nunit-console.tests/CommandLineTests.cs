@@ -132,7 +132,7 @@ namespace NUnit.ConsoleRunner
         public void NoInputFiles()
         {
             ConsoleOptions options = ConsoleMocks.Options();
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(0));
         }
 
@@ -196,7 +196,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
 #if NETFRAMEWORK
-        [TestCase("Framework", "framework", new string[] { "net-4.6.2" }, new string[0])]
+        [TestCase("RuntimeFramework", "framework", new string[] { "net-4.6.2" }, new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
 #endif
@@ -213,7 +213,7 @@ namespace NUnit.ConsoleRunner
                 {
                     string optionPlusValue = string.Format("--{0}:{1}", option, value);
                     ConsoleOptions options = ConsoleMocks.Options(optionPlusValue);
-                    Assert.That(options.Validate(), Is.True, "Should be valid: " + optionPlusValue);
+                    Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "Should be valid: " + optionPlusValue);
                     Assert.That((string)property.GetValue(options, null), Is.EqualTo(value), "Didn't recognize " + optionPlusValue);
                 }
 
@@ -221,7 +221,7 @@ namespace NUnit.ConsoleRunner
                 {
                     string optionPlusValue = string.Format("--{0}:{1}", option, value);
                     ConsoleOptions options = ConsoleMocks.Options(optionPlusValue);
-                    Assert.That(options.Validate(), Is.False, "Should not be valid: " + optionPlusValue);
+                    Assert.That(options.ErrorMessages.Count, Is.EqualTo(1), "Should not be valid: " + optionPlusValue);
                 }
             }
         }
@@ -238,7 +238,7 @@ namespace NUnit.ConsoleRunner
                 string lowercaseValue = canonicalValue.ToLowerInvariant();
                 string optionPlusValue = string.Format("--{0}:{1}", optionName, lowercaseValue);
                 ConsoleOptions options = ConsoleMocks.Options(optionPlusValue);
-                Assert.That(options.Validate(), Is.True, "Should be valid: " + optionPlusValue);
+                Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "Should be valid: " + optionPlusValue);
                 Assert.That((string)property.GetValue(options, null), Is.EqualTo(canonicalValue), "Didn't recognize " + optionPlusValue);
             }
         }
@@ -278,7 +278,7 @@ namespace NUnit.ConsoleRunner
         public void MissingValuesAreReported(string option)
         {
             ConsoleOptions options = ConsoleMocks.Options(option + "=");
-            Assert.That(options.Validate(), Is.False, "Missing value should not be valid");
+            Assert.That(options.ErrorMessages.Count, Is.Not.EqualTo(0), "Missing value should not be valid");
             Assert.That(options.ErrorMessages[0], Is.EqualTo("Missing required value for option '" + option + "'."));
         }
 
@@ -286,7 +286,7 @@ namespace NUnit.ConsoleRunner
         public void AssemblyName()
         {
             ConsoleOptions options = ConsoleMocks.Options("nunit.tests.dll");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1));
             Assert.That(options.InputFiles[0], Is.EqualTo("nunit.tests.dll"));
         }
@@ -295,7 +295,6 @@ namespace NUnit.ConsoleRunner
         public void AssemblyAloneIsValid()
         {
             ConsoleOptions options = ConsoleMocks.Options("nunit.tests.dll");
-            Assert.That(options.Validate(), Is.True);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "command line should be valid");
         }
 
@@ -303,7 +302,6 @@ namespace NUnit.ConsoleRunner
         public void InvalidOption()
         {
             ConsoleOptions options = ConsoleMocks.Options("-assembly:nunit.tests.dll");
-            Assert.That(options.Validate(), Is.False);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
             Assert.That(options.ErrorMessages[0], Is.EqualTo("Invalid argument: -assembly:nunit.tests.dll"));
         }
@@ -312,7 +310,6 @@ namespace NUnit.ConsoleRunner
         public void InvalidCommandLineParms()
         {
             ConsoleOptions options = ConsoleMocks.Options("-garbage:TestFixture", "-assembly:Tests.dll");
-            Assert.That(options.Validate(), Is.False);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(2));
             Assert.That(options.ErrorMessages[0], Is.EqualTo("Invalid argument: -garbage:TestFixture"));
             Assert.That(options.ErrorMessages[1], Is.EqualTo("Invalid argument: -assembly:Tests.dll"));
@@ -322,7 +319,7 @@ namespace NUnit.ConsoleRunner
         public void TimeoutIsMinusOneIfNoOptionIsProvided()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.DefaultTestCaseTimeout, Is.EqualTo(-1));
         }
 
@@ -336,7 +333,7 @@ namespace NUnit.ConsoleRunner
         public void TimeoutParsesIntValueCorrectly()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-testCaseTimeout:5000");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.DefaultTestCaseTimeout, Is.EqualTo(5000));
         }
 
@@ -344,7 +341,7 @@ namespace NUnit.ConsoleRunner
         public void TimeoutCausesErrorIfValueIsNotInteger()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-testCaseTimeout:abc");
-            Assert.That(options.Validate(), Is.False);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(1));
             Assert.That(options.DefaultTestCaseTimeout, Is.EqualTo(-1));
         }
 
@@ -352,7 +349,7 @@ namespace NUnit.ConsoleRunner
         public void ResultOptionWithFilePath()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-result:results.xml");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
@@ -366,7 +363,7 @@ namespace NUnit.ConsoleRunner
         public void ResultOptionWithFilePathAndFormat()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-result:results.xml;format=nunit2");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
@@ -386,7 +383,7 @@ namespace NUnit.ConsoleRunner
                 new DefaultOptionsProviderStub(false),
                 fileSystem,
                 "tests.dll", $"-result:results.xml;transform={transformFile}");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
@@ -401,7 +398,6 @@ namespace NUnit.ConsoleRunner
         public void FileNameWithoutResultOptionLooksLikeParameter()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "results.xml");
-            Assert.That(options.Validate(), Is.True);
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(2));
         }
@@ -410,7 +406,6 @@ namespace NUnit.ConsoleRunner
         public void ResultOptionWithoutFileNameIsInvalid()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-result:");
-            Assert.That(options.Validate(), Is.False, "Should not be valid");
             Assert.That(options.ErrorMessages.Count, Is.EqualTo(1), "An error was expected");
         }
 
@@ -424,7 +419,7 @@ namespace NUnit.ConsoleRunner
                 new DefaultOptionsProviderStub(false),
                 fileSystem,
                 "tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", $"-result:myresult.xml;transform={transformFile}");
-            Assert.That(options.Validate(), Is.True, "Should be valid");
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "Should be valid");
 
             var specs = options.ResultOutputSpecifications;
             Assert.That(specs.Count, Is.EqualTo(3));
@@ -465,6 +460,10 @@ namespace NUnit.ConsoleRunner
             Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
         }
 
+        private void DumpErrors()
+        {
+        }
+
         [Test]
         public void NoResultSuppressesAllResultSpecifications()
         {
@@ -499,7 +498,7 @@ namespace NUnit.ConsoleRunner
         public void ExploreOptionWithoutPath()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-explore");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.Explore, Is.True);
         }
 
@@ -507,7 +506,7 @@ namespace NUnit.ConsoleRunner
         public void ExploreOptionWithFilePath()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-explore:results.xml");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
@@ -522,7 +521,7 @@ namespace NUnit.ConsoleRunner
         public void ExploreOptionWithFilePathAndFormat()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-explore:results.xml;format=cases");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
@@ -542,7 +541,7 @@ namespace NUnit.ConsoleRunner
                 new DefaultOptionsProviderStub(false),
                 fileSystem,
                 "tests.dll", $"-explore:results.xml;transform={transformFile}");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
@@ -558,7 +557,7 @@ namespace NUnit.ConsoleRunner
         public void ExploreOptionWithFilePathUsingEqualSign()
         {
             ConsoleOptions options = ConsoleMocks.Options("tests.dll", "-explore=C:/nunit/tests/bin/Debug/console-test.xml");
-            Assert.That(options.Validate(), Is.True);
+            Assert.That(options.ErrorMessages.Count, Is.EqualTo(0));
             Assert.That(options.Explore, Is.True);
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
