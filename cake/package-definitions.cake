@@ -167,14 +167,17 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
                 HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
+                HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_FILES),
                 HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
                 HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
+                HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
                 HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES_NET20),
                 HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_FILES_NET462)
             },
             symbols: new PackageCheck[] {
                 HasDirectory("lib/net462").WithFiles(ENGINE_PDB_FILES),
                 HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
+                HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_PDB_FILES),
                 HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_PDB_FILES_NET20),
                 HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_PDB_FILES_NET462)
             }),

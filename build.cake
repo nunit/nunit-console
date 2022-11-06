@@ -271,6 +271,19 @@ Task("TestNetStandard20Engine")
     });
 
 //////////////////////////////////////////////////////////////////////
+// TEST NETSTANDARD 2.0 ENGINE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNetCore31Engine")
+    .Description("Tests the .NET Core 3.1 Engine")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does(() =>
+    {
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
+    });
+
+//////////////////////////////////////////////////////////////////////
 // TEST .NET FRAMEWORK  CONSOLE
 //////////////////////////////////////////////////////////////////////
 
@@ -739,7 +752,8 @@ Task("TestEngineCore")
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
     .IsDependentOn("TestNetFxEngine")
-    .IsDependentOn("TestNetStandard20Engine");
+    .IsDependentOn("TestNetStandard20Engine")
+    .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")
     .Description("Builds and tests the engine and console runner")
