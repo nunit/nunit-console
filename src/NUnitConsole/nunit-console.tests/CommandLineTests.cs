@@ -193,7 +193,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter" }, new string[] { "JUNK" })]
         [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
-        [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[] { "junk-4.0" } )]
+        [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
 #if NETFRAMEWORK
         [TestCase("RuntimeFramework", "framework", new string[] { "net-4.6.2" }, new string[0])]
