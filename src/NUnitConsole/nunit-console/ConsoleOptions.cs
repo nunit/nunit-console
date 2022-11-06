@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using NUnit.Engine;
 
 namespace NUnit.ConsoleRunner.Options
 {
@@ -17,9 +18,6 @@ namespace NUnit.ConsoleRunner.Options
     public class ConsoleOptions : OptionSet
     {
         private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
-
-        private bool validated;
-        private bool noresult;
 
         /// <summary>
         /// An abstraction of the file system
@@ -101,7 +99,7 @@ namespace NUnit.ConsoleRunner.Options
         {
             get
             {
-                if (noresult)
+                if (NoResultSpecified)
                     return new OutputSpecification[0];
 
                 if (resultOutputSpecifications.Count == 0)
@@ -112,6 +110,8 @@ namespace NUnit.ConsoleRunner.Options
             }
         }
 
+        public bool NoResultSpecified { get; private set; }
+
         public IList<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
 
         public string ActiveConfig { get; private set; }
@@ -119,8 +119,8 @@ namespace NUnit.ConsoleRunner.Options
 
         // How to Run Tests
 
-        public string Framework { get; private set; }
-        public bool FrameworkSpecified { get { return Framework != null; } }
+        public string RuntimeFramework { get; private set; }
+        public bool RuntimeFrameworkSpecified { get { return RuntimeFramework != null; } }
 
         public string ConfigurationFile { get; private set; }
 
@@ -243,7 +243,7 @@ namespace NUnit.ConsoleRunner.Options
             });
 
             this.Add("noresult", "Don't save any test results.",
-                v => noresult = v != null);
+                v => NoResultSpecified = v != null);
 
             this.Add("labels=", "Specify whether to write test case names to the output. Values: Off (Default), On, OnOutput, Before, After, BeforeAndAfter. On is currently an alias for OnOutput, but is subject to change.",
                 v => {
@@ -291,7 +291,7 @@ namespace NUnit.ConsoleRunner.Options
 
             // How to Run Tests
             this.AddNetFxOnlyOption("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
-                NetFxOnlyOption("framework=", v => Framework = parser.RequiredValue(v, "--framework")));
+                NetFxOnlyOption("framework=", v => RuntimeFramework = parser.RequiredValue(v, "--framework")));
 
             this.AddNetFxOnlyOption("x86", "Run tests in an x86 process on 64 bit systems",
                 NetFxOnlyOption("x86", v => RunAsX86 = v != null));
@@ -346,18 +346,6 @@ namespace NUnit.ConsoleRunner.Options
 #else
             return s => ErrorMessages.Add($"The {optionName} option is not available on this platform.");
 #endif
-        }
-
-        public bool Validate()
-        {
-            if (!validated)
-            {
-                CheckOptionCombinations();
-
-                validated = true;
-            }
-
-            return ErrorMessages.Count == 0;
         }
 
         private void CheckOptionCombinations()

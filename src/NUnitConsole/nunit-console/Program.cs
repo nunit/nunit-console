@@ -46,7 +46,7 @@ namespace NUnit.ConsoleRunner
             catch (OptionException ex)
             {
                 WriteHeader();
-                OutWriter.WriteLine(ColorStyle.Error, string.Format(ex.Message, ex.OptionName));
+                WriteErrorMessage(string.Format(ex.Message, ex.OptionName));
                 return ConsoleRunner.INVALID_ARG;
             }
 
@@ -59,7 +59,7 @@ namespace NUnit.ConsoleRunner
                 catch (Exception error)
                 {
                     WriteHeader();
-                    OutWriter.WriteLine(ColorStyle.Error, string.Format("Unsupported Encoding, {0}", error.Message));
+                    WriteErrorMessage(string.Format("Unsupported Encoding, {0}", error.Message));
                     return ConsoleRunner.INVALID_ARG;
                 }
             }
@@ -87,19 +87,38 @@ namespace NUnit.ConsoleRunner
                     OutWriter.WriteLine();
                 }
 
-                if (!Options.Validate())
-                {
-                    using (new ColorConsole(ColorStyle.Error))
-                    {
-                        foreach (string message in Options.ErrorMessages)
-                            Console.Error.WriteLine(message);
-                    }
-
-                    return ConsoleRunner.INVALID_ARG;
-                }
-
                 using (ITestEngine engine = TestEngineActivator.CreateInstance())
                 {
+                    if (Options.ErrorMessages.Count > 0)
+                    {
+                        foreach (string message in Options.ErrorMessages)
+                            WriteErrorMessage(message);
+
+                        return ConsoleRunner.INVALID_ARG;
+                    }
+
+#if NETFRAMEWORK
+                    if (Options.RuntimeFrameworkSpecified)
+                    {
+                        var availableRuntimeService = engine.Services.GetService<IAvailableRuntimes>();
+                        if (availableRuntimeService == null)
+                        {
+                            WriteErrorMessage("Unable to acquire AvailableRuntimeService from engine");
+                            return ConsoleRunner.UNEXPECTED_ERROR;
+                        }
+
+                        bool runtimeAvailable = false;
+                        foreach (var runtime in availableRuntimeService.AvailableRuntimes)
+                        {
+                            if (runtimeAvailable = runtime.Id == Options.RuntimeFramework)
+                                break;
+                        }
+
+                        if (!runtimeAvailable)
+                            WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
+                    }
+#endif
+
                     if (Options.WorkDirectory != null)
                         engine.WorkDirectory = Options.WorkDirectory;
 
@@ -113,24 +132,24 @@ namespace NUnit.ConsoleRunner
                     }
                     catch (TestSelectionParserException ex)
                     {
-                        OutWriter.WriteLine(ColorStyle.Error, ex.Message);
+                        WriteErrorMessage(ex.Message);
                         return ConsoleRunner.INVALID_ARG;
                     }
                     catch (FileNotFoundException ex)
                     {
-                        OutWriter.WriteLine(ColorStyle.Error, ex.Message);
+                        WriteErrorMessage(ex.Message);
                         return ConsoleRunner.INVALID_ASSEMBLY;
                     }
                     catch (DirectoryNotFoundException ex)
                     {
-                        OutWriter.WriteLine(ColorStyle.Error, ex.Message);
+                        WriteErrorMessage(ex.Message);
                         return ConsoleRunner.INVALID_ASSEMBLY;
                     }
                     catch (Exception ex)
                     {
-                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
+                        WriteErrorMessage(ExceptionHelper.BuildMessage(ex));
                         OutWriter.WriteLine();
-                        OutWriter.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessageAndStackTrace(ex));
+                        WriteErrorMessage(ExceptionHelper.BuildMessageAndStackTrace(ex));
                         return ConsoleRunner.UNEXPECTED_ERROR;
                     }
                     finally
@@ -240,6 +259,11 @@ namespace NUnit.ConsoleRunner
                 //writer.WriteLine("or a space to separate the option from its value.");
                 //writer.WriteLine();
             }
+        }
+
+        private static void WriteErrorMessage(string msg)
+        {
+            OutWriter.WriteLine(ColorStyle.Error, msg);
         }
 
         private static void CancelHandler(object sender, ConsoleCancelEventArgs args)
