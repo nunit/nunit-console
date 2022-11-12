@@ -80,6 +80,7 @@
     <file src="agents/netcoreapp3.1/nunit.engine.core.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit.engine.core.pdb" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/netcoreapp3.1" />
     <file src="../../../../../../nuget/nunit.agent.addins" target="tools/agents/netcoreapp3.1"/>
 
     <file src="agents/net5.0/nunit-agent.dll" target="tools/agents/net5.0" />
@@ -93,7 +94,8 @@
     <file src="agents/net5.0/nunit.engine.core.dll" target="tools/agents/net5.0" />
     <file src="agents/net5.0/nunit.engine.core.pdb" target="tools/agents/net5.0" />
     <file src="agents/net5.0/testcentric.engine.metadata.dll" target="tools/agents/net5.0" />
-    <file src="../../../../../../nuget/nunit.agent.addins" target="tools/agents/net5.0"/>
+    <file src="agents/net5.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net5.0" />
+    <file src="../../../../../../nuget/nunit.agent.addins" target="tools/agents/net5.0" />
 
     <file src="agents/net6.0/nunit-agent.dll" target="tools/agents/net6.0" />
     <file src="agents/net6.0/nunit-agent.pdb" target="tools/agents/net6.0" />
@@ -106,6 +108,7 @@
     <file src="agents/net6.0/nunit.engine.core.dll" target="tools/agents/net6.0" />
     <file src="agents/net6.0/nunit.engine.core.pdb" target="tools/agents/net6.0" />
     <file src="agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net6.0" />
     <file src="../../../../../../nuget/nunit.agent.addins" target="tools/agents/net6.0"/>
 
     <file src="agents/net7.0/nunit-agent.dll" target="tools/agents/net7.0" />
@@ -119,7 +122,7 @@
     <file src="agents/net7.0/nunit.engine.core.dll" target="tools/agents/net7.0" />
     <file src="agents/net7.0/nunit.engine.core.pdb" target="tools/agents/net7.0" />
     <file src="agents/net7.0/testcentric.engine.metadata.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
     <file src="../../../../../../nuget/nunit.agent.addins" target="tools/agents/net7.0"/>
-
   </files>
 </package>
