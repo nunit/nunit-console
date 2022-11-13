@@ -37,7 +37,8 @@ public void InitializePackageDefinitions(ICakeContext context)
     if (IsRunningOnWindows())
         StandardRunnerTests.Add(Net60WindowsFormsTest);
 
-    if (dotnetX86Available)
+    // Temporarily disable X86 tests of .NET Core on AppVeyor
+    if (dotnetX86Available && !BuildSystem.IsRunningOnAppVeyor)
         StandardRunnerTests.Add(NetCore31X86Test);
 
     // Tests run for the NETCORE runner package
@@ -132,12 +133,12 @@ public void InitializePackageDefinitions(ICakeContext context)
             checks: new PackageCheck[] {
                 HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
                 HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
-                HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles("nunit-agent.exe", "nunit-agent.exe.config"),
-                HasDirectory("NUnit.org/nunit-console/agents/net462").WithFiles("nunit-agent.exe", "nunit-agent.exe.config"),
+                HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles(AGENT_FILES),
+                HasDirectory("NUnit.org/nunit-console/agents/net462").WithFiles(AGENT_FILES),
                 HasDirectory("NUnit.org/nunit-console/agents/netcoreapp3.1").WithFile("nunit-agent.dll"),
                 HasDirectory("NUnit.org/nunit-console/agents/net5.0").WithFile("nunit-agent.dll"),
                 HasDirectory("NUnit.org/nunit-console/agents/net6.0").WithFile("nunit-agent.dll"),
-                //HasDirectory("NUnit.org/nunit-console/agents/net7.0").WithFile("nunit-agent.dll"),
+                HasDirectory("NUnit.org/nunit-console/agents/net7.0").WithFile("nunit-agent.dll"),
                 HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
             },
             executable: "NUnit.org/nunit-console/nunit3-console.exe",
