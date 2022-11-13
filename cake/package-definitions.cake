@@ -37,7 +37,8 @@ public void InitializePackageDefinitions(ICakeContext context)
     if (IsRunningOnWindows())
         StandardRunnerTests.Add(Net60WindowsFormsTest);
 
-    if (dotnetX86Available)
+    // Temporarily disable X86 tests of .NET Core on AppVeyor
+    if (dotnetX86Available && !BuildSystem.IsRunningOnAppVeyor)
         StandardRunnerTests.Add(NetCore31X86Test);
 
     // Tests run for the NETCORE runner package
