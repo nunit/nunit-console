@@ -109,7 +109,7 @@ namespace NUnit.Engine.Runners
             {
                 var testFile = subPackage.FullName;
 
-                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
+                string targetFramework = subPackage.GetSetting(EnginePackageSettings.TargetRuntimeFramework, (string)null);
                 bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
                 if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
