@@ -39,7 +39,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net45PlusNet60NUnit4Test
     };
 
-    if (dotnetX86Available)
+    if (dotnetX86Available && !BuildSystem.IsRunningOnAppVeyor)
     {
         StandardRunnerTests.Add(NetCore21X86Test);
         StandardRunnerTests.Add(NetCore31X86Test);
