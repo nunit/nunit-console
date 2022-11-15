@@ -8,6 +8,7 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>Full</DebugType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <NoWarn>1505</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
