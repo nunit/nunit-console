@@ -29,6 +29,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        Net50PlusNet60Test,
         NetCore21PlusNetCore31Test,
         NetCore21PlusNetCore31PlusNet50PlusNet60Test,
         Net462PlusNet60Test,
@@ -38,7 +39,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net45PlusNet60NUnit4Test
     };
 
-    if (dotnetX86Available)
+    if (dotnetX86Available && !BuildSystem.IsRunningOnAppVeyor)
     {
         StandardRunnerTests.Add(NetCore21X86Test);
         StandardRunnerTests.Add(NetCore31X86Test);
@@ -51,6 +52,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        Net50PlusNet60Test,
         NetCore21PlusNetCore31Test,
         NetCore21PlusNetCore31PlusNet50PlusNet60Test,
         NetCore31NUnit4Test,
