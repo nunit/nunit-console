@@ -7,7 +7,7 @@ string[] ENGINE_FILES = {
 string[] ENGINE_PDB_FILES = {
         "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] ENGINE_CORE_FILES = {
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll", "Microsoft.Extensions.DependencyModel.dll" };
 string[] ENGINE_CORE_PDB_FILES = {
         "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_FILES = {
