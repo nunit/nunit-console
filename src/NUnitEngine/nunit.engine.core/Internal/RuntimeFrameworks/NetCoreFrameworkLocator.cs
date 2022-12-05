@@ -72,7 +72,15 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
                 }
             };
 
-            process.Start();
+            try
+            {
+                process.Start();
+            }
+            catch(Exception)
+            {
+                // No versions are installed, just return
+                yield break;
+            }
 
             const string PREFIX = "Microsoft.NETCore.App ";
             const int VERSION_START = 22;
