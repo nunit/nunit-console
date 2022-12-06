@@ -2,28 +2,28 @@
 // LISTS OF FILES USED IN CHECKING PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-string[] ENGINE_FILES = {
+static readonly string[] ENGINE_FILES = {
         "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-string[] ENGINE_PDB_FILES = {
+static readonly string[] ENGINE_PDB_FILES = {
         "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] ENGINE_CORE_FILES = {
+static readonly string[] ENGINE_CORE_FILES = {
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll", "Microsoft.Extensions.DependencyModel.dll" };
-string[] ENGINE_CORE_PDB_FILES = {
+static readonly string[] ENGINE_CORE_PDB_FILES = {
         "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_FILES = {
+static readonly string[] AGENT_FILES = {
         "nunit-agent.exe", "nunit-agent.exe.config",
         "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_FILES_NETCORE = {
+static readonly string[] AGENT_FILES_NETCORE = {
         "nunit-agent.dll", "nunit-agent.dll.config", "Microsoft.Extensions.DependencyModel.dll",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_PDB_FILES = {
+static readonly string[] AGENT_PDB_FILES = {
         "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_PDB_FILES_NETCORE = {
+static readonly string[] AGENT_PDB_FILES_NETCORE = {
         "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] CONSOLE_FILES = {
+static readonly string[] CONSOLE_FILES = {
         "nunit3-console.exe", "nunit3-console.exe.config" };
-string[] CONSOLE_FILES_NETCORE = {
+static readonly string[] CONSOLE_FILES_NETCORE = {
         "nunit3-netcore-console.exe", "nunit3-netcore-console.dll", "nunit3-netcore-console.dll.config" };
 
 //////////////////////////////////////////////////////////////////////
@@ -206,10 +206,10 @@ public class DirectoryCheck : PackageCheck
     }
 }
 
-private FileCheck HasFile(string file) => HasFiles(new [] { file });
-private FileCheck HasFiles(params string[] files) => new FileCheck(files);  
+private static FileCheck HasFile(string file) => HasFiles(new [] { file });
+private static FileCheck HasFiles(params string[] files) => new FileCheck(files);  
 
-private DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
+private static DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
 
 private static void WriteError(string msg)
 {

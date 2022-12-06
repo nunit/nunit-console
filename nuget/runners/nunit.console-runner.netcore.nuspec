@@ -30,24 +30,24 @@
     <file src="../../../../../../LICENSE.txt" />
     <file src="../../../../../../NOTICES.txt" />
     
-    <file src="nunit3-netcore-console.exe" target="tools/net6.0/any" />
-    <file src="nunit3-netcore-console.pdb" target="tools/net6.0/any" />
-    <file src="nunit3-netcore-console.dll" target="tools/net6.0/any" />
-    <file src="nunit3-netcore-console.dll.config" target="tools/net6.0/any" />
-    <file src="nunit3-netcore-console.deps.json" target="tools/net6.0/any" />
-    <file src="nunit3-netcore-console.runtimeconfig.json" target="tools/net6.0/any" />
-    <file src="nunit.engine.core.dll" target="tools/net6.0/any" />
-    <file src="nunit.engine.core.pdb" target="tools/net6.0/any" />
-    <file src="nunit.engine.dll" target="tools/net6.0/any" />
-    <file src="nunit.engine.pdb" target="tools/net6.0/any" />
-    <file src="nunit.engine.api.dll" target="tools/net6.0/any" />
-    <file src="nunit.engine.api.pdb" target="tools/net6.0/any" />
-    <file src="nunit.engine.api.xml" target="tools/net6.0/any" />
-    <file src="testcentric.engine.metadata.dll" target="tools/net6.0/any" />
-    <file src="Microsoft.Extensions.DependencyModel.dll" target="tools/net6.0/any" />
+    <file src="nunit3-netcore-console.exe" target="tools/net6.0" />
+    <file src="nunit3-netcore-console.pdb" target="tools/net6.0" />
+    <file src="nunit3-netcore-console.dll" target="tools/net6.0" />
+    <file src="nunit3-netcore-console.dll.config" target="tools/net6.0" />
+    <file src="nunit3-netcore-console.deps.json" target="tools/net6.0" />
+    <file src="nunit3-netcore-console.runtimeconfig.json" target="tools/net6.0" />
+    <file src="nunit.engine.core.dll" target="tools/net6.0" />
+    <file src="nunit.engine.core.pdb" target="tools/net6.0" />
+    <file src="nunit.engine.dll" target="tools/net6.0" />
+    <file src="nunit.engine.pdb" target="tools/net6.0" />
+    <file src="nunit.engine.api.dll" target="tools/net6.0" />
+    <file src="nunit.engine.api.pdb" target="tools/net6.0" />
+    <file src="nunit.engine.api.xml" target="tools/net6.0" />
+    <file src="testcentric.engine.metadata.dll" target="tools/net6.0" />
+    <file src="Microsoft.Extensions.DependencyModel.dll" target="tools/net6.0" />
 
-    <file src="../../../../../../nuget/runners/nunit.console.nuget.addins" target="tools/net6.0/any"/>
-    <file src="../../../../../../nuget/runners/DotnetToolSettings.xml" target="tools/net6.0/any"/>
+    <file src="../../../../../../nuget/runners/nunit.console.nuget.addins" target="tools/net6.0"/>
+    <file src="../../../../../../nuget/runners/DotnetToolSettings.xml" target="tools/net6.0"/>
     <file src="../../../../../../nunit_256.png" target="images"/>
   </files>
 </package>

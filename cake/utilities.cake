@@ -296,10 +296,10 @@ public int VerifyPackage(PackageDefinition package)
 {
     int failures = 0;
 
-    if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
+    if (!CheckPackage(package.PackageFilePath, package.PackageChecks))
         ++failures;
 
-    if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
+    if (package.HasSymbols && !CheckPackage(PACKAGE_DIR + package.SymbolPackageName, package.SymbolChecks))
         ++failures;
 
     return failures;

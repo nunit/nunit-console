@@ -7,10 +7,10 @@ static bool NoPush; NoPush = HasArgument("nopush");
 #load cake/package-checks.cake
 #load cake/test-results.cake
 #load cake/package-tests.cake
-#load cake/package-tester.cake
 #load cake/versioning.cake
 #load cake/utilities.cake
-#load cake/package-definitions.cake
+#load cake/package-definition.cake
+#load cake/packages.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=6.0.0
@@ -22,6 +22,8 @@ string ProductVersion => _buildVersion.ProductVersion;
 string SemVer => _buildVersion.SemVer;
 string PreReleaseLabel => _buildVersion.PreReleaseLabel;
 bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
+
+PackageDefinition[] AllPackages;
 
 var UnreportedErrors = new List<string>();
 
@@ -36,8 +38,21 @@ Setup(context =>
     Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
     Information("PreReleaseLabel is " + PreReleaseLabel);
 
+    // TODO: Hide this in a lower-level file
+    if (IsRunningOnWindows())
+        StandardRunnerTests.Add(Net60WindowsFormsTest);
+
     Information("Initializing PackageDefinitions");
-    InitializePackageDefinitions(context);
+    AllPackages = new PackageDefinition[] {
+        new NUnitConsoleNuGetPackage(context, ProductVersion),
+        new NUnitConsoleRunnerNuGetPackage(context, ProductVersion),
+        new NUnitNetCoreConsoleRunnerPackage(context, ProductVersion),
+        new NUnitConsoleRunnerChocolateyPackage(context, ProductVersion),
+        new NUnitConsoleMsiPackage(context, SemVer),
+        new NUnitConsoleZipPackage(context, ProductVersion),
+        new NUnitEnginePackage(context, ProductVersion),
+        new NUnitEngineApiPackage(context, ProductVersion)
+    };
 
     if (BuildSystem.IsRunningOnAppVeyor)
         AppVeyor.UpdateBuildVersion(ProductVersion + "-" + AppVeyor.Environment.Build.Number);
@@ -113,11 +128,11 @@ Task("BuildCppTestFiles")
     .Does(() =>
     {
         MSBuild(
-            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
+            PROJECT_DIR + "src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
             CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
 
         MSBuild(
-            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
+            PROJECT_DIR + "src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
             CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
     });
 
@@ -181,7 +196,7 @@ Task("TestNetFxEngine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, NETFX_ENGINE_TARGET);
+        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, "NET462");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -271,7 +286,7 @@ Task("CreateZipImage")
             new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
             ZIP_IMG_DIR);
         CopyDirectory(NETFX_CONSOLE_DIR, ZIP_IMG_DIR + "bin/");
-        CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", ZIP_IMG_DIR + "bin/");
+        CopyFileToDirectory(PROJECT_DIR + "zip/nunit.bundle.addins", ZIP_IMG_DIR + "bin/");
 
         // Currently, only the .NET Framework runner accepts extensions
         foreach (var framework in new[] { NETFX_CONSOLE_TARGET })
@@ -325,10 +340,8 @@ Task("TestPackages")
     .Does(() =>
     {
         foreach (var package in AllPackages)
-        {
-            if (package.PackageTests != null)
-                new PackageTester(Context, package).RunTests();
-        }
+            if (package.HasTests)
+                package.RunTests();
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -342,7 +355,7 @@ Task("PackageMsi")
     {
         foreach(var package in AllPackages)
         {
-            if (package.PackageType == PackageType.Msi)
+            if (package is MsiPackage)
             {
                 EnsureDirectoryExists(PACKAGE_DIR);
 
@@ -352,7 +365,7 @@ Task("PackageMsi")
                 VerifyPackage(package);
 
                 if (package.PackageTests != null)
-                    new PackageTester(Context, package).RunTests();
+                    package.RunTests();
             }
         }
     });
@@ -452,15 +465,10 @@ Task("PublishToMyGet")
             foreach (var package in AllPackages)
                 try
                 {
-                    switch (package.PackageType)
-                    {
-                        case PackageType.NuGet:
-                            PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                            break;
-                        case PackageType.Chocolatey:
-                            PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                            break;
-                    }
+                    if (package is NuGetPackage)
+                        PushNuGetPackage(package.PackageFilePath, apiKey, MYGET_PUSH_URL);
+                    else if (package is ChocolateyPackage)
+                        PushChocolateyPackage(package.PackageFilePath, apiKey, MYGET_PUSH_URL);
                 }
                 catch(Exception)
                 {
@@ -482,10 +490,10 @@ Task("PublishToNuGet")
             var apiKey = EnvironmentVariable(NUGET_API_KEY);
 
             foreach (var package in AllPackages)
-                if (package.PackageType == PackageType.NuGet)
+                if (package is NuGetPackage)
                     try
                     {
-                        PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, NUGET_PUSH_URL);
+                        PushNuGetPackage(package.PackageFilePath, apiKey, NUGET_PUSH_URL);
                     }
                     catch (Exception)
                     {
@@ -507,10 +515,10 @@ Task("PublishToChocolatey")
             var apiKey = EnvironmentVariable(CHOCO_API_KEY);
 
             foreach (var package in AllPackages)
-                if (package.PackageType == PackageType.Chocolatey)
+                if (package is ChocolateyPackage)
                     try
                     {
-                        PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
+                        PushChocolateyPackage(package.PackageFilePath, apiKey, CHOCO_PUSH_URL);
                     }
                     catch (Exception)
                     {
@@ -587,7 +595,7 @@ Task("CreateProductionRelease")
 
             var assetList = new List<string>();
             foreach (var package in AllPackages)
-                assetList.Add(PACKAGE_DIR + package.PackageName);
+                assetList.Add(package.PackageFilePath);
             string assets = $"\"{string.Join(',', assetList.ToArray())}\"";
 
             Information($"Publishing release {tagName} to GitHub");
