@@ -2,20 +2,9 @@
 // NUGET PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-public abstract class NuGetPackage : PackageDefinition
+public abstract class NuGetPackageDefinition : PackageDefinition
 {
-    public NuGetPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
-        PackageCheck[] checks = null, PackageCheck[] symbols = null, IEnumerable<PackageTest> tests = null)
-        : base(context, id, version, source, basepath, executable: executable, checks: checks, symbols: symbols, tests: tests)
-    {
-        if (symbols != null)
-        {
-            HasSymbols = true;
-            SymbolChecks = symbols;
-        }
-    }
-
-    protected NuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected NuGetPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
 
     public override string PackageFileName => $"{PackageId}.{PackageVersion}.nupkg";
     public override string SymbolPackageName => System.IO.Path.ChangeExtension(PackageFileName, ".snupkg");
@@ -53,7 +42,7 @@ public abstract class NuGetPackage : PackageDefinition
     }
 }
 
-public class NUnitConsoleNuGetPackage : NuGetPackage
+public class NUnitConsoleNuGetPackage : NuGetPackageDefinition
 {
     public NUnitConsoleNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -64,7 +53,7 @@ public class NUnitConsoleNuGetPackage : NuGetPackage
     }
 }
 
-public class NUnitConsoleRunnerNuGetPackage : NuGetPackage
+public class NUnitConsoleRunnerNuGetPackage : NuGetPackageDefinition
 {
     public NUnitConsoleRunnerNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -95,7 +84,7 @@ public class NUnitConsoleRunnerNuGetPackage : NuGetPackage
     }
 }
 
-public class NUnitNetCoreConsoleRunnerPackage : NuGetPackage
+public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
 {
     public NUnitNetCoreConsoleRunnerPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -121,7 +110,7 @@ public class NUnitNetCoreConsoleRunnerPackage : NuGetPackage
     }
 }
 
-public class NUnitEnginePackage : NuGetPackage
+public class NUnitEnginePackage : NuGetPackageDefinition
 {
     public NUnitEnginePackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -151,7 +140,7 @@ public class NUnitEnginePackage : NuGetPackage
     }
 }
 
-public class NUnitEngineApiPackage : NuGetPackage
+public class NUnitEngineApiPackage : NuGetPackageDefinition
 {
     public NUnitEngineApiPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -174,13 +163,9 @@ public class NUnitEngineApiPackage : NuGetPackage
 // CHOCOLATEY PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public abstract class ChocolateyPackage : PackageDefinition
+public abstract class ChocolateyPackageDefinition : PackageDefinition
 {
-    public ChocolateyPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null, 
-        PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
-
-    protected ChocolateyPackage(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected ChocolateyPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
 
     public override string PackageFileName => $"{PackageId}.{PackageVersion}.nupkg";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"choco/{PackageId}/";
@@ -207,7 +192,7 @@ public abstract class ChocolateyPackage : PackageDefinition
     }
 }
 
-public class NUnitConsoleRunnerChocolateyPackage : ChocolateyPackage
+public class NUnitConsoleRunnerChocolateyPackage : ChocolateyPackageDefinition
 {
     public NUnitConsoleRunnerChocolateyPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -232,13 +217,9 @@ public class NUnitConsoleRunnerChocolateyPackage : ChocolateyPackage
 // MSI PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public abstract class MsiPackage : PackageDefinition
+public abstract class MsiPackageDefinition : PackageDefinition
 {
-    public MsiPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
-        PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
-
-    protected MsiPackage(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected MsiPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
 
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.msi";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"msi/{PackageId}/";
@@ -271,7 +252,7 @@ public abstract class MsiPackage : PackageDefinition
     }
 }
 
-public class NUnitConsoleMsiPackage : MsiPackage
+public class NUnitConsoleMsiPackage : MsiPackageDefinition
 {
     public NUnitConsoleMsiPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
@@ -298,13 +279,9 @@ public class NUnitConsoleMsiPackage : MsiPackage
 // ZIP PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public abstract class ZipPackage : PackageDefinition
+public abstract class ZipPackageDefinition : PackageDefinition
 {
-    public ZipPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
-        PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
-
-    protected ZipPackage(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected ZipPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
 
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.zip";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"zip/{PackageId}/";
@@ -323,7 +300,7 @@ public abstract class ZipPackage : PackageDefinition
     }
 }
 
-public class NUnitConsoleZipPackage : ZipPackage
+public class NUnitConsoleZipPackage : ZipPackageDefinition
 {
     public NUnitConsoleZipPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {

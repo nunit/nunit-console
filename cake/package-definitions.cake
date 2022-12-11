@@ -1,5 +1,33 @@
 //////////////////////////////////////////////////////////////////////
-// PACKAGE DEFINITION IMPLEMENTATION
+// INITIALIZE DEFINITIONS OF PACKAGES
+//////////////////////////////////////////////////////////////////////
+static PackageDefinition[] AllPackages;
+static PackageDefinition ConsolePackage;
+static PackageDefinition ConsoleRunnerPackage;
+static PackageDefinition NetCoreConsoleRunnerPackage;
+static PackageDefinition ChocolateyPackage;
+static PackageDefinition MsiPackage;
+static PackageDefinition ZipPackage;
+static PackageDefinition EnginePackage;
+static PackageDefinition EngineApiPackage;
+
+// Called from SetUp
+public void InitializePackageDefinitions(ISetupContext context)
+{
+    AllPackages = new PackageDefinition[] {
+        ConsolePackage = new NUnitConsoleNuGetPackage(context, ProductVersion),
+        ConsoleRunnerPackage = new NUnitConsoleRunnerNuGetPackage(context, ProductVersion),
+        NetCoreConsoleRunnerPackage = new NUnitNetCoreConsoleRunnerPackage(context, ProductVersion),
+        ChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(context, ProductVersion),
+        MsiPackage = new NUnitConsoleMsiPackage(context, SemVer),
+        ZipPackage = new NUnitConsoleZipPackage(context, ProductVersion),
+        EnginePackage = new NUnitEnginePackage(context, ProductVersion),
+        EngineApiPackage = new NUnitEngineApiPackage(context, ProductVersion)
+    };
+}
+
+//////////////////////////////////////////////////////////////////////
+// PACKAGE DEFINITION ABSTRACT CLASS
 //////////////////////////////////////////////////////////////////////
 
 /// <summary>
@@ -8,42 +36,6 @@
 public abstract class PackageDefinition
 {
     protected ICakeContext _context;
-
-    /// <summary>
-    /// Construct with arguments
-    /// </summary>
-    /// <param name="id">A string containing the package ID, used as the root of the PackageFileName</param>
-    /// <param name="version">A string representing the package version, used as part of the PackageFileName</param>
-    /// <param name="source">A string representing the source used to create the package, e.g. a nuspec file</param>
-    /// <param name="executable">A string containing the path to the executable used in running tests. If relative, the path is contained within the package itself.</param>
-    /// <param name="checks">An array of PackageChecks be made on the content of the package. Optional.</param>
-    /// <param name="symbols">An array of PackageChecks to be made on the symbol package, if one is created. Optional. Only supported for nuget packages.</param>
-    /// <param name="tests">An array of PackageTests to be run against the package. Optional.</param>
-	protected PackageDefinition(
-        ICakeContext context,
-        string id,
-        string version,
-        string source,
-        string basepath,
-        string executable = null,
-        PackageCheck[] checks = null,
-        PackageCheck[] symbols = null,
-        IEnumerable<PackageTest> tests = null)
-    {
-        if (executable == null && tests != null)
-            throw new System.ArgumentException($"Unable to create package {id}: Executable must be provided if there are tests", nameof(executable));
-
-        _context = context;
-
-        PackageId = id;
-        PackageVersion = version;
-        PackageSource = source;
-        BasePath = basepath;
-        TestExecutable = executable;
-        PackageChecks = checks;
-        PackageTests = tests;
-        SymbolChecks = symbols;
-    }
 
     /// <summary>
     /// Construct without arguments - derived class must set properties
@@ -63,6 +55,8 @@ public abstract class PackageDefinition
     public PackageCheck[] SymbolChecks { get; protected set; }
     public IEnumerable<PackageTest> PackageTests { get; protected set; }
     public bool HasTests => PackageTests != null;
+    public bool HasChecks => PackageChecks != null;
+    public bool HasSymbols => SymbolChecks != null;
 
     public abstract string PackageFileName { get; }
     public abstract string InstallDirectory { get; }
@@ -142,6 +136,5 @@ public abstract class PackageDefinition
         DisplayBanner($"{action} package {PackageFileName}");
     }
 
-    public bool HasSymbols { get; protected set; } = false;
     public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {GetType().Name} packages.");
 }

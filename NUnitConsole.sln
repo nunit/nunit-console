@@ -115,11 +115,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D072-424B-A6DF-5BECF719C1FB}"
 	ProjectSection(SolutionItems) = preProject
+		cake\build-settings.cake = cake\build-settings.cake
 		cake\constants.cake = cake\constants.cake
 		cake\header-check.cake = cake\header-check.cake
 		cake\package-checks.cake = cake\package-checks.cake
 		cake\package-tests.cake = cake\package-tests.cake
-		cake\package-definition.cake = cake\package-definition.cake
+		cake\package-definitions.cake = cake\package-definitions.cake
 		cake\packages.cake = cake\packages.cake
 		cake\test-results.cake = cake\test-results.cake
 		cake\utilities.cake = cake\utilities.cake

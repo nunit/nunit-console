@@ -3,17 +3,18 @@ static string Configuration; Configuration = GetArgument("configuration|c", "Rel
 static bool NoPush; NoPush = HasArgument("nopush");
 
 #load cake/constants.cake
+#load cake/build-settings.cake
 #load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
 #load cake/package-tests.cake
 #load cake/versioning.cake
 #load cake/utilities.cake
-#load cake/package-definition.cake
+#load cake/package-definitions.cake
 #load cake/packages.cake
 
 // Install Tools
-#tool NuGet.CommandLine&version=6.0.0
+#tool NuGet.CommandLine&version=6.3.1
 #tool dotnet:?package=GitVersion.Tool&version=5.6.3
 #tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
 
@@ -22,8 +23,6 @@ string ProductVersion => _buildVersion.ProductVersion;
 string SemVer => _buildVersion.SemVer;
 string PreReleaseLabel => _buildVersion.PreReleaseLabel;
 bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
-
-PackageDefinition[] AllPackages;
 
 var UnreportedErrors = new List<string>();
 
@@ -43,16 +42,7 @@ Setup(context =>
         StandardRunnerTests.Add(Net60WindowsFormsTest);
 
     Information("Initializing PackageDefinitions");
-    AllPackages = new PackageDefinition[] {
-        new NUnitConsoleNuGetPackage(context, ProductVersion),
-        new NUnitConsoleRunnerNuGetPackage(context, ProductVersion),
-        new NUnitNetCoreConsoleRunnerPackage(context, ProductVersion),
-        new NUnitConsoleRunnerChocolateyPackage(context, ProductVersion),
-        new NUnitConsoleMsiPackage(context, SemVer),
-        new NUnitConsoleZipPackage(context, ProductVersion),
-        new NUnitEnginePackage(context, ProductVersion),
-        new NUnitEngineApiPackage(context, ProductVersion)
-    };
+    InitializePackageDefinitions(context);
 
     if (BuildSystem.IsRunningOnAppVeyor)
         AppVeyor.UpdateBuildVersion(ProductVersion + "-" + AppVeyor.Environment.Build.Number);
@@ -300,74 +290,79 @@ Task("CreateZipImage")
     });
 
 //////////////////////////////////////////////////////////////////////
-// BUILD PACKAGES
+// BUILD AND TEST ALL PACKAGES USING PREVIOUSLY BUILT BINARIES
 //////////////////////////////////////////////////////////////////////
-Task("BuildPackages")
+Task("PackageExistingBuild")
+    .Description("Builds and tests all packages, using previously build binaries")
+    .IsDependentOn("PackageConsole")
+    .IsDependentOn("PackageConsoleRunner")
+    .IsDependentOn("PackageDotNetConsoleRunner")
+    .IsDependentOn("PackageMsi")
+    .IsDependentOn("PackageZip")
+    .IsDependentOn("PackageEngine")
+    .IsDependentOn("PackageEngineApi");
+
+//////////////////////////////////////////////////////////////////////
+// BUILD AND TEST INDIVIDUAL PACKAGES
+//////////////////////////////////////////////////////////////////////
+
+Task("PackageConsole")
+    .Description("Build and Test NUnit.Console NuGet Package")
+    .Does(() =>
+    {
+        BuildVerifyAndTest(new NUnitConsoleNuGetPackage(Context, ProductVersion));
+    });
+
+Task("PackageConsoleRunner")
+    .Description("Build and  Test NUnit.ConsoleRunner NuGet Package")
+    .Does(() =>
+    {
+        BuildVerifyAndTest(new NUnitConsoleRunnerNuGetPackage(Context, ProductVersion));
+    });
+        
+Task("PackageDotNetConsoleRunner")
+    .Description("Build and  Test NUnit.ConsoleRunner NuGet Package")
+    .Does(() =>
+    {
+        BuildVerifyAndTest(new NUnitNetCoreConsoleRunnerPackage(Context, ProductVersion));
+    });
+
+Task("PackageChocolateyConsoleRunner")
+    .Description("Build Verify and Test the Chocolatey nunit-console-runner package")
+    .Does(() =>
+    {
+        BuildVerifyAndTest(new NUnitConsoleRunnerChocolateyPackage(Context, ProductVersion));
+    });
+
+Task("PackageMsi")
+    .Description("Build, Verify and Test the MSI package")
+    .IsDependentOn("FetchBundledExtensions")
+    .Does(() =>
+    {
+        BuildVerifyAndTest(new NUnitConsoleMsiPackage(Context, SemVer));
+    });
+
+Task("PackageZip")
+    .Description("Build, Verify and Test the Zip package")
     .IsDependentOn("FetchBundledExtensions")
     .IsDependentOn("CreateZipImage")
     .Does(() =>
     {
-        EnsureDirectoryExists(PACKAGE_DIR);
-
-        foreach (var package in AllPackages)
-            package.BuildPackage();
+        BuildVerifyAndTest(new NUnitConsoleZipPackage(Context, ProductVersion));
     });
 
-//////////////////////////////////////////////////////////////////////
-// VERIFY PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("VerifyPackages")
-    .Description("Check content of all the packages we build")
+Task("PackageEngine")
+    .Description("Build and Verify the NUnit.Engine package")
     .Does(() =>
     {
-        int failures = 0;
-
-        foreach (var package in AllPackages)
-            failures += VerifyPackage(package);
-
-        if (failures == 0)
-            Information("\nAll packages passed verification.");
-        else
-            throw new System.Exception($"{failures} packages failed verification.");
+        BuildVerifyAndTest(new NUnitEnginePackage(Context, ProductVersion));
     });
 
-//////////////////////////////////////////////////////////////////////
-// TEST PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("TestPackages")
+Task("PackageEngineApi")
+    .Description("Build and Verify the NUnit.Engine.Api package")
     .Does(() =>
     {
-        foreach (var package in AllPackages)
-            if (package.HasTests)
-                package.RunTests();
-    });
-
-//////////////////////////////////////////////////////////////////////
-// PACKAGE DEVELOPMENT - Tasks for working on individual packages
-//////////////////////////////////////////////////////////////////////
-
-Task("PackageMsi")
-    .Description("Build Check and Test the MSI package")
-    .IsDependentOn("FetchBundledExtensions")
-    .Does(() =>
-    {
-        foreach(var package in AllPackages)
-        {
-            if (package is MsiPackage)
-            {
-                EnsureDirectoryExists(PACKAGE_DIR);
-
-                package.BuildPackage();
-
-                DisplayBanner("Checking package content");
-                VerifyPackage(package);
-
-                if (package.PackageTests != null)
-                    package.RunTests();
-            }
-        }
+        BuildVerifyAndTest(new NUnitEngineApiPackage(Context, ProductVersion));
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -465,9 +460,9 @@ Task("PublishToMyGet")
             foreach (var package in AllPackages)
                 try
                 {
-                    if (package is NuGetPackage)
+                    if (package is NuGetPackageDefinition)
                         PushNuGetPackage(package.PackageFilePath, apiKey, MYGET_PUSH_URL);
-                    else if (package is ChocolateyPackage)
+                    else if (package is ChocolateyPackageDefinition)
                         PushChocolateyPackage(package.PackageFilePath, apiKey, MYGET_PUSH_URL);
                 }
                 catch(Exception)
@@ -490,7 +485,7 @@ Task("PublishToNuGet")
             var apiKey = EnvironmentVariable(NUGET_API_KEY);
 
             foreach (var package in AllPackages)
-                if (package is NuGetPackage)
+                if (package is NuGetPackageDefinition)
                     try
                     {
                         PushNuGetPackage(package.PackageFilePath, apiKey, NUGET_PUSH_URL);
@@ -515,7 +510,7 @@ Task("PublishToChocolatey")
             var apiKey = EnvironmentVariable(CHOCO_API_KEY);
 
             foreach (var package in AllPackages)
-                if (package is ChocolateyPackage)
+                if (package is ChocolateyPackageDefinition)
                     try
                     {
                         PushChocolateyPackage(package.PackageFilePath, apiKey, CHOCO_PUSH_URL);
@@ -649,15 +644,7 @@ Task("Test")
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("Build")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("VerifyPackages")
-    .IsDependentOn("TestPackages");
-
-Task("PackageExistingBuild")
-    .Description("Builds and tests all packages, using previously build binaries")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("VerifyPackages")
-    .IsDependentOn("TestPackages");
+    .IsDependentOn("PackageExistingBuild");
 
 Task("BuildTestAndPackage")
     .Description("Builds, tests and packages")

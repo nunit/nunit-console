@@ -292,11 +292,24 @@ void RunNetCoreConsole(string projectPath, string targetRuntime)
 // HELPER METHODS - PACKAGING
 //////////////////////////////////////////////////////////////////////
 
+public void BuildVerifyAndTest(PackageDefinition package)
+{
+        EnsureDirectoryExists(PACKAGE_DIR);
+
+        package.BuildPackage();
+
+        DisplayBanner("Checking package content");
+        VerifyPackage(package);
+
+        if (package.PackageTests != null)
+            package.RunTests();
+}
+
 public int VerifyPackage(PackageDefinition package)
 {
     int failures = 0;
 
-    if (!CheckPackage(package.PackageFilePath, package.PackageChecks))
+    if (package.HasChecks && !CheckPackage(package.PackageFilePath, package.PackageChecks))
         ++failures;
 
     if (package.HasSymbols && !CheckPackage(PACKAGE_DIR + package.SymbolPackageName, package.SymbolChecks))
@@ -304,7 +317,6 @@ public int VerifyPackage(PackageDefinition package)
 
     return failures;
 }
-
 
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
