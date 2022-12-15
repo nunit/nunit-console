@@ -24,7 +24,6 @@ static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.Fu
 static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
 static string PACKAGE_RESULT_DIR; PACKAGE_RESULT_DIR = PACKAGE_DIR + "results/";
-static string ZIP_IMG_DIR; ZIP_IMG_DIR = PACKAGE_DIR + "zip-image/";
 static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 
 // Solution and Projects

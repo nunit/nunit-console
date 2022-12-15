@@ -286,12 +286,14 @@ public abstract class ZipPackageDefinition : PackageDefinition
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.zip";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"zip/{PackageId}/";
     public override string ResultDirectory => PACKAGE_RESULT_DIR + $"zip/{PackageId}/";
+
+    protected abstract string ZipImageDirectory { get; }
     
     protected override void doBuildPackage()
     {
         DisplayAction("Building");
 
-        _context.Zip(ZIP_IMG_DIR, PackageFilePath);
+        _context.Zip(ZipImageDirectory, PackageFilePath);
     }
 
     protected override void doInstallPackage()
@@ -305,8 +307,8 @@ public class NUnitConsoleZipPackage : ZipPackageDefinition
     public NUnitConsoleZipPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
         PackageId = "NUnit.Console";
-        PackageSource = ZIP_IMG_DIR;
-        BasePath = ZIP_IMG_DIR;
+        PackageSource = ZipImageDirectory;
+        BasePath = ZipImageDirectory;
         PackageChecks = new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico"),
             HasDirectory("bin").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
@@ -319,4 +321,6 @@ public class NUnitConsoleZipPackage : ZipPackageDefinition
         TestExecutable = "bin/nunit3-console.exe";
         PackageTests = StandardRunnerTests.Concat(new [] { NUnitProjectTest });
     }
+
+    protected override string ZipImageDirectory => PACKAGE_DIR + "zip-image";
 }

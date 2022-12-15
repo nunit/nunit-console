@@ -12,17 +12,17 @@ static PackageDefinition EnginePackage;
 static PackageDefinition EngineApiPackage;
 
 // Called from SetUp
-public void InitializePackageDefinitions(ISetupContext context)
+public void InitializePackageDefinitions(ISetupContext context, BuildSettings settings)
 {
     AllPackages = new PackageDefinition[] {
-        ConsolePackage = new NUnitConsoleNuGetPackage(context, ProductVersion),
-        ConsoleRunnerPackage = new NUnitConsoleRunnerNuGetPackage(context, ProductVersion),
-        NetCoreConsoleRunnerPackage = new NUnitNetCoreConsoleRunnerPackage(context, ProductVersion),
-        ChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(context, ProductVersion),
-        MsiPackage = new NUnitConsoleMsiPackage(context, SemVer),
-        ZipPackage = new NUnitConsoleZipPackage(context, ProductVersion),
-        EnginePackage = new NUnitEnginePackage(context, ProductVersion),
-        EngineApiPackage = new NUnitEngineApiPackage(context, ProductVersion)
+        ConsolePackage = new NUnitConsoleNuGetPackage(context, settings.ProductVersion),
+        ConsoleRunnerPackage = new NUnitConsoleRunnerNuGetPackage(context, settings.ProductVersion),
+        NetCoreConsoleRunnerPackage = new NUnitNetCoreConsoleRunnerPackage(context, settings.ProductVersion),
+        ChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(context, settings.ProductVersion),
+        MsiPackage = new NUnitConsoleMsiPackage(context, settings.SemVer),
+        ZipPackage = new NUnitConsoleZipPackage(context, settings.ProductVersion),
+        EnginePackage = new NUnitEnginePackage(context, settings.ProductVersion),
+        EngineApiPackage = new NUnitEngineApiPackage(context, settings.ProductVersion)
     };
 }
 
