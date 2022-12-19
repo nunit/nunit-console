@@ -13,8 +13,6 @@ public abstract class NuGetPackageDefinition : PackageDefinition
 
     protected override void doBuildPackage()
     {
-        DisplayAction("Building");
-
         var nugetPackSettings = new NuGetPackSettings()
         {
             Version = PackageVersion,
@@ -50,6 +48,13 @@ public class NUnitConsoleNuGetPackage : NuGetPackageDefinition
         PackageSource = PROJECT_DIR + "nuget/runners/nunit.console-runner-with-extensions.nuspec";
         BasePath = PROJECT_DIR;
         PackageChecks = new PackageCheck[] { HasFile("LICENSE.txt") };
+    }
+
+    protected override void doInstallPackage()
+    {
+        // TODO: This has dependencies, which are only satisified
+        // after we are done building, so we just unzip it to verify.
+        _context.Unzip(PackageFilePath, InstallDirectory);
     }
 }
 
@@ -89,17 +94,36 @@ public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
     public NUnitNetCoreConsoleRunnerPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
         PackageId = "NUnit.ConsoleRunner.NetCore";
-        PackageSource = PROJECT_DIR + "nuget/runners/nunit.console-runner.netcore.nuspec";
-        BasePath = NETCORE_CONSOLE_DIR;
+        //PackageSource = PROJECT_DIR + "nuget/runners/nunit.console-runner.netcore.nuspec";
+        PackageSource = NETCORE_CONSOLE_PROJECT;
+        //BasePath = NETCORE_CONSOLE_DIR;
+        BasePath = NETCORE_CONSOLE_PROJECT_BIN_DIR;
         PackageChecks = new PackageCheck[] {
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
+            HasDirectory("content").WithFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES)
         };
         SymbolChecks = new PackageCheck[] {
-            HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}").WithFile("nunit3-netcore-console.pdb").AndFiles(ENGINE_PDB_FILES)
+            HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFile("nunit3-netcore-console.pdb").AndFiles(ENGINE_PDB_FILES)
         };
-        TestExecutable = $"tools/{NETCORE_CONSOLE_TARGET}/nunit3-netcore-console.exe";
+        TestExecutable = $"tools/{NETCORE_CONSOLE_TARGET}/any/nunit3-netcore-console.dll";
         PackageTests = NetCoreRunnerTests;
+    }
+
+    // Build package from project file
+    protected override void doBuildPackage()
+    {
+        var settings = new DotNetPackSettings()
+        {
+            Configuration = Configuration,
+            OutputDirectory = PACKAGE_DIR,
+            IncludeSymbols = HasSymbols,
+            ArgumentCustomization = args => args.Append($"/p:Version={PackageVersion}")
+        };
+
+        if (HasSymbols)
+            settings.SymbolPackageFormat = "snupkg";
+
+        _context.DotNetPack(PackageSource, settings);
     }
 
     protected override void doInstallPackage()
@@ -110,9 +134,9 @@ public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
     }
 }
 
-public class NUnitEnginePackage : NuGetPackageDefinition
+public class NUnitEngineNuGetPackage : NuGetPackageDefinition
 {
-    public NUnitEnginePackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitEngineNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
         PackageId = "NUnit.Engine";
         PackageSource = PROJECT_DIR + "nuget/engine/nunit.engine.nuspec";
@@ -140,9 +164,9 @@ public class NUnitEnginePackage : NuGetPackageDefinition
     }
 }
 
-public class NUnitEngineApiPackage : NuGetPackageDefinition
+public class NUnitEngineApiNuGetPackage : NuGetPackageDefinition
 {
-    public NUnitEngineApiPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitEngineApiNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
     {
         PackageId = "NUnit.Engine.Api";
         PackageSource = PROJECT_DIR + "nuget/engine/nunit.engine.api.nuspec";
@@ -173,8 +197,6 @@ public abstract class ChocolateyPackageDefinition : PackageDefinition
     
     protected override void doBuildPackage()
     {
-        DisplayAction("Building");
-
         _context.ChocolateyPack(PackageSource,
             new ChocolateyPackSettings()
             {
@@ -227,8 +249,6 @@ public abstract class MsiPackageDefinition : PackageDefinition
 
     protected override void doBuildPackage()
     {
-        DisplayAction("Building");
-
         _context.MSBuild(PackageSource, new MSBuildSettings()
             .WithTarget("Rebuild")
             .SetConfiguration(Configuration)
@@ -291,8 +311,6 @@ public abstract class ZipPackageDefinition : PackageDefinition
     
     protected override void doBuildPackage()
     {
-        DisplayAction("Building");
-
         _context.Zip(ZipImageDirectory, PackageFilePath);
     }
 

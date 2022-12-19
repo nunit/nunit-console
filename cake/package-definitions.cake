@@ -1,32 +1,4 @@
 //////////////////////////////////////////////////////////////////////
-// INITIALIZE DEFINITIONS OF PACKAGES
-//////////////////////////////////////////////////////////////////////
-static PackageDefinition[] AllPackages;
-static PackageDefinition ConsolePackage;
-static PackageDefinition ConsoleRunnerPackage;
-static PackageDefinition NetCoreConsoleRunnerPackage;
-static PackageDefinition ChocolateyPackage;
-static PackageDefinition MsiPackage;
-static PackageDefinition ZipPackage;
-static PackageDefinition EnginePackage;
-static PackageDefinition EngineApiPackage;
-
-// Called from SetUp
-public void InitializePackageDefinitions(ISetupContext context, BuildSettings settings)
-{
-    AllPackages = new PackageDefinition[] {
-        ConsolePackage = new NUnitConsoleNuGetPackage(context, settings.ProductVersion),
-        ConsoleRunnerPackage = new NUnitConsoleRunnerNuGetPackage(context, settings.ProductVersion),
-        NetCoreConsoleRunnerPackage = new NUnitNetCoreConsoleRunnerPackage(context, settings.ProductVersion),
-        ChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(context, settings.ProductVersion),
-        MsiPackage = new NUnitConsoleMsiPackage(context, settings.SemVer),
-        ZipPackage = new NUnitConsoleZipPackage(context, settings.ProductVersion),
-        EnginePackage = new NUnitEnginePackage(context, settings.ProductVersion),
-        EngineApiPackage = new NUnitEngineApiPackage(context, settings.ProductVersion)
-    };
-}
-
-//////////////////////////////////////////////////////////////////////
 // PACKAGE DEFINITION ABSTRACT CLASS
 //////////////////////////////////////////////////////////////////////
 
@@ -67,6 +39,23 @@ public abstract class PackageDefinition
     protected abstract void doBuildPackage();
     protected abstract void doInstallPackage();
 
+    public void BuildVerifyAndTest()
+    {
+        _context.EnsureDirectoryExists(PACKAGE_DIR);
+
+        BuildPackage();
+        InstallPackage();
+
+        if (HasChecks)
+            VerifyPackage();
+
+        if (HasSymbols)
+            VerifySymbolPackage();
+
+        if (HasTests)
+            TestPackage();
+    }
+
     public void BuildPackage()
     {
         DisplayAction("Building");
@@ -75,16 +64,31 @@ public abstract class PackageDefinition
 
     public void InstallPackage()
     {
+        DisplayAction("Installing");
         Console.WriteLine($"Installing package to {InstallDirectory}");
         _context.CleanDirectory(InstallDirectory);
         doInstallPackage();
     }
 
-    public void RunTests()
+    public void VerifyPackage()
+    {
+        DisplayAction("Verifying");
+
+        bool allOK = true;
+        foreach (var check in PackageChecks)
+            allOK &= check.Apply(InstallDirectory);
+
+        if (allOK)
+            WriteInfo("All checks passed!");
+        else 
+            throw new Exception("Verification failed!");
+    }
+
+    public virtual void VerifySymbolPackage() { } // Overridden for NuGet packages
+
+    public void TestPackage()
     {
         DisplayAction("Testing");
-
-        InstallPackage();
 
         var reporter = new ResultReporter(PackageFileName);
 
@@ -99,12 +103,19 @@ public abstract class PackageDefinition
 
             Console.WriteLine($"Running {InstallDirectory + TestExecutable}");
 
-            int rc = _context.StartProcess(
-                InstallDirectory + TestExecutable,
-                new ProcessSettings()
-                {
-                    Arguments = $"{packageTest.Arguments} --work={testResultDir}",
-                });
+            int rc = TestExecutable.EndsWith(".dll")
+                ? _context.StartProcess(
+                    "dotnet",
+                    new ProcessSettings()
+                    {
+                        Arguments = $"\"{InstallDirectory}{TestExecutable}\" {packageTest.Arguments} --work={testResultDir}",
+                    })
+                : _context.StartProcess(
+                    InstallDirectory + TestExecutable,
+                    new ProcessSettings()
+                    {
+                        Arguments = $"{packageTest.Arguments} --work={testResultDir}",
+                    });
 
             try
             {

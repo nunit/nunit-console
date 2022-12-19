@@ -18,8 +18,6 @@ static bool NoPush; NoPush = HasArgument("nopush");
 #tool dotnet:?package=GitVersion.Tool&version=5.6.3
 #tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
 
-BuildVersion _buildVersion;
-
 var UnreportedErrors = new List<string>();
 
 //////////////////////////////////////////////////////////////////////
@@ -28,7 +26,6 @@ var UnreportedErrors = new List<string>();
 Setup(context =>
 {
     var settings = new BuildSettings(context);
-    _buildVersion = settings.BuildVersion;
 
     Information($"Building {settings.Configuration} version {settings.ProductVersion} of NUnit Console/Engine.");
     Information($"PreReleaseLabel is {settings.PreReleaseLabel}");
@@ -36,9 +33,6 @@ Setup(context =>
     // TODO: Hide this in a lower-level file
     if (IsRunningOnWindows())
         StandardRunnerTests.Add(Net60WindowsFormsTest);
-
-    Information("Initializing PackageDefinitions");
-    InitializePackageDefinitions(context, settings);
 
     if (BuildSystem.IsRunningOnAppVeyor)
         AppVeyor.UpdateBuildVersion(settings.ProductVersion + "-" + AppVeyor.Environment.Build.Number);
@@ -305,6 +299,7 @@ Task("PackageExistingBuild")
     .IsDependentOn("PackageConsole")
     .IsDependentOn("PackageConsoleRunner")
     .IsDependentOn("PackageDotNetConsoleRunner")
+    .IsDependentOn("PackageChocolateyConsoleRunner")
     .IsDependentOn("PackageMsi")
     .IsDependentOn("PackageZip")
     .IsDependentOn("PackageEngine")
@@ -318,28 +313,28 @@ Task("PackageConsole")
     .Description("Build and Test NUnit.Console NuGet Package")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitConsoleNuGetPackage(Context, settings.ProductVersion));
+        settings.ConsoleNuGetPackage.BuildVerifyAndTest();
     });
 
 Task("PackageConsoleRunner")
-    .Description("Build and  Test NUnit.ConsoleRunner NuGet Package")
+    .Description("Build and Test NUnit.ConsoleRunner NuGet Package")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitConsoleRunnerNuGetPackage(Context, settings.ProductVersion));
+        settings.ConsoleRunnerNuGetPackage.BuildVerifyAndTest();
     });
         
 Task("PackageDotNetConsoleRunner")
-    .Description("Build and  Test NUnit.ConsoleRunner NuGet Package")
+    .Description("Build and Test NUnit.ConsoleRunner NuGet Package")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitNetCoreConsoleRunnerPackage(Context, settings.ProductVersion));
+        settings.DotNetConsoleRunnerNuGetPackage.BuildVerifyAndTest();
     });
 
 Task("PackageChocolateyConsoleRunner")
     .Description("Build Verify and Test the Chocolatey nunit-console-runner package")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitConsoleRunnerChocolateyPackage(Context, settings.ProductVersion));
+        settings.ConsoleRunnerChocolateyPackage.BuildVerifyAndTest();
     });
 
 Task("PackageMsi")
@@ -347,7 +342,7 @@ Task("PackageMsi")
     .IsDependentOn("FetchBundledExtensions")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitConsoleMsiPackage(Context, settings.SemVer));
+        settings.ConsoleMsiPackage.BuildVerifyAndTest();
     });
 
 Task("PackageZip")
@@ -356,21 +351,21 @@ Task("PackageZip")
     .IsDependentOn("CreateZipImage")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitConsoleZipPackage(Context, settings.ProductVersion));
+        settings.ConsoleZipPackage.BuildVerifyAndTest();
     });
 
 Task("PackageEngine")
     .Description("Build and Verify the NUnit.Engine package")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitEnginePackage(Context, settings.ProductVersion));
+        settings.EngineNuGetPackage.BuildVerifyAndTest();
     });
 
 Task("PackageEngineApi")
     .Description("Build and Verify the NUnit.Engine.Api package")
     .Does<BuildSettings>(settings =>
     {
-        BuildVerifyAndTest(new NUnitEngineApiPackage(Context, settings.ProductVersion));
+        settings.EngineApiNuGetPackage.BuildVerifyAndTest();
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -465,7 +460,7 @@ Task("PublishToMyGet")
         {
             var apiKey = EnvironmentVariable(MYGET_API_KEY);
 
-            foreach (var package in AllPackages)
+            foreach (var package in settings.AllPackages)
                 try
                 {
                     if (package is NuGetPackageDefinition)
@@ -492,7 +487,7 @@ Task("PublishToNuGet")
         {
             var apiKey = EnvironmentVariable(NUGET_API_KEY);
 
-            foreach (var package in AllPackages)
+            foreach (var package in settings.AllPackages)
                 if (package is NuGetPackageDefinition)
                     try
                     {
@@ -517,7 +512,7 @@ Task("PublishToChocolatey")
         {
             var apiKey = EnvironmentVariable(CHOCO_API_KEY);
 
-            foreach (var package in AllPackages)
+            foreach (var package in settings.AllPackages)
                 if (package is ChocolateyPackageDefinition)
                     try
                     {
@@ -597,7 +592,7 @@ Task("CreateProductionRelease")
             string tagName = settings.ProductVersion;
 
             var assetList = new List<string>();
-            foreach (var package in AllPackages)
+            foreach (var package in settings.AllPackages)
                 assetList.Add(package.PackageFilePath);
             string assets = $"\"{string.Join(',', assetList.ToArray())}\"";
 

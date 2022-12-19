@@ -17,6 +17,17 @@ public class BuildSettings
         Configuration = context.Argument("configuration", "Release");
 
         BuildVersion = new BuildVersion(context);
+
+        AllPackages = new PackageDefinition[] {
+            ConsoleNuGetPackage = new NUnitConsoleNuGetPackage(context, ProductVersion),
+            ConsoleRunnerNuGetPackage = new NUnitConsoleRunnerNuGetPackage(context, ProductVersion),
+            DotNetConsoleRunnerNuGetPackage = new NUnitNetCoreConsoleRunnerPackage(context, ProductVersion),
+            ConsoleRunnerChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(context, ProductVersion),
+            ConsoleMsiPackage = new NUnitConsoleMsiPackage(context, SemVer),
+            ConsoleZipPackage = new NUnitConsoleZipPackage(context, ProductVersion),
+            EngineNuGetPackage = new NUnitEngineNuGetPackage(context, ProductVersion),
+            EngineApiNuGetPackage = new NUnitEngineApiNuGetPackage(context, ProductVersion)
+        };
     }
 
     public string Target { get; }
@@ -47,6 +58,17 @@ public class BuildSettings
     public bool ShouldPublishToNuGet => !IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel);
     public bool ShouldPublishToChocolatey => !IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);
     public bool IsProductionRelease => !IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(PreReleaseLabel);
+
+    public PackageDefinition[] AllPackages { get; }
+
+    public PackageDefinition ConsoleNuGetPackage;
+    public PackageDefinition ConsoleRunnerNuGetPackage;
+    public PackageDefinition DotNetConsoleRunnerNuGetPackage;
+    public PackageDefinition ConsoleRunnerChocolateyPackage;
+    public PackageDefinition ConsoleMsiPackage;
+    public PackageDefinition ConsoleZipPackage;
+    public PackageDefinition EngineNuGetPackage;
+    public PackageDefinition EngineApiNuGetPackage;
 
     public void Display()
     {

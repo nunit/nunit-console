@@ -292,32 +292,6 @@ void RunNetCoreConsole(string projectPath, string targetRuntime)
 // HELPER METHODS - PACKAGING
 //////////////////////////////////////////////////////////////////////
 
-public void BuildVerifyAndTest(PackageDefinition package)
-{
-        EnsureDirectoryExists(PACKAGE_DIR);
-
-        package.BuildPackage();
-
-        DisplayBanner("Checking package content");
-        VerifyPackage(package);
-
-        if (package.PackageTests != null)
-            package.RunTests();
-}
-
-public int VerifyPackage(PackageDefinition package)
-{
-    int failures = 0;
-
-    if (package.HasChecks && !CheckPackage(package.PackageFilePath, package.PackageChecks))
-        ++failures;
-
-    if (package.HasSymbols && !CheckPackage(PACKAGE_DIR + package.SymbolPackageName, package.SymbolChecks))
-        ++failures;
-
-    return failures;
-}
-
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
     var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));

@@ -24,7 +24,7 @@ static readonly string[] AGENT_PDB_FILES_NETCORE = {
 static readonly string[] CONSOLE_FILES = {
         "nunit3-console.exe", "nunit3-console.exe.config" };
 static readonly string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-netcore-console.exe", "nunit3-netcore-console.dll", "nunit3-netcore-console.dll.config" };
+        "nunit3-netcore-console.dll", "nunit3-netcore-console.dll.config" };
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE CHECK IMPLEMENTATION
@@ -32,90 +32,6 @@ static readonly string[] CONSOLE_FILES_NETCORE = {
 
 // NOTE: Package checks basically do no more than what the programmer might 
 // do in opening the package itself and examining the content.
-
-public bool CheckPackage(string package, params PackageCheck[] checks)
-{
-    Console.WriteLine("\nPackage Name: " + System.IO.Path.GetFileName(package));
-
-    if (!FileExists(package))
-    {
-        WriteError("Package was not found!");
-        return false;
-    }
-
-    if (checks.Length == 0)
-    {
-        WriteWarning("Package found but no checks were specified.");
-        return true;
-    }
-
-    bool isMsi = package.EndsWith(".msi"); 
-    string tempDir = isMsi
-        ? InstallMsiToTempDir(package)
-        : UnzipToTempDir(package);
-
-    if (!System.IO.Directory.Exists(tempDir))
-    {
-        WriteError("Temporary directory was not created!");
-        return false;
-    }
-
-    try
-    {
-        bool allPassed = ApplyChecks(tempDir, checks);
-        if (allPassed)
-            WriteInfo("All checks passed!");
-
-        return allPassed;
-    }
-    finally
-    {
-        DeleteDirectory(tempDir, new DeleteDirectorySettings()
-        {
-            Recursive = true,
-            Force = true
-        });
-    }
-}
-
-private string InstallMsiToTempDir(string package)
-{
-    // Msiexec does not tolerate forward slashes!
-    package = package.Replace("/", "\\");
-    var tempDir = GetTempDirectoryPath();
-    
-    WriteInfo("Installing to " + tempDir);
-    int rc = StartProcess("msiexec", $"/a {package} TARGETDIR={tempDir} /q");
-    if (rc != 0)
-        WriteError($"Installer returned {rc.ToString()}");
-
-    return tempDir;
-}
-
-private string UnzipToTempDir(string package)
-{
-    var tempDir = GetTempDirectoryPath();
- 
-    WriteInfo("Unzipping to " + tempDir);
-    Unzip(package, tempDir);
-
-    return tempDir;
-}
-
-private string GetTempDirectoryPath()
-{
-   return System.IO.Path.GetTempPath() + System.IO.Path.GetRandomFileName() + "\\";
-}
-
-private bool ApplyChecks(string dir, PackageCheck[] checks)
-{
-    bool allOK = true;
-
-    foreach (var check in checks)
-        allOK &= check.Apply(dir);
-
-    return allOK;
-}
 
 public abstract class PackageCheck
 {
