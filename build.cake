@@ -102,9 +102,9 @@ Task("Build")
     {
         // TEMP change for use with .NET 7.0 RC 2
         // We must build one project at a time
-        //if (IsRunningOnWindows())
-        //    BuildSolution();
-        //else
+        if (settings.IsLocalBuild && settings.IsRunningOnWindows)
+            BuildSolution(settings);
+        else
             BuildEachProjectSeparately(settings);
     });
 
