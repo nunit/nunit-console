@@ -1,4 +1,24 @@
 //////////////////////////////////////////////////////////////////////
+/// Representation of a single test to be run against a pre-built package.
+//////////////////////////////////////////////////////////////////////
+
+public struct PackageTest
+{
+    public string Name;
+    public string Description;
+    public string Arguments;
+    public ExpectedResult ExpectedResult;
+
+    public PackageTest(string name, string description, string arguments, ExpectedResult expectedResult)
+    {
+        Name = name;
+        Description = description;
+        Arguments = arguments;
+        ExpectedResult = expectedResult;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE TEST DEFINITIONS
 //////////////////////////////////////////////////////////////////////
 
@@ -119,20 +139,35 @@ NUnitProjectTest = new PackageTest(
     $"NetFXTests.nunit --config={Configuration}",
     MockAssemblyExpectedResult(2));
 
-// Representation of a single test to be run against a pre-built package.
-public struct PackageTest
+//////////////////////////////////////////////////////////////////////
+// LISTS OF PACKAGE TESTS
+//////////////////////////////////////////////////////////////////////
+
+// Tests run for all runner packages except NETCORE runner
+static List<PackageTest> StandardRunnerTests = new List<PackageTest>
 {
-    public string Name;
-    public string Description;
-    public string Arguments;
-    public ExpectedResult ExpectedResult;
+    Net35Test,
+    Net40Test,
+    NetCore21Test,
+    NetCore31Test,
+    Net50Test,
+    Net60Test,
+    Net70Test,
+    Net35PlusNet40Test,
+    Net40PlusNet60Test,
+    Net50PlusNet60Test,
+    Net35X86Test,
+    Net40X86Test,
+    Net60AspNetCoreTest
+};
 
-    public PackageTest(string name, string description, string arguments, ExpectedResult expectedResult)
-    {
-        Name = name;
-        Description = description;
-        Arguments = arguments;
-        ExpectedResult = expectedResult;
-    }
-}
-
+// Tests run for the NETCORE runner package
+static List<PackageTest> NetCoreRunnerTests = new List<PackageTest>
+{
+    NetCore21Test,
+    NetCore31Test,
+    Net50Test,
+    Net60Test,
+    Net50PlusNet60Test,
+    Net60AspNetCoreTest
+};

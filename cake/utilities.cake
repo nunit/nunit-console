@@ -77,24 +77,24 @@ public static void DisplayBanner(string message)
 // HELPER METHODS - BUILD
 //////////////////////////////////////////////////////////////////////
 
-void BuildSolution()
+void BuildSolution(BuildSettings settings)
 {
-    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
+    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build", settings).WithRestore());
 }
 
-MSBuildSettings CreateMSBuildSettings(string target)
+MSBuildSettings CreateMSBuildSettings(string target, BuildSettings settings)
 {
-    var settings = new MSBuildSettings()
+    var msbuildSettings = new MSBuildSettings()
         .SetConfiguration(Configuration)
         .SetVerbosity(Verbosity.Minimal)
-        .WithProperty("Version", ProductVersion)
-        .WithProperty("ApiFileVersion", SemVer + ".0")
+        .WithProperty("Version", settings.ProductVersion)
+        .WithProperty("ApiFileVersion", settings.SemVer + ".0")
         .WithTarget(target)
         // Workaround for https://github.com/Microsoft/msbuild/issues/3626
         .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
 
     if (BuildSystem.IsRunningOnAppVeyor)
-        settings.ToolPath = System.IO.Path.GetFullPath(@".dotnetsdk\sdk\7.0.100-rc.2.22477.23\MSBuild.dll");
+        msbuildSettings.ToolPath = System.IO.Path.GetFullPath(@".dotnetsdk\sdk\7.0.100-rc.2.22477.23\MSBuild.dll");
     else 
     if (IsRunningOnWindows())
     {
@@ -112,60 +112,60 @@ MSBuildSettings CreateMSBuildSettings(string target)
 
             if (FileExists(msBuildPath))
             {
-                settings.ToolPath = msBuildPath;
+                msbuildSettings.ToolPath = msBuildPath;
                 Information("Using MSBuild at " + msBuildPath);
             }
         }
     }
 
-    return settings;
+    return msbuildSettings;
 }
 
-DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
+DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target, BuildSettings settings)
 {
     return new DotNetMSBuildSettings()
         .SetConfiguration(Configuration)
-        .WithProperty("Version", ProductVersion)
-        .WithProperty("ApiFileVersion", SemVer + ".0")
+        .WithProperty("Version", settings.ProductVersion)
+        .WithProperty("ApiFileVersion", settings.SemVer + ".0")
         .WithTarget(target);
 }
 
-private void BuildEachProjectSeparately()
+private void BuildEachProjectSeparately(BuildSettings settings)
 {
     Information($"Restoring {SOLUTION_FILE}");
     DotNetRestore(SOLUTION_FILE);
 
-    BuildProject(ENGINE_API_PROJECT);
+    BuildProject(ENGINE_API_PROJECT, settings);
 
-    BuildProject(MOCK_ASSEMBLY_PROJECT);
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT);
-    BuildProject(NOTEST_PROJECT);
+    BuildProject(MOCK_ASSEMBLY_PROJECT, settings);
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, settings);
+    BuildProject(NOTEST_PROJECT, settings);
     if (IsRunningOnWindows())
-        BuildProject(WINDOWS_TEST_PROJECT);
-    BuildProject(ASPNETCORE_TEST_PROJECT);
+        BuildProject(WINDOWS_TEST_PROJECT, settings);
+    BuildProject(ASPNETCORE_TEST_PROJECT, settings);
 
-    BuildProject(ENGINE_CORE_PROJECT);
-    BuildProject(AGENT_PROJECT);
-    BuildProject(AGENT_X86_PROJECT);
-    BuildProject(ENGINE_PROJECT);
+    BuildProject(ENGINE_CORE_PROJECT, settings);
+    BuildProject(AGENT_PROJECT, settings);
+    BuildProject(AGENT_X86_PROJECT, settings);
+    BuildProject(ENGINE_PROJECT, settings);
     
-    BuildProject(NETFX_CONSOLE_PROJECT);
-    BuildProject(NETCORE_CONSOLE_PROJECT);
+    BuildProject(NETFX_CONSOLE_PROJECT, settings);
+    BuildProject(NETCORE_CONSOLE_PROJECT, settings);
 
-    BuildProject(ENGINE_TESTS_PROJECT);
-    BuildProject(ENGINE_CORE_TESTS_PROJECT);
-    BuildProject(CONSOLE_TESTS_PROJECT);
+    BuildProject(ENGINE_TESTS_PROJECT, settings);
+    BuildProject(ENGINE_CORE_TESTS_PROJECT, settings);
+    BuildProject(CONSOLE_TESTS_PROJECT, settings);
 }
 
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
 // If we use MSBuild, then the net5.0 projects fail. So we build each project
 // differently depending on whether it has net35 as one of its targets. 
-void BuildProject(string project, params string[] targetFrameworks)
+void BuildProject(string project, BuildSettings settings, params string[] targetFrameworks)
 {
     if (targetFrameworks.Length == 0)
     {
         DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
-        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
+        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", settings));
     }
     else
     {
@@ -173,9 +173,9 @@ void BuildProject(string project, params string[] targetFrameworks)
         {
             DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
             if (framework == "net35" || framework.StartsWith("net4"))
-                MSBuild(project, CreateMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+                MSBuild(project, CreateMSBuildSettings("Build", settings).WithProperty("TargetFramework", framework));
             else
-                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", settings).WithProperty("TargetFramework", framework));
         }
     }
 }
@@ -292,20 +292,6 @@ void RunNetCoreConsole(string projectPath, string targetRuntime)
 // HELPER METHODS - PACKAGING
 //////////////////////////////////////////////////////////////////////
 
-public int VerifyPackage(PackageDefinition package)
-{
-    int failures = 0;
-
-    if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
-        ++failures;
-
-    if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
-        ++failures;
-
-    return failures;
-}
-
-
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
     var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));
@@ -336,10 +322,3 @@ private void CheckPackageExists(FilePath package)
 		throw new InvalidOperationException(
 			$"Package not found: {package.GetFilename()}.\nCode may have changed since package was last built.");
 }
-
-public bool IsPreRelease => !string.IsNullOrEmpty(PreReleaseLabel);
-
-public bool ShouldPublishToMyGet => IsPreRelease && LABELS_WE_PUBLISH_ON_MYGET.Contains(PreReleaseLabel);
-public bool ShouldPublishToNuGet => !IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel);
-public bool ShouldPublishToChocolatey => !IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);
-public bool IsProductionRelease => !IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(PreReleaseLabel);

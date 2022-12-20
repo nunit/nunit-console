@@ -2,29 +2,29 @@
 // LISTS OF FILES USED IN CHECKING PACKAGES
 //////////////////////////////////////////////////////////////////////
 
-string[] ENGINE_FILES = {
+static readonly string[] ENGINE_FILES = {
         "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-string[] ENGINE_PDB_FILES = {
+static readonly string[] ENGINE_PDB_FILES = {
         "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] ENGINE_CORE_FILES = {
+static readonly string[] ENGINE_CORE_FILES = {
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll", "Microsoft.Extensions.DependencyModel.dll" };
-string[] ENGINE_CORE_PDB_FILES = {
+static readonly string[] ENGINE_CORE_PDB_FILES = {
         "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_FILES = {
+static readonly string[] AGENT_FILES = {
         "nunit-agent.exe", "nunit-agent.exe.config",
         "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_FILES_NETCORE = {
+static readonly string[] AGENT_FILES_NETCORE = {
         "nunit-agent.dll", "nunit-agent.dll.config", "Microsoft.Extensions.DependencyModel.dll",
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_PDB_FILES = {
+static readonly string[] AGENT_PDB_FILES = {
         "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_PDB_FILES_NETCORE = {
+static readonly string[] AGENT_PDB_FILES_NETCORE = {
         "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] CONSOLE_FILES = {
+static readonly string[] CONSOLE_FILES = {
         "nunit3-console.exe", "nunit3-console.exe.config" };
-string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-netcore-console.exe", "nunit3-netcore-console.dll", "nunit3-netcore-console.dll.config" };
+static readonly string[] CONSOLE_FILES_NETCORE = {
+        "nunit3-netcore-console.dll", "nunit3-netcore-console.dll.config" };
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE CHECK IMPLEMENTATION
@@ -32,90 +32,6 @@ string[] CONSOLE_FILES_NETCORE = {
 
 // NOTE: Package checks basically do no more than what the programmer might 
 // do in opening the package itself and examining the content.
-
-public bool CheckPackage(string package, params PackageCheck[] checks)
-{
-    Console.WriteLine("\nPackage Name: " + System.IO.Path.GetFileName(package));
-
-    if (!FileExists(package))
-    {
-        WriteError("Package was not found!");
-        return false;
-    }
-
-    if (checks.Length == 0)
-    {
-        WriteWarning("Package found but no checks were specified.");
-        return true;
-    }
-
-    bool isMsi = package.EndsWith(".msi"); 
-    string tempDir = isMsi
-        ? InstallMsiToTempDir(package)
-        : UnzipToTempDir(package);
-
-    if (!System.IO.Directory.Exists(tempDir))
-    {
-        WriteError("Temporary directory was not created!");
-        return false;
-    }
-
-    try
-    {
-        bool allPassed = ApplyChecks(tempDir, checks);
-        if (allPassed)
-            WriteInfo("All checks passed!");
-
-        return allPassed;
-    }
-    finally
-    {
-        DeleteDirectory(tempDir, new DeleteDirectorySettings()
-        {
-            Recursive = true,
-            Force = true
-        });
-    }
-}
-
-private string InstallMsiToTempDir(string package)
-{
-    // Msiexec does not tolerate forward slashes!
-    package = package.Replace("/", "\\");
-    var tempDir = GetTempDirectoryPath();
-    
-    WriteInfo("Installing to " + tempDir);
-    int rc = StartProcess("msiexec", $"/a {package} TARGETDIR={tempDir} /q");
-    if (rc != 0)
-        WriteError($"Installer returned {rc.ToString()}");
-
-    return tempDir;
-}
-
-private string UnzipToTempDir(string package)
-{
-    var tempDir = GetTempDirectoryPath();
- 
-    WriteInfo("Unzipping to " + tempDir);
-    Unzip(package, tempDir);
-
-    return tempDir;
-}
-
-private string GetTempDirectoryPath()
-{
-   return System.IO.Path.GetTempPath() + System.IO.Path.GetRandomFileName() + "\\";
-}
-
-private bool ApplyChecks(string dir, PackageCheck[] checks)
-{
-    bool allOK = true;
-
-    foreach (var check in checks)
-        allOK &= check.Apply(dir);
-
-    return allOK;
-}
 
 public abstract class PackageCheck
 {
@@ -206,10 +122,10 @@ public class DirectoryCheck : PackageCheck
     }
 }
 
-private FileCheck HasFile(string file) => HasFiles(new [] { file });
-private FileCheck HasFiles(params string[] files) => new FileCheck(files);  
+private static FileCheck HasFile(string file) => HasFiles(new [] { file });
+private static FileCheck HasFiles(params string[] files) => new FileCheck(files);  
 
-private DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
+private static DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
 
 private static void WriteError(string msg)
 {

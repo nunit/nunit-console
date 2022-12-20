@@ -1,397 +1,151 @@
 //////////////////////////////////////////////////////////////////////
-// INDIVIDUAL PACKAGE DEFINITIONS
+// PACKAGE DEFINITION ABSTRACT CLASS
 //////////////////////////////////////////////////////////////////////
-
-PackageDefinition NUnitConsoleNuGetPackage;
-PackageDefinition NUnitConsoleRunnerNuGetPackage;
-PackageDefinition NUnitNetCoreConsoleRunnerPackage;
-PackageDefinition NUnitEnginePackage;
-PackageDefinition NUnitEngineApiPackage;
-PackageDefinition NUnitConsoleRunnerChocolateyPackage;
-PackageDefinition NUnitConsoleMsiPackage;
-PackageDefinition NUnitConsoleZipPackage;
-
-public void InitializePackageDefinitions(ICakeContext context)
-{
-    const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
-    bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
-
-    // Tests run for all runner packages except NETCORE runner
-    var StandardRunnerTests = new List<PackageTest>
-    {
-        Net35Test,
-        Net40Test,
-        NetCore21Test,
-        NetCore31Test,
-        Net50Test,
-        Net60Test,
-        Net70Test,
-        Net35PlusNet40Test,
-        Net40PlusNet60Test,
-        Net50PlusNet60Test,
-        Net35X86Test,
-        Net40X86Test,
-        Net60AspNetCoreTest
-    };
-
-    if (IsRunningOnWindows())
-        StandardRunnerTests.Add(Net60WindowsFormsTest);
-
-    // Temporarily disable X86 tests of .NET Core on AppVeyor
-    if (dotnetX86Available && !BuildSystem.IsRunningOnAppVeyor)
-        StandardRunnerTests.Add(NetCore31X86Test);
-
-    // Tests run for the NETCORE runner package
-    var NetCoreRunnerTests = new List<PackageTest>
-    {
-        NetCore21Test,
-        NetCore31Test,
-        Net50Test,
-        Net60Test,
-        Net50PlusNet60Test,
-        Net60AspNetCoreTest
-    };
-
-    AllPackages.AddRange(new PackageDefinition[] {
-
-        NUnitConsoleNuGetPackage = new NuGetPackage(
-            context: context,
-            id: "NUnit.Console",
-            version: ProductVersion,
-            source: NUGET_DIR + "runners/nunit.console-runner-with-extensions.nuspec",
-            basepath: PROJECT_DIR,
-            checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
-
-        NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
-            context: context,
-            id: "NUnit.ConsoleRunner",
-            version: ProductVersion,
-            source: NUGET_DIR + "runners/nunit.console-runner.nuspec",
-            basepath: NETFX_CONSOLE_DIR,
-            checks: new PackageCheck[] {
-                HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
-                HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
-            },
-            symbols: new PackageCheck[] {
-                HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
-                HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
-                HasDirectory("tools/agents/net462").WithFiles(AGENT_PDB_FILES),
-                HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE)
-            },
-            executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests),
-
-        NUnitNetCoreConsoleRunnerPackage = new NuGetPackage(
-            context: context,
-            id: "NUnit.ConsoleRunner.NetCore",
-            version: ProductVersion,
-            source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
-            basepath: NETCORE_CONSOLE_DIR,
-            checks: new PackageCheck[] {
-                HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
-            },
-            symbols: new PackageCheck[] {
-                HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFile("nunit3-netcore-console.pdb").AndFiles(ENGINE_PDB_FILES)
-            },
-            executable: $"tools/{NETCORE_CONSOLE_TARGET}/any/nunit3-netcore-console.exe",
-            tests: NetCoreRunnerTests),
-
-        NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
-            context: context,
-            id: "nunit-console-runner",
-            version: ProductVersion,
-            source: CHOCO_DIR + "nunit-console-runner.nuspec",
-            basepath: NETFX_CONSOLE_DIR,
-            checks: new PackageCheck[] {
-                HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
-                HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
-            },
-            executable: "tools/nunit3-console.exe",
-            tests: StandardRunnerTests),
-
-        NUnitConsoleMsiPackage = new MsiPackage(
-            context: context,
-            id: "NUnit.Console",
-            version: SemVer,
-            source: MSI_DIR + "nunit/nunit.wixproj",
-            basepath: NETFX_CONSOLE_DIR,
-            checks: new PackageCheck[] {
-                HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
-                HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
-                HasDirectory("NUnit.org/nunit-console/agents/net20").WithFiles(AGENT_FILES),
-                HasDirectory("NUnit.org/nunit-console/agents/net462").WithFiles(AGENT_FILES),
-                HasDirectory("NUnit.org/nunit-console/agents/netcoreapp3.1").WithFile("nunit-agent.dll"),
-                HasDirectory("NUnit.org/nunit-console/agents/net5.0").WithFile("nunit-agent.dll"),
-                HasDirectory("NUnit.org/nunit-console/agents/net6.0").WithFile("nunit-agent.dll"),
-                HasDirectory("NUnit.org/nunit-console/agents/net7.0").WithFile("nunit-agent.dll"),
-                HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
-            },
-            executable: "NUnit.org/nunit-console/nunit3-console.exe",
-            tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
-
-       NUnitConsoleZipPackage = new ZipPackage(
-            context: context,
-            id: "NUnit.Console",
-            version: ProductVersion,
-            source: ZIP_IMG_DIR,
-            basepath: ZIP_IMG_DIR,
-            checks: new PackageCheck[] {
-                HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico"),
-                HasDirectory("bin").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
-                HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
-                HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
-                HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
-            },
-            executable: $"bin/nunit3-console.exe",
-            tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),
- 
-        // NOTE: Packages below this point have no direct tests
-
-        NUnitEnginePackage = new NuGetPackage(
-            context: context,
-            id: "NUnit.Engine",
-            version: ProductVersion,
-            source: NUGET_DIR + "engine/nunit.engine.nuspec",
-            basepath: ENGINE_PROJECT_BIN_DIR,
-            checks: new PackageCheck[] {
-                HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory($"lib/{NETFX_ENGINE_TARGET}").WithFiles(ENGINE_FILES),
-                HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
-                HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES),
-                HasDirectory($"contentFiles/any/lib/{NETFX_ENGINE_TARGET}").WithFile("nunit.engine.nuget.addins"),
-                HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
-                HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
-                HasDirectory("agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-                HasDirectory("agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-                HasDirectory("agents/netcoreapp3.1").WithFile("nunit.agent.addins")
-            },
-            symbols: new PackageCheck[] {
-                HasDirectory($"lib/{NETFX_ENGINE_TARGET}").WithFiles(ENGINE_PDB_FILES),
-                HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
-                HasDirectory("lib/netcoreapp3.1").WithFiles(ENGINE_PDB_FILES),
-                HasDirectory("agents/net20").WithFiles(AGENT_PDB_FILES),
-                HasDirectory("agents/net462").WithFiles(AGENT_PDB_FILES),
-                HasDirectory("agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE)
-            }),
-
-        NUnitEngineApiPackage = new NuGetPackage(
-            context: context,
-            id: "NUnit.Engine.Api",
-            version: ProductVersion,
-            source: NUGET_DIR + "engine/nunit.engine.api.nuspec",
-            basepath: ENGINE_API_PROJECT_BIN_DIR,
-            checks: new PackageCheck[] {
-                HasFile("LICENSE.txt"),
-                HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
-                HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
-            },
-            symbols: new PackageCheck[] {
-                HasDirectory("lib/net20").WithFile("nunit.engine.api.pdb"),
-                HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
-            })
-    });
-}
-
-//////////////////////////////////////////////////////////////////////
-// LIST OF ALL PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-var AllPackages = new List<PackageDefinition>();
-
-//////////////////////////////////////////////////////////////////////
-// PACKAGE DEFINITION IMPLEMENTATION
-//////////////////////////////////////////////////////////////////////
-
-public enum PackageType
-{
-    NuGet,
-    Chocolatey,
-    Msi,
-    Zip
-}
 
 /// <summary>
-/// 
+/// The abstract base of all packages
 /// </summary>
 public abstract class PackageDefinition
 {
     protected ICakeContext _context;
 
     /// <summary>
-    /// 
+    /// Construct without arguments - derived class must set properties
     /// </summary>
-    /// <param name="packageType">A PackageType value specifying one of the four known package types</param>
-    /// <param name="id">A string containing the package ID, used as the root of the PackageName</param>
-    /// <param name="version">A string representing the package version, used as part of the PackageName</param>
-    /// <param name="source">A string representing the source used to create the package, e.g. a nuspec file</param>
-    /// <param name="executable">A string containing the path to the executable used in running tests. If relative, the path is contained within the package itself.</param>
-    /// <param name="checks">An array of PackageChecks be made on the content of the package. Optional.</param>
-    /// <param name="symbols">An array of PackageChecks to be made on the symbol package, if one is created. Optional. Only supported for nuget packages.</param>
-    /// <param name="tests">An array of PackageTests to be run against the package. Optional.</param>
-	protected PackageDefinition(
-        ICakeContext context,
-        PackageType packageType,
-        string id,
-        string version,
-        string source,
-        string basepath,
-        string executable = null,
-        PackageCheck[] checks = null,
-        PackageCheck[] symbols = null,
-        IEnumerable<PackageTest> tests = null)
+    protected PackageDefinition(ICakeContext context, string packageVersion)
     {
-        if (executable == null && tests != null)
-            throw new System.ArgumentException($"Unable to create {packageType} package {id}: Executable must be provided if there are tests", nameof(executable));
-
         _context = context;
-
-        PackageType = packageType;
-        PackageId = id;
-        PackageVersion = version;
-        PackageSource = source;
-        BasePath = basepath;
-        TestExecutable = executable;
-        PackageChecks = checks;
-        PackageTests = tests;
-        SymbolChecks = symbols;
+        PackageVersion = packageVersion;
     }
 
-    public PackageType PackageType { get; }
-	public string PackageId { get; }
-    public string PackageVersion { get; }
-	public string PackageSource { get; }
-    public string BasePath { get; }
-    public string TestExecutable { get; }
-    public PackageCheck[] PackageChecks { get; }
+	public string PackageId { get; protected set; }
+    public string PackageVersion { get; protected set; }
+	public string PackageSource { get; protected set; }
+    public string BasePath { get; protected set; }
+    public string TestExecutable { get; protected set; }
+    public PackageCheck[] PackageChecks { get; protected set; }
     public PackageCheck[] SymbolChecks { get; protected set; }
-    public IEnumerable<PackageTest> PackageTests { get; }
+    public IEnumerable<PackageTest> PackageTests { get; protected set; }
+    public bool HasTests => PackageTests != null;
+    public bool HasChecks => PackageChecks != null;
+    public bool HasSymbols => SymbolChecks != null;
 
-    public abstract string PackageName { get; }
-    public abstract void BuildPackage();
+    public abstract string PackageFileName { get; }
+    public abstract string InstallDirectory { get; }
+    public abstract string ResultDirectory { get; }
+
+    public string PackageFilePath => PACKAGE_DIR + PackageFileName;
+
+    protected abstract void doBuildPackage();
+    protected abstract void doInstallPackage();
+
+    public void BuildVerifyAndTest()
+    {
+        _context.EnsureDirectoryExists(PACKAGE_DIR);
+
+        BuildPackage();
+        InstallPackage();
+
+        if (HasChecks)
+            VerifyPackage();
+
+        if (HasSymbols)
+            VerifySymbolPackage();
+
+        if (HasTests)
+            TestPackage();
+    }
+
+    public void BuildPackage()
+    {
+        DisplayAction("Building");
+        doBuildPackage();
+    }
+
+    public void InstallPackage()
+    {
+        DisplayAction("Installing");
+        Console.WriteLine($"Installing package to {InstallDirectory}");
+        _context.CleanDirectory(InstallDirectory);
+        doInstallPackage();
+    }
+
+    public void VerifyPackage()
+    {
+        DisplayAction("Verifying");
+
+        bool allOK = true;
+        foreach (var check in PackageChecks)
+            allOK &= check.Apply(InstallDirectory);
+
+        if (allOK)
+            WriteInfo("All checks passed!");
+        else 
+            throw new Exception("Verification failed!");
+    }
+
+    public virtual void VerifySymbolPackage() { } // Overridden for NuGet packages
+
+    public void TestPackage()
+    {
+        DisplayAction("Testing");
+
+        var reporter = new ResultReporter(PackageFileName);
+
+        _context.CleanDirectory(ResultDirectory);
+
+        foreach (var packageTest in PackageTests)
+        {
+            var testResultDir = ResultDirectory + packageTest.Name + SEPARATOR;
+            var resultFile = testResultDir + "TestResult.xml";
+
+            DisplayBanner(packageTest.Description);
+
+            Console.WriteLine($"Running {InstallDirectory + TestExecutable}");
+
+            int rc = TestExecutable.EndsWith(".dll")
+                ? _context.StartProcess(
+                    "dotnet",
+                    new ProcessSettings()
+                    {
+                        Arguments = $"\"{InstallDirectory}{TestExecutable}\" {packageTest.Arguments} --work={testResultDir}",
+                    })
+                : _context.StartProcess(
+                    InstallDirectory + TestExecutable,
+                    new ProcessSettings()
+                    {
+                        Arguments = $"{packageTest.Arguments} --work={testResultDir}",
+                    });
+
+            try
+            {
+                var result = new ActualResult(resultFile);
+                var report = new TestReport(packageTest, result);
+                reporter.AddReport(report);
+
+                Console.WriteLine(report.Errors.Count == 0
+                    ? "\nSUCCESS: Test Result matches expected result!"
+                    : "\nERROR: Test Result not as expected!");
+            }
+            catch (Exception ex)
+            {
+                reporter.AddReport(new TestReport(packageTest, ex));
+
+                Console.WriteLine("\nERROR: No result found!");
+            }
+        }
+
+        bool hadErrors = reporter.ReportResults();
+        Console.WriteLine();
+
+        if (hadErrors)
+            throw new Exception("One or more package tests had errors!");
+    }
 
     public void DisplayAction(string action)
     {
-        DisplayBanner($"{action} package {PackageName}");
+        DisplayBanner($"{action} package {PackageFileName}");
     }
 
-    public bool HasSymbols { get; protected set; } = false;
-    public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {PackageType} packages.");
-}
-
-// Users may only instantiate the derived classes, which avoids
-// exposing PackageType and makes it impossible to create a
-// PackageDefinition with an unknown package type.
-public class NuGetPackage : PackageDefinition
-{
-    public NuGetPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
-        PackageCheck[] checks = null, PackageCheck[] symbols = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.NuGet, id, version, source, basepath, executable: executable, checks: checks, symbols: symbols, tests: tests)
-    {
-        if (symbols != null)
-        {
-            HasSymbols = true;
-            SymbolChecks = symbols;
-        }
-    }
-
-    public override string PackageName => $"{PackageId}.{PackageVersion}.nupkg";
-    public override string SymbolPackageName => System.IO.Path.ChangeExtension(PackageName, ".snupkg");
-
-    public override void BuildPackage()
-    {
-        DisplayAction("Building");
-
-        var nugetPackSettings = new NuGetPackSettings()
-        {
-            Version = PackageVersion,
-            OutputDirectory = PACKAGE_DIR,
-            BasePath = BasePath,
-            NoPackageAnalysis = true,
-            Symbols = HasSymbols
-        };
-
-        if (HasSymbols)
-            nugetPackSettings.SymbolPackageFormat = "snupkg";
-
-        _context.NuGetPack(PackageSource, nugetPackSettings);
-    }
-}
-
-public class ChocolateyPackage : PackageDefinition
-{
-    public ChocolateyPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null, 
-        PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.Chocolatey, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
-
-    public override string PackageName => $"{PackageId}.{PackageVersion}.nupkg";
-    
-    public override void BuildPackage()
-    {
-        DisplayAction("Building");
-
-        _context.ChocolateyPack(PackageSource,
-            new ChocolateyPackSettings()
-            {
-                Version = PackageVersion,
-                OutputDirectory = PACKAGE_DIR,
-                ArgumentCustomization = args => args.Append($"BASE={BasePath}")
-            });
-    }
-}
-
-public class MsiPackage : PackageDefinition
-{
-    public MsiPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
-        PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.Msi, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
-
-    public override string PackageName => $"{PackageId}-{PackageVersion}.msi";
-
-    public override void BuildPackage()
-    {
-        DisplayAction("Building");
-
-        _context.MSBuild(PackageSource, new MSBuildSettings()
-            .WithTarget("Rebuild")
-            .SetConfiguration(Configuration)
-            .WithProperty("Version", PackageVersion)
-            .WithProperty("DisplayVersion", PackageVersion)
-            .WithProperty("OutDir", PACKAGE_DIR)
-            .WithProperty("Image", BasePath)
-            .SetMSBuildPlatform(MSBuildPlatform.x86)
-            .SetNodeReuse(false));
-    }
-}
-
-public class ZipPackage : PackageDefinition
-{
-    public ZipPackage(ICakeContext context, string id, string version, string source, string basepath, string executable = null,
-        PackageCheck[] checks = null, IEnumerable<PackageTest> tests = null)
-        : base(context, PackageType.Zip, id, version, source, basepath, executable: executable, checks: checks, tests: tests) { }
-
-    public override string PackageName => $"{PackageId}-{PackageVersion}.zip";
-    
-    public override void BuildPackage()
-    {
-        DisplayAction("Building");
-
-        _context.Zip(ZIP_IMG_DIR, $"{PACKAGE_DIR}{PackageName}");
-    }
+    public virtual string SymbolPackageName => throw new System.NotImplementedException($"Symbols are not available for {GetType().Name} packages.");
 }
