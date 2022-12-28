@@ -4,7 +4,7 @@
 
 public abstract class NuGetPackageDefinition : PackageDefinition
 {
-    protected NuGetPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected NuGetPackageDefinition(BuildSettings settings) : base(settings) { }
 
     public override string PackageFileName => $"{PackageId}.{PackageVersion}.nupkg";
     public override string SymbolPackageName => System.IO.Path.ChangeExtension(PackageFileName, ".snupkg");
@@ -42,7 +42,7 @@ public abstract class NuGetPackageDefinition : PackageDefinition
 
 public class NUnitConsoleNuGetPackage : NuGetPackageDefinition
 {
-    public NUnitConsoleNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitConsoleNuGetPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.Console";
         PackageSource = PROJECT_DIR + "nuget/runners/nunit.console-runner-with-extensions.nuspec";
@@ -60,11 +60,11 @@ public class NUnitConsoleNuGetPackage : NuGetPackageDefinition
 
 public class NUnitConsoleRunnerNuGetPackage : NuGetPackageDefinition
 {
-    public NUnitConsoleRunnerNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitConsoleRunnerNuGetPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.ConsoleRunner";
         PackageSource = PROJECT_DIR + "nuget/runners/nunit.console-runner.nuspec";
-        BasePath = NETFX_CONSOLE_DIR;
+        BasePath = settings.NetFxConsoleBinDir;
         PackageChecks = new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
@@ -85,19 +85,17 @@ public class NUnitConsoleRunnerNuGetPackage : NuGetPackageDefinition
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE)
         };
         TestExecutable = "tools/nunit3-console.exe";
-        PackageTests = StandardRunnerTests;
+        PackageTests = settings.StandardRunnerTests;
     }
 }
 
 public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
 {
-    public NUnitNetCoreConsoleRunnerPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitNetCoreConsoleRunnerPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.ConsoleRunner.NetCore";
-        //PackageSource = PROJECT_DIR + "nuget/runners/nunit.console-runner.netcore.nuspec";
         PackageSource = NETCORE_CONSOLE_PROJECT;
-        //BasePath = NETCORE_CONSOLE_DIR;
-        BasePath = NETCORE_CONSOLE_PROJECT_BIN_DIR;
+        BasePath = settings.NetCoreConsoleBinDir;
         PackageChecks = new PackageCheck[] {
             HasDirectory("content").WithFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES)
@@ -106,7 +104,7 @@ public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
             HasDirectory($"tools/{NETCORE_CONSOLE_TARGET}/any").WithFile("nunit3-netcore-console.pdb").AndFiles(ENGINE_PDB_FILES)
         };
         TestExecutable = $"tools/{NETCORE_CONSOLE_TARGET}/any/nunit3-netcore-console.dll";
-        PackageTests = NetCoreRunnerTests;
+        PackageTests = settings.NetCoreRunnerTests;
     }
 
     // Build package from project file
@@ -114,7 +112,7 @@ public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
     {
         var settings = new DotNetPackSettings()
         {
-            Configuration = Configuration,
+            Configuration = _settings.Configuration,
             OutputDirectory = PACKAGE_DIR,
             IncludeSymbols = HasSymbols,
             ArgumentCustomization = args => args.Append($"/p:Version={PackageVersion}")
@@ -136,11 +134,11 @@ public class NUnitNetCoreConsoleRunnerPackage : NuGetPackageDefinition
 
 public class NUnitEngineNuGetPackage : NuGetPackageDefinition
 {
-    public NUnitEngineNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitEngineNuGetPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.Engine";
         PackageSource = PROJECT_DIR + "nuget/engine/nunit.engine.nuspec";
-        BasePath = ENGINE_PROJECT_BIN_DIR;
+        BasePath = PROJECT_DIR + $"src/NUnitEngine/nunit.engine/bin/{settings.Configuration}/";
         PackageChecks = new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
@@ -166,11 +164,11 @@ public class NUnitEngineNuGetPackage : NuGetPackageDefinition
 
 public class NUnitEngineApiNuGetPackage : NuGetPackageDefinition
 {
-    public NUnitEngineApiNuGetPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitEngineApiNuGetPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.Engine.Api";
         PackageSource = PROJECT_DIR + "nuget/engine/nunit.engine.api.nuspec";
-        BasePath = ENGINE_API_PROJECT_BIN_DIR;
+        BasePath = PROJECT_DIR + $"src/NUnitEngine/nunit.engine.api/bin/{settings.Configuration}/";
         PackageChecks = new PackageCheck[] {
             HasFile("LICENSE.txt"),
             HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
@@ -189,7 +187,7 @@ public class NUnitEngineApiNuGetPackage : NuGetPackageDefinition
 
 public abstract class ChocolateyPackageDefinition : PackageDefinition
 {
-    protected ChocolateyPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected ChocolateyPackageDefinition(BuildSettings settings) : base(settings) { }
 
     public override string PackageFileName => $"{PackageId}.{PackageVersion}.nupkg";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"choco/{PackageId}/";
@@ -216,11 +214,11 @@ public abstract class ChocolateyPackageDefinition : PackageDefinition
 
 public class NUnitConsoleRunnerChocolateyPackage : ChocolateyPackageDefinition
 {
-    public NUnitConsoleRunnerChocolateyPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitConsoleRunnerChocolateyPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "nunit-console-runner";
         PackageSource = PROJECT_DIR + "choco/nunit-console-runner.nuspec";
-        BasePath = NETFX_CONSOLE_DIR;
+        BasePath = settings.NetFxConsoleBinDir;
         PackageChecks = new PackageCheck[] {
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.choco.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
@@ -231,7 +229,7 @@ public class NUnitConsoleRunnerChocolateyPackage : ChocolateyPackageDefinition
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
         };
         TestExecutable = "tools/nunit3-console.exe";
-        PackageTests = StandardRunnerTests;
+        PackageTests = settings.StandardRunnerTests;
     }
 }
 
@@ -241,7 +239,11 @@ public class NUnitConsoleRunnerChocolateyPackage : ChocolateyPackageDefinition
 
 public abstract class MsiPackageDefinition : PackageDefinition
 {
-    protected MsiPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected MsiPackageDefinition(BuildSettings settings) : base(settings) 
+    {
+        // Required version format for MSI
+        PackageVersion = settings.BuildVersion.SemVer;
+    }
 
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.msi";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"msi/{PackageId}/";
@@ -251,7 +253,7 @@ public abstract class MsiPackageDefinition : PackageDefinition
     {
         _context.MSBuild(PackageSource, new MSBuildSettings()
             .WithTarget("Rebuild")
-            .SetConfiguration(Configuration)
+            .SetConfiguration(_settings.Configuration)
             .WithProperty("Version", PackageVersion)
             .WithProperty("DisplayVersion", PackageVersion)
             .WithProperty("OutDir", PACKAGE_DIR)
@@ -274,11 +276,12 @@ public abstract class MsiPackageDefinition : PackageDefinition
 
 public class NUnitConsoleMsiPackage : MsiPackageDefinition
 {
-    public NUnitConsoleMsiPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitConsoleMsiPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.Console";
         PackageSource = PROJECT_DIR + "msi/nunit/nunit.wixproj";
-        BasePath = NETFX_CONSOLE_DIR;
+        BasePath = settings.NetFxConsoleBinDir;
+        PackageVersion = settings.BuildVersion.SemVer;
         PackageChecks = new PackageCheck[] {
             HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
             HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
@@ -291,7 +294,7 @@ public class NUnitConsoleMsiPackage : MsiPackageDefinition
             HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
         };
         TestExecutable = "NUnit.org/nunit-console/nunit3-console.exe";
-        PackageTests = StandardRunnerTests.Concat(new[] { NUnitProjectTest });
+        PackageTests = settings.StandardRunnerTests.Concat(new[] { settings.NUnitProjectTest });
     }
 }
 
@@ -301,7 +304,7 @@ public class NUnitConsoleMsiPackage : MsiPackageDefinition
 
 public abstract class ZipPackageDefinition : PackageDefinition
 {
-    protected ZipPackageDefinition(ICakeContext context, string packageVersion) : base(context, packageVersion) { }
+    protected ZipPackageDefinition(BuildSettings settings) : base(settings) { }
 
     public override string PackageFileName => $"{PackageId}-{PackageVersion}.zip";
     public override string InstallDirectory => PACKAGE_TEST_DIR + $"zip/{PackageId}/";
@@ -322,7 +325,7 @@ public abstract class ZipPackageDefinition : PackageDefinition
 
 public class NUnitConsoleZipPackage : ZipPackageDefinition
 {
-    public NUnitConsoleZipPackage(ICakeContext context, string packageVersion) : base(context, packageVersion)
+    public NUnitConsoleZipPackage(BuildSettings settings) : base(settings)
     {
         PackageId = "NUnit.Console";
         PackageSource = ZipImageDirectory;
@@ -337,7 +340,7 @@ public class NUnitConsoleZipPackage : ZipPackageDefinition
             HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
         };
         TestExecutable = "bin/nunit3-console.exe";
-        PackageTests = StandardRunnerTests.Concat(new [] { NUnitProjectTest });
+        PackageTests = settings.StandardRunnerTests.Concat(new [] { settings.NUnitProjectTest });
     }
 
     protected override string ZipImageDirectory => PACKAGE_DIR + "zip-image";
