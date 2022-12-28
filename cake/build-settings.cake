@@ -14,19 +14,129 @@ public class BuildSettings
         Target = context.TargetTask.Name;
         TasksToExecute = context.TasksToExecute.Select(t => t.Name);
 
-        Configuration = context.Argument("configuration", "Release");
+        Configuration = context.Argument("configuration", context.Argument("c", "Release"));
+        NoPush = context.HasArgument("nopush");
 
         BuildVersion = new BuildVersion(context);
 
+        Net35Test = new PackageTest(
+            "Net35Test",
+            "Run mock-assembly.dll under .NET 3.5",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net35/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        Net40Test = new PackageTest(
+            "Net40Test",
+            "Run mock-assembly.dll under .NET 4.x",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net462/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        NetCore21Test = new PackageTest(
+            "NetCore21Test",
+            "Run mock-assembly.dll targeting .NET Core 2.1",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/netcoreapp2.1/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        NetCore31Test = new PackageTest(
+            "NetCore31Test",
+            "Run mock-assembly.dll under .NET Core 3.1",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/netcoreapp3.1/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        Net50Test = new PackageTest(
+            "Net50Test",
+            "Run mock-assembly.dll under .NET 5.0",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net5.0/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        Net60Test = new PackageTest(
+            "Net60Test",
+            "Run mock-assembly.dll under .NET 6.0",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net6.0/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        Net70Test = new PackageTest(
+            "Net70Test",
+            "Run mock-assembly.dll under .NET 7.0",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net7.0/mock-assembly.dll",
+            MockAssemblyExpectedResult(1));
+        Net35X86Test = new PackageTest(
+            "Net35X86Test",
+            "Run mock-assembly-x86.dll under .NET 3.5",
+            $"src/NUnitEngine/mock-assembly-x86/bin/{Configuration}/net35/mock-assembly-x86.dll",
+            MockAssemblyExpectedResult(1));
+        Net40X86Test = new PackageTest(
+            "Net40X86Test",
+            "Run mock-assembly-x86.dll under .NET 4.x",
+            $"src/NUnitEngine/mock-assembly-x86/bin/{Configuration}/net462/mock-assembly-x86.dll",
+            MockAssemblyExpectedResult(1));
+        NetCore31X86Test = new PackageTest(
+            "NetCore31X86Test",
+            "Run mock-assembly-x86.dll under .NET Core 3.1",
+            $"src/NUnitEngine/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll",
+            MockAssemblyExpectedResult(1));
+        Net60WindowsFormsTest = new PackageTest(
+            "Net60WindowsFormsTest",
+            "Run test using windows forms under .NET 6.0",
+            $"src/NUnitEngine/windows-test/bin/{Configuration}/net6.0-windows/windows-test.dll",
+            new ExpectedResult("Passed"));
+        Net60AspNetCoreTest = new PackageTest(
+            "Net60AspNetCoreTest",
+            "Run test using AspNetCore under .NET 6.0",
+            $"src/NUnitEngine/aspnetcore-test/bin/{Configuration}/net6.0/aspnetcore-test.dll",
+            new ExpectedResult("Passed"));
+        Net35PlusNet40Test = new PackageTest(
+            "Net35PlusNet40Test",
+            "Run both copies of mock-assembly together",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net35/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/{Configuration}/net462/mock-assembly.dll",
+            MockAssemblyExpectedResult(2));
+        Net40PlusNet60Test = new PackageTest(
+            "Net40PlusNet60Test",
+            "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net462/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/{Configuration}/net6.0/mock-assembly.dll",
+            MockAssemblyExpectedResult(2));
+        Net50PlusNet60Test = new PackageTest(
+            "Net50PlusNet60Test",
+            "Run mock-assembly under .Net 5.0 and .Net 6.0 together",
+            $"src/NUnitEngine/mock-assembly/bin/{Configuration}/net5.0/mock-assembly.dll src/NUnitEngine/mock-assembly/bin/{Configuration}/net6.0/mock-assembly.dll",
+            MockAssemblyExpectedResult(2));
+        NUnitProjectTest = new PackageTest(
+            "NUnitProjectTest",
+            "Run project with both copies of mock-assembly",
+            $"NetFXTests.nunit --config={Configuration}",
+            MockAssemblyExpectedResult(2));
+
+        StandardRunnerTests = new List<PackageTest>
+        {
+            Net35Test,
+            Net40Test,
+            NetCore21Test,
+            NetCore31Test,
+            Net50Test,
+            Net60Test,
+            Net70Test,
+            Net35PlusNet40Test,
+            Net40PlusNet60Test,
+            Net50PlusNet60Test,
+            Net35X86Test,
+            Net40X86Test,
+            Net60AspNetCoreTest
+        };
+        if (IsRunningOnWindows)
+            StandardRunnerTests.Add(Net60WindowsFormsTest);
+
+        NetCoreRunnerTests = new List<PackageTest>
+        {
+            NetCore21Test,
+            NetCore31Test,
+            Net50Test,
+            Net60Test,
+            Net50PlusNet60Test,
+            Net60AspNetCoreTest
+        };
         AllPackages = new PackageDefinition[] {
-            ConsoleNuGetPackage = new NUnitConsoleNuGetPackage(context, ProductVersion),
-            ConsoleRunnerNuGetPackage = new NUnitConsoleRunnerNuGetPackage(context, ProductVersion),
-            DotNetConsoleRunnerNuGetPackage = new NUnitNetCoreConsoleRunnerPackage(context, ProductVersion),
-            ConsoleRunnerChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(context, ProductVersion),
-            ConsoleMsiPackage = new NUnitConsoleMsiPackage(context, SemVer),
-            ConsoleZipPackage = new NUnitConsoleZipPackage(context, ProductVersion),
-            EngineNuGetPackage = new NUnitEngineNuGetPackage(context, ProductVersion),
-            EngineApiNuGetPackage = new NUnitEngineApiNuGetPackage(context, ProductVersion)
+            ConsoleNuGetPackage = new NUnitConsoleNuGetPackage(this),
+            ConsoleRunnerNuGetPackage = new NUnitConsoleRunnerNuGetPackage(this),
+            DotNetConsoleRunnerNuGetPackage = new NUnitNetCoreConsoleRunnerPackage(this),
+            ConsoleRunnerChocolateyPackage = new NUnitConsoleRunnerChocolateyPackage(this),
+            ConsoleMsiPackage = new NUnitConsoleMsiPackage(this),
+            ConsoleZipPackage = new NUnitConsoleZipPackage(this),
+            EngineNuGetPackage = new NUnitEngineNuGetPackage(this),
+            EngineApiNuGetPackage = new NUnitEngineApiNuGetPackage(this)
         };
     }
 
@@ -36,6 +146,9 @@ public class BuildSettings
     public ICakeContext Context => _context;
 
     public string Configuration { get; }
+
+    public string NetFxConsoleBinDir => NETFX_CONSOLE_DIR + $"bin/{Configuration}/{NETFX_CONSOLE_TARGET}/";
+    public string NetCoreConsoleBinDir => NETCORE_CONSOLE_DIR + $"bin/{Configuration}/{NETCORE_CONSOLE_TARGET}";
 
     public BuildVersion BuildVersion { get; }
     public string SemVer => BuildVersion.SemVer;
@@ -58,6 +171,59 @@ public class BuildSettings
     public bool ShouldPublishToNuGet => !IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(PreReleaseLabel);
     public bool ShouldPublishToChocolatey => !IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);
     public bool IsProductionRelease => !IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(PreReleaseLabel);
+
+    public string MyGetApiKey => _context.EnvironmentVariable(MYGET_API_KEY);
+    public string NuGetApiKey => _context.EnvironmentVariable(NUGET_API_KEY);
+    public string ChocolateyApiKey => _context.EnvironmentVariable(CHOCO_API_KEY);
+
+    public string GitHubAccessToken => _context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
+
+    public bool NoPush { get; }
+
+//////////////////////////////////////////////////////////////////////
+// INDIVIDUAL PACKAGE TEST DEFINITIONS
+//////////////////////////////////////////////////////////////////////
+
+    static ExpectedResult MockAssemblyExpectedResult(int nCopies = 1) => new ExpectedResult("Failed")
+    {
+        Total = 37 * nCopies,
+        Passed = 23 * nCopies,
+        Failed = 5 * nCopies,
+        Warnings = 1 * nCopies,
+        Inconclusive = 1 * nCopies,
+        Skipped = 7 * nCopies
+    };
+
+    //Single Assembly Tests using each agent
+    public PackageTest Net35Test { get; }
+    public PackageTest Net40Test { get; }
+    public PackageTest NetCore21Test { get; }
+    public PackageTest NetCore31Test { get; }
+    public PackageTest Net50Test { get; }
+    public PackageTest Net60Test { get; }
+    public PackageTest Net70Test { get; }
+    // X86 Tests
+    public PackageTest Net35X86Test { get; }
+    public PackageTest Net40X86Test { get; }
+    public PackageTest NetCore31X86Test { get; }
+    // Special Test Situations
+    public PackageTest Net60WindowsFormsTest { get; }
+    public PackageTest Net60AspNetCoreTest { get; }
+    // Multiple Assemblies
+    public PackageTest Net35PlusNet40Test { get; }
+    public PackageTest Net40PlusNet60Test { get; }
+    public PackageTest Net50PlusNet60Test { get; }
+    // NUnit Project
+    public PackageTest NUnitProjectTest { get; }
+
+    // Tests run for all runner packages except NETCORE runner
+    public List<PackageTest> StandardRunnerTests { get; }
+    // Tests run for the NETCORE runner package
+    public List<PackageTest> NetCoreRunnerTests { get; }
+
+//////////////////////////////////////////////////////////////////////
+// PACKAGE DEFINITIONS
+//////////////////////////////////////////////////////////////////////
 
     public PackageDefinition[] AllPackages { get; }
 
@@ -96,6 +262,19 @@ public class BuildSettings
 		Console.WriteLine("BranchName:                   " + BranchName);
 		Console.WriteLine("IsReleaseBranch:              " + IsReleaseBranch);
 
+        Console.WriteLine("\nPUBLISHING");
+        Console.WriteLine("MyGet Push URL:               " + MYGET_PUSH_URL);
+        ShowApiKeyAvailability(MyGetApiKey);
+        Console.WriteLine("NuGet Push URL:               " + NUGET_PUSH_URL);
+        ShowApiKeyAvailability(NuGetApiKey);
+        Console.WriteLine("Chocolatey Push URL:          " + CHOCO_PUSH_URL);
+        ShowApiKeyAvailability(ChocolateyApiKey);
+        
+        if (string.IsNullOrEmpty(GitHubAccessToken))
+            Console.WriteLine("GitHubAccessToken:            NOT Available");
+        else
+            Console.WriteLine("GitHubAccessToken:            Available");
+
 		Console.WriteLine("\nDIRECTORIES");
         Console.WriteLine($"Project:         {PROJECT_DIR}");
         Console.WriteLine($"Package:         {PACKAGE_DIR}");
@@ -106,8 +285,14 @@ public class BuildSettings
         Console.WriteLine("Solution and Projects");
         Console.WriteLine($"  Solution:        {SOLUTION_FILE}");
         Console.WriteLine($"  NetFx Runner:    {NETFX_CONSOLE_PROJECT}");
-        Console.WriteLine($"    Bin Dir:       {NETFX_CONSOLE_PROJECT_BIN_DIR}");
         Console.WriteLine($"  NetCore Runner:  {NETCORE_CONSOLE_PROJECT}");
-        Console.WriteLine($"    Bin Dir:       {NETCORE_CONSOLE_PROJECT_BIN_DIR}");
+    }
+
+    private void ShowApiKeyAvailability(string apikey)
+    {
+        if (string.IsNullOrEmpty(apikey))
+            Console.WriteLine("      API Key:                NOT Available");
+        else
+            Console.WriteLine("      API Key:                Available");
     }
 }

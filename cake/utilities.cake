@@ -2,15 +2,6 @@
 // HELPER METHODS - GENERAL
 //////////////////////////////////////////////////////////////////////
 
-T GetArgument<T>(string pattern, T defaultValue)
-{
-    foreach (string name in pattern.Split('|'))
-        if (HasArgument(name))
-            return Argument<T>(name);
-
-    return defaultValue;
-}
-
 bool CheckIfDotNetCoreInstalled()
 {
     try
@@ -85,7 +76,7 @@ void BuildSolution(BuildSettings settings)
 MSBuildSettings CreateMSBuildSettings(string target, BuildSettings settings)
 {
     var msbuildSettings = new MSBuildSettings()
-        .SetConfiguration(Configuration)
+        .SetConfiguration(settings.Configuration)
         .SetVerbosity(Verbosity.Minimal)
         .WithProperty("Version", settings.ProductVersion)
         .WithProperty("ApiFileVersion", settings.SemVer + ".0")
@@ -124,7 +115,7 @@ MSBuildSettings CreateMSBuildSettings(string target, BuildSettings settings)
 DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target, BuildSettings settings)
 {
     return new DotNetMSBuildSettings()
-        .SetConfiguration(Configuration)
+        .SetConfiguration(settings.Configuration)
         .WithProperty("Version", settings.ProductVersion)
         .WithProperty("ApiFileVersion", settings.SemVer + ".0")
         .WithTarget(target);
@@ -194,21 +185,16 @@ FilePath GetResultXmlPath(string testAssembly, string targetRuntime)
     return MakeAbsolute(new FilePath($@"test-results\{targetRuntime}\{assemblyName}.xml"));
 }
 
-string GetProjectBinDir(string projectPath)
+string GetProjectBinDir(string projectPath, string configuration)
 {
     var projectDir = System.IO.Path.GetDirectoryName(projectPath);
-    return projectDir + $"/bin/{Configuration}/";
+    return projectDir + $"/bin/{configuration}/";
 }
 
-string GetProjectBinDir(string projectPath, string targetRuntime)
-{
-    return GetProjectBinDir(projectPath) + targetRuntime + "/";
-}
-
-void RunNUnitLiteTests(string projectPath, string targetRuntime, string additionalArgs="")
+void RunNUnitLiteTests(string projectPath, string configuration, string targetRuntime, string additionalArgs="")
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".exe";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration) + targetRuntime + "/";
     var resultPath = GetResultXmlPath( testAssembly, targetRuntime).FullPath;
 
     int rc = StartProcess(
@@ -225,10 +211,10 @@ void RunNUnitLiteTests(string projectPath, string targetRuntime, string addition
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime, string additionalArgs="")
+void RunDotnetNUnitLiteTests(string projectPath, string configuration, string targetRuntime, string additionalArgs="")
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration) + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -246,15 +232,15 @@ void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime, string ad
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetFxConsole(string projectPath, string targetRuntime, string additionalArgs="")
+void RunNetFxConsole(string projectPath, string configuration, string targetRuntime, string additionalArgs="")
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration) + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
-        NETFX_CONSOLE,
+        NETFX_CONSOLE_DIR + $"bin/{configuration}/{NETFX_CONSOLE_TARGET}/nunit3-console.exe",
         new ProcessSettings()
         {
             Arguments = $"\"{assemblyPath}\" --result:{resultPath} {additionalArgs}",
@@ -267,10 +253,10 @@ void RunNetFxConsole(string projectPath, string targetRuntime, string additional
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetCoreConsole(string projectPath, string targetRuntime)
+void RunNetCoreConsole(string projectPath, string configuration, string targetRuntime)
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration) + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -278,7 +264,7 @@ void RunNetCoreConsole(string projectPath, string targetRuntime)
         "dotnet",
         new ProcessSettings
         {
-            Arguments = $"\"{NETCORE_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{NETCORE_CONSOLE_DIR}bin/{configuration}/{NETCORE_CONSOLE_TARGET}/nunit3-netcore-console.dll\" \"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 
@@ -301,19 +287,13 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 public void PushNuGetPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
-    if (NoPush)
-        Information($"Push {package} to {url}");
-    else
-        NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
+    NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
 }
 
 public void PushChocolateyPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
-    if (NoPush)
-        Information($"Push {package} to {url}");
-    else
-        ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
+    ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
 }
 
 private void CheckPackageExists(FilePath package)

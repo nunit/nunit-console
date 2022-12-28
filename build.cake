@@ -1,6 +1,4 @@
-static string Target; Target = GetArgument("target|t", "Default");
-static string Configuration; Configuration = GetArgument("configuration|c", "Release");
-static bool NoPush; NoPush = HasArgument("nopush");
+static string Target; Target = Argument("target", Argument("t", "Default"));
 
 #load cake/constants.cake
 #load cake/build-settings.cake
@@ -29,10 +27,6 @@ Setup(context =>
 
     Information($"Building {settings.Configuration} version {settings.ProductVersion} of NUnit Console/Engine.");
     Information($"PreReleaseLabel is {settings.PreReleaseLabel}");
-
-    // TODO: Hide this in a lower-level file
-    if (IsRunningOnWindows())
-        StandardRunnerTests.Add(Net60WindowsFormsTest);
 
     if (BuildSystem.IsRunningOnAppVeyor)
         AppVeyor.UpdateBuildVersion(settings.ProductVersion + "-" + AppVeyor.Environment.Build.Number);
@@ -145,9 +139,9 @@ Task("TestNet20EngineCore")
     .Description("Tests the engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "net35");
+        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "net35");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -158,9 +152,9 @@ Task("TestNetStandard20EngineCore")
     .Description("Tests the .NET Standard Engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -171,9 +165,9 @@ Task("TestNetCore31EngineCore")
     .Description("Tests the .NET Core 3.1 Engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -184,9 +178,9 @@ Task("TestNetFxEngine")
     .Description("Tests the .NET Framework build of the engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, "NET462");
+        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "NET462");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -197,9 +191,9 @@ Task("TestNetStandard20Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -210,9 +204,9 @@ Task("TestNetCore31Engine")
     .Description("Tests the .NET Core 3.1 Engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "netcoreapp3.1");
     });
     
 //////////////////////////////////////////////////////////////////////
@@ -223,9 +217,9 @@ Task("TestNetFxConsole")
     .Description("Tests the .NET 4.6.2 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNetFxConsole(CONSOLE_TESTS_PROJECT, NETFX_CONSOLE_TARGET);
+        RunNetFxConsole(CONSOLE_TESTS_PROJECT, settings.Configuration, NETFX_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -236,9 +230,9 @@ Task("TestNetCoreConsole")
     .Description("Tests the .NET 6.0 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNetCoreConsole(CONSOLE_TESTS_PROJECT, NETCORE_CONSOLE_TARGET);
+        RunNetCoreConsole(CONSOLE_TESTS_PROJECT, settings.Configuration, NETCORE_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -277,7 +271,7 @@ Task("CreateZipImage")
         CopyFiles(
             new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
             zipImageDirectory);
-        CopyDirectory(NETFX_CONSOLE_DIR, zipImageDirectory + "bin/");
+        CopyDirectory(settings.NetFxConsoleBinDir, zipImageDirectory + "bin/");
         CopyFileToDirectory(PROJECT_DIR + "zip/nunit.bundle.addins", zipImageDirectory + "bin/");
 
         // Currently, only the .NET Framework runner accepts extensions
@@ -456,17 +450,17 @@ Task("PublishToMyGet")
     {
         if (!settings.ShouldPublishToMyGet)
             Information("Nothing to publish to MyGet from this run.");
+        else if (settings.NoPush)
+            Information("NoPush option suppressing publication to MyGet");
         else
         {
-            var apiKey = EnvironmentVariable(MYGET_API_KEY);
-
             foreach (var package in settings.AllPackages)
                 try
                 {
                     if (package is NuGetPackageDefinition)
-                        PushNuGetPackage(package.PackageFilePath, apiKey, MYGET_PUSH_URL);
+                        PushNuGetPackage(package.PackageFilePath, settings.MyGetApiKey, MYGET_PUSH_URL);
                     else if (package is ChocolateyPackageDefinition)
-                        PushChocolateyPackage(package.PackageFilePath, apiKey, MYGET_PUSH_URL);
+                        PushChocolateyPackage(package.PackageFilePath, settings.MyGetApiKey, MYGET_PUSH_URL);
                 }
                 catch(Exception)
                 {
@@ -483,15 +477,15 @@ Task("PublishToNuGet")
     {
         if (!settings.ShouldPublishToNuGet)
             Information("Nothing to publish to NuGet from this run.");
+        else if (settings.NoPush)
+            Information("NoPush option suppressing publication to NuGet");
         else
         {
-            var apiKey = EnvironmentVariable(NUGET_API_KEY);
-
             foreach (var package in settings.AllPackages)
                 if (package is NuGetPackageDefinition)
                     try
                     {
-                        PushNuGetPackage(package.PackageFilePath, apiKey, NUGET_PUSH_URL);
+                        PushNuGetPackage(package.PackageFilePath, settings.NuGetApiKey, NUGET_PUSH_URL);
                     }
                     catch (Exception)
                     {
@@ -508,15 +502,15 @@ Task("PublishToChocolatey")
     {
         if (!settings.ShouldPublishToChocolatey)
             Information("Nothing to publish to Chocolatey from this run.");
+        else if (settings.NoPush)
+            Information("NoPush option suppressing publication to Chocolatey");
         else
         {
-            var apiKey = EnvironmentVariable(CHOCO_API_KEY);
-
             foreach (var package in settings.AllPackages)
                 if (package is ChocolateyPackageDefinition)
                     try
                     {
-                        PushChocolateyPackage(package.PackageFilePath, apiKey, CHOCO_PUSH_URL);
+                        PushChocolateyPackage(package.PackageFilePath, settings.ChocolateyApiKey, CHOCO_PUSH_URL);
                     }
                     catch (Exception)
                     {
@@ -556,10 +550,12 @@ Task("CreateDraftRelease")
 
             Information($"Creating draft release for {releaseName}");
 
-            if (!NoPush)
+            if (settings.NoPush)
+                Information("NoPush option suppressed creation of draft release");
+            else
                 try
                 {
-                    GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
+                    GitReleaseManagerCreate(settings.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
                     {
                         Name = releaseName,
                         Milestone = milestone
@@ -588,7 +584,7 @@ Task("CreateProductionRelease")
     {
         if (settings.IsProductionRelease)
         {
-            string token = EnvironmentVariable(GITHUB_ACCESS_TOKEN);
+            string token = settings.GitHubAccessToken;
             string tagName = settings.ProductVersion;
 
             var assetList = new List<string>();
@@ -598,9 +594,9 @@ Task("CreateProductionRelease")
 
             Information($"Publishing release {tagName} to GitHub");
 
-            if (NoPush)
+            if (settings.NoPush)
             {
-                Information($"Assets:");
+                Information("NoPush option suppressed publishing of assets:");
                 foreach (var asset in assetList)
                     Information("  " + asset);
             }
