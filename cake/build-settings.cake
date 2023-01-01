@@ -128,6 +128,9 @@ public class BuildSettings
             Net50PlusNet60Test,
             Net60AspNetCoreTest
         };
+        if (IsRunningOnWindows)
+            NetCoreRunnerTests.Add(Net60WindowsFormsTest);
+
         AllPackages = new PackageDefinition[] {
             ConsoleNuGetPackage = new NUnitConsoleNuGetPackage(this),
             ConsoleRunnerNuGetPackage = new NUnitConsoleRunnerNuGetPackage(this),

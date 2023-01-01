@@ -5,7 +5,6 @@ static string Target; Target = Argument("target", Argument("t", "Default"));
 #load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
-#load cake/package-tests.cake
 #load cake/versioning.cake
 #load cake/utilities.cake
 #load cake/package-definitions.cake

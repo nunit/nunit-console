@@ -120,7 +120,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{9BCA00E2-D
 		cake\header-check.cake = cake\header-check.cake
 		cake\package-checks.cake = cake\package-checks.cake
 		cake\package-definitions.cake = cake\package-definitions.cake
-		cake\package-tests.cake = cake\package-tests.cake
 		cake\packages.cake = cake\packages.cake
 		cake\test-results.cake = cake\test-results.cake
 		cake\utilities.cake = cake\utilities.cake
