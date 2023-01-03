@@ -44,12 +44,24 @@ namespace NUnit.Engine.Services
             Assert.That(_runtimeService.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
-        [TestCase("mock-assembly.dll", false)]
-        [TestCase("../agents/net20/nunit-agent.exe", false)]
-        [TestCase("../agents/net20/nunit-agent-net20-x86.exe", true)]
-        public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
+#if DEBUG
+        const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
+#else
+        const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
+#endif
+
+        [TestCase("net35", false)]
+        [TestCase("net35", true)]
+        [TestCase("net462", false)]
+        [TestCase("net462", true)]
+        public void SelectRuntimeFramework(string runtime, bool runAsX86)
         {
-            var package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, assemblyName));
+            var assemblyPath = runAsX86
+                ? TestData.MockAssemblyX86Path(runtime)
+                : TestData.MockAssemblyPath(runtime);
+
+            FileAssert.Exists(assemblyPath);
+            var package = new TestPackage(assemblyPath);
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
 

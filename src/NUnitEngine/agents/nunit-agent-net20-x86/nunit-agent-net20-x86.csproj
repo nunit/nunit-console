@@ -7,7 +7,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
-    <OutputPath>..\..\..\..\bin\$(Configuration)\agents\</OutputPath>
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
   </PropertyGroup>
 

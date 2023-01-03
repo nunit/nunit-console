@@ -20,29 +20,41 @@ namespace NUnit.Engine.Services
             _driverService = new DriverService();
         }
 
-#if NETCOREAPP3_1
-        [TestCase("mock-assembly.dll", false, typeof(NUnitNetCore31Driver))]
-        [TestCase("mock-assembly.dll", true, typeof(NUnitNetCore31Driver))]
-        [TestCase("notest-assembly.dll", false, typeof(NUnitNetCore31Driver))]
-#elif NETCOREAPP2_1
-        [TestCase("mock-assembly.dll", false, typeof(NUnitNetStandardDriver))]
-        [TestCase("mock-assembly.dll", true, typeof(NUnitNetStandardDriver))]
-        [TestCase("notest-assembly.dll", false, typeof(NUnitNetStandardDriver))]
+        const string NOTEST_ASSEMBLY =
+#if DEBUG
+            "../../../../../TestData/notest-assembly/bin/Debug/notest-assembly.dll";
 #else
-        [TestCase("mock-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
-        [TestCase("mock-assembly.dll", true, typeof(NUnit3FrameworkDriver))]
-        [TestCase("notest-assembly.dll", false, typeof(NUnit3FrameworkDriver))]
+            "../../../../../TestData/notest-assembly/bin/Release/notest-assembly.dll";
 #endif
-        [TestCase("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("nunit.engine.core.dll", false, typeof(InvalidAssemblyFrameworkDriver))]
-        [TestCase("nunit.engine.core.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
-        [TestCase("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))]
-        public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
+
+        static IEnumerable<TestCaseData> DriverData()
         {
-            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), null, skipNonTestAssemblies);
+#if NETCOREAPP3_1
+            yield return new TestCaseData(TestData.MockAssemblyPath("netcoreapp3.1"), false, typeof(NUnitNetCore31Driver));
+            yield return new TestCaseData(TestData.MockAssemblyPath("netcoreapp3.1"), true, typeof(NUnitNetCore31Driver));
+            yield return new TestCaseData(TestData.NoTestAssemblyPath("netcoreapp3.1"), false, typeof(NUnitNetCore31Driver));
+#elif NETCOREAPP2_1
+            yield return new TestCaseData(TestData.MockAssemblyPath("netcoreapp2.1"), false, typeof(NUnitNetStandardDriver));
+            yield return new TestCaseData(TestData.MockAssemblyPath("netcoreapp2.1"), true, typeof(NUnitNetStandardDriver));
+            yield return new TestCaseData(TestData.NoTestAssemblyPath("netcoreapp2.1"), false, typeof(NUnitNetStandardDriver));
+#else
+            yield return new TestCaseData(TestData.MockAssemblyPath("net35"), false, typeof(NUnit3FrameworkDriver));
+            yield return new TestCaseData(TestData.MockAssemblyPath("net35"), true, typeof(NUnit3FrameworkDriver));
+            yield return new TestCaseData(TestData.NoTestAssemblyPath("net35"), false, typeof(NUnit3FrameworkDriver));
+#endif
+            yield return new TestCaseData("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver));
+            yield return new TestCaseData("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver));
+            yield return new TestCaseData("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver));
+            yield return new TestCaseData("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver));
+            yield return new TestCaseData("nunit.engine.core.dll", false, typeof(InvalidAssemblyFrameworkDriver));
+            yield return new TestCaseData("nunit.engine.core.dll", true, typeof(SkippedAssemblyFrameworkDriver));
+            yield return new TestCaseData(TestData.NoTestAssemblyPath("net35"), true, typeof(SkippedAssemblyFrameworkDriver));
+        }
+
+        [TestCaseSource(nameof(DriverData))]
+        public void CorrectDriverIsUsed(string assemblyPath, bool skipNonTestAssemblies, Type expectedType)
+        {
+            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, assemblyPath, null, skipNonTestAssemblies);
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
     }

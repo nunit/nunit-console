@@ -17,6 +17,14 @@ namespace NUnit.Engine.Runners
     [TestFixtureSource(nameof(FixtureData))]
     public class MasterTestRunnerTests : ITestEventListener
     {
+#if NETFRAMEWORK
+        const string RUNTIME = "net462";
+#elif NETCOREAPP
+        const string RUNTIME = "netcoreapp3.1";
+#else
+        const string RUNTIME = "netstandard2.0";
+#endif
+
         private TestRunData _testRunData;
 
         private List<string> _testFiles = new List<string>();
@@ -48,15 +56,18 @@ namespace NUnit.Engine.Runners
         static ResultData Project2Data =
             new ResultData("project2.nunit", "Runnable", MockAssemblyData, MockAssemblyData);
 
+        static readonly string MOCK_ASSEMBLY = TestData.MockAssemblyPath(RUNTIME);
+        static readonly string NOTEST_ASSEMBLY = TestData.NoTestAssemblyPath(RUNTIME);
+
         static TestRunData[] FixtureData = new TestRunData[]
         {
             // NOTES: 
             // 1. These tests document current behavior. In some cases we may want to change that behavior.
-            // 2. The .NET Standard builds don't seem to handle notest-assembly correctly, so those entries are commented out.
-            // 3. The .NET Standard 1.6 build is not intended to handle projects.
+            // 2. The .NET Standard build does not seem to handle notest-assembly correctly, so those entries are commented out.
+            // 3. The .NET Standard build is not intended to handle projects.
 #if NETCOREAPP2_1_OR_GREATER
-            new TestRunData( "mock-assembly.dll", MockAssemblyData ),
-            new TestRunData( "mock-assembly.dll,mock-assembly.dll", MockAssemblyData, MockAssemblyData ),
+            new TestRunData( MOCK_ASSEMBLY, MockAssemblyData ),
+            new TestRunData( $"{MOCK_ASSEMBLY},{MOCK_ASSEMBLY}", MockAssemblyData, MockAssemblyData ),
             //new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),
             //new TestRunData( "notest-assembly.dll,notest-assembly.dll, NoTestAssemblyData, NoTestAssemblyData ),
             //new TestRunData( "mock-assembly.dll,notest-assembly.dll", MockAssemblyData, NoTestAssemblyData ),
@@ -65,11 +76,11 @@ namespace NUnit.Engine.Runners
             new TestRunData( "project1.nunit,project2.nunit", Project1Data, Project2Data ),
             new TestRunData( "project1.nunit,mock-assembly.dll,project2.nunit", Project1Data, MockAssemblyData, Project2Data)
 #else
-            new TestRunData( "mock-assembly.dll", MockAssemblyData ),
-            new TestRunData( "mock-assembly.dll,mock-assembly.dll", MockAssemblyData, MockAssemblyData ),
-            new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),
-            new TestRunData( "notest-assembly.dll,notest-assembly.dll", NoTestAssemblyData, NoTestAssemblyData ),
-            new TestRunData( "mock-assembly.dll,notest-assembly.dll", MockAssemblyData, NoTestAssemblyData ),
+            new TestRunData( MOCK_ASSEMBLY, MockAssemblyData ),
+            new TestRunData( $"{MOCK_ASSEMBLY},{MOCK_ASSEMBLY}", MockAssemblyData, MockAssemblyData ),
+            new TestRunData( NOTEST_ASSEMBLY, NoTestAssemblyData ),
+            new TestRunData( $"{NOTEST_ASSEMBLY},{NOTEST_ASSEMBLY}", NoTestAssemblyData, NoTestAssemblyData ),
+            new TestRunData( $"{MOCK_ASSEMBLY},{NOTEST_ASSEMBLY}", MockAssemblyData, NoTestAssemblyData ),
             new TestRunData( "project1.nunit", Project1Data ),
             new TestRunData( "project2.nunit", Project2Data ),
             new TestRunData( "project1.nunit,project2.nunit", Project1Data, Project2Data ),

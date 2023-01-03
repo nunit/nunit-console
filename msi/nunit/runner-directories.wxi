@@ -11,11 +11,11 @@
       <Directory Id="CONSOLE_BIN" Name="nunit-console">
           <Directory Id="ADDINS" Name="addins" />
           <Directory Id="AGENTS" Name="agents">
-              <Directory Id="NET20_AGENT_DIR" Name="net20" />
-              <Directory Id="NET462_AGENT_DIR" Name="net462" />
-              <Directory Id="NETCORE31_AGENT_DIR" Name="netcoreapp3.1" />
-              <Directory Id="NET50_AGENT_DIR" Name="net5.0" />
-              <Directory Id="NET60_AGENT_DIR" Name="net6.0" />
+              <Directory Id="NET20_AGENT_DIR" Name="nunit-agent-net20" />
+              <Directory Id="NET462_AGENT_DIR" Name="nunit-agent-net462" />
+              <Directory Id="NETCORE31_AGENT_DIR" Name="nunit-agent-netcore31" />
+              <Directory Id="NET50_AGENT_DIR" Name="nunit-agent-net50" />
+              <Directory Id="NET60_AGENT_DIR" Name="nunit-agent-net60" />
           </Directory>
       </Directory>
     </DirectoryRef>

@@ -103,25 +103,28 @@ namespace NUnit.Engine.Services
 
             if (!Directory.Exists(agentsDir))
             {
-                // When developing and running in the output directory, "agents" is a 
-                // sibling directory the one holding the agent (e.g. net20). This is a
-                // bit of a kluge, but it's necessary unless we change the binary 
-                // output directory to match the distribution structure.
-                agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
-                log.Debug("Assuming test run in project output directory");
+                // HACK: When running in the development environment, the engine may be
+                // copied to the directory without the agents. In that cae, we locate the
+                // agents in the nunit.engine project binaries.
+#if DEBUG
+                agentsDir = Path.GetFullPath("../../../../nunit.engine/bin/Debug/agents/");
+#else
+                agentsDir = Path.GetFullPath("../../../../nunit.engine/bin/Release/agents/");
+#endif
             }
 
             log.Debug($"Checking for agents at {agentsDir}");
 
             string runtimeIdentifier;
             string agentName;
+            string agentSubDir;
             string agentExtension;
             int major = targetRuntime.FrameworkVersion.Major;
             switch (targetRuntime.Runtime.FrameworkIdentifier)
             {
                 case FrameworkIdentifiers.NetFramework:
                     runtimeIdentifier = major >= 4 ? "net462" : "net20";
-                    agentName = "nunit-agent-" + runtimeIdentifier;
+                    agentName = agentSubDir = "nunit-agent-" + runtimeIdentifier;
                     if (requires32Bit)
                         agentName += "-x86";
                     agentExtension = ".exe";
@@ -131,15 +134,15 @@ namespace NUnit.Engine.Services
                     {
                         case 6:
                             runtimeIdentifier = "net6.0";
-                            agentName = "nunit-agent-net60";
+                            agentName = agentSubDir = "nunit-agent-net60";
                             break;
                         case 5:
                             runtimeIdentifier = "net5.0";
-                            agentName = "nunit-agent-net50";
+                            agentName = agentSubDir = "nunit-agent-net50";
                             break;
                         default:
                             runtimeIdentifier = "netcoreapp3.1";
-                            agentName = "nunit-agent-netcore31";
+                            agentName = agentSubDir = "nunit-agent-netcore31";
                             break;
                     }
                     agentExtension = ".dll";
@@ -149,7 +152,7 @@ namespace NUnit.Engine.Services
                     return null;
             }
 
-            return Path.Combine(Path.Combine(agentsDir, runtimeIdentifier), agentName + agentExtension);
+            return Path.Combine(agentsDir, agentSubDir, agentName + agentExtension);
         }
     }
 }

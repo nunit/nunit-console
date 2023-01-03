@@ -14,11 +14,11 @@ using FrameworkName = System.Runtime.Versioning.FrameworkName;
 namespace NUnit.Engine.Extensibility
 {
     // TODO: This should actually give us 3.5
-    [TestFixture("../net35/mock-assembly.dll", FrameworkIdentifiers.NetFramework, "2.0")]
-    [TestFixture("../netcoreapp2.1/mock-assembly.dll", FrameworkIdentifiers.NetCoreApp, "2.1")]
-    [TestFixture("../netcoreapp3.1/mock-assembly.dll", FrameworkIdentifiers.NetCoreApp, "3.1")]
-    [TestFixture("../net5.0/mock-assembly.dll", FrameworkIdentifiers.NetCoreApp, "5.0")]
-    [TestFixture("../net6.0/mock-assembly.dll", FrameworkIdentifiers.NetCoreApp, "6.0")]
+    [TestFixture("net35", FrameworkIdentifiers.NetFramework, "2.0")]
+    [TestFixture("netcoreapp2.1", FrameworkIdentifiers.NetCoreApp, "2.1")]
+    [TestFixture("netcoreapp3.1", FrameworkIdentifiers.NetCoreApp, "3.1")]
+    [TestFixture("net5.0", FrameworkIdentifiers.NetCoreApp, "5.0")]
+    [TestFixture("net6.0", FrameworkIdentifiers.NetCoreApp, "6.0")]
     public class ExtensionAssemblyTests
     {
         private string _assemblyPath;
@@ -26,10 +26,10 @@ namespace NUnit.Engine.Extensibility
         private FrameworkName _expectedTargetRuntime;
         private ExtensionAssembly _ea;
 
-        public ExtensionAssemblyTests(string assemblyPath, string expectedRuntime, string expectedVersion)
+        public ExtensionAssemblyTests(string runtimeDir, string expectedRuntime, string expectedVersion)
         {
-            _assemblyPath = assemblyPath;
-            _assemblyFileName = Path.GetFileNameWithoutExtension(assemblyPath);
+            _assemblyPath = TestData.MockAssemblyPath(runtimeDir);
+            _assemblyFileName = Path.GetFileNameWithoutExtension(_assemblyPath);
             _expectedTargetRuntime = new FrameworkName(expectedRuntime, new Version(expectedVersion));
         }
 

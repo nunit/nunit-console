@@ -61,9 +61,9 @@ public class PackageTester
                 // users may do their own installls. For security reasons, we can't
                 // do a full install so we simulate the user portion of the install,
                 // copying certain files to their final destination.
-                Console.WriteLine("Copying agent files");
-                _context.CopyFiles(filesToCopy, binDir + "agents/net20");
-                _context.CopyFiles(filesToCopy, binDir + "agents/net462");
+                //Console.WriteLine("Copying agent files");
+                //_context.CopyFiles(filesToCopy, binDir + "agents/net20");
+                //_context.CopyFiles(filesToCopy, binDir + "agents/net462");
             }
         }
         else
@@ -92,14 +92,11 @@ public class PackageTester
 
             Console.WriteLine($"Running {_installDirectory + _testExecutable}");
 
-            var outputDir = System.IO.Path.GetFullPath(
-                $"bin/{Configuration}/");
             int rc = _context.StartProcess(
                 _installDirectory + _testExecutable,
                 new ProcessSettings()
                 {
-                    Arguments = $"{packageTest.Arguments} --work={testResultDir}",
-                    WorkingDirectory = outputDir
+                    Arguments = $"{packageTest.Arguments} --work={testResultDir}"
                 });
 
             try
