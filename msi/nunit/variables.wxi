@@ -29,7 +29,7 @@
     <!-- *********  Properties for the Add Remove Programs list  ********* -->
     <!-- ***************************************************************** -->
 
-    <Icon Id="nunit.ico" SourceFile="$(var.InstallImage)\nunit.ico"/>
+    <Icon Id="nunit.ico" SourceFile="..\..\nunit.ico"/>
     <Property Id="ARPCONTACT" Value="The NUnit Project" />
     <Property Id="ARPPRODUCTICON" Value="nunit.ico" />
     <Property Id="ARPHELPLINK" Value="https://groups.google.com/forum/#!forum/nunit-discuss" />
@@ -42,7 +42,7 @@
     <!-- **********  Define our GUI using standard WiX UI       ********** -->
     <!-- ***************************************************************** -->
 
-    <WixVariable Id="WixUILicenseRtf" Value="$(var.InstallImage)\License.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="..\resources\License.rtf" />
     <UIRef Id="WixUI_Mondo" />
     <UIRef Id="WixUI_ErrorProgressText" />
 

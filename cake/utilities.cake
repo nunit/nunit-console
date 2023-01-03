@@ -96,6 +96,27 @@ DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
         .WithTarget(target);
 }
 
+void CopyAgentsToDirectory(string targetDir)
+{
+    DisplayBanner($"Copying agents to {targetDir}");
+    CreateDirectory( targetDir + "agents");
+
+    // Copy agent directories we are retaining
+    CopyDirectory(NET20_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net20");
+    CopyDirectory(NET462_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net462");
+    CopyDirectory(NET50_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net50");
+    CopyDirectory(NET60_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net60");
+    CopyDirectory(NETCORE31_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-netcore31");
+
+    // Copy X86 files to corresponding runtime directories
+    CopyFiles(
+        NET20_AGENT_X86_PROJECT_BIN_DIR + "nunit-agent-net20-x86.*",
+        targetDir + "agents/nunit-agent-net20/");
+    CopyFiles(
+        NET462_AGENT_X86_PROJECT_BIN_DIR + "nunit-agent-net462-x86.*",
+        targetDir + "agents/nunit-agent-net462/");
+}
+
 //////////////////////////////////////////////////////////////////////
 // HELPER METHODS - TEST
 //////////////////////////////////////////////////////////////////////
@@ -110,14 +131,25 @@ FilePath GetResultXmlPath(string testAssembly, string targetRuntime)
     return MakeAbsolute(new FilePath($@"test-results\{targetRuntime}\{assemblyName}.xml"));
 }
 
-void RunNUnitLiteTests(string testAssembly, string targetRuntime)
+string GetProjectBinDir(string projectPath)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
-    var assemblyPath = workingDir + testAssembly;
-    var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
+    var projectDir = System.IO.Path.GetDirectoryName(projectPath);
+    return projectDir + $"/bin/{Configuration}/";
+}
 
+string GetProjectBinDir(string projectPath, string targetRuntime)
+{
+    return GetProjectBinDir(projectPath) + targetRuntime + "/";
+}
+
+void RunNUnitLiteTests(string projectPath, string targetRuntime)
+{
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".exe";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var resultPath = GetResultXmlPath( testAssembly, targetRuntime).FullPath;
+    
     int rc = StartProcess(
-        assemblyPath,
+        workingDir + testAssembly,
         new ProcessSettings()
         {
             Arguments = $"--result:{resultPath}",
@@ -130,9 +162,10 @@ void RunNUnitLiteTests(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
+void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -150,9 +183,10 @@ void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetFxConsole(string testAssembly, string targetRuntime)
+void RunNetFxConsole(string projectPath, string targetRuntime)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -170,9 +204,10 @@ void RunNetFxConsole(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetCoreConsole(string testAssembly, string targetRuntime)
+void RunNetCoreConsole(string projectPath, string targetRuntime)
 {
-    var workingDir = BIN_DIR + targetRuntime + "/";
+    var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
+    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 

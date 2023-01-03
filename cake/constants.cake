@@ -2,15 +2,15 @@
 // RUNTIME CONSTANTS AND VARIABLES USED AS CONSTANTS
 //////////////////////////////////////////////////////////////////////
 
-// Some values are static so they may be used in property initialization and in
-// classes. Initialization is separate to allow use of non-constant expressions.
+// Values are static so they may be used in property initialization and in
+// classes. Initialization is separate for any that depend upon PROJECT_DIR
+// or Configuration being initialized before them.
 
 // Directories
 static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
 static string PACKAGE_TEST_DIR; PACKAGE_TEST_DIR = PACKAGE_DIR + "tests/";
 static string PACKAGE_RESULT_DIR; PACKAGE_RESULT_DIR = PACKAGE_DIR + "results/";
-static string BIN_DIR; BIN_DIR = PROJECT_DIR + "bin/" + Configuration + "/";
 static string NUGET_DIR; NUGET_DIR = PROJECT_DIR + "nuget/";
 static string CHOCO_DIR; CHOCO_DIR = PROJECT_DIR + "choco/";
 static string MSI_DIR; MSI_DIR = PROJECT_DIR + "msi/";
@@ -23,39 +23,70 @@ static string SOURCE_DIR; SOURCE_DIR = PROJECT_DIR + "src/";
 static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions";
 
 // Solution and Projects
-var SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
-var ENGINE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
-var AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent/nunit-agent.csproj";
-var AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-x86/nunit-agent-x86.csproj";
-var ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
-var ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
-var ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
-var ENGINE_CORE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core.tests/nunit.engine.core.tests.csproj";
-var CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console/nunit-console.csproj";
-var CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console.tests/nunit-console.tests.csproj";
-var MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "TestData/mock-assembly/mock-assembly.csproj";
-var MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "TestData/mock-assembly-x86/mock-assembly-x86.csproj";
-var MOCK_ASSEMBLY_NUNIT4_PROJECT = SOURCE_DIR + "TestData/mock-assembly-nunit4/mock-assembly-nunit4.csproj";
-var NOTEST_PROJECT = SOURCE_DIR + "TestData/notest-assembly/notest-assembly.csproj";
-// Console Runner
+static string SOLUTION_FILE; SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
+static string NETFX_CONSOLE_PROJECT; NETFX_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console/nunit-console.csproj";
+//static string NETCORE_CONSOLE_PROJECT; NETCORE_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-netcore-console/nunit-netcore-console.csproj";
+static string ENGINE_PROJECT; ENGINE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
+static string ENGINE_CORE_PROJECT; ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
+static string ENGINE_API_PROJECT; ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
+static string NET20_AGENT_PROJECT; NET20_AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-net20-x86/nunit-agent-net20.csproj";
+static string NET20_AGENT_X86_PROJECT; NET20_AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-net20-x86/nunit-agent-net20-x86.csproj";
+static string NET462_AGENT_PROJECT; NET462_AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-net462/nunit-agent-net462.csproj";
+static string NET462_AGENT_X86_PROJECT; NET462_AGENT_X86_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-net462-x86/nunit-agent-net462-x86.csproj";
+static string NET50_AGENT_PROJECT; NET50_AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-net50/nunit-agent-net50.csproj";
+static string NET60_AGENT_PROJECT; NET60_AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-net60/nunit-agent-net60.csproj";
+static string NETCORE31_AGENT_PROJECT; NETCORE31_AGENT_PROJECT = SOURCE_DIR + "NUnitEngine/agents/nunit-agent-netcore31/nunit-agent-netcore31.csproj";
+static string CONSOLE_TESTS_PROJECT; CONSOLE_TESTS_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-console.tests/nunit-console.tests.csproj";
+static string ENGINE_TESTS_PROJECT; ENGINE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj";
+static string ENGINE_CORE_TESTS_PROJECT; ENGINE_CORE_TESTS_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core.tests/nunit.engine.core.tests.csproj";
+static string MOCK_ASSEMBLY_PROJECT; MOCK_ASSEMBLY_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly/mock-assembly.csproj";
+static string MOCK_ASSEMBLY_X86_PROJECT; MOCK_ASSEMBLY_X86_PROJECT = SOURCE_DIR + "NUnitEngine/mock-assembly-x86/mock-assembly-x86.csproj";
+static string NOTEST_PROJECT; NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.csproj";// Console Runner
+
+// Bin directories for projects
+static string NETFX_CONSOLE_PROJECT_BIN_DIR; NETFX_CONSOLE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit-console/bin/{Configuration}/";
+static string NETCORE_CONSOLE_PROJECT_BIN_DIR; NETCORE_CONSOLE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit-console/bin/{Configuration}/";
+static string ENGINE_PROJECT_BIN_DIR; ENGINE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine/bin/{Configuration}/";
+static string ENGINE_CORE_PROJECT_BIN_DIR; ENGINE_CORE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine.core/bin/{Configuration}/";
+static string ENGINE_API_PROJECT_BIN_DIR; ENGINE_API_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine.api/bin/{Configuration}/";
+static string NET20_AGENT_PROJECT_BIN_DIR; NET20_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net20/bin/{Configuration}/net20/";
+static string NET20_AGENT_X86_PROJECT_BIN_DIR; NET20_AGENT_X86_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net20-x86/bin/{Configuration}/net20/";
+static string NET462_AGENT_PROJECT_BIN_DIR; NET462_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net462/bin/{Configuration}/net462/";
+static string NET462_AGENT_X86_PROJECT_BIN_DIR; NET462_AGENT_X86_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net462-x86/bin/{Configuration}/net462/";
+static string NET50_AGENT_PROJECT_BIN_DIR; NET50_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net50/bin/{Configuration}/net5.0/";
+static string NET60_AGENT_PROJECT_BIN_DIR; NET60_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net60/bin/{Configuration}/net6.0/";
+static string NETCORE31_AGENT_PROJECT_BIN_DIR; NETCORE31_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-netcore31/bin/{Configuration}/netcoreapp3.1/";
+
+static string CONSOLE_TESTS_PROJECT_BIN_DIR; CONSOLE_TESTS_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit-console.tests/bin/{Configuration}/";
+static string ENGINE_TESTS_PROJECT_BIN_DIR; ENGINE_TESTS_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine.tests/bin/{Configuration}/";
+static string ENGINE_CORE_TESTS_PROJECT_BIN_DIR; ENGINE_CORE_TESTS_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine.core/bin/{Configuration}/";
+static string MOCK_ASSEMBLY_PROJECT_BIN_DIR; MOCK_ASSEMBLY_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/mock-assembly/bin/{Configuration}/";
+static string MOCK_ASSEMBLY_X86_PROJECT_BIN_DIR; MOCK_ASSEMBLY_X86_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/mock-assembly-x86/bin/{Configuration}/";
+static string MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR; MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/mock-assembly-nunit4/bin/{Configuration}/";
+static string NOTEST_ASSEMBLY_PROJECT_BIN_DIR; NOTEST_ASSEMBLY_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/notest-assembly/bin/{Configuration}/";
+
 // We build two console runners. If version of either is upgraded, change it here
-var NETFX_CONSOLE_TARGET = "net462";
-var NETFX_CONSOLE_DIR = BIN_DIR + NETFX_CONSOLE_TARGET + "/";
-var NETFX_CONSOLE = NETFX_CONSOLE_DIR + "nunit-console.exe";
-var NETCORE_CONSOLE_TARGET = "net6.0";
-var NETCORE_CONSOLE_DIR = BIN_DIR + NETCORE_CONSOLE_TARGET + "/";
-var NETCORE_CONSOLE = NETCORE_CONSOLE_DIR + "nunit-console.dll";
+const string NETFX_CONSOLE_TARGET = "net462";
+const string NETCORE_CONSOLE_TARGET = "net6.0";
+static string[] ENGINE_TARGETS = new [] { "net462", "netstandard2.0", "netcoreapp3.1" };
+static string[] ENGINE_API_TARGETS = new [] { "net20", "netstandard2.0" };
+
+// Console Runner
+static string NETFX_CONSOLE_DIR; NETFX_CONSOLE_DIR = $"{NETFX_CONSOLE_PROJECT_BIN_DIR}{NETFX_CONSOLE_TARGET}/";
+static string NETFX_CONSOLE; NETFX_CONSOLE = NETFX_CONSOLE_DIR + "nunit-console.exe";
+static string NETCORE_CONSOLE_DIR; NETCORE_CONSOLE_DIR = $"{NETCORE_CONSOLE_PROJECT_BIN_DIR}{NETCORE_CONSOLE_TARGET}/";
+static string NETCORE_CONSOLE; NETCORE_CONSOLE = NETCORE_CONSOLE_DIR + "nunit-console.dll";
 
 // Currently, the engine uses the same versions as the console runner but this may not always be true
-var NETFX_ENGINE_TARGET = NETFX_CONSOLE_TARGET;
-var NETCORE_ENGINE_TARGET = NETCORE_CONSOLE_TARGET;
+const string NETFX_ENGINE_TARGET = NETFX_CONSOLE_TARGET;
+const string NETCORE_ENGINE_TARGET = NETCORE_CONSOLE_TARGET;
 
 // Unit Tests
-var NETFX_ENGINE_CORE_TESTS = "nunit.engine.core.tests.exe";
-var NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
-var NETFX_ENGINE_TESTS = "nunit.engine.tests.exe";
-var NETCORE_ENGINE_TESTS = "nunit.engine.tests.dll";
-var CONSOLE_TESTS = "nunit-console.tests.dll";
+const string NETFX_ENGINE_CORE_TESTS = "src/NUnitEngine/nunit.engine.core.tests/nunit.engine.core.tests.exe";
+const string NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
+const string NETFX_ENGINE_TESTS = "nunit.engine.tests.exe";
+const string NETCORE_ENGINE_TESTS = "nunit.engine.tests.dll";
+const string CONSOLE_TESTS = "nunit-console.tests.dll";
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]

@@ -27,25 +27,37 @@ namespace NUnit.Engine.Services
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = "net-4.5";
         }
 
-        [TestCase("net-4.8", false, "../agents/net462/nunit-agent-net462.exe")]
-        [TestCase("net-4.8", true, "../agents/net462/nunit-agent-net462-x86.exe")]
-        [TestCase("net-4.6.2", false, "../agents/net462/nunit-agent-net462.exe")]
-        [TestCase("net-4.6.2", true, "../agents/net462/nunit-agent-net462-x86.exe")]
-        [TestCase("net-4.0", false, "../agents/net462/nunit-agent-net462.exe")]
-        [TestCase("net-4.0", true, "../agents/net462/nunit-agent-net462-x86.exe")]
-        [TestCase("net-3.5", false, "../agents/net20/nunit-agent-net20.exe")]
-        [TestCase("net-3.5", true, "../agents/net20/nunit-agent-net20-x86.exe")]
-        [TestCase("net-2.0", false, "../agents/net20/nunit-agent-net20.exe")]
-        [TestCase("net-2.0", true, "../agents/net20/nunit-agent-net20-x86.exe")]
-        //[TestCase("netcore-2.1", false, "agents/netcoreapp2.1/testcentric-agent.dll")]
-        //[TestCase("netcore-2.1", true, "agents/netcoreapp2.1/testcentric-agent-x86.dll")]
+#if DEBUG
+        const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
+#else
+        const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
+#endif
+
+        [TestCase("net-4.8", false, "nunit-agent-net462/nunit-agent-net462.exe")]
+        [TestCase("net-4.8", true, "nunit-agent-net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-4.6.2", false, "nunit-agent-net462/nunit-agent-net462.exe")]
+        [TestCase("net-4.6.2", true, "nunit-agent-net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-4.0", false, "nunit-agent-net462/nunit-agent-net462.exe")]
+        [TestCase("net-4.0", true, "nunit-agent-net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-3.5", false, "nunit-agent-net20/nunit-agent-net20.exe")]
+        [TestCase("net-3.5", true, "nunit-agent-net20/nunit-agent-net20-x86.exe")]
+        [TestCase("net-2.0", false, "nunit-agent-net20/nunit-agent-net20.exe")]
+        [TestCase("net-2.0", true, "nunit-agent-net20/nunit-agent-net20-x86.exe")]
+        [TestCase("netcore-2.1", false, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-2.1", true, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-3.1", false, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-3.1", true, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-5.0", false, "nunit-agent-net50/nunit-agent-net50.dll")]
+        [TestCase("netcore-5.0", true, "nunit-agent-net50/nunit-agent-net50.dll")]
+        [TestCase("netcore-6.0", false, "nunit-agent-net60/nunit-agent-net60.dll")]
+        [TestCase("netcore-6.0", true, "nunit-agent-net60/nunit-agent-net60.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)
         {
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = runtime;
             _package.Settings[EnginePackageSettings.RunAsX86] = x86;
 
             var agentProcess = GetAgentProcess();
-            agentPath = Path.Combine(TestContext.CurrentContext.TestDirectory, agentPath);
+            agentPath = Path.GetFullPath(AGENTS_DIR + agentPath);
 
             // NOTE: the file doesn't actually exist at this location during unit
             // testing, but it's where it will be found once the app is installed.
