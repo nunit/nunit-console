@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
@@ -93,7 +94,7 @@ namespace NUnit.Engine.Internal
 
         private static string GetDotNetInstallDirectory()
         {
-            if (Path.DirectorySeparatorChar == '\\')
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Running on Windows so use registry
                 RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
