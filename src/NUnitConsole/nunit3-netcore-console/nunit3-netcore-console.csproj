@@ -11,10 +11,6 @@
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
   </PropertyGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
   <PropertyGroup>
     <Product>NUnit Console</Product>
     <AssemblyTitle>NUnit Console Runner ($(TargetFramework))</AssemblyTitle>
