@@ -87,5 +87,14 @@
     <file src = "$BASE$agents/nunit-agent-net60/nunit.engine.api.xml" target="tools/agents/nunit-agent-net60" />
     <file src = "$BASE$agents/nunit-agent-net60/nunit.engine.core.dll" target="tools/agents/nunit-agent-net60" />
     <file src = "$BASE$agents/nunit-agent-net60/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net60" />
+
+    <file src = "$BASE$agents/nunit-agent-net70/nunit-agent-net70.dll" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/nunit-agent-net70.dll.config" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/nunit-agent-net70.deps.json" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/nunit-agent-net70.runtimeconfig.json" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/nunit.engine.api.dll" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/nunit.engine.api.xml" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/nunit.engine.core.dll" target="tools/agents/nunit-agent-net70" />
+    <file src = "$BASE$agents/nunit-agent-net70/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net70" />
   </files>
 </package>

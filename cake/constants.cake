@@ -55,6 +55,7 @@ static string NET462_AGENT_PROJECT_BIN_DIR; NET462_AGENT_PROJECT_BIN_DIR = SOURC
 static string NET462_AGENT_X86_PROJECT_BIN_DIR; NET462_AGENT_X86_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net462-x86/bin/{Configuration}/net462/";
 static string NET50_AGENT_PROJECT_BIN_DIR; NET50_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net50/bin/{Configuration}/net5.0/";
 static string NET60_AGENT_PROJECT_BIN_DIR; NET60_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net60/bin/{Configuration}/net6.0/";
+static string NET70_AGENT_PROJECT_BIN_DIR; NET70_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-net70/bin/{Configuration}/net7.0/";
 static string NETCORE31_AGENT_PROJECT_BIN_DIR; NETCORE31_AGENT_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/agents/nunit-agent-netcore31/bin/{Configuration}/netcoreapp3.1/";
 
 static string CONSOLE_TESTS_PROJECT_BIN_DIR; CONSOLE_TESTS_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit-console.tests/bin/{Configuration}/";

@@ -16,6 +16,7 @@
               <Directory Id="NETCORE31_AGENT_DIR" Name="nunit-agent-netcore31" />
               <Directory Id="NET50_AGENT_DIR" Name="nunit-agent-net50" />
               <Directory Id="NET60_AGENT_DIR" Name="nunit-agent-net60" />
+              <Directory Id="NET70_AGENT_DIR" Name="nunit-agent-net70" />
           </Directory>
       </Directory>
     </DirectoryRef>
