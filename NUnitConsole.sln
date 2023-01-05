@@ -146,6 +146,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-net462", "src\N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-net462-x86", "src\NUnitEngine\agents\nunit-agent-net462-x86\nunit-agent-net462-x86.csproj", "{D4AE483A-D4E1-4892-AF87-3607FBA8755F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-net70", "src\NUnitEngine\agents\nunit-agent-net70\nunit-agent-net70.csproj", "{1343AB32-5FB0-408B-9BAC-B1483414D5D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -224,6 +226,10 @@ Global
 		{D4AE483A-D4E1-4892-AF87-3607FBA8755F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4AE483A-D4E1-4892-AF87-3607FBA8755F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4AE483A-D4E1-4892-AF87-3607FBA8755F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1343AB32-5FB0-408B-9BAC-B1483414D5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1343AB32-5FB0-408B-9BAC-B1483414D5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1343AB32-5FB0-408B-9BAC-B1483414D5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1343AB32-5FB0-408B-9BAC-B1483414D5D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -257,6 +263,7 @@ Global
 		{D5CC541C-95B7-4CB4-AADD-660FDCC281B8} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
 		{E4041712-A1F1-479D-A7F7-89F491066163} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
 		{D4AE483A-D4E1-4892-AF87-3607FBA8755F} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
+		{1343AB32-5FB0-408B-9BAC-B1483414D5D5} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

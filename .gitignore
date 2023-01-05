@@ -186,6 +186,12 @@ tools
 bundled-extensions
 
 # =========================
+# NUnit 3 Directories not used in NUnit 4
+# =========================
+nunit3-console
+nunit3-netcore-console
+
+# =========================
 # Docker Mono build packages
 # =========================
 

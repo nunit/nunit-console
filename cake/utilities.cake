@@ -104,9 +104,10 @@ void CopyAgentsToDirectory(string targetDir)
     // Copy agent directories we are retaining
     CopyDirectory(NET20_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net20");
     CopyDirectory(NET462_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net462");
+    CopyDirectory(NETCORE31_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-netcore31");
     CopyDirectory(NET50_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net50");
     CopyDirectory(NET60_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net60");
-    CopyDirectory(NETCORE31_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-netcore31");
+    CopyDirectory(NET70_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net70");
 
     // Copy X86 files to corresponding runtime directories
     CopyFiles(

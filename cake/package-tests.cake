@@ -43,10 +43,16 @@ PackageTest Net35PlusNet462Test = new PackageTest(
     $"{MOCK_ASSEMBLY_PROJECT_BIN_DIR}net35/mock-assembly.dll {MOCK_ASSEMBLY_PROJECT_BIN_DIR}net462/mock-assembly.dll",
     MockAssemblyExpectedResult(2));
 
+PackageTest Net70Test = new PackageTest(
+    "Net70Test",
+    "Run mock-assembly.dll under .NET 7.0",
+    MOCK_ASSEMBLY_PROJECT_BIN_DIR + "net7.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(1));
+
 PackageTest Net60Test = new PackageTest(
     "Net60Test",
     "Run mock-assembly.dll under .NET 6.0",
-    MOCK_ASSEMBLY_PROJECT_BIN_DIR + "net6.0/mock-assembly.dll --trace:Debug",
+    MOCK_ASSEMBLY_PROJECT_BIN_DIR + "net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
 PackageTest Net50Test = new PackageTest(
