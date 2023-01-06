@@ -36,7 +36,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             _listenerThread = new Thread(WaitForClientConnections)
             {
-                Name = "TCPLisstenerThread",
+                Name = "TCPListenerThread",
                 IsBackground = true
             };
             _listenerThread.Start();

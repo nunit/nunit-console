@@ -46,7 +46,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
-    <ProjectReference Include="..\nunit-console\nunit-console.csproj" />
+    <ProjectReference Include="..\nunit4-console\nunit4-console.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
   

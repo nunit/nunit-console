@@ -100,9 +100,9 @@
     <file src="agents/nunit-agent-net70/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net70" />
     <file src="agents/nunit-agent-net70/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net70" />
 
-    <file src="nunit-console.exe" target="tools" />
-    <file src="nunit-console.pdb" target="tools" />
-    <file src="nunit-console.exe.config" target="tools" />
+    <file src="nunit4-console.exe" target="tools" />
+    <file src="nunit4-console.pdb" target="tools" />
+    <file src="nunit4-console.exe.config" target="tools" />
     <file src="nunit.engine.api.dll" target="tools" />
     <file src="nunit.engine.api.pdb" target="tools" />
     <file src="nunit.engine.api.xml" target="tools" />

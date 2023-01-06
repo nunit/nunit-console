@@ -117,16 +117,16 @@ NUnitProjectTest = new PackageTest(
     MockAssemblyExpectedResult(2));
 
 // Tests using NUnit 4
-PackageTest Net45PlusNet60NUnit4Test = new PackageTest(
-    "Net45PlusNet60Test",
-    "Run mock-assembly-nunit4 under .Net Framework 4.5 and .Net 6.0 together",
-    $"{MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR}net45/mock-assembly-nunit4.dll {MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR}net6.0/mock-assembly-nunit4.dll",
+PackageTest Net462PlusNet60NUnit4Test = new PackageTest(
+    "Net462PlusNet60Test",
+    "Run mock-assembly-nunit4 under .Net Framework 4.6.2 and .Net 6.0 together",
+    $"{MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR}net462/mock-assembly-nunit4.dll {MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR}net6.0/mock-assembly-nunit4.dll",
     MockAssemblyExpectedResult(2));
 
-PackageTest Net45NUnit4Test = new PackageTest(
-    "Net45NUnit4Test",
-    "Run mock-assembly-nunit4.dll under .NET 4.5",
-    MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR + "net45/mock-assembly-nunit4.dll",
+PackageTest Net462NUnit4Test = new PackageTest(
+    "Net462NUnit4Test",
+    "Run mock-assembly-nunit4.dll under .NET 4.6.2",
+    MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR + "net462/mock-assembly-nunit4.dll",
     MockAssemblyExpectedResult(1));
 
 PackageTest Net60NUnit4Test = new PackageTest(
