@@ -25,7 +25,7 @@ static string EXTENSIONS_DIR; EXTENSIONS_DIR = PROJECT_DIR + "bundled-extensions
 // Solution and Projects
 static string SOLUTION_FILE; SOLUTION_FILE = PROJECT_DIR + "NUnitConsole.sln";
 static string NETFX_CONSOLE_PROJECT; NETFX_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit4-console/nunit4-console.csproj";
-//static string NETCORE_CONSOLE_PROJECT; NETCORE_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit-netcore-console/nunit-netcore-console.csproj";
+static string NETCORE_CONSOLE_PROJECT; NETCORE_CONSOLE_PROJECT = SOURCE_DIR + "NUnitConsole/nunit4-netcore-console/nunit4-netcore-console.csproj";
 static string ENGINE_PROJECT; ENGINE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine/nunit.engine.csproj";
 static string ENGINE_CORE_PROJECT; ENGINE_CORE_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.core/nunit.engine.core.csproj";
 static string ENGINE_API_PROJECT; ENGINE_API_PROJECT = SOURCE_DIR + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj";
@@ -45,7 +45,7 @@ static string NOTEST_PROJECT; NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-
 
 // Bin directories for projects
 static string NETFX_CONSOLE_PROJECT_BIN_DIR; NETFX_CONSOLE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit4-console/bin/{Configuration}/";
-static string NETCORE_CONSOLE_PROJECT_BIN_DIR; NETCORE_CONSOLE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit4-console/bin/{Configuration}/";
+static string NETCORE_CONSOLE_PROJECT_BIN_DIR; NETCORE_CONSOLE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitConsole/nunit4-netcore-console/bin/{Configuration}/";
 static string ENGINE_PROJECT_BIN_DIR; ENGINE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine/bin/{Configuration}/";
 static string ENGINE_CORE_PROJECT_BIN_DIR; ENGINE_CORE_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine.core/bin/{Configuration}/";
 static string ENGINE_API_PROJECT_BIN_DIR; ENGINE_API_PROJECT_BIN_DIR = SOURCE_DIR + $"NUnitEngine/nunit.engine.api/bin/{Configuration}/";
@@ -76,7 +76,7 @@ static string[] ENGINE_API_TARGETS = new [] { "net20", "netstandard2.0" };
 static string NETFX_CONSOLE_DIR; NETFX_CONSOLE_DIR = $"{NETFX_CONSOLE_PROJECT_BIN_DIR}{NETFX_CONSOLE_TARGET}/";
 static string NETFX_CONSOLE; NETFX_CONSOLE = NETFX_CONSOLE_DIR + "nunit4-console.exe";
 static string NETCORE_CONSOLE_DIR; NETCORE_CONSOLE_DIR = $"{NETCORE_CONSOLE_PROJECT_BIN_DIR}{NETCORE_CONSOLE_TARGET}/";
-static string NETCORE_CONSOLE; NETCORE_CONSOLE = NETCORE_CONSOLE_DIR + "nunit4-console.dll";
+static string NETCORE_CONSOLE; NETCORE_CONSOLE = NETCORE_CONSOLE_DIR + "nunit4-netcore-console.dll";
 
 // Currently, the engine uses the same versions as the console runner but this may not always be true
 const string NETFX_ENGINE_TARGET = NETFX_CONSOLE_TARGET;

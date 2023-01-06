@@ -140,15 +140,15 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory("tools/net6.0/any")
                     .WithFiles(
-                        "nunit4-console.exe", "nunit4-console.dll", "nunit4-console.dll.config", "nunit.console.nuget.addins",
+                        "nunit4-netcore-console.exe", "nunit4-netcore-console.dll", "nunit4-netcore-console.dll.config", "nunit.console.nuget.addins",
                         "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll")
             },
             symbols: new PackageCheck[] {
                 HasDirectory("tools/net6.0/any").
                     WithFiles(
-                        "nunit4-console.pdb", "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb")
+                        "nunit4-netcore-console.pdb", "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb")
             },
-            executable: "tools/net6.0/any/nunit4-console.exe",
+            executable: "tools/net6.0/any/nunit4-netcore-console.exe",
             tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(

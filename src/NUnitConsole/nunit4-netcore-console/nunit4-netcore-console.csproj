@@ -3,8 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <AssemblyName>nunit4-console</AssemblyName>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <AssemblyName>nunit4-netcore-console</AssemblyName>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <RollForward>Major</RollForward>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
