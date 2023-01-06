@@ -29,12 +29,12 @@
   <files>
     <file src="../../../../../../LICENSE.txt" />
     <file src="../../../../../../NOTICES.txt" />
-    <file src="nunit-console.exe" target="tools/net6.0/any" />
-    <file src="nunit-console.pdb" target="tools/net6.0/any" />
-    <file src="nunit-console.dll" target="tools/net6.0/any" />
-    <file src="nunit-console.dll.config" target="tools/net6.0/any" />
-    <file src="nunit-console.deps.json" target="tools/net6.0/any" />
-    <file src="nunit-console.runtimeconfig.json" target="tools/net6.0/any" />
+    <file src="nunit4-console.exe" target="tools/net6.0/any" />
+    <file src="nunit4-console.pdb" target="tools/net6.0/any" />
+    <file src="nunit4-console.dll" target="tools/net6.0/any" />
+    <file src="nunit4-console.dll.config" target="tools/net6.0/any" />
+    <file src="nunit4-console.deps.json" target="tools/net6.0/any" />
+    <file src="nunit4-console.runtimeconfig.json" target="tools/net6.0/any" />
     <file src="nunit.engine.core.dll" target="tools/net6.0/any" />
     <file src="nunit.engine.core.pdb" target="tools/net6.0/any" />
     <file src="nunit.engine.dll" target="tools/net6.0/any" />
