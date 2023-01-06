@@ -6,6 +6,7 @@ branches:
   - /^azure-/
 
 build_script:
+  - ps: dotnet --info
   - ps: .\build.ps1 --target=Appveyor --configuration=Release
 
 # disable built-in tests.
