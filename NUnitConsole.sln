@@ -143,6 +143,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit4-console", "src\NUnit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit4-console.tests", "src\NUnitConsole\nunit4-console.tests\nunit4-console.tests.csproj", "{0D6B575A-93B4-4944-B4C0-68CDD413B904}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit4-netcore-console", "src\NUnitConsole\nunit4-netcore-console\nunit4-netcore-console.csproj", "{9667833E-A037-41C9-A3BC-D218903EF670}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -225,6 +227,10 @@ Global
 		{0D6B575A-93B4-4944-B4C0-68CDD413B904}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D6B575A-93B4-4944-B4C0-68CDD413B904}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D6B575A-93B4-4944-B4C0-68CDD413B904}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9667833E-A037-41C9-A3BC-D218903EF670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9667833E-A037-41C9-A3BC-D218903EF670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9667833E-A037-41C9-A3BC-D218903EF670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9667833E-A037-41C9-A3BC-D218903EF670}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -259,6 +265,7 @@ Global
 		{1343AB32-5FB0-408B-9BAC-B1483414D5D5} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
 		{E1F5F8D3-4AC4-4BB0-9438-2BF41768B473} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
 		{0D6B575A-93B4-4944-B4C0-68CDD413B904} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
+		{9667833E-A037-41C9-A3BC-D218903EF670} = {576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
