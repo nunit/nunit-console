@@ -63,6 +63,7 @@
     <file src="agents/nunit-agent-netcore31/nunit.engine.core.dll" target="tools/agents/nunit-agent-netcore31" />
     <file src="agents/nunit-agent-netcore31/nunit.engine.core.pdb" target="tools/agents/nunit-agent-netcore31" />
     <file src="agents/nunit-agent-netcore31/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-netcore31" />
+    <file src="agents/nunit-agent-netcore31/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-netcore31" />
 
     <file src="agents/nunit-agent-net50/nunit-agent-net50.dll" target="tools/agents/nunit-agent-net50" />
     <file src="agents/nunit-agent-net50/nunit-agent-net50.pdb" target="tools/agents/nunit-agent-net50" />
@@ -75,6 +76,7 @@
     <file src="agents/nunit-agent-net50/nunit.engine.core.dll" target="tools/agents/nunit-agent-net50" />
     <file src="agents/nunit-agent-net50/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net50" />
     <file src="agents/nunit-agent-net50/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net50" />
+    <file src="agents/nunit-agent-net50/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-net50" />
 
     <file src="agents/nunit-agent-net60/nunit-agent-net60.dll" target="tools/agents/nunit-agent-net60" />
     <file src="agents/nunit-agent-net60/nunit-agent-net60.pdb" target="tools/agents/nunit-agent-net60" />
@@ -87,6 +89,7 @@
     <file src="agents/nunit-agent-net60/nunit.engine.core.dll" target="tools/agents/nunit-agent-net60" />
     <file src="agents/nunit-agent-net60/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net60" />
     <file src="agents/nunit-agent-net60/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net60" />
+    <file src="agents/nunit-agent-net60/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-net60" />
 
     <file src="agents/nunit-agent-net70/nunit-agent-net70.dll" target="tools/agents/nunit-agent-net70" />
     <file src="agents/nunit-agent-net70/nunit-agent-net70.pdb" target="tools/agents/nunit-agent-net70" />
@@ -99,6 +102,7 @@
     <file src="agents/nunit-agent-net70/nunit.engine.core.dll" target="tools/agents/nunit-agent-net70" />
     <file src="agents/nunit-agent-net70/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net70" />
     <file src="agents/nunit-agent-net70/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net70" />
+    <file src="agents/nunit-agent-net70/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-net70" />
 
     <file src="nunit4-console.exe" target="tools" />
     <file src="nunit4-console.pdb" target="tools" />
