@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace NUnit.Engine
 {
@@ -78,6 +79,10 @@ namespace NUnit.Engine
             new TestCaseData(
                 new RuntimeFramework(Runtime.Mono, new Version(4,0)),
                 new RuntimeFramework(Runtime.Net, new Version(4,0)))
+                .Returns(true),
+            new TestCaseData(
+                new RuntimeFramework(Runtime.Mono, new Version(4,0)),
+                new RuntimeFramework(Runtime.Net, new Version(4,6,2)))
                 .Returns(true),
             new TestCaseData(
                 new RuntimeFramework(Runtime.Net, new Version(2,0)),
