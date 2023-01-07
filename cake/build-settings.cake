@@ -19,6 +19,10 @@ public class BuildSettings
 
         BuildVersion = new BuildVersion(context);
 
+        MyGetApiKey = GetApiKey(MYGET_API_KEY, FALLBACK_MYGET_API_KEY);
+        NuGetApiKey = GetApiKey(NUGET_API_KEY, FALLBACK_NUGET_API_KEY);
+        ChocolateyApiKey = GetApiKey(CHOCO_API_KEY, FALLBACK_CHOCO_API_KEY);
+
         Net35Test = new PackageTest(
             "Net35Test",
             "Run mock-assembly.dll under .NET 3.5",
@@ -175,9 +179,9 @@ public class BuildSettings
     public bool ShouldPublishToChocolatey => !IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(PreReleaseLabel);
     public bool IsProductionRelease => !IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(PreReleaseLabel);
 
-    public string MyGetApiKey => _context.EnvironmentVariable(MYGET_API_KEY);
-    public string NuGetApiKey => _context.EnvironmentVariable(NUGET_API_KEY);
-    public string ChocolateyApiKey => _context.EnvironmentVariable(CHOCO_API_KEY);
+    public string MyGetApiKey { get; }
+    public string NuGetApiKey { get; }
+    public string ChocolateyApiKey { get; }
 
     public string GitHubAccessToken => _context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
@@ -289,6 +293,16 @@ public class BuildSettings
         Console.WriteLine($"  Solution:        {SOLUTION_FILE}");
         Console.WriteLine($"  NetFx Runner:    {NETFX_CONSOLE_PROJECT}");
         Console.WriteLine($"  NetCore Runner:  {NETCORE_CONSOLE_PROJECT}");
+    }
+
+    private string GetApiKey(string name, string fallback=null)
+    {
+        var apikey = _context.EnvironmentVariable(name);
+
+        if (string.IsNullOrEmpty(apikey) && fallback != null)
+            apikey = _context.EnvironmentVariable(fallback);
+
+        return apikey;
     }
 
     private void ShowApiKeyAvailability(string apikey)

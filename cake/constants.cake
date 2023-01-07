@@ -77,9 +77,12 @@ private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
 private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
 
 // Environment Variable names holding API keys
-private const string MYGET_API_KEY = "MYGET_API_KEY";
-private const string NUGET_API_KEY = "NUGET_API_KEY";
-private const string CHOCO_API_KEY = "CHOCO_API_KEY";
+private const string MYGET_API_KEY = "NUNIT_MYGET_API_KEY";
+private const string NUGET_API_KEY = "NUNIT_NUGET_API_KEY";
+private const string CHOCO_API_KEY = "NUNIT_CHOCO_API_KEY";
+private const string FALLBACK_MYGET_API_KEY = "MYGET_API_KEY";
+private const string FALLBACK_NUGET_API_KEY = "NUGET_API_KEY";
+private const string FALLBACK_CHOCO_API_KEY = "CHOCO_API_KEY";
 
 // GitHub Information
 private const string GITHUB_OWNER = "nunit";
