@@ -159,15 +159,19 @@ namespace NUnit.Engine.Services
                 {
                     case ".NETFramework":
                         targetRuntime = Runtime.Net;
+                        targetVersion = frameworkName.Version;
                         break;
                     case ".NETCoreApp":
                         targetRuntime = Runtime.NetCore;
+                        targetVersion = frameworkName.Version;
+                        break;
+                    case ".NETStandard":
+                        targetRuntime = Runtime.NetCore;
+                        targetVersion = new Version(3, 1);
                         break;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
                 }
-
-                targetVersion = frameworkName.Version;
             }
 
             if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id))
