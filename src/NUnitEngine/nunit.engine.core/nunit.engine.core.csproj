@@ -20,11 +20,16 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='netcoreapp3.1'">
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
   </ItemGroup>
-  
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="TestCentric.Metadata" Version="1.7.1" />
   </ItemGroup>

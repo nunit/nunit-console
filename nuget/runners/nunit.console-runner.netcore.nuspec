@@ -43,6 +43,7 @@
     <file src="nunit.engine.api.pdb" target="tools/net6.0/any" />
     <file src="nunit.engine.api.xml" target="tools/net6.0/any" />
     <file src="testcentric.engine.metadata.dll" target="tools/net6.0/any" />
+    <file src="Microsoft.Extensions.DependencyModel.dll" target="tools/net6.0/any" />
     <file src="../../../../../../nuget/runners/nunit.console.nuget.addins" target="tools/net6.0/any"/>
     <file src="../../../../../../nuget/runners/DotnetToolSettings.xml" target="tools/net6.0/any"/>
     <file src="../../../../../../nunit_256.png" target="images"/>
