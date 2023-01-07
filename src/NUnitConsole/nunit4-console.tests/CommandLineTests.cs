@@ -196,7 +196,9 @@ namespace NUnit.ConsoleRunner
         [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
 #if NETFRAMEWORK
-        [TestCase("RuntimeFramework", "framework", new string[] { "net-4.6.2" }, new string[0])]
+       // We can't predict which runtimes are available on the test machine, so we don't
+        // test for any good or bad values. TODO: Create a fake list of availble runtimes.
+        [TestCase("RuntimeFramework", "framework", new string[0], new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
 #endif

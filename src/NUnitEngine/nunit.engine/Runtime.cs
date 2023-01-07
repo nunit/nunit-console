@@ -99,6 +99,11 @@ namespace NUnit.Engine
             public override string DisplayName => "Mono";
 
             public override string ToString() => "Mono";
+
+            public override bool Supports(Version runtime, Version target)
+            {
+                return base.Supports(runtime, target) || runtime.Major >= 4 && target.Major == 4;
+            }
         }
 
         private class NetCoreRuntime : Runtime
