@@ -312,24 +312,32 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
                 HasDirectory("lib/net462")
                     .WithFiles(
-                        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
+                        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll",
+                        "testcentric.engine.metadata.dll", "nunit.engine.nuget.addins"),
                 HasDirectory("lib/netstandard2.0")
                     .WithFiles(
-                        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
+                        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll",
+                        "testcentric.engine.metadata.dll", "nunit.engine.nuget.addins"),
                 HasDirectory("lib/netcoreapp3.1")
                     .WithFiles(
-                        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
-                HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
-                HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
-                HasDirectory("contentFiles/any/lib/netcoreapp3.1").WithFile("nunit.engine.nuget.addins"),
-                HasDirectory("contentFiles/any/agents/net20")
+                        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", 
+                        "testcentric.engine.metadata.dll", "Microsoft.Extensions.DependencyModel.dll",
+                        "nunit.engine.nuget.addins"),
+                HasDirectory("agents/net20")
                     .WithFiles(
                         "nunit-agent-net20.exe", "nunit-agent-net20.exe.config",
-                        "nunit-agent-net20-x86.exe", "nunit-agent-net20-x86.exe.config"),
-                HasDirectory("contentFiles/any/agents/net462")
+                        "nunit-agent-net20-x86.exe", "nunit-agent-net20-x86.exe.config",
+                        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
+                HasDirectory("agents/net462")
                     .WithFiles(
                         "nunit-agent-net462.exe", "nunit-agent-net462.exe.config",
-                        "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config")
+                        "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
+                        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
+                HasDirectory("agents/netcoreapp3.1")
+                    .WithFiles(
+                        "nunit-agent-netcore31.dll", "nunit-agent-netcore31.dll.config",
+                        "nunit.engine.core.dll", "nunit.engine.api.dll",
+                        "testcentric.engine.metadata.dll", "Microsoft.Extensions.DependencyModel.dll"),
             },
             symbols: new PackageCheck[] {
                 HasDirectory("lib/net462")
@@ -338,11 +346,11 @@ public void InitializePackageDefinitions(ICakeContext context)
                     .WithFiles("nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
                 HasDirectory("lib/netcoreapp3.1")
                     .WithFiles("nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-                HasDirectory("contentFiles/any/agents/net20")
+                HasDirectory("agents/net20")
                     .WithFiles(
                         "nunit-agent-net20.pdb", "nunit-agent-net20-x86.pdb",
                         "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-                HasDirectory("contentFiles/any/agents/net462")
+                HasDirectory("agents/net462")
                     .WithFiles(
                         "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb",
                         "nunit.engine.core.pdb", "nunit.engine.api.pdb")
