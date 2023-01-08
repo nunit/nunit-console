@@ -19,25 +19,29 @@ public void InitializePackageDefinitions(ICakeContext context)
     // Tests run for all runner packages except NETCORE runner
     var StandardRunnerTests = new List<PackageTest>
     {
+        // Single assemblies
         Net35Test,
-        Net35X86Test,
         Net462Test,
-        Net462X86Test,
-        Net462NUnit4Test,
-        Net35PlusNet462Test,
         NetCore21Test,
         NetCore31Test,
         Net50Test,
         Net60Test,
         Net70Test,
+        // X86 Tests
+        Net35X86Test,
+        Net462X86Test,
+        // Special Test Situations
+        Net60WindowsFormsTest,
+        Net60AspNetCoreTest,
+        // Multiple Assemblies
+        Net35PlusNet462Test,
         Net50PlusNet60Test,
-        NetCore21PlusNetCore31Test,
-        NetCore21PlusNetCore31PlusNet50PlusNet60Test,
         Net462PlusNet60Test,
+        // NUnit4 Tests
+        Net462NUnit4Test,
         NetCore31NUnit4Test,
         Net50NUnit4Test,
         Net60NUnit4Test,
-        Net462PlusNet60NUnit4Test
     };
 
     if (dotnetX86Available && !BuildSystem.IsRunningOnAppVeyor)
@@ -49,17 +53,23 @@ public void InitializePackageDefinitions(ICakeContext context)
     // Tests run for the NETCORE runner package
     var NetCoreRunnerTests = new List<PackageTest>
     {
+        // Single assemblies
         NetCore21Test,
         NetCore31Test,
         Net50Test,
         Net60Test,
+        // Special test situation
+        Net60AspNetCoreTest,
+        // Multiple assemblies
         Net50PlusNet60Test,
-        NetCore21PlusNetCore31Test,
-        NetCore21PlusNetCore31PlusNet50PlusNet60Test,
+        // NUnit4 Tests
         NetCore31NUnit4Test,
         Net50NUnit4Test,
         Net60NUnit4Test,
     };
+
+    if (IsRunningOnWindows())
+        NetCoreRunnerTests.Add(Net60WindowsFormsTest);
 
     AllPackages.AddRange(new PackageDefinition[] {
 
