@@ -65,6 +65,8 @@ static string MOCK_ASSEMBLY_PROJECT_BIN_DIR; MOCK_ASSEMBLY_PROJECT_BIN_DIR = SOU
 static string MOCK_ASSEMBLY_X86_PROJECT_BIN_DIR; MOCK_ASSEMBLY_X86_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/mock-assembly-x86/bin/{Configuration}/";
 static string MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR; MOCK_ASSEMBLY_NUNIT4_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/mock-assembly-nunit4/bin/{Configuration}/";
 static string NOTEST_ASSEMBLY_PROJECT_BIN_DIR; NOTEST_ASSEMBLY_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/notest-assembly/bin/{Configuration}/";
+static string WINDOWS_TEST_PROJECT_BIN_DIR; WINDOWS_TEST_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/windows-test/bin/{Configuration}/";
+static string ASP_NET_CORE_TEST_PROJECT_BIN_DIR; ASP_NET_CORE_TEST_PROJECT_BIN_DIR = SOURCE_DIR + $"TestData/aspnetcore-test/bin/{Configuration}/";
 
 // We build two console runners. If version of either is upgraded, change it here
 const string NETFX_CONSOLE_TARGET = "net462";
