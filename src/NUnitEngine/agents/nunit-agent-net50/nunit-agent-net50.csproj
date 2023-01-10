@@ -38,4 +38,20 @@
     <ProjectReference Include="..\..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
 
+  <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net50/"))</ConsoleDestination>
+      <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net50/"))</EngineDestination>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <AgentFiles Include="$(TargetDir)/*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(AgentFiles)" DestinationFiles="$(ConsoleDestination)%(FileName)%(Extension)" />
+    <Message Text="Copied @(AgentFiles->Count()) files to $(ConsoleDestination)" Importance="High" />
+    <Copy SourceFiles="@(AgentFiles)" DestinationFiles="$(EngineDestination)%(FileName)%(Extension)" />
+    <Message Text="Copied @(AgentFiles->Count()) files to $(EngineDestination)" Importance="High" />
+  </Target>
+
 </Project>

@@ -54,68 +54,49 @@ public static void DisplayBanner(string message)
 // HELPER METHODS - BUILD
 //////////////////////////////////////////////////////////////////////
 
-MSBuildSettings CreateMSBuildSettings(string target)
+MSBuildSettings CreateMSBuildSettings(string target, BuildSettings buildSettings)
 {
-    var settings = new MSBuildSettings()
-        .SetConfiguration(Configuration)
+    var msbuildSettings = new MSBuildSettings()
+        .SetConfiguration(buildSettings.Configuration)
         .SetVerbosity(Verbosity.Minimal)
-        .WithProperty("Version", ProductVersion)
-        .WithProperty("ApiFileVersion", SemVer + ".0")
+        .WithProperty("Version", buildSettings.ProductVersion)
+        .WithProperty("ApiFileVersion", buildSettings.SemVer + ".0")
         .WithTarget(target)
         // Workaround for https://github.com/Microsoft/msbuild/issues/3626
         .WithProperty("AddSyntheticProjectReferencesForSolutionDependencies", "false");
 
     if (IsRunningOnWindows())
     {
+        // Originally, we only used previews when no other version is installed.
+        // Currently we use the latest version, even if it is a preview.
         var vsInstallation =
-            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" });
-
-        if (vsInstallation == null || !vsInstallation.FullPath.Contains("2022"))
-        {
-            vsInstallation = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
-        }
+            VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
 
         if (vsInstallation != null)
         {
             var msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\Current\Bin\MSBuild.exe");
 
+            if (!FileExists(msBuildPath))
+                msBuildPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
+
             if (FileExists(msBuildPath))
-                settings.ToolPath = msBuildPath;
+            {
+                msbuildSettings.ToolPath = msBuildPath;
+                Information("Using MSBuild at " + msBuildPath);
+            }
         }
     }
 
-    return settings;
+    return msbuildSettings;
 }
 
-DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target)
+DotNetMSBuildSettings CreateDotNetMSBuildSettings(string target, BuildSettings buildSettings)
 {
     return new DotNetMSBuildSettings()
-        .SetConfiguration(Configuration)
-        .WithProperty("Version", ProductVersion)
-        .WithProperty("ApiFileVersion", SemVer + ".0")
+        .SetConfiguration(buildSettings.Configuration)
+        .WithProperty("Version", buildSettings.ProductVersion)
+        .WithProperty("ApiFileVersion", buildSettings.SemVer + ".0")
         .WithTarget(target);
-}
-
-void CopyAgentsToDirectory(string targetDir)
-{
-    DisplayBanner($"Copying agents to {targetDir}");
-    CreateDirectory( targetDir + "agents");
-
-    // Copy agent directories we are retaining
-    CopyDirectory(NET20_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net20");
-    CopyDirectory(NET462_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net462");
-    CopyDirectory(NETCORE31_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-netcore31");
-    CopyDirectory(NET50_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net50");
-    CopyDirectory(NET60_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net60");
-    CopyDirectory(NET70_AGENT_PROJECT_BIN_DIR,  targetDir + "agents/nunit-agent-net70");
-
-    // Copy X86 files to corresponding runtime directories
-    CopyFiles(
-        NET20_AGENT_X86_PROJECT_BIN_DIR + "nunit-agent-net20-x86.*",
-        targetDir + "agents/nunit-agent-net20/");
-    CopyFiles(
-        NET462_AGENT_X86_PROJECT_BIN_DIR + "nunit-agent-net462-x86.*",
-        targetDir + "agents/nunit-agent-net462/");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -132,21 +113,21 @@ FilePath GetResultXmlPath(string testAssembly, string targetRuntime)
     return MakeAbsolute(new FilePath($@"test-results\{targetRuntime}\{assemblyName}.xml"));
 }
 
-string GetProjectBinDir(string projectPath)
+string GetProjectBinDir(string projectPath, string configuration)
 {
     var projectDir = System.IO.Path.GetDirectoryName(projectPath);
-    return projectDir + $"/bin/{Configuration}/";
+    return projectDir + $"/bin/{configuration}/";
 }
 
-string GetProjectBinDir(string projectPath, string targetRuntime)
+string GetProjectBinDir(string projectPath, string configuration, string targetRuntime)
 {
-    return GetProjectBinDir(projectPath) + targetRuntime + "/";
+    return GetProjectBinDir(projectPath, configuration) + targetRuntime + "/";
 }
 
-void RunNUnitLiteTests(string projectPath, string targetRuntime)
+void RunNUnitLiteTests(string projectPath, string configuration, string targetRuntime)
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".exe";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration, targetRuntime);
     var resultPath = GetResultXmlPath( testAssembly, targetRuntime).FullPath;
     
     int rc = StartProcess(
@@ -163,10 +144,10 @@ void RunNUnitLiteTests(string projectPath, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime)
+void RunDotnetNUnitLiteTests(string projectPath, string configuration, string targetRuntime)
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -184,18 +165,18 @@ void RunDotnetNUnitLiteTests(string projectPath, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetFxConsole(string projectPath, string targetRuntime)
+void RunNetFxConsole(string projectPath, string configuration, string targetRuntime)
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
-        NETFX_CONSOLE,
+        NETFX_CONSOLE_DIR + $"bin/{configuration}/{NETFX_CONSOLE_TARGET}/nunit4-console.exe",
         new ProcessSettings()
         {
-            Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{assemblyPath}\" --result:\"{resultPath}\" --trace:Debug",
             WorkingDirectory = workingDir
         });
 
@@ -205,10 +186,10 @@ void RunNetFxConsole(string projectPath, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNetCoreConsole(string projectPath, string targetRuntime)
+void RunNetCoreConsole(string projectPath, string configuration, string targetRuntime)
 {
     var testAssembly = System.IO.Path.GetFileNameWithoutExtension(projectPath) + ".dll";
-    var workingDir = GetProjectBinDir(projectPath, targetRuntime);
+    var workingDir = GetProjectBinDir(projectPath, configuration, targetRuntime);
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
@@ -216,7 +197,7 @@ void RunNetCoreConsole(string projectPath, string targetRuntime)
         "dotnet",
         new ProcessSettings
         {
-            Arguments = $"\"{NETCORE_CONSOLE}\" \"{assemblyPath}\" --result:{resultPath}",
+            Arguments = $"\"{NETCORE_CONSOLE_DIR}bin/{configuration}/{NETCORE_CONSOLE_TARGET}/nunit4-netcore-console.dll\" \"{assemblyPath}\" --result:{resultPath}",
             WorkingDirectory = workingDir
         });
 
@@ -262,19 +243,13 @@ public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 public void PushNuGetPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
-    if (NoPush)
-        Information($"Push {package} to {url}");
-    else
-        NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
+    NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
 }
 
 public void PushChocolateyPackage(FilePath package, string apiKey, string url)
 {
 	CheckPackageExists(package);
-    if (NoPush)
-        Information($"Push {package} to {url}");
-    else
-        ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
+    ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
 }
 
 private void CheckPackageExists(FilePath package)

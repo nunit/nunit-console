@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
-    <TargetFrameworks>net20;net462</TargetFrameworks>
+    <TargetFrameworks>net462</TargetFrameworks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
@@ -36,5 +36,21 @@
     <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
+
+  <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net462/"))</ConsoleDestination>
+      <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net462/"))</EngineDestination>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <AgentFiles Include="$(TargetDir)/nunit-agent-net462-x86.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(AgentFiles)" DestinationFiles="$(ConsoleDestination)%(FileName)%(Extension)" />
+    <Message Text="Copied @(AgentFiles->Count()) files to $(ConsoleDestination)" Importance="High" />
+    <Copy SourceFiles="@(AgentFiles)" DestinationFiles="$(EngineDestination)%(FileName)%(Extension)" />
+    <Message Text="Copied @(AgentFiles->Count()) files to $(EngineDestination)" Importance="High" />
+  </Target>
 
 </Project>

@@ -15,7 +15,7 @@ using System.Text;
 namespace NUnit.ConsoleRunner
 {
     /// <summary>
-    /// ConsoleRunner provides the nunit3-console text-based
+    /// ConsoleRunner provides the nunit4-console text-based
     /// user interface, running the tests and reporting the results.
     /// </summary>
     public class ConsoleRunner

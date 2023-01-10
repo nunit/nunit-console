@@ -11,13 +11,13 @@ namespace NUnit.Engine.Integration
     {
         private readonly DirectoryWithNeededAssemblies directory;
 
-        public string ConsoleExe => Path.Combine(directory.Directory, "nunit3-console.exe");
+        public string ConsoleExe => Path.Combine(directory.Directory, "nunit4-console.exe");
         public string AgentExe => Path.Combine(directory.Directory, "nunit-agent.exe");
         public string AgentX86Exe => Path.Combine(directory.Directory, "nunit-agent-x86.exe");
 
         public RunnerInDirectoryWithoutFramework()
         {
-            directory = new DirectoryWithNeededAssemblies("nunit3-console", "nunit.engine");
+            directory = new DirectoryWithNeededAssemblies("nunit4-console", "nunit.engine");
 
             Assert.That(Path.Combine(directory.Directory, "nunit.framework.dll"), Does.Not.Exist, "This test must be run without nunit.framework.dll in the same directory as the console runner.");
         }

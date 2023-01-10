@@ -1,13 +1,11 @@
 static string Target; Target = GetArgument("target|t", "Default");
-static string Configuration; Configuration = GetArgument("configuration|c", "Release");
-static bool NoPush; NoPush = HasArgument("nopush");
 
 #load cake/constants.cake
+#load cake/build-settings.cake
 #load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
 #load cake/package-tests.cake
-#load cake/package-tester.cake
 #load cake/versioning.cake
 #load cake/utilities.cake
 #load cake/package-definitions.cake
@@ -31,17 +29,15 @@ var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 //////////////////////////////////////////////////////////////////////
 Setup(context =>
 {
-    Information("Creating BuildVersion");
-    _buildVersion = new BuildVersion(context);
+    var settings = new BuildSettings(context);
 
-    Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
-    Information("PreReleaseLabel is " + PreReleaseLabel);
-
-    Information("Initializing PackageDefinitions");
-    InitializePackageDefinitions(context);
+    Information($"Building {settings.Configuration} version {settings.ProductVersion} of NUnit Console/Engine.");
+    Information($"PreReleaseLabel is {settings.PreReleaseLabel}");
 
     if (BuildSystem.IsRunningOnAppVeyor)
         AppVeyor.UpdateBuildVersion(ProductVersion + "-" + AppVeyor.Environment.Build.Number);
+
+    return settings;
 });
 
 Teardown(context =>
@@ -51,15 +47,23 @@ Teardown(context =>
 });
 
 //////////////////////////////////////////////////////////////////////
+// DISPLAY THE BUILD SETTINGS
+//////////////////////////////////////////////////////////////////////
+
+Task("DisplaySettings")
+    .Description("Dispay BuildSettings")
+    .Does<BuildSettings>(settings => settings.Display());
+
+//////////////////////////////////////////////////////////////////////
 // CLEANING
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
     .Description("Cleans directories.")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        Information($"Cleaning bin/{Configuration} directories");
-        foreach (var dir in GetDirectories($"src/**/bin/{Configuration}"))
+        Information($"Cleaning bin/{settings.Configuration} directories");
+        foreach (var dir in GetDirectories($"src/**/bin/{settings.Configuration}"))
             CleanDirectory(dir);
 
         Information("Cleaning Extensions Directory");
@@ -94,59 +98,53 @@ Task("Build")
     .Description("Builds the engine and console")
     .IsDependentOn("CheckHeaders")
     .IsDependentOn("Clean")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
         if (IsRunningOnWindows())
-            BuildSolution();
+            BuildSolution(settings);
         else
-            BuildEachProjectSeparately();
+            BuildEachProjectSeparately(settings);
     });
 
-public void BuildSolution()
+public void BuildSolution(BuildSettings settings)
 {
-    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
-
-    DisplayBanner("Copying agents to console runner directory");
-    CopyAgentsToDirectory(NETFX_CONSOLE_DIR);
-
-    DisplayBanner("Copying agents to engine directory");
-    CopyAgentsToDirectory(ENGINE_PROJECT_BIN_DIR);
+    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build", settings).WithRestore());
 }
 
-private void BuildEachProjectSeparately()
+private void BuildEachProjectSeparately(BuildSettings settings)
 {
     DotNetRestore(SOLUTION_FILE);
 
-    BuildProject(ENGINE_PROJECT);
-    BuildProject(NETFX_CONSOLE_PROJECT);
-    //BuildProject(NETCORE_CONSOLE_PROJECT);
-    BuildProject(NET20_AGENT_PROJECT);
-    BuildProject(NET20_AGENT_X86_PROJECT);
-    BuildProject(NET462_AGENT_PROJECT);
-    BuildProject(NET462_AGENT_X86_PROJECT);
-    BuildProject(NET50_AGENT_PROJECT);
-    BuildProject(NET60_AGENT_PROJECT);
-    BuildProject(NETCORE31_AGENT_PROJECT);
+    BuildProject(ENGINE_PROJECT, settings);
+    BuildProject(NETFX_CONSOLE_PROJECT, settings);
+    //BuildProject(NETCORE_CONSOLE_PROJECT, settings);
+    BuildProject(NET20_AGENT_PROJECT, settings);
+    BuildProject(NET20_AGENT_X86_PROJECT, settings);
+    BuildProject(NET462_AGENT_PROJECT, settings);
+    BuildProject(NET462_AGENT_X86_PROJECT, settings);
+    BuildProject(NET50_AGENT_PROJECT, settings);
+    BuildProject(NET60_AGENT_PROJECT, settings);
+    BuildProject(NETCORE31_AGENT_PROJECT, settings);
 
-    BuildProject(ENGINE_TESTS_PROJECT, NETFX_ENGINE_TARGET, "netcoreapp2.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net462", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
-    BuildProject(CONSOLE_TESTS_PROJECT, NETFX_CONSOLE_TARGET, "net6.0");
+    BuildProject(ENGINE_TESTS_PROJECT, settings, "net462", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(ENGINE_CORE_TESTS_PROJECT, settings, "net462", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0");
+    BuildProject(CONSOLE_TESTS_PROJECT, settings, NETFX_CONSOLE_TARGET, "net6.0");
 
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
-
-
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, settings, "net35", "net462", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(NOTEST_PROJECT, settings, "net35", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(WINDOWS_FORMS_TEST_PROJECT, settings);
+    BuildProject(ASP_NET_CORE_TEST_PROJECT, settings);
 }
 
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
 // If we use MSBuild, then the net5.0 projects fail. So we build each project
 // differently depending on whether it has net35 as one of its targets. 
-private void BuildProject(string project, params string[] targetFrameworks)
+private void BuildProject(string project, BuildSettings settings, params string[] targetFrameworks)
 {
     if (targetFrameworks.Length == 0)
     {
         DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
-        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
+        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", settings));
     }
     else
     {
@@ -154,9 +152,9 @@ private void BuildProject(string project, params string[] targetFrameworks)
         {
             DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
             if (framework == "net35")
-                MSBuild(project, CreateMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+                MSBuild(project, CreateMSBuildSettings("Build", settings).WithProperty("TargetFramework", framework));
             else
-                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", settings).WithProperty("TargetFramework", framework));
         }
     }
 }
@@ -168,15 +166,15 @@ private void BuildProject(string project, params string[] targetFrameworks)
 Task("BuildCppTestFiles")
     .Description("Builds the C++ mock test assemblies")
     .WithCriteria(IsRunningOnWindows)
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
         MSBuild(
-            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-            CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+            PROJECT_DIR + "src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
+            CreateMSBuildSettings("Build", settings).WithProperty("Platform", "x86"));
 
         MSBuild(
-            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
-            CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
+            PROJECT_DIR + "src/NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
+            CreateMSBuildSettings("Build", settings).WithProperty("Platform", "x64"));
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -198,9 +196,9 @@ Task("TestNet20EngineCore")
     .Description("Tests the engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "net35");
+        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "net35");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -211,9 +209,9 @@ Task("TestNetStandard20EngineCore")
     .Description("Tests the .NET Standard Engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -224,9 +222,9 @@ Task("TestNetCore31EngineCore")
     .Description("Tests the .NET Core 3.1 Engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -237,9 +235,9 @@ Task("TestNetFxEngine")
     .Description("Tests the NETFX 4.6.2 engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, NETFX_ENGINE_TARGET);
+        RunNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "net462");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -250,9 +248,9 @@ Task("TestNetStandard20Engine")
     .Description("Tests the .NET Standard Engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "netcoreapp2.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -263,9 +261,9 @@ Task("TestNetCore31Engine")
     .Description("Tests the .NET Core 3.1 Engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -276,9 +274,9 @@ Task("TestNetFxConsole")
     .Description("Tests the .NET Framework console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNetFxConsole(CONSOLE_TESTS_PROJECT, NETFX_CONSOLE_TARGET);
+        RunNetFxConsole(CONSOLE_TESTS_PROJECT, settings.Configuration, NETFX_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -289,9 +287,9 @@ Task("TestNetCoreConsole")
     .Description("Tests the .NET Core console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        RunNetCoreConsole(CONSOLE_TESTS_PROJECT, NETCORE_CONSOLE_TARGET);
+        RunNetCoreConsole(CONSOLE_TESTS_PROJECT, settings.Configuration, NETCORE_CONSOLE_TARGET);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -325,16 +323,18 @@ Task("FetchBundledExtensions")
 
 Task("CreateZipImage")
     .IsDependentOn("FetchBundledExtensions")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        CleanDirectory(ZIP_IMG_DIR);
+        var zipImageDirectory = PACKAGE_DIR + "zip-image/";
+
+        CleanDirectory(zipImageDirectory);
         CopyFiles(
             new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
-            ZIP_IMG_DIR);
-        CopyDirectory(NETFX_CONSOLE_DIR, ZIP_IMG_DIR + "bin/");
-        CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", ZIP_IMG_DIR + "bin/");
+            zipImageDirectory);
+        CopyDirectory(settings.NetFxConsoleBinDir, zipImageDirectory + "bin/");
+        CopyFileToDirectory(PROJECT_DIR + "zip/nunit.bundle.addins", zipImageDirectory + "bin/");
 
-        var addinsDir = ZIP_IMG_DIR + "bin/addins/";
+        var addinsDir = zipImageDirectory + "bin/addins/";
         CleanDirectory(addinsDir);
 
         foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
@@ -342,98 +342,82 @@ Task("CreateZipImage")
     });
 
 //////////////////////////////////////////////////////////////////////
-// VERIFY PACKAGES
+// BUILD AND TEST ALL PACKAGES USING PREVIOUSLY BUILT BINARIES
 //////////////////////////////////////////////////////////////////////
 
-Task("BuildPackages")
+Task("PackageExistingBuild")
+    .Description("Builds and tests all packages, using previously build binaries")
+    .IsDependentOn("PackageConsole")
+    .IsDependentOn("PackageConsoleRunner")
+    .IsDependentOn("PackageDotNetConsoleRunner")
+    .IsDependentOn("PackageChocolateyConsoleRunner")
+    .IsDependentOn("PackageMsi")
+    .IsDependentOn("PackageZip")
+    .IsDependentOn("PackageEngine")
+    .IsDependentOn("PackageEngineApi");
+
+//////////////////////////////////////////////////////////////////////
+// BUILD AND TEST INDIVIDUAL PACKAGES
+//////////////////////////////////////////////////////////////////////
+
+Task("PackageConsole")
+    .Description("Build and Test NUnit.Console NuGet Package")
+    .Does<BuildSettings>(settings =>
+    {
+        settings.ConsoleNuGetPackage.BuildVerifyAndTest();
+    });
+
+Task("PackageConsoleRunner")
+    .Description("Build and Test NUnit.ConsoleRunner NuGet Package")
+    .Does<BuildSettings>(settings =>
+    {
+        settings.ConsoleRunnerNuGetPackage.BuildVerifyAndTest();
+    });
+        
+Task("PackageDotNetConsoleRunner")
+    .Description("Build and Test NUnit.ConsoleRunner NuGet Package")
+    .Does<BuildSettings>(settings =>
+    {
+        settings.DotNetConsoleRunnerNuGetPackage.BuildVerifyAndTest();
+    });
+
+Task("PackageChocolateyConsoleRunner")
+    .Description("Build Verify and Test the Chocolatey nunit-console-runner package")
+    .Does<BuildSettings>(settings =>
+    {
+        settings.ConsoleRunnerChocolateyPackage.BuildVerifyAndTest();
+    });
+
+Task("PackageMsi")
+    .Description("Build, Verify and Test the MSI package")
+    .IsDependentOn("FetchBundledExtensions")
+    .Does<BuildSettings>(settings =>
+    {
+        settings.ConsoleMsiPackage.BuildVerifyAndTest();
+    });
+
+Task("PackageZip")
+    .Description("Build, Verify and Test the Zip package")
+    .IsDependentOn("FetchBundledExtensions")
     .IsDependentOn("CreateZipImage")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        EnsureDirectoryExists(PACKAGE_DIR);
-
-        foreach (var package in AllPackages)
-        {
-            DisplayBanner($"Building package {package.PackageName}");
-
-            package.BuildPackage();
-        }
+        settings.ConsoleZipPackage.BuildVerifyAndTest();
     });
 
-//////////////////////////////////////////////////////////////////////
-// VERIFY PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("VerifyPackages")
-    .Description("Check content of all the packages we build")
-    .Does(() =>
+Task("PackageEngine")
+    .Description("Build and Verify the NUnit.Engine package")
+    .Does<BuildSettings>(settings =>
     {
-        int failures = 0;
-
-        foreach (var package in AllPackages)
-        {
-            if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
-                ++failures;
-
-            if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
-                ++failures;
-        }
-
-        if (failures == 0)
-            Information("\nAll packages passed verification.");
-        else
-            throw new System.Exception($"{failures} packages failed verification.");
+        settings.EngineNuGetPackage.BuildVerifyAndTest();
     });
 
-//////////////////////////////////////////////////////////////////////
-// TEST PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("TestPackages")
-    .Does(() =>
+Task("PackageEngineApi")
+    .Description("Build and Verify the NUnit.Engine.Api package")
+    .Does<BuildSettings>(settings =>
     {
-        TestPackages();
+        settings.EngineApiNuGetPackage.BuildVerifyAndTest();
     });
-
-Task("TestNuGetNetFXPackage")
-    .Does(() =>
-    {
-        TestPackages(packageType: PackageType.NuGet, packageId: "NUnit.ConsoleRunner");
-    });
-
-Task("TestNuGetNetCorePackage")
-    .Does(() =>
-    {
-        TestPackages(packageType: PackageType.NuGet, packageId: "NUnit.ConsoleRunner.NetCore");
-    });
-
-Task("TestChocolateyPackage")
-    .Does(() =>
-    {
-        TestPackages(packageType: PackageType.Chocolatey);
-    });
-
-Task("TestMsiPackage")
-    .Does(() =>
-    {
-        TestPackages(packageType: PackageType.Msi);
-    });
-
-Task("TestZipPackage")
-    .Does(() =>
-    {
-        TestPackages(packageType: PackageType.Zip);
-    });
-
-private void TestPackages(PackageType? packageType=null, string packageId=null)
-{
-        foreach (var package in AllPackages)
-        {
-            if (package.PackageTests != null)
-                if (packageType == null || package.PackageType == packageType)
-                    if (packageId == null || package.PackageId == packageId)
-                        new PackageTester(Context, package).RunTests();
-        }
-}
 
 //////////////////////////////////////////////////////////////////////
 // INSTALL SIGNING TOOL
@@ -523,26 +507,21 @@ Task("PublishPackages")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToMyGet")
     .Description("Publish packages to MyGet")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        if (!ShouldPublishToMyGet)
+        if (!settings.ShouldPublishToMyGet)
             Information("Nothing to publish to MyGet from this run.");
+        else if (settings.NoPush)
+            Information("NoPush option suppressing publication to MyGet");
         else
         {
-            var apiKey = EnvironmentVariable(MYGET_API_KEY);
-
-            foreach (var package in AllPackages)
+            foreach (var package in settings.AllPackages)
                 try
                 {
-                    switch (package.PackageType)
-                    {
-                        case PackageType.NuGet:
-                            PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                            break;
-                        case PackageType.Chocolatey:
-                            PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                            break;
-                    }
+                    if (package is NuGetPackageDefinition)
+                        PushNuGetPackage(PACKAGE_DIR + package.PackageFileName, settings.MyGetApiKey, MYGET_PUSH_URL);
+                    else if (package is ChocolateyPackageDefinition)
+                        PushChocolateyPackage(PACKAGE_DIR + package.PackageFileName, settings.MyGetApiKey, MYGET_PUSH_URL);
                 }
                 catch(Exception)
                 {
@@ -555,19 +534,19 @@ Task("PublishToMyGet")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToNuGet")
     .Description("Publish packages to NuGet")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        if (!ShouldPublishToNuGet)
+        if (!settings.ShouldPublishToNuGet)
             Information("Nothing to publish to NuGet from this run.");
+        else if (settings.NoPush)
+            Information("NoPush option suppressing publication to NuGet");
         else
         {
-            var apiKey = EnvironmentVariable(NUGET_API_KEY);
-
-            foreach (var package in AllPackages)
-                if (package.PackageType == PackageType.NuGet)
+            foreach (var package in settings.AllPackages)
+                if (package is NuGetPackageDefinition)
                     try
                     {
-                        PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, NUGET_PUSH_URL);
+                        PushNuGetPackage(PACKAGE_DIR + package.PackageFileName, settings.NuGetApiKey, NUGET_PUSH_URL);
                     }
                     catch (Exception)
                     {
@@ -580,19 +559,19 @@ Task("PublishToNuGet")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToChocolatey")
     .Description("Publish packages to Chocolatey")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
-        if (!ShouldPublishToChocolatey)
+        if (!settings.ShouldPublishToChocolatey)
             Information("Nothing to publish to Chocolatey from this run.");
+        else if (settings.NoPush)
+            Information("NoPush option suppressing publication to Chocolatey");
         else
         {
-            var apiKey = EnvironmentVariable(CHOCO_API_KEY);
-
-            foreach (var package in AllPackages)
-                if (package.PackageType == PackageType.Chocolatey)
+            foreach (var package in settings.AllPackages)
+                if (package is ChocolateyPackageDefinition)
                     try
                     {
-                        PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
+                        PushChocolateyPackage(PACKAGE_DIR + package.PackageFileName, settings.ChocolateyApiKey, CHOCO_PUSH_URL);
                     }
                     catch (Exception)
                     {
@@ -617,7 +596,7 @@ Task("ListInstalledNetCoreRuntimes")
 //////////////////////////////////////////////////////////////////////
 
 Task("CreateDraftRelease")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
         bool isDirectTarget = Target == "CreateDraftRelease";
 
@@ -633,7 +612,7 @@ Task("CreateDraftRelease")
 
             Information($"Creating draft release for {releaseName}");
 
-            if (!NoPush)
+            if (!settings.NoPush)
                 try
                 {
                     GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
@@ -661,7 +640,7 @@ Task("CreateDraftRelease")
 //////////////////////////////////////////////////////////////////////
 
 Task("CreateProductionRelease")
-    .Does(() =>
+    .Does<BuildSettings>(settings =>
     {
         if (IsProductionRelease)
         {
@@ -669,13 +648,13 @@ Task("CreateProductionRelease")
             string tagName = ProductVersion;
 
             var assetList = new List<string>();
-            foreach (var package in AllPackages)
-                assetList.Add(PACKAGE_DIR + package.PackageName);
+            foreach (var package in settings.AllPackages)
+                assetList.Add(PACKAGE_DIR + package.PackageFileName);
             string assets = $"\"{string.Join(',', assetList.ToArray())}\"";
 
             Information($"Publishing release {tagName} to GitHub");
 
-            if (NoPush)
+            if (settings.NoPush)
             {
                 Information($"Assets:");
                 foreach (var asset in assetList)
@@ -724,21 +703,13 @@ Task("Test")
 Task("Package")
     .Description("Builds and tests all packages")
     .IsDependentOn("Build")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("VerifyPackages")
-    .IsDependentOn("TestPackages");
-
-Task("PackageExistingBuild")
-    .Description("Builds and tests all packages, using previously build binaries")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("VerifyPackages")
-    .IsDependentOn("TestPackages");
+    .IsDependentOn("PackageExistingBuild");
 
 Task("BuildTestAndPackage")
     .Description("Builds, tests and packages")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("Package");
+    .IsDependentOn("PackageExistingBuild");
 
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
