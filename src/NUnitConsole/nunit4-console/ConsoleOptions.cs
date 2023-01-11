@@ -11,7 +11,7 @@ namespace NUnit.ConsoleRunner.Options
 {
     /// <summary>
     /// <c>ConsoleOptions</c> encapsulates the option settings for
-    /// the nunit3-console program. The class inherits from the Mono
+    /// the nunit4-console program. The class inherits from the Mono
     /// Options <see cref="OptionSet"/> class and provides a central location
     /// for defining and parsing options.
     /// </summary>

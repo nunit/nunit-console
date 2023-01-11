@@ -178,10 +178,10 @@ public class DirectoryCheck : PackageCheck
     }
 }
 
-private FileCheck HasFile(string file) => HasFiles(new [] { file });
-private FileCheck HasFiles(params string[] files) => new FileCheck(files);  
+private static FileCheck HasFile(string file) => HasFiles(new [] { file });
+private static FileCheck HasFiles(params string[] files) => new FileCheck(files);  
 
-private DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
+private static DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
 
 private static void WriteError(string msg)
 {

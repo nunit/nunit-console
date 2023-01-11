@@ -195,7 +195,7 @@ namespace NUnit.ConsoleRunner
         private static void WriteHelpText()
         {
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.Header, "NUNIT3-CONSOLE [inputfiles] [options]");
+            OutWriter.WriteLine(ColorStyle.Header, "NUNIT4-CONSOLE [inputfiles] [options]");
             OutWriter.WriteLine();
             OutWriter.WriteLine(ColorStyle.Default, "Runs a set of NUnit tests from the console.");
             OutWriter.WriteLine();

@@ -16,12 +16,37 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-nunit</ToolCommandName>
+    <PackageId>NUnit.ConsoleRunner.NetCore</PackageId>
+    <Title>NUnit Console Runner (.NET Core)</Title>
+    <Authors>Charlie Poole, Rob Prouse,</Authors>
+    <PackageLicenseFile>content\LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://nunit.org</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <RepostoryUrl>https://github.com/nunit/nunit-console</RepostoryUrl>
+    <PackageIcon>content\nunit_256.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</PackageReleaseNotes>
+    <PackageTags>nunit test testing tdd runner</PackageTags>
+    <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
+    <Content Include="..\..\..\LICENSE.txt" Link="LICENSE.txt" />
+    <Content Include="..\..\..\NOTICES.txt" Link="NOTICES.txt" />
+    <None Include="..\..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <Content Include="..\..\..\nunit_256.png" Link="nunit_256.png" />
     <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
   </ItemGroup>
   

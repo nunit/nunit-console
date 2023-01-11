@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NUnit.Console</id>
-    <title>NUnit 3 Console Runner Plus Extensions</title>
+    <title>NUnit 4 Console Runner Plus Extensions</title>
     <version>$version$</version>
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>
@@ -12,9 +12,9 @@
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
     <icon>images\nunit_256.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Console runner for the NUnit 3 unit-testing framework with selected extensions.</summary>
+    <summary>Console runner for the NUnit unit-testing framework with selected extensions.</summary>
     <description>
-      This package includes the nunit3-console runner and test engine for version 3 of the NUnit unit-testing framework.
+      This package includes the nunit4-console runner and test engine for the NUnit unit-testing framework.
 
       The following extensions are included with this package:
       * NUnitProjectLoader     - loads tests from NUnit projects
