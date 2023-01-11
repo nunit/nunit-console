@@ -143,8 +143,6 @@ public class BuildSettings
             Net462PlusNet60Test,
             Net35X86Test,
             Net462X86Test,
-            NetCore21X86Test,
-            NetCore31X86Test,
             Net60AspNetCoreTest,
             Net462NUnit4Test,
             NetCore31NUnit4Test,
@@ -152,7 +150,15 @@ public class BuildSettings
             Net60NUnit4Test
         };
         if (IsRunningOnWindows)
+        {
             StandardRunnerTests.Add(Net60WindowsFormsTest);
+
+            if (!IsRunningOnAppVeyor)
+            {
+                StandardRunnerTests.Add(NetCore21X86Test);
+                StandardRunnerTests.Add(NetCore31X86Test);
+            }
+        }
 
         NetCoreRunnerTests = new List<PackageTest>
         {
