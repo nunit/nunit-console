@@ -14,7 +14,7 @@ public class BuildSettings
         Target = context.TargetTask.Name;
         TasksToExecute = context.TasksToExecute.Select(t => t.Name);
 
-        Configuration = context.Argument("configuration", "Release");
+        Configuration = context.Argument("configuration", context.Argument("c", "Release"));
         NoPush = context.HasArgument("nopush");
 
         BuildVersion = new BuildVersion(context);
