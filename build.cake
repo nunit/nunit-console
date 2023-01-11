@@ -15,12 +15,6 @@ static string Target; Target = GetArgument("target|t", "Default");
 #tool dotnet:?package=GitVersion.Tool&version=5.6.3
 #tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
 
-BuildVersion _buildVersion;
-string ProductVersion => _buildVersion.ProductVersion;
-string SemVer => _buildVersion.SemVer;
-string PreReleaseLabel => _buildVersion.PreReleaseLabel;
-bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
-
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 
@@ -35,7 +29,7 @@ Setup(context =>
     Information($"PreReleaseLabel is {settings.PreReleaseLabel}");
 
     if (BuildSystem.IsRunningOnAppVeyor)
-        AppVeyor.UpdateBuildVersion(ProductVersion + "-" + AppVeyor.Environment.Build.Number);
+        AppVeyor.UpdateBuildVersion(settings.ProductVersion + "-" + AppVeyor.Environment.Build.Number);
 
     return settings;
 });
@@ -603,11 +597,11 @@ Task("CreateDraftRelease")
         if (isDirectTarget && !HasArgument("productVersion"))
             throw new Exception("Must specify --productVersion with the CreateDraftRelease target.");
 
-        if (IsReleaseBranch || isDirectTarget)
+        if (settings.IsReleaseBranch || isDirectTarget)
         {
-            string milestone = IsReleaseBranch
-                ? _buildVersion.BranchName.Substring(8)
-                : ProductVersion;
+            string milestone = settings.IsReleaseBranch
+                ? settings.BranchName.Substring(8)
+                : settings.ProductVersion;
             string releaseName = $"NUnit Console and Engine {milestone}";
 
             Information($"Creating draft release for {releaseName}");
@@ -642,10 +636,10 @@ Task("CreateDraftRelease")
 Task("CreateProductionRelease")
     .Does<BuildSettings>(settings =>
     {
-        if (IsProductionRelease)
+        if (settings.IsProductionRelease)
         {
             string token = EnvironmentVariable(GITHUB_ACCESS_TOKEN);
-            string tagName = ProductVersion;
+            string tagName = settings.ProductVersion;
 
             var assetList = new List<string>();
             foreach (var package in settings.AllPackages)
