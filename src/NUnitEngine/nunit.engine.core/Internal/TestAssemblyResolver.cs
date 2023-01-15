@@ -108,6 +108,8 @@ namespace NUnit.Engine.Internal
 
         private static string FindBestVersionDir(string libraryDir, Version targetVersion)
         {
+            if (targetVersion == null)
+                return null;
             Version bestVersion = new Version(0,0);
             foreach (var subdir in Directory.GetDirectories(libraryDir))
             {
