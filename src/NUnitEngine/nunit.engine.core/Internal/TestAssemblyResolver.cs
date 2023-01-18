@@ -77,7 +77,8 @@ namespace NUnit.Engine.Internal
                         return _loadContext.LoadFromAssemblyPath(assemblyPath);
                 }
             }
-
+            if (name.Version == null)
+                return null;
             foreach(string frameworkDirectory in AdditionalFrameworkDirectories)
             {
                 var versionDir = FindBestVersionDir(frameworkDirectory, name.Version);
@@ -108,7 +109,8 @@ namespace NUnit.Engine.Internal
 
         private static string FindBestVersionDir(string libraryDir, Version targetVersion)
         {
-            string target = targetVersion.ToString();
+            if (targetVersion == null)
+                return null;
             Version bestVersion = new Version(0,0);
             foreach (var subdir in Directory.GetDirectories(libraryDir))
             {
