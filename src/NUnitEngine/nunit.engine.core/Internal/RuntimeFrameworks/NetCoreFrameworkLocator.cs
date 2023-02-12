@@ -26,7 +26,7 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
                     alreadyFound.Add(newVersion);
                     // HACK: Avoid Exception for an unknown version - see issue #1223
                     // Requires change in RuntimeFramework.GetClrVersionForFramework()
-                    if (newVersion.Major <= 7)
+                    if (newVersion.Major <= 8)
                         yield return new RuntimeFramework(RuntimeType.NetCore, newVersion);
                     else
                         log.Error($"Found .NET {newVersion.ToString(2)}, which is not yet supported.");
