@@ -55,6 +55,11 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
+        public Assembly Resolve(AssemblyLoadContext context, AssemblyName name)
+        {
+            return OnResolving(context, name);
+        }
+
         private Assembly OnResolving(AssemblyLoadContext context, AssemblyName name)
         {
             foreach (var library in _dependencyContext.RuntimeLibraries)
@@ -77,8 +82,9 @@ namespace NUnit.Engine.Internal
                         return _loadContext.LoadFromAssemblyPath(assemblyPath);
                 }
             }
-
-            foreach (string frameworkDirectory in AdditionalFrameworkDirectories)
+            if (name.Version == null)
+                return null;
+            foreach(string frameworkDirectory in AdditionalFrameworkDirectories)
             {
                 var versionDir = FindBestVersionDir(frameworkDirectory, name.Version);
                 if (versionDir != null)
@@ -108,8 +114,9 @@ namespace NUnit.Engine.Internal
 
         private static string FindBestVersionDir(string libraryDir, Version targetVersion)
         {
-            string target = targetVersion.ToString();
-            Version bestVersion = new Version(0, 0);
+            if (targetVersion == null)
+                return null;
+            Version bestVersion = new Version(0,0);
             foreach (var subdir in Directory.GetDirectories(libraryDir))
             {
                 Version version;
