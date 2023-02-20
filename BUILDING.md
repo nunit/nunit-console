@@ -15,15 +15,27 @@ See also [Building and testing for Linux on a Windows machine](#building-and-tes
 
 ## Prerequisites
 
-- Visual Studio 2017 Update 5 or newer to build on Windows
+- Visual Studio 2017 Update 5 or newer to build on Windows. Preferably use VS2022.
 - .NET 4.5+ or Mono 5.10.0+
-- .NET Core 1.1.6 or newer
+- A set of runtimes, from .NET Core 2.1.30 runtime, and some more, see below. You will also need the net framework 3.5 service pack 1 installed.
+- An appropriate newer dotnet SDK, e.g. .net 6. 
+- Chocolatey  : [Install instructions here](https://docs.chocolatey.org/en-us/choco/setup)
+- Wix: [Install instructions here](https://wixtoolset.org/docs/wix3/). Note that you need to install both the [3.11 toolset](https://github.com/wixtoolset/wix3/releases/tag/wix3112rtm) (Use the wix311.exe installer)  and the [VS2022 Vsix extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WixToolsetVisualStudio2022Extension).
 
 ## Solution Build
 
 All projects are built together using a single Visual Studio solution NUnitConsole.sln, which may be
 built with Visual Studio or on the command line using Cake. The projects all place their output in
 a common bin directory.
+
+The easiest way is to use the command line with just `build`.  If that works, you can test it doing `build -t test` and then create a package doing `build -t package`.
+On each step you may get some errors, mostly due to missing frameworks. Install whatever is required. We will work on getting a complete list up.
+The generated packages can be found in the `package` subfolder.
+
+## Setting a new version
+
+Before building a new package, ensure you set the appropriate (according to [Semver](https://semver.org) ) next version number to be used for the final package. Note that you dont need to set any prerelase tags, those will be done automatically based on whatever non-main branch you are building from.
+You set that version number in the 1st line of the `gitversion.yml` file.
 
 ## Build Script
 

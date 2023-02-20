@@ -20,16 +20,10 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
 
             foreach (string dirName in GetRuntimeDirectories())
             {
-                Version newVersion;
-                if (TryGetVersionFromString(dirName, out newVersion) && !alreadyFound.Contains(newVersion))
+                if (TryGetVersionFromString(dirName, out var newVersion) && !alreadyFound.Contains(newVersion))
                 {
                     alreadyFound.Add(newVersion);
-                    // HACK: Avoid Exception for an unknown version - see issue #1223
-                    // Requires change in RuntimeFramework.GetClrVersionForFramework()
-                    if (newVersion.Major <= 7)
-                        yield return new RuntimeFramework(RuntimeType.NetCore, newVersion);
-                    else
-                        log.Error($"Found .NET {newVersion.ToString(2)}, which is not yet supported.");
+                    yield return new RuntimeFramework(RuntimeType.NetCore, newVersion);
                 }
             }
 
@@ -76,7 +70,7 @@ namespace NUnit.Engine.Internal.RuntimeFrameworks
             {
                 process.Start();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 // No versions are installed, just return
                 yield break;
