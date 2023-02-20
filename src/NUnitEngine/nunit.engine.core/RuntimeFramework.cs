@@ -200,14 +200,9 @@ namespace NUnit.Engine
                             return new Version(3, 1, 10);
                         case 5:
                             return new Version(5, 0, 1);
-                        case 6:
-                            return new Version(6, 0, 0);
-                        case 7:
-                            return new Version(7, 0, 0);
-                        case 8:
-                            return new Version(8, 0, 0);
+                        default:
+                            return new Version(frameworkVersion.Major, 0, 0);
                     }
-                    break;
             }
 
             throw new ArgumentException("Unknown framework version " + frameworkVersion.ToString(), "version");
