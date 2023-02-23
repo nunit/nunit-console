@@ -55,6 +55,11 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
+        public Assembly Resolve(AssemblyLoadContext context, AssemblyName name)
+        {
+            return OnResolving(context, name);
+        }
+
         private Assembly OnResolving(AssemblyLoadContext context, AssemblyName name)
         {
             foreach (var library in _dependencyContext.RuntimeLibraries)
