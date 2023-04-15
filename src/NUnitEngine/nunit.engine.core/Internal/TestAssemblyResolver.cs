@@ -17,7 +17,7 @@ namespace NUnit.Engine.Internal
 {
     internal sealed class TestAssemblyResolver : IDisposable
     {
-        private static readonly Logger _log = InternalTrace.GetLogger(typeof(TestAssemblyResolver));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyResolver));
 
         private readonly ICompilationAssemblyResolver _assemblyResolver;
         private readonly DependencyContext _dependencyContext;
@@ -68,7 +68,7 @@ namespace NUnit.Engine.Internal
             
             if (TryLoadFromTrustedPlatformAssemblies(context, name, out var loadedAssembly))
             {
-                _log.Info("'{0}' assembly is loaded from trusted path '{1}'", name, loadedAssembly.Location);
+                log.Info("'{0}' assembly is loaded from trusted path '{1}'", name, loadedAssembly.Location);
                 return loadedAssembly;
             }
 
@@ -91,7 +91,7 @@ namespace NUnit.Engine.Internal
                     if (name.Name == Path.GetFileNameWithoutExtension(assemblyPath))
                     {
                         loadedAssembly = context.LoadFromAssemblyPath(assemblyPath);
-                        _log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
+                        log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
                             name,
                             loadedAssembly.Location,
                             library.Name);
@@ -116,7 +116,7 @@ namespace NUnit.Engine.Internal
                     if (File.Exists(candidate))
                     {
                         loadedAssembly = context.LoadFromAssemblyPath(candidate);
-                        _log.Info("'{0}' ({1}) assembly is loaded from AdditionalFrameworkDirectory {2} dependencies with best candidate version {3}",
+                        log.Info("'{0}' ({1}) assembly is loaded from AdditionalFrameworkDirectory {2} dependencies with best candidate version {3}",
                             name,
                             loadedAssembly.Location,
                             frameworkDirectory,
@@ -126,12 +126,12 @@ namespace NUnit.Engine.Internal
                     }
                     else
                     {
-                        _log.Debug("Best version dir for {0} is {1}, but there is no {2} file", frameworkDirectory, versionDir, candidate);
+                        log.Debug("Best version dir for {0} is {1}, but there is no {2} file", frameworkDirectory, versionDir, candidate);
                     }
                 }
             }
 
-            _log.Info("Cannot resolve assembly '{0}'", name);
+            log.Info("Cannot resolve assembly '{0}'", name);
             return null;
         }
 
