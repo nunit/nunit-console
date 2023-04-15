@@ -12,7 +12,7 @@ namespace NUnit.Engine.Internal
 {
     internal sealed class TestAssemblyLoadContext : AssemblyLoadContext
     {
-        private static readonly Logger _log = InternalTrace.GetLogger(typeof(TestAssemblyLoadContext));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyLoadContext));
 
         private readonly string _testAssemblyPath;
         private readonly string _basePath;
@@ -29,12 +29,12 @@ namespace NUnit.Engine.Internal
 
         protected override Assembly Load(AssemblyName name)
         {
-            _log.Debug("Loading {0} assembly", name);
+            log.Debug("Loading {0} assembly", name);
 
             var loadedAssembly = base.Load(name);
             if (loadedAssembly != null)
             {
-                _log.Info("Assembly {0} ({1}) is loaded using default base.Load()", name, GetAssemblyLocationInfo(loadedAssembly));
+                log.Info("Assembly {0} ({1}) is loaded using default base.Load()", name, GetAssemblyLocationInfo(loadedAssembly));
                 return loadedAssembly;
             }
 
@@ -48,14 +48,14 @@ namespace NUnit.Engine.Internal
 
             if (loadedAssembly != null)
             {
-                _log.Info("Assembly {0} ({1}) is loaded using the deps.json info", name, GetAssemblyLocationInfo(loadedAssembly));
+                log.Info("Assembly {0} ({1}) is loaded using the deps.json info", name, GetAssemblyLocationInfo(loadedAssembly));
                 return loadedAssembly;
             }
 
             loadedAssembly = _resolver.Resolve(this, name);
             if (loadedAssembly != null)
             {
-                _log.Info("Assembly {0} ({1}) is loaded using the TestAssembliesResolver", name, GetAssemblyLocationInfo(loadedAssembly));
+                log.Info("Assembly {0} ({1}) is loaded using the TestAssembliesResolver", name, GetAssemblyLocationInfo(loadedAssembly));
                 
                 return loadedAssembly;
             }
@@ -72,7 +72,7 @@ namespace NUnit.Engine.Internal
 
             if (loadedAssembly != null)
             {
-                _log.Info("Assembly {0} ({1}) is loaded using base path", name, GetAssemblyLocationInfo(loadedAssembly));
+                log.Info("Assembly {0} ({1}) is loaded using base path", name, GetAssemblyLocationInfo(loadedAssembly));
                 return loadedAssembly;
             }
 
