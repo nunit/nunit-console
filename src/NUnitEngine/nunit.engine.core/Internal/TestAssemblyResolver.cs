@@ -17,6 +17,8 @@ namespace NUnit.Engine.Internal
 {
     internal sealed class TestAssemblyResolver : IDisposable
     {
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyResolver));
+
         private readonly ICompilationAssemblyResolver _assemblyResolver;
         private readonly DependencyContext _dependencyContext;
         private readonly AssemblyLoadContext _loadContext;
@@ -62,6 +64,14 @@ namespace NUnit.Engine.Internal
 
         private Assembly OnResolving(AssemblyLoadContext context, AssemblyName name)
         {
+            context = context ?? _loadContext;
+            
+            if (TryLoadFromTrustedPlatformAssemblies(context, name, out var loadedAssembly))
+            {
+                log.Info("'{0}' assembly is loaded from trusted path '{1}'", name, loadedAssembly.Location);
+                return loadedAssembly;
+            }
+
             foreach (var library in _dependencyContext.RuntimeLibraries)
             {
                 var wrapper = new CompilationLibrary(
@@ -79,22 +89,79 @@ namespace NUnit.Engine.Internal
                 foreach (var assemblyPath in assemblies)
                 {
                     if (name.Name == Path.GetFileNameWithoutExtension(assemblyPath))
-                        return _loadContext.LoadFromAssemblyPath(assemblyPath);
+                    {
+                        loadedAssembly = context.LoadFromAssemblyPath(assemblyPath);
+                        log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
+                            name,
+                            loadedAssembly.Location,
+                            library.Name);
+
+                        return loadedAssembly;
+                    }
                 }
+            }
+
+            if (name.Version == null)
+            {
+                return null;
             }
 
             foreach (string frameworkDirectory in AdditionalFrameworkDirectories)
             {
                 var versionDir = FindBestVersionDir(frameworkDirectory, name.Version);
+
                 if (versionDir != null)
                 {
                     string candidate = Path.Combine(frameworkDirectory, versionDir, name.Name + ".dll");
                     if (File.Exists(candidate))
-                        return _loadContext.LoadFromAssemblyPath(candidate);
+                    {
+                        loadedAssembly = context.LoadFromAssemblyPath(candidate);
+                        log.Info("'{0}' ({1}) assembly is loaded from AdditionalFrameworkDirectory {2} dependencies with best candidate version {3}",
+                            name,
+                            loadedAssembly.Location,
+                            frameworkDirectory,
+                            versionDir);
+
+                        return loadedAssembly;
+                    }
+                    else
+                    {
+                        log.Debug("Best version dir for {0} is {1}, but there is no {2} file", frameworkDirectory, versionDir, candidate);
+                    }
                 }
             }
 
+            log.Info("Cannot resolve assembly '{0}'", name);
             return null;
+        }
+
+        private static bool TryLoadFromTrustedPlatformAssemblies(AssemblyLoadContext context, AssemblyName assemblyName, out Assembly loadedAssembly)
+        {
+            // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
+            loadedAssembly = null;
+            var trustedAssemblies = System.AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
+            if (string.IsNullOrEmpty(trustedAssemblies))
+            {
+                return false;
+            }
+
+            var separator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ";" : ":";
+            foreach (var assemblyPath in trustedAssemblies.Split(separator))
+            {
+                var fileName = Path.GetFileNameWithoutExtension(assemblyPath);
+                if (string.Equals(fileName, assemblyName.Name, StringComparison.InvariantCultureIgnoreCase) == false)
+                {
+                    continue;
+                }
+
+                if (File.Exists(assemblyPath))
+                {
+                    loadedAssembly = context.LoadFromAssemblyPath(assemblyPath);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static string GetDotNetInstallDirectory()
@@ -119,9 +186,11 @@ namespace NUnit.Engine.Internal
             {
                 Version version;
                 if (TryGetVersionFromString(Path.GetFileName(subdir), out version))
+                {
                     if (version >= targetVersion)
                         if (bestVersion.Major == 0 || bestVersion > version)
                             bestVersion = version;
+                }
             }
 
             return bestVersion.Major > 0
