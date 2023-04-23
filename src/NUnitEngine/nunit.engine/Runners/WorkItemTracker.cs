@@ -1,9 +1,11 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Xml;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {
@@ -25,18 +27,60 @@ namespace NUnit.Engine.Runners
     /// Once the test has been cancelled, it provide notifications to the runner
     /// so the information may be displayed.
     /// </summary>
-    internal class WorkItemTracker : ITestEventListener
+    internal sealed class WorkItemTracker : ITestEventListener
     {
-        private List<XmlNode> _itemsInProcess = new List<XmlNode>();
-        private ManualResetEvent _allItemsComplete = new ManualResetEvent(false);
-        private object _trackerLock = new object();
-        
+        /// <summary>
+        /// Holds data about recorded test that started.
+        /// </summary>
+        private sealed class InProgressItem : IComparable<InProgressItem>
+        {
+            private readonly int _order;
+
+            public InProgressItem(int order, string name, XmlReader reader)
+            {
+                _order = order;
+                Name = name;
+
+                var attributeCount = reader.AttributeCount;
+                Properties = new Dictionary<string, string>(attributeCount);
+                for (var i = 0; i < attributeCount; i++)
+                {
+                    reader.MoveToNextAttribute();
+                    Properties.Add(reader.Name, reader.Value);
+                }
+            }
+
+            public string Name { get; }
+            public Dictionary<string, string> Properties { get; }
+
+            public int CompareTo(InProgressItem other)
+            {
+                // for signaling purposes, return in reverse order
+                return _order.CompareTo(other._order) * -1;
+            }
+        }
+
+        // items are keyed by id
+        private readonly Dictionary<string, InProgressItem> _itemsInProcess = new Dictionary<string, InProgressItem>();
+        private readonly ManualResetEvent _allItemsComplete = new ManualResetEvent(false);
+        private readonly object _trackerLock = new object();
+
+        // incrementing ordering id for work items so we can traverse in correct order
+        private int _itemOrderNumberCounter = 1;
+
+        // when sending thousands of cancelled notifications, it makes sense to reuse string builder, used inside a lock
+        private readonly StringBuilder _notificationBuilder = new StringBuilder();
+
+        // we want to write just the main element without XML declarations
+        private static readonly XmlWriterSettings XmlWriterSettings = new XmlWriterSettings { ConformanceLevel = ConformanceLevel.Fragment };
+
         public void Clear()
         {
             lock (_trackerLock)
             {
                 _itemsInProcess.Clear();
                 _allItemsComplete.Reset();
+                _itemOrderNumberCounter = 1;
             }
         }
 
@@ -49,66 +93,85 @@ namespace NUnit.Engine.Runners
         {
             lock (_trackerLock)
             {
-                int count = _itemsInProcess.Count;
-
                 // Signal completion of all pending suites, in reverse order
-                while (count > 0)
-                    listener.OnTestEvent(CreateNotification(_itemsInProcess[--count]));
+                var toNotify = new List<InProgressItem>(_itemsInProcess.Values);
+                toNotify.Sort();
+
+                foreach (var item in toNotify)
+                    listener.OnTestEvent(CreateNotification(item));
             }
         }
 
-        private static string CreateNotification(XmlNode startElement)
+        private string CreateNotification(InProgressItem item)
         {
-            bool isSuite = startElement.Name == "start-suite";
+            _notificationBuilder.Clear();
 
-            XmlNode notification = XmlHelper.CreateTopLevelElement(isSuite ? "test-suite" : "test-case");
-            if (isSuite)
-                notification.AddAttribute("type", startElement.GetAttribute("type"));
-            notification.AddAttribute("id", startElement.GetAttribute("id"));
-            notification.AddAttribute("name", startElement.GetAttribute("name"));
-            notification.AddAttribute("fullname", startElement.GetAttribute("fullname"));
-            notification.AddAttribute("result", "Failed");
-            notification.AddAttribute("label", "Cancelled");
-            XmlNode failure = notification.AddElement("failure");
-            XmlNode message = failure.AddElementWithCDataSection("message", "Test run cancelled by user");
-            return notification.OuterXml;
+            using (var stringWriter = new StringWriter(_notificationBuilder))
+            {
+                using (var writer = XmlWriter.Create(stringWriter, XmlWriterSettings))
+                {
+                    bool isSuite = item.Name == "start-suite";
+                    writer.WriteStartElement(isSuite ? "test-suite" : "test-case");
+
+                    if (isSuite)
+                        writer.WriteAttributeString("type", item.Properties["type"]);
+
+                    writer.WriteAttributeString("id", item.Properties["id"]);
+                    writer.WriteAttributeString("name", item.Properties["name"]);
+                    writer.WriteAttributeString("fullname", item.Properties["fullname"]);
+                    writer.WriteAttributeString("result", "Failed");
+                    writer.WriteAttributeString("label", "Cancelled");
+
+                    writer.WriteStartElement("failure");
+                    writer.WriteStartElement("message");
+                    writer.WriteCData("Test run cancelled by user");
+                    writer.WriteEndElement();
+                    writer.WriteEndElement();
+
+                    writer.WriteEndElement();
+                }
+
+                return stringWriter.ToString();
+            }
         }
 
         void ITestEventListener.OnTestEvent(string report)
         {
-            XmlNode xmlNode = XmlHelper.CreateXmlNode(report);
-
-            lock (_trackerLock)
+            using (var stringReader = new StringReader(report))
+            using (var reader = XmlReader.Create(stringReader))
             {
-                switch (xmlNode.Name)
+                // go to starting point
+                reader.MoveToContent();
+
+                if (reader.NodeType != XmlNodeType.Element)
+                    throw new InvalidOperationException("Expected to find root element");
+
+                lock (_trackerLock)
                 {
-                    case "start-test":
-                    case "start-suite":
-                        _itemsInProcess.Add(xmlNode);
-                        break;
+                    var name = reader.Name;
+                    switch (name)
+                    {
+                        case "start-test":
+                        case "start-suite":
+                            var item = new InProgressItem(_itemOrderNumberCounter++, name, reader);
+                            _itemsInProcess.Add(item.Properties["id"], item);
+                            break;
 
-                    case "test-case":
-                    case "test-suite":
-                        string id = xmlNode.GetAttribute("id");
-                        RemoveItem(id);
+                        case "test-case":
+                        case "test-suite":
+                            RemoveItem(reader.GetAttribute("id"));
 
-                        if (_itemsInProcess.Count == 0)
-                            _allItemsComplete.Set();
-                        break;
+                            if (_itemsInProcess.Count == 0)
+                                _allItemsComplete.Set();
+                            break;
+                    }
                 }
             }
         }
 
         private void RemoveItem(string id)
         {
-            foreach (XmlNode item in _itemsInProcess)
-            {
-                if (item.GetAttribute("id") == id)
-                {
-                    _itemsInProcess.Remove(item);
-                    return;
-                }
-            }
+            _itemsInProcess.Remove(id);
         }
     }
 }
