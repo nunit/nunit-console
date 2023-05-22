@@ -126,6 +126,7 @@ namespace NUnit.Engine
                 case "name":
                 case "test":
                 case "namespace":
+                case "partition":
                     Token op = lhs.Text == "id"
                         ? Expect(EQ_OPS)
                         : Expect(REL_OPS);
