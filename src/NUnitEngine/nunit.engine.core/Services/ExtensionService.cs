@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Mono.Cecil;
+using TestCentric.Metadata;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.Backports;

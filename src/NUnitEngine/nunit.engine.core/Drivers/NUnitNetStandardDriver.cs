@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using NUnit.Engine.Internal;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
-using Mono.Cecil;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Drivers
 {

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Mono.Cecil;
+using TestCentric.Metadata;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 #if NET20
@@ -195,7 +195,7 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Use Mono.Cecil to get information about all assemblies and
+        /// Use TestCentric.Metadata to get information about all assemblies and
         /// apply it to the package using special internal keywords.
         /// </summary>
         /// <param name="package"></param>

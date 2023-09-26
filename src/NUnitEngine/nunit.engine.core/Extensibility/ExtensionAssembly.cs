@@ -2,7 +2,7 @@
 
 using System;
 using System.IO;
-using Mono.Cecil;
+using TestCentric.Metadata;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Extensibility
