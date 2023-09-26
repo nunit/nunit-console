@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='net35'">
