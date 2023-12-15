@@ -3,6 +3,7 @@
 #if NETCOREAPP3_1_OR_GREATER
 
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.IO;
 using System;
@@ -56,7 +57,7 @@ namespace NUnit.Engine.Internal
             if (loadedAssembly != null)
             {
                 log.Info("Assembly {0} ({1}) is loaded using the TestAssembliesResolver", name, GetAssemblyLocationInfo(loadedAssembly));
-                
+
                 return loadedAssembly;
             }
 
@@ -77,6 +78,45 @@ namespace NUnit.Engine.Internal
             }
 
             return loadedAssembly;
+        }
+
+        protected override IntPtr LoadUnmanagedDll(string name)
+        {
+            log.Debug("Loading {0} unmanaged dll", name);
+
+            IntPtr loadedDllHandle = base.LoadUnmanagedDll(name);
+            if (loadedDllHandle != IntPtr.Zero)
+            {
+                log.Info("Unmanaged DLL {0} is loaded using default base.LoadUnmanagedDll()", name);
+                return loadedDllHandle;
+            }
+
+            string runtimeResolverPath = _runtimeResolver.ResolveUnmanagedDllToPath(name);
+            if (string.IsNullOrEmpty(runtimeResolverPath) == false &&
+                File.Exists(runtimeResolverPath))
+            {
+                loadedDllHandle = LoadUnmanagedDllFromPath(runtimeResolverPath);
+            }
+
+            if (loadedDllHandle != IntPtr.Zero)
+            {
+                log.Info("Unmanaged DLL {0} ({1}) is loaded using the deps.json info", name, runtimeResolverPath);
+                return loadedDllHandle;
+            }
+
+            string unmanagedDllPath = Path.Combine(_basePath, name + ".dll");
+            if (File.Exists(unmanagedDllPath))
+            {
+                loadedDllHandle = LoadUnmanagedDllFromPath(unmanagedDllPath);
+            }
+
+            if (loadedDllHandle != IntPtr.Zero)
+            {
+                log.Info("Unmanaged DLL {0} ({1}) is loaded using base path", name, unmanagedDllPath);
+                return loadedDllHandle;
+            }
+
+            return IntPtr.Zero;
         }
 
         private static string GetAssemblyLocationInfo(Assembly assembly)
