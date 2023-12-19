@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             }
         }
 
-        [Test]
+        [Test, Platform(Exclude = "Linux")]
         public void MultipleClientConnections()
         {
             TcpClient[] clients = new[] { new TcpClient(), new TcpClient(), new TcpClient() };
@@ -63,9 +64,10 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             for (int i = 0; i < num; i++)
             {
-                Assert.That(_serverConnections[i].Connected, $"Server is not connected to client {i + 1}");
-                Assert.True(clients[i].Connected, $"Client {i + 1} is not connected to server");
+                Assert.That(_serverConnections[i].Connected, $"Server is not connected to client {i+1}");
+                Assert.True(clients[i].Connected, $"Client {i+1} is not connected to server");
             }
         }
     }
 }
+#endif
