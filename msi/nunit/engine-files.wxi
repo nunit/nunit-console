@@ -92,9 +92,11 @@
         </ComponentGroup>
         <ComponentGroup Id="NETCORE31_AGENT" Directory="NETCORE31_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NETCORE31" Location="local" Guid="21E39B4C-07E4-4C38-8F91-7030516127E2">
-                <File Id="nunit_agent_netcore31.exe"
+                <File Id="nunit_agent_netcore31.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.dll" />
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent-netcore31.dll" />
+                <File Id="nunit_agent_netcore31.dll.config"
+                      Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent-netcore31.dll.config" />
                 <File Id="nunit_agent_netcore31.deps.json"
                       Source="$(var.InstallImage)bin/agents/netcoreapp3.1/nunit-agent.deps.json" />
                 <File Id="nunit_agent_netcore31.runtimeconfig.json"
@@ -117,12 +119,19 @@
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/netcoreapp3.1/testcentric.engine.metadata.dll" />
             </Component>
+            <Component Id="NUNIT_AGENT_NETCORE31_DEPENDENCY_MODEL" Location="local" Guid="6A33A615-BCD2-411C-B3A8-95BF5829C8CA">
+                <File Id="Microsoft.Extensions.DependencyModel.netcore31.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)agents/nunit-agent-netcore31/Microsoft.Extensions.DependencyModel.dll" />
+            </Component>
         </ComponentGroup>
         <ComponentGroup Id="NET50_AGENT" Directory="NET50_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NET50" Location="local" Guid="6B5C423E-5EDB-4DD4-8B7F-626C8F4EAF06">
-                <File Id="nunit_agent_net50.exe"
+                <File Id="nunit_agent_net50.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent.dll" />
+                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent-net50.dll" />
+                <File Id="nunit_agent_net50.dll.config"
+                      Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent-net50.dll.config" />
                 <File Id="nunit_agent_net50.deps.json"
                       Source="$(var.InstallImage)bin/agents/net5.0/nunit-agent.deps.json" />
                 <File Id="nunit_agent_net50.runtimeconfig.json"
@@ -145,16 +154,22 @@
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/net5.0/testcentric.engine.metadata.dll" />
             </Component>
-        </ComponentGroup>
+            <Component Id="NUNIT_AGENT_NET50_DEPENDENCY_MODEL" Location="local" Guid="EF4F5A8A-AC06-4228-97C0-DBD8B7E1C50B">
+                <File Id="Microsoft.Extensions.DependencyModel.net50.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/net5.0/Microsoft.Extensions.DependencyModel.dll" />
+            </Component>        </ComponentGroup>
         <ComponentGroup Id="NET60_AGENT" Directory="NET60_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NET60" Location="local" Guid="8AFA7F03-96EA-4F80-8B79-7AFB59B67786">
-                <File Id="nunit_agent_net60.exe"
+                <File Id="nunit_agent_net60.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent.dll" />
+                      Source="$(var.InstallImage)bin/net6.0/nunit-agent-net60.dll" />
+                <File Id="nunit_agent_net60.dll.config"
+                      Source="$(var.InstallImage)bin/net6.0/nunit-agent-net60.dll.config" />
                 <File Id="nunit_agent_net60.deps.json"
-                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent.deps.json" />
+                      Source="$(var.InstallImage)bin/net6.0/nunit-agent.deps.json" />
                 <File Id="nunit_agent_net60.runtimeconfig.json"
-                      Source="$(var.InstallImage)bin/agents/net6.0/nunit-agent.runtimeconfig.json" />
+                      Source="$(var.InstallImage)bin/net6.0/nunit-agent.runtimeconfig.json" />
             </Component>
             <Component Id="NUNIT_AGENT_NET60_ENGINE_API" Location="local" Guid="393F8699-4F44-479B-916D-34F506F089D1">
                 <File Id="nunit.agent.net60.engine.api.dll"
@@ -172,6 +187,11 @@
                 <File Id="nunit.agent.net60.engine.metadata.dll"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/net6.0/testcentric.engine.metadata.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET60_DEPENDENCY_MODEL" Location="local" Guid="EFD82EAE-A38E-45E0-944B-A776F7353100">
+                <File Id="Microsoft.Extensions.DependencyModel.net60.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/net6.0/Microsoft.Extensions.DependencyModel.dll" />
             </Component>
         </ComponentGroup>
     </Fragment>
