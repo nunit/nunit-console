@@ -3,7 +3,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Security;
 using NUnit.Common;
 using NUnit.Engine;
@@ -71,7 +73,9 @@ namespace NUnit.Agent
 
             LocateAgencyProcess(agencyPid);
 
-#if NETCOREAPP3_1
+#if NET5_0_OR_GREATER
+            log.Info($"Running {typeof(NUnitTestAgent).Assembly.GetCustomAttribute<TargetFrameworkAttribute>().FrameworkDisplayName} agent under {RuntimeInformation.FrameworkDescription}");
+#elif NETCOREAPP3_1
             log.Info($"Running .NET Core 3.1 agent under {RuntimeInformation.FrameworkDescription}");
 #elif NET40
             log.Info($"Running .NET 4.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
