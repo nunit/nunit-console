@@ -5,6 +5,7 @@
 PackageDefinition NUnitConsoleNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNet60Package;
+PackageDefinition NUnitConsoleRunnerNet80Package;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
@@ -46,6 +47,8 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        Net70Test,
+        Net80Test,
         NetCore21PlusNetCore31Test,
         NetCore21PlusNetCore31PlusNet50PlusNet60Test
     };
@@ -71,7 +74,9 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
+                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
+                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
+                HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             symbols: new PackageCheck[] {
                 HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
@@ -79,10 +84,27 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
                 HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
                 HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE)
+                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
+                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE),
+                HasDirectory("tools/agents/net8.0").WithFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "tools/nunit3-console.exe",
             tests: StandardRunnerTests),
+
+        NUnitConsoleRunnerNet80Package = new NuGetPackage(
+            context: context,
+            id: "NUnit.ConsoleRunner.NetCore",
+            version: ProductVersion,
+            source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
+            checks: new PackageCheck[] {
+                HasFiles("LICENSE.txt", "NOTICES.txt"),
+                HasDirectory("tools/net8.0/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
+            },
+            symbols: new PackageCheck[] {
+                HasDirectory("tools/net8.0/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+            },
+            executable: "tools/net8.0/any/nunit3-console.exe",
+            tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerNet60Package = new NuGetPackage(
             context: context,
@@ -110,7 +132,9 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
                 HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
-                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
+                HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
+                HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins"),
+                HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.agent.addins")
             },
             executable: "tools/nunit3-console.exe",
             tests: StandardRunnerTests),
@@ -144,7 +168,9 @@ public void InitializePackageDefinitions(ICakeContext context)
                 HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
                 HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
                 HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
-                HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
+                HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
+                HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
+                HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
             },
             executable: "bin/net20/nunit3-console.exe",
             tests: StandardRunnerTests.Concat(new[] { NUnitProjectTest })),

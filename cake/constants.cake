@@ -39,6 +39,7 @@ var NOTEST_PROJECT = SOURCE_DIR + "NUnitEngine/notest-assembly/notest-assembly.c
 // Console Runner
 var NET20_CONSOLE = BIN_DIR + "net20/nunit3-console.exe";
 var NET60_CONSOLE = BIN_DIR + "net6.0/nunit3-console.dll";
+var NET80_CONSOLE = BIN_DIR + "net8.0/nunit3-console.dll";
 // Unit Tests
 var NETFX_ENGINE_CORE_TESTS = "nunit.engine.core.tests.exe";
 var NETCORE_ENGINE_CORE_TESTS = "nunit.engine.core.tests.dll";
