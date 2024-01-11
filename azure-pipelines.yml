@@ -9,8 +9,18 @@ jobs:
   condition: not(or(startsWith(variables['Build.SourceBranchName'], 'azure-linux-'),startsWith(variables['Build.SourceBranchName'], 'azure-macOS-')))
   pool:
     vmImage: windows-2022
-  
+
   steps:
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 8.0'
+    inputs:
+      version: 8.x
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 7.0'
+    inputs:
+      version: 7.x
 
   - task: UseDotNet@2
     displayName: 'Install .NET 6.0'
@@ -26,7 +36,7 @@ jobs:
     displayName: 'Install .NET Core SDK'
     inputs:
       version: 3.1.x
-      
+
   - task: UseDotNet@2
     displayName: 'Install .NET Core runtime 2.1'
     inputs:
@@ -70,6 +80,16 @@ jobs:
   steps:
 
   - task: UseDotNet@2
+    displayName: 'Install .NET 8.0'
+    inputs:
+      version: 8.x
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 7.0'
+    inputs:
+      version: 7.x
+
+  - task: UseDotNet@2
     displayName: 'Install .NET 6.0'
     inputs:
       version: 6.x
@@ -83,7 +103,7 @@ jobs:
     displayName: 'Install .NET Core SDK'
     inputs:
       version: 3.1.x
-      
+
   - task: UseDotNet@2
     displayName: 'Install .NET Core runtime 2.1'
     inputs:
@@ -119,6 +139,16 @@ jobs:
   steps:
 
   - task: UseDotNet@2
+    displayName: 'Install .NET 8.0'
+    inputs:
+      version: 8.x
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET 7.0'
+    inputs:
+      version: 7.x
+
+  - task: UseDotNet@2
     displayName: 'Install .NET 6.0'
     inputs:
       version: 6.x
@@ -132,7 +162,7 @@ jobs:
     displayName: 'Install .NET Core SDK'
     inputs:
       version: 3.1.x
-      
+
   - task: UseDotNet@2
     displayName: 'Install .NET Core runtime 2.1'
     inputs:

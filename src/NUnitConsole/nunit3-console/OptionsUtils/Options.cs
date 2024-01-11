@@ -771,7 +771,7 @@ namespace NUnit.Options
             this.option = optionName;
         }
 
-#if !PCL
+#if !PCL && !NET8_0_OR_GREATER
         protected OptionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -784,7 +784,7 @@ namespace NUnit.Options
             get { return this.option; }
         }
 
-#if !PCL
+#if !PCL && !NET8_0_OR_GREATER
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
