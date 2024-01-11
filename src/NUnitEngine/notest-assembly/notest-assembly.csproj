@@ -4,7 +4,7 @@
     <RootNamespace>notest_assembly</RootNamespace>
     <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <NuGetAudit Condition="'$(TargetFramework)'=='netcoreapp2.1'">false</NuGetAudit>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <PropertyGroup>

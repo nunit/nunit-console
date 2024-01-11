@@ -7,7 +7,7 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>x86</PlatformTarget>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <NuGetAudit Condition="'$(TargetFramework)'=='netcoreapp2.1'">false</NuGetAudit>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <PropertyGroup>
