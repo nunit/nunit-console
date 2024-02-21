@@ -38,7 +38,7 @@ namespace NUnit.Engine.Drivers
         Assembly _frameworkAssembly;
         object _frameworkController;
         Type _frameworkControllerType;
-        CustomAssemblyLoadContext _assemblyLoadContext;
+        TestAssemblyLoadContext _assemblyLoadContext;
 
         /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
@@ -58,13 +58,7 @@ namespace NUnit.Engine.Drivers
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
-            _assemblyLoadContext = new CustomAssemblyLoadContext(assemblyPath);
-
-            _assemblyLoadContext.Resolving += (context, assemblyName) =>
-            {
-                var calc = context as CustomAssemblyLoadContext; 
-                return calc?.LoadFallback(assemblyName);
-            };
+            _assemblyLoadContext = new TestAssemblyLoadContext(assemblyPath);
 
             try
             {
