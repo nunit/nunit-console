@@ -106,8 +106,12 @@ namespace NUnit.ConsoleRunner
                     if (Options.WorkDirectory != null)
                         engine.WorkDirectory = Options.WorkDirectory;
 
-                    if (Options.InternalTraceLevel != null)
-                        engine.InternalTraceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), Options.InternalTraceLevel);
+                    //if (Options.InternalTraceLevel != null)
+                    //    engine.InternalTraceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), Options.InternalTraceLevel);
+                    // See PR 1114  https://github.com/nunit/nunit-console/pull/1214/files  
+                    engine.InternalTraceLevel = Options.InternalTraceLevel != null
+                        ? (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), Options.InternalTraceLevel)
+                        : InternalTraceLevel.Off;
 
                     try
                     {
