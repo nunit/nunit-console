@@ -24,12 +24,13 @@ jobs:
     - name: 🛠️ Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        global-json-file: global.json
+        # global-json-file: global.json
         dotnet-version: |
           '2.1.x'
           '3.1.x'
           '5.0.0'
           '5.0.x'
+          '8.0.100'
 
         
     - name: 🛠️ Install dotnet tools
