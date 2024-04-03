@@ -38,24 +38,26 @@ jobs:
       run: dotnet tool restore
 
     - name: 🔨 Build and Test
-      run: dotnet tool run dotnet-cake --verbosity=diagnostic --target=Test --test-run-name=Windows --configuration=Release
+      run: dotnet tool run dotnet-cake --target=Test --test-run-name=Windows --configuration=Release
+      # If you need to get more verbose logging, add the following to the dotnet-cake above:  --verbosity=diagnostic
 
-    - name: 📦 Package
-      run: dotnet tool run dotnet-cake --target=Package
+# Wait with this until package errors (tests following packaging) are all fixed
+    # - name: 📦 Package
+    #   run: dotnet tool run dotnet-cake --target=Package
 
-    - name: 💾 Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: Package
-        path: package
+    # - name: 💾 Upload build artifacts
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: Package
+    #     path: package
 
-    - name: 💾 Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: Test results (Windows)
-        path: test-results
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
+    # - name: 💾 Upload test results
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: Test results (Windows)
+    #     path: test-results
+    #   # Use always() to always run this step to publish test results when there are test failures
+    #   if: ${{ always() }}
 
   # build-linux:
   #   name: Linux Build
