@@ -36,7 +36,7 @@ jobs:
       run: dotnet tool restore
 
     - name: 🔨 Build and Test
-      run: dotnet tool run dotnet-cake --target=Test --test-run-name=Windows --configuration=Release
+      run: dotnet tool run dotnet-cake --verbosity=diagnostic --target=Test --test-run-name=Windows --configuration=Release
 
     - name: 📦 Package
       run: dotnet tool run dotnet-cake --target=Package
