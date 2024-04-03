@@ -14,6 +14,7 @@ public class BuildVersion
     // then parsing it to provide information that is used in the build.
     public BuildVersion(ISetupContext context)
     {
+         Console.WriteLine("Start BuildVersion");
         _context = context;
         _gitVersion = context.GitVersion();
         Console.WriteLine($"Running GitVersion: {_gitVersion.FullSemVer}");
