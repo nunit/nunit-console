@@ -16,7 +16,7 @@ public class BuildVersion
     {
         _context = context;
         _gitVersion = context.GitVersion();
-
+        Information("Running GitVersion: {0}", _gitVersion.FullSemVer);
         BranchName = _gitVersion.BranchName;
         IsReleaseBranch = BranchName.StartsWith("release-");
 
