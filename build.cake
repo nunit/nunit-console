@@ -13,8 +13,8 @@ static bool NoPush; NoPush = HasArgument("nopush");
 #load cake/package-definitions.cake
 
 // Install Tools
-#tool NuGet.CommandLine&version=6.0.0
-#tool dotnet:?package=GitVersion.Tool&version=5.6.3
+#tool NuGet.CommandLine&version=6.9.1
+#tool dotnet:?package=GitVersion.Tool&version=5.12.0
 #tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
 
 BuildVersion _buildVersion;
