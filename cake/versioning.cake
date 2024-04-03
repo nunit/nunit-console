@@ -16,6 +16,8 @@ public class BuildVersion
     {
          Console.WriteLine("Start BuildVersion");
         _context = context;
+        if (context==null)
+            throw new ArgumentNullException(nameof(context));
         _gitVersion = context.GitVersion();
         Console.WriteLine($"Running GitVersion: {_gitVersion.FullSemVer}");
         BranchName = _gitVersion.BranchName;
