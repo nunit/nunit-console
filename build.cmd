@@ -8,4 +8,4 @@ set DOTNET_NOLOGO=1
 dotnet tool restore
 @if %ERRORLEVEL% neq 0 goto :eof
 
-dotnet cake %*
+dotnet cake --verbosity=diagnostic %*
