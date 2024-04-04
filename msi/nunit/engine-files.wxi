@@ -158,7 +158,8 @@
                 <File Id="Microsoft.Extensions.DependencyModel.net50.dll"
                       ProcessorArchitecture="msil"
                       Source="$(var.InstallImage)bin/net5.0/Microsoft.Extensions.DependencyModel.dll" />
-            </Component>        </ComponentGroup>
+            </Component>
+        </ComponentGroup>
         <ComponentGroup Id="NET60_AGENT" Directory="NET60_AGENT_DIR">
             <Component Id="NUNIT_AGENT_NET60" Location="local" Guid="8AFA7F03-96EA-4F80-8B79-7AFB59B67786">
                 <File Id="nunit_agent_net60.dll"

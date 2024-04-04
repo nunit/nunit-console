@@ -104,6 +104,7 @@
     <file src = "$BIN_DIR$agents/net7.0/nunit.engine.api.xml" target="tools/agents/net7.0" />
     <file src = "$BIN_DIR$agents/net7.0/nunit.engine.core.dll" target="tools/agents/net7.0" />
     <file src = "$BIN_DIR$agents/net7.0/testcentric.engine.metadata.dll" target="tools/agents/net7.0" />
+    <file src = "$BIN_DIR$agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
     <file src = "nunit.agent.addins" target = "tools/agents/net7.0" />
 
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent.dll" target="tools/agents/net8.0" />
@@ -114,6 +115,7 @@
     <file src = "$BIN_DIR$agents/net8.0/nunit.engine.api.xml" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit.engine.core.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/testcentric.engine.metadata.dll" target="tools/agents/net8.0" />
+    <file src = "$BIN_DIR$agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
     <file src = "nunit.agent.addins" target = "tools/agents/net8.0" />
   </files>
 </package>
