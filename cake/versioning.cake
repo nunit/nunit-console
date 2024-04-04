@@ -14,9 +14,12 @@ public class BuildVersion
     // then parsing it to provide information that is used in the build.
     public BuildVersion(ISetupContext context)
     {
+         Console.WriteLine("Start BuildVersion");
         _context = context;
+        if (context==null)
+            throw new ArgumentNullException(nameof(context));
         _gitVersion = context.GitVersion();
-
+        Console.WriteLine($"Running GitVersion: {_gitVersion.FullSemVer}");
         BranchName = _gitVersion.BranchName;
         IsReleaseBranch = BranchName.StartsWith("release-");
 
@@ -90,7 +93,7 @@ public class BuildVersion
             label = "ci";
 
         string suffix = "-" + label + _gitVersion.CommitsSinceVersionSourcePadded;
-
+        Console.WriteLine($"CalculateProductVersion: {label} {branchName} {suffix}");
         switch (label)
         {
             case "ci":
