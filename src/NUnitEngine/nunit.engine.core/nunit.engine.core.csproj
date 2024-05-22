@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net20;netstandard2.0;netcoreapp3.1;net5.0;net6.0;net8.0</TargetFrameworks>
@@ -20,11 +20,16 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='netcoreapp3.1'">
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
   </ItemGroup>
-  
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' or '$(TargetFramework)'=='net5.0' or '$(TargetFramework)'=='net6.0' or '$(TargetFramework)'=='net7.0' or '$(TargetFramework)'=='net8.0'">
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="TestCentric.Metadata" Version="2.0.0" />
   </ItemGroup>

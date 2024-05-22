@@ -16,7 +16,8 @@ string[] AGENT_FILES = {
         "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
 string[] AGENT_FILES_NETCORE = {
         "nunit-agent.dll", "nunit-agent.dll.config",
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
+        "Microsoft.Extensions.DependencyModel.dll"};
 string[] AGENT_PDB_FILES = {
         "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 string[] AGENT_PDB_FILES_NETCORE = {
