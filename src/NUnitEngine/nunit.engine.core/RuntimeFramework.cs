@@ -457,9 +457,13 @@ namespace NUnit.Engine
             if (FrameworkVersion == DefaultVersion || target.FrameworkVersion == DefaultVersion)
                 return true;
 
-            return VersionsMatch(this.ClrVersion, target.ClrVersion)
-                && this.FrameworkVersion.Major >= target.FrameworkVersion.Major
-                && this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
+            if (!VersionsMatch(this.ClrVersion, target.ClrVersion))
+                return false;
+
+            return this.Runtime == RuntimeType.Mono
+                ? this.FrameworkVersion.Major >= target.FrameworkVersion.Major
+                : this.FrameworkVersion.Major >= target.FrameworkVersion.Major &&
+                  this.FrameworkVersion.Minor >= target.FrameworkVersion.Minor;
         }
 
         private bool Supports(RuntimeType targetRuntime)
