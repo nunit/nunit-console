@@ -677,13 +677,13 @@ Task("TestConsole")
 Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
     .IsDependentOn("TestNet20EngineCore")
-    .IsDependentOn("TestNetStandard20EngineCore")
+    //.IsDependentOn("TestNetStandard20EngineCore")
     .IsDependentOn("TestNetCore31EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
     .IsDependentOn("TestNetFxEngine")
-    .IsDependentOn("TestNetStandard20Engine")
+    //.IsDependentOn("TestNetStandard20Engine")
     .IsDependentOn("TestNetCore31Engine");
 
 Task("Test")

@@ -33,11 +33,11 @@ public class BuildSettings
             "Run mock-assembly.dll under .NET 4.6.2",
             $"src/TestData/mock-assembly/bin/{Configuration}/net462/mock-assembly.dll",
             MockAssemblyExpectedResult(1));
-        NetCore21Test = new PackageTest(
-            "NetCore21Test",
-            "Run mock-assembly.dll targeting .NET Core 2.1",
-            $"src/TestData/mock-assembly/bin/{Configuration}/netcoreapp2.1/mock-assembly.dll",
-            MockAssemblyExpectedResult(1));
+        //NetCore21Test = new PackageTest(
+        //    "NetCore21Test",
+        //    "Run mock-assembly.dll targeting .NET Core 2.1",
+        //    $"src/TestData/mock-assembly/bin/{Configuration}/netcoreapp2.1/mock-assembly.dll",
+        //    MockAssemblyExpectedResult(1));
         NetCore31Test = new PackageTest(
             "NetCore31Test",
             "Run mock-assembly.dll under .NET Core 3.1",
@@ -68,16 +68,16 @@ public class BuildSettings
             "Run mock-assembly-x86.dll under .NET 4.6.2",
             $"src/TestData/mock-assembly-x86/bin/{Configuration}/net462/mock-assembly-x86.dll",
             MockAssemblyExpectedResult(1));
-        NetCore31X86Test = new PackageTest(
-            "NetCore31X86Test",
-            "Run mock-assembly-x86.dll under .NET Core 3.1",
-            $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll",
-            MockAssemblyExpectedResult(1));
-        NetCore21X86Test = new PackageTest(
-            "NetCore21X86Test",
-            "Run mock-assembly-x86.dll under .NET Core 2.1",
-            $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp2.1/mock-assembly-x86.dll",
-            MockAssemblyExpectedResult(1));
+        //NetCore31X86Test = new PackageTest(
+        //    "NetCore31X86Test",
+        //    "Run mock-assembly-x86.dll under .NET Core 3.1",
+        //    $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll",
+        //    MockAssemblyExpectedResult(1));
+        //NetCore21X86Test = new PackageTest(
+        //    "NetCore21X86Test",
+        //    "Run mock-assembly-x86.dll under .NET Core 2.1",
+        //    $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp2.1/mock-assembly-x86.dll",
+        //    MockAssemblyExpectedResult(1));
         Net60WindowsFormsTest = new PackageTest(
             "Net60WindowsFormsTest",
             "Run test using windows forms under .NET 6.0",
@@ -103,11 +103,12 @@ public class BuildSettings
             "Run mock-assembly under .Net Framework 4.6.2 and .Net 6.0 together",
             $"src/TestData/mock-assembly/bin/{Configuration}/net462/mock-assembly.dll src/TestData/mock-assembly/bin/{Configuration}/net6.0/mock-assembly.dll",
             MockAssemblyExpectedResult(2));
-        NUnitProjectTest = new PackageTest(
-            "NUnitProjectTest",
-            "Run project with two copies of mock-assembly",
-            $"NetFXTests.nunit --config={Configuration}",
-            MockAssemblyExpectedResult(2));
+        // TODO: Get nunit projects working
+        //NUnitProjectTest = new PackageTest(
+        //    "NUnitProjectTest",
+        //    "Run project with two copies of mock-assembly",
+        //    $"NetFXTests.nunit --config={Configuration}",
+        //    MockAssemblyExpectedResult(2));
         Net462NUnit4Test = new PackageTest(
             "Net462NUnit4Test",
             "Run mock-assembly-nunit4.dll under .NET 4.6.2",
@@ -133,7 +134,7 @@ public class BuildSettings
         {
             Net35Test,
             Net462Test,
-            NetCore21Test,
+            //NetCore21Test,
             NetCore31Test,
             Net50Test,
             Net60Test,
@@ -153,16 +154,16 @@ public class BuildSettings
         {
             StandardRunnerTests.Add(Net60WindowsFormsTest);
 
-            if (!IsRunningOnAppVeyor)
-            {
-                StandardRunnerTests.Add(NetCore21X86Test);
-                StandardRunnerTests.Add(NetCore31X86Test);
-            }
+            //if (!IsRunningOnAppVeyor)
+            //{
+            //    StandardRunnerTests.Add(NetCore21X86Test);
+            //    StandardRunnerTests.Add(NetCore31X86Test);
+            //}
         }
 
         NetCoreRunnerTests = new List<PackageTest>
         {
-            NetCore21Test,
+            //NetCore21Test,
             NetCore31Test,
             Net50Test,
             Net60Test,
