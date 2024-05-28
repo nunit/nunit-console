@@ -15,7 +15,6 @@ namespace NUnit.Engine.Extensibility
 {
     // TODO: This should actually give us 3.5
     [TestFixture("net35", FrameworkIdentifiers.NetFramework, "2.0")]
-    [TestFixture("netcoreapp2.1", FrameworkIdentifiers.NetCoreApp, "2.1")]
     [TestFixture("netcoreapp3.1", FrameworkIdentifiers.NetCoreApp, "3.1")]
     [TestFixture("net5.0", FrameworkIdentifiers.NetCoreApp, "5.0")]
     [TestFixture("net6.0", FrameworkIdentifiers.NetCoreApp, "6.0")]
