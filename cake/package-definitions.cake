@@ -535,9 +535,7 @@ public class NUnitConsoleMsiPackage : MsiPackageDefinition
             HasDirectory("Nunit.org/nunit-console/addins").WithFile("nunit-project-loader.dll")
         };
         TestExecutable = "NUnit.org/nunit-console/nunit4-console.exe";
-        // TODO: Get NUnitProjectTest to work
-        //PackageTests = settings.StandardRunnerTests.Concat(new[] { settings.NUnitProjectTest });
-        PackageTests = settings.StandardRunnerTests;
+        PackageTests = settings.StandardRunnerTests.Concat(new[] { settings.NUnitProjectTest });
     }
 }
 
@@ -612,11 +610,9 @@ public class NUnitConsoleZipPackage : ZipPackageDefinition
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
                 "Microsoft.Extensions.DependencyModel.dll",
                 "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-};
+        };
         TestExecutable = "bin/nunit4-console.exe";
-        // TODO: Get NUnitProjectTest to work
-        //PackageTests = settings.StandardRunnerTests.Concat(new[] { settings.NUnitProjectTest });
-        PackageTests = settings.StandardRunnerTests;
+        PackageTests = settings.StandardRunnerTests.Concat(new[] { settings.NUnitProjectTest });
     }
 
     protected override string ZipImageDirectory => PACKAGE_DIR + "zip-image";
