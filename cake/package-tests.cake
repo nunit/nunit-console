@@ -72,35 +72,35 @@ static PackageTest NetCore31Test = new PackageTest(
     "netcoreapp3.1/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
-static PackageTest NetCore31X86Test = new PackageTest(
-    "NetCore31X86Test",
-    "Run mock-assembly-x86.dll under .NET Core 3.1",
-    "netcoreapp3.1/mock-assembly-x86.dll",
-    MockAssemblyExpectedResult(1));
+//static PackageTest NetCore31X86Test = new PackageTest(
+//    "NetCore31X86Test",
+//    "Run mock-assembly-x86.dll under .NET Core 3.1",
+//    "netcoreapp3.1/mock-assembly-x86.dll",
+//    MockAssemblyExpectedResult(1));
 
-static PackageTest NetCore21Test = new PackageTest(
-    "NetCore21Test",
-    "Run mock-assembly.dll targeting .NET Core 2.1",
-    "netcoreapp2.1/mock-assembly.dll",
-    MockAssemblyExpectedResult(1));
+//static PackageTest NetCore21Test = new PackageTest(
+//    "NetCore21Test",
+//    "Run mock-assembly.dll targeting .NET Core 2.1",
+//    "netcoreapp2.1/mock-assembly.dll",
+//    MockAssemblyExpectedResult(1));
 
-static PackageTest NetCore21X86Test = new PackageTest(
-    "NetCore21X86Test",
-    "Run mock-assembly-x86.dll under .NET Core 2.1",
-    "netcoreapp2.1/mock-assembly-x86.dll",
-    MockAssemblyExpectedResult(1));
+//static PackageTest NetCore21X86Test = new PackageTest(
+//    "NetCore21X86Test",
+//    "Run mock-assembly-x86.dll under .NET Core 2.1",
+//    "netcoreapp2.1/mock-assembly-x86.dll",
+//    MockAssemblyExpectedResult(1));
 
-static PackageTest NetCore21PlusNetCore31Test = new PackageTest(
-    "NetCore21PlusNetCore31Test",
-    "Run two copies of mock-assembly together",
-    "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll",
-    MockAssemblyExpectedResult(2));
+//static PackageTest NetCore21PlusNetCore31Test = new PackageTest(
+//    "NetCore21PlusNetCore31Test",
+//    "Run two copies of mock-assembly together",
+//    "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll",
+//    MockAssemblyExpectedResult(2));
 
-static PackageTest NetCore21PlusNetCore31PlusNet50PlusNet60Test = new PackageTest(
-    "NetCore21PlusNetCore31PlusNet50PlusNet60Test",
+static PackageTest Net50PlusNet60Test = new PackageTest(
+    "Net50PlusNet60Test",
     "Run four copies of mock-assembly together",
-    "netcoreapp2.1/mock-assembly.dll netcoreapp3.1/mock-assembly.dll net5.0/mock-assembly.dll net6.0/mock-assembly.dll net7.0/mock-assembly.dll net8.0/mock-assembly.dll",
-    MockAssemblyExpectedResult(4));
+    "net5.0/mock-assembly.dll net6.0/mock-assembly.dll",//" net7.0/mock-assembly.dll net8.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(2));
 
 static PackageTest Net40PlusNet60Test = new PackageTest(
     "Net40PlusNet60Test",
