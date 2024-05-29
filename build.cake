@@ -114,11 +114,6 @@ public void BuildSolution()
         .WithProperty("TargetFramework", "netstandard2.0")
         .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
 
-    DisplayBanner("Publishing ENGINE TESTS Project for NETCOREAPP2.1");
-    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
-        .WithProperty("TargetFramework", "netcoreapp2.1")
-        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-
     // TODO: May not be needed
     foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
     {
@@ -129,6 +124,7 @@ public void BuildSolution()
     }
 }
 
+// TODO: Test this on linux to see if changes are needed
 private void BuildEachProjectSeparately()
 {
     DotNetRestore(SOLUTION_FILE);
@@ -237,7 +233,7 @@ Task("TestNetStandard20EngineCore")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -302,7 +298,7 @@ Task("TestNetStandard20Engine")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp2.1");
+        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
     });
 
 //////////////////////////////////////////////////////////////////////

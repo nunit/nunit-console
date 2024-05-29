@@ -153,7 +153,7 @@ namespace NUnit.Engine.Services.Tests
             var assemblyName = Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.core.tests.exe");
 #else
             // Attempt to load the .NET Core 2.1 version of the extensions from the .NET 3.5 tests
-            var assemblyName = Path.Combine(GetSiblingDirectory("netcoreapp2.1"), "nunit.engine.core.tests.dll");
+            var assemblyName = Path.Combine(GetSiblingDirectory("netcoreapp3.1"), "nunit.engine.core.tests.dll");
 #endif
             Assert.That(assemblyName, Does.Exist);
             Console.WriteLine($"{assemblyName} does exist");
@@ -242,7 +242,7 @@ namespace NUnit.Engine.Services.Tests
             Assembly netFramework = typeof(ExtensionService).Assembly;
 
             var extNetStandard = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netstandard2.0"), "nunit.engine.dll"), false);
-            var extNetCore = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netcoreapp2.1"), "nunit.engine.tests.dll"), false);
+            var extNetCore = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("netcoreapp3.1"), "nunit.engine.tests.dll"), false);
 
             yield return new TestCaseData(new FrameworkCombo(netFramework, extNetCore)).SetName("InvalidCombo(.NET Framework, .NET Core)");
 #endif

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Core.Tests</RootNamespace>
-    <TargetFrameworks>net35;netcoreapp2.1;netcoreapp3.1;net5.0;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net35;netcoreapp3.1;net5.0;net6.0;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
