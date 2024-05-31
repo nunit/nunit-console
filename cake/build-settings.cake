@@ -63,6 +63,11 @@ public class BuildSettings
             "Run mock-assembly-x86.dll under .NET 4.6.2",
             $"src/TestData/mock-assembly-x86/bin/{Configuration}/net462/mock-assembly-x86.dll",
             MockAssemblyExpectedResult(1));
+        NetCore31X86Test = new PackageTest(
+            "NetCore31X86Test",
+            "Run mock-assembly-x86.dll under .NET Core 3.1",
+            $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll",
+            MockAssemblyExpectedResult(1));
         Net60WindowsFormsTest = new PackageTest(
             "Net60WindowsFormsTest",
             "Run test using windows forms under .NET 6.0",
@@ -134,9 +139,11 @@ public class BuildSettings
             Net60NUnit4Test
         };
         if (IsRunningOnWindows)
-        {
             StandardRunnerTests.Add(Net60WindowsFormsTest);
-        }
+
+        // TODO: Get .NET Core X86 to work and test under supported versions
+        //if (IsDotNetX86Installed)
+        //    StandardRunnerTests.Add(NetCore31X86Test);
 
         NetCoreRunnerTests = new List<PackageTest>
         {
@@ -188,6 +195,7 @@ public class BuildSettings
 	public bool IsRunningOnUnix => _context.IsRunningOnUnix();
 	public bool IsRunningOnWindows => _context.IsRunningOnWindows();
 	public bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
+    public bool IsDotNetX86Installed => IsRunningOnWindows && System.IO.File.Exists(@"C:\Program Files (x86)\dotnet\dotnet.exe");
 
     public bool IsPreRelease => !string.IsNullOrEmpty(PreReleaseLabel);
 

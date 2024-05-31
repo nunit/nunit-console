@@ -152,7 +152,7 @@ namespace NUnit.Engine.Services
             // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
             var assemblyName = Path.GetFullPath("../net35/nunit.engine.core.tests.exe");
 #else
-            // Attempt to load the .NET Core 2.1 version of the extensions from the .NET 3.5 tests
+            // Attempt to load the .NET Core 3.1 version of the extensions from the .NET 3.5 tests
             var assemblyName = Path.GetFullPath("../netcoreapp3.1/nunit.engine.core.tests.dll");
 #endif
             Assert.That(assemblyName, Does.Exist);
