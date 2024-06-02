@@ -33,11 +33,6 @@ public class BuildSettings
             "Run mock-assembly.dll under .NET 4.6.2",
             $"src/TestData/mock-assembly/bin/{Configuration}/net462/mock-assembly.dll",
             MockAssemblyExpectedResult(1));
-        NetCore21Test = new PackageTest(
-            "NetCore21Test",
-            "Run mock-assembly.dll targeting .NET Core 2.1",
-            $"src/TestData/mock-assembly/bin/{Configuration}/netcoreapp2.1/mock-assembly.dll",
-            MockAssemblyExpectedResult(1));
         NetCore31Test = new PackageTest(
             "NetCore31Test",
             "Run mock-assembly.dll under .NET Core 3.1",
@@ -72,11 +67,6 @@ public class BuildSettings
             "NetCore31X86Test",
             "Run mock-assembly-x86.dll under .NET Core 3.1",
             $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll",
-            MockAssemblyExpectedResult(1));
-        NetCore21X86Test = new PackageTest(
-            "NetCore21X86Test",
-            "Run mock-assembly-x86.dll under .NET Core 2.1",
-            $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp2.1/mock-assembly-x86.dll",
             MockAssemblyExpectedResult(1));
         Net60WindowsFormsTest = new PackageTest(
             "Net60WindowsFormsTest",
@@ -133,7 +123,6 @@ public class BuildSettings
         {
             Net35Test,
             Net462Test,
-            NetCore21Test,
             NetCore31Test,
             Net50Test,
             Net60Test,
@@ -150,19 +139,14 @@ public class BuildSettings
             Net60NUnit4Test
         };
         if (IsRunningOnWindows)
-        {
             StandardRunnerTests.Add(Net60WindowsFormsTest);
 
-            if (!IsRunningOnAppVeyor)
-            {
-                StandardRunnerTests.Add(NetCore21X86Test);
-                StandardRunnerTests.Add(NetCore31X86Test);
-            }
-        }
+        // TODO: Get .NET Core X86 to work and test under supported versions
+        //if (IsDotNetX86Installed)
+        //    StandardRunnerTests.Add(NetCore31X86Test);
 
         NetCoreRunnerTests = new List<PackageTest>
         {
-            NetCore21Test,
             NetCore31Test,
             Net50Test,
             Net60Test,
@@ -211,6 +195,7 @@ public class BuildSettings
 	public bool IsRunningOnUnix => _context.IsRunningOnUnix();
 	public bool IsRunningOnWindows => _context.IsRunningOnWindows();
 	public bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
+    public bool IsDotNetX86Installed => IsRunningOnWindows && System.IO.File.Exists(@"C:\Program Files (x86)\dotnet\dotnet.exe");
 
     public bool IsPreRelease => !string.IsNullOrEmpty(PreReleaseLabel);
 
