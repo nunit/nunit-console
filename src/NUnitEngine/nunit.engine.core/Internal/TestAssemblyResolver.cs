@@ -169,10 +169,17 @@ namespace NUnit.Engine.Internal
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Running on Windows so use registry
-                RegistryKey key = Environment.Is64BitProcess
-                    ? Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\")
-                    : Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x86\sharedHost\");
-                return (string)key?.GetValue("Path");
+                //RegistryKey key = Environment.Is64BitProcess
+                //    ? Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\")
+                //    : Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x86\sharedHost\");
+                if (Environment.Is64BitProcess)
+                {
+                    RegistryKey key =
+                        Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
+                    return (string)key?.GetValue("Path");
+                }
+                else
+                    return (@"C:\Program Files (x86)\dotnet\");
             }
             else
                 return "/usr/shared/dotnet/";

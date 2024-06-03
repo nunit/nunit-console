@@ -16,6 +16,7 @@ public class BuildSettings
 
         Configuration = context.Argument("configuration", context.Argument("c", "Release"));
         NoPush = context.HasArgument("nopush");
+        TestName = context.Argument("testName", context.Argument<string>("test", null));
 
         BuildVersion = new BuildVersion(context);
 
@@ -23,6 +24,7 @@ public class BuildSettings
         NuGetApiKey = GetApiKey(NUGET_API_KEY, FALLBACK_NUGET_API_KEY);
         ChocolateyApiKey = GetApiKey(CHOCO_API_KEY, FALLBACK_CHOCO_API_KEY);
 
+        // Single Assembly Tests
         Net35Test = new PackageTest(
             "Net35Test",
             "Run mock-assembly.dll under .NET 3.5",
@@ -53,6 +55,8 @@ public class BuildSettings
             "Run mock-assembly.dll under .NET 7.0",
             $"src/TestData/mock-assembly/bin/{Configuration}/net7.0/mock-assembly.dll",
             MockAssemblyExpectedResult(1));
+
+        // X86 assembly tests
         Net35X86Test = new PackageTest(
             "Net35X86Test",
             "Run mock-assembly-x86.dll under .NET 3.5",
@@ -66,18 +70,34 @@ public class BuildSettings
         NetCore31X86Test = new PackageTest(
             "NetCore31X86Test",
             "Run mock-assembly-x86.dll under .NET Core 3.1",
-            $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll",
+            $"src/TestData/mock-assembly-x86/bin/{Configuration}/netcoreapp3.1/mock-assembly-x86.dll --trace:Debug",
             MockAssemblyExpectedResult(1));
+        Net60X86Test = new PackageTest(
+            "Net60X86Test",
+            "Run mock-assembly-x86.dll under .NET 6.0",
+            $"src/TestData/mock-assembly-x86/bin/{Configuration}/net6.0/mock-assembly-x86.dll --trace:Debug",
+            MockAssemblyExpectedResult(1));
+        Net80X86Test = new PackageTest(
+            "Net80X86Test",
+            "Run mock-assembly-x86.dll under .NET 8.0",
+            $"src/TestData/mock-assembly-x86/bin/{Configuration}/net8.0/mock-assembly-x86.dll --trace:Debug",
+            MockAssemblyExpectedResult(1));
+        
+        // Windows Forms Tests
         Net60WindowsFormsTest = new PackageTest(
             "Net60WindowsFormsTest",
             "Run test using windows forms under .NET 6.0",
             $"src/TestData/windows-test/bin/{Configuration}/net6.0-windows/windows-test.dll",
             new ExpectedResult("Passed"));
+
+        // AspNetCore Tests
         Net60AspNetCoreTest = new PackageTest(
             "Net60AspNetCoreTest",
             "Run test using AspNetCore under .NET 6.0",
             $"src/TestData/aspnetcore-test/bin/{Configuration}/net6.0/aspnetcore-test.dll",
             new ExpectedResult("Passed"));
+
+        // Multiple Assembly Tests
         Net35PlusNet462Test = new PackageTest(
             "Net35PlusNet462Test",
             "Run both copies of mock-assembly together",
@@ -98,6 +118,8 @@ public class BuildSettings
             "Run project with two copies of mock-assembly",
             $"NetFXTests.nunit --config={Configuration}",
             MockAssemblyExpectedResult(2));
+
+        // Tests using NUnit4
         Net462NUnit4Test = new PackageTest(
             "Net462NUnit4Test",
             "Run mock-assembly-nunit4.dll under .NET 4.6.2",
@@ -138,12 +160,6 @@ public class BuildSettings
             Net50NUnit4Test,
             Net60NUnit4Test
         };
-        if (IsRunningOnWindows)
-            StandardRunnerTests.Add(Net60WindowsFormsTest);
-
-        // TODO: Get .NET Core X86 to work and test under supported versions
-        //if (IsDotNetX86Installed)
-        //    StandardRunnerTests.Add(NetCore31X86Test);
 
         NetCoreRunnerTests = new List<PackageTest>
         {
@@ -156,8 +172,23 @@ public class BuildSettings
             Net50NUnit4Test,
             Net60NUnit4Test
         };
+
         if (IsRunningOnWindows)
+        {
+            StandardRunnerTests.Add(Net60WindowsFormsTest);
             NetCoreRunnerTests.Add(Net60WindowsFormsTest);
+        }
+
+        if (IsDotNetX86Installed && !IsRunningOnAppVeyor)
+        {
+            StandardRunnerTests.Add(NetCore31X86Test);
+            StandardRunnerTests.Add(Net60X86Test);
+            StandardRunnerTests.Add(Net80X86Test);
+            // TODO: Make X86 work in .NET Core Runner
+            //NetCoreRunnerTests.Add(NetCore31X86Test);
+            //NetCoreRunnerTests.Add(Net60X86Test);
+            //NetCoreRunnerTests.Add(Net80X86Test);
+        }
 
         AllPackages = new PackageDefinition[] {
             ConsoleNuGetPackage = new NUnitConsoleNuGetPackage(this),
@@ -212,6 +243,8 @@ public class BuildSettings
 
     public bool NoPush { get; }
 
+    public string TestName { get; }
+
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE TEST DEFINITIONS
 //////////////////////////////////////////////////////////////////////
@@ -238,7 +271,8 @@ public class BuildSettings
     public PackageTest Net35X86Test { get; }
     public PackageTest Net462X86Test { get; }
     public PackageTest NetCore31X86Test { get; }
-    public PackageTest NetCore21X86Test { get; }
+    public PackageTest Net60X86Test { get; }
+    public PackageTest Net80X86Test { get; }
     // Special Test Situations
     public PackageTest Net60WindowsFormsTest { get; }
     public PackageTest Net60AspNetCoreTest { get; }
