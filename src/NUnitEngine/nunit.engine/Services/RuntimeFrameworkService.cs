@@ -19,6 +19,7 @@ namespace NUnit.Engine.Services
         static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
         private List<RuntimeFramework> _availableRuntimes = new List<RuntimeFramework>();
+        private List<RuntimeFramework> _availableX86Runtimes = new List<RuntimeFramework>();
 
         /// <summary>
         /// Gets a RuntimeFramework instance representing the runtime under
@@ -36,9 +37,14 @@ namespace NUnit.Engine.Services
                     : "mono";
 
         /// <summary>
-        /// Gets a list of available runtimes.
+        /// Gets a list of available X64 runtimes.
         /// </summary>
         public IList<IRuntimeFramework> AvailableRuntimes => _availableRuntimes.ToArray();
+
+        /// <summary>
+        /// Gets a list of available X86 runtimes.
+        /// </summary>
+        public IList<IRuntimeFramework> AvailableX86Runtimes => _availableX86Runtimes.ToArray();
 
         /// <summary>
         /// Returns true if the runtime framework represented by
@@ -46,14 +52,15 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="name">A string representing a framework, like 'net-4.0'</param>
         /// <returns>True if the framework is available, false if unavailable or nonexistent</returns>
-        public bool IsAvailable(string name)
+        public bool IsAvailable(string name, bool needX86)
         {
             Guard.ArgumentNotNullOrEmpty(name, nameof(name));
 
             if (!RuntimeFramework.TryParse(name, out RuntimeFramework requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
 
-            foreach (var framework in _availableRuntimes)
+            var runtimes = needX86 ? _availableX86Runtimes : _availableRuntimes;
+            foreach (var framework in runtimes)
                 if (FrameworksMatch(requestedFramework, framework))
                     return true;
 
@@ -122,6 +129,7 @@ namespace NUnit.Engine.Services
             log.Debug("Current framework is " + currentFramework);
 
             string frameworkSetting = package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
+            bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             if (frameworkSetting.Length > 0)
             {
@@ -130,7 +138,7 @@ namespace NUnit.Engine.Services
 
                 log.Debug($"Requested framework for {package.Name} is {requestedFramework}");
 
-                if (!IsAvailable(frameworkSetting))
+                if (!IsAvailable(frameworkSetting, runAsX86))
                     throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
 
                 package.Settings[EnginePackageSettings.TargetRuntimeFramework] = frameworkSetting;
@@ -174,7 +182,7 @@ namespace NUnit.Engine.Services
                 }
             }
 
-            if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id))
+            if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id, runAsX86))
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
                 if (targetVersion < currentFramework.FrameworkVersion)
@@ -305,12 +313,18 @@ namespace NUnit.Engine.Services
         private void FindAvailableRuntimes()
         {
             _availableRuntimes = new List<RuntimeFramework>();
+            _availableX86Runtimes = new List<RuntimeFramework>();
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                _availableRuntimes.AddRange(NetFxRuntimeLocator.FindRuntimes());
+            {
+                var netFxRuntimes = NetFxRuntimeLocator.FindRuntimes();
+                _availableRuntimes.AddRange(netFxRuntimes);
+                _availableX86Runtimes.AddRange(netFxRuntimes);
+            }
 
             //FindDefaultMonoFramework();
-            _availableRuntimes.AddRange(NetCoreRuntimeLocator.FindRuntimes());
+            _availableRuntimes.AddRange(NetCoreRuntimeLocator.FindRuntimes(forX86: false));
+            _availableX86Runtimes.AddRange(NetCoreRuntimeLocator.FindRuntimes(forX86: true));
         }
 
         /// <summary>
