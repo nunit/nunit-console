@@ -23,13 +23,17 @@ namespace NUnit.Engine.Internal
         private readonly DependencyContext _dependencyContext;
         private readonly AssemblyLoadContext _loadContext;
 
-        private static readonly string INSTALL_DIR = GetDotNetInstallDirectory();
-        private static readonly string WINDOWS_DESKTOP_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.WindowsDesktop.App");
-        private static readonly string ASP_NET_CORE_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.AspNetCore.App");
+        private static readonly string INSTALL_DIR;
+        private static readonly string WINDOWS_DESKTOP_DIR;
+        private static readonly string ASP_NET_CORE_DIR;
         private static readonly List<string> AdditionalFrameworkDirectories;
 
         static TestAssemblyResolver()
         {
+            INSTALL_DIR = GetDotNetInstallDirectory();
+            WINDOWS_DESKTOP_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.WindowsDesktop.App");
+            ASP_NET_CORE_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.AspNetCore.App");
+
             AdditionalFrameworkDirectories = new List<string>();
             if (Directory.Exists(WINDOWS_DESKTOP_DIR))
                 AdditionalFrameworkDirectories.Add(WINDOWS_DESKTOP_DIR);
@@ -168,13 +172,20 @@ namespace NUnit.Engine.Internal
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                // Running on Windows so use registry
-                RegistryKey key = Environment.Is64BitProcess
-                    ? Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\")
-                    : Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x86\sharedHost\");
-                return (string)key?.GetValue("Path");
+                if (Environment.Is64BitProcess)
+                {
+                    RegistryKey key =
+                        Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
+                    return (string)key?.GetValue("Path");
+                }
+                else
+                {
+                    RegistryKey key =
+                        Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\");
+                    return (string)key?.GetValue("InstallLocation");
+                }
             }
-            else
+            else // For now, we assume linux with a fixed path
                 return "/usr/shared/dotnet/";
         }
 

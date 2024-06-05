@@ -2,6 +2,7 @@ static string Target; Target = Argument("target", Argument("t", "Default"));
 
 #load cake/constants.cake
 #load cake/build-settings.cake
+#load cake/dotnet.cake
 #load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake
@@ -665,6 +666,41 @@ Task("CreateProductionRelease")
         }
     });
 
+#if false
+    Task("RegistryTest")
+        .Does(() =>
+        {
+            Information($"x64: {RegistryKey.LocalMashine.OpenSubKey(@"Software/dotnet/setup")?.GetValue("Path")"32 bit base key is ")
+            Information("Install Dir is " + GetDotNetInstallDirectory())
+        }
+        private static string GetDotNetInstallDirectory()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+
+                // Running on Windows so use registry
+                RegistryKey baseKey = Environment.Is64BitProcess
+                    ? RegistryKey.
+                    : RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+                RegistryKey key = Environment.Is64BitProcess
+                    ? baseKey.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\")
+                    : baseKey.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x86\sharedHost\");
+                return (string)key?.GetValue("Path");
+                //if (Environment.Is64BitProcess)
+                //{
+                //    RegistryKey key =
+                //        Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
+                //    return (string)key?.GetValue("Path");
+                //}
+                //else
+                //    return (@"C:\Program Files (x86)\dotnet\");
+            }
+            else
+                return "/usr/shared/dotnet/";
+        }
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
@@ -706,6 +742,7 @@ Task("BuildTestAndPackage")
 
 Task("Appveyor")
     .Description("Target we run in our AppVeyor CI")
+    .IsDependentOn("DotnetInfo")
     .IsDependentOn("BuildTestAndPackage")
     .IsDependentOn("PublishPackages")
     .IsDependentOn("CreateDraftRelease")

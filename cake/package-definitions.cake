@@ -115,6 +115,9 @@ public abstract class PackageDefinition
 
         foreach (var packageTest in PackageTests)
         {
+            if (_settings.TestName != null && packageTest.Name != _settings.TestName)
+                continue;
+
             var testResultDir = ResultDirectory + packageTest.Name + "/";
             var resultFile = testResultDir + "TestResult.xml";
 

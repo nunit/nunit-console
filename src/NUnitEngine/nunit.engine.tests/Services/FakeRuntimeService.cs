@@ -8,7 +8,7 @@ namespace NUnit.Engine.Services
     {
         public IRuntimeFramework CurrentFramework => throw new System.NotImplementedException();
 
-        bool IRuntimeFrameworkService.IsAvailable(string framework)
+        bool IRuntimeFrameworkService.IsAvailable(string framework, bool runAsX86)
         {
             return true;
         }
@@ -19,5 +19,7 @@ namespace NUnit.Engine.Services
         }
 
         public IList<IRuntimeFramework> AvailableRuntimes => throw new System.NotImplementedException();
+
+        public IList<IRuntimeFramework> AvailableX86Runtimes => throw new System.NotImplementedException();
     }
 }

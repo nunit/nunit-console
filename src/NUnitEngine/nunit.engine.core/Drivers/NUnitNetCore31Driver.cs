@@ -8,6 +8,7 @@ using System.IO;
 using NUnit.Engine.Internal;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
+using System.Diagnostics;
 
 namespace NUnit.Engine.Drivers
 {

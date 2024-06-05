@@ -56,20 +56,24 @@ namespace NUnit.Engine.Services
             // Target Runtime must be specified by this point
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
+            bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             // If target runtime is not available, something went wrong earlier.
             // We list all available frameworks to use in debugging.
             var targetRuntime = RuntimeFramework.Parse(runtimeSetting);
-            if (!_runtimeService.IsAvailable(targetRuntime.Id))
+            if (!_runtimeService.IsAvailable(targetRuntime.Id, runAsX86))
             {
+                var runtimes = runAsX86 ? _availableRuntimeService.AvailableX86Runtimes : _availableRuntimeService.AvailableRuntimes;
                 string msg = $"The {targetRuntime} framework is not available.\r\nAvailable frameworks:";
-                foreach (var runtime in _availableRuntimeService.AvailableRuntimes)
+                foreach (var runtime in runtimes)
                     msg += $" {runtime}";
                 throw new ArgumentException(msg);
             }
 
             var agentId = Guid.NewGuid();
             var agentProcess = new AgentProcess(this, package, agentId);
+            var agentName = targetRuntime.Id + (runAsX86 ? "-x86" : "") + "-agent";
+            package.AddSetting("SelectedAgentName", agentName);
 
             agentProcess.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
 

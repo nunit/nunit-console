@@ -108,7 +108,8 @@ namespace NUnit.ConsoleRunner
                         }
 
                         bool runtimeAvailable = false;
-                        foreach (var runtime in availableRuntimeService.AvailableRuntimes)
+                        var runtimes = Options.RunAsX86 ? availableRuntimeService.AvailableX86Runtimes : availableRuntimeService.AvailableRuntimes;
+                        foreach (var runtime in runtimes)
                         {
                             if (runtimeAvailable = runtime.Id == Options.RuntimeFramework)
                                 break;
