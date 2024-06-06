@@ -2,11 +2,8 @@
 
 #if NETFRAMEWORK
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using NUnit.Framework;
-using NUnit.Tests;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -76,8 +73,6 @@ namespace NUnit.Engine.Services.Tests
         public void RuntimeFrameworkIsSetForSubpackages()
         {
             //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available
-            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("2.0.50727")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
-            Assume.That(new RuntimeFramework(RuntimeType.Net, new Version("4.0.30319")), Has.Property(nameof(RuntimeFramework.IsAvailable)).True);
 
             var topLevelPackage = new TestPackage(new [] {"a.dll", "b.dll"});
 

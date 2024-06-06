@@ -5,7 +5,7 @@ build-metadata-padding: 5
 commits-since-version-source-padding: 5
 branches:
   master:
-    regex: ^(main|version3X)$
+    regex: ^(main|version4)$
     tag: dev
   release:
     tag: pre

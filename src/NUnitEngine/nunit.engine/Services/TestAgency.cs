@@ -62,7 +62,8 @@ namespace NUnit.Engine.Services
             if (!_runtimeService.IsAvailable(targetRuntime.Id))
             {
                 string msg = $"The {targetRuntime} framework is not available.\r\nAvailable frameworks:";
-                foreach (var runtime in RuntimeFramework.AvailableFrameworks)
+                // HACK
+                foreach (var runtime in ((RuntimeFrameworkService)_runtimeService).AvailableRuntimes)
                     msg += $" {runtime}";
                 throw new ArgumentException(msg);
             }

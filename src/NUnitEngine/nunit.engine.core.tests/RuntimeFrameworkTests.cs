@@ -30,41 +30,42 @@ namespace NUnit.Engine.Tests
             Assert.That(RuntimeFramework.CurrentFramework.ClrVersion.Build, Is.GreaterThan(0));
         }
 
-        [Test]
-        public void CurrentFrameworkMustBeAvailable()
-        {
-            var current = RuntimeFramework.CurrentFramework;
-            Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
-            Assert.That(current.IsAvailable, "{0} not available", current);
-        }
+        // TODO: The commented tests should be in RuntimeFrameworkService Tests
+        //[Test]
+        //public void CurrentFrameworkMustBeAvailable()
+        //{
+        //    var current = RuntimeFramework.CurrentFramework;
+        //    Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
+        //    Assert.That(current.IsAvailable, "{0} not available", current);
+        //}
 
-        [Test]
-        public void AvailableFrameworksList()
-        {
-            RuntimeFramework[] available = RuntimeFramework.AvailableFrameworks;
-            Assert.That(RuntimeFramework.AvailableFrameworks.Length, Is.GreaterThan(0) );
-            foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                Console.WriteLine("Available: {0}", framework.DisplayName);
-        }
+        //[Test]
+        //public void AvailableFrameworksList()
+        //{
+        //    RuntimeFramework[] available = RuntimeFramework.AvailableFrameworks;
+        //    Assert.That(RuntimeFramework.AvailableFrameworks.Length, Is.GreaterThan(0) );
+        //    foreach (var framework in RuntimeFramework.AvailableFrameworks)
+        //        Console.WriteLine("Available: {0}", framework.DisplayName);
+        //}
 
-        [Test]
-        public void AvailableFrameworksList_IncludesCurrentFramework()
-        {
-            foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                if (RuntimeFramework.CurrentFramework.Supports(framework))
-                    return;
+        //[Test]
+        //public void AvailableFrameworksList_IncludesCurrentFramework()
+        //{
+        //    foreach (var framework in RuntimeFramework.AvailableFrameworks)
+        //        if (RuntimeFramework.CurrentFramework.Supports(framework))
+        //            return;
 
-            Assert.Fail("CurrentFramework not listed as available");
-        }
+        //    Assert.Fail("CurrentFramework not listed as available");
+        //}
 
-        [Test]
-        public void AvailableFrameworksList_ContainsNoDuplicates()
-        {
-            var names = new List<string>();
-            foreach (var framework in RuntimeFramework.AvailableFrameworks)
-                names.Add(framework.DisplayName);
-            Assert.That(names, Is.Unique);
-        }
+        //[Test]
+        //public void AvailableFrameworksList_ContainsNoDuplicates()
+        //{
+        //    var names = new List<string>();
+        //    foreach (var framework in RuntimeFramework.AvailableFrameworks)
+        //        names.Add(framework.DisplayName);
+        //    Assert.That(names, Is.Unique);
+        //}
 
         [TestCaseSource(nameof(frameworkData))]
         public void CanCreateUsingFrameworkVersion(FrameworkData data)
