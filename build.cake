@@ -3,6 +3,7 @@ static string Configuration; Configuration = GetArgument("configuration|c", "Rel
 static bool NoPush; NoPush = HasArgument("nopush");
 
 #load cake/constants.cake
+#load cake/dotnet.cake
 #load cake/header-check.cake
 #load cake/package-checks.cake
 #load cake/test-results.cake

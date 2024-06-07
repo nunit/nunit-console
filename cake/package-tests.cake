@@ -48,10 +48,22 @@ static PackageTest Net80Test = new PackageTest(
     "net8.0/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
+static PackageTest Net80X86Test = new PackageTest(
+    "Net80X86Test",
+    "Run mock-assembly-x86.dll under .NET 8.0",
+    "net8.0/mock-assembly-x86.dll",
+    MockAssemblyExpectedResult(1));
+
 static PackageTest Net70Test = new PackageTest(
     "Net70Test",
     "Run mock-assembly.dll under .NET 7.0",
     "net7.0/mock-assembly.dll",
+    MockAssemblyExpectedResult(1));
+
+static PackageTest Net70X86Test = new PackageTest(
+    "Net70X86Test",
+    "Run mock-assembly-x86.dll under .NET 7.0",
+    "net7.0/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net60Test = new PackageTest(
@@ -60,16 +72,34 @@ static PackageTest Net60Test = new PackageTest(
     "net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
+static PackageTest Net60X86Test = new PackageTest(
+    "Net60X86Test",
+    "Run mock-assembly-x86.dll under .NET 6.0",
+    "net6.0/mock-assembly-x86.dll --trace:Debug",
+    MockAssemblyExpectedResult(1));
+
 static PackageTest Net50Test = new PackageTest(
     "Net50Test",
     "Run mock-assembly.dll under .NET 5.0",
     "net5.0/mock-assembly.dll",
     MockAssemblyExpectedResult(1));
 
+static PackageTest Net50X86Test = new PackageTest(
+    "Net50X86Test",
+    "Run mock-assembly-x86.dll under .NET 5.0",
+    "net5.0/mock-assembly-x86.dll",
+    MockAssemblyExpectedResult(1));
+
 static PackageTest NetCore31Test = new PackageTest(
     "NetCore31Test",
     "Run mock-assembly.dll under .NET Core 3.1",
     "netcoreapp3.1/mock-assembly.dll",
+    MockAssemblyExpectedResult(1));
+
+static PackageTest NetCore31X86Test = new PackageTest(
+    "NetCore31X86Test",
+    "Run mock-assembly-x86.dll under .NET Core 3.1",
+    "netcoreapp3.1/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net50PlusNet60Test = new PackageTest(

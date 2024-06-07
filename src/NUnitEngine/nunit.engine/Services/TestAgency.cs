@@ -55,15 +55,18 @@ namespace NUnit.Engine.Services
             // Target Runtime must be specified by this point
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
+            bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             // If target runtime is not available, something went wrong earlier.
             // We list all available frameworks to use in debugging.
             var targetRuntime = RuntimeFramework.Parse(runtimeSetting);
-            if (!_runtimeService.IsAvailable(targetRuntime.Id))
+            if (!_runtimeService.IsAvailable(targetRuntime.Id, runAsX86))
             {
-                string msg = $"The {targetRuntime} framework is not available.\r\nAvailable frameworks:";
+                string msg = $"The {targetRuntime} framework is not available for X86={runAsX86}.\r\nAvailable frameworks:";
                 // HACK
-                foreach (var runtime in ((RuntimeFrameworkService)_runtimeService).AvailableRuntimes)
+                var service = _runtimeService as RuntimeFrameworkService;
+                var availableRuntimes = runAsX86 ? service.AvailableX86Runtimes : service.AvailableRuntimes;
+                foreach (var runtime in availableRuntimes)
                     msg += $" {runtime}";
                 throw new ArgumentException(msg);
             }

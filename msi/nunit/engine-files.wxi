@@ -49,6 +49,8 @@
             <ComponentGroupRef Id="NETCORE31_AGENT" />
             <ComponentGroupRef Id="NET50_AGENT" />
             <ComponentGroupRef Id="NET60_AGENT" />
+            <ComponentGroupRef Id="NET70_AGENT" />
+            <ComponentGroupRef Id="NET80_AGENT" />
         </ComponentGroup>
     </Fragment>
     <Fragment>
@@ -175,24 +177,94 @@
             <Component Id="NUNIT_AGENT_NET60_ENGINE_API" Location="local" Guid="393F8699-4F44-479B-916D-34F506F089D1">
                 <File Id="nunit.agent.net60.engine.api.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net6.0/nunit.engine.api.dll" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/nunit.engine.api.dll" />
                 <File Id="nunit.agent.net60.engine.api.xml"
-                      Source="$(var.InstallImage)bin/net6.0/nunit.engine.api.xml" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/nunit.engine.api.xml" />
             </Component>
             <Component Id="NUNIT_AGENT_NET60_ENGINE_CORE" Location="local" Guid="583A7D7E-9046-408C-8AA1-821EFCC2A7EA">
                 <File Id="nunit.agent.net60.engine.core.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net6.0/nunit.engine.core.dll" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/nunit.engine.core.dll" />
             </Component>
             <Component Id="NUNIT_AGENT_NET60_ENGINE_METADATA" Location="local" Guid="8F00367C-4FFD-429D-8483-D5FA6D109627">
                 <File Id="nunit.agent.net60.engine.metadata.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net6.0/testcentric.engine.metadata.dll" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/testcentric.engine.metadata.dll" />
             </Component>
             <Component Id="NUNIT_AGENT_NET60_DEPENDENCY_MODEL" Location="local" Guid="EFD82EAE-A38E-45E0-944B-A776F7353100">
                 <File Id="Microsoft.Extensions.DependencyModel.net60.dll"
                       ProcessorArchitecture="msil"
-                      Source="$(var.InstallImage)bin/net6.0/Microsoft.Extensions.DependencyModel.dll" />
+                      Source="$(var.InstallImage)bin/agents/net6.0/Microsoft.Extensions.DependencyModel.dll" />
+            </Component>
+        </ComponentGroup>
+        <ComponentGroup Id="NET70_AGENT" Directory="NET70_AGENT_DIR">
+            <Component Id="NUNIT_AGENT_NET70" Location="local" Guid="F1B28B46-EBAE-4D3D-AFAB-9E60B0F35EDC">
+                <File Id="nunit_agent_net70.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit-agent.dll" />
+                <File Id="nunit_agent_net70.dll.config"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit-agent.dll.config" />
+                <File Id="nunit_agent_net70.deps.json"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit-agent.deps.json" />
+                <File Id="nunit_agent_net70.runtimeconfig.json"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit-agent.runtimeconfig.json" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET70_ENGINE_API" Location="local" Guid="03667196-96FA-4AE9-8A1B-6059FA520CD9">
+                <File Id="nunit.agent.net70.engine.api.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit.engine.api.dll" />
+                <File Id="nunit.agent.net70.engine.api.xml"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit.engine.api.xml" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET70_ENGINE_CORE" Location="local" Guid="1CA60508-6E99-4FD5-AE90-023EC61C2CDB">
+                <File Id="nunit.agent.net70.engine.core.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net7.0/nunit.engine.core.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET70_ENGINE_METADATA" Location="local" Guid="B2BEE75C-2BCA-4D81-BA23-64F309A5B45D">
+                <File Id="nunit.agent.net70.engine.metadata.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net7.0/testcentric.engine.metadata.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET70_DEPENDENCY_MODEL" Location="local" Guid="B6C3D2CF-8441-4479-8EDE-A4E76A487F63">
+                <File Id="Microsoft.Extensions.DependencyModel.net70.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net7.0/Microsoft.Extensions.DependencyModel.dll" />
+            </Component>
+        </ComponentGroup>
+        <ComponentGroup Id="NET80_AGENT" Directory="NET80_AGENT_DIR">
+            <Component Id="NUNIT_AGENT_NET80" Location="local" Guid="D8F8C2FB-E60E-455E-9C6A-B715268F3260">
+                <File Id="nunit_agent_net80.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net8.0/nunit-agent.dll" />
+                <File Id="nunit_agent_net80.dll.config"
+                      Source="$(var.InstallImage)bin/agents/net8.0/nunit-agent.dll.config" />
+                <File Id="nunit_agent_net80.deps.json"
+                      Source="$(var.InstallImage)bin/agents/net8.0/nunit-agent.deps.json" />
+                <File Id="nunit_agent_net80.runtimeconfig.json"
+                      Source="$(var.InstallImage)bin/agents/net8.0/nunit-agent.runtimeconfig.json" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET80_ENGINE_API" Location="local" Guid="74172ECE-BEE7-4961-9A6A-DA0D06120C88">
+                <File Id="nunit.agent.net80.engine.api.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net8.0/nunit.engine.api.dll" />
+                <File Id="nunit.agent.net80.engine.api.xml"
+                      Source="$(var.InstallImage)bin/net8.0/nunit.engine.api.xml" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET80_ENGINE_CORE" Location="local" Guid="A24E77FD-350C-4E6C-B467-A7877CF9D656">
+                <File Id="nunit.agent.net80.engine.core.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net8.0/nunit.engine.core.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET80_ENGINE_METADATA" Location="local" Guid="CFE58B66-97D3-434D-A929-638D07F23D94">
+                <File Id="nunit.agent.net80.engine.metadata.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net8.0/testcentric.engine.metadata.dll" />
+            </Component>
+            <Component Id="NUNIT_AGENT_NET80_DEPENDENCY_MODEL" Location="local" Guid="F3B15759-D568-430E-84A2-773CB9E9BBBA">
+                <File Id="Microsoft.Extensions.DependencyModel.net80.dll"
+                      ProcessorArchitecture="msil"
+                      Source="$(var.InstallImage)bin/agents/net8.0/Microsoft.Extensions.DependencyModel.dll" />
             </Component>
         </ComponentGroup>
     </Fragment>

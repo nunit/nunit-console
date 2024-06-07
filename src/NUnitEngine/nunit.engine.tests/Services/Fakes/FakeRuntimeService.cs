@@ -4,7 +4,7 @@ namespace NUnit.Engine.Services.Tests.Fakes
 {
     public class FakeRuntimeService : FakeService, IRuntimeFrameworkService
     {
-        bool IRuntimeFrameworkService.IsAvailable(string framework)
+        bool IRuntimeFrameworkService.IsAvailable(string framework, bool x86)
         {
             return true;
         }

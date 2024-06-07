@@ -376,8 +376,10 @@ namespace NUnit.Engine.Runners
             {
                 // Check requested framework is actually available
                 var runtimeService = _services.GetService<IRuntimeFrameworkService>();
-                if (!runtimeService.IsAvailable(frameworkSetting))
-                    throw new NUnitEngineException(string.Format("The requested framework {0} is unknown or not available.", frameworkSetting));
+                if (!runtimeService.IsAvailable(frameworkSetting, runAsX86))
+                    throw new NUnitEngineException(runAsX86
+                        ? $"The requested framework {frameworkSetting} is unknown or not available for X86."
+                        : $"The requested framework {frameworkSetting} is unknown or not available.");
 
                 // If running in process, check requested framework is compatible
                 if (runningInProcess)

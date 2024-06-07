@@ -16,6 +16,8 @@
               <Directory Id="NETCORE31_AGENT_DIR" Name="netcoreapp3.1" />
               <Directory Id="NET50_AGENT_DIR" Name="net5.0" />
               <Directory Id="NET60_AGENT_DIR" Name="net6.0" />
+              <Directory Id="NET70_AGENT_DIR" Name="net7.0" />
+              <Directory Id="NET80_AGENT_DIR" Name="net8.0" />
           </Directory>
       </Directory>
     </DirectoryRef>

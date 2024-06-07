@@ -28,6 +28,8 @@ public void InitializePackageDefinitions(ICakeContext context)
         NetCore31Test,
         Net50Test,
         Net60Test,
+        Net70Test,
+        Net80Test,
         Net50PlusNet60Test,
         Net40PlusNet60Test
     };
@@ -41,6 +43,24 @@ public void InitializePackageDefinitions(ICakeContext context)
         Net70Test,
         Net80Test,
     };
+
+    // TODO: Remove the limitation to Windows
+    if (IsRunningOnWindows() && dotnetX86Available)
+    {
+        StandardRunnerTests.Add(Net60X86Test);
+        // TODO: Make these tests run on AppVeyor
+        if (!context.BuildSystem().IsRunningOnAppVeyor)
+        {
+            StandardRunnerTests.Add(NetCore31X86Test);
+            StandardRunnerTests.Add(Net50X86Test);
+            StandardRunnerTests.Add(Net70X86Test);
+            StandardRunnerTests.Add(Net80X86Test);
+        }
+        // Currently, NetCoreRunner runs tests in process. As a result,
+        // X86 tests will work in our environment, although uses may run
+        // it as a tool using the X86 architecture.
+    }
+
 
     AllPackages.AddRange(new PackageDefinition[] {
 

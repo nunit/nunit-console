@@ -16,8 +16,9 @@ namespace NUnit.Engine
         /// the string passed as an argument is available.
         /// </summary>
         /// <param name="framework">A string representing a framework, like 'net-4.0'</param>
+        /// <param name="x86">A flag indicating whether the X86 architecture is needed. Defaults to false.</param>
         /// <returns>True if the framework is available, false if unavailable or nonexistent</returns>
-        bool IsAvailable(string framework);
+        bool IsAvailable(string framework, bool x86);
 
         /// <summary>
         /// Selects a target runtime framework for a TestPackage based on
