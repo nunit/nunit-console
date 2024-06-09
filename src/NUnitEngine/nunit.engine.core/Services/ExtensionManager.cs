@@ -305,6 +305,12 @@ namespace NUnit.Engine.Services
             {
                 bool isWild = fromWildCard || entry.Contains("*");
                 var args = GetBaseDirAndPattern(baseDir, entry);
+                // TODO: See if we can handle '/tools/*/' efficiently by examining every
+                // assembly in the directory. Otherwise try this approach:
+                // 1. Check entry for ending with '/tools/*/'
+                // 2. If so, examine the directory name to see if it matches a tfm.
+                // 3. If it does, check to see if the implied runtime would be loadable.
+                // 4. If so, process it, if not, skip it.
                 if (entry.EndsWith("/"))
                 {
                     foreach (var dir in _directoryFinder.GetDirectories(args.Item1, args.Item2))

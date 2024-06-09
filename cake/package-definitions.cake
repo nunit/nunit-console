@@ -107,12 +107,12 @@ public void InitializePackageDefinitions(ICakeContext context)
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory("tools/net8.0/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
+                HasDirectory("tools/net8.0").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_CORE_FILES).AndFile("nunit.console.nuget.addins")
             },
             symbols: new PackageCheck[] {
-                HasDirectory("tools/net8.0/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+                HasDirectory("tools/net8.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
             },
-            executable: "tools/net8.0/any/nunit3-console.exe",
+            executable: "tools/net8.0/nunit3-console.exe",
             tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerNet60Package = new NuGetPackage(
@@ -122,12 +122,12 @@ public void InitializePackageDefinitions(ICakeContext context)
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
-                HasDirectory("tools/net6.0/any").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins")
+                HasDirectory("tools/net6.0").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_CORE_FILES).AndFile("nunit.console.nuget.addins")
             },
             symbols: new PackageCheck[] {
-                HasDirectory("tools/net6.0/any").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+                HasDirectory("tools/net6.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
             },
-            executable: "tools/net6.0/any/nunit3-console.exe",
+            executable: "tools/net6.0/nunit3-console.exe",
             tests: NetCoreRunnerTests),
 
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(

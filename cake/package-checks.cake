@@ -25,7 +25,7 @@ string[] AGENT_PDB_FILES_NETCORE = {
 string[] CONSOLE_FILES = {
         "nunit3-console.exe", "nunit3-console.exe.config" };
 string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-console.exe", "nunit3-console.dll", "nunit3-console.dll.config" };
+        "nunit3-console.exe", "nunit3-console.dll" };
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE CHECK IMPLEMENTATION
