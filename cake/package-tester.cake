@@ -70,7 +70,35 @@ public class PackageTester
         {
             Console.WriteLine($"Unzipping package to {_installDirectory}");
             _context.Unzip(_packageUnderTest, _installDirectory);
+
+            if (_packageType == PackageType.NuGet || _packageType == PackageType.Chocolatey)
+            {
+                foreach (string packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+                {
+                    string subdir = _packageType.ToString().ToLower();
+                    string packageName = System.IO.Path.GetFileName(packageDir);
+                    string targetDir = $"{PACKAGE_TEST_DIR}{subdir}/{packageName}";
+
+                    _context.CopyDirectory(packageDir, targetDir);
+            
+                    if (_packageType == PackageType.Chocolatey)
+                        RenamePackageForChocolatey(targetDir);
+                }
+            }
         }
+    }
+
+    private void RenamePackageForChocolatey(string nugetDir)
+    {
+        string chocoDir = nugetDir
+            .Replace("NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader")
+            .Replace("NUnit.Extension.VSProjectLoader", "nunit-extension-vs-project-loader")
+            .Replace("NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-v2-result-writer")
+            .Replace("NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver")
+            .Replace("NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener");
+
+        if (chocoDir != nugetDir)
+            _context.MoveDirectory(nugetDir, chocoDir);
     }
 
     private void RunPackageTests()
