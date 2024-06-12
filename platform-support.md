@@ -22,7 +22,7 @@ for runtimes which have been declared a security risk may be removed immediately
 
 > _We currently supply agents for .NET Famework 2.0 and 4.6.2. .NET Core 2,1 and 3.1 and .NET 5.0, 6.0 and 7.0. The .NET
 > Core 2.1 runner is being removed in version 3.18.0 and .NET 8.0 will probably be added before this document is finalized.
-> Once this document is approved, we will begin to phase out agents according to the above criteria.
+> Once this document is approved, we will begin to phase out agents according to the above criteria._
 
 ## Required Runtimes
 
