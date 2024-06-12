@@ -140,7 +140,7 @@ namespace NUnit.Engine.Services
 
             if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
             {
-                // Assume .NET Framework
+                // Assume .NET Framework 2.0
                 targetRuntime = currentFramework.Runtime;
                 targetVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
             }
@@ -152,15 +152,19 @@ namespace NUnit.Engine.Services
                 {
                     case ".NETFramework":
                         targetRuntime = RuntimeType.Net;
+                        targetVersion = frameworkName.Version;
                         break;
                     case ".NETCoreApp":
                         targetRuntime = RuntimeType.NetCore;
+                        targetVersion = frameworkName.Version;
+                        break;
+                    case ".NETStandard":
+                        targetRuntime = RuntimeType.NetCore;
+                        targetVersion = new Version(3, 1);
                         break;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
                 }
-
-                targetVersion = frameworkName.Version;
             }
 
             if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id, runAsX86))

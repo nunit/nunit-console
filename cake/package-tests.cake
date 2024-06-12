@@ -75,7 +75,7 @@ static PackageTest Net60Test = new PackageTest(
 static PackageTest Net60X86Test = new PackageTest(
     "Net60X86Test",
     "Run mock-assembly-x86.dll under .NET 6.0",
-    "net6.0/mock-assembly-x86.dll --trace:Debug",
+    "net6.0/mock-assembly-x86.dll",
     MockAssemblyExpectedResult(1));
 
 static PackageTest Net50Test = new PackageTest(
