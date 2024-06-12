@@ -38,4 +38,13 @@
 
     </application>
   </compatibility>
+    
+    <!-- Makes the application long-path aware. See https://docs.microsoft.com/windows/win32/fileio/maximum-file-path-limitation -->
+
+    <application xmlns="urn:schemas-microsoft-com:asm.v3">
+        <windowsSettings>
+            <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">true</longPathAware>
+        </windowsSettings>
+    </application>
+
 </asmv1:assembly>
