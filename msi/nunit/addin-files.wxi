@@ -4,7 +4,7 @@
         <ComponentGroup Id="ADDINS.NUNIT.PROJECT.LOADER" Directory="ADDINS">
             <Component Id="ADDINS.NUNIT.PROJECT.LOADER" Location="local" Guid="294BEC17-144D-403B-A08C-E524BE8F3FA3">
                 <File Id="nunit_project_loader.dll"
-                      Source="../../bundled-extensions/NUnit.Extension.NUnitProjectLoader.4.0.0-dev00015/tools/nunit-project-loader.dll" />
+                      Source="../../bundled-extensions/NUnit.Extension.NUnitProjectLoader.4.0.0-dev00016/tools/nunit-project-loader.dll" />
             </Component>
         </ComponentGroup>
 
