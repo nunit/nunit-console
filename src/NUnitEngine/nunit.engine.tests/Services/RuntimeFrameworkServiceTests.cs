@@ -35,6 +35,7 @@ namespace NUnit.Engine.Services.Tests
         [TestCase("mock-assembly.dll", false)]
         [TestCase("../agents/net20/nunit-agent.exe", false)]
         [TestCase("../agents/net20/nunit-agent-x86.exe", true)]
+        [TestCase("../netstandard2.0/nunit.engine.api.dll", false)]
         public void SelectRuntimeFramework(string assemblyName, bool runAsX86)
         {
             var package = new TestPackage(Path.Combine(TestContext.CurrentContext.TestDirectory, assemblyName));
