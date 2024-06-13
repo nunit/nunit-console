@@ -12,10 +12,11 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage;
 PackageDefinition NUnitConsoleMsiPackage;
 PackageDefinition NUnitConsoleZipPackage;
 
-public void InitializePackageDefinitions(ICakeContext context)
+public void InitializePackageDefinitions(BuildSettings settings)
 {
     const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
     bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
+    var context = settings.Context;
 
     // Tests run for all runner packages except NETCORE runner
     var StandardRunnerTests = new List<PackageTest>
@@ -68,14 +69,14 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleNuGetPackage = new NuGetPackage(
             context: context,
             id: "NUnit.Console",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: NUGET_DIR + "runners/nunit.console-runner-with-extensions.nuspec",
             checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
 
         NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
             context: context,
             id: "NUnit.ConsoleRunner",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -104,7 +105,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleRunnerNet80Package = new NuGetPackage(
             context: context,
             id: "NUnit.ConsoleRunner.NetCore",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -119,7 +120,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleRunnerNet60Package = new NuGetPackage(
             context: context,
             id: "NUnit.ConsoleRunner.NetCore",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: NUGET_DIR + "runners/nunit.console-runner.netcore.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -134,7 +135,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
             context: context,
             id: "nunit-console-runner",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: CHOCO_DIR + "nunit-console-runner.nuspec",
             checks: new PackageCheck[] {
                 HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.choco.addins"),
@@ -152,7 +153,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleMsiPackage = new MsiPackage(
             context: context,
             id: "NUnit.Console",
-            version: SemVer,
+            version: settings.BuildVersion.SemVer,
             source: MSI_DIR + "nunit/nunit.wixproj",
             checks: new PackageCheck[] {
                 HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
@@ -165,7 +166,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitConsoleZipPackage = new ZipPackage(
             context: context,
             id: "NUnit.Console",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: ZIP_IMG_DIR,
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
@@ -189,7 +190,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitEnginePackage = new NuGetPackage(
             context: context,
             id: "NUnit.Engine",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: NUGET_DIR + "engine/nunit.engine.nuspec",
             checks: new PackageCheck[] {
                 HasFiles("LICENSE.txt", "NOTICES.txt"),
@@ -210,7 +211,7 @@ public void InitializePackageDefinitions(ICakeContext context)
         NUnitEngineApiPackage = new NuGetPackage(
             context: context,
             id: "NUnit.Engine.Api",
-            version: ProductVersion,
+            version: settings.PackageVersion,
             source: NUGET_DIR + "engine/nunit.engine.api.nuspec",
             checks: new PackageCheck[] {
                 HasFile("LICENSE.txt"),

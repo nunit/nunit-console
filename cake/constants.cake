@@ -5,6 +5,11 @@
 // Some values are static so they may be used in property initialization and in
 // classes. Initialization is separate to allow use of non-constant expressions.
 
+private const string GITHUB_REPO = "nunit-console";
+const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
+const string CHOCO_ID = "nunit-extension-nunit-project-loader";
+const string DEFAULT_CONFIGURATION = "Release";
+
 // Directories
 static string PROJECT_DIR; PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 static string PACKAGE_DIR; PACKAGE_DIR = Argument("artifact-dir", PROJECT_DIR + "package") + "/";
@@ -63,24 +68,3 @@ var BUNDLED_EXTENSIONS = new[]
   "NUnit.Extension.NUnitV2ResultWriter",
   "NUnit.Extension.TeamCityEventListener"
 };
-
-// URLs for uploading packages
-private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
-private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
-private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
-
-// Environment Variable names holding API keys
-private const string MYGET_API_KEY = "MYGET_API_KEY";
-private const string NUGET_API_KEY = "NUGET_API_KEY";
-private const string CHOCO_API_KEY = "CHOCO_API_KEY";
-
-// GitHub Information
-private const string GITHUB_OWNER = "nunit";
-private const string GITHUB_REPO = "nunit-console";
-private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
-
-// Pre-release labels that we publish
-private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev" };
-private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "alpha", "beta", "rc" };
-private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "alpha", "beta", "rc" };
-private static readonly string[] LABELS_WE_RELEASE_ON_GITHUB = { "alpha", "beta", "rc" };

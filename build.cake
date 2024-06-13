@@ -2,27 +2,20 @@ static string Target; Target = GetArgument("target|t", "Default");
 static string Configuration; Configuration = GetArgument("configuration|c", "Release");
 static bool NoPush; NoPush = HasArgument("nopush");
 
-#load cake/constants.cake
-#load cake/dotnet.cake
-#load cake/header-check.cake
-#load cake/package-checks.cake
-#load cake/test-results.cake
-#load cake/package-tests.cake
-#load cake/package-tester.cake
-#load cake/versioning.cake
-#load cake/utilities.cake
-#load cake/package-definitions.cake
+// Load scripts
+#load cake/common/*.cake
+#load cake/*.cake
 
 // Install Tools
 #tool NuGet.CommandLine&version=6.9.1
 #tool dotnet:?package=GitVersion.Tool&version=5.12.0
 #tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
 
-BuildVersion _buildVersion;
-string ProductVersion => _buildVersion.ProductVersion;
-string SemVer => _buildVersion.SemVer;
-string PreReleaseLabel => _buildVersion.PreReleaseLabel;
-bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
+//BuildVersion _buildVersion;
+//string ProductVersion => _buildVersion.ProductVersion;
+//string SemVer => _buildVersion.SemVer;
+//string PreReleaseLabel => _buildVersion.PreReleaseLabel;
+//bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
 
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -30,19 +23,23 @@ var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN TASKS
 //////////////////////////////////////////////////////////////////////
-Setup(context =>
+Setup<BuildSettings>(context =>
 {
-    Information("Creating BuildVersion");
-    _buildVersion = new BuildVersion(context);
+    //Information("Creating BuildVersion");
+    //_buildVersion = new BuildVersion(context);
 
-    Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
-    Information("PreReleaseLabel is " + PreReleaseLabel);
+    //Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
+    //Information("PreReleaseLabel is " + PreReleaseLabel);
+
+    var settings = BuildSettings.Create(context);
 
     Information("Initializing PackageDefinitions");
-    InitializePackageDefinitions(context);
+    InitializePackageDefinitions(settings);
 
     if (BuildSystem.IsRunningOnAppVeyor)
-        AppVeyor.UpdateBuildVersion(ProductVersion + "-" + AppVeyor.Environment.Build.Number);
+        AppVeyor.UpdateBuildVersion(settings.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
+
+    return settings;
 });
 
 Teardown(context =>
@@ -52,37 +49,6 @@ Teardown(context =>
 });
 
 //////////////////////////////////////////////////////////////////////
-// CLEANING
-//////////////////////////////////////////////////////////////////////
-
-Task("Clean")
-    .Description("Cleans directories.")
-    .Does(() =>
-    {
-        CleanDirectory(BIN_DIR);
-        CleanDirectory(PACKAGE_DIR);
-        CleanDirectory(IMAGE_DIR);
-        CleanDirectory(EXTENSIONS_DIR);
-        CleanDirectory(PACKAGE_DIR);
-    });
-
-Task("CleanAll")
-    .Description("Cleans both Debug and Release Directories followed by deleting object directories")
-    .Does(() =>
-    {
-        Information("Cleaning both Debug and Release");
-        CleanDirectory(PROJECT_DIR + "bin");
-        CleanDirectory(PACKAGE_DIR);
-        CleanDirectory(IMAGE_DIR);
-        CleanDirectory(EXTENSIONS_DIR);
-        CleanDirectory(PACKAGE_DIR);
-
-        Information("Deleting object directories");
-        foreach (var dir in GetDirectories("src/**/obj/"))
-            DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });
-    });
-
-//////////////////////////////////////////////////////////////////////
 // BUILD ENGINE AND CONSOLE
 //////////////////////////////////////////////////////////////////////
 
@@ -90,28 +56,28 @@ Task("Build")
     .Description("Builds the engine and console")
     .IsDependentOn("CheckHeaders")
     .IsDependentOn("Clean")
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
-        if (IsRunningOnWindows())
-            BuildSolution();
+        if (settings.IsRunningOnWindows)
+            BuildSolution(settings.BuildVersion);
         else
-            BuildEachProjectSeparately();
+            BuildEachProjectSeparately(settings.BuildVersion);
     });
 
-public void BuildSolution()
+public void BuildSolution(BuildVersion buildVersion)
 {
-    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build").WithRestore());
+    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build", buildVersion).WithRestore());
 
     // Publishing in place where needed to ensure that all references are present.
 
     // TODO: May not be needed
     DisplayBanner("Publishing ENGINE API Project for NETSTANDARD_2.0");
-    MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish")
+    MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
         .WithProperty("TargetFramework", "netstandard2.0")
         .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
 
     DisplayBanner("Publishing ENGINE Project for NETSTANDARD2.0");
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
         .WithProperty("TargetFramework", "netstandard2.0")
         .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
 
@@ -119,42 +85,42 @@ public void BuildSolution()
     foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
     {
         DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
-        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish")
+        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
             .WithProperty("TargetFramework", framework)
             .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
     }
 }
 
 // TODO: Test this on linux to see if changes are needed
-private void BuildEachProjectSeparately()
+private void BuildEachProjectSeparately(BuildVersion buildVersion)
 {
     DotNetRestore(SOLUTION_FILE);
 
-    BuildProject(ENGINE_PROJECT);
-    BuildProject(CONSOLE_PROJECT);
-    BuildProject(AGENT_PROJECT);
-    BuildProject(AGENT_X86_PROJECT);
+    BuildProject(ENGINE_PROJECT, buildVersion);
+    BuildProject(CONSOLE_PROJECT, buildVersion);
+    BuildProject(AGENT_PROJECT, buildVersion);
+    BuildProject(AGENT_X86_PROJECT, buildVersion);
 
-    BuildProject(ENGINE_TESTS_PROJECT, "net35", "netcoreapp2.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0", "net8.0");
-    BuildProject(CONSOLE_TESTS_PROJECT, "net35", "net6.0", "net8.0");
+    BuildProject(ENGINE_TESTS_PROJECT, buildVersion, "net35", "netcoreapp2.1");
+    BuildProject(ENGINE_CORE_TESTS_PROJECT, buildVersion, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0", "net8.0");
+    BuildProject(CONSOLE_TESTS_PROJECT, buildVersion, "net35", "net6.0", "net8.0");
 
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(NOTEST_PROJECT, "net35", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, buildVersion, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
+    BuildProject(NOTEST_PROJECT, buildVersion, "net35", "netcoreapp2.1", "netcoreapp3.1");
 
 
     DisplayBanner("Publish .NET Core & Standard projects");
 
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish")
+    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
        .WithProperty("TargetFramework", "netstandard2.0")
        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
     CopyFileToDirectory(
        BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
        BIN_DIR + "netcoreapp2.1");
-    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
        .WithProperty("TargetFramework", "netcoreapp2.1")
        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-    MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish")
+    MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
        .WithProperty("TargetFramework", "netcoreapp2.1")
        .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
 }
@@ -162,12 +128,12 @@ private void BuildEachProjectSeparately()
 // NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
 // If we use MSBuild, then the net5.0 projects fail. So we build each project
 // differently depending on whether it has net35 as one of its targets. 
-private void BuildProject(string project, params string[] targetFrameworks)
+private void BuildProject(string project, BuildVersion buildVersion, params string[] targetFrameworks)
 {
     if (targetFrameworks.Length == 0)
     {
         DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
-        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build"));
+        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", buildVersion));
     }
     else
     {
@@ -175,9 +141,9 @@ private void BuildProject(string project, params string[] targetFrameworks)
         {
             DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
             if (framework == "net35")
-                MSBuild(project, CreateMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+                MSBuild(project, CreateMSBuildSettings("Build", buildVersion).WithProperty("TargetFramework", framework));
             else
-                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build").WithProperty("TargetFramework", framework));
+                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", buildVersion).WithProperty("TargetFramework", framework));
         }
     }
 }
@@ -189,15 +155,15 @@ private void BuildProject(string project, params string[] targetFrameworks)
 Task("BuildCppTestFiles")
     .Description("Builds the C++ mock test assemblies")
     .WithCriteria(IsRunningOnWindows)
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
         MSBuild(
             SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-            CreateMSBuildSettings("Build").WithProperty("Platform", "x86"));
+            CreateMSBuildSettings("Build", settings.BuildVersion).WithProperty("Platform", "x86"));
 
         MSBuild(
             SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
-            CreateMSBuildSettings("Build").WithProperty("Platform", "x64"));
+            CreateMSBuildSettings("Build", settings.BuildVersion).WithProperty("Platform", "x64"));
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -559,9 +525,9 @@ Task("PublishPackages")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToMyGet")
     .Description("Publish packages to MyGet")
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
-        if (!ShouldPublishToMyGet)
+        if (!settings.ShouldPublishToMyGet)
             Information("Nothing to publish to MyGet from this run.");
         else
         {
@@ -591,9 +557,9 @@ Task("PublishToMyGet")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToNuGet")
     .Description("Publish packages to NuGet")
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
-        if (!ShouldPublishToNuGet)
+        if (!settings.ShouldPublishToNuGet)
             Information("Nothing to publish to NuGet from this run.");
         else
         {
@@ -616,9 +582,9 @@ Task("PublishToNuGet")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToChocolatey")
     .Description("Publish packages to Chocolatey")
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
-        if (!ShouldPublishToChocolatey)
+        if (!settings.ShouldPublishToChocolatey)
             Information("Nothing to publish to Chocolatey from this run.");
         else
         {
@@ -653,18 +619,18 @@ Task("ListInstalledNetCoreRuntimes")
 //////////////////////////////////////////////////////////////////////
 
 Task("CreateDraftRelease")
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
         bool isDirectTarget = Target == "CreateDraftRelease";
 
         if (isDirectTarget && !HasArgument("productVersion"))
             throw new Exception("Must specify --productVersion with the CreateDraftRelease target.");
 
-        if (IsReleaseBranch || isDirectTarget)
+        if (settings.BuildVersion.IsReleaseBranch || isDirectTarget)
         {
-            string milestone = IsReleaseBranch
-                ? _buildVersion.BranchName.Substring(8)
-                : ProductVersion;
+            string milestone = settings.IsReleaseBranch
+                ? settings.BranchName.Substring(8)
+                : settings.PackageVersion;
             string releaseName = $"NUnit Console and Engine {milestone}";
 
             Information($"Creating draft release for {releaseName}");
@@ -697,12 +663,12 @@ Task("CreateDraftRelease")
 //////////////////////////////////////////////////////////////////////
 
 Task("CreateProductionRelease")
-    .Does(() =>
+    .Does<BuildSettings>((settings) =>
     {
-        if (IsProductionRelease)
+        if (settings.IsProductionRelease)
         {
             string token = EnvironmentVariable(GITHUB_ACCESS_TOKEN);
-            string tagName = ProductVersion;
+            string tagName = settings.PackageVersion;
 
             var assetList = new List<string>();
             foreach (var package in AllPackages)
