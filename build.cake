@@ -1,761 +1,456 @@
-static string Target; Target = GetArgument("target|t", "Default");
-static string Configuration; Configuration = GetArgument("configuration|c", "Release");
-static bool NoPush; NoPush = HasArgument("nopush");
-
 // Load scripts
-#load cake/common/*.cake
 #load cake/*.cake
 
-// Install Tools
-#tool NuGet.CommandLine&version=6.9.1
-#tool dotnet:?package=GitVersion.Tool&version=5.12.0
-#tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
-
-//BuildVersion _buildVersion;
-//string ProductVersion => _buildVersion.ProductVersion;
-//string SemVer => _buildVersion.SemVer;
-//string PreReleaseLabel => _buildVersion.PreReleaseLabel;
-//bool IsReleaseBranch => _buildVersion.IsReleaseBranch;
-
-var UnreportedErrors = new List<string>();
-var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
+// Initialize BuildSettings
+BuildSettings.Initialize(
+    Context,
+    "NUnit Console and Engine",
+    "nunit-console",
+    solutionFile: "NUnitConsole.sln",
+    exemptFiles: new [] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" },
+    unitTests: "**/*.tests.exe|**/nunit3-console.tests.dll",
+    unitTestRunner: new CustomTestRunner() );
 
 //////////////////////////////////////////////////////////////////////
-// SETUP AND TEARDOWN TASKS
+// PACKAGE TEST LISTS
 //////////////////////////////////////////////////////////////////////
-Setup<BuildSettings>(context =>
+
+    // Tests run for all runner packages except NETCORE runner
+    var StandardRunnerTests = new List<PackageTest>
+    {
+        Net35Test,
+        Net35X86Test,
+        Net40Test,
+        Net40X86Test,
+        Net35PlusNet40Test,
+        NetCore31Test,
+        Net50Test,
+        Net60Test,
+        Net70Test,
+        Net80Test,
+        Net50PlusNet60Test,
+        Net40PlusNet60Test,
+        NUnitProjectTest
+    };
+
+    // Tests run for the NETCORE runner package
+    var NetCoreRunnerTests = new List<PackageTest>
+    {
+        NetCore31Test,
+        Net50Test,
+        Net60Test,
+        Net70Test,
+        Net80Test,
+    };
+
+    const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+    bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
+
+    // TODO: Remove the limitation to Windows
+    if (IsRunningOnWindows() && dotnetX86Available)
+    {
+        StandardRunnerTests.Add(Net60X86Test);
+        // TODO: Make these tests run on AppVeyor
+        if (!BuildSystem.IsRunningOnAppVeyor)
+        {
+            StandardRunnerTests.Add(NetCore31X86Test);
+            StandardRunnerTests.Add(Net50X86Test);
+            StandardRunnerTests.Add(Net70X86Test);
+            StandardRunnerTests.Add(Net80X86Test);
+        }
+        // Currently, NetCoreRunner runs tests in process. As a result,
+        // X86 tests will work in our environment, although uses may run
+        // it as a tool using the X86 architecture.
+    }
+
+//////////////////////////////////////////////////////////////////////
+// INDIVIDUAL PACKAGE TEST DEFINITIONS
+//////////////////////////////////////////////////////////////////////
+
+static ExpectedResult MockAssemblyExpectedResult(int nCopies = 1) => new ExpectedResult("Failed")
 {
-    //Information("Creating BuildVersion");
-    //_buildVersion = new BuildVersion(context);
+    Total = 37 * nCopies,
+    Passed = 23 * nCopies,
+    Failed = 5 * nCopies,
+    Warnings = 1 * nCopies,
+    Inconclusive = 1 * nCopies,
+    Skipped = 7 * nCopies
+};
 
-    //Information("Building {0} version {1} of NUnit Console/Engine.", Configuration, ProductVersion);
-    //Information("PreReleaseLabel is " + PreReleaseLabel);
+static ExpectedResult MockAssemblyExpectedResult(params string[] runtimes)
+{
+    int nCopies = runtimes.Length;
+    var result = MockAssemblyExpectedResult(nCopies);
+    result.Assemblies = new ExpectedAssemblyResult[nCopies];
+    for (int i = 0; i < nCopies; i++)
+        result.Assemblies[i] = new ExpectedAssemblyResult("mock-assembly.dll", runtimes[i]);
+    return result;
+}
 
-    var settings = BuildSettings.Create(context);
+static ExpectedResult MockAssemblyX86ExpectedResult(params string[] runtimes)
+{
+    int nCopies = runtimes.Length;
+    var result = MockAssemblyExpectedResult(nCopies);
+    result.Assemblies = new ExpectedAssemblyResult[nCopies];
+    for (int i = 0; i < nCopies; i++)
+        result.Assemblies[i] = new ExpectedAssemblyResult("mock-assembly-x86.dll", runtimes[i]);
+    return result;
+}
 
-    Information("Initializing PackageDefinitions");
-    InitializePackageDefinitions(settings);
+static PackageTest Net35Test = new PackageTest(
+    1, "Net35Test",
+    "Run mock-assembly.dll under .NET 3.5",
+    "net35/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-2.0"));
 
-    if (BuildSystem.IsRunningOnAppVeyor)
-        AppVeyor.UpdateBuildVersion(settings.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
+static PackageTest Net35X86Test = new PackageTest(
+    1, "Net35X86Test",
+    "Run mock-assembly-x86.dll under .NET 3.5",
+    "net35/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("net-2.0"));
 
-    return settings;
+static PackageTest Net40Test = new PackageTest(
+    1, "Net40Test",
+    "Run mock-assembly.dll under .NET 4.x",
+    "net40/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-4.0"));
+
+static PackageTest Net40X86Test = new PackageTest(
+    1, "Net40X86Test",
+    "Run mock-assembly-x86.dll under .NET 4.x",
+    "net40/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("net-4.0"));
+
+static PackageTest Net35PlusNet40Test = new PackageTest(
+    1, "Net35PlusNet40Test",
+    "Run both copies of mock-assembly together",
+    "net35/mock-assembly.dll net40/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-2.0", "net-4.0"));
+
+static PackageTest Net80Test = new PackageTest(
+    1, "Net80Test",
+    "Run mock-assembly.dll under .NET 8.0",
+    "net8.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-8.0"));
+
+static PackageTest Net80X86Test = new PackageTest(
+    1, "Net80X86Test",
+    "Run mock-assembly-x86.dll under .NET 8.0",
+    "net8.0/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-8.0"));
+
+static PackageTest Net70Test = new PackageTest(
+    1, "Net70Test",
+    "Run mock-assembly.dll under .NET 7.0",
+    "net7.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-7.0"));
+
+static PackageTest Net70X86Test = new PackageTest(
+    1, "Net70X86Test",
+    "Run mock-assembly-x86.dll under .NET 7.0",
+    "net7.0/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-7.0"));
+
+static PackageTest Net60Test = new PackageTest(
+    1, "Net60Test",
+    "Run mock-assembly.dll under .NET 6.0",
+    "net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-6.0"));
+
+static PackageTest Net60X86Test = new PackageTest(
+    1, "Net60X86Test",
+    "Run mock-assembly-x86.dll under .NET 6.0",
+    "net6.0/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-6.0"));
+
+static PackageTest Net50Test = new PackageTest(
+    1, "Net50Test",
+    "Run mock-assembly.dll under .NET 5.0",
+    "net5.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-5.0"));
+
+static PackageTest Net50X86Test = new PackageTest(
+    1, "Net50X86Test",
+    "Run mock-assembly-x86.dll under .NET 5.0",
+    "net5.0/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-5.0"));
+
+static PackageTest NetCore31Test = new PackageTest(
+    1, "NetCore31Test",
+    "Run mock-assembly.dll under .NET Core 3.1",
+    "netcoreapp3.1/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-3.1"));
+
+static PackageTest NetCore31X86Test = new PackageTest(
+    1, "NetCore31X86Test",
+    "Run mock-assembly-x86.dll under .NET Core 3.1",
+    "netcoreapp3.1/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-3.1"));
+
+static PackageTest Net50PlusNet60Test = new PackageTest(
+    1, "Net50PlusNet60Test",
+    "Run mock-assembly under .NET 5.0 and 6.0 together",
+    "net5.0/mock-assembly.dll net6.0/mock-assembly.dll",//" net7.0/mock-assembly.dll net8.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-5.0", "netcore-6.0"));
+
+static PackageTest Net40PlusNet60Test = new PackageTest(
+    1, "Net40PlusNet60Test",
+    "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
+    "net40/mock-assembly.dll net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-4.0", "netcore-6.0"));
+
+static PackageTest NUnitProjectTest = new PackageTest(
+    1, "NUnitProjectTest",
+    "Run project with both copies of mock-assembly",
+    "../../NetFXTests.nunit --config=Release --trace=Debug",
+    MockAssemblyExpectedResult("net-2.0", "net-4.0"),
+    KnownExtensions.NUnitProjectLoader);
+
+//////////////////////////////////////////////////////////////////////
+// LISTS OF FILES USED IN CHECKING PACKAGES
+//////////////////////////////////////////////////////////////////////
+
+FilePath[] ENGINE_FILES = {
+        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+FilePath[] ENGINE_PDB_FILES = {
+        "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+FilePath[] ENGINE_CORE_FILES = {
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+FilePath[] ENGINE_CORE_PDB_FILES = {
+        "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+FilePath[] AGENT_FILES = {
+        "nunit-agent.exe", "nunit-agent.exe.config",
+        "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+FilePath[] AGENT_FILES_NETCORE = {
+        "nunit-agent.dll", "nunit-agent.dll.config",
+        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
+        "Microsoft.Extensions.DependencyModel.dll"};
+FilePath[] AGENT_PDB_FILES = {
+        "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+FilePath[] AGENT_PDB_FILES_NETCORE = {
+        "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+FilePath[] CONSOLE_FILES = {
+        "nunit3-console.exe", "nunit3-console.exe.config" };
+FilePath[] CONSOLE_FILES_NETCORE = {
+        "nunit3-console.exe", "nunit3-console.dll" };
+
+//////////////////////////////////////////////////////////////////////
+// INDIVIDUAL PACKAGE DEFINITIONS
+//////////////////////////////////////////////////////////////////////
+
+PackageDefinition NUnitConsoleNuGetPackage;
+PackageDefinition NUnitConsoleRunnerNuGetPackage;
+PackageDefinition NUnitConsoleRunnerNet60Package;
+PackageDefinition NUnitConsoleRunnerNet80Package;
+PackageDefinition NUnitEnginePackage;
+PackageDefinition NUnitEngineApiPackage;
+PackageDefinition NUnitConsoleRunnerChocolateyPackage;
+PackageDefinition NUnitConsoleMsiPackage;
+PackageDefinition NUnitConsoleZipPackage;
+
+BuildSettings.Packages.AddRange(new PackageDefinition[] {
+
+    NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
+        id: "NUnit.ConsoleRunner",
+        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
+        checks: new PackageCheck[] {
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
+            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins")
+        },
+        symbols: new PackageCheck[] {
+            HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
+            HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("tools/agents/net8.0").WithFiles(AGENT_PDB_FILES_NETCORE)
+        },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
+            + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
+        tests: StandardRunnerTests),
+
+    // NOTE: Must follow ConsoleRunner, upon which it depends
+    NUnitConsoleNuGetPackage = new NuGetPackage(
+        id: "NUnit.Console",
+        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
+        checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
+
+    NUnitConsoleRunnerNet80Package = new NuGetPackage(
+        id: "NUnit.ConsoleRunner.NetCore",
+        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
+        checks: new PackageCheck[] {
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory("tools/net8.0").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_CORE_FILES).AndFile("nunit.console.nuget.addins")
+        },
+        symbols: new PackageCheck[] {
+            HasDirectory("tools/net8.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+        },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
+            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/tools/net8.0/nunit3-console.exe"),
+        tests: NetCoreRunnerTests),
+
+    NUnitConsoleRunnerNet60Package = new NuGetPackage(
+        id: "NUnit.ConsoleRunner.NetCore",
+        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
+        checks: new PackageCheck[] {
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory("tools/net6.0").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_CORE_FILES).AndFile("nunit.console.nuget.addins")
+        },
+        symbols: new PackageCheck[] {
+            HasDirectory("tools/net6.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
+        },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
+            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/tools/net6.0/nunit3-console.exe"),
+        tests: NetCoreRunnerTests),
+
+    NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
+        id: "nunit-console-runner",
+        source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
+        checks: new PackageCheck[] {
+            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.choco.addins"),
+            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins")
+        },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory 
+            + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
+        tests: StandardRunnerTests),
+
+    NUnitConsoleMsiPackage = new MsiPackage(
+        id: "NUnit.Console",
+        source: BuildSettings.MsiDirectory + "nunit/nunit.wixproj",
+        checks: new PackageCheck[] {
+            HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
+            HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
+            HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
+        },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.MsiTestDirectory
+            + $"NUnit.Console.{BuildSettings.BuildVersion.SemVer}/NUnit.org/nunit-console/nunit3-console.exe"),
+        tests: StandardRunnerTests,
+        bundledExtensions: new [] {
+            new PackageReference("NUnit.Extension.VSProjectLoader", "3.9.0"),
+            new PackageReference("NUnit.Extension.NUnitProjectLoader", "3.7.1"),
+            new PackageReference("NUnit.Extension.NUnitV2Driver", "3.9.0"),
+            new PackageReference("NUnit.Extension.NUnitV2ResultWriter", "3.7.0"),
+            new PackageReference("NUnit.Extension.TeamCityEventListener", "1.0.9")
+        }),
+
+    NUnitConsoleZipPackage = new ZipPackage(
+        id: "NUnit.Console",
+        source: BuildSettings.ZipImageDirectory,
+        checks: new PackageCheck[] {
+            HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
+            HasDirectory("bin/net20").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/net35").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
+            //HasDirectory("bin/net5.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
+            HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
+            HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
+            HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
+        },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory 
+            + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net20/nunit3-console.exe"),
+        tests: StandardRunnerTests,
+        bundledExtensions: new [] {
+            new PackageReference("NUnit.Extension.VSProjectLoader", "3.9.0"),
+            new PackageReference("NUnit.Extension.NUnitProjectLoader", "3.7.1"),
+            new PackageReference("NUnit.Extension.NUnitV2Driver", "3.9.0"),
+            new PackageReference("NUnit.Extension.NUnitV2ResultWriter", "3.7.0"),
+            new PackageReference("NUnit.Extension.TeamCityEventListener", "1.0.9")
+        }),
+
+    // NOTE: Packages below this point have no direct tests
+
+    NUnitEnginePackage = new NuGetPackage(
+        id: "NUnit.Engine",
+        source: BuildSettings.NuGetDirectory + "engine/nunit.engine.nuspec",
+        checks: new PackageCheck[] {
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
+            HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
+            HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
+            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
+        },
+        symbols: new PackageCheck[] {
+            HasDirectory("lib/net20").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_PDB_FILES)
+        }),
+
+    NUnitEngineApiPackage = new NuGetPackage(
+        id: "NUnit.Engine.Api",
+        source: BuildSettings.NuGetDirectory + "engine/nunit.engine.api.nuspec",
+        checks: new PackageCheck[] {
+            HasFile("LICENSE.txt"),
+            HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
+            HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
+        },
+        symbols: new PackageCheck[] {
+            HasDirectory("lib/net20").WithFile("nunit.engine.api.pdb"),
+            HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
+        })
 });
 
-Teardown(context =>
-{
-    // Executed AFTER the last task.
-    DisplayUnreportedErrors();
-});
-
 //////////////////////////////////////////////////////////////////////
-// BUILD ENGINE AND CONSOLE
+// TEST RUNNERS
 //////////////////////////////////////////////////////////////////////
 
-Task("Build")
-    .Description("Builds the engine and console")
-    .IsDependentOn("CheckHeaders")
-    .IsDependentOn("Clean")
-    .Does<BuildSettings>((settings) =>
-    {
-        if (settings.IsRunningOnWindows)
-            BuildSolution(settings.BuildVersion);
-        else
-            BuildEachProjectSeparately(settings.BuildVersion);
-    });
-
-public void BuildSolution(BuildVersion buildVersion)
+// Custom unit test runner to run console vs engine tests differently
+// TODO: Use NUnitLite for all tests?
+public class CustomTestRunner : UnitTestRunner
 {
-    MSBuild(SOLUTION_FILE, CreateMSBuildSettings("Build", buildVersion).WithRestore());
-
-    // Publishing in place where needed to ensure that all references are present.
-
-    // TODO: May not be needed
-    DisplayBanner("Publishing ENGINE API Project for NETSTANDARD_2.0");
-    MSBuild(ENGINE_API_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
-        .WithProperty("TargetFramework", "netstandard2.0")
-        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-
-    DisplayBanner("Publishing ENGINE Project for NETSTANDARD2.0");
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
-        .WithProperty("TargetFramework", "netstandard2.0")
-        .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-
-    // TODO: May not be needed
-    foreach (var framework in new[] { "netcoreapp3.1", "net5.0" })
+    public override int Run(FilePath testPath)
     {
-        DisplayBanner($"Publishing AGENT Project for {framework.ToUpper()}");
-        MSBuild(AGENT_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
-            .WithProperty("TargetFramework", framework)
-            .WithProperty("PublishDir", BIN_DIR + "agents/" + framework));
+        // Run console tests under the just-built console
+        if(testPath.ToString().Contains("nunit3-console.tests.dll"))
+        {
+            return BuildSettings.Context.StartProcess(
+                BuildSettings.OutputDirectory + "net20/nunit3-console.exe",
+                $"\"{testPath}\" {BuildSettings.UnitTestArguments}" );
+        }
+
+        // All other tests use NUnitLite
+        return new NUnitLiteRunner().Run(testPath);
     }
 }
 
-// TODO: Test this on linux to see if changes are needed
-private void BuildEachProjectSeparately(BuildVersion buildVersion)
+// Use the console runner we just built to run package tests
+public class ConsoleRunnerSelfTester : PackageTestRunner
 {
-    DotNetRestore(SOLUTION_FILE);
+	public ConsoleRunnerSelfTester(string executablePath)
+	{
+		ExecutablePath = executablePath;
+	}
 
-    BuildProject(ENGINE_PROJECT, buildVersion);
-    BuildProject(CONSOLE_PROJECT, buildVersion);
-    BuildProject(AGENT_PROJECT, buildVersion);
-    BuildProject(AGENT_X86_PROJECT, buildVersion);
-
-    BuildProject(ENGINE_TESTS_PROJECT, buildVersion, "net35", "netcoreapp2.1");
-    BuildProject(ENGINE_CORE_TESTS_PROJECT, buildVersion, "net35", "netcoreapp2.1", "netcoreapp3.1", "net5.0", "net6.0", "net8.0");
-    BuildProject(CONSOLE_TESTS_PROJECT, buildVersion, "net35", "net6.0", "net8.0");
-
-    BuildProject(MOCK_ASSEMBLY_X86_PROJECT, buildVersion, "net35", "net40", "netcoreapp2.1", "netcoreapp3.1");
-    BuildProject(NOTEST_PROJECT, buildVersion, "net35", "netcoreapp2.1", "netcoreapp3.1");
-
-
-    DisplayBanner("Publish .NET Core & Standard projects");
-
-    MSBuild(ENGINE_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
-       .WithProperty("TargetFramework", "netstandard2.0")
-       .WithProperty("PublishDir", BIN_DIR + "netstandard2.0"));
-    CopyFileToDirectory(
-       BIN_DIR + "netstandard2.0/testcentric.engine.metadata.dll",
-       BIN_DIR + "netcoreapp2.1");
-    MSBuild(ENGINE_TESTS_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
-       .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
-    MSBuild(ENGINE_CORE_TESTS_PROJECT, CreateMSBuildSettings("Publish", buildVersion)
-       .WithProperty("TargetFramework", "netcoreapp2.1")
-       .WithProperty("PublishDir", BIN_DIR + "netcoreapp2.1"));
+	public override int Run(string arguments)
+	{
+		return base.Run(arguments);
+	}
 }
-
-// NOTE: If we use DotNet to build on Linux, then our net35 projects fail.
-// If we use MSBuild, then the net5.0 projects fail. So we build each project
-// differently depending on whether it has net35 as one of its targets. 
-private void BuildProject(string project, BuildVersion buildVersion, params string[] targetFrameworks)
-{
-    if (targetFrameworks.Length == 0)
-    {
-        DisplayBanner($"Building {System.IO.Path.GetFileName(project)}");
-        DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", buildVersion));
-    }
-    else
-    {
-        foreach (var framework in targetFrameworks)
-        {
-            DisplayBanner($"Building {System.IO.Path.GetFileName(project)} for {framework}");
-            if (framework == "net35")
-                MSBuild(project, CreateMSBuildSettings("Build", buildVersion).WithProperty("TargetFramework", framework));
-            else
-                DotNetMSBuild(project, CreateDotNetMSBuildSettings("Build", buildVersion).WithProperty("TargetFramework", framework));
-        }
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-// BUILD C++ TESTS
-//////////////////////////////////////////////////////////////////////
-
-Task("BuildCppTestFiles")
-    .Description("Builds the C++ mock test assemblies")
-    .WithCriteria(IsRunningOnWindows)
-    .Does<BuildSettings>((settings) =>
-    {
-        MSBuild(
-            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x86.vcxproj",
-            CreateMSBuildSettings("Build", settings.BuildVersion).WithProperty("Platform", "x86"));
-
-        MSBuild(
-            SOURCE_DIR + "NUnitEngine/mock-cpp-clr/mock-cpp-clr-x64.vcxproj",
-            CreateMSBuildSettings("Build", settings.BuildVersion).WithProperty("Platform", "x64"));
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST
-//////////////////////////////////////////////////////////////////////
-
-// All Unit Tests are run and any error results are saved in
-// the global PendingUnitTestErrors. This method task displays them
-// and throws if there were any errors.
-Task("CheckForTestErrors")
-    .Description("Checks for errors running the test suites")
-    .Does(() => DisplayUnreportedErrors());
-
-//////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet20EngineCore")
-    .Description("Tests the engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunNUnitLiteTests(NETFX_ENGINE_CORE_TESTS, "net35");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 2.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetStandard20EngineCore")
-    .Description("Tests the .NET Standard Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp3.1");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETCORE 3.1 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetCore31EngineCore")
-    .Description("Tests the .NET Core 3.1 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "netcoreapp3.1");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NET 5.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet50EngineCore")
-    .Description("Tests the .NET 5.0 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net5.0");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NET 6.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet60EngineCore")
-    .Description("Tests the .NET 6.0 Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_CORE_TESTS, "net6.0");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet20Engine")
-    .Description("Tests the engine")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net35");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 2.0 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetStandard20Engine")
-    .Description("Tests the .NET Standard Engine")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunDotnetNUnitLiteTests(NETCORE_ENGINE_TESTS, "netcoreapp3.1");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet20Console")
-    .Description("Tests the .NET 2.0 console runner")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunNet20Console(CONSOLE_TESTS, "net35");
-    });
-    
-//////////////////////////////////////////////////////////////////////
-// TEST .NET 6.0 CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet60Console")
-    .Description("Tests the .NET 6.0 console runner")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunNetCoreConsole(CONSOLE_TESTS, "net6.0");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST .NET 8.0 CONSOLE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNet80Console")
-    .Description("Tests the .NET 8.0 console runner")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does(() =>
-    {
-        RunNetCoreConsole(CONSOLE_TESTS, "net8.0");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// FETCH BUNDLED EXTENSIONS
-//////////////////////////////////////////////////////////////////////
-
-Task("FetchBundledExtensions")
-    .Does(() =>
-    {
-        CleanDirectory(EXTENSIONS_DIR);
-
-        DisplayBanner("Fetching bundled extensions");
-
-        foreach (var extension in BUNDLED_EXTENSIONS)
-        {
-            DisplayBanner(extension);
-
-            NuGetInstall(extension, new NuGetInstallSettings
-            {
-                OutputDirectory = EXTENSIONS_DIR,
-                Source = new[] { "https://www.nuget.org/api/v2" }
-            });
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// CREATE MSI IMAGE
-//////////////////////////////////////////////////////////////////////
-
-Task("CreateMsiImage")
-    .IsDependentOn("FetchBundledExtensions")
-    .Does(() =>
-    {
-        CleanDirectory(MSI_IMG_DIR);
-        CopyFiles(
-            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
-            MSI_IMG_DIR);
-        CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
-
-        foreach (var framework in new[] { "net20", "net35" })
-        {
-            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
-
-            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
-            CleanDirectory(addinsImgDir);
-
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsImgDir);
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// CREATE ZIP IMAGE
-//////////////////////////////////////////////////////////////////////
-
-Task("CreateZipImage")
-    .IsDependentOn("FetchBundledExtensions")
-    .Does(() =>
-    {
-        CleanDirectory(ZIP_IMG_DIR);
-        CopyFiles(
-            new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
-            ZIP_IMG_DIR);
-        CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
-
-        foreach (var framework in new[] { "net20", "net35" })
-        {
-            var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
-            CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
-
-            var addinsDir = frameworkDir + "addins/";
-            CleanDirectory(addinsDir);
-
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsDir);
-        }
-    });
-
-Task("BuildPackages")
-    .IsDependentOn("CreateMsiImage")
-    .IsDependentOn("CreateZipImage")
-    .Does(() =>
-    {
-        EnsureDirectoryExists(PACKAGE_DIR);
-
-        foreach (var package in AllPackages)
-        {
-            DisplayBanner($"Building package {package.PackageName}");
-
-            package.BuildPackage();
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// VERIFY PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("VerifyPackages")
-    .Description("Check content of all the packages we build")
-    .Does(() =>
-    {
-        int failures = 0;
-
-        foreach (var package in AllPackages)
-        {
-            if (!CheckPackage($"{PACKAGE_DIR}{package.PackageName}", package.PackageChecks))
-                ++failures;
-
-            if (package.HasSymbols && !CheckPackage($"{PACKAGE_DIR}{package.SymbolPackageName}", package.SymbolChecks))
-                ++failures;
-        }
-
-        if (failures == 0)
-            Information("\nAll packages passed verification.");
-        else
-            throw new System.Exception($"{failures} packages failed verification.");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("TestPackages")
-    .Does(() =>
-    {
-        foreach (var package in AllPackages)
-        {
-            if (package.PackageTests != null)
-                new PackageTester(Context, package).RunTests();
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// INSTALL SIGNING TOOL
-//////////////////////////////////////////////////////////////////////
-
-Task("InstallSigningTool")
-    .Does(() =>
-    {
-        var result = StartProcess("dotnet.exe", new ProcessSettings {  Arguments = "tool install SignClient --global" });
-    });
-
-//////////////////////////////////////////////////////////////////////
-// SIGN PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-Task("SignPackages")
-    .IsDependentOn("InstallSigningTool")
-    .IsDependentOn("Package")
-    .Does(() =>
-    {
-        // Get the secret.
-        var secret = EnvironmentVariable("SIGNING_SECRET");
-        if(string.IsNullOrWhiteSpace(secret)) {
-            throw new InvalidOperationException("Could not resolve signing secret.");
-        }
-        // Get the user.
-        var user = EnvironmentVariable("SIGNING_USER");
-        if(string.IsNullOrWhiteSpace(user)) {
-            throw new InvalidOperationException("Could not resolve signing user.");
-        }
-
-        var signClientPath = Context.Tools.Resolve("SignClient.exe") ?? Context.Tools.Resolve("SignClient") ?? throw new Exception("Failed to locate sign tool");
-
-        var settings = File("./signclient.json");
-
-        // Get the files to sign.
-        var files = GetFiles(string.Concat(PACKAGE_DIR, "*.nupkg")) +
-            GetFiles(string.Concat(PACKAGE_DIR, "*.msi"));
-
-        foreach(var file in files)
-        {
-            Information("Signing {0}...", file.FullPath);
-
-            // Build the argument list.
-            var arguments = new ProcessArgumentBuilder()
-                .Append("sign")
-                .AppendSwitchQuoted("-c", MakeAbsolute(settings.Path).FullPath)
-                .AppendSwitchQuoted("-i", MakeAbsolute(file).FullPath)
-                .AppendSwitchQuotedSecret("-s", secret)
-                .AppendSwitchQuotedSecret("-r", user)
-                .AppendSwitchQuoted("-n", "NUnit.org")
-                .AppendSwitchQuoted("-d", "NUnit is a unit-testing framework for all .NET languages.")
-                .AppendSwitchQuoted("-u", "https://nunit.org/");
-
-            // Sign the binary.
-            var result = StartProcess(signClientPath.FullPath, new ProcessSettings {  Arguments = arguments });
-            if(result != 0)
-            {
-                // We should not recover from this.
-                throw new InvalidOperationException("Signing failed!");
-            }
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// PUBLISH PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////
-// PUBLISH PACKAGES
-//////////////////////////////////////////////////////////////////////
-
-static bool HadPublishingErrors = false;
-
-Task("PublishPackages")
-    .Description("Publish nuget and chocolatey packages according to the current settings")
-    .IsDependentOn("PublishToMyGet")
-    .IsDependentOn("PublishToNuGet")
-    .IsDependentOn("PublishToChocolatey")
-    .Does(() =>
-    {
-        if (HadPublishingErrors)
-            throw new Exception("One of the publishing steps failed.");
-    });
-
-// This task may either be run by the PublishPackages task,
-// which depends on it, or directly when recovering from errors.
-Task("PublishToMyGet")
-    .Description("Publish packages to MyGet")
-    .Does<BuildSettings>((settings) =>
-    {
-        if (!settings.ShouldPublishToMyGet)
-            Information("Nothing to publish to MyGet from this run.");
-        else
-        {
-            var apiKey = EnvironmentVariable(MYGET_API_KEY);
-
-            foreach (var package in AllPackages)
-                try
-                {
-                    switch (package.PackageType)
-                    {
-                        case PackageType.NuGet:
-                            PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                            break;
-                        case PackageType.Chocolatey:
-                            PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, MYGET_PUSH_URL);
-                            break;
-                    }
-                }
-                catch(Exception)
-                {
-                    HadPublishingErrors = true;
-                }
-        }
-    });
-
-// This task may either be run by the PublishPackages task,
-// which depends on it, or directly when recovering from errors.
-Task("PublishToNuGet")
-    .Description("Publish packages to NuGet")
-    .Does<BuildSettings>((settings) =>
-    {
-        if (!settings.ShouldPublishToNuGet)
-            Information("Nothing to publish to NuGet from this run.");
-        else
-        {
-            var apiKey = EnvironmentVariable(NUGET_API_KEY);
-
-            foreach (var package in AllPackages)
-                if (package.PackageType == PackageType.NuGet)
-                    try
-                    {
-                        PushNuGetPackage(PACKAGE_DIR + package.PackageName, apiKey, NUGET_PUSH_URL);
-                    }
-                    catch (Exception)
-                    {
-                        HadPublishingErrors = true;
-                    }
-        }
-    });
-
-// This task may either be run by the PublishPackages task,
-// which depends on it, or directly when recovering from errors.
-Task("PublishToChocolatey")
-    .Description("Publish packages to Chocolatey")
-    .Does<BuildSettings>((settings) =>
-    {
-        if (!settings.ShouldPublishToChocolatey)
-            Information("Nothing to publish to Chocolatey from this run.");
-        else
-        {
-            var apiKey = EnvironmentVariable(CHOCO_API_KEY);
-
-            foreach (var package in AllPackages)
-                if (package.PackageType == PackageType.Chocolatey)
-                    try
-                    {
-                        PushChocolateyPackage(PACKAGE_DIR + package.PackageName, apiKey, CHOCO_PUSH_URL);
-                    }
-                    catch (Exception)
-                    {
-                        HadPublishingErrors = true;
-                    }
-        }
-    });
-
-Task("ListInstalledNetCoreRuntimes")
-    .Description("Lists all installed .NET Core Runtimes")
-    .Does(() => 
-    {
-        var runtimes = GetInstalledNetCoreRuntimes();
-        foreach (var runtime in runtimes)
-        {
-            Information(runtime);            
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// CREATE A DRAFT RELEASE
-//////////////////////////////////////////////////////////////////////
-
-Task("CreateDraftRelease")
-    .Does<BuildSettings>((settings) =>
-    {
-        bool isDirectTarget = Target == "CreateDraftRelease";
-
-        if (isDirectTarget && !HasArgument("productVersion"))
-            throw new Exception("Must specify --productVersion with the CreateDraftRelease target.");
-
-        if (settings.BuildVersion.IsReleaseBranch || isDirectTarget)
-        {
-            string milestone = settings.IsReleaseBranch
-                ? settings.BranchName.Substring(8)
-                : settings.PackageVersion;
-            string releaseName = $"NUnit Console and Engine {milestone}";
-
-            Information($"Creating draft release for {releaseName}");
-
-            if (!NoPush)
-                try
-                {
-                    GitReleaseManagerCreate(EnvironmentVariable(GITHUB_ACCESS_TOKEN), GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
-                    {
-                        Name = releaseName,
-                        Milestone = milestone
-                    });
-                }
-                catch
-                {
-                    Error($"Unable to create draft release for {releaseName}.");
-                    Error($"Check that there is a {milestone} milestone with at least one closed issue.");
-                    Error("");
-                    throw;
-                }
-        }
-        else
-        {
-            Information("Skipping Release creation because this is not a release branch");
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// CREATE A PRODUCTION RELEASE
-//////////////////////////////////////////////////////////////////////
-
-Task("CreateProductionRelease")
-    .Does<BuildSettings>((settings) =>
-    {
-        if (settings.IsProductionRelease)
-        {
-            string token = EnvironmentVariable(GITHUB_ACCESS_TOKEN);
-            string tagName = settings.PackageVersion;
-
-            var assetList = new List<string>();
-            foreach (var package in AllPackages)
-                assetList.Add(PACKAGE_DIR + package.PackageName);
-            string assets = $"\"{string.Join(',', assetList.ToArray())}\"";
-
-            Information($"Publishing release {tagName} to GitHub");
-
-            if (NoPush)
-            {
-                Information($"Assets:");
-                foreach (var asset in assetList)
-                    Information("  " + asset);
-            }
-            else
-            {
-                GitReleaseManagerAddAssets(token, GITHUB_OWNER, GITHUB_REPO, tagName, assets);
-                GitReleaseManagerClose(token, GITHUB_OWNER, GITHUB_REPO, tagName);
-            }
-        }
-        else
-        {
-            Information("Skipping CreateProductionRelease because this is not a production release");
-        }
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TASK TARGETS
-//////////////////////////////////////////////////////////////////////
-
-Task("TestConsole")
-    .Description("Builds and tests the console runner")
-    .IsDependentOn("TestNet20Console")
-    .IsDependentOn("TestNet60Console");
-
-Task("TestEngineCore")
-    .Description("Builds and tests the engine core assembly")
-    .IsDependentOn("TestNet20EngineCore")
-    .IsDependentOn("TestNetStandard20EngineCore")
-    .IsDependentOn("TestNetCore31EngineCore")
-    .IsDependentOn("TestNet50EngineCore")
-    .IsDependentOn("TestNet60EngineCore");
-
-Task("TestEngine")
-    .Description("Builds and tests the engine assembly")
-    .IsDependentOn("TestNet20Engine")
-    .IsDependentOn("TestNetStandard20Engine");
-
-Task("Test")
-    .Description("Builds and tests the engine and console runner")
-    .IsDependentOn("TestEngineCore")
-    .IsDependentOn("TestEngine")
-    .IsDependentOn("TestConsole")
-    .IsDependentOn("CheckForTestErrors");
-
-Task("Package")
-    .Description("Builds and tests all packages")
-    .IsDependentOn("Build")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("VerifyPackages")
-    .IsDependentOn("TestPackages");
-
-Task("PackageExistingBuild")
-    .Description("Builds and tests all packages, using previously build binaries")
-    .IsDependentOn("BuildPackages")
-    .IsDependentOn("VerifyPackages")
-    .IsDependentOn("TestPackages");
-
-Task("BuildTestAndPackage")
-    .Description("Builds, tests and packages")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")
-    .IsDependentOn("Package");
-
-Task("Appveyor")
-    .Description("Target we run in our AppVeyor CI")
-    .IsDependentOn("BuildTestAndPackage")
-    .IsDependentOn("PublishPackages")
-    .IsDependentOn("CreateDraftRelease")
-    .IsDependentOn("CreateProductionRelease");
-
-Task("Default")
-    .Description("Builds the engine and console runner")
-    .IsDependentOn("Build");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
 
-RunTarget(Target);
+Build.Run()
