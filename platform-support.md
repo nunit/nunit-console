@@ -1,32 +1,55 @@
 # Platform Support Lifecycle
 
 "Platform Support" for this project includes three somewhat different things:
-1. The target platforms for which tests may be written.
-2. The platforms under which those tests will run, which is equivalent to the list of agents we supply.
+1. Test assembly target platforms, that is, the target platforms for which tests may be written.
+2. The target platforms under which those tests will actually run, which is equivalent to the list of agents we provide.
 3. The minimum platforms required to execute the runner and engine themselves, without regard to the tests being run.
 
 ## Test Assembly Target Runtimes
 
-We will continue to support tests targeting runtimes which are out of support from Microsoft's perspective, so long
-as we are able to do so without significant additional effort or security risk. If no agent is available for a runtime,
-the tests will be run on the closest higher runtime available.
-
-> _We currently support execution of tests written to target any version of the .NET Framework >= 2.0 and any version
-> of .NET Core >= 3.1, including .NET 5.0 and higher._
+We currently support execution of tests written to target any version of the .NET Framework >= 2.0 and any version
+of .NET Core >= 3.1, including .NET 5.0 and higher. We will continue to support tests targeting runtimes which are
+out of support from Microsoft's perspective, so long as we are able to do so without significant additional effort
+and without security risk. If no agent is available for a runtime, the tests will be run on the closest higher 
+runtime available.
 
 ## Agents Provided
 
-We will continue to provide agents for any Microsoft runtime for at least six months after its end of life. This is 
-intended to support continued testing of legacy applications while users are in the process of upgrade. However, agents
-for runtimes which have been declared a security risk may be removed immediately.
+We currently supply a fairly large selection of agents with the console runner:
+* .NET Framework 2.0
+* .NET Framework 4.6.2
+* .NET Core 2,1
+* ,NET Core 3.1
+* .NET 5.0
+* .NET 6.0
+* .NET 7.0
+* .NET 8.0 (coming in version 3.18.0)
 
-> _We currently supply agents for .NET Famework 2.0 and 4.6.2. .NET Core 2,1 and 3.1 and .NET 5.0, 6.0 and 7.0. The .NET
-> Core 2.1 runner is being removed in version 3.18.0 and .NET 8.0 will probably be added before this document is finalized.
-> Once this document is approved, we will begin to phase out agents according to the above criteria._
+As a general policy, we will continue to provide agents for any Microsoft runtime for at least six months after its
+official end of life. This is intended to support continued testing of legacy applications while users are in the 
+process of upgrade. However, agents for runtimes which have been declared a security risk may be removed immediately.
+
+Based on that policy and the planned end-of-life dates for runtimes, we expect to retire agents on or after the
+dates listed in the following table.
+
+| Runtime              | Retirement Date |
+| -------------------- | --------------- |
+| .NET Framework 2.0   | TBD             |
+| .NET Framework 4.6.2 | TBD             |
+| .NET Core 2.1        | July, 2024      |
+| .NET Core 3.1        | July, 2024      |
+| .NET 5.0             | July, 2024      |
+| .NET 6.0             | May, 2025       |
+| .NET 7.0             | November, 2024  |
+| .NET 8.0             | May, 2027       |
+
+**NOTES:**
+1. Some discussion is needed before we can determine when the .NET Framework agents will be removed and how they will be replaced.
+2. July, 2024 is the estimated release date of version 3.18.0 of the console runner.
 
 ## Required Runtimes
 
-The console runner and engine target .NET 4.6.2, so that runtime or greater is required to execute any tests at all
-without loss of features. In individual cases, it may be possible to run using a lesser version of .NET 4.x.
+The console runner and engine target .NET Framework 4.6.2, so that runtime or greater is required to execute any tests at all
+without loss of features. In individual cases, it may be possible to run using a lesser version of .NET 4.x. It's possible
+that we may require a higher level of the framework in a future 3.x release.
 
-> **Note:** Editorial comments in italics will be removed in the final version of this document
