@@ -18,7 +18,6 @@ runtime available.
 We currently supply a fairly large selection of agents with the console runner:
 * .NET Framework 2.0
 * .NET Framework 4.6.2
-* .NET Core 2,1
 * ,NET Core 3.1
 * .NET 5.0
 * .NET 6.0
@@ -36,7 +35,6 @@ dates listed in the following table.
 | -------------------- | --------------- |
 | .NET Framework 2.0   | TBD             |
 | .NET Framework 4.6.2 | TBD             |
-| .NET Core 2.1        | July, 2024      |
 | .NET Core 3.1        | July, 2024      |
 | .NET 5.0             | July, 2024      |
 | .NET 6.0             | May, 2025       |
