@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Integration
@@ -9,3 +10,4 @@ namespace NUnit.Engine.Tests.Integration
     {
     }
 }
+#endif

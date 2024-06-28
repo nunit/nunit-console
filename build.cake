@@ -23,7 +23,6 @@ BuildSettings.Initialize(
         Net40Test,
         Net40X86Test,
         Net35PlusNet40Test,
-        NetCore31Test,
         Net50Test,
         Net60Test,
         Net70Test,
@@ -36,7 +35,6 @@ BuildSettings.Initialize(
     // Tests run for the NETCORE runner package
     var NetCoreRunnerTests = new List<PackageTest>
     {
-        NetCore31Test,
         Net50Test,
         Net60Test,
         Net70Test,
@@ -53,7 +51,6 @@ BuildSettings.Initialize(
         // TODO: Make these tests run on AppVeyor
         if (!BuildSystem.IsRunningOnAppVeyor)
         {
-            StandardRunnerTests.Add(NetCore31X86Test);
             StandardRunnerTests.Add(Net50X86Test);
             StandardRunnerTests.Add(Net70X86Test);
             StandardRunnerTests.Add(Net80X86Test);
@@ -175,18 +172,6 @@ static PackageTest Net50X86Test = new PackageTest(
     "net5.0/mock-assembly-x86.dll",
     MockAssemblyX86ExpectedResult("netcore-5.0"));
 
-static PackageTest NetCore31Test = new PackageTest(
-    1, "NetCore31Test",
-    "Run mock-assembly.dll under .NET Core 3.1",
-    "netcoreapp3.1/mock-assembly.dll",
-    MockAssemblyExpectedResult("netcore-3.1"));
-
-static PackageTest NetCore31X86Test = new PackageTest(
-    1, "NetCore31X86Test",
-    "Run mock-assembly-x86.dll under .NET Core 3.1",
-    "netcoreapp3.1/mock-assembly-x86.dll",
-    MockAssemblyX86ExpectedResult("netcore-3.1"));
-
 static PackageTest Net50PlusNet60Test = new PackageTest(
     1, "Net50PlusNet60Test",
     "Run mock-assembly under .NET 5.0 and 6.0 together",
@@ -259,7 +244,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
@@ -269,7 +253,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE),
@@ -320,7 +303,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.choco.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
@@ -357,7 +339,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("bin/net20").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/net35").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-            HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             //HasDirectory("bin/net5.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
