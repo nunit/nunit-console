@@ -21,7 +21,7 @@ public static class UnitTesting
             RunTest(testPath);
     }
 
-    private static void RunTest(FilePath testPath)
+    public static void RunTest(FilePath testPath)
     {
         var testFile = testPath.GetFilename();
         var containingDir = testPath.GetDirectory().GetDirectoryName();

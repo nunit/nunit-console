@@ -23,11 +23,10 @@ BuildSettings.Initialize(
         Net40Test,
         Net40X86Test,
         Net35PlusNet40Test,
-        Net50Test,
         Net60Test,
         Net70Test,
         Net80Test,
-        Net50PlusNet60Test,
+        Net60PlusNet80Test,
         Net40PlusNet60Test,
         NUnitProjectTest
     };
@@ -35,7 +34,6 @@ BuildSettings.Initialize(
     // Tests run for the NETCORE runner package
     var NetCoreRunnerTests = new List<PackageTest>
     {
-        Net50Test,
         Net60Test,
         Net70Test,
         Net80Test,
@@ -51,7 +49,6 @@ BuildSettings.Initialize(
         // TODO: Make these tests run on AppVeyor
         if (!BuildSystem.IsRunningOnAppVeyor)
         {
-            StandardRunnerTests.Add(Net50X86Test);
             StandardRunnerTests.Add(Net70X86Test);
             StandardRunnerTests.Add(Net80X86Test);
         }
@@ -160,26 +157,14 @@ static PackageTest Net60X86Test = new PackageTest(
     "net6.0/mock-assembly-x86.dll",
     MockAssemblyX86ExpectedResult("netcore-6.0"));
 
-static PackageTest Net50Test = new PackageTest(
-    1, "Net50Test",
-    "Run mock-assembly.dll under .NET 5.0",
-    "net5.0/mock-assembly.dll",
-    MockAssemblyExpectedResult("netcore-5.0"));
-
-static PackageTest Net50X86Test = new PackageTest(
-    1, "Net50X86Test",
-    "Run mock-assembly-x86.dll under .NET 5.0",
-    "net5.0/mock-assembly-x86.dll",
-    MockAssemblyX86ExpectedResult("netcore-5.0"));
-
-static PackageTest Net50PlusNet60Test = new PackageTest(
-    1, "Net50PlusNet60Test",
-    "Run mock-assembly under .NET 5.0 and 6.0 together",
-    "net5.0/mock-assembly.dll net6.0/mock-assembly.dll",//" net7.0/mock-assembly.dll net8.0/mock-assembly.dll",
-    MockAssemblyExpectedResult("netcore-5.0", "netcore-6.0"));
+static PackageTest Net60PlusNet80Test = new PackageTest(
+    1, "Net60PlusNe860Test",
+    "Run mock-assembly under .NET 6.0 and 8.0 together",
+    "net6.0/mock-assembly.dll net8.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"));
 
 static PackageTest Net40PlusNet60Test = new PackageTest(
-    1, "Net40PlusNet60Test",
+    1, "Net60PlusNet80Test",
     "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
     "net40/mock-assembly.dll net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult("net-4.0", "netcore-6.0"));
@@ -244,7 +229,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
-            HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins")
@@ -253,7 +237,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
-            HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_PDB_FILES_NETCORE)
@@ -303,7 +286,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.choco.addins"),
             HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
-            HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins")
@@ -342,7 +324,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             //HasDirectory("bin/net5.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
-            HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
