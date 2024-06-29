@@ -31,11 +31,11 @@ process of upgrade. However, agents for runtimes which have been declared a secu
 Based on that policy and the planned end-of-life dates for runtimes, we expect to retire agents on or after the
 dates listed in the following table.
 
-| Runtime              | Retirement Date |
+| Runtime              | Agent Supported<br>At Least Until |
 | -------------------- | --------------- |
-| .NET Framework 2.0   | TBD             |
-| .NET Framework 4.6.2 | TBD             |
-| .NET Core 3.1        | July, 2024      |
+| .NET Framework 2.0   |                 |
+| .NET Framework 4.6.2 |                 |
+| .NET Core 3.1        |                 |
 | .NET 5.0             | July, 2024      |
 | .NET 6.0             | May, 2025       |
 | .NET 7.0             | November, 2024  |
