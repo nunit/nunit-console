@@ -5,6 +5,11 @@ branches:
   except:
   - /^azure-/
 
+skip_commits:
+  files:
+    - ./*.txt
+    - ./*.md
+
 build_script:
   - ps: .\build.ps1 --target=Appveyor --configuration=Release
 
