@@ -41,10 +41,6 @@ dates listed in the following table.
 | .NET 7.0             | May, 2024       | after November, 2024  |
 | .NET 8.0             | November, 2027  | after May, 2027       |
 
-**NOTES:**
-1. Some discussion is needed before we can determine when the .NET Framework agents will be removed and how they will be replaced.
-2. July, 2024 is the estimated release date of version 3.18.0 of the console runner.
-
 ## Required Runtimes
 
 The console runner and engine target .NET Framework 4.6.2, so that runtime or greater is required to execute any tests at all
