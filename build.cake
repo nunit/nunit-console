@@ -212,16 +212,16 @@ Task("CheckForTestErrors")
     .Does(() => DisplayUnreportedErrors());
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE CORE
+// TEST .NET 4.6.2 ENGINE CORE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20EngineCore")
+Task("TestNet462EngineCore")
     .Description("Tests the engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_CORE_TESTS, "net35");
+        RunNUnitLiteTests(NETFX_ENGINE_CORE_TESTS, "net462");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -277,16 +277,16 @@ Task("TestNet60EngineCore")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE
+// TEST .NET 4.6.2 ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20Engine")
+Task("TestNet462Engine")
     .Description("Tests the engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net35");
+        RunNUnitLiteTests(NETFX_ENGINE_TESTS, "net462");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -303,16 +303,16 @@ Task("TestNetStandard20Engine")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 CONSOLE
+// TEST .NET 4.6.2 CONSOLE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20Console")
-    .Description("Tests the .NET 2.0 console runner")
+Task("TestNet462Console")
+    .Description("Tests the .NET 4.6.2 console runner")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does(() =>
     {
-        RunNet20Console(CONSOLE_TESTS, "net35");
+        RunNet462Console(CONSOLE_TESTS, "net462");
     });
     
 //////////////////////////////////////////////////////////////////////
@@ -376,18 +376,13 @@ Task("CreateMsiImage")
         CopyFiles(
             new FilePath[] { "LICENSE.txt", "NOTICES.txt", "CHANGES.txt", "nunit.ico" },
             MSI_IMG_DIR);
+        CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
         CopyDirectory(BIN_DIR, MSI_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net20", "net35" })
-        {
-            var addinsImgDir = MSI_IMG_DIR + "bin/" + framework + "/addins/";
-
-            CopyDirectory(MSI_DIR + "resources/", MSI_IMG_DIR);
-            CleanDirectory(addinsImgDir);
-
-            foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
-                CopyPackageContents(packageDir, addinsImgDir);
-        }
+        var addinsImgDir = MSI_IMG_DIR + "bin/net462/addins/";
+        CreateDirectory(addinsImgDir);
+        foreach (var packageDir in System.IO.Directory.GetDirectories(EXTENSIONS_DIR))
+            CopyPackageContents(packageDir, addinsImgDir);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -404,7 +399,7 @@ Task("CreateZipImage")
             ZIP_IMG_DIR);
         CopyDirectory(BIN_DIR, ZIP_IMG_DIR + "bin/");
 
-        foreach (var framework in new[] { "net20", "net35" })
+        foreach (var framework in new[] { "net462" })
         {
             var frameworkDir = ZIP_IMG_DIR + "bin/" + framework + "/";
             CopyFileToDirectory(ZIP_DIR + "nunit.bundle.addins", frameworkDir);
@@ -735,12 +730,12 @@ Task("CreateProductionRelease")
 
 Task("TestConsole")
     .Description("Builds and tests the console runner")
-    .IsDependentOn("TestNet20Console")
+    .IsDependentOn("TestNet462Console")
     .IsDependentOn("TestNet60Console");
 
 Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
-    .IsDependentOn("TestNet20EngineCore")
+    .IsDependentOn("TestNet462EngineCore")
     .IsDependentOn("TestNetStandard20EngineCore")
     .IsDependentOn("TestNetCore31EngineCore")
     .IsDependentOn("TestNet50EngineCore")
@@ -748,7 +743,7 @@ Task("TestEngineCore")
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
-    .IsDependentOn("TestNet20Engine")
+    .IsDependentOn("TestNet462Engine")
     .IsDependentOn("TestNetStandard20Engine");
 
 Task("Test")

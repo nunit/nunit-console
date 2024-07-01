@@ -40,7 +40,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--workers=0", "NumberOfTestWorkers", 0)]
         [TestCase("--params:X=5;Y=7", "TestParameters", "X=5;Y=7")]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
-#if NET35
+#if NETFRAMEWORK
         [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--shadowcopy", "ShadowCopyFiles", true)]
         [TestCase("--process=Separate", "ProcessModel", "Separate")]
@@ -69,7 +69,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(package.Settings[key], Is.EqualTo(val), "NumberOfTestWorkers not set correctly for {0}", option);
         }
 
-#if NET35
+#if NETFRAMEWORK
         [Test]
         public void WhenDebugging_NumberOfTestWorkersDefaultsToZero()
         {

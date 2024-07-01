@@ -150,14 +150,14 @@ void RunDotnetNUnitLiteTests(string testAssembly, string targetRuntime)
         UnreportedErrors.Add($"{testAssembly}({targetRuntime}) returned rc = {rc}");
 }
 
-void RunNet20Console(string testAssembly, string targetRuntime)
+void RunNet462Console(string testAssembly, string targetRuntime)
 {
     var workingDir = BIN_DIR + targetRuntime + "/";
     var assemblyPath = workingDir + testAssembly;
     var resultPath = GetResultXmlPath(assemblyPath, targetRuntime).FullPath;
 
     int rc = StartProcess(
-        NET20_CONSOLE,
+        NET462_CONSOLE,
         new ProcessSettings()
         {
             Arguments = $"\"{assemblyPath}\" --result:{resultPath}",
@@ -219,6 +219,7 @@ public List<string> GetInstalledNetCoreRuntimes()
 
 public void CopyPackageContents(DirectoryPath packageDir, DirectoryPath outDir)
 {
+    // Some of our extensions have binaries in tools, some in the net20 subdirectory
     var files = GetFiles(packageDir + "/tools/*").Concat(GetFiles(packageDir + "/tools/net20/*"));
     CopyFiles(files.Where(f => f.GetExtension() != ".addins"), outDir);
 }

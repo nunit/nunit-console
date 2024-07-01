@@ -1,6 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NET20 || NET35
+#if NETFRAMEORK
 using System;
 using System.Diagnostics;
 using NUnit.Common;
