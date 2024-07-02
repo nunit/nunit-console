@@ -220,17 +220,22 @@ public static class BuildSettings
 			? CommandLineOptions.TestLevel.Value
 			: CalcPackageTestLevel();
 
-    // Publishing
+	// Publishing - MyGet
 	public static string MyGetPushUrl => MYGET_PUSH_URL;
-	public static string NuGetPushUrl => NUGET_PUSH_URL;
-	public static string ChocolateyPushUrl => CHOCO_PUSH_URL;
+	public static string MyGetApiKey => Context.EnvironmentVariable(MYGET_API_KEY);
 
-	public static string MyGetApiKey { get; private set; }
-	public static string NuGetApiKey { get; private set; }
-	public static string ChocolateyApiKey { get; private set;}
-    public static string GitHubOwner { get; private set; }
-    public static string GitHubRepository { get; private set; }
-	public static string GitHubAccessToken { get; private set; }
+	// Publishing - NuGet
+	public static string NuGetPushUrl => NUGET_PUSH_URL;
+	public static string NuGetApiKey => Context.EnvironmentVariable(NUGET_API_KEY);
+
+	// Publishing - Chocolatey
+	public static string ChocolateyPushUrl => CHOCO_PUSH_URL;
+	public static string ChocolateyApiKey => Context.EnvironmentVariable(CHOCO_API_KEY);
+
+	// Publishing - GitHub
+	public static string GitHubOwner { get; set; }
+	public static string GitHubRepository { get; set; }
+	public static string GitHubAccessToken => Context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
 	public static bool IsPreRelease => BuildVersion.IsPreRelease;
 	public static bool ShouldPublishToMyGet =>
@@ -318,6 +323,7 @@ public static class BuildSettings
 		Console.WriteLine("MyGetApiKey:               " + (!string.IsNullOrEmpty(MyGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
 		Console.WriteLine("NuGetApiKey:               " + (!string.IsNullOrEmpty(NuGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
 		Console.WriteLine("ChocolateyApiKey:          " + (!string.IsNullOrEmpty(ChocolateyApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
+        Console.WriteLine("GitHubAccessToken:         " + (!string.IsNullOrEmpty(GitHubAccessToken) ? "AVAILABLE" : "NOT AVAILABLE"));
 
 		Console.WriteLine("\nPACKAGES");
 		foreach (var package in Packages)
