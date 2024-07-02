@@ -18,8 +18,7 @@ public class ZipPackage : PackageDefinition
         BundledExtensions = bundledExtensions;
     }
 
-    // MSI and ZIP packages support bundling of extensions
-    // if any are specified in the definition.
+    // ZIP package supports bundling of extensions
     public PackageReference[] BundledExtensions { get; }
 
     // The file name of this package, including extension
