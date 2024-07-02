@@ -105,7 +105,7 @@ namespace NUnit.Engine.Services
             if (!Directory.Exists(agentsDir))
             {
                 // When developing and running in the output directory, "agents" is a 
-                // sibling directory the one holding the agent (e.g. net20). This is a
+                // sibling directory the one holding the agent (e.g. net462). This is a
                 // bit of a kluge, but it's necessary unless we change the binary 
                 // output directory to match the distribution structure.
                 agentsDir = Path.Combine(Path.GetDirectoryName(engineDir), "agents");
@@ -122,7 +122,7 @@ namespace NUnit.Engine.Services
             {
                 case RuntimeType.Net:
                 case RuntimeType.Mono:
-                    runtimeDir = major >= 4 ? "net40" : "net20";
+                    runtimeDir = "net462";
                     agentName = requires32Bit ? "nunit-agent-x86" : "nunit-agent";
                     agentExtension = ".exe";
                     break;

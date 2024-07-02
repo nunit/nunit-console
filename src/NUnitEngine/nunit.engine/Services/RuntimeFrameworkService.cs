@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TestCentric.Metadata;
+using System.Runtime.Versioning;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services.RuntimeLocators;
-#if NET20
-using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
-#endif
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Services
 {
