@@ -40,10 +40,6 @@ namespace NUnit.ConsoleRunner
         [STAThread]
         public static int Main(string[] args)
         {
-            Console.WriteLine($"Main called with {args.Length} arguments:");
-            foreach (var arg in args)
-                Console.WriteLine("  " + arg);
-
             Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelHandler);
 
             try

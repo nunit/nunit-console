@@ -26,28 +26,19 @@ public static class BuildSettings
         )
 	{
         // Required arguments
-        if (context == null)
-            throw new ArgumentNullException(nameof(context));
-		if (title == null)
-			throw new ArgumentNullException(nameof(title));
-		if (githubRepository == null)
-			throw new ArgumentNullException(nameof(githubRepository));
+        Context = context ?? throw new ArgumentNullException(nameof(context));
+        Title = title ?? throw new ArgumentNullException(nameof(title));
+        GitHubRepository = githubRepository ?? throw new ArgumentNullException(nameof(githubRepository));
 
-        Context = context;
-        Title = title;
-        GitHubRepository = githubRepository;
-
-		// NOTE: Order of initialization can be sensitive. Obviously,
-		// we have to set any properties in this method before we
-		// make use of them. Less obviously, some of the classes we
-		// construct here have dependencies on certain properties
-		// being set before the constructor is called. I have
-		// tried to annotate such dependencies below.
+        // NOTE: Order of initialization can be sensitive. Obviously,
+        // we have to set any properties in this method before we
+        // make use of them. Less obviously, some of the classes we
+        // construct here have dependencies on certain properties
+        // being set before the constructor is called. I have
+        // tried to annotate such dependencies below.
 
         _buildSystem = context.BuildSystem();
 	
-		// If not specified, uses TITLE.sln if it exists or uses solution
-		// found in the root directory provided there is only one. 
 		SolutionFile = solutionFile ?? DeduceSolutionFile();
 
 		ValidConfigurations = validConfigurations ?? DEFAULT_VALID_CONFIGS;
@@ -90,21 +81,18 @@ public static class BuildSettings
 		}
     }
 
-	// Try to figure out solution file when not provided
+	// If solution file was not provided, uses TITLE.sln if it exists or 
+    // the solution found in the root directory provided there is only one. 
 	private static string DeduceSolutionFile()			
 	{
-		string solutionFile = null;
-
 		if (System.IO.File.Exists(Title + ".sln"))
-			solutionFile = Title + ".sln";
-		else
-		{
-			var files = System.IO.Directory.GetFiles(ProjectDirectory, "*.sln");
-			if (files.Count() == 1 && System.IO.File.Exists(files[0]))
-				solutionFile = files[0];
-		}
+			return Title + ".sln";
 
-		return solutionFile;
+		var files = System.IO.Directory.GetFiles(ProjectDirectory, "*.sln");
+		if (files.Length == 1 && System.IO.File.Exists(files[0]))
+            return files[0];
+
+        return null;
 	}
 
 	private static int CalcPackageTestLevel()
