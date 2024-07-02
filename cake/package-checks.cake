@@ -1,228 +1,148 @@
 //////////////////////////////////////////////////////////////////////
-// LISTS OF FILES USED IN CHECKING PACKAGES
+// SYNTAX FOR EXPRESSING CHECKS
 //////////////////////////////////////////////////////////////////////
 
-string[] ENGINE_FILES = {
-        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-string[] ENGINE_PDB_FILES = {
-        "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] ENGINE_CORE_FILES = {
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
-string[] ENGINE_CORE_PDB_FILES = {
-        "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_FILES = {
-        "nunit-agent.exe", "nunit-agent.exe.config",
-        "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
-string[] AGENT_FILES_NETCORE = {
-        "nunit-agent.dll", "nunit-agent.dll.config",
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-        "Microsoft.Extensions.DependencyModel.dll"};
-string[] AGENT_PDB_FILES = {
-        "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] AGENT_PDB_FILES_NETCORE = {
-        "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-string[] CONSOLE_FILES = {
-        "nunit3-console.exe", "nunit3-console.exe.config" };
-string[] CONSOLE_FILES_NETCORE = {
-        "nunit3-console.exe", "nunit3-console.dll" };
+public static class Check
+{
+	public static void That(DirectoryPath testDirPath, IList<PackageCheck> checks)
+	{
+		if (checks == null)
+			throw new ArgumentNullException(nameof(checks));
+
+		bool allOK = true;
+
+		foreach (var check in checks)
+			allOK &= check.ApplyTo(testDirPath);
+
+        if (!allOK) throw new Exception("Verification failed!");
+    }
+}
+
+private static FileCheck HasFile(FilePath file) => HasFiles(new[] { file });
+private static FileCheck HasFiles(params FilePath[] files) => new FileCheck(files);
+
+private static DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
 
 //////////////////////////////////////////////////////////////////////
-// PACKAGE CHECK IMPLEMENTATION
+// PACKAGECHECK CLASS
 //////////////////////////////////////////////////////////////////////
-
-// NOTE: Package checks basically do no more than what the programmer might 
-// do in opening the package itself and examining the content.
-
-public bool CheckPackage(string package, params PackageCheck[] checks)
-{
-    Console.WriteLine("\nPackage Name: " + System.IO.Path.GetFileName(package));
-
-    if (!FileExists(package))
-    {
-        WriteError("Package was not found!");
-        return false;
-    }
-
-    if (checks.Length == 0)
-    {
-        WriteWarning("Package found but no checks were specified.");
-        return true;
-    }
-
-    bool isMsi = package.EndsWith(".msi"); 
-    string tempDir = isMsi
-        ? InstallMsiToTempDir(package)
-        : UnzipToTempDir(package);
-
-    if (!System.IO.Directory.Exists(tempDir))
-    {
-        WriteError("Temporary directory was not created!");
-        return false;
-    }
-
-    try
-    {
-        bool allPassed = ApplyChecks(tempDir, checks);
-        if (allPassed)
-            WriteInfo("All checks passed!");
-
-        return allPassed;
-    }
-    finally
-    {
-        DeleteDirectory(tempDir, new DeleteDirectorySettings()
-        {
-            Recursive = true,
-            Force = true
-        });
-    }
-}
-
-private string InstallMsiToTempDir(string package)
-{
-    // Msiexec does not tolerate forward slashes!
-    package = package.Replace("/", "\\");
-    var tempDir = GetTempDirectoryPath();
-    
-    WriteInfo("Installing to " + tempDir);
-    int rc = StartProcess("msiexec", $"/a {package} TARGETDIR={tempDir} /q");
-    if (rc != 0)
-        WriteError($"Installer returned {rc.ToString()}");
-
-    return tempDir;
-}
-
-private string UnzipToTempDir(string package)
-{
-    var tempDir = GetTempDirectoryPath();
- 
-    WriteInfo("Unzipping to " + tempDir);
-    Unzip(package, tempDir);
-
-    return tempDir;
-}
-
-private string GetTempDirectoryPath()
-{
-   return System.IO.Path.GetTempPath() + System.IO.Path.GetRandomFileName() + "\\";
-}
-
-private bool ApplyChecks(string dir, PackageCheck[] checks)
-{
-    bool allOK = true;
-
-    foreach (var check in checks)
-        allOK &= check.Apply(dir);
-
-    return allOK;
-}
 
 public abstract class PackageCheck
 {
-    public abstract bool Apply(string dir);
+	protected ICakeContext _context;
+
+	public PackageCheck()
+	{
+		_context = BuildSettings.Context;
+	}
+	
+	public abstract bool ApplyTo(DirectoryPath testDirPath);
+
+	protected bool CheckDirectoryExists(DirectoryPath dirPath)
+	{
+		if (!_context.DirectoryExists(dirPath))
+		{
+			DisplayError($"Directory {dirPath} was not found.");
+			return false;
+		}
+
+		return true;
+	}
+
+	protected bool CheckFileExists(FilePath filePath)
+	{
+		if (!_context.FileExists(filePath))
+		{
+			DisplayError($"File {filePath} was not found.");
+			return false;
+		}
+
+		return true;
+	}
+
+	protected bool CheckFilesExist(IEnumerable<FilePath> filePaths)
+	{
+		bool isOK = true;
+
+		foreach (var filePath in filePaths)
+			isOK &= CheckFileExists(filePath);
+
+		return isOK;
+	}
+
+	protected bool DisplayError(string msg)
+	{
+		_context.Error("  ERROR: " + msg);
+
+		// The return value may be ignored or used as a shortcut
+		// for an immediate return from ApplyTo as in
+		//    return DisplayError(...)
+		return false;
+	}
 }
+
+//////////////////////////////////////////////////////////////////////
+// FILECHECK CLASS
+//////////////////////////////////////////////////////////////////////
 
 public class FileCheck : PackageCheck
 {
-    string[] _paths;
+	FilePath[] _files;
 
-    public FileCheck(string[] paths)
-    {
-        _paths = paths;
-    }
+	public FileCheck(FilePath[] files)
+	{
+		_files = files;
+	}
 
-    public override bool Apply(string dir)
-    {
-        var isOK = true;
-
-        foreach (string path in _paths)
-        {
-            if (!System.IO.File.Exists(dir + path))
-            {
-                WriteError($"File {path} was not found.");
-                isOK = false;
-            }
-        }
-
-        return isOK;
-    }
+	public override bool ApplyTo(DirectoryPath testDirPath)
+	{
+		return CheckFilesExist(_files.Select(file => testDirPath.CombineWithFilePath(file)));
+	}
 }
+
+//////////////////////////////////////////////////////////////////////
+// DIRECTORYCHECK CLASS
+//////////////////////////////////////////////////////////////////////
 
 public class DirectoryCheck : PackageCheck
 {
-    private string _path;
-    private List<string> _files = new List<string>();
+	private DirectoryPath _relDirPath;
+	private List<FilePath> _files = new List<FilePath>();
 
-    public DirectoryCheck(string path)
-    {
-        _path = path;
-    }
+	public DirectoryCheck(DirectoryPath relDirPath)
+	{
+		_relDirPath = relDirPath;
+	}
 
-    public DirectoryCheck WithFiles(params string[] files)
-    {
-        _files.AddRange(files);
-        return this;
-    }
+	public DirectoryCheck WithFiles(params FilePath[] files)
+	{
+		_files.AddRange(files);
+		return this;
+	}
 
-    public DirectoryCheck AndFiles(params string[] files)
+    public DirectoryCheck AndFiles(params FilePath[] files)
     {
         return WithFiles(files);
     }
 
-    public DirectoryCheck WithFile(string file)
-    {
-        _files.Add(file);
-        return this;
-    }
+	public DirectoryCheck WithFile(FilePath file)
+	{
+		_files.Add(file);
+		return this;
+	}
 
-    public DirectoryCheck AndFile(string file)
+    public DirectoryCheck AndFile(FilePath file)
     {
         return AndFiles(file);
     }
 
-    public override bool Apply(string dir)
-    {
-        if (!System.IO.Directory.Exists(dir + _path))
-        {
-            WriteError($"Directory {_path} was not found.");
-            return false;
-        }
+	public override bool ApplyTo(DirectoryPath testDirPath)
+	{
+		DirectoryPath absDirPath = testDirPath.Combine(_relDirPath);
 
-        bool isOK = true;
+		if (!CheckDirectoryExists(absDirPath))
+			return false;
 
-        if (_files != null)
-        {
-            foreach (var file in _files)
-            {
-                if (!System.IO.File.Exists(System.IO.Path.Combine(dir + _path, file)))
-                {
-                    WriteError($"File {file} was not found in directory {_path}.");
-                    isOK = false;
-                }
-            }
-        }
-
-        return isOK;
-    }
-}
-
-private FileCheck HasFile(string file) => HasFiles(new [] { file });
-private FileCheck HasFiles(params string[] files) => new FileCheck(files);  
-
-private DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
-
-private static void WriteError(string msg)
-{
-    Console.WriteLine("  ERROR: " + msg);
-}
-
-private static void WriteWarning(string msg)
-{
-    Console.WriteLine("  WARNING: " + msg);
-}
-
-private static void WriteInfo(string msg)
-{
-    Console.WriteLine("  " + msg);
+		return CheckFilesExist(_files.Select(file => absDirPath.CombineWithFilePath(file)));
+	}
 }
