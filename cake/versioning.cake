@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 public class BuildVersion
 {
-    private ISetupContext _context;
+    private ICakeContext _context;
     private GitVersion _gitVersion;
 
     // NOTE: This is complicated because (1) the user may have specified 
@@ -12,32 +12,30 @@ public class BuildVersion
     //
     // We simplify things a by figuring out the full package version and
     // then parsing it to provide information that is used in the build.
-    public BuildVersion(ISetupContext context)
+    public BuildVersion(ICakeContext context)
     {
-         Console.WriteLine("Start BuildVersion");
-        _context = context;
-        if (context==null)
+         if (context==null)
             throw new ArgumentNullException(nameof(context));
+
+       _context = context;
         _gitVersion = context.GitVersion();
-        Console.WriteLine($"Running GitVersion: {_gitVersion.FullSemVer}");
+
         BranchName = _gitVersion.BranchName;
         IsReleaseBranch = BranchName.StartsWith("release-");
 
-        string productVersion = context.HasArgument("productVersion")
-            ? context.Argument<string>("productVersion")
-            : CalculateProductVersion();
+        string packageVersion = CommandLineOptions.PackageVersion.Value ?? CalculatePackageVersion();
         
-        int dash = productVersion.IndexOf('-');
+        int dash = packageVersion.IndexOf('-');
         IsPreRelease = dash > 0;
 
-        string versionPart = productVersion;
+        string versionPart = packageVersion;
         string suffix = "";
         string label = "";
 
         if (IsPreRelease)
         {
-            versionPart = productVersion.Substring(0, dash);
-            suffix = productVersion.Substring(dash + 1);
+            versionPart = packageVersion.Substring(0, dash);
+            suffix = packageVersion.Substring(dash + 1);
             foreach (char c in suffix)
             {
                 if (!char.IsLetter(c))
@@ -51,16 +49,16 @@ public class BuildVersion
         PreReleaseLabel = label;
         PreReleaseSuffix = suffix;
 
-        ProductVersion = productVersion;
+        PackageVersion = packageVersion;
         AssemblyVersion = SemVer + ".0";
         AssemblyFileVersion = SemVer;
-        AssemblyInformationalVersion = productVersion;
+        AssemblyInformationalVersion = packageVersion;
     }
 
     public string BranchName { get; }
     public bool IsReleaseBranch { get; }
 
-    public string ProductVersion { get; }
+    public string PackageVersion { get; }
     public string AssemblyVersion { get; }
     public string AssemblyFileVersion { get; }
     public string AssemblyInformationalVersion { get; }
@@ -70,7 +68,7 @@ public class BuildVersion
     public string PreReleaseLabel { get; }
     public string PreReleaseSuffix { get; }
 
-    private string CalculateProductVersion()
+    private string CalculatePackageVersion()
     {
         string label = _gitVersion.PreReleaseLabel;
 
@@ -79,10 +77,6 @@ public class BuildVersion
             return _gitVersion.MajorMinorPatch;
 
         string branchName = _gitVersion.BranchName;
-
-        // Treat version3 branch as an alternate "main"
-        if (branchName == "version3X" || branchName == "version315" || branchName == "version317")
-            label = "dev";
 
         // We don't currently use this pattern, but check in case we do later.
         if (branchName.StartsWith("feature/"))
@@ -93,7 +87,7 @@ public class BuildVersion
             label = "ci";
 
         string suffix = "-" + label + _gitVersion.CommitsSinceVersionSourcePadded;
-        Console.WriteLine($"CalculateProductVersion: {label} {branchName} {suffix}");
+
         switch (label)
         {
             case "ci":

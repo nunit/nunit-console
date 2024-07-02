@@ -132,7 +132,6 @@ namespace NUnit.ConsoleRunner
 
         private int RunTests(TestPackage package, TestFilter filter)
         {
-
             var writer = new ColorConsoleWriter(!_options.NoColor);
 
             foreach (var spec in _options.ResultOutputSpecifications)
