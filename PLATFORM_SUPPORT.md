@@ -15,11 +15,9 @@ runtime available.
 
 ## Agents Provided
 
-We currently supply a fairly large selection of agents with the console runner:
-* .NET Framework 2.0
+We currently (July 3, 2024) supply the following agents with the console runner:
 * .NET Framework 4.6.2
 * ,NET Core 3.1
-* .NET 5.0
 * .NET 6.0
 * .NET 7.0
 * .NET 8.0 (coming in version 3.18.0)
@@ -33,10 +31,10 @@ dates listed in the following table.
 
 | Runtime              | Microsoft<br>End of Support | Agent Retirement | Notes |
 | -------------------- | --------------- | --------------------- | --- |
-| .NET Framework 2.0   | July, 2011      | July, 2024            | Will be removed in version 3.18.0
+| .NET Framework 2.0   | July, 2011      | July, 2024            | Removed in version 3.18.0
 | .NET Framework 4.6.2 | January, 2027   | after July, 2027      | May be upgraded to 4.8.1 before retirement date |
 | .NET Core 3.1        | December, 2022  | after December, 2024  | 
-| .NET 5.0             | May, 2022       | July, 2024            | Will be removed in version 3.18.0
+| .NET 5.0             | May, 2022       | July, 2024            | Removed in version 3.18.0
 | .NET 6.0             | November, 2024  | after May, 2025       |
 | .NET 7.0             | May, 2024       | after November, 2024  |
 | .NET 8.0             | November, 2027  | after May, 2027       |
