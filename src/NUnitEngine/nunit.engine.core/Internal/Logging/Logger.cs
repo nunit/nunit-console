@@ -126,7 +126,7 @@ namespace NUnit.Engine.Internal
             _writer.WriteLine(TraceFmt,
                 DateTime.Now.ToString(TimeFmt),
                 level,
-#if NET20
+#if NETFRAMEWORK
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
 #else
                 Environment.CurrentManagedThreadId,

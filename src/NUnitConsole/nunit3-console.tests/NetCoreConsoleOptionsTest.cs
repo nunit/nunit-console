@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Tests
 {
-#if !NET35
+#if !NETFRAMEWORK
     class NetCoreConsoleOptionsTest
     {
         [TestCaseSource(nameof(TestCases))]

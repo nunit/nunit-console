@@ -150,7 +150,7 @@ namespace NUnit.Engine.Services.Tests
 
 #if NETCOREAPP
             // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
-            var assemblyName = Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.core.tests.exe");
+            var assemblyName = Path.Combine(GetSiblingDirectory("net462"), "nunit.engine.core.tests.exe");
 #else
             // Attempt to load the .NET Core 3.1 version of the extensions from the .NET 3.5 tests
             var assemblyName = Path.Combine(GetSiblingDirectory("netcoreapp3.1"), "nunit.engine.core.tests.dll");
@@ -235,7 +235,7 @@ namespace NUnit.Engine.Services.Tests
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
             var extNetCore = new ExtensionAssembly(netcore.Location, false);
-            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.dll"), false);
+            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net462"), "nunit.engine.dll"), false);
 
             yield return new TestCaseData(new FrameworkCombo(netcore, extNetFramework)).SetName("InvalidCombo(.NET Core, .NET Framework)");
 #else
@@ -257,7 +257,7 @@ namespace NUnit.Engine.Services.Tests
 
             var extNetStandard = new ExtensionAssembly(netstandard.Location, false);
             var extNetCore = new ExtensionAssembly(netcore.Location, false);
-            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net35"), "nunit.engine.dll"), false);
+            var extNetFramework = new ExtensionAssembly(Path.Combine(GetSiblingDirectory("net462"), "nunit.engine.dll"), false);
 
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetStandard)).SetName("InvalidCombo(.NET Standard, .NET Standard)");
             yield return new TestCaseData(new FrameworkCombo(netstandard, extNetCore)).SetName("InvalidCombo(.NET Standard, .NET Core)");
@@ -270,7 +270,7 @@ namespace NUnit.Engine.Services.Tests
         /// <summary>
         /// Returns a directory in the parent directory that the current test assembly is in. This
         /// is used to load assemblies that target different frameworks than the current tests. So
-        /// if these tests are in bin\release\net35 and dir is netstandard2.0, this will return
+        /// if these tests are in bin\release\net462 and dir is netstandard2.0, this will return
         /// bin\release\netstandard2.0.
         /// </summary>
         /// <param name="dir">The sibling directory</param>

@@ -56,22 +56,17 @@ public class ZipPackage : PackageDefinition
             BuildSettings.OutputDirectory,
             BuildSettings.ZipImageDirectory + "bin/" );
 
-        foreach (var runtime in new[] { "net20", "net35" })
+        _context.CopyFileToDirectory(
+            BuildSettings.ZipDirectory + "nunit.bundle.addins",
+            BuildSettings.ZipImageDirectory);
+
+        var addinsDir = BuildSettings.ZipImageDirectory + "bin/net462/addins/";
+        _context.CreateDirectory(addinsDir);
+
+        foreach (var packageDir in System.IO.Directory.GetDirectories(BuildSettings.ExtensionsDirectory))
         {
-            var runtimeDir = BuildSettings.ZipImageDirectory + $"bin/{runtime}/";
-
-            _context.CopyFileToDirectory(
-                BuildSettings.ZipDirectory + "nunit.bundle.addins",
-                BuildSettings.ZipImageDirectory);
-
-            var addinsDir = runtimeDir + "addins/";
-            _context.CleanDirectory(addinsDir);
-
-            foreach (var packageDir in System.IO.Directory.GetDirectories(BuildSettings.ExtensionsDirectory))
-            {
-                var files = _context.GetFiles(packageDir + "/tools/*").Concat(_context.GetFiles(packageDir + "/tools/net20/*"));
-                _context.CopyFiles(files.Where(f => f.GetExtension() != ".addins"), addinsDir);
-            }
+            var files = _context.GetFiles(packageDir + "/tools/*").Concat(_context.GetFiles(packageDir + "/tools/net462/*"));
+            _context.CopyFiles(files.Where(f => f.GetExtension() != ".addins"), addinsDir);
         }
     }
 }

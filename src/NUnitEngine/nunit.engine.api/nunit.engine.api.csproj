@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
-    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -18,7 +18,7 @@
     <FileVersion>3.99.0.0</FileVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <Reference Include="System.Web" />
   </ItemGroup>
   

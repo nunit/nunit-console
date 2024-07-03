@@ -28,12 +28,10 @@ namespace NUnit.Engine.Services
             try
             {
                 var settings = new XmlReaderSettings();
-#if NET20
-                settings.ProhibitDtd = false;
+#if NETFRAMEWORK
                 settings.XmlResolver = null;
-#else
-                settings.DtdProcessing = DtdProcessing.Ignore;
 #endif
+                settings.DtdProcessing = DtdProcessing.Ignore;
                 using (var xmlReader = XmlReader.Create(_xsltFile, settings))
                     _transform.Load(xmlReader);
             }

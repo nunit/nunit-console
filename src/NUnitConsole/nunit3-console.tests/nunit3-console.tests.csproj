@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
-    <TargetFrameworks>net35;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
   </PropertyGroup>
@@ -18,7 +18,7 @@
     <PackageReference Include="NUnit" Version="3.13.3" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='net35'">
+  <ItemGroup Condition="'$(TargetFramework)'!='net462'">
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
