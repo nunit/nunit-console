@@ -2,7 +2,6 @@ public enum PackageType
 {
     NuGet,
     Chocolatey,
-    Msi,
     Zip
 }
 

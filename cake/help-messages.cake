@@ -31,9 +31,9 @@
                 more specifications, separated by '|' and '&'. Each specification
                 is of the form "prop=value", where prop may be either id or type.
                 Examples:
-                    --where type=msi
+                    --where type=nuget
                     --where id=NUnit.Engine.Api
-                    --where "type=msi|type=zip"
+                    --where "type=nuget|type=choco"
 
             --level=LEVEL           [--lev]
                 Specifies the level of package testing, 1, 2 or 3. Defaults are

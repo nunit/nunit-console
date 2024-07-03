@@ -167,21 +167,17 @@ public static class BuildSettings
 	public static string OutputDirectory                => ProjectDirectory + BIN_DIR + Configuration + "/";
 	public static string NuGetDirectory                 => ProjectDirectory + NUGET_DIR;
 	public static string ChocolateyDirectory            => ProjectDirectory + CHOCO_DIR;
-    public static string MsiDirectory                   => ProjectDirectory + MSI_DIR;
     public static string ZipDirectory                   => ProjectDirectory + ZIP_DIR;
 	public static string PackageDirectory               => ProjectDirectory + PACKAGE_DIR;
 	public static string PackageTestDirectory           => ProjectDirectory + PKG_TEST_DIR;
 	public static string NuGetTestDirectory             => ProjectDirectory + NUGET_TEST_DIR;
 	public static string ChocolateyTestDirectory        => ProjectDirectory + CHOCO_TEST_DIR;
-	public static string MsiTestDirectory               => ProjectDirectory + MSI_TEST_DIR;
 	public static string ZipTestDirectory               => ProjectDirectory + ZIP_TEST_DIR;
 	public static string PackageResultDirectory         => ProjectDirectory + PKG_RSLT_DIR;
 	public static string NuGetResultDirectory           => ProjectDirectory + NUGET_RSLT_DIR;
 	public static string ChocolateyResultDirectory      => ProjectDirectory + CHOCO_RSLT_DIR;
-	public static string MsiResultDirectory             => ProjectDirectory + MSI_RSLT_DIR;
 	public static string ZipResultDirectory             => ProjectDirectory + ZIP_RSLT_DIR;
 	public static string ImageDirectory                 => ProjectDirectory + IMAGE_DIR;
-    public static string MsiImageDirectory              => ProjectDirectory + MSI_IMG_DIR;
     public static string ZipImageDirectory              => ProjectDirectory + ZIP_IMG_DIR;
 	public static string ExtensionsDirectory            => ProjectDirectory + "bundled-extensions/";
 	public static string ToolsDirectory                 => ProjectDirectory + "tools/";
@@ -298,15 +294,12 @@ public static class BuildSettings
 		Console.WriteLine("PackageTest:   " + PackageTestDirectory);
 		Console.WriteLine("NuGetTest:     " + NuGetTestDirectory);
 		Console.WriteLine("ChocoTest:     " + ChocolateyTestDirectory);
-		Console.WriteLine("MsiTest:       " + MsiTestDirectory);
 		Console.WriteLine("ZipTest:       " + ZipTestDirectory);
 		Console.WriteLine("PackageResult: " + PackageResultDirectory);
 		Console.WriteLine("NuGetResult:   " + NuGetResultDirectory);
 		Console.WriteLine("ChocoResult:   " + ChocolateyResultDirectory);
-		Console.WriteLine("MsiResult:     " + MsiResultDirectory);
 		Console.WriteLine("ZipResult:     " + ZipResultDirectory);
 		Console.WriteLine("Image:         " + ImageDirectory);
-		Console.WriteLine("MsiImage:      " + MsiImageDirectory);
 		Console.WriteLine("ZipImage:      " + ZipImageDirectory);
 
 		Console.WriteLine("\nBUILD");

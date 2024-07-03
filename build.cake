@@ -246,7 +246,6 @@ PackageDefinition NUnitConsoleRunnerNet80Package;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
-PackageDefinition NUnitConsoleMsiPackage;
 PackageDefinition NUnitConsoleZipPackage;
 
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
@@ -329,25 +328,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory 
             + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
         tests: StandardRunnerTests),
-
-    NUnitConsoleMsiPackage = new MsiPackage(
-        id: "NUnit.Console",
-        source: BuildSettings.MsiDirectory + "nunit/nunit.wixproj",
-        checks: new PackageCheck[] {
-            HasDirectory("NUnit.org").WithFiles("LICENSE.txt", "NOTICES.txt", "nunit.ico"),
-            HasDirectory("NUnit.org/nunit-console").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.bundle.addins"),
-            HasDirectory("Nunit.org/nunit-console/addins").WithFiles("nunit.core.dll", "nunit.core.interfaces.dll", "nunit.v2.driver.dll", "nunit-project-loader.dll", "vs-project-loader.dll", "nunit-v2-result-writer.dll", "teamcity-event-listener.dll")
-        },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.MsiTestDirectory
-            + $"NUnit.Console.{BuildSettings.BuildVersion.SemVer}/NUnit.org/nunit-console/nunit3-console.exe"),
-        tests: StandardRunnerTests,
-        bundledExtensions: new [] {
-            new PackageReference("NUnit.Extension.VSProjectLoader", "3.9.0"),
-            new PackageReference("NUnit.Extension.NUnitProjectLoader", "3.7.1"),
-            new PackageReference("NUnit.Extension.NUnitV2Driver", "3.9.0"),
-            new PackageReference("NUnit.Extension.NUnitV2ResultWriter", "3.7.0"),
-            new PackageReference("NUnit.Extension.TeamCityEventListener", "1.0.9")
-        }),
 
     NUnitConsoleZipPackage = new ZipPackage(
         id: "NUnit.Console",

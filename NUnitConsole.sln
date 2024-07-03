@@ -109,12 +109,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deprecated", "deprecated", 
 		choco\deprecated\nunit-console-with-extensions.nuspec = choco\deprecated\nunit-console-with-extensions.nuspec
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "msi", "msi", "{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A}"
-	ProjectSection(SolutionItems) = preProject
-		msi\nunit-install.sln = msi\nunit-install.sln
-		msi\resources\nunit.bundle.addins = msi\resources\nunit.bundle.addins
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "zip", "zip", "{20005864-BE82-412D-99BF-288E2D8370E9}"
 	ProjectSection(SolutionItems) = preProject
 		zip\nunit.bundle.addins = zip\nunit.bundle.addins
@@ -141,21 +135,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{C5B712
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nunit", "nunit", "{93E5CAF4-D5DB-4915-AF0F-908A6043E462}"
-	ProjectSection(SolutionItems) = preProject
-		msi\nunit\addin-files.wxi = msi\nunit\addin-files.wxi
-		msi\nunit\banner.bmp = msi\nunit\banner.bmp
-		msi\nunit\console-files.wxi = msi\nunit\console-files.wxi
-		msi\nunit\dialog.bmp = msi\nunit\dialog.bmp
-		msi\nunit\engine-files.wxi = msi\nunit\engine-files.wxi
-		msi\nunit\nunit.wixproj = msi\nunit\nunit.wixproj
-		msi\nunit\nunit.wxs = msi\nunit\nunit.wxs
-		msi\nunit\runner-directories.wxi = msi\nunit\runner-directories.wxi
-		msi\nunit\runner-features.wxi = msi\nunit\runner-features.wxi
-		msi\nunit\utility-files.wxi = msi\nunit\utility-files.wxi
-		msi\nunit\variables.wxi = msi\nunit\variables.wxi
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{D6449B7A-20FF-467B-A65E-174DD6992AEB}"
 	ProjectSection(SolutionItems) = preProject
 		cake\banner.cake = cake\banner.cake
@@ -169,7 +148,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{D6449B7A-2
 		cake\headers.cake = cake\headers.cake
 		cake\help-messages.cake = cake\help-messages.cake
 		cake\known-extensions.cake = cake\known-extensions.cake
-		cake\msi-package.cake = cake\msi-package.cake
 		cake\nuget-package.cake = cake\nuget-package.cake
 		cake\package-checks.cake = cake\package-checks.cake
 		cake\package-definition.cake = cake\package-definition.cake
@@ -177,9 +155,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{D6449B7A-2
 		cake\package-test.cake = cake\package-test.cake
 		cake\publishing.cake = cake\publishing.cake
 		cake\setup.cake = cake\setup.cake
+		cake\task-builders.cake = cake\task-builders.cake
 		cake\task-definitions.cake = cake\task-definitions.cake
 		cake\test-reports.cake = cake\test-reports.cake
-		cake\task-builders.cake = cake\task-builders.cake
 		cake\test-results.cake = cake\test-results.cake
 		cake\test-runners.cake = cake\test-runners.cake
 		cake\tools.cake = cake\tools.cake
@@ -265,14 +243,12 @@ Global
 		{333D2FBC-CCA7-46AF-9453-C310671A67B0} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{9D3015EE-5B84-41B3-A1D3-1A439370C392} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{068F6CA9-6108-4F45-8540-351AA5227259} = {4FDF7BFA-A337-41D3-898D-C6A98278E6AD}
-		{0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 		{20005864-BE82-412D-99BF-288E2D8370E9} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 		{CACC0520-B452-4310-A33C-DC944129ACDD} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{25DA12FE-6209-4524-9A37-8E51F815E198} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 		{08F8160E-E691-4F07-9F57-EA31B9736429} = {25DA12FE-6209-4524-9A37-8E51F815E198}
 		{50371E48-BEC3-4D53-BD37-F3A6149CFD0D} = {25DA12FE-6209-4524-9A37-8E51F815E198}
 		{C5B7120C-190B-4C38-95CB-83F12799598D} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
-		{93E5CAF4-D5DB-4915-AF0F-908A6043E462} = {0C0D20CE-70CD-4CEF-BE9B-AEB8A2DE9C8A}
 		{D6449B7A-20FF-467B-A65E-174DD6992AEB} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
