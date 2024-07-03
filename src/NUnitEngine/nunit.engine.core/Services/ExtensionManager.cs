@@ -6,12 +6,10 @@ using System.Reflection;
 using TestCentric.Metadata;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
 
-using Backports = NUnit.Engine.Internal.Backports;
-#if NET20 || NETSTANDARD2_0
+#if NET462 || NETSTANDARD2_0
 using Path = NUnit.Engine.Internal.Backports.Path;
 #else
 using Path = System.IO.Path;
@@ -328,22 +326,22 @@ namespace NUnit.Engine.Services
             }
         }
 
-        private Backports.Tuple<IDirectory, string> GetBaseDirAndPattern(IDirectory baseDir, string path)
+        private Tuple<IDirectory, string> GetBaseDirAndPattern(IDirectory baseDir, string path)
         {
             if (Path.IsPathFullyQualified(path))
             {
                 if (path.EndsWith("/"))
                 {
-                    return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(path), string.Empty);
+                    return new Tuple<IDirectory, string>(_fileSystem.GetDirectory(path), string.Empty);
                 }
                 else
                 {
-                    return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
+                    return new Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
                 }
             }
             else
             {
-                return new Backports.Tuple<IDirectory, string>(baseDir, path);
+                return new Tuple<IDirectory, string>(baseDir, path);
             }
         }
 

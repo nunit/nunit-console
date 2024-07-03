@@ -77,10 +77,8 @@ namespace NUnit.Agent
             log.Info($"Running {typeof(NUnitTestAgent).Assembly.GetCustomAttribute<TargetFrameworkAttribute>().FrameworkDisplayName} agent under {RuntimeInformation.FrameworkDescription}");
 #elif NETCOREAPP3_1
             log.Info($"Running .NET Core 3.1 agent under {RuntimeInformation.FrameworkDescription}");
-#elif NET40
-            log.Info($"Running .NET 4.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
-#elif NET20
-            log.Info($"Running .NET 2.0 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
+#elif NET462
+            log.Info($"Running .NET 4.6.2 agent under {RuntimeFramework.CurrentFramework.DisplayName}");
 #endif
 
             // Create CoreEngine

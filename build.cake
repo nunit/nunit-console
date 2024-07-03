@@ -18,18 +18,16 @@ BuildSettings.Initialize(
     // Tests run for all runner packages except NETCORE runner
     var StandardRunnerTests = new List<PackageTest>
     {
-        Net35Test,
-        Net35X86Test,
-        Net40Test,
-        Net40X86Test,
-        Net35PlusNet40Test,
+        Net462Test,
+        Net462X86Test,
+        Net462PlusNet462Test,
         NetCore31Test,
         Net50Test,
         Net60Test,
         Net70Test,
         Net80Test,
         Net50PlusNet60Test,
-        Net40PlusNet60Test,
+        Net462PlusNet60Test,
         NUnitProjectTest
     };
 
@@ -97,35 +95,23 @@ static ExpectedResult MockAssemblyX86ExpectedResult(params string[] runtimes)
     return result;
 }
 
-static PackageTest Net35Test = new PackageTest(
-    1, "Net35Test",
-    "Run mock-assembly.dll under .NET 3.5",
-    "net35/mock-assembly.dll",
-    MockAssemblyExpectedResult("net-2.0"));
+static PackageTest Net462Test = new PackageTest(
+    1, "Net462Test",
+    "Run mock-assembly.dll under .NET 4.6.2",
+    "net462/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-4.6.2"));
 
-static PackageTest Net35X86Test = new PackageTest(
-    1, "Net35X86Test",
-    "Run mock-assembly-x86.dll under .NET 3.5",
-    "net35/mock-assembly-x86.dll",
-    MockAssemblyX86ExpectedResult("net-2.0"));
+static PackageTest Net462X86Test = new PackageTest(
+    1, "Net462X86Test",
+    "Run mock-assembly-x86.dll under .NET 4.6.2",
+    "net462/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("net-4.6.2"));
 
-static PackageTest Net40Test = new PackageTest(
-    1, "Net40Test",
-    "Run mock-assembly.dll under .NET 4.x",
-    "net40/mock-assembly.dll",
-    MockAssemblyExpectedResult("net-4.0"));
-
-static PackageTest Net40X86Test = new PackageTest(
-    1, "Net40X86Test",
-    "Run mock-assembly-x86.dll under .NET 4.x",
-    "net40/mock-assembly-x86.dll",
-    MockAssemblyX86ExpectedResult("net-4.0"));
-
-static PackageTest Net35PlusNet40Test = new PackageTest(
-    1, "Net35PlusNet40Test",
-    "Run both copies of mock-assembly together",
-    "net35/mock-assembly.dll net40/mock-assembly.dll",
-    MockAssemblyExpectedResult("net-2.0", "net-4.0"));
+static PackageTest Net462PlusNet462Test = new PackageTest(
+    1, "Net462PlusNet462Test",
+    "Run two copies of mock-assembly together",
+    "net462/mock-assembly.dll net462/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-4.6.2", "net-4.6.2"));
 
 static PackageTest Net80Test = new PackageTest(
     1, "Net80Test",
@@ -193,17 +179,17 @@ static PackageTest Net50PlusNet60Test = new PackageTest(
     "net5.0/mock-assembly.dll net6.0/mock-assembly.dll",//" net7.0/mock-assembly.dll net8.0/mock-assembly.dll",
     MockAssemblyExpectedResult("netcore-5.0", "netcore-6.0"));
 
-static PackageTest Net40PlusNet60Test = new PackageTest(
-    1, "Net40PlusNet60Test",
-    "Run mock-assembly under .Net Framework 4.0 and .Net 6.0 together",
-    "net40/mock-assembly.dll net6.0/mock-assembly.dll",
-    MockAssemblyExpectedResult("net-4.0", "netcore-6.0"));
+static PackageTest Net462PlusNet60Test = new PackageTest(
+    1, "Net462PlusNet60Test",
+    "Run mock-assembly under .Net Framework 4.6.2 and .Net 6.0 together",
+    "net462/mock-assembly.dll net6.0/mock-assembly.dll",
+    MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"));
 
 static PackageTest NUnitProjectTest = new PackageTest(
     1, "NUnitProjectTest",
     "Run project with both copies of mock-assembly",
     "../../NetFXTests.nunit --config=Release --trace=Debug",
-    MockAssemblyExpectedResult("net-2.0", "net-4.0"),
+    MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"),
     KnownExtensions.NUnitProjectLoader);
 
 //////////////////////////////////////////////////////////////////////
@@ -256,8 +242,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
-            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
-            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
+            HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
@@ -266,8 +251,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         symbols: new PackageCheck[] {
             HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
-            HasDirectory("tools/agents/net20").WithFiles(AGENT_PDB_FILES),
-            HasDirectory("tools/agents/net40").WithFiles(AGENT_PDB_FILES),
+            HasDirectory("tools/agents/net462").WithFiles(AGENT_PDB_FILES),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net5.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
@@ -317,8 +301,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
         checks: new PackageCheck[] {
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.choco.addins"),
-            HasDirectory("tools/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
-            HasDirectory("tools/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
+            HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
@@ -334,20 +317,17 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.ZipImageDirectory,
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-            HasDirectory("bin/net20").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
-            HasDirectory("bin/net35").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/net462").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
-            //HasDirectory("bin/net5.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-            HasDirectory("bin/agents/net20").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
-            HasDirectory("bin/agents/net40").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
+            HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net5.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory 
-            + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net20/nunit3-console.exe"),
+            + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit3-console.exe"),
         tests: StandardRunnerTests,
         bundledExtensions: new [] {
             new PackageReference("NUnit.Extension.VSProjectLoader", "3.9.0"),
@@ -364,18 +344,16 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "engine/nunit.engine.nuspec",
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("lib/net20").WithFiles(ENGINE_FILES),
+            HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
-            HasDirectory("contentFiles/any/lib/net20").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/lib/net462").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
-            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins"),
-            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
+            HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
         },
         symbols: new PackageCheck[] {
-            HasDirectory("lib/net20").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/net462").WithFiles(ENGINE_PDB_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
-            HasDirectory("contentFiles/any/agents/net20").WithFiles(AGENT_PDB_FILES),
-            HasDirectory("contentFiles/any/agents/net40").WithFiles(AGENT_PDB_FILES)
+            HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_PDB_FILES)
         }),
 
     NUnitEngineApiPackage = new NuGetPackage(
@@ -383,11 +361,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "engine/nunit.engine.api.nuspec",
         checks: new PackageCheck[] {
             HasFile("LICENSE.txt"),
-            HasDirectory("lib/net20").WithFile("nunit.engine.api.dll"),
+            HasDirectory("lib/net462").WithFile("nunit.engine.api.dll"),
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
         },
         symbols: new PackageCheck[] {
-            HasDirectory("lib/net20").WithFile("nunit.engine.api.pdb"),
+            HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
         })
 });
@@ -406,7 +384,7 @@ public class CustomTestRunner : UnitTestRunner
         if(testPath.ToString().Contains("nunit3-console.tests.dll"))
         {
             return BuildSettings.Context.StartProcess(
-                BuildSettings.OutputDirectory + "net20/nunit3-console.exe",
+                BuildSettings.OutputDirectory + "net462/nunit3-console.exe",
                 $"\"{testPath}\" {BuildSettings.UnitTestArguments}" );
         }
 

@@ -146,12 +146,7 @@ namespace NUnit.Engine.Drivers
             try
             {
                 return _testDomain.CreateInstanceAndUnwrap(
-                    _reference.FullName, typeName, false, 0,
-#if !NET_4_0
-                    null, args, null, null, null);
-#else
-                null, args, null, null );
-#endif
+                    _reference.FullName, typeName, false, 0, null, args, null, null );
             }
             catch (TargetInvocationException ex)
             {
