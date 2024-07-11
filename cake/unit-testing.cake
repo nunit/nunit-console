@@ -16,23 +16,36 @@ public static class UnitTesting
 		var unitTests = FindUnitTestFiles(BuildSettings.UnitTests);
 
         _context.Information($"Located {unitTests.Count} unit test assemblies.");
+        var errors = new List<string>();
     
         foreach (var testPath in unitTests)
-            RunTest(testPath);
-    }
+        {
+            var testFile = testPath.GetFilename();
+            var containingDir = testPath.GetDirectory().GetDirectoryName();
+            var runtime = IsValidRuntime(containingDir) ? containingDir : null;
+            
+            Banner.Display(runtime != null
+                ? $"Running {testFile} under {runtime}"
+                : $"Running {testFile}");
 
-    private static void RunTest(FilePath testPath)
-    {
-        var testFile = testPath.GetFilename();
-        var containingDir = testPath.GetDirectory().GetDirectoryName();
-        var msg = "Running " + testFile;
-        if (IsValidRuntime(containingDir))
-            msg += " under " + containingDir;
+            var runner = BuildSettings.UnitTestRunner ?? new NUnitLiteRunner();
+            int rc = runner.Run(testPath);
 
-        Banner.Display(msg);
+            var name = runtime != null
+                ? $"{testFile}({runtime})"
+                : testFile;
+            if (rc > 0)
+                errors.Add($"{name}: {rc} tests failed");
+            else if (rc < 0)
+                errors.Add($"{name} returned rc = {rc}");
+        }
 
-        var runner = BuildSettings.UnitTestRunner ?? new NUnitLiteRunner();
-        runner.Run(testPath);
+        if (unitTests.Count == 0)
+            _context.Warning("No unit tests were found");
+        else if (errors.Count > 0)
+            throw new Exception(
+                "One or more unit tests failed, breaking the build.\r\n"
+                + errors.Aggregate((x, y) => x + "\r\n" + y) );
 
         static bool IsValidRuntime(string text)
         {
