@@ -18,7 +18,7 @@ public class DotnetInfo
     // NOTES:
     // * We don't need an IsInstalled property because our scripts all run under dotnet.
 
-    public bool IsX86Installed => System.IO.Directory.Exists(X86InstallPath) && System.IO.File.Exists(X86Executable);
+    public bool IsX86Installed => SIO.Directory.Exists(X86InstallPath) && SIO.File.Exists(X86Executable);
 
     public string InstallPath { get; }
     public string Executable => InstallPath + "dotnet.exe";
@@ -33,12 +33,12 @@ public class DotnetInfo
         _context.Information($"Install Path:      {InstallPath}");
         _context.Information($"Executable:        {Executable}");
         _context.Information("Runtimes:");
-        foreach (string dir in System.IO.Directory.GetDirectories(System.IO.Path.Combine(InstallPath, "shared")))
+        foreach (string dir in SIO.Directory.GetDirectories(SIO.Path.Combine(InstallPath, "shared")))
         {
-            string runtime = System.IO.Path.GetFileName(dir);
-            foreach (string dir2 in System.IO.Directory.GetDirectories(dir))
+            string runtime = SIO.Path.GetFileName(dir);
+            foreach (string dir2 in SIO.Directory.GetDirectories(dir))
             {
-                string version = System.IO.Path.GetFileName(dir2);
+                string version = SIO.Path.GetFileName(dir2);
                 _context.Information($"  {runtime} {version}");
             }
         }
@@ -48,12 +48,12 @@ public class DotnetInfo
             _context.Information($"\nX86 Install Path:  {X86InstallPath}");
             _context.Information($"X86 Executable:    {X86Executable}");
             _context.Information("Runtimes:");
-            foreach (var dir in System.IO.Directory.GetDirectories(System.IO.Path.Combine(X86InstallPath, "shared")))
+            foreach (var dir in SIO.Directory.GetDirectories(SIO.Path.Combine(X86InstallPath, "shared")))
             {
-                string runtime = System.IO.Path.GetFileName(dir);
-                foreach (string dir2 in System.IO.Directory.GetDirectories(dir))
+                string runtime = SIO.Path.GetFileName(dir);
+                foreach (string dir2 in SIO.Directory.GetDirectories(dir))
                 {
-                    string version = System.IO.Path.GetFileName(dir2);
+                    string version = SIO.Path.GetFileName(dir2);
                     _context.Information($"  {runtime} {version}");
                 }
             }

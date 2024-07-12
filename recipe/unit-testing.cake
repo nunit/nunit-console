@@ -18,6 +18,8 @@ public static class UnitTesting
         _context.Information($"Located {unitTests.Count} unit test assemblies.");
         var errors = new List<string>();
     
+        var runner = BuildSettings.UnitTestRunner ?? new NUnitLiteRunner();
+    
         foreach (var testPath in unitTests)
         {
             var testFile = testPath.GetFilename();
@@ -28,8 +30,7 @@ public static class UnitTesting
                 ? $"Running {testFile} under {runtime}"
                 : $"Running {testFile}");
 
-            var runner = BuildSettings.UnitTestRunner ?? new NUnitLiteRunner();
-            int rc = runner.Run(testPath);
+            int rc = runner.RunUnitTest(testPath);
 
             var name = runtime != null
                 ? $"{testFile}({runtime})"

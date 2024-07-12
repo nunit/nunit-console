@@ -23,14 +23,17 @@ public abstract class PackageDefinition
         PackageType packageType,
         string id,
         string source,
-        PackageTestRunner testRunner = null,
+        IPackageTestRunner testRunner = null,
+        TestRunnerSource testRunnerSource = null,
         string extraTestArguments = null,
         PackageCheck[] checks = null,
         PackageCheck[] symbols = null,
         IEnumerable<PackageTest> tests = null)
     {
-        if (testRunner == null && tests != null)
-            throw new System.ArgumentException($"Unable to create {packageType} package {id}: TestRunner must be provided if there are tests", nameof(testRunner));
+        if (testRunner == null && testRunnerSource == null && tests != null)
+            throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: TestRunner or TestRunnerSource must be provided if there are tests.");
+        if (testRunner != null && testRunnerSource != null)
+            throw new System.InvalidOperationException($"Unable to create {packageType} package {id}: Either TestRunner or TestRunnerSource must be provided, but not both.");
 
         _context = BuildSettings.Context;
 
@@ -40,6 +43,7 @@ public abstract class PackageDefinition
         PackageSource = source;
         BasePath = BuildSettings.OutputDirectory;
         TestRunner = testRunner;
+        TestRunnerSource = testRunnerSource;
         ExtraTestArguments = extraTestArguments;
         PackageChecks = checks;
         SymbolChecks = symbols;
@@ -51,7 +55,8 @@ public abstract class PackageDefinition
     public string PackageVersion { get; protected set; }
 	public string PackageSource { get; }
     public string BasePath { get; }
-    public PackageTestRunner TestRunner { get; }
+    public IPackageTestRunner TestRunner { get; }
+    public TestRunnerSource TestRunnerSource { get; }
     public string ExtraTestArguments { get; }
     public PackageCheck[] PackageChecks { get; }
     public PackageCheck[] SymbolChecks { get; protected set; }
@@ -201,44 +206,55 @@ public abstract class PackageDefinition
 		//    _context.Information("Deleted directory " + dirPath.GetDirectoryName());
         //}
 
-        //if (TestRunner.RequiresInstallation)
-        //    TestRunner.Install();
+        // Package was defined with either a TestRunnerSource or a single TestRunner. In either
+        // case, these will all be package test runners and may or may not require installation.
+        var defaultRunners = TestRunnerSource ?? new TestRunnerSource((TestRunner)TestRunner);
+
+        // Preinstall all runners requiring installation
+        InstallRunners(defaultRunners.PackageTestRunners);
 
         foreach (var packageTest in PackageTests)
         {
             if (packageTest.Level > BuildSettings.PackageTestLevel)
                 continue;
 
-            foreach (ExtensionSpecifier extension in packageTest.ExtensionsNeeded)
-                extension.InstallExtension(this);
+            InstallExtensions(packageTest.ExtensionsNeeded);
+            InstallRunners(packageTest.TestRunners);
 
-            var testResultDir = $"{PackageResultDirectory}/{packageTest.Name}/";
-            var resultFile = testResultDir + "TestResult.xml";
-
-            Banner.Display(packageTest.Description);
-
-			_context.CreateDirectory(testResultDir);
-            string arguments = $"{packageTest.Arguments} {ExtraTestArguments} --work={testResultDir}";
-            if (CommandLineOptions.TraceLevel.Value != "Off")
-                arguments += $" --trace:{CommandLineOptions.TraceLevel.Value}";
-
-            int rc = TestRunner.Run(arguments);
-
-            try
+            // Use runners from the test if provided, otherwise the default runners
+            var runners = packageTest.TestRunners.Length > 0 ? packageTest.TestRunners : defaultRunners.PackageTestRunners;
+            
+            foreach (var runner in runners)
             {
-                var result = new ActualResult(resultFile);
-                var report = new PackageTestReport(packageTest, result);
-                reporter.AddReport(report);
+                Console.WriteLine(runner.Version);
+                var testResultDir = $"{PackageResultDirectory}/{packageTest.Name}/";
+                var resultFile = testResultDir + "TestResult.xml";
 
-                Console.WriteLine(report.Errors.Count == 0
-                    ? "\nSUCCESS: Test Result matches expected result!"
-                    : "\nERROR: Test Result not as expected!");
-            }
-            catch (Exception ex)
-            {
-                reporter.AddReport(new PackageTestReport(packageTest, ex));
+                Banner.Display(packageTest.Description);
 
-                Console.WriteLine("\nERROR: No result found!");
+			    _context.CreateDirectory(testResultDir);
+                string arguments = $"{packageTest.Arguments} {ExtraTestArguments} --work={testResultDir}";
+                if (CommandLineOptions.TraceLevel.Value != "Off")
+                    arguments += $" --trace:{CommandLineOptions.TraceLevel.Value}";
+
+                int rc = runner.RunPackageTest(arguments);
+
+                try
+                {
+                    var result = new ActualResult(resultFile);
+                    var report = new PackageTestReport(packageTest, result, runner);
+                    reporter.AddReport(report);
+
+                    Console.WriteLine(report.Errors.Count == 0
+                        ? "\nSUCCESS: Test Result matches expected result!"
+                        : "\nERROR: Test Result not as expected!");
+                }
+                catch (Exception ex)
+                {
+                    reporter.AddReport(new PackageTestReport(packageTest, ex));
+
+                    Console.WriteLine("\nERROR: No result found!");
+                }
             }
         }
 
@@ -256,6 +272,41 @@ public abstract class PackageDefinition
 
         if (hadErrors)
             throw new Exception("One or more package tests had errors!");
+    }
+    
+    private void InstallExtensions(ExtensionSpecifier[] extensionsNeeded)
+    {
+        foreach (ExtensionSpecifier extension in extensionsNeeded)
+            extension.InstallExtension(this);
+    }
+
+    private void InstallRunners(IEnumerable<IPackageTestRunner> runners)
+    {
+        // Install any runners needing installation
+        foreach (var runner in runners)
+            if (runner is InstallableTestRunner)
+                InstallRunner((InstallableTestRunner)runner);
+    }
+
+    private void InstallRunner(InstallableTestRunner runner)
+    {
+        runner.Install(PackageInstallDirectory);
+
+		// We are using nuget packages for the runner, so it won't normally recognize
+		// chocolatey extensions. We add an extra addins file for that purpose.
+        if (PackageType == PackageType.Chocolatey)
+        {
+            var filePath = runner.ExecutablePath.GetDirectory().CombineWithFilePath("choco.engine.addins").ToString();
+            Console.WriteLine($"Creating {filePath}");
+
+			using (var writer = new StreamWriter(filePath))
+			{
+				writer.WriteLine("../../nunit-extension-*/tools/");
+				writer.WriteLine("../../nunit-extension-*/tools/*/");
+				writer.WriteLine("../../../nunit-extension-*/tools/");
+				writer.WriteLine("../../../nunit-extension-*/tools/*/");
+			}
+        }
     }
 
     public virtual void VerifySymbolPackage() { } // Does nothing. Overridden for NuGet packages.

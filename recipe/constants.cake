@@ -1,6 +1,9 @@
 // This file contains both real constants and static readonly variables used
 // as constants. All values are initialized before any instance variables.
 
+// Alias used throughout the recipe
+using SIO = System.IO;
+
 // GitHub owner is the NUnit organization
 const string GITHUB_OWNER = "nunit";
 

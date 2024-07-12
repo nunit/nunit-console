@@ -33,7 +33,7 @@ public static class Headers
                 continue;
 
             // Ignore AssemblyInfo files
-            if (System.IO.Path.GetFileName(path) == "AssemblyInfo.cs")
+            if (SIO.Path.GetFileName(path) == "AssemblyInfo.cs")
                 continue;
 
             examined++;
@@ -92,7 +92,7 @@ public static class Headers
         List<string> GetHeader(FilePath file)
         {
             var header = new List<string>();
-            var lines = System.IO.File.ReadLines(file.ToString());
+            var lines = SIO.File.ReadLines(file.ToString());
 
             foreach (string line in lines)
             {

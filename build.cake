@@ -1,5 +1,5 @@
 // Load scripts
-#load cake/*.cake
+#load recipe/*.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -357,9 +357,9 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
 
 // Custom unit test runner to run console vs engine tests differently
 // TODO: Use NUnitLite for all tests?
-public class CustomTestRunner : UnitTestRunner
+public class CustomTestRunner : TestRunner, IUnitTestRunner
 {
-    public override int Run(FilePath testPath)
+    public int RunUnitTest(FilePath testPath)
     {
         // Run console tests under the just-built console
         if(testPath.ToString().Contains("nunit3-console.tests.dll"))
@@ -370,21 +370,24 @@ public class CustomTestRunner : UnitTestRunner
         }
 
         // All other tests use NUnitLite
-        return new NUnitLiteRunner().Run(testPath);
+        return new NUnitLiteRunner().RunUnitTest(testPath);
     }
 }
 
 // Use the console runner we just built to run package tests
-public class ConsoleRunnerSelfTester : PackageTestRunner
+public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
 {
+    private string _executablePath;
+
 	public ConsoleRunnerSelfTester(string executablePath)
 	{
-		ExecutablePath = executablePath;
+		_executablePath = executablePath;
 	}
 
-	public override int Run(string arguments)
+	public int RunPackageTest(string arguments)
 	{
-		return base.Run(arguments);
+        Console.WriteLine("Running package test");
+		return base.RunTest(_executablePath, arguments);
 	}
 }
 

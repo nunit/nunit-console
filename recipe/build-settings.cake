@@ -21,7 +21,7 @@ public static class BuildSettings
 		Verbosity msbuildVerbosity = Verbosity.Minimal,
 
         string unitTests = null, // Defaults to "**/*.tests.dll|**/*.tests.exe" (case insensitive)
-        UnitTestRunner unitTestRunner = null, // If not set, NUnitLite is used
+        IUnitTestRunner unitTestRunner = null, // If not set, NUnitLite is used
         string unitTestArguments = null
         )
 	{
@@ -85,11 +85,11 @@ public static class BuildSettings
     // the solution found in the root directory provided there is only one. 
 	private static string DeduceSolutionFile()			
 	{
-		if (System.IO.File.Exists(Title + ".sln"))
+		if (SIO.File.Exists(Title + ".sln"))
 			return Title + ".sln";
 
-		var files = System.IO.Directory.GetFiles(ProjectDirectory, "*.sln");
-		if (files.Length == 1 && System.IO.File.Exists(files[0]))
+		var files = SIO.Directory.GetFiles(ProjectDirectory, "*.sln");
+		if (files.Length == 1 && SIO.File.Exists(files[0]))
             return files[0];
 
         return null;
@@ -203,7 +203,7 @@ public static class BuildSettings
 
 	//Testing
 	public static string UnitTests { get; set; }
-	public static UnitTestRunner UnitTestRunner { get; private set; }
+	public static IUnitTestRunner UnitTestRunner { get; private set; }
 	public static string UnitTestArguments { get; private set; }
 
 	// Packaging
@@ -310,6 +310,7 @@ public static class BuildSettings
         Console.WriteLine("UnitTestRunner:            " + UnitTestRunner?.GetType().Name ?? "<NUnitLiteRunner>");
 
 		Console.WriteLine("\nPACKAGING");
+		Console.WriteLine("PackageTestLevel:          " + PackageTestLevel);
 		Console.WriteLine("MyGetPushUrl:              " + MyGetPushUrl);
 		Console.WriteLine("NuGetPushUrl:              " + NuGetPushUrl);
 		Console.WriteLine("ChocolateyPushUrl:         " + ChocolateyPushUrl);

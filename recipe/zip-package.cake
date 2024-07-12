@@ -3,7 +3,8 @@ public class ZipPackage : PackageDefinition
     public ZipPackage(
         string id, 
         string source, 
-        PackageTestRunner testRunner = null,
+        IPackageTestRunner testRunner = null,
+        TestRunnerSource testRunnerSource = null,
         PackageCheck[] checks = null, 
         IEnumerable<PackageTest> tests = null,
         PackageReference[] bundledExtensions = null )
@@ -11,7 +12,8 @@ public class ZipPackage : PackageDefinition
         PackageType.Zip, 
         id, 
         source, 
-        testRunner: testRunner, 
+        testRunner: testRunner,
+        testRunnerSource: testRunnerSource,
         checks: checks, 
         tests: tests) 
     {
@@ -63,7 +65,7 @@ public class ZipPackage : PackageDefinition
         var addinsDir = BuildSettings.ZipImageDirectory + "bin/net462/addins/";
         _context.CreateDirectory(addinsDir);
 
-        foreach (var packageDir in System.IO.Directory.GetDirectories(BuildSettings.ExtensionsDirectory))
+        foreach (var packageDir in SIO.Directory.GetDirectories(BuildSettings.ExtensionsDirectory))
         {
             var files = _context.GetFiles(packageDir + "/tools/*").Concat(_context.GetFiles(packageDir + "/tools/net462/*"));
             _context.CopyFiles(files.Where(f => f.GetExtension() != ".addins"), addinsDir);
