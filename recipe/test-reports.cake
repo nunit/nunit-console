@@ -2,15 +2,15 @@ public class PackageTestReport
 {
 	public PackageTest Test;
 	public ActualResult Result;
-	public string ConsoleVersion;
+	public ITestRunner Runner;
 	public List<string> Errors;
 	public List<string> Warnings;
 
-	public PackageTestReport(PackageTest test, ActualResult actualResult, string consoleVersion = null)
+	public PackageTestReport(PackageTest test, ActualResult actualResult, ITestRunner runner = null)
 	{
 		Test = test;
 		Result = actualResult;
-		ConsoleVersion = consoleVersion;
+		Runner = runner;
 		Errors = new List<string>();
 		Warnings = new List<string>();
 
@@ -39,7 +39,7 @@ public class PackageTestReport
 
 			if (expected.AssemblyName != actual.AssemblyName)
 				Errors.Add($"   Expected: {expected.AssemblyName} But was: { actual.AssemblyName}");
-			else if (consoleVersion == null || !consoleVersion.StartsWith("NetCore."))
+			else if (runner == null || runner.PackageId == "NUnit.ConsoleRunner.NetCore")
 			{
 				if (actual.Runtime == null)
 					Warnings.Add($"Unable to determine actual runtime used for {expected.AssemblyName}");
@@ -55,21 +55,21 @@ public class PackageTestReport
 			Errors.Add($"   Found unexpected assembly {actualAssemblies[i].AssemblyName}");
 	}
 
-	public PackageTestReport(PackageTest test, Exception ex, string consoleVersion = null)
+	public PackageTestReport(PackageTest test, Exception ex, ITestRunner runner = null)
 	{
 		Test = test;
 		Result = null;
 		Errors = new List<string>();
 		Errors.Add($"     {ex.Message}");
-		ConsoleVersion = consoleVersion;
+		Runner = runner;
 	}
 
 	public void Display(int index, TextWriter writer)
 	{
 		writer.WriteLine();
 		writer.WriteLine($"{index}. {Test.Description}");
-		if (ConsoleVersion != null)
-		    writer.WriteLine($"   ConsoleVersion: {ConsoleVersion}");
+		if (Runner != null)
+		    writer.WriteLine($"   Runner: {Runner.PackageId} {Runner.Version}");
 		writer.WriteLine($"   Args: {Test.Arguments}");
 		writer.WriteLine();
 

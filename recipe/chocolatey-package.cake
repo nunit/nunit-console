@@ -3,7 +3,8 @@ public class ChocolateyPackage : PackageDefinition
     public ChocolateyPackage(
         string id, 
         string source, 
-        PackageTestRunner testRunner = null, 
+        IPackageTestRunner testRunner = null, 
+        TestRunnerSource testRunnerSource = null,
         PackageCheck[] checks = null, 
         IEnumerable<PackageTest> tests = null)
     : base(
@@ -11,6 +12,7 @@ public class ChocolateyPackage : PackageDefinition
         id, 
         source, 
         testRunner: testRunner, 
+        testRunnerSource: testRunnerSource,
         checks: checks, 
         tests: tests)
     {
@@ -21,7 +23,7 @@ public class ChocolateyPackage : PackageDefinition
     // The file name of this package, including extension
     public override string PackageFileName => $"{PackageId}.{PackageVersion}.nupkg";
     // The file name of any symbol package, including extension
-    public override string SymbolPackageName => System.IO.Path.ChangeExtension(PackageFileName, ".snupkg");
+    public override string SymbolPackageName => SIO.Path.ChangeExtension(PackageFileName, ".snupkg");
     // The directory into which this package is installed
     public override string PackageInstallDirectory => BuildSettings.ChocolateyTestDirectory;
     // The directory used to contain results of package tests for this package
