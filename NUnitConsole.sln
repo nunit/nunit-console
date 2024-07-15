@@ -136,38 +136,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{C5B712
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "recipe", "recipe", "{D6449B7A-20FF-467B-A65E-174DD6992AEB}"
-	ProjectSection(SolutionItems) = preProject
-		recipe\banner.cake = recipe\banner.cake
-		recipe\build-settings.cake = recipe\build-settings.cake
-		recipe\builder.cake = recipe\builder.cake
-		recipe\chocolatey-package.cake = recipe\chocolatey-package.cake
-		recipe\command-line-options.cake = recipe\command-line-options.cake
-		recipe\constants.cake = recipe\constants.cake
-		recipe\dotnet.cake = recipe\dotnet.cake
-		recipe\extending.cake = recipe\extending.cake
-		recipe\headers.cake = recipe\headers.cake
-		recipe\help-messages.cake = recipe\help-messages.cake
-		recipe\known-extensions.cake = recipe\known-extensions.cake
-		recipe\nuget-package.cake = recipe\nuget-package.cake
-		recipe\package-checks.cake = recipe\package-checks.cake
-		recipe\package-definition.cake = recipe\package-definition.cake
-		recipe\package-reference.cake = recipe\package-reference.cake
-		recipe\package-test.cake = recipe\package-test.cake
-		recipe\publishing.cake = recipe\publishing.cake
-		recipe\setup.cake = recipe\setup.cake
-		recipe\task-builders.cake = recipe\task-builders.cake
-		recipe\task-definitions.cake = recipe\task-definitions.cake
-		recipe\test-reports.cake = recipe\test-reports.cake
-		recipe\test-results.cake = recipe\test-results.cake
-		recipe\test-runners.cake = recipe\test-runners.cake
-		recipe\tools.cake = recipe\tools.cake
-		recipe\unit-testing.cake = recipe\unit-testing.cake
-		recipe\utilities.cake = recipe\utilities.cake
-		recipe\versioning.cake = recipe\versioning.cake
-		recipe\zip-package.cake = recipe\zip-package.cake
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,7 +218,6 @@ Global
 		{08F8160E-E691-4F07-9F57-EA31B9736429} = {25DA12FE-6209-4524-9A37-8E51F815E198}
 		{50371E48-BEC3-4D53-BD37-F3A6149CFD0D} = {25DA12FE-6209-4524-9A37-8E51F815E198}
 		{C5B7120C-190B-4C38-95CB-83F12799598D} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
-		{D6449B7A-20FF-467B-A65E-174DD6992AEB} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

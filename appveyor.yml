@@ -30,3 +30,4 @@ environment:
     secure: aDsu1U+umVYFVybjkBVtVQsatSj3QKbD7VkGQci9mNF3493g9Giao/GABISIaHjT
   GITHUB_ACCESS_TOKEN:
     secure: RJ6sKRBZzwXz8JQvj8zcp45mkHNDad1UlvmfCsiVx63V9/pXHcm2Y2Lg/G/Vyhlz
+  IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1  
