@@ -1,13 +1,13 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.0.0-dev00001
+#load nuget:?package=NUnit.Cake.Recipe&version=1.0.1-dev00001
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
     Context,
-    "NUnit Console and Engine",
-    "nunit-console",
+    title: "NUnit Console and Engine",
+    githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.sln",
     exemptFiles: new [] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" },
     unitTests: "**/*.tests.exe|**/nunit3-console.tests.dll",
@@ -29,7 +29,8 @@ BuildSettings.Initialize(
         Net80Test,
         Net60PlusNet80Test,
         Net462PlusNet60Test,
-        NUnitProjectTest
+        NUnitProjectTest,
+        V2ResultWriterTest
     };
 
     // Tests run for the NETCORE runner package
@@ -93,6 +94,7 @@ static ExpectedResult MockAssemblyX86ExpectedResult(params string[] runtimes)
         result.Assemblies[i] = new ExpectedAssemblyResult("mock-assembly-x86.dll", runtimes[i]);
     return result;
 }
+
 
 static PackageTest Net462Test = new PackageTest(
     1, "Net462Test",
@@ -172,12 +174,24 @@ static PackageTest Net462PlusNet60Test = new PackageTest(
     "net462/mock-assembly.dll net6.0/mock-assembly.dll",
     MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"));
 
+// Test with latest released version of each of our extensions
+
+static ExtensionSpecifier NUnitProjectLoader = KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0");
+static ExtensionSpecifier NUnitV2ResultWriter = KnownExtensions.NUnitV2ResultWriter.SetVersion("3.8.0");
+
 static PackageTest NUnitProjectTest = new PackageTest(
     1, "NUnitProjectTest",
     "Run project with both copies of mock-assembly",
     "../../NetFXTests.nunit --config=Release --trace=Debug",
     MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"),
-    KnownExtensions.NUnitProjectLoader);
+    NUnitProjectLoader);
+
+static PackageTest V2ResultWriterTest = new PackageTest(
+    1, "V2ResultWriterTest",
+    "Run mock-assembly under .NET 6.0 and produce V2 output",
+    "net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+    MockAssemblyExpectedResult("netcore-6.0"),
+    NUnitV2ResultWriter);
 
 //////////////////////////////////////////////////////////////////////
 // LISTS OF FILES USED IN CHECKING PACKAGES
@@ -314,9 +328,9 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         tests: StandardRunnerTests,
         bundledExtensions: new [] {
             new PackageReference("NUnit.Extension.VSProjectLoader", "3.9.0"),
-            new PackageReference("NUnit.Extension.NUnitProjectLoader", "3.7.1"),
+            new PackageReference("NUnit.Extension.NUnitProjectLoader", "3.8.0"),
             new PackageReference("NUnit.Extension.NUnitV2Driver", "3.9.0"),
-            new PackageReference("NUnit.Extension.NUnitV2ResultWriter", "3.7.0"),
+            new PackageReference("NUnit.Extension.NUnitV2ResultWriter", "3.8.0"),
             new PackageReference("NUnit.Extension.TeamCityEventListener", "1.0.9")
         }),
 
