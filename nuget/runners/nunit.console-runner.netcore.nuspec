@@ -26,6 +26,7 @@
   <files>
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
+    
     <file src="net6.0/nunit3-console.exe" target="tools/net6.0/" />
     <file src="net6.0/nunit3-console.pdb" target="tools/net6.0/" />
     <file src="net6.0/nunit3-console.dll" target="tools/net6.0/" />
@@ -43,25 +44,7 @@
     <file src="net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/net6.0" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools/net6.0"/>
     <file src="../../nuget/runners/DotnetToolSettings.xml" target="tools/net6.0"/>
-
-    <file src="net8.0/nunit3-console.exe" target="tools/net8.0" />
-    <file src="net8.0/nunit3-console.pdb" target="tools/net8.0" />
-    <file src="net8.0/nunit3-console.dll" target="tools/net8.0" />
-    <file src="net8.0/nunit3-console.dll.config" target="tools/net8.0" />
-    <file src="net8.0/nunit3-console.deps.json" target="tools/net8.0" />
-    <file src="net8.0/nunit3-console.runtimeconfig.json" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.core.dll" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.core.pdb" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.dll" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.pdb" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.api.dll" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.api.pdb" target="tools/net8.0" />
-    <file src="net8.0/nunit.engine.api.xml" target="tools/net8.0" />
-    <file src="net8.0/testcentric.engine.metadata.dll" target="tools/net8.0" />
-    <file src="net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/net8.0" />
-    <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools/net8.0"/>
-    <file src="../../nuget/runners/DotnetToolSettings.xml" target="tools/net8.0"/>
-    
+   
     <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>
