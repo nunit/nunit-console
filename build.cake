@@ -228,8 +228,7 @@ FilePath[] CONSOLE_FILES_NETCORE = {
 
 PackageDefinition NUnitConsoleNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNuGetPackage;
-PackageDefinition NUnitConsoleRunnerNet60Package;
-PackageDefinition NUnitConsoleRunnerNet80Package;
+PackageDefinition NUnitConsoleRunnerNetCorePackage;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
@@ -267,21 +266,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
         checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
 
-    NUnitConsoleRunnerNet80Package = new NuGetPackage(
-        id: "NUnit.ConsoleRunner.NetCore",
-        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
-        checks: new PackageCheck[] {
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools/net8.0").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_CORE_FILES).AndFile("nunit.console.nuget.addins")
-        },
-        symbols: new PackageCheck[] {
-            HasDirectory("tools/net8.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
-        },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
-            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/tools/net8.0/nunit3-console.exe"),
-        tests: NetCoreRunnerTests),
-
-    NUnitConsoleRunnerNet60Package = new NuGetPackage(
+    NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
         id: "NUnit.ConsoleRunner.NetCore",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
         checks: new PackageCheck[] {
