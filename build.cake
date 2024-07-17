@@ -408,6 +408,65 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
 }
 
 //////////////////////////////////////////////////////////////////////
+// ADDITIONAL TARGETS USED FOR RECOVERY AND DEBUGGING
+//////////////////////////////////////////////////////////////////////
+
+// Some of these targets may be moved into the recipe itself in the future.
+
+// When a NuGet package was published successfully but the corresponding symbols 
+// package failed, use this target locally after correcting the error.
+// TODO: This task is extemely complicated because it has to copy lots of code
+// from the recipe. It would be simpler if it were integrated in the recipe.
+// TODO: This has been tested on NUnit.ConsoleRunner, so the branches with either
+// zero or one packages are speculative at this point. They will need testing
+// if this is incorporated into the recipe.
+Task("PublishSymbolsPackage")
+    .Description("Re-publish a specific symbols package to NuGet after a failure")
+    .Does(() => 
+    {
+		if (!BuildSettings.ShouldPublishToNuGet)
+			Information("Nothing to publish to NuGet from this run.");
+		else if (CommandLineOptions.NoPush)
+			Information("NoPush option suppressing publication to NuGet");
+        else
+        {
+            List<PackageDefinition> packages;
+
+            if (BuildSettings.Packages.Count == 0)
+                throw new Exception("No packages exist!");
+            else if (BuildSettings.Packages.Count == 1)
+            {
+                if (BuildSettings.Packages[0].PackageType != PackageType.NuGet)
+                    throw new Exception("The only package is not a NuGet package");
+
+                packages = BuildSettings.Packages;
+            }
+            else // count is > 1
+            {
+                if (!CommandLineOptions.PackageSelector.Exists)
+                    throw new Exception("Multiple packages exist. Specify a nuget package id using the '--where' option");
+
+                packages = new List<PackageDefinition>();
+
+                foreach (var package in BuildSettings.Packages)
+                    if (package.IsSelectedBy(CommandLineOptions.PackageSelector.Value))
+                        packages.Add(package);
+
+                if (packages.Count > 1)
+                    throw new Exception("The '--where' option selected multiple packages");
+
+                if (packages[0].PackageType != PackageType.NuGet)
+                    throw new Exception("The selected package is a {package.PackageType} package. It must be a package for nuget.org.");
+            }
+
+            // At this point we have a single NuGet package in packages
+		    var packageName = $"{packages[0].PackageId}.{BuildSettings.PackageVersion}.snupkg";
+			var packagePath = BuildSettings.PackageDirectory + packageName;
+            NuGetPush(packagePath, new NuGetPushSettings() { ApiKey = BuildSettings.NuGetApiKey, Source = BuildSettings.NuGetPushUrl });
+        }
+    });
+
+//////////////////////////////////////////////////////////////////////
 // EXECUTION
 //////////////////////////////////////////////////////////////////////
 
