@@ -6,6 +6,8 @@
     <AssemblyName>nunit3-console</AssemblyName>
     <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
     <RollForward>Major</RollForward>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup>
