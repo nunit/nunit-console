@@ -217,10 +217,6 @@ FilePath[] AGENT_PDB_FILES = {
         "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 FilePath[] AGENT_PDB_FILES_NETCORE = {
         "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
-FilePath[] CONSOLE_FILES = {
-        "nunit3-console.exe", "nunit3-console.exe.config" };
-FilePath[] CONSOLE_FILES_NETCORE = {
-        "nunit3-console.exe", "nunit3-console.dll" };
 
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE DEFINITIONS
@@ -241,7 +237,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.nuget.addins"),
+            HasDirectory("tools").WithFiles("nunit3-console.exe", "nunit3-console.exe.config", "nunit.console.nuget.addins").AndFiles(ENGINE_FILES),
             HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.nuget.agent.addins"),
@@ -271,7 +267,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools/net6.0").WithFiles(CONSOLE_FILES_NETCORE).AndFiles(ENGINE_CORE_FILES).AndFile("nunit.console.nuget.addins")
+            HasDirectory("tools/net6.0").WithFiles("nunit3-console.exe", "nunit3-console.dll", "nunit-console.nuget.addins").AndFiles(ENGINE_FILES)
         },
         symbols: new PackageCheck[] {
             HasDirectory("tools/net6.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
@@ -284,7 +280,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         id: "nunit-console-runner",
         source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
         checks: new PackageCheck[] {
-            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt").AndFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit.console.choco.addins"),
+            HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit3-console.exe", "nunit3-console.exe.config", "nunit.console.choco.addins").AndFiles(ENGINE_FILES),
             HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
@@ -300,7 +296,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.ZipImageDirectory,
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-            HasDirectory("bin/net462").WithFiles(CONSOLE_FILES).AndFiles(ENGINE_FILES).AndFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/net462").WithFiles("nunit3-console.exe", "nunit3-console.exe.config", "nunit3-console.pdb").AndFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
             HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
