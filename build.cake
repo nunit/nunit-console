@@ -262,18 +262,12 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
         checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
 
-    NUnitConsoleRunnerNetCorePackage = new NuGetPackage(
+    NUnitConsoleRunnerNetCorePackage = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.NetCore",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
-        checks: new PackageCheck[] {
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools/net6.0").WithFiles("nunit3-console.exe", "nunit3-console.dll", "nunit-console.nuget.addins").AndFiles(ENGINE_FILES)
-        },
-        symbols: new PackageCheck[] {
-            HasDirectory("tools/net6.0").WithFile("nunit3-console.pdb").AndFiles(ENGINE_PDB_FILES)
-        },
+        checks: new PackageCheck[] { HasFiles("nunit.exe") },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
-            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/tools/net6.0/nunit3-console.exe"),
+            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
         tests: NetCoreRunnerTests),
 
     NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
@@ -386,6 +380,29 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
         Console.WriteLine("Running package test");
 		return base.RunTest(_executablePath, arguments);
 	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// DOTNET TOOL PACKAGE
+//////////////////////////////////////////////////////////////////////
+
+// TODO: Temporary custom package class to be moved into the recipe
+
+public class DotNetToolPackage : NuGetPackage
+{
+    public DotNetToolPackage(string id, string source, string basePath = null,
+        IPackageTestRunner testRunner = null, TestRunnerSource testRunnerSource = null,
+        PackageCheck[] checks = null, PackageCheck[] symbols = null, IEnumerable<PackageTest> tests = null)
+    : base(id, source, basePath: basePath, testRunner: testRunner, testRunnerSource: testRunnerSource,
+        checks: checks, symbols: symbols, tests: tests) { }
+
+    public override void InstallPackage()
+    {
+        var arguments = $"tool install {PackageId} --version {BuildSettings.PackageVersion} " + 
+            $"--add-source \"{BuildSettings.PackageDirectory}\" --tool-path \"{PackageTestDirectory}\"";
+        Console.WriteLine($"Executing dotnet {arguments}");
+        _context.StartProcess("dotnet", arguments);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
