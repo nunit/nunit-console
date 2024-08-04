@@ -59,7 +59,8 @@ BuildTasks.RestoreTask = Task("Restore")
 		NuGetRestore(BuildSettings.SolutionFile, new NuGetRestoreSettings() {
 		    Source = new string[]	{ 
                 "https://www.nuget.org/api/v2",
-                "https://www.myget.org/F/nunit/api/v2" }
+                "https://www.myget.org/F/nunit/api/v2" },
+            Verbosity = NuGetVerbosity.Quiet
         });
 	});
 
@@ -71,7 +72,7 @@ BuildTasks.BuildTask = Task("Build")
 	.IsDependentOn("CheckHeaders")
 	.Description("Build the solution")
 	.Does(() =>	{
-		MSBuild(BuildSettings.SolutionFile, BuildSettings.MSBuildSettings.WithProperty("Version", BuildSettings.PackageVersion));
+        DotNetBuild(BuildSettings.SolutionFile, BuildSettings.DotNetBuildSettings);
 	});
 
 BuildTasks.UnitTestTask = Task("Test")
