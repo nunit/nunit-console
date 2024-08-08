@@ -176,6 +176,7 @@ TestResult.xml
 testCaseCollection.xml
 deploy
 lib
+build-results
 test-results
 package
 images

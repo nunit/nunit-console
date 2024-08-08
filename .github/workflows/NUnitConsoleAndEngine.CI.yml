@@ -62,7 +62,7 @@ jobs:
         with:
           name: NUnitConsoleLogs
           # This path is defined in build-settings.cake
-          path: "build/*.binlog"
+          path: "build-results/*.binlog"
           # if-no-files-found: error
 
       # Wait with this until package errors (tests following packaging) are all fixed
