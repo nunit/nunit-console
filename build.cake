@@ -1,5 +1,5 @@
-// Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.0.1-dev00002
+// Load the recipe
+#load nuget:?package=NUnit.Cake.Recipe&version=1.0.1-dev00007
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -17,8 +17,8 @@ BuildSettings.Initialize(
 // PACKAGE TEST LISTS
 //////////////////////////////////////////////////////////////////////
 
-    // Tests run for all runner packages except NETCORE runner
-    var StandardRunnerTests = new List<PackageTest>
+// Tests run for all runner packages except NETCORE runner
+var StandardRunnerTests = new List<PackageTest>
     {
         Net462Test,
         Net462X86Test,
@@ -33,8 +33,8 @@ BuildSettings.Initialize(
         V2ResultWriterTest
     };
 
-    // Tests run for the NETCORE runner package
-    var NetCoreRunnerTests = new List<PackageTest>
+// Tests run for the NETCORE runner package
+var NetCoreRunnerTests = new List<PackageTest>
     {
         NetCore31Test,
         Net60Test,
@@ -42,24 +42,24 @@ BuildSettings.Initialize(
         Net80Test,
     };
 
-    const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
-    bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
+const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
 
-    // TODO: Remove the limitation to Windows
-    if (IsRunningOnWindows() && dotnetX86Available)
+// TODO: Remove the limitation to Windows
+if (IsRunningOnWindows() && dotnetX86Available)
+{
+    StandardRunnerTests.Add(Net60X86Test);
+    // TODO: Make these tests run on AppVeyor
+    if (!BuildSystem.IsRunningOnAppVeyor)
     {
-        StandardRunnerTests.Add(Net60X86Test);
-        // TODO: Make these tests run on AppVeyor
-        if (!BuildSystem.IsRunningOnAppVeyor)
-        {
-            StandardRunnerTests.Add(NetCore31X86Test);
-            StandardRunnerTests.Add(Net70X86Test);
-            StandardRunnerTests.Add(Net80X86Test);
-        }
-        // Currently, NetCoreRunner runs tests in process. As a result,
-        // X86 tests will work in our environment, although uses may run
-        // it as a tool using the X86 architecture.
+        StandardRunnerTests.Add(NetCore31X86Test);
+        StandardRunnerTests.Add(Net70X86Test);
+        StandardRunnerTests.Add(Net80X86Test);
     }
+    // Currently, NetCoreRunner runs tests in process. As a result,
+    // X86 tests will work in our environment, although uses may run
+    // it as a tool using the X86 architecture.
+}
 
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE TEST DEFINITIONS
@@ -252,7 +252,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_PDB_FILES_NETCORE)
         },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
         tests: StandardRunnerTests),
 
@@ -266,7 +266,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         id: "NUnit.ConsoleRunner.NetCore",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
         checks: new PackageCheck[] { HasFiles("nunit.exe") },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory 
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
         tests: NetCoreRunnerTests),
 
@@ -281,7 +281,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins"),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFile("nunit.console.choco.agent.addins")
         },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory 
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
             + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
         tests: StandardRunnerTests),
 
@@ -298,7 +298,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
         },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory 
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory
             + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit3-console.exe"),
         tests: StandardRunnerTests,
         bundledExtensions: new [] {
@@ -370,16 +370,16 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
 {
     private string _executablePath;
 
-	public ConsoleRunnerSelfTester(string executablePath)
-	{
-		_executablePath = executablePath;
-	}
+    public ConsoleRunnerSelfTester(string executablePath)
+    {
+        _executablePath = executablePath;
+    }
 
-	public int RunPackageTest(string arguments)
-	{
+    public int RunPackageTest(string arguments)
+    {
         Console.WriteLine("Running package test");
-		return base.RunTest(_executablePath, arguments);
-	}
+        return base.RunTest(_executablePath, arguments);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -398,7 +398,7 @@ public class DotNetToolPackage : NuGetPackage
 
     public override void InstallPackage()
     {
-        var arguments = $"tool install {PackageId} --version {BuildSettings.PackageVersion} " + 
+        var arguments = $"tool install {PackageId} --version {BuildSettings.PackageVersion} " +
             $"--add-source \"{BuildSettings.PackageDirectory}\" --tool-path \"{PackageTestDirectory}\"";
         Console.WriteLine($"Executing dotnet {arguments}");
         _context.StartProcess("dotnet", arguments);
@@ -411,7 +411,7 @@ public class DotNetToolPackage : NuGetPackage
 
 // Some of these targets may be moved into the recipe itself in the future.
 
-// When a NuGet package was published successfully but the corresponding symbols 
+// When a NuGet package was published successfully but the corresponding symbols
 // package failed, use this target locally after correcting the error.
 // TODO: This task is extemely complicated because it has to copy lots of code
 // from the recipe. It would be simpler if it were integrated in the recipe.
@@ -420,12 +420,12 @@ public class DotNetToolPackage : NuGetPackage
 // if this is incorporated into the recipe.
 Task("PublishSymbolsPackage")
     .Description("Re-publish a specific symbols package to NuGet after a failure")
-    .Does(() => 
+    .Does(() =>
     {
-		if (!BuildSettings.ShouldPublishToNuGet)
-			Information("Nothing to publish to NuGet from this run.");
-		else if (CommandLineOptions.NoPush)
-			Information("NoPush option suppressing publication to NuGet");
+        if (!BuildSettings.ShouldPublishToNuGet)
+            Information("Nothing to publish to NuGet from this run.");
+        else if (CommandLineOptions.NoPush)
+            Information("NoPush option suppressing publication to NuGet");
         else
         {
             List<PackageDefinition> packages;
@@ -458,8 +458,8 @@ Task("PublishSymbolsPackage")
             }
 
             // At this point we have a single NuGet package in packages
-		    var packageName = $"{packages[0].PackageId}.{BuildSettings.PackageVersion}.snupkg";
-			var packagePath = BuildSettings.PackageDirectory + packageName;
+            var packageName = $"{packages[0].PackageId}.{BuildSettings.PackageVersion}.snupkg";
+            var packagePath = BuildSettings.PackageDirectory + packageName;
             NuGetPush(packagePath, new NuGetPushSettings() { ApiKey = BuildSettings.NuGetApiKey, Source = BuildSettings.NuGetPushUrl });
         }
     });
