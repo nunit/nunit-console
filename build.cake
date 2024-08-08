@@ -9,9 +9,9 @@ BuildSettings.Initialize(
     title: "NUnit Console and Engine",
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.sln",
-    exemptFiles: new [] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" },
+    exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" },
     unitTests: "**/*.tests.exe|**/nunit3-console.tests.dll",
-    unitTestRunner: new CustomTestRunner() );
+    unitTestRunner: new CustomTestRunner());
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE TEST LISTS
@@ -353,11 +353,11 @@ public class CustomTestRunner : TestRunner, IUnitTestRunner
     public int RunUnitTest(FilePath testPath)
     {
         // Run console tests under the just-built console
-        if(testPath.ToString().Contains("nunit3-console.tests.dll"))
+        if (testPath.ToString().Contains("nunit3-console.tests.dll"))
         {
             return BuildSettings.Context.StartProcess(
                 BuildSettings.OutputDirectory + "net462/nunit3-console.exe",
-                $"\"{testPath}\" {BuildSettings.UnitTestArguments}" );
+                $"\"{testPath}\" {BuildSettings.UnitTestArguments}");
         }
 
         // All other tests use NUnitLite
@@ -379,29 +379,6 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
     {
         Console.WriteLine("Running package test");
         return base.RunTest(_executablePath, arguments);
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-// DOTNET TOOL PACKAGE
-//////////////////////////////////////////////////////////////////////
-
-// TODO: Temporary custom package class to be moved into the recipe
-
-public class DotNetToolPackage : NuGetPackage
-{
-    public DotNetToolPackage(string id, string source, string basePath = null,
-        IPackageTestRunner testRunner = null, TestRunnerSource testRunnerSource = null,
-        PackageCheck[] checks = null, PackageCheck[] symbols = null, IEnumerable<PackageTest> tests = null)
-    : base(id, source, basePath: basePath, testRunner: testRunner, testRunnerSource: testRunnerSource,
-        checks: checks, symbols: symbols, tests: tests) { }
-
-    public override void InstallPackage()
-    {
-        var arguments = $"tool install {PackageId} --version {BuildSettings.PackageVersion} " +
-            $"--add-source \"{BuildSettings.PackageDirectory}\" --tool-path \"{PackageTestDirectory}\"";
-        Console.WriteLine($"Executing dotnet {arguments}");
-        _context.StartProcess("dotnet", arguments);
     }
 }
 
