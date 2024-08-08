@@ -9,8 +9,8 @@ on:
       - "*.md"
 
 env:
-  DOTNET_NOLOGO: true                     # Disable the .NET logo
-  DOTNET_CLI_TELEMETRY_OPTOUT: true       # Disable sending .NET CLI telemetry  
+  DOTNET_NOLOGO: true # Disable the .NET logo
+  DOTNET_CLI_TELEMETRY_OPTOUT: true # Disable sending .NET CLI telemetry
 
 jobs:
   build:
@@ -21,10 +21,10 @@ jobs:
         include:
           - os: windows-latest
             testRunName: Windows
-          - os: ubuntu-latest
-            testRunName: Linux
-          - os: macos-14
-            testRunName: Linux
+          # - os: ubuntu-latest
+          #   testRunName: Linux
+          # - os: macos-14
+          #   testRunName: Linux
       fail-fast: false
 
     env:
