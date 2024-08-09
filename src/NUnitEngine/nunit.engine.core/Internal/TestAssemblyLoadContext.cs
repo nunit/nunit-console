@@ -65,10 +65,14 @@ namespace NUnit.Engine.Internal
             // but are not fully specified in test assembly deps.json file. This happens when the
             // dependencies reference in the csproj file has CopyLocal=false, and for example, the
             // reference is a projectReference and has the same output directory as the parent.
-            string assemblyPath = Path.Combine(_basePath, name.Name + ".dll");
-            if (File.Exists(assemblyPath))
+            foreach (var extension in new string[] { ".dll", ".exe" })
             {
-                loadedAssembly = LoadFromAssemblyPath(assemblyPath);
+                string assemblyPath = Path.Combine(_basePath, name.Name + extension);
+                if (File.Exists(assemblyPath))
+                {
+                    loadedAssembly = LoadFromAssemblyPath(assemblyPath);
+                    break;
+                }
             }
 
             if (loadedAssembly != null)
