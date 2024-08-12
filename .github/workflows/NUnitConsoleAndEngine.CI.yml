@@ -1,7 +1,9 @@
 ﻿name: NUnitConsoleAndEngine.CI
 
 on:
-  pull_request:
+  workflow_dispatch:
+  
+  push:
     branches-ignore:
       - "azure-*"
     paths-ignore:
@@ -13,25 +15,15 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true # Disable sending .NET CLI telemetry
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            testRunName: Windows
-          # - os: ubuntu-latest
-          #   testRunName: Linux
-          # - os: macos-14
-          #   testRunName: Linux
-      fail-fast: false
+  build-windows:
+    name: Windows Build
+    runs-on: windows-latest
 
     env:
-      MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
-      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-      CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
-      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
+        NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
+        CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
 
     steps:
       - name: ⤵️ Checkout Source
@@ -42,7 +34,6 @@ jobs:
       - name: 🛠️ Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          # global-json-file: global.json
           dotnet-version: |
             3.1.x
             6.0.x
@@ -52,9 +43,15 @@ jobs:
         run: dotnet tool restore
 
       - name: 🍰 Run cake
-        shell: pwsh
+        env:
+            MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
+            NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
+            CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
+
+        #shell: pwsh
         # If you need to get more verbose logging, add the following to the dotnet-cake above:  --verbosity=diagnostic
-        run: dotnet cake --target=Test --test-run-name=${{ matrix.testRunName }} --configuration=Release
+        run: dotnet cake --target=Publish --configuration=Release
 
       - name: 🪵 Upload build logs
         if: always()
@@ -79,5 +76,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: "Test results (${{ matrix.testRunName }})"
+          name: "Test Results"
           path: test-results
