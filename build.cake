@@ -10,8 +10,7 @@ BuildSettings.Initialize(
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.sln",
     exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" },
-    unitTests: "**/*.tests.exe|**/nunit3-console.tests.dll",
-    unitTestRunner: new CustomTestRunner());
+    unitTests: "**/*.tests.exe");
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE TEST LISTS
@@ -348,25 +347,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
 //////////////////////////////////////////////////////////////////////
 // TEST RUNNERS
 //////////////////////////////////////////////////////////////////////
-
-// Custom unit test runner to run console vs engine tests differently
-// TODO: Use NUnitLite for all tests?
-public class CustomTestRunner : TestRunner, IUnitTestRunner
-{
-    public int RunUnitTest(FilePath testPath)
-    {
-        // Run console tests under the just-built console
-        if (testPath.ToString().Contains("nunit3-console.tests.dll"))
-        {
-            return BuildSettings.Context.StartProcess(
-                BuildSettings.OutputDirectory + "net462/nunit3-console.exe",
-                $"\"{testPath}\" {BuildSettings.UnitTestArguments}");
-        }
-
-        // All other tests use NUnitLite
-        return new NUnitLiteRunner().RunUnitTest(testPath);
-    }
-}
 
 // Use the console runner we just built to run package tests
 public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner

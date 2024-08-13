@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace NUnit.Common
+namespace NUnit.ConsoleRunner.Options
 {
     /// <summary>
     /// TestNameParser is used to parse the arguments to the 

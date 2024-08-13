@@ -7,9 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+
 using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
-using NUnit.Options;
 
 namespace NUnit.ConsoleRunner
 {

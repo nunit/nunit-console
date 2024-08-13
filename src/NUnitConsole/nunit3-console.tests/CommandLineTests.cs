@@ -3,11 +3,11 @@
 using System;
 using System.IO;
 using System.Reflection;
-using NUnit.Common;
 using System.Collections.Generic;
-using NUnit.Framework;
 
-using NUnit.Options;
+using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
+using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Tests
 {
@@ -403,7 +403,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
-            OutputSpecification spec = options.ResultOutputSpecifications[0];
+            var spec = options.ResultOutputSpecifications[0];
             Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec.Transform);
@@ -417,7 +417,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
-            OutputSpecification spec = options.ResultOutputSpecifications[0];
+            var spec = options.ResultOutputSpecifications[0];
             Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit2"));
             Assert.Null(spec.Transform);
@@ -437,7 +437,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles.Count, Is.EqualTo(1), "assembly should be set");
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
 
-            OutputSpecification spec = options.ResultOutputSpecifications[0];
+            var spec = options.ResultOutputSpecifications[0];
             Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
             var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);
@@ -524,7 +524,7 @@ namespace NUnit.ConsoleRunner.Tests
         {
             var options = ConsoleMocks.Options("test.dll", "-result:userspecifed.xml;format=nunit2;format=nunit3");
             Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
-                .And.Exactly(1).Property(nameof(OutputSpecification.OutputPath)).EqualTo("TestResult.xml"));
+                .And.Exactly(1).Property(nameof(Options.OutputSpecification.OutputPath)).EqualTo("TestResult.xml"));
             Assert.That(options.ErrorMessages, Has.Exactly(1).Contains("conflicting format options").IgnoreCase);
         }
 
@@ -538,7 +538,7 @@ namespace NUnit.ConsoleRunner.Tests
                 new VirtualFileSystem(),
                 "test.dll", $"-result:userspecifed.xml;transform={missingXslt}");
             Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
-                                                               .And.Exactly(1).Property(nameof(OutputSpecification.Transform)).Null);
+                                                               .And.Exactly(1).Property(nameof(Options.OutputSpecification.Transform)).Null);
             Assert.That(options.ErrorMessages, Has.Exactly(1).Contains($"{missingXslt} could not be found").IgnoreCase);
         }
 
@@ -559,7 +559,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
 
-            OutputSpecification spec = options.ExploreOutputSpecifications[0];
+            var spec = options.ExploreOutputSpecifications[0];
             Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.Null(spec.Transform);
@@ -574,7 +574,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
 
-            OutputSpecification spec = options.ExploreOutputSpecifications[0];
+            var spec = options.ExploreOutputSpecifications[0];
             Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
             Assert.That(spec.Format, Is.EqualTo("cases"));
             Assert.Null(spec.Transform);
@@ -594,7 +594,7 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.InputFiles[0], Is.EqualTo("tests.dll"));
             Assert.That(options.Explore, Is.True);
 
-            OutputSpecification spec = options.ExploreOutputSpecifications[0];
+            var spec = options.ExploreOutputSpecifications[0];
             Assert.That(spec.OutputPath, Is.EqualTo("results.xml"));
             Assert.That(spec.Format, Is.EqualTo("user"));
             var fullFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, transformFile);

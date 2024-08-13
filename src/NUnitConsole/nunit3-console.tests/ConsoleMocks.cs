@@ -2,6 +2,7 @@
 
 using NSubstitute;
 using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
 
 namespace NUnit.ConsoleRunner.Tests
 {
