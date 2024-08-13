@@ -3,6 +3,8 @@
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
     <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <StartupObject>NUnit.Engine.Tests.Program</StartupObject>
     <NoWarn>1685</NoWarn>
     <DebugType>Full</DebugType>
   </PropertyGroup>
@@ -16,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="2.0.3" />
     <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnitLite" Version="3.13.3" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='net462'">
@@ -42,7 +45,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
-    <ProjectReference Include="..\nunit3-console\nunit3-console.csproj" />
+    <ProjectReference Include="..\nunit3-console\nunit3-console.csproj">
+      <Aliases></Aliases>
+    </ProjectReference>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
   

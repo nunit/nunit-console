@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
 using NUnit.ConsoleRunner.Utilities;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
