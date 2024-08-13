@@ -2,7 +2,7 @@
 
 on:
   workflow_dispatch:
-  
+  pull_request:
   push:
     branches-ignore:
       - "azure-*"
@@ -51,7 +51,7 @@ jobs:
 
         #shell: pwsh
         # If you need to get more verbose logging, add the following to the dotnet-cake above:  --verbosity=diagnostic
-        run: dotnet cake --target=Publish --configuration=Release
+        run: dotnet cake --target=ContinuousIntegration --configuration=Release
 
       - name: 🪵 Upload build logs
         if: always()

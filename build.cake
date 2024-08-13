@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.1.0
+#load nuget:?package=NUnit.Cake.Recipe&version=1.2.0-dev00003
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -43,21 +43,24 @@ var NetCoreRunnerTests = new List<PackageTest>
     };
 
 const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+// TODO: Remove the limitation to Windows
 bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
 
-// TODO: Remove the limitation to Windows
-if (IsRunningOnWindows() && dotnetX86Available)
+if (dotnetX86Available)
 {
+    bool onAppVeyor = BuildSystem.IsRunningOnAppVeyor;
+    bool onGitHubActions = BuildSystem.IsRunningOnGitHubActions;
+
     StandardRunnerTests.Add(Net60X86Test);
-    // TODO: Make these tests run on AppVeyor
-    if (!BuildSystem.IsRunningOnAppVeyor)
-    {
-        //StandardRunnerTests.Add(NetCore31X86Test);
-        //StandardRunnerTests.Add(Net70X86Test);
+    // TODO: Make these tests run on AppVeyor and GitHub Actions
+    if (!onAppVeyor && !onGitHubActions)
+        StandardRunnerTests.Add(NetCore31X86Test);
+    if (!onAppVeyor && !onGitHubActions)
+        StandardRunnerTests.Add(Net70X86Test);
+    if (!onAppVeyor)
         StandardRunnerTests.Add(Net80X86Test);
-    }
     // Currently, NetCoreRunner runs tests in process. As a result,
-    // X86 tests will work in our environment, although uses may run
+    // X86 tests will not work in our environment, although uses may run
     // it as a tool using the X86 architecture.
 }
 
@@ -132,11 +135,11 @@ static PackageTest Net70Test = new PackageTest(
     "net7.0/mock-assembly.dll",
     MockAssemblyExpectedResult("netcore-7.0"));
 
-//static PackageTest Net70X86Test = new PackageTest(
-//    1, "Net70X86Test",
-//    "Run mock-assembly-x86.dll under .NET 7.0",
-//    "net7.0/mock-assembly-x86.dll",
-//    MockAssemblyX86ExpectedResult("netcore-7.0"));
+static PackageTest Net70X86Test = new PackageTest(
+    1, "Net70X86Test",
+    "Run mock-assembly-x86.dll under .NET 7.0",
+    "net7.0/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-7.0"));
 
 static PackageTest Net60Test = new PackageTest(
     1, "Net60Test",
@@ -156,12 +159,11 @@ static PackageTest NetCore31Test = new PackageTest(
     "netcoreapp3.1/mock-assembly.dll",
     MockAssemblyExpectedResult("netcore-3.1"));
 
-// TODO: Currently failing in github workflow
-//static PackageTest NetCore31X86Test = new PackageTest(
-//    1, "NetCore31X86Test",
-//    "Run mock-assembly-x86.dll under .NET Core 3.1",
-//    "netcoreapp3.1/mock-assembly-x86.dll",
-//    MockAssemblyX86ExpectedResult("netcore-3.1"));
+static PackageTest NetCore31X86Test = new PackageTest(
+    1, "NetCore31X86Test",
+    "Run mock-assembly-x86.dll under .NET Core 3.1",
+    "netcoreapp3.1/mock-assembly-x86.dll",
+    MockAssemblyX86ExpectedResult("netcore-3.1"));
 
 static PackageTest Net60PlusNet80Test = new PackageTest(
     1, "Net60PlusNet80Test",
