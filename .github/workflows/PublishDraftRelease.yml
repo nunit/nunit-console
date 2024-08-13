@@ -3,8 +3,8 @@
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release version (must match a mileston)'
+      packageVersion:
+        description: "Package version for release (must match an existing milestone)"
         required: true
         type: string
     
@@ -30,4 +30,4 @@ jobs:
       env:
         GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
 
-      run: dotnet cake --target=CreateDraftRelease --packageVersion="${{ inputs.version }}"
+      run: dotnet cake --target=CreateDraftRelease --packageVersion="${{ inputs.packageVersion }}"
