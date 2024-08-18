@@ -19,7 +19,7 @@ using Path = System.IO.Path;
 
 namespace NUnit.Engine.Services
 {
-    public sealed class ExtensionManager : IDisposable
+    public class ExtensionManager : IExtensionManager
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
         static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
@@ -50,16 +50,7 @@ namespace NUnit.Engine.Services
             _directoryFinder = directoryFinder;
         }
 
-        internal void FindExtensions(string startDir)
-        {
-            // Create the list of possible extension assemblies,
-            // eliminating duplicates, start in the provided directory.
-            FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
-
-            // Check each assembly to see if it contains extensions
-            foreach (var candidate in _assemblies)
-                FindExtensionsInAssembly(candidate);
-        }
+        #region IExtensionManager Implementation
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -78,81 +69,9 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Enable or disable an extension
-        /// </summary>
-        public void EnableExtension(string typeName, bool enabled)
-        {
-            foreach (var node in _extensions)
-                if (node.TypeName == typeName)
-                    node.Enabled = enabled;
-        }
-
-        /// <summary>
-        /// Get an ExtensionPoint based on its unique identifying path.
-        /// </summary>
-        public ExtensionPoint GetExtensionPoint(string path)
-        {
-            return _pathIndex.ContainsKey(path) ? _pathIndex[path] : null;
-        }
-
-        /// <summary>
-        /// Get an ExtensionPoint based on the required Type for extensions.
-        /// </summary>
-        public ExtensionPoint GetExtensionPoint(Type type)
-        {
-            foreach (var ep in _extensionPoints)
-                if (ep.TypeName == type.FullName)
-                    return ep;
-
-            return null;
-        }
-
-        /// <summary>
-        /// Get an ExtensionPoint based on a Cecil TypeReference.
-        /// </summary>
-        public ExtensionPoint GetExtensionPoint(TypeReference type)
-        {
-            foreach (var ep in _extensionPoints)
-                if (ep.TypeName == type.FullName)
-                    return ep;
-
-            return null;
-        }
-
-        public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
-        {
-            var ep = GetExtensionPoint(path);
-            if (ep != null)
-                foreach (var node in ep.Extensions)
-                    yield return node;
-        }
-
-        public ExtensionNode GetExtensionNode(string path)
-        {
-            var ep = GetExtensionPoint(path);
-
-            return ep != null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
-        }
-
-        public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
-        {
-            var ep = GetExtensionPoint(typeof(T));
-            if (ep != null)
-                foreach (var node in ep.Extensions)
-                    if (includeDisabled || node.Enabled)
-                        yield return node;
-        }
-
-        public IEnumerable<T> GetExtensions<T>()
-        {
-            foreach (var node in GetExtensionNodes<T>())
-                yield return (T)node.ExtensionObject;
-        }
-
-        /// <summary>
         /// Find the extension points in a loaded assembly.
         /// </summary>
-        public void FindExtensionPoints(params Assembly[] targetAssemblies)
+        public virtual void FindExtensionPoints(params Assembly[] targetAssemblies)
         {
             foreach (var assembly in targetAssemblies)
             {
@@ -205,6 +124,92 @@ namespace NUnit.Engine.Services
                     }
                 }
             }
+        }
+
+        public void FindExtensions(string startDir)
+        {
+            // Create the list of possible extension assemblies,
+            // eliminating duplicates, start in the provided directory.
+            FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
+
+            // Check each assembly to see if it contains extensions
+            foreach (var candidate in _assemblies)
+                FindExtensionsInAssembly(candidate);
+        }
+
+        /// <summary>
+        /// Get an ExtensionPoint based on its unique identifying path.
+        /// </summary>
+        public IExtensionPoint GetExtensionPoint(string path)
+        {
+            return _pathIndex.ContainsKey(path) ? _pathIndex[path] : null;
+        }
+
+        public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
+        {
+            var ep = GetExtensionPoint(path);
+            if (ep != null)
+                foreach (var node in ep.Extensions)
+                    yield return node;
+        }
+
+        public IExtensionNode GetExtensionNode(string path)
+        {
+            // TODO: Remove need for the cast
+            var ep = GetExtensionPoint(path) as ExtensionPoint;
+
+            return ep != null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
+        }
+
+        public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
+        {
+            var ep = GetExtensionPoint(typeof(T));
+            if (ep != null)
+                foreach (var node in ep.Extensions)
+                    if (includeDisabled || node.Enabled)
+                        yield return node;
+        }
+
+        public IEnumerable<T> GetExtensions<T>()
+        {
+            foreach (var node in GetExtensionNodes<T>())
+                yield return (T)((ExtensionNode)node).ExtensionObject; // HACK
+        }
+
+        /// <summary>
+        /// Enable or disable an extension
+        /// </summary>
+        public void EnableExtension(string typeName, bool enabled)
+        {
+            foreach (var node in _extensions)
+                if (node.TypeName == typeName)
+                    node.Enabled = enabled;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Get an ExtensionPoint based on the required Type for extensions.
+        /// </summary>
+        public ExtensionPoint GetExtensionPoint(Type type)
+        {
+            foreach (var ep in _extensionPoints)
+                if (ep.TypeName == type.FullName)
+                    return ep;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get an ExtensionPoint based on a Cecil TypeReference.
+        /// </summary>
+        public ExtensionPoint GetExtensionPoint(TypeReference type)
+        {
+            foreach (var ep in _extensionPoints)
+                if (ep.TypeName == type.FullName)
+                    return ep;
+
+            return null;
         }
 
         /// <summary>
@@ -482,7 +487,8 @@ namespace NUnit.Engine.Services
                 }
                 else
                 {
-                    ep = GetExtensionPoint(node.Path);
+                    // TODO: Remove need for the cast
+                    ep = GetExtensionPoint(node.Path) as ExtensionPoint;
                     if (ep == null)
                     {
                         string msg = string.Format(

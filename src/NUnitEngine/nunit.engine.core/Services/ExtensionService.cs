@@ -26,11 +26,16 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
-        private readonly ExtensionManager _extensionManager;
+        private readonly IExtensionManager _extensionManager;
 
         public ExtensionService()
         {
             _extensionManager = new ExtensionManager();
+        }
+
+        public ExtensionService(ExtensionManager extensionManager)
+        {
+            _extensionManager = extensionManager;
         }
 
         internal ExtensionService(IFileSystem fileSystem)
@@ -72,7 +77,7 @@ namespace NUnit.Engine.Services
 
         public IEnumerable<T> GetExtensions<T>() => _extensionManager.GetExtensions<T>();
 
-        public ExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
+        public IExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
 
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>() => _extensionManager.GetExtensionNodes<T>();
 
