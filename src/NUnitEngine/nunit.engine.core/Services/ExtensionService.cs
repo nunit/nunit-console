@@ -33,15 +33,15 @@ namespace NUnit.Engine.Services
             _extensionManager = new ExtensionManager();
         }
 
-        internal ExtensionService(IAddinsFileReader addinsReader, IFileSystem fileSystem)
-            : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
+        internal ExtensionService(IFileSystem fileSystem)
+            : this(fileSystem, new DirectoryFinder(fileSystem))
         {
-            _extensionManager = new ExtensionManager(addinsReader, fileSystem);
+            _extensionManager = new ExtensionManager(fileSystem);
         }
 
-        internal ExtensionService(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        internal ExtensionService(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _extensionManager = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
+            _extensionManager = new ExtensionManager(fileSystem, directoryFinder);
         }
 
         public IEnumerable<IExtensionPoint> ExtensionPoints => _extensionManager.ExtensionPoints;

@@ -40,19 +40,19 @@ namespace NUnit.Engine.Services.Tests
 #pragma warning restore 414
 
         [SetUp]
-        public void CreateService()
+        public void CreateExtensionManager()
         {
             _extensionManager = new ExtensionManager();
 
-            // Rather than actually starting the service, which would result
-            // in finding the extensions actually in use on the current system,
-            // we simulate the start using this assemblies dummy extensions.
+            // Find actual extension points.
             _extensionManager.FindExtensionPoints(typeof(CoreEngine).Assembly);
             _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
+            // Find dummy extensions in this test assembly.
             _extensionManager.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
         }
 
+#if SERVICE
         [Test]
         public void StartService_UseFileSystemAbstraction()
         {
@@ -65,6 +65,7 @@ namespace NUnit.Engine.Services.Tests
 
             fileSystem.Received().GetDirectory(workingDir);
         }
+#endif
 
         [Test]
         public void AllExtensionPointsAreKnown()
@@ -281,6 +282,7 @@ namespace NUnit.Engine.Services.Tests
             return Path.Combine(file.Directory.Parent.FullName, dir);
         }
 
+#if SERVICE
         [Test]
         public void StartService_ReadsAddinsFile()
         {
@@ -752,5 +754,6 @@ namespace NUnit.Engine.Services.Tests
             directoryFinder.Received().GetDirectories(startDirectory, "**/../");
             directoryFinder.Received().GetDirectories(startDirectory, "**/./");
         }
+#endif
     }
 }

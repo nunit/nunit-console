@@ -8,6 +8,8 @@ using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+using System.Linq;
+
 
 #if NET462 || NETSTANDARD2_0
 using Path = NUnit.Engine.Internal.Backports.Path;
@@ -23,7 +25,7 @@ namespace NUnit.Engine.Services
         static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
 
         private readonly IFileSystem _fileSystem;
-        private readonly IAddinsFileReader _addinsReader;
+        //private readonly IAddinsFileReader _addinsReader;
         private readonly IDirectoryFinder _directoryFinder;
 
         private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
@@ -33,18 +35,17 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
         public ExtensionManager()
-            : this(new AddinsFileReader(), new FileSystem())
+            : this(new FileSystem())
         {
         }
 
-        internal ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem)
-            : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
+        internal ExtensionManager(IFileSystem fileSystem)
+            : this(fileSystem, new DirectoryFinder(fileSystem))
         {
         }
 
-        internal ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        internal ExtensionManager(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _addinsReader = addinsReader;
             _fileSystem = fileSystem;
             _directoryFinder = directoryFinder;
         }
@@ -278,14 +279,12 @@ namespace NUnit.Engine.Services
             var addinsFiles = startDir.GetFiles("*.addins");
             var addinsFileCount = 0;
 
-            if (addinsFiles.Any())
+            foreach (var file in addinsFiles)
             {
-                foreach (var file in addinsFiles)
-                {
-                    ProcessAddinsFile(startDir, file, fromWildCard);
-                    addinsFileCount += 1;
-                }
+                ProcessAddinsFile(startDir, file, fromWildCard);
+                addinsFileCount++;
             }
+
             return addinsFileCount;
         }
 
@@ -299,17 +298,17 @@ namespace NUnit.Engine.Services
         {
             log.Info("Processing file " + addinsFile.FullName);
 
-            foreach (var entry in _addinsReader.Read(addinsFile))
+            foreach (var entry in AddinsFile.Read(addinsFile).Where(e => e.Text != string.Empty))
             {
-                bool isWild = fromWildCard || entry.Contains("*");
-                var args = GetBaseDirAndPattern(baseDir, entry);
+                bool isWild = fromWildCard || entry.Text.Contains("*");
+                var args = GetBaseDirAndPattern(baseDir, entry.Text);
                 // TODO: See if we can handle '/tools/*/' efficiently by examining every
                 // assembly in the directory. Otherwise try this approach:
                 // 1. Check entry for ending with '/tools/*/'
                 // 2. If so, examine the directory name to see if it matches a tfm.
                 // 3. If it does, check to see if the implied runtime would be loadable.
                 // 4. If so, process it, if not, skip it.
-                if (entry.EndsWith("/"))
+                if (entry.Text.EndsWith("/"))
                 {
                     foreach (var dir in _directoryFinder.GetDirectories(args.Item1, args.Item2))
                     {
