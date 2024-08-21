@@ -49,6 +49,16 @@ namespace NUnit.Engine.Internal.Tests
         }
 
         [Test]
+        public void Read_InvalidEntry()
+        {
+            var content = "// This is not valid";
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+            {
+                Assert.That(() => AddinsFile.Read(stream), Throws.Exception);
+            }
+        }
+
+        [Test]
         [Platform("win")]
         public void Read_Stream_TransformBackslash_Windows()
         {

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using TestCentric.Metadata;
 using NUnit.Engine.Extensibility;
@@ -9,13 +10,6 @@ using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
 using System.Linq;
-
-
-#if NET462 || NETSTANDARD2_0
-using Path = NUnit.Engine.Internal.Backports.Path;
-#else
-using Path = System.IO.Path;
-#endif
 
 namespace NUnit.Engine.Services
 {
@@ -286,7 +280,7 @@ namespace NUnit.Engine.Services
 
             foreach (var file in addinsFiles)
             {
-                ProcessAddinsFile(startDir, file, fromWildCard);
+                ProcessAddinsFile(file, fromWildCard);
                 addinsFileCount++;
             }
 
@@ -299,53 +293,40 @@ namespace NUnit.Engine.Services
         /// path or a wildcard pattern used to find assemblies. Blank
         /// lines and comments started by # are ignored.
         /// </summary>
-        private void ProcessAddinsFile(IDirectory baseDir, IFile addinsFile, bool fromWildCard)
+        private void ProcessAddinsFile(IFile addinsFile, bool fromWildCard)
         {
             log.Info("Processing file " + addinsFile.FullName);
 
             foreach (var entry in AddinsFile.Read(addinsFile).Where(e => e.Text != string.Empty))
             {
-                bool isWild = fromWildCard || entry.Text.Contains("*");
-                var args = GetBaseDirAndPattern(baseDir, entry.Text);
-                // TODO: See if we can handle '/tools/*/' efficiently by examining every
-                // assembly in the directory. Otherwise try this approach:
-                // 1. Check entry for ending with '/tools/*/'
-                // 2. If so, examine the directory name to see if it matches a tfm.
-                // 3. If it does, check to see if the implied runtime would be loadable.
-                // 4. If so, process it, if not, skip it.
-                if (entry.Text.EndsWith("/"))
-                {
-                    foreach (var dir in _directoryFinder.GetDirectories(args.Item1, args.Item2))
-                    {
-                        ProcessDirectory(dir, isWild);
-                    }
-                }
-                else
-                {
-                    foreach (var file in _directoryFinder.GetFiles(args.Item1, args.Item2))
-                    {
-                        ProcessCandidateAssembly(file.FullName, isWild);
-                    }
-                }
-            }
-        }
+                bool isWild = fromWildCard || entry.IsPattern;
+                IDirectory baseDir = addinsFile.Parent;
+                string entryDir = entry.DirectoryName;
+                string entryFile = entry.FileName;
 
-        private Tuple<IDirectory, string> GetBaseDirAndPattern(IDirectory baseDir, string path)
-        {
-            if (Path.IsPathFullyQualified(path))
-            {
-                if (path.EndsWith("/"))
+                if (entry.IsDirectory)
                 {
-                    return new Tuple<IDirectory, string>(_fileSystem.GetDirectory(path), string.Empty);
+                    if (entry.IsFullyQualified)
+                    {
+                        baseDir = _fileSystem.GetDirectory(entry.Text);
+                        foreach (var dir in _directoryFinder.GetDirectories(_fileSystem.GetDirectory(entryDir), ""))
+                            ProcessDirectory(dir, isWild);
+                    }
+                    else
+                        foreach (var dir in _directoryFinder.GetDirectories(baseDir, entry.Text))
+                            ProcessDirectory(dir, isWild);
                 }
                 else
                 {
-                    return new Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
+                    if (entry.IsFullyQualified)
+                    {
+                        foreach (var file in _directoryFinder.GetFiles(_fileSystem.GetDirectory(entryDir), entryFile))
+                            ProcessCandidateAssembly(file.FullName, isWild);
+                    }
+                    else
+                        foreach (var file in _directoryFinder.GetFiles(baseDir, entry.Text))
+                            ProcessCandidateAssembly(file.FullName, isWild);
                 }
-            }
-            else
-            {
-                return new Tuple<IDirectory, string>(baseDir, path);
             }
         }
 

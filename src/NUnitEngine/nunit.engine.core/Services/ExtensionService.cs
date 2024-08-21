@@ -6,16 +6,8 @@ using System.Reflection;
 using TestCentric.Metadata;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
-
-using Backports = NUnit.Engine.Internal.Backports;
-#if NETFRAMEWORK || NETSTANDARD2_0
-using Path = NUnit.Engine.Internal.Backports.Path;
-#else
-using Path = System.IO.Path;
-#endif
 
 namespace NUnit.Engine.Services
 {

@@ -13,6 +13,14 @@ namespace NUnit.Engine.Internal
         public string RawText { get; }
         public string Text { get; }
 
+        public bool IsFullyQualified => PathUtils.IsFullyQualifiedPath(Text);
+        public bool IsDirectory => Text.EndsWith("/");
+        public bool IsPattern => Text.Contains("*");
+        public bool IsValid => PathUtils.IsValidPath(Text.Replace('*', 'X'));
+
+        public string DirectoryName => Path.GetDirectoryName(Text);
+        public string FileName => Path.GetFileName(Text);
+
         public AddinsFileEntry(int lineNumber, string rawText)
         {
             LineNumber = lineNumber;

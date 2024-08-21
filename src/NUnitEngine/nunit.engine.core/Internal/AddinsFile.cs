@@ -20,7 +20,7 @@ namespace NUnit.Engine.Internal
 
             using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                return Read(stream);
+                return Read(stream, file.FullName);
             }
         }
 
@@ -31,7 +31,7 @@ namespace NUnit.Engine.Internal
         /// <returns>All entries contained in the file.</returns>
         /// <exception cref="System.IO.IOException"><paramref name="stream"/> cannot be read</exception>
         /// <remarks>If the executing system uses backslashes ('\') to separate directories, these will be substituted with slashes ('/').</remarks>
-        internal static AddinsFile Read(Stream stream)
+        internal static AddinsFile Read(Stream stream, string fullName = null)
         {
             using (var reader = new StreamReader(stream))
             {
@@ -39,7 +39,16 @@ namespace NUnit.Engine.Internal
 
                 int lineNumber = 0;
                 while (!reader.EndOfStream)
-                    addinsFile.Add(new AddinsFileEntry(++lineNumber, reader.ReadLine()));
+                {
+                    var entry = new AddinsFileEntry(++lineNumber, reader.ReadLine());
+                    if (entry.Text != "" && !entry.IsValid)
+                    {
+                        string msg = $"Invalid Entry in {fullName ?? "addins file"}:\r\n  {entry}";
+                        throw new InvalidOperationException(msg);
+                    }
+
+                    addinsFile.Add(entry);
+                }
 
                 return addinsFile;
             }
