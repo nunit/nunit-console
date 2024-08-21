@@ -63,9 +63,36 @@ namespace NUnit.Engine.Internal.Tests
         {
             Assert.That(() => PathUtils.IsFullyQualifiedWindowsPath(null), Throws.ArgumentNullException);
         }
+
+        [TestCase("X")]
+        [TestCase("X/")]
+        [TestCase("/X/")]
+        [TestCase("\\X\\")]
+        [TestCase("X/Y/Z")]
+        [TestCase("X/Y/Z/")]
+        [TestCase("/X/Y/Z")]
+        [TestCase("/X/Y/Z/")]
+        [TestCase("\\X\\Y\\Z\\")]
+        [TestCase("C:X/Y/Z/")]
+        [TestCase("C:/X/Y/Z")]
+        [TestCase("C:/X/Y/Z/")]
+        [TestCase("C:\\X\\Y\\Z\\")]
+        public void IsValidPath(string path)
+        {
+            Assert.That(PathUtils.IsValidPath(path), Is.True);
+        }
+
+        [TestCase(":")]
+        [TestCase("?")]
+        [TestCase("*")]
+        [TestCase("// Spurious comment")]
+        public void IsValidPath_Fails(string path)
+        {
+            Assert.That(PathUtils.IsValidPath(path), Is.False);
+        }
     }
 
-	[TestFixture]
+    [TestFixture]
 	public class PathUtilDefaultsTests : PathUtils
 	{
 		[Test]

@@ -6,16 +6,8 @@ using System.Reflection;
 using TestCentric.Metadata;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
-
-using Backports = NUnit.Engine.Internal.Backports;
-#if NETFRAMEWORK || NETSTANDARD2_0
-using Path = NUnit.Engine.Internal.Backports.Path;
-#else
-using Path = System.IO.Path;
-#endif
 
 namespace NUnit.Engine.Services
 {
@@ -26,22 +18,27 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
-        private readonly ExtensionManager _extensionManager;
+        private readonly IExtensionManager _extensionManager;
 
         public ExtensionService()
         {
             _extensionManager = new ExtensionManager();
         }
 
-        internal ExtensionService(IAddinsFileReader addinsReader, IFileSystem fileSystem)
-            : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
+        public ExtensionService(ExtensionManager extensionManager)
         {
-            _extensionManager = new ExtensionManager(addinsReader, fileSystem);
+            _extensionManager = extensionManager;
         }
 
-        internal ExtensionService(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        internal ExtensionService(IFileSystem fileSystem)
+            : this(fileSystem, new DirectoryFinder(fileSystem))
         {
-            _extensionManager = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
+            _extensionManager = new ExtensionManager(fileSystem);
+        }
+
+        internal ExtensionService(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        {
+            _extensionManager = new ExtensionManager(fileSystem, directoryFinder);
         }
 
         public IEnumerable<IExtensionPoint> ExtensionPoints => _extensionManager.ExtensionPoints;
@@ -72,7 +69,7 @@ namespace NUnit.Engine.Services
 
         public IEnumerable<T> GetExtensions<T>() => _extensionManager.GetExtensions<T>();
 
-        public ExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
+        public IExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
 
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>() => _extensionManager.GetExtensionNodes<T>();
 
