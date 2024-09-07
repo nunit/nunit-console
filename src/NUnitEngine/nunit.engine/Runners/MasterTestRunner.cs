@@ -331,14 +331,10 @@ namespace NUnit.Engine.Runners
             if (package == null) throw new ArgumentNullException("package");
 
             foreach (var subPackage in package.SubPackages)
-            {
                 EnsurePackagesAreExpanded(subPackage);
-            }
 
             if (package.SubPackages.Count == 0 && IsProjectPackage(package))
-            {
                 _projectService.ExpandProjectPackage(package);
-            }
         }
 
         private bool IsProjectPackage(TestPackage package)
