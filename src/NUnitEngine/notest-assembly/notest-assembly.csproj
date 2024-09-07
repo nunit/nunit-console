@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <RootNamespace>notest_assembly</RootNamespace>
-    <TargetFrameworks>net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>

@@ -484,38 +484,89 @@ namespace NUnit.Engine.Services
             }
         }
 
+        private const string NETFRAMEWORK = ".NETFramework";
+        private const string NETCOREAPP = ".NETCoreApp";
+        private const string NETSTANDARD = ".NETStandard";
+
         /// <summary>
         /// Checks that the target framework of the current runner can load the extension assembly. For example, .NET Core
         /// cannot load .NET Framework assemblies and vice-versa.
         /// </summary>
         /// <param name="runnerAsm">The executing runner</param>
         /// <param name="extensionAsm">The extension we are attempting to load</param>
-        internal static bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        internal bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
         {
             if (runnerAsm == null)
                 return true;
 
-            string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
-            string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
-            if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
+            var runnerFrameworkName = GetTargetRuntime(runnerAsm.Location);
+            var extensionFrameworkName = GetTargetRuntime(extensionAsm.FilePath);
+
+            switch (runnerFrameworkName.Identifier)
             {
-                throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
-            }
-            else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
-            {
-                if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
-                {
-                    log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
-                    return false;
-                }
-            }
-            else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
-            {
-                log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
-                return false;
+                case NETSTANDARD:
+                    throw new Exception($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
+
+                case NETCOREAPP:
+                    switch (extensionFrameworkName.Identifier)
+                    {
+                        case NETSTANDARD:
+                        case NETCOREAPP:
+                            return true;
+                        case NETFRAMEWORK:
+                        default:
+                            log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
+                            return false;
+                    }
+                case NETFRAMEWORK:
+                default:
+                    switch (extensionFrameworkName.Identifier)
+                    {
+                        case NETFRAMEWORK:
+                            return runnerFrameworkName.Version.Major == 4 || extensionFrameworkName.Version.Major < 4;
+                        // For .NET Framework calling .NET Standard, we only support if framework is 4.7.2 or higher
+                        case NETSTANDARD:
+                            return extensionFrameworkName.Version >= new Version(4, 7, 2);
+                        case NETCOREAPP:
+                        default:
+                            log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
+                            return false;
+                    }
             }
 
-            return true;
+            //string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
+            //string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
+            //if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
+            //{
+            //    throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
+            //}
+            //else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
+            //{
+            //    if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
+            //    {
+            //        log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
+            //        return false;
+            //    }
+            //}
+            //else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
+            //{
+            //    log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
+            //    return false;
+            //}
+
+            //return true;
+        }
+
+        private System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
+        {
+            var assemblyDef = AssemblyDefinition.ReadAssembly(filePath);
+            var frameworkName = assemblyDef.GetFrameworkName();
+            if (string.IsNullOrEmpty(frameworkName))
+            {
+                var runtimeVersion = assemblyDef.GetRuntimeVersion();
+                frameworkName = $".NETFramework,Version=v{runtimeVersion.ToString(3)}";
+            }
+            return new System.Runtime.Versioning.FrameworkName(frameworkName);
         }
 
         public void Dispose()

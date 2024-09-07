@@ -22,6 +22,7 @@ var StandardRunnerTests = new List<PackageTest>
         Net462Test,
         Net462X86Test,
         Net462PlusNet462Test,
+        Net462ExeTest,
         NetCore31Test,
         Net60Test,
         Net70Test,
@@ -29,7 +30,9 @@ var StandardRunnerTests = new List<PackageTest>
         Net60PlusNet80Test,
         Net462PlusNet60Test,
         NUnitProjectTest,
-        V2ResultWriterTest
+        V2ResultWriterTest,
+        VSProjectLoaderTest_Project,
+        VSProjectLoaderTest_Solution
     };
 
 // Tests run for the NETCORE runner package
@@ -97,6 +100,26 @@ static ExpectedResult MockAssemblyX86ExpectedResult(params string[] runtimes)
     return result;
 }
 
+static ExpectedResult MockAssemblySolutionResult = new ExpectedResult("Failed")
+{
+    Total = 37 * 5,
+    Passed = 23 * 5,
+    Failed = 5 * 5,
+    Warnings = 1 * 5,
+    Inconclusive = 1 * 5,
+    Skipped = 7 * 5,
+    Assemblies = new ExpectedAssemblyResult[]
+    {
+        new ExpectedAssemblyResult("mock-assembly.dll", "net-4.6.2"),
+        new ExpectedAssemblyResult("mock-assembly.dll", "netcore-3.1"),
+        new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0"),
+        new ExpectedAssemblyResult("mock-assembly.dll", "netcore-7.0"),
+        new ExpectedAssemblyResult("mock-assembly.dll", "netcore-8.0"),
+        new ExpectedAssemblyResult("notest-assembly.dll", "net-4.6.2"),
+        new ExpectedAssemblyResult("notest-assembly.dll", "netcore-3.1"),
+        new ExpectedAssemblyResult("notest-assembly.dll", "netstandard-2.0")
+    }
+};
 
 static PackageTest Net462Test = new PackageTest(
     1, "Net462Test",
@@ -109,6 +132,12 @@ static PackageTest Net462X86Test = new PackageTest(
     "Run mock-assembly-x86.dll under .NET 4.6.2",
     "net462/mock-assembly-x86.dll",
     MockAssemblyX86ExpectedResult("net-4.6.2"));
+
+static PackageTest Net462ExeTest = new PackageTest(
+    1, "Net462ExeTest",
+    "Run nunit.engine.core.tests.exe under .NET 4.6.2",
+    "net462/nunit.engine.core.tests.exe",
+    new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("nunit.engine.core.tests.exe")}});
 
 static PackageTest Net462PlusNet462Test = new PackageTest(
     1, "Net462PlusNet462Test",
@@ -180,6 +209,7 @@ static PackageTest Net462PlusNet60Test = new PackageTest(
 
 static ExtensionSpecifier NUnitProjectLoader = KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0");
 static ExtensionSpecifier NUnitV2ResultWriter = KnownExtensions.NUnitV2ResultWriter.SetVersion("3.8.0");
+static ExtensionSpecifier VSProjectLoader = KnownExtensions.VSProjectLoader.SetVersion("3.9.0");
 
 static PackageTest NUnitProjectTest = new PackageTest(
     1, "NUnitProjectTest",
@@ -194,6 +224,20 @@ static PackageTest V2ResultWriterTest = new PackageTest(
     "net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
     MockAssemblyExpectedResult("netcore-6.0"),
     NUnitV2ResultWriter);
+
+static PackageTest VSProjectLoaderTest_Project = new PackageTest(
+    1, "VSProjectLoaderTest_Project",
+    "Run mock-assembly using the .csproj file",
+    "../../src/NUnitEngine/mock-assembly/mock-assembly.csproj --config=Release",
+    MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0"),
+    VSProjectLoader);
+
+static PackageTest VSProjectLoaderTest_Solution = new PackageTest(
+    1, "VSProjectLoaderTest_Solution",
+    "Run mock-assembly using the .sln file",
+    "../../src/NUnitEngine/mock-assembly/mock-assembly.sln --config=Release",
+    MockAssemblySolutionResult,
+    VSProjectLoader);
 
 //////////////////////////////////////////////////////////////////////
 // LISTS OF FILES USED IN CHECKING PACKAGES
