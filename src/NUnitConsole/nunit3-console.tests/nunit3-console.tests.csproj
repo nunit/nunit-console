@@ -43,7 +43,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitEngine\mock-assembly\mock-assembly.csproj" />
+    <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
     <ProjectReference Include="..\nunit3-console\nunit3-console.csproj">
       <Aliases></Aliases>
