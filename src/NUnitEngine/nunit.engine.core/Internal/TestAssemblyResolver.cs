@@ -69,7 +69,7 @@ namespace NUnit.Engine.Internal
         private Assembly OnResolving(AssemblyLoadContext context, AssemblyName name)
         {
             context = context ?? _loadContext;
-            
+
             if (TryLoadFromTrustedPlatformAssemblies(context, name, out var loadedAssembly))
             {
                 log.Info("'{0}' assembly is loaded from trusted path '{1}'", name, loadedAssembly.Location);
