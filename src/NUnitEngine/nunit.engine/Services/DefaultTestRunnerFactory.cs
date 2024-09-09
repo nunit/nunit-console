@@ -43,6 +43,10 @@ namespace NUnit.Engine.Services
         }
 #else
 
+            // Unmanaged code is handled in-process irrespective of the process model
+            if (package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
+                return new UnmanagedExecutableTestRunner(package.FullName);
+
             ProcessModel processModel = (ProcessModel)System.Enum.Parse(
                 typeof(ProcessModel),
                 package.GetSetting(EnginePackageSettings.ProcessModel, "Default"));

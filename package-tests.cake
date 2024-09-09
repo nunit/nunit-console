@@ -238,7 +238,8 @@ static ExpectedResult MockAssemblySolutionResult = new ExpectedResult("Failed")
         new ExpectedAssemblyResult("mock-assembly.dll", "netcore-8.0"),
         new ExpectedAssemblyResult("notest-assembly.dll", "net-4.6.2"),
         new ExpectedAssemblyResult("notest-assembly.dll", "netcore-3.1"),
-        new ExpectedAssemblyResult("notest-assembly.dll", "netstandard-2.0")
+        new ExpectedAssemblyResult("notest-assembly.dll", "netstandard-2.0"),
+        new ExpectedAssemblyResult("WpfApp.exe")
     }
 };
 

@@ -130,12 +130,17 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfTest", "src\TestData\wpf-test\WpfTest.csproj", "{A96876EE-1A1F-4096-9B6A-5739E66B3364}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestData", "TestData", "{2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}"
+	ProjectSection(SolutionItems) = preProject
+		src\TestData\TestData.sln = src\TestData\TestData.sln
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\TestData\mock-assembly\mock-assembly.csproj", "{C3FF8716-052B-4D6C-81FF-E80F89AF9A80}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly-x86", "src\TestData\mock-assembly-x86\mock-assembly-x86.csproj", "{8FE8378E-5A8B-4708-8F86-35BE0DE121F7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "notest-assembly", "src\TestData\notest-assembly\notest-assembly.csproj", "{81E63A90-3191-4E99-92FF-01F9B1D3E3C5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfApp", "src\TestData\WpfApp\WpfApp.csproj", "{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -203,6 +208,10 @@ Global
 		{81E63A90-3191-4E99-92FF-01F9B1D3E3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81E63A90-3191-4E99-92FF-01F9B1D3E3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81E63A90-3191-4E99-92FF-01F9B1D3E3C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -234,6 +243,7 @@ Global
 		{C3FF8716-052B-4D6C-81FF-E80F89AF9A80} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{8FE8378E-5A8B-4708-8F86-35BE0DE121F7} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{81E63A90-3191-4E99-92FF-01F9B1D3E3C5} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
+		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
