@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.2.0-dev00003
+#load nuget:?package=NUnit.Cake.Recipe&version=1.2.0-dev00007
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -11,8 +11,7 @@ BuildSettings.Initialize(
     title: "NUnit Console and Engine",
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.sln",
-    exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" },
-    unitTests: "**/*.tests.exe");
+    exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" });
 
 //////////////////////////////////////////////////////////////////////
 // LISTS OF FILES USED IN CHECKING PACKAGES
