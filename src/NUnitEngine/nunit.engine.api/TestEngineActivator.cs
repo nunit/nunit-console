@@ -17,7 +17,7 @@ namespace NUnit.Engine
         private const string DefaultAssemblyName = "nunit.engine.dll";
         internal const string DefaultTypeName = "NUnit.Engine.TestEngine";
 
-#if NETSTANDARD2_0
+#if NETSTANDARD || NETCOREAPP
         /// <summary>
         /// Create an instance of the test engine.
         /// </summary>
