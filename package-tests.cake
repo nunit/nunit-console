@@ -202,7 +202,7 @@ StandardRunnerTests.Add(new PackageTest(
 
 StandardRunnerTests.Add(new PackageTest(
     1, "NUnitProjectTest",
-    "Run project with both copies of mock-assembly",
+    "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
     "../../NetFXTests.nunit --config=Release --trace=Debug",
     new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"),
     KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0")));
@@ -249,3 +249,41 @@ StandardRunnerTests.Add(new PackageTest(
     "../../src/TestData/TestData.sln --config=Release --trace=Debug",
     MockAssemblySolutionResult,
     KnownExtensions.VSProjectLoader.SetVersion("3.9.0")));
+
+// Special Cases
+
+StandardRunnerTests.Add(new PackageTest(
+    1, "InvalidTestNameTest_Net462",
+    "Ensure we handle invalid test names correctly under .NET 4.6.2",
+    "net462/InvalidTestNames.dll --trace:Debug",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "net-4.6.2")
+        }
+    }));
+
+AddToBothLists(new PackageTest(
+    1, "InvalidTestNameTest_Net60",
+    "Ensure we handle invalid test names correctly under .NET 6.0",
+    "net6.0/InvalidTestNames.dll --trace:Debug",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-6.0")
+        }
+    }));
+
+AddToBothLists(new PackageTest(
+    1, "InvalidTestNameTest_Net80",
+    "Ensure we handle invalid test names correctly under .NET 8.0",
+    "net8.0/InvalidTestNames.dll --trace:Debug",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-8.0")
+        }
+    }));
