@@ -277,7 +277,7 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("        --framework               Runtime of the runner is used.");
                 OutWriter.WriteLine("        --x86                     Bitness of the runner is used.");
                 OutWriter.WriteLine("        --shadowcopy              Not available.");
-                OutWriter.WriteLine("        --loaduserprofile         Not avalable.");
+                OutWriter.WriteLine("        --loaduserprofile         Not available.");
                 OutWriter.WriteLine("        --agents                  No agents are used.");
                 OutWriter.WriteLine("        --debug                   Debug in process directly.");
                 OutWriter.WriteLine("        --pause                   Used for debugging agents.");

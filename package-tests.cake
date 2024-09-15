@@ -150,7 +150,7 @@ StandardRunnerTests.Add(new PackageTest(
     1, "Net60AspNetCoreTest", "Run test using AspNetCore targeting .NET 6.0",
     "net6.0/aspnetcore-test.dll", new ExpectedResult("Passed")
     {
-        Total = 2, Passed = 2, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
+        Total = 3, Passed = 3, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-6.0") }
     }));
 
@@ -158,7 +158,7 @@ StandardRunnerTests.Add(new PackageTest(
     1, "Net80AspNetCoreTest", "Run test using AspNetCore targeting .NET 8.0",
     "net8.0/aspnetcore-test.dll", new ExpectedResult("Passed")
     {
-        Total = 2, Passed = 2, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
+        Total = 3, Passed = 3, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-8.0") }
     }));
 
