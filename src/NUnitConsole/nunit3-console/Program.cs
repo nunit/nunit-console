@@ -160,7 +160,10 @@ namespace NUnit.ConsoleRunner
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
 
-            var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
+            var version = versionBlock.ProductVersion;
+            int plus = version.IndexOf('+');
+            if (plus > 0) version = version.Substring(0, plus);
+            var header = $"{versionBlock.ProductName} {version}";
 
 #if NETFRAMEWORK
             object[] configurationAttributes = entryAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
@@ -185,7 +188,22 @@ namespace NUnit.ConsoleRunner
             OutWriter.WriteLine();
             OutWriter.WriteLine(ColorStyle.Header, "NUNIT3-CONSOLE [inputfiles] [options]");
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.Default, "Runs a set of NUnit tests from the console.");
+            OutWriter.WriteLine(ColorStyle.SectionHeader, "Description:");
+            using (new ColorConsole(ColorStyle.Default))
+            {
+#if NETFRAMEWORK
+                OutWriter.WriteLine("      The standard NUnit Console Runner runs a set of NUnit tests from the");
+                OutWriter.WriteLine("      console command-line. By default, all tests are run using separate agents");
+                OutWriter.WriteLine("      for each test assembly. This allows each assembly to run independently");
+                OutWriter.WriteLine("      and allows each assembly to run under the appropriate target runtime.");
+#else
+                OutWriter.WriteLine("      The NetCore Console Runner runs a set of NUnit tests from the console");
+                OutWriter.WriteLine("      command-line. All tests are run in-process and therefore execute under");
+                OutWriter.WriteLine("      the same runtime as the runner itself. A number of options supported by");
+                OutWriter.WriteLine("      the standard console runner are not available using the NetCore runner.");
+                OutWriter.WriteLine("      See \"Limitations\" below for more information.");
+#endif
+            }
             OutWriter.WriteLine();
             OutWriter.WriteLine(ColorStyle.SectionHeader, "InputFiles:");
             OutWriter.WriteLine(ColorStyle.Default, "      One or more assemblies or test projects of a recognized type.");
@@ -196,7 +214,7 @@ namespace NUnit.ConsoleRunner
                 Options.WriteOptionDescriptions(Console.Out);
             }
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.SectionHeader, "Description:");
+            OutWriter.WriteLine(ColorStyle.SectionHeader, "Operation:");
             using (new ColorConsole(ColorStyle.Default))
             {
                 OutWriter.WriteLine("      By default, this command runs the tests contained in the");
@@ -242,10 +260,30 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      To be able to load NUnit projects, file type .nunit, the engine");
                 OutWriter.WriteLine("      extension NUnitProjectLoader is required. For Visual Studio projects");
                 OutWriter.WriteLine("      and solutions the engine extension VSProjectLoader is required.");
+#if NETCOREAPP
                 OutWriter.WriteLine();
-                //writer.WriteLine("Options that take values may use an equal sign, a colon");
-                //writer.WriteLine("or a space to separate the option from its value.");
-                //writer.WriteLine();
+                OutWriter.WriteLine(ColorStyle.SectionHeader, "Limitations:");
+                OutWriter.WriteLine("      The NetCore Runner is primarily intended for use as a dotnet  tool.");
+                OutWriter.WriteLine("      When used in this way, a single assembly is usually being tested and");
+                OutWriter.WriteLine("      the assembly must be compatible with execution under the same runtime");
+                OutWriter.WriteLine("      as the runner itself, normally .NET 6.0.");
+                OutWriter.WriteLine();
+                OutWriter.WriteLine("      Using this runner, the following options are not available. A brief");
+                OutWriter.WriteLine("      rationale is given for each option excluded.");
+                OutWriter.WriteLine("        --configFile              Config of the runner itself is used.");
+                OutWriter.WriteLine("        --process                 Not designed to run out of process.");
+                OutWriter.WriteLine("        --inprocess               Redundant. We always run in process.");
+                OutWriter.WriteLine("        --domain                  Not applicable to .NET Core.");
+                OutWriter.WriteLine("        --framework               Runtime of the runner is used.");
+                OutWriter.WriteLine("        --x86                     Bitness of the runner is used.");
+                OutWriter.WriteLine("        --shadowcopy              Not available.");
+                OutWriter.WriteLine("        --loaduserprofile         Not avalable.");
+                OutWriter.WriteLine("        --agents                  No agents are used.");
+                OutWriter.WriteLine("        --debug                   Debug in process directly.");
+                OutWriter.WriteLine("        --pause                   Used for debugging agents.");
+                OutWriter.WriteLine("        --set-principal-policy    Not available.");
+                OutWriter.WriteLine("        --debug-agent             No agents are used.");
+#endif
             }
         }
 
