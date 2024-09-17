@@ -2,6 +2,9 @@
 
 #if NETCOREAPP3_1_OR_GREATER
 
+using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.DependencyModel.Resolution;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,9 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
-using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.DependencyModel.Resolution;
-using Microsoft.Win32;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Internal
 {
@@ -19,41 +20,61 @@ namespace NUnit.Engine.Internal
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyResolver));
 
-        private readonly ICompilationAssemblyResolver _assemblyResolver;
-        private readonly DependencyContext _dependencyContext;
         private readonly AssemblyLoadContext _loadContext;
 
         private static readonly string INSTALL_DIR;
         private static readonly string WINDOWS_DESKTOP_DIR;
         private static readonly string ASP_NET_CORE_DIR;
-        private static readonly List<string> AdditionalFrameworkDirectories;
+
+        // Our Strategies for resolving references
+        List<ResolutionStrategy> ResolutionStrategies;
 
         static TestAssemblyResolver()
         {
             INSTALL_DIR = GetDotNetInstallDirectory();
             WINDOWS_DESKTOP_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.WindowsDesktop.App");
             ASP_NET_CORE_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.AspNetCore.App");
-
-            AdditionalFrameworkDirectories = new List<string>();
-            if (Directory.Exists(WINDOWS_DESKTOP_DIR))
-                AdditionalFrameworkDirectories.Add(WINDOWS_DESKTOP_DIR);
-            if (Directory.Exists(ASP_NET_CORE_DIR))
-                AdditionalFrameworkDirectories.Add(ASP_NET_CORE_DIR);
         }
 
-        public TestAssemblyResolver(AssemblyLoadContext loadContext, string assemblyPath)
+        public TestAssemblyResolver(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
             _loadContext = loadContext;
-            _dependencyContext = DependencyContext.Load(loadContext.LoadFromAssemblyPath(assemblyPath));
 
-            _assemblyResolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
-            {
-                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(assemblyPath)),
-                new ReferenceAssemblyPathResolver(),
-                new PackageCompilationAssemblyResolver()
-            });
+            InitializeResolutionStrategies(loadContext, testAssemblyPath);
 
             _loadContext.Resolving += OnResolving;
+        }
+
+        private void InitializeResolutionStrategies(AssemblyLoadContext loadContext, string testAssemblyPath)
+        {
+            // First, looking only at direct references by the test assembly, try to determine if
+            // this assembly is using WindowsDesktop (either SWF or WPF) and/or AspNetCore.
+            AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(testAssemblyPath);
+            bool isWindowsDesktop = false;
+            bool isAspNetCore = false;
+            foreach (var reference in assemblyDef.MainModule.GetTypeReferences())
+            {
+                string fn = reference.FullName;
+                if (fn.StartsWith("System.Windows.") || fn.StartsWith("PresentationFramework"))
+                    isWindowsDesktop = true;
+                if (fn.StartsWith("Microsoft.AspNetCore."))
+                    isAspNetCore = true;
+            }
+
+            // Initialize the list of ResolutionStrategies in the best order depending on
+            // what we learned.
+            ResolutionStrategies = new List<ResolutionStrategy>();
+            
+            if (isWindowsDesktop && Directory.Exists(WINDOWS_DESKTOP_DIR))
+                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(WINDOWS_DESKTOP_DIR));
+            if (isAspNetCore && Directory.Exists(ASP_NET_CORE_DIR))
+                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(ASP_NET_CORE_DIR));
+            ResolutionStrategies.Add(new TrustedPlatformAssembliesStrategy());
+            ResolutionStrategies.Add(new RuntimeLibrariesStrategy(loadContext, testAssemblyPath));
+            if (!isWindowsDesktop && Directory.Exists(WINDOWS_DESKTOP_DIR))
+                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(WINDOWS_DESKTOP_DIR));
+            if (!isAspNetCore && Directory.Exists(ASP_NET_CORE_DIR))
+                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(ASP_NET_CORE_DIR));
         }
 
         public void Dispose()
@@ -61,112 +82,171 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
-        public Assembly Resolve(AssemblyLoadContext context, AssemblyName name)
+        public Assembly Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
         {
-            return OnResolving(context, name);
+            return OnResolving(context, assemblyName);
         }
 
-        private Assembly OnResolving(AssemblyLoadContext context, AssemblyName name)
+        private Assembly OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            context = context ?? _loadContext;
+            if (loadContext == null) throw new ArgumentNullException("context");
 
-            if (TryLoadFromTrustedPlatformAssemblies(context, name, out var loadedAssembly))
-            {
-                log.Info("'{0}' assembly is loaded from trusted path '{1}'", name, loadedAssembly.Location);
-                return loadedAssembly;
-            }
+            Assembly loadedAssembly;
+            foreach (var strategy in ResolutionStrategies)
+                if (strategy.TryToResolve(loadContext, assemblyName, out loadedAssembly))
+                    return loadedAssembly;
 
-            foreach (var library in _dependencyContext.RuntimeLibraries)
-            {
-                var wrapper = new CompilationLibrary(
-                    library.Type,
-                    library.Name,
-                    library.Version,
-                    library.Hash,
-                    library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
-                    library.Dependencies,
-                    library.Serviceable);
-
-                var assemblies = new List<string>();
-                _assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies);
-
-                foreach (var assemblyPath in assemblies)
-                {
-                    if (name.Name == Path.GetFileNameWithoutExtension(assemblyPath))
-                    {
-                        loadedAssembly = context.LoadFromAssemblyPath(assemblyPath);
-                        log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
-                            name,
-                            loadedAssembly.Location,
-                            library.Name);
-
-                        return loadedAssembly;
-                    }
-                }
-            }
-
-            if (name.Version == null)
-            {
-                return null;
-            }
-
-            foreach (string frameworkDirectory in AdditionalFrameworkDirectories)
-            {
-                var versionDir = FindBestVersionDir(frameworkDirectory, name.Version);
-
-                if (versionDir != null)
-                {
-                    string candidate = Path.Combine(frameworkDirectory, versionDir, name.Name + ".dll");
-                    if (File.Exists(candidate))
-                    {
-                        loadedAssembly = context.LoadFromAssemblyPath(candidate);
-                        log.Info("'{0}' ({1}) assembly is loaded from AdditionalFrameworkDirectory {2} dependencies with best candidate version {3}",
-                            name,
-                            loadedAssembly.Location,
-                            frameworkDirectory,
-                            versionDir);
-
-                        return loadedAssembly;
-                    }
-                    else
-                    {
-                        log.Debug("Best version dir for {0} is {1}, but there is no {2} file", frameworkDirectory, versionDir, candidate);
-                    }
-                }
-            }
-
-            log.Info("Cannot resolve assembly '{0}'", name);
+            log.Info("Cannot resolve assembly '{0}'", assemblyName);
             return null;
         }
 
-        private static bool TryLoadFromTrustedPlatformAssemblies(AssemblyLoadContext context, AssemblyName assemblyName, out Assembly loadedAssembly)
+        #region Nested ResolutionStrategy Classes
+
+        public abstract class ResolutionStrategy
         {
-            // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
-            loadedAssembly = null;
-            var trustedAssemblies = System.AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
-            if (string.IsNullOrEmpty(trustedAssemblies))
+            public abstract bool TryToResolve(
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly);
+        }
+
+        public class TrustedPlatformAssembliesStrategy : ResolutionStrategy
+        {
+            public override bool TryToResolve(
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
             {
+                return TryLoadFromTrustedPlatformAssemblies(loadContext, assemblyName, out loadedAssembly);
+            }
+
+            private static bool TryLoadFromTrustedPlatformAssemblies(
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
+                loadedAssembly = null;
+                var trustedAssemblies = System.AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
+                if (string.IsNullOrEmpty(trustedAssemblies))
+                {
+                    return false;
+                }
+
+                var separator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ";" : ":";
+                foreach (var assemblyPath in trustedAssemblies.Split(separator))
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(assemblyPath);
+                    if (FileMatchesAssembly(fileName) && File.Exists(assemblyPath))
+                    {
+                        loadedAssembly = loadContext.LoadFromAssemblyPath(assemblyPath);
+                        log.Info("'{0}' assembly is loaded from trusted path '{1}'", assemblyPath, loadedAssembly.Location);
+
+                        return true;
+                    }
+                }
+
+                return false;
+
+                bool FileMatchesAssembly(string fileName) =>
+                    string.Equals(fileName, assemblyName.Name, StringComparison.InvariantCultureIgnoreCase);
+            }
+        }
+
+        public class RuntimeLibrariesStrategy : ResolutionStrategy
+        {
+            private DependencyContext _dependencyContext;
+            private readonly ICompilationAssemblyResolver _assemblyResolver;
+
+            public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
+            {
+                _dependencyContext = DependencyContext.Load(loadContext.LoadFromAssemblyPath(testAssemblyPath));
+
+                _assemblyResolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
+                {
+                    new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssemblyPath)),
+                    new ReferenceAssemblyPathResolver(),
+                    new PackageCompilationAssemblyResolver()
+                });
+            }
+
+            public override bool TryToResolve(
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+            {
+                foreach (var library in _dependencyContext.RuntimeLibraries)
+                {
+                    var wrapper = new CompilationLibrary(
+                        library.Type,
+                        library.Name,
+                        library.Version,
+                        library.Hash,
+                        library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
+                        library.Dependencies,
+                        library.Serviceable);
+
+                    var assemblies = new List<string>();
+                    _assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies);
+
+                    foreach (var assemblyPath in assemblies)
+                    {
+                        if (assemblyName.Name == Path.GetFileNameWithoutExtension(assemblyPath))
+                        {
+                            loadedAssembly = loadContext.LoadFromAssemblyPath(assemblyPath);
+                            log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
+                                assemblyName,
+                                loadedAssembly.Location,
+                                library.Name);
+
+                            return true;
+                        }
+                    }
+                }
+
+                loadedAssembly = null;
                 return false;
             }
+        }
 
-            var separator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ";" : ":";
-            foreach (var assemblyPath in trustedAssemblies.Split(separator))
+        public class AdditionalDirectoryStrategy : ResolutionStrategy
+        {
+            private string _frameworkDirectory;
+
+            public AdditionalDirectoryStrategy(string frameworkDirectory)
             {
-                var fileName = Path.GetFileNameWithoutExtension(assemblyPath);
-                if (string.Equals(fileName, assemblyName.Name, StringComparison.InvariantCultureIgnoreCase) == false)
-                {
-                    continue;
-                }
-
-                if (File.Exists(assemblyPath))
-                {
-                    loadedAssembly = context.LoadFromAssemblyPath(assemblyPath);
-                    return true;
-                }
+                _frameworkDirectory = frameworkDirectory;
             }
 
-            return false;
+            public override bool TryToResolve(
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+            {
+                loadedAssembly = null;
+                if (assemblyName.Version == null)
+                    return false;
+
+                var versionDir = FindBestVersionDir(_frameworkDirectory, assemblyName.Version);
+
+                if (versionDir != null)
+                {
+                    string candidate = Path.Combine(_frameworkDirectory, versionDir, assemblyName.Name + ".dll");
+                    if (File.Exists(candidate))
+                    {
+                        loadedAssembly = loadContext.LoadFromAssemblyPath(candidate);
+                        log.Info("'{0}' ({1}) assembly is loaded from AdditionalFrameworkDirectory {2} dependencies with best candidate version {3}",
+                            assemblyName,
+                            loadedAssembly.Location,
+                            _frameworkDirectory,
+                            versionDir);
+
+                        return true;
+                    }
+                    else
+                    {
+                        log.Debug("Best version dir for {0} is {1}, but there is no {2} file", _frameworkDirectory, versionDir, candidate);
+                        return false;
+                    }
+                }
+
+                return false;
+            }
         }
+
+        #endregion
+
+        #region HelperMethods
 
         private static string GetDotNetInstallDirectory()
         {
@@ -232,6 +312,8 @@ namespace NUnit.Engine.Internal
                 return false;
             }
         }
+
+        #endregion
     }
 }
 #endif
