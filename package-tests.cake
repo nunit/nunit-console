@@ -35,31 +35,31 @@ class MockAssemblyExpectedResult : ExpectedResult
 StandardRunnerTests.Add(new PackageTest(
     1, "Net462Test",
     "Run mock-assembly.dll under .NET 4.6.2",
-    "net462/mock-assembly.dll",
+    "testdata/net462/mock-assembly.dll",
     new MockAssemblyExpectedResult("net-4.6.2")));
 
 AddToBothLists(new PackageTest(
     1, "Net80Test",
     "Run mock-assembly.dll under .NET 8.0",
-    "net8.0/mock-assembly.dll",
+    "testdata/net8.0/mock-assembly.dll",
     new MockAssemblyExpectedResult("netcore-8.0")));
 
 AddToBothLists(new PackageTest(
     1, "Net70Test",
     "Run mock-assembly.dll under .NET 7.0",
-    "net7.0/mock-assembly.dll",
+    "testdata/net7.0/mock-assembly.dll",
     new MockAssemblyExpectedResult("netcore-7.0")));
 
 AddToBothLists(new PackageTest(
     1, "Net60Test",
     "Run mock-assembly.dll under .NET 6.0",
-    "net6.0/mock-assembly.dll",
+    "testdata/net6.0/mock-assembly.dll",
     new MockAssemblyExpectedResult("netcore-6.0")));
 
 AddToBothLists(new PackageTest(
     1, "NetCore31Test",
     "Run mock-assembly.dll under .NET Core 3.1",
-    "netcoreapp3.1/mock-assembly.dll",
+    "testdata/netcoreapp3.1/mock-assembly.dll",
     new MockAssemblyExpectedResult("netcore-3.1")));
 
 //////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ class MockAssemblyX86ExpectedResult : MockAssemblyExpectedResult
 StandardRunnerTests.Add(new PackageTest(
     1, "Net462X86Test",
     "Run mock-assembly-x86.dll under .NET 4.6.2",
-    "net462/mock-assembly-x86.dll",
+    "testdata/net462/mock-assembly-x86.dll",
     new MockAssemblyX86ExpectedResult("net-4.6.2")));
 
 if (dotnetX86Available)
@@ -96,27 +96,27 @@ if (dotnetX86Available)
         StandardRunnerTests.Add(new PackageTest(
             1, "Net80X86Test",
             "Run mock-assembly-x86.dll under .NET 8.0",
-            "net8.0/mock-assembly-x86.dll",
+            "testdata/net8.0/mock-assembly-x86.dll",
             new MockAssemblyX86ExpectedResult("netcore-8.0")));
 
     if (!onAppVeyor && !onGitHubActions)
         StandardRunnerTests.Add(new PackageTest(
             1, "Net70X86Test",
             "Run mock-assembly-x86.dll under .NET 7.0",
-            "net7.0/mock-assembly-x86.dll",
+            "testdata/net7.0/mock-assembly-x86.dll",
             new MockAssemblyX86ExpectedResult("netcore-7.0")));
 
     StandardRunnerTests.Add(new PackageTest(
         1, "Net60X86Test",
         "Run mock-assembly-x86.dll under .NET 6.0",
-        "net6.0/mock-assembly-x86.dll",
+        "testdata/net6.0/mock-assembly-x86.dll",
         new MockAssemblyX86ExpectedResult("netcore-6.0")));
 
     if (!onAppVeyor && !onGitHubActions)
         StandardRunnerTests.Add(new PackageTest(
             1, "NetCore31X86Test",
             "Run mock-assembly-x86.dll under .NET Core 3.1",
-            "netcoreapp3.1/mock-assembly-x86.dll",
+            "testdata/netcoreapp3.1/mock-assembly-x86.dll",
             new MockAssemblyX86ExpectedResult("netcore-3.1")));
 }
 
@@ -127,19 +127,19 @@ if (dotnetX86Available)
 StandardRunnerTests.Add(new PackageTest(
     1, "Net462PlusNet462Test",
     "Run two copies of mock-assembly together",
-    "net462/mock-assembly.dll net462/mock-assembly.dll",
+    "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll",
     new MockAssemblyExpectedResult("net-4.6.2", "net-4.6.2")));
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net60PlusNet80Test",
     "Run mock-assembly under .NET6.0 and 8.0 together",
-    "net6.0/mock-assembly.dll net8.0/mock-assembly.dll",
+    "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll",
     new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0")));
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net462PlusNet60Test",
     "Run mock-assembly under .Net Framework 4.6.2 and .Net 6.0 together",
-    "net462/mock-assembly.dll net6.0/mock-assembly.dll",
+    "testdata/net462/mock-assembly.dll testdata/net6.0/mock-assembly.dll",
     new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0")));
 
 //////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ StandardRunnerTests.Add(new PackageTest(
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net60AspNetCoreTest", "Run test using AspNetCore targeting .NET 6.0",
-    "net6.0/aspnetcore-test.dll", new ExpectedResult("Passed")
+    "testdata/net6.0/aspnetcore-test.dll", new ExpectedResult("Passed")
     {
         Total = 3, Passed = 3, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-6.0") }
@@ -156,7 +156,7 @@ StandardRunnerTests.Add(new PackageTest(
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net80AspNetCoreTest", "Run test using AspNetCore targeting .NET 8.0",
-    "net8.0/aspnetcore-test.dll", new ExpectedResult("Passed")
+    "testdata/net8.0/aspnetcore-test.dll", new ExpectedResult("Passed")
     {
         Total = 3, Passed = 3, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-8.0") }
@@ -168,7 +168,7 @@ StandardRunnerTests.Add(new PackageTest(
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net60WindowsFormsTest", "Run test using windows forms under .NET 6.0",
-    "net6.0-windows/windows-forms-test.dll", new ExpectedResult("Passed")
+    "testdata/net6.0-windows/windows-forms-test.dll", new ExpectedResult("Passed")
     {
         Total = 2, Passed = 2, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-forms-test.dll", "netcore-6.0") }
@@ -176,7 +176,7 @@ StandardRunnerTests.Add(new PackageTest(
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net80WindowsFormsTest", "Run test using windows forms under .NET 8.0",
-    "net8.0-windows/windows-forms-test.dll", new ExpectedResult("Passed")
+    "testdata/net8.0-windows/windows-forms-test.dll", new ExpectedResult("Passed")
     {
         Total = 2, Passed = 2, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-forms-test.dll", "netcore-8.0") }
@@ -188,12 +188,12 @@ StandardRunnerTests.Add(new PackageTest(
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net60WPFTest", "Run test using WPF under .NET 6.0",
-    "net6.0-windows/WpfTest.dll --trace=Debug", 
+    "testdata/net6.0-windows/WpfTest.dll --trace=Debug", 
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }));
 
 StandardRunnerTests.Add(new PackageTest(
     1, "Net80WPFTest", "Run test using WPF under .NET 8.0",
-    "net8.0-windows/WpfTest.dll --trace=Debug",
+    "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }));
 
 //////////////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ StandardRunnerTests.Add(new PackageTest(
 StandardRunnerTests.Add(new PackageTest(
     1, "V2ResultWriterTest",
     "Run mock-assembly under .NET 6.0 and produce V2 output",
-    "net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+    "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
     new MockAssemblyExpectedResult("netcore-6.0"),
     KnownExtensions.NUnitV2ResultWriter.SetVersion("3.8.0")));
 
@@ -255,7 +255,7 @@ StandardRunnerTests.Add(new PackageTest(
 StandardRunnerTests.Add(new PackageTest(
     1, "InvalidTestNameTest_Net462",
     "Ensure we handle invalid test names correctly under .NET 4.6.2",
-    "net462/InvalidTestNames.dll --trace:Debug",
+    "testdata/net462/InvalidTestNames.dll --trace:Debug",
     new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -267,7 +267,7 @@ StandardRunnerTests.Add(new PackageTest(
 AddToBothLists(new PackageTest(
     1, "InvalidTestNameTest_Net60",
     "Ensure we handle invalid test names correctly under .NET 6.0",
-    "net6.0/InvalidTestNames.dll --trace:Debug",
+    "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
     new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -279,7 +279,7 @@ AddToBothLists(new PackageTest(
 AddToBothLists(new PackageTest(
     1, "InvalidTestNameTest_Net80",
     "Ensure we handle invalid test names correctly under .NET 8.0",
-    "net8.0/InvalidTestNames.dll --trace:Debug",
+    "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
     new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]

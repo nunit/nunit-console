@@ -166,11 +166,11 @@ namespace NUnit.Engine.Internal.Tests
 				@"c:\folder1", @"c:\folder2\folder3" ), Is.EqualTo(@"..\folder2\folder3"));
 			Assert.That(PathUtils.RelativePath(
 				@"c:\folder1", @"bin\debug" ), Is.EqualTo(@"bin\debug"));
-			Assert.IsNull( PathUtils.RelativePath( @"C:\folder", @"D:\folder" ),
+			Assert.That( PathUtils.RelativePath( @"C:\folder", @"D:\folder"), Is.Null,
 				"Unrelated paths should return null" );
-            Assert.IsNull(PathUtils.RelativePath(@"C:\", @"D:\"),
+            Assert.That(PathUtils.RelativePath(@"C:\", @"D:\"), Is.Null,
                 "Unrelated roots should return null");
-            Assert.IsNull(PathUtils.RelativePath(@"C:", @"D:"),
+            Assert.That(PathUtils.RelativePath(@"C:", @"D:"), Is.Null,
                 "Unrelated roots (no trailing separators) should return null");
             Assert.That(PathUtils.RelativePath(@"C:\folder1", @"C:\folder1"), Is.EqualTo(string.Empty));
             Assert.That(PathUtils.RelativePath(@"C:\", @"C:\"), Is.EqualTo(string.Empty));

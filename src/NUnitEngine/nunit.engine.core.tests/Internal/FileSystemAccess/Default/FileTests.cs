@@ -19,8 +19,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var file = new File(path);
 
-            Assert.AreEqual(path, file.FullName);
-            Assert.AreEqual(parent, file.Parent.FullName);
+            Assert.That(file.FullName, Is.EqualTo(path));
+            Assert.That(file.Parent.FullName, Is.EqualTo(parent));
         }
 
         [Test]
@@ -75,8 +75,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var file = new File(path);
 
-            Assert.AreEqual(path, file.FullName);
-            Assert.AreEqual(parent, file.Parent.FullName);
+            Assert.That(file.FullName, Is.EqualTo(path));
+            Assert.That(file.Parent.FullName, Is.EqualTo(parent));
         }
 
         [Test]

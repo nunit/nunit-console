@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
+    <OutputPath>..\..\..\bin\$(Configuration)\testdata\</OutputPath>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include = "nunit" Version="3.13.3" />
+    <PackageReference Include = "nunit" Version="4.2.2" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Tests</RootNamespace>
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
+    <OutputPath>..\..\..\bin\$(Configuration)\testdata\</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>x86</PlatformTarget>
@@ -16,9 +17,14 @@
     <Description>Assembly used in testing the engine</Description>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.13.3" />
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <PackageReference Include="NUnit" Version="3.14.0" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <PackageReference Include="NUnit" Version="4.2.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Include="..\mock-assembly\*.cs" />
     <None Include="..\..\nunit.snk" Link="nunit.snk" />
