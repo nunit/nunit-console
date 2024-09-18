@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <PackageReference Include="NSubstitute" Version="5.1.0" />
-    <PackageReference Include="NUnit" Version="4.1.0" />
-    <PackageReference Include="NUnitLite" Version="4.1.0" />
+    <PackageReference Include="NUnit" Version="4.2.2" />
+    <PackageReference Include="NUnitLite" Version="4.2.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='net462'">
