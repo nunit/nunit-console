@@ -92,7 +92,7 @@ namespace NUnit.Engine.Services.Tests
             [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
         {
             var ep = _extensionManager.GetExtensionPoint(path);
-            Assert.NotNull(ep);
+            Assert.That(ep, Is.Not.Null);
             Assert.That(ep.Path, Is.EqualTo(path));
             Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
         }
@@ -103,7 +103,7 @@ namespace NUnit.Engine.Services.Tests
             [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
         {
             var ep = _extensionManager.GetExtensionPoint(type);
-            Assert.NotNull(ep);
+            Assert.That(ep, Is.Not.Null);
             Assert.That(ep.Path, Is.EqualTo(path));
             Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
         }

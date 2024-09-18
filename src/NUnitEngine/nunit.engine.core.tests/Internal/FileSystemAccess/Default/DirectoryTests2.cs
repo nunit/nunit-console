@@ -68,7 +68,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var actualDirectories = directory.GetDirectories("*", SIO.SearchOption.TopDirectoryOnly);
 
             var actual = actualDirectories.Select(x => x.FullName);
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var actualDirectories = directory.GetDirectories("*", SIO.SearchOption.AllDirectories);
 
             var actual = actualDirectories.Select(x => x.FullName);
-            CollectionAssert.AreEquivalent(this.subDirectories, actual);
+            Assert.That(actual, Is.EquivalentTo(this.subDirectories));
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var actualDirectories = directory.GetDirectories("a??", SIO.SearchOption.TopDirectoryOnly);
 
             var actual = actualDirectories.Select(x => x.FullName);
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var actual = directory.GetDirectories("z*", SIO.SearchOption.AllDirectories);
 
-            CollectionAssert.IsEmpty(actual);
+            Assert.That(actual, Is.Empty);
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var actualDirectories = directory.GetDirectories("?e?", SIO.SearchOption.AllDirectories);
 
             var actual = actualDirectories.Select(x => x.FullName);
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
     }
 }

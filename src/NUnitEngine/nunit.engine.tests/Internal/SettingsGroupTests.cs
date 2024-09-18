@@ -23,8 +23,8 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void WhenSettingIsNotInitialized_NullIsReturned()
         {
-            Assert.IsNull(settings.GetSetting("X"));
-            Assert.IsNull(settings.GetSetting("NAME"));
+            Assert.That(settings.GetSetting("X"), Is.Null);
+            Assert.That(settings.GetSetting("NAME"), Is.Null);
         }
 
         [TestCase("X", 5)]
@@ -37,7 +37,7 @@ namespace NUnit.Engine.Internal.Tests
             settings.SaveSetting(name, expected);
             object actual = settings.GetSetting(name);
             Assert.That(actual, Is.EqualTo(expected));
-            Assert.IsInstanceOf(expected.GetType(),actual);
+            Assert.That(actual, Is.InstanceOf(expected.GetType()));
         }
 
         private enum PriorityValue
@@ -54,11 +54,11 @@ namespace NUnit.Engine.Internal.Tests
             settings.SaveSetting("NAME", "Charlie");
 
             settings.RemoveSetting("X");
-            Assert.IsNull(settings.GetSetting("X"), "X not removed");
+            Assert.That(settings.GetSetting("X"), Is.Null, "X not removed");
             Assert.That(settings.GetSetting("NAME"), Is.EqualTo("Charlie"));
 
             settings.RemoveSetting("NAME");
-            Assert.IsNull(settings.GetSetting("NAME"), "NAME not removed");
+            Assert.That(settings.GetSetting("NAME"), Is.Null, "NAME not removed");
         }
 
         [Test]

@@ -64,12 +64,12 @@ namespace NUnit.Engine.Services
 
             Assert.That(process.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS));
 
-            Assert.True(process.EnableRaisingEvents, "EnableRaisingEvents");
+            Assert.That(process.EnableRaisingEvents, "EnableRaisingEvents");
 
             var startInfo = process.StartInfo;
-            Assert.False(startInfo.UseShellExecute, "UseShellExecute");
-            Assert.True(startInfo.CreateNoWindow, "CreateNoWindow");
-            Assert.False(startInfo.LoadUserProfile, "LoadUserProfile");
+            Assert.That(startInfo.UseShellExecute, Is.False, "UseShellExecute");
+            Assert.That(startInfo.CreateNoWindow, "CreateNoWindow");
+            Assert.That(startInfo.LoadUserProfile, Is.False, "LoadUserProfile");
 
             var targetRuntime = RuntimeFramework.Parse(framework);
             if (targetRuntime.Runtime == RuntimeType.Mono)

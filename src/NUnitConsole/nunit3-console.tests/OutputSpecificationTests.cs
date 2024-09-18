@@ -40,7 +40,7 @@ namespace NUnit.Common.Tests
             var spec = new Spec("MyFile.xml", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit3"));
-            Assert.Null(spec.Transform);
+            Assert.That(spec.Transform, Is.Null);
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace NUnit.Common.Tests
             var spec = new Spec("MyFile.xml;format=nunit2", null);
             Assert.That(spec.OutputPath, Is.EqualTo("MyFile.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit2"));
-            Assert.Null(spec.Transform);
+            Assert.That(spec.Transform, Is.Null);
         }
 
         [Test]

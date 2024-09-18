@@ -42,7 +42,7 @@ namespace NUnit.ConsoleRunner.Tests
             var engineResult = AddMetadata(new TestEngineResult(xmlText));
             _result = engineResult.Xml;
 
-            Assert.NotNull(_result, "Unable to create report result.");
+            Assert.That(_result, Is.Not.Null, "Unable to create report result.");
         }
 
         [SetUp]

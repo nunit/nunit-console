@@ -36,7 +36,7 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void EmptyList()
         {
-            Assert.IsNotNull(  _recentFiles.Entries, "Entries should never be null" );
+            Assert.That(_recentFiles.Entries, Is.Not.Null, "Entries should never be null");
             Assert.That(_recentFiles.Entries.Count, Is.EqualTo(0));
         }
 
