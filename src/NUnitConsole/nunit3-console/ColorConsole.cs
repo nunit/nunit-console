@@ -39,6 +39,11 @@ namespace NUnit.ConsoleRunner
             return color;
         }
 
+        public static void SetForeground(ColorStyle style)
+        {
+            Console.ForegroundColor = GetColorForStyle(style);
+        }
+
         private static ConsoleColor GetColorForStyle(ColorStyle style)
         {
             switch (Console.BackgroundColor)
