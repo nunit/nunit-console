@@ -1352,8 +1352,9 @@ namespace NUnit.ConsoleRunner.Options
                     o.Write(new string(' ', OptionWidth));
                 }
 
-                WriteDescription(o, p.Description, new string(' ', OptionWidth + 2),
+                WriteDescription(o, p.Description, new string(' ', OptionWidth),
                         Description_FirstWidth, Description_RemWidth);
+                o.WriteLine();
             }
 
             foreach (ArgumentSource s in sources)
@@ -1406,7 +1407,7 @@ namespace NUnit.ConsoleRunner.Options
             {
                 if (indent)
                     o.Write(prefix);
-                o.WriteLine(line);
+                o.WriteLine(line.Trim());
                 indent = true;
             }
         }
