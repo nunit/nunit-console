@@ -250,7 +250,9 @@ StandardRunnerTests.Add(new PackageTest(
     MockAssemblySolutionResult,
     KnownExtensions.VSProjectLoader.SetVersion("3.9.0")));
 
-// Special Cases
+//////////////////////////////////////////////////////////////////////
+// SPECIAL CASES
+//////////////////////////////////////////////////////////////////////
 
 StandardRunnerTests.Add(new PackageTest(
     1, "InvalidTestNameTest_Net462",
@@ -286,4 +288,13 @@ AddToBothLists(new PackageTest(
         {
             new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-8.0")
         }
+    }));
+
+StandardRunnerTests.Add(new PackageTest(
+    1, "AppContextBaseDirectory_NET80",
+    "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
+    "testdata/net8.0/AppContextTest.dll",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
     }));
