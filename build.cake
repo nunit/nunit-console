@@ -126,7 +126,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             new PackageReference("NUnit.Extension.NUnitProjectLoader", "3.8.0"),
             new PackageReference("NUnit.Extension.NUnitV2Driver", "3.9.0"),
             new PackageReference("NUnit.Extension.NUnitV2ResultWriter", "3.8.0"),
-            new PackageReference("NUnit.Extension.TeamCityEventListener", "1.0.9")
+            new PackageReference("NUnit.Extension.TeamCityEventListener", "1.0.7")
         }),
 
     // NOTE: Packages below this point have no direct tests
