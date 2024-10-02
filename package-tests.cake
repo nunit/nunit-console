@@ -250,6 +250,13 @@ StandardRunnerTests.Add(new PackageTest(
     MockAssemblySolutionResult,
     KnownExtensions.VSProjectLoader.SetVersion("3.9.0")));
 
+StandardRunnerTests.Add(new PackageTest(
+    1, "TeamCityListenerTest",
+    "Run mock-assembly with --teamcity enabled",
+    "testdata/net462/mock-assembly.dll --teamcity",
+    new MockAssemblyExpectedResult("net-4.6.2"),
+    new ExtensionSpecifier("NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.7")));
+
 //////////////////////////////////////////////////////////////////////
 // SPECIAL CASES
 //////////////////////////////////////////////////////////////////////
