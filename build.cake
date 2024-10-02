@@ -45,6 +45,7 @@ FilePath[] AGENT_PDB_FILES_NETCORE = {
 PackageDefinition NUnitConsoleNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNetCorePackage;
+PackageDefinition NUnitConsoleRunnerNet80Package;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
@@ -88,6 +89,14 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         checks: new PackageCheck[] { HasFiles("nunit.exe") },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
+        tests: NetCoreRunnerTests),
+
+    NUnitConsoleRunnerNet80Package = new DotNetToolPackage(
+        id: "NUnit.ConsoleRunner.Net80",
+        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.net80.nuspec",
+        checks: new PackageCheck[] { HasFiles("nunit-net80.exe") },
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
+            + $"NUnit.ConsoleRunner.Net80.{BuildSettings.PackageVersion}/nunit-net80.exe"),
         tests: NetCoreRunnerTests),
 
     NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(

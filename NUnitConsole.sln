@@ -66,6 +66,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E8
 	ProjectSection(SolutionItems) = preProject
 		nuget\runners\DotnetToolSettings.xml = nuget\runners\DotnetToolSettings.xml
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
+		nuget\runners\nunit.console-runner.net80.nuspec = nuget\runners\nunit.console-runner.net80.nuspec
 		nuget\runners\nunit.console-runner.netcore.nuspec = nuget\runners\nunit.console-runner.netcore.nuspec
 		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
 		nuget\runners\nunit.console.nuget.addins = nuget\runners\nunit.console.nuget.addins
@@ -145,6 +146,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvalidTestNames", "src\TestData\InvalidTestNames\InvalidTestNames.csproj", "{58E18ACC-1F7E-4395-817E-E7EF943E0C77}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppContextTest", "src\TestData\AppContextTest\AppContextTest.csproj", "{E43A3E4B-B050-471B-B43C-0DF60FD44376}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net8.0", "net8.0", "{303CF83E-2A87-4882-8CAC-3EB59AAD81FC}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\runners\net8.0\DotnetToolSettings.xml = nuget\runners\net8.0\DotnetToolSettings.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -258,6 +264,7 @@ Global
 		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{58E18ACC-1F7E-4395-817E-E7EF943E0C77} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{E43A3E4B-B050-471B-B43C-0DF60FD44376} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
+		{303CF83E-2A87-4882-8CAC-3EB59AAD81FC} = {F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
