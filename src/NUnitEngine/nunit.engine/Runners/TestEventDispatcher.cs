@@ -33,6 +33,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
+#if NET6_0 || NET8_0
+        [Obsolete]
+#endif
         public override object InitializeLifetimeService()
         {
             return null;
