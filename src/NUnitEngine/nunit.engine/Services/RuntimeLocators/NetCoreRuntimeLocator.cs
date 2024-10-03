@@ -70,7 +70,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
             }
             catch (Exception)
             {
-                // Failed to start dotnet command. Assume no versions are installed and just r eturn just return
+                // Failed to start dotnet command. Assume no versions are installed and just return
                 yield break;
             }
 
