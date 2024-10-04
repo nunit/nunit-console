@@ -15,28 +15,31 @@ BuildSettings.Initialize(
 
 //////////////////////////////////////////////////////////////////////
 // LISTS OF FILES USED IN CHECKING PACKAGES
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////// 
 
+FilePath[] ConsoleFiles = { 
+    "nunit3-console.dll", "nunit3-console.dll.config", "nunit3-console.exe", "nunit3-console.pdb", 
+    "nunit3-console.deps.json", "nunit3-console.runtimeconfig.json", "nunit.console.nuget.addins" };
 FilePath[] ENGINE_FILES = {
-        "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+    "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
 FilePath[] ENGINE_PDB_FILES = {
-        "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 FilePath[] ENGINE_CORE_FILES = {
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
+    "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll" };
 FilePath[] ENGINE_CORE_PDB_FILES = {
-        "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 FilePath[] AGENT_FILES = {
-        "nunit-agent.exe", "nunit-agent.exe.config",
-        "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
+    "nunit-agent.exe", "nunit-agent.exe.config",
+    "nunit-agent-x86.exe", "nunit-agent-x86.exe.config",
+    "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"};
 FilePath[] AGENT_FILES_NETCORE = {
-        "nunit-agent.dll", "nunit-agent.dll.config",
-        "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-        "Microsoft.Extensions.DependencyModel.dll"};
+    "nunit-agent.dll", "nunit-agent.dll.config",
+    "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
+    "Microsoft.Extensions.DependencyModel.dll"};
 FilePath[] AGENT_PDB_FILES = {
-        "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 FilePath[] AGENT_PDB_FILES_NETCORE = {
-        "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
+    "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"};
 
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE DEFINITIONS
@@ -86,7 +89,12 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitConsoleRunnerNetCorePackage = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.NetCore",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
-        checks: new PackageCheck[] { HasFiles("nunit.exe") },
+        checks: new PackageCheck[]
+        { 
+            HasFiles("nunit.exe"),
+            HasSomeDirectory(".store/nunit.consolerunner.netcore/**/tools/net6.0/any")
+                .WithFiles(ENGINE_FILES).AndFiles(ConsoleFiles).AndFile("Microsoft.Extensions.DependencyModel.dll")
+        },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
         tests: NetCoreRunnerTests),
@@ -94,7 +102,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitConsoleRunnerNet80Package = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.Net80",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.net80.nuspec",
-        checks: new PackageCheck[] { HasFiles("nunit-net80.exe") },
+        checks: new PackageCheck[] { 
+            HasFiles("nunit-net80.exe"),
+            HasSomeDirectory(".store/nunit.consolerunner.net80/**/tools/net8.0/any")
+                .WithFiles(ENGINE_FILES).AndFiles(ConsoleFiles).AndFile("Microsoft.Extensions.DependencyModel.dll")
+        },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.Net80.{BuildSettings.PackageVersion}/nunit-net80.exe"),
         tests: NetCoreRunnerTests),
@@ -147,13 +159,19 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
+            HasDirectory("lib/net6.0").WithFiles(ENGINE_FILES).AndFile("Microsoft.Extensions.DependencyModel.dll"),
+            HasDirectory("lib/net8.0").WithFiles(ENGINE_FILES).AndFile("Microsoft.Extensions.DependencyModel.dll"),
             HasDirectory("contentFiles/any/lib/net462").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/lib/net6.0").WithFile("nunit.engine.nuget.addins"),
+            HasDirectory("contentFiles/any/lib/net8.0").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
         },
         symbols: new PackageCheck[] {
             HasDirectory("lib/net462").WithFiles(ENGINE_PDB_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/net6.0").WithFiles(ENGINE_PDB_FILES),
+            HasDirectory("lib/net8.0").WithFiles(ENGINE_PDB_FILES),
             HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_PDB_FILES)
         }),
 
@@ -170,6 +188,68 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
         })
 });
+
+// Adhoc code to check content of a dotnet standalone executable
+// TODO: Incorporate this in the recipe itself
+
+private static ExtendedDirectoryCheck HasSomeDirectory(string pattern) => new ExtendedDirectoryCheck(pattern);
+
+public class ExtendedDirectoryCheck : PackageCheck
+{
+    private string _directoryPattern;
+    private List<FilePath> _files = new List<FilePath>();
+
+    public ExtendedDirectoryCheck(string directoryPattern)
+    {
+        // Assume it has no wildcard - checked in ApplyTo method
+        _directoryPattern = directoryPattern;
+    }
+
+    public ExtendedDirectoryCheck WithFiles(params FilePath[] files)
+    {
+        _files.AddRange(files);
+        return this;
+    }
+
+    public ExtendedDirectoryCheck AndFiles(params FilePath[] files)
+    {
+        return WithFiles(files);
+    }
+
+    public ExtendedDirectoryCheck WithFile(FilePath file)
+    {
+        _files.Add(file);
+        return this;
+    }
+
+    public ExtendedDirectoryCheck AndFile(FilePath file)
+    {
+        return AndFiles(file);
+    }
+
+    public override bool ApplyTo(DirectoryPath testDirPath)
+    {
+        if (_directoryPattern.Contains('*') || _directoryPattern.Contains('?')) // Wildcard
+        {
+            var absDirPattern = testDirPath.Combine(_directoryPattern).ToString();
+            foreach (var dir in _context.GetDirectories(absDirPattern))
+            {
+                // Use first one found
+                return CheckFilesExist(_files.Select(file => dir.CombineWithFilePath(file)));
+            }
+        }
+        else // No wildcard
+        {
+            var absDirPath = testDirPath.Combine(_directoryPattern);
+            if (!CheckDirectoryExists(absDirPath))
+                return false;
+
+            return CheckFilesExist(_files.Select(file => absDirPath.CombineWithFilePath(file)));
+        }
+
+        return false;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 // TEST RUNNERS
