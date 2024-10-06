@@ -58,7 +58,7 @@ namespace NUnit.Engine.Drivers
 
             return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(
                 _driverNode.AssemblyPath, _driverNode.TypeName, 
-                false, 0, null, null, null, null) as IFrameworkDriver;
+                false, 0, null, new[] { domain }, null, null) as IFrameworkDriver;
         }
     }
 }
