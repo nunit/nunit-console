@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+		<RootNamespace>NUnit.Tests</RootNamespace>
+		<TargetFrameworks>net462</TargetFrameworks>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+		<OutputPath>..\..\..\bin\$(Configuration)\v2-tests\</OutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+  
+	<ItemGroup>
+		<PackageReference Include="NUnit" Version="2.6.4" />
+	</ItemGroup>
+  
+</Project>

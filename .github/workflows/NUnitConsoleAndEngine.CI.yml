@@ -61,6 +61,15 @@ jobs:
           path: "build-results/*.binlog"
           # if-no-files-found: error
 
+      - name: 🪵 Upload InternalTrace logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: InternalTraceLogs
+          # This path is defined in build-settings.cake
+          path: "*.log"
+          # if-no-files-found: error
+
       - name: 💾 Upload test results
         uses: actions/upload-artifact@v4
         if: always()

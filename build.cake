@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.2.0-dev00007
+#load nuget:?package=NUnit.Cake.Recipe&version=1.2.0-dev00009
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -188,6 +188,30 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
         })
 });
+
+Task("BuildZipPackage")
+    .Does(() =>
+    {
+        NUnitConsoleZipPackage.BuildPackage();
+    });
+
+Task("InstallZipPackage")
+    .Does(() =>
+    {
+        NUnitConsoleZipPackage.InstallPackage();
+    });
+
+Task("VerifyZipPackage")
+    .Does(() =>
+    {
+        NUnitConsoleZipPackage.VerifyPackage();
+    });
+
+Task("TestZipPackage")
+    .Does(() =>
+    {
+        NUnitConsoleZipPackage.RunPackageTests();
+    });
 
 // Adhoc code to check content of a dotnet standalone executable
 // TODO: Incorporate this in the recipe itself
