@@ -1,0 +1,5 @@
+﻿../../net462/addins/nunit.v2.driver.dll
+../../net462/addins/nunit-v2-result-writer.dll
+../../net462/addins/nunit-project-loader.dll
+../../net462/addins/vs-project-loader.dll
+../../net462/addins/teamcity-event-listener.dll
