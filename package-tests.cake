@@ -146,7 +146,7 @@ StandardRunnerTests.Add(new PackageTest(
 // ASP.NETCORE TESTS
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "Net60AspNetCoreTest", "Run test using AspNetCore targeting .NET 6.0",
     "testdata/net6.0/aspnetcore-test.dll", new ExpectedResult("Passed")
     {
@@ -154,7 +154,7 @@ StandardRunnerTests.Add(new PackageTest(
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-6.0") }
     }));
 
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "Net80AspNetCoreTest", "Run test using AspNetCore targeting .NET 8.0",
     "testdata/net8.0/aspnetcore-test.dll", new ExpectedResult("Passed")
     {
@@ -166,7 +166,7 @@ StandardRunnerTests.Add(new PackageTest(
 // WINDOWS FORMS TESTS
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "Net60WindowsFormsTest", "Run test using windows forms under .NET 6.0",
     "testdata/net6.0-windows/windows-forms-test.dll", new ExpectedResult("Passed")
     {
@@ -174,6 +174,7 @@ StandardRunnerTests.Add(new PackageTest(
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-forms-test.dll", "netcore-6.0") }
     }));
 
+// Runs under Net80 runner but not NetCore
 StandardRunnerTests.Add(new PackageTest(
     1, "Net80WindowsFormsTest", "Run test using windows forms under .NET 8.0",
     "testdata/net8.0-windows/windows-forms-test.dll", new ExpectedResult("Passed")
@@ -186,12 +187,12 @@ StandardRunnerTests.Add(new PackageTest(
 // WPF TESTS
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "Net60WPFTest", "Run test using WPF under .NET 6.0",
     "testdata/net6.0-windows/WpfTest.dll --trace=Debug", 
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }));
 
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "Net80WPFTest", "Run test using WPF under .NET 8.0",
     "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }));
