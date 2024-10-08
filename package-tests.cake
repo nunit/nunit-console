@@ -206,7 +206,7 @@ StandardRunnerTests.Add(new PackageTest(
     "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
     "../../NetFXTests.nunit --config=Release --trace=Debug",
     new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"),
-    KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0")));
+    KnownExtensions.NUnitProjectLoader));
 
 // V2 Result Writer Test
 StandardRunnerTests.Add(new PackageTest(
@@ -214,7 +214,7 @@ StandardRunnerTests.Add(new PackageTest(
     "Run mock-assembly under .NET 6.0 and produce V2 output",
     "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
     new MockAssemblyExpectedResult("netcore-6.0"),
-    KnownExtensions.NUnitV2ResultWriter.SetVersion("3.8.0")));
+    KnownExtensions.NUnitV2ResultWriter));
 
 // VS Project Loader Tests
 StandardRunnerTests.Add(new PackageTest(
@@ -222,7 +222,7 @@ StandardRunnerTests.Add(new PackageTest(
     "Run mock-assembly using the .csproj file",
     "../../src/TestData/mock-assembly/mock-assembly.csproj --config=Release",
     new MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0"),
-    KnownExtensions.VSProjectLoader.SetVersion("3.9.0")));
+    KnownExtensions.VSProjectLoader));
 
 StandardRunnerTests.Add(new PackageTest(
     1, "VSProjectLoaderTest_Solution",
@@ -249,7 +249,7 @@ StandardRunnerTests.Add(new PackageTest(
             new ExpectedAssemblyResult("WpfApp.exe")
         }
     },
-    KnownExtensions.VSProjectLoader.SetVersion("3.9.0")));
+    KnownExtensions.VSProjectLoader));
 
 // TeamCity Event Listener Test
 StandardRunnerTests.Add(new PackageTest(
@@ -257,7 +257,7 @@ StandardRunnerTests.Add(new PackageTest(
     "Run mock-assembly with --teamcity enabled",
     "testdata/net462/mock-assembly.dll --teamcity",
     new MockAssemblyExpectedResult("net-4.6.2"),
-    new ExtensionSpecifier("NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.7")));
+    KnownExtensions.TeamCityEventListener));
 
 // V2 Framework Driver Tests
 StandardRunnerTests.Add(new PackageTest(
@@ -274,7 +274,7 @@ StandardRunnerTests.Add(new PackageTest(
         Skipped = 4,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("mock-assembly-v2.dll", "net-4.6.2") }
     },
-    new ExtensionSpecifier("NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0")));
+    KnownExtensions.NUnitV2Driver));
 
 StandardRunnerTests.Add(new PackageTest(
     1, "V2FrameworkDriverTest",
@@ -290,7 +290,7 @@ StandardRunnerTests.Add(new PackageTest(
         Skipped = 4,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("mock-assembly-v2.dll", "net-4.6.2") }
     },
-    new ExtensionSpecifier("NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0")));
+    KnownExtensions.NUnitV2Driver));
 
 //////////////////////////////////////////////////////////////////////
 // SPECIAL CASES
