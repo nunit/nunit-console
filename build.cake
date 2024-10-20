@@ -92,23 +92,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         checks: new PackageCheck[]
         { 
             HasFiles("nunit.exe"),
-            HasSomeDirectory(".store/nunit.consolerunner.netcore/**/tools/net6.0/any")
+            HasSomeDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any")
                 .WithFiles(ENGINE_FILES).AndFiles(ConsoleFiles).AndFile("Microsoft.Extensions.DependencyModel.dll")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
-        tests: NetCoreRunnerTests),
-
-    NUnitConsoleRunnerNet80Package = new DotNetToolPackage(
-        id: "NUnit.ConsoleRunner.Net80",
-        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.net80.nuspec",
-        checks: new PackageCheck[] { 
-            HasFiles("nunit-net80.exe"),
-            HasSomeDirectory(".store/nunit.consolerunner.net80/**/tools/net8.0/any")
-                .WithFiles(ENGINE_FILES).AndFiles(ConsoleFiles).AndFile("Microsoft.Extensions.DependencyModel.dll")
-        },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
-            + $"NUnit.ConsoleRunner.Net80.{BuildSettings.PackageVersion}/nunit-net80.exe"),
         tests: NetCoreRunnerTests),
 
     NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
@@ -159,11 +147,9 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
             HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
-            HasDirectory("lib/net6.0").WithFiles(ENGINE_FILES).AndFile("Microsoft.Extensions.DependencyModel.dll"),
             HasDirectory("lib/net8.0").WithFiles(ENGINE_FILES).AndFile("Microsoft.Extensions.DependencyModel.dll"),
             HasDirectory("contentFiles/any/lib/net462").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
-            HasDirectory("contentFiles/any/lib/net6.0").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/net8.0").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
         },
