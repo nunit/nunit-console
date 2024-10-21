@@ -12,7 +12,7 @@ using NSubstitute;
 using NUnit.Engine.Internal.FileSystemAccess;
 using System.Diagnostics;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     public class ExtensionManagerTests
     {
@@ -58,7 +58,7 @@ namespace NUnit.Engine.Services.Tests
             // Find actual extension points.
             _extensionManager.FindExtensionPoints(typeof(CoreEngine).Assembly);
             _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
-            // Find extensions.
+            // Find extensions directly in the their assemblies
 #if NETCOREAPP
             _extensionManager.FindExtensionsInAssembly(FakeExtensions("netstandard2.0"));
 #else

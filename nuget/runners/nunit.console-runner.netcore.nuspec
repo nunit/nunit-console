@@ -45,7 +45,6 @@
     <file src="net8.0/nunit.engine.api.xml" target="tools/net8.0/any" />
     <file src="net8.0/testcentric.engine.metadata.dll" target="tools/net8.0/any" />
     <file src="net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/net8.0/any" />
-    <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools/net8.0/any"/>
     <file src="../../nuget/runners/DotnetToolSettings.xml" target="tools/net8.0/any"/>
    
     <file src="../../nunit_256.png" target="images"/>

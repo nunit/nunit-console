@@ -14,7 +14,22 @@ namespace NUnit.Engine.Services
         IEnumerable<IExtensionNode> Extensions { get; }
 
         void FindExtensionPoints(params Assembly[] targetAssemblies);
-        void FindExtensions(string startDir);
+
+        /// <summary>
+        /// Find and install extensions starting from a given base directory,
+        /// and using the contained '.addins' files to direct the search.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        void FindExtensions(string initialDirectory);
+
+        /// <summary>
+        /// Find and install extensions starting from a given base directory,
+        /// and using the provided list of patterns to direct the search using
+        /// a built-in algorithm.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        /// <param name="patterns">A list of patterns used to identify potential candidates.</param>
+        void FindExtensions(string initialDirectory, string[] patterns);
 
         IExtensionPoint GetExtensionPoint(string path);
         
