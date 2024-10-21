@@ -77,8 +77,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{4FDF7BFA
 		choco\nunit-agent-x86.exe.ignore = choco\nunit-agent-x86.exe.ignore
 		choco\nunit-agent.exe.ignore = choco\nunit-agent.exe.ignore
 		choco\nunit-console-runner.nuspec = choco\nunit-console-runner.nuspec
-		choco\nunit.console.choco.addins = choco\nunit.console.choco.addins
-		choco\nunit.console.choco.agent.addins = choco\nunit.console.choco.agent.addins
 		choco\VERIFICATION.txt = choco\VERIFICATION.txt
 	EndProjectSection
 EndProject
@@ -147,14 +145,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvalidTestNames", "src\Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppContextTest", "src\TestData\AppContextTest\AppContextTest.csproj", "{E43A3E4B-B050-471B-B43C-0DF60FD44376}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "net8.0", "net8.0", "{303CF83E-2A87-4882-8CAC-3EB59AAD81FC}"
-	ProjectSection(SolutionItems) = preProject
-		nuget\runners\net8.0\DotnetToolSettings.xml = nuget\runners\net8.0\DotnetToolSettings.xml
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly-v2", "src\TestData\mock-assembly-v2\mock-assembly-v2.csproj", "{AD40CA55-35CC-41CA-85F5-8FDA4ECAFF78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeExtensions", "src\TestData\FakeExtensions\FakeExtensions.csproj", "{D6C217E0-BFB7-4C80-8D50-C969F46EBC59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeExtensions", "src\TestData\FakeExtensions\FakeExtensions.csproj", "{D6C217E0-BFB7-4C80-8D50-C969F46EBC59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -276,7 +269,6 @@ Global
 		{6B550F25-1CA5-4F3E-B631-1ECCD4CB94E4} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{58E18ACC-1F7E-4395-817E-E7EF943E0C77} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{E43A3E4B-B050-471B-B43C-0DF60FD44376} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
-		{303CF83E-2A87-4882-8CAC-3EB59AAD81FC} = {F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E}
 		{AD40CA55-35CC-41CA-85F5-8FDA4ECAFF78} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 		{D6C217E0-BFB7-4C80-8D50-C969F46EBC59} = {2ECE1CFB-9436-4149-B7E4-1FB1786FDE9F}
 	EndGlobalSection

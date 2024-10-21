@@ -15,8 +15,9 @@ namespace NUnit.Engine.Services
 {
     public class ExtensionManager : IExtensionManager
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
-        static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
+        static readonly Assembly THIS_ASSEMBLY = Assembly.GetExecutingAssembly();
+        static readonly Version ENGINE_VERSION = THIS_ASSEMBLY.GetName().Version;
 
         private readonly IFileSystem _fileSystem;
         //private readonly IAddinsFileReader _addinsReader;
@@ -120,6 +121,11 @@ namespace NUnit.Engine.Services
             }
         }
 
+        /// <summary>
+        /// Find and install extensions starting from a given base directory,
+        /// and using the contained '.addins' files to direct the search.
+        /// </summary>
+        /// <param name="startDir"></param>
         public void FindExtensions(string startDir)
         {
             // Create the list of possible extension assemblies,
@@ -127,6 +133,21 @@ namespace NUnit.Engine.Services
             FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
 
             // Check each assembly to see if it contains extensions
+            foreach (var candidate in _assemblies)
+                FindExtensionsInAssembly(candidate);
+        }
+
+        /// <summary>
+        /// Find and install extensions starting from a given base directory,
+        /// and using the provided list of patterns to direct the search using
+        /// a built-in algorithm.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        /// <param name="patterns">A list of patterns used to identify potential candidates.</param>
+        public void FindExtensions(string startDir, string[] patterns)
+        {
+            FindExtensionAssemblies(_fileSystem.GetDirectory(startDir), patterns);
+
             foreach (var candidate in _assemblies)
                 FindExtensionsInAssembly(candidate);
         }
@@ -233,14 +254,36 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Find candidate extension assemblies starting from a
-        /// given base directory.
+        /// Find candidate extension assemblies starting from a given base directory
+        /// and using the contained '.addins' files to direct the search.
         /// </summary>
-        /// <param name="startDir"></param>
-        private void FindExtensionAssemblies(IDirectory startDir)
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        private void FindExtensionAssemblies(IDirectory initialDirectory)
         {
-            // First check the directory itself
-            ProcessAddinsFiles(startDir, false);
+            // Since no patterns are provided, look for addins files
+            ProcessAddinsFiles(initialDirectory, false);
+        }
+
+        /// <summary>
+        /// Find candidate extension assemblies starting from a given base directory
+        /// and using the provided list of patterns to direct the search using
+        /// a built-in algorithm.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        /// <param name="patterns">A list of patterns used to identify potential candidates.</param>
+        private void FindExtensionAssemblies(IDirectory initialDirectory, string[] patterns)
+        {
+            // Start looking two levels above initial directory
+            var startDir = initialDirectory.Parent.Parent;
+
+            while (startDir != null)
+            {               
+                foreach (var pattern in patterns)
+                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
+                        ProcessDirectory(dir, true);
+
+                startDir = startDir.Parent;
+            }
         }
 
         /// <summary>

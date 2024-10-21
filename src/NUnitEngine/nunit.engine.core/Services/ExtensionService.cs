@@ -8,6 +8,7 @@ using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+using System.IO;
 
 namespace NUnit.Engine.Services
 {
@@ -18,6 +19,13 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
+        private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionService).Assembly;
+
+        private static readonly string[] CHOCO_PATTERNS = new[] {
+            "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" };
+        private static readonly string[] NUGET_PATTERNS = new[] {
+            "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
+
         private readonly IExtensionManager _extensionManager;
 
         public ExtensionService()
@@ -81,8 +89,10 @@ namespace NUnit.Engine.Services
                     Assembly.GetExecutingAssembly(),
                     typeof(ITestEngine).Assembly);
 
-                var thisAssembly = Assembly.GetExecutingAssembly();
-                _extensionManager.FindExtensions(AssemblyHelper.GetDirectoryName(thisAssembly));
+                var initialDirectory = AssemblyHelper.GetDirectoryName(THIS_ASSEMBLY);
+                bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(THIS_ASSEMBLY.Location, "VERIFICATION.txt"));
+
+                _extensionManager.FindExtensions(initialDirectory, isChocolateyPackage ? CHOCO_PATTERNS : NUGET_PATTERNS);
 
                 Status = ServiceStatus.Started;
             }
