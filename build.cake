@@ -125,7 +125,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.core.dll", "nunit.core.interfaces.dll", "nunit.engine.api.dll", 
                 "nunit.v2.driver.dll", "nunit-project-loader.dll", "nunit-v2-result-writer.dll", 
                 "teamcity-event-listener.dll", "vs-project-loader.dll"),
-            HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
