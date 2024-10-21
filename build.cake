@@ -119,13 +119,17 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.ZipImageDirectory,
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-            HasDirectory("bin/net462").WithFiles("nunit3-console.exe", "nunit3-console.exe.config", "nunit3-console.pdb").AndFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-            HasDirectory("bin/netstandard2.0").WithFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/net462").WithFiles("nunit3-console.exe", "nunit3-console.exe.config", 
+                "nunit3-console.pdb").AndFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
+            HasDirectory("bin/net462/addins").WithFiles(
+                "nunit.core.dll", "nunit.core.interfaces.dll", "nunit.engine.api.dll", 
+                "nunit.v2.driver.dll", "nunit-project-loader.dll", "nunit-v2-result-writer.dll", 
+                "teamcity-event-listener.dll", "vs-project-loader.dll"),
             HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
-            HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
+            HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory
             + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit3-console.exe"),
@@ -146,10 +150,8 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("lib/net462").WithFiles(ENGINE_FILES),
-            HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_FILES),
             HasDirectory("lib/net8.0").WithFiles(ENGINE_FILES).AndFile("Microsoft.Extensions.DependencyModel.dll"),
             HasDirectory("contentFiles/any/lib/net462").WithFile("nunit.engine.nuget.addins"),
-            HasDirectory("contentFiles/any/lib/netstandard2.0").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/lib/net8.0").WithFile("nunit.engine.nuget.addins"),
             HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_FILES).AndFile("nunit.agent.addins")
         },

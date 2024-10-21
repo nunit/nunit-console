@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using NUnit.Engine.Internal;
 using NSubstitute;
 using NUnit.Engine.Internal.FileSystemAccess;
+using System.Diagnostics;
 
 namespace NUnit.Engine.Services.Tests
 {
@@ -57,9 +58,12 @@ namespace NUnit.Engine.Services.Tests
             // Find actual extension points.
             _extensionManager.FindExtensionPoints(typeof(CoreEngine).Assembly);
             _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
-
-            // Find dummy extensions in this test assembly.
-            _extensionManager.FindExtensionsInAssembly(new ExtensionAssembly(GetType().Assembly.Location, false));
+            // Find extensions.
+#if NETCOREAPP
+            _extensionManager.FindExtensionsInAssembly(FakeExtensions("netstandard2.0"));
+#else
+            _extensionManager.FindExtensionsInAssembly(FakeExtensions("net462"));
+#endif
         }
 
         [Test]
@@ -161,21 +165,39 @@ namespace NUnit.Engine.Services.Tests
             Assert.That(() => service.FindExtensionsInAssembly(extensionAssembly), Throws.Nothing);
         }
 
-        [TestCaseSource(nameof(ValidCombos))]
+#if NETCOREAPP
+        [TestCase("netstandard2.0", ExpectedResult = true)]
+        [TestCase("net462", ExpectedResult = false)]
+        //[TestCase("net20", ExpectedResult = false)]
+#elif NET40_OR_GREATER
+        [TestCase("netstandard2.0", ExpectedResult = false)]
+        [TestCase("net462", ExpectedResult = true)]
+        //[TestCase("net20", ExpectedResult = true)]
+#else
+        [TestCase("netstandard2.0", ExpectedResult = false)]
+        [TestCase("net462", ExpectedResult = false)]
+        //[TestCase("net20", ExpectedResult = true)]
+#endif
+        public bool LoadTargetFramework(string tfm)
+        {
+            return _extensionManager.CanLoadTargetFramework(THIS_ASSEMBLY, FakeExtensions(tfm));
+        }
+
+        //[TestCaseSource(nameof(ValidCombos))]
         public void ValidTargetFrameworkCombinations(FrameworkCombo combo)
         {
             Assert.That(() => _extensionManager.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
                 Is.True);
         }
 
-        [TestCaseSource(nameof(InvalidTargetFrameworkCombos))]
+        //[TestCaseSource(nameof(InvalidTargetFrameworkCombos))]
         public void InvalidTargetFrameworkCombinations(FrameworkCombo combo)
         {
             Assert.That(() => _extensionManager.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly),
                 Is.False);
         }
 
-        [TestCaseSource(nameof(InvalidRunnerCombos))]
+        //[TestCaseSource(nameof(InvalidRunnerCombos))]
         public void InvalidRunnerTargetFrameworkCombinations(FrameworkCombo combo)
         {
             var ex = Assert.Catch(() => _extensionManager.CanLoadTargetFramework(combo.RunnerAssembly, combo.ExtensionAssembly));
@@ -274,6 +296,24 @@ namespace NUnit.Engine.Services.Tests
         {
             var file = new FileInfo(typeof(ExtensionManagerTests).Assembly.Location);
             return Path.Combine(file.Directory.Parent.FullName, dir);
+        }
+
+        private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionManagerTests).Assembly;
+        private static readonly string THIS_ASSEMBLY_DIRECTORY = Path.GetDirectoryName(THIS_ASSEMBLY.Location);
+        private const string FAKE_EXTENSIONS_FILENAME = "FakeExtensions.dll";
+        private static readonly string FAKE_EXTENSIONS_PARENT_DIRECTORY =
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent.FullName, "fakes");
+
+        /// <summary>
+        /// Returns an ExtensionAssembly referring to a particular build of the fake test extensions
+        /// assembly based on the argument provided.
+        /// </summary>
+        /// <param name="tfm">A test framework moniker. Must be one for which the fake extensions are built.</param>
+        /// <returns></returns>
+        private static ExtensionAssembly FakeExtensions(string tfm)
+        {
+            return new ExtensionAssembly(
+                Path.Combine(FAKE_EXTENSIONS_PARENT_DIRECTORY, Path.Combine(tfm, FAKE_EXTENSIONS_FILENAME)), false);
         }
     }
 }

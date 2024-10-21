@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner.Tests</RootNamespace>
-    <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <StartupObject>NUnit.Engine.Tests.Program</StartupObject>
     <NoWarn>1685</NoWarn>

@@ -264,7 +264,7 @@ StandardRunnerTests.Add(new PackageTest(
 StandardRunnerTests.Add(new PackageTest(
     1, "V2FrameworkDriverTest",
     "Run mock-assembly-v2 using the V2 Driver in process",
-    "v2-tests/net462/mock-assembly-v2.dll --inprocess",
+    "v2-tests/net462/mock-assembly-v2.dll",
     new ExpectedResult("Failed")
     {
         Total = 28,
@@ -280,7 +280,7 @@ StandardRunnerTests.Add(new PackageTest(
 StandardRunnerTests.Add(new PackageTest(
     1, "V2FrameworkDriverTest",
     "Run mock-assembly-v2 using the V2 Driver out of process",
-    "v2-tests/net462/mock-assembly-v2.dll --trace:Debug",
+    "v2-tests/net462/mock-assembly-v2.dll --list-extensions",
     new ExpectedResult("Failed")
     {
         Total = 28,

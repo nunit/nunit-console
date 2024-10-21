@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <TargetFrameworks>net462;netcoreapp3.1;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
@@ -17,13 +17,7 @@
     <Description>Tests of nunit.engine assembly</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="NUnit" Version="3.14.0" />
-    <PackageReference Include="NUnitLite" Version="3.14.0" />
-    <PackageReference Include="NSubstitute" Version="2.0.3" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+  <ItemGroup>
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnitLite" Version="4.2.2" />
     <PackageReference Include="NSubstitute" Version="5.1.0" />
@@ -33,10 +27,6 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
   </ItemGroup>
   
   <ItemGroup>
