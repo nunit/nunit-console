@@ -39,7 +39,6 @@
     <file src="agents/net462/nunit.engine.core.dll" target="tools/agents/net462" />
     <file src="agents/net462/nunit.engine.core.pdb" target="tools/agents/net462" />
     <file src="agents/net462/testcentric.engine.metadata.dll" target="tools/agents/net462" />
-    <file src="../../nuget/runners/nunit.console.nuget.agent.addins" target="tools/agents/net462"/>
 
     <file src="agents/netcoreapp3.1/nunit-agent.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit-agent.pdb" target="tools/agents/netcoreapp3.1" />
@@ -53,7 +52,6 @@
     <file src="agents/netcoreapp3.1/nunit.engine.core.pdb" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/netcoreapp3.1" />
-    <file src="../../nuget/runners/nunit.console.nuget.agent.addins" target="tools/agents/netcoreapp3.1"/>
 
     <file src="agents/net6.0/nunit-agent.dll" target="tools/agents/net6.0" />
     <file src="agents/net6.0/nunit-agent.pdb" target="tools/agents/net6.0" />
@@ -67,7 +65,6 @@
     <file src="agents/net6.0/nunit.engine.core.pdb" target="tools/agents/net6.0" />
     <file src="agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
     <file src="agents/net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net6.0" />
-    <file src="../../nuget/runners/nunit.console.nuget.agent.addins" target="tools/agents/net6.0"/>
 
     <file src="agents/net7.0/nunit-agent.dll" target="tools/agents/net7.0" />
     <file src="agents/net7.0/nunit-agent.pdb" target="tools/agents/net7.0" />
@@ -81,7 +78,6 @@
     <file src="agents/net7.0/nunit.engine.core.pdb" target="tools/agents/net7.0" />
     <file src="agents/net7.0/testcentric.engine.metadata.dll" target="tools/agents/net7.0" />
     <file src="agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
-    <file src="../../nuget/runners/nunit.console.nuget.agent.addins" target="tools/agents/net7.0"/>
 
     <file src="agents/net8.0/nunit-agent.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/nunit-agent.pdb" target="tools/agents/net8.0" />
@@ -95,7 +91,6 @@
     <file src="agents/net8.0/nunit.engine.core.pdb" target="tools/agents/net8.0" />
     <file src="agents/net8.0/testcentric.engine.metadata.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
-    <file src="../../nuget/runners/nunit.console.nuget.agent.addins" target="tools/agents/net8.0"/>
 
     <file src="net462/nunit3-console.exe" target="tools" />
     <file src="net462/nunit3-console.pdb" target="tools" />
@@ -108,7 +103,6 @@
     <file src="net462/nunit.engine.dll" target="tools" />
     <file src="net462/nunit.engine.pdb" target="tools" />
     <file src="net462/testcentric.engine.metadata.dll" target="tools" />
-    <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
     <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>

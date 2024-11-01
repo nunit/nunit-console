@@ -1,7 +1,0 @@
-# Extensions built for a single runtime target
-../../nunit-extension-*/**/tools/        # nuget v2 layout
-../../../nunit-extension-*/**/tools/     # nuget v3 layout
-
-# Extensions built for multiple targets
-../../nunit-extension-*/**/tools/*/      # nuget v2 layout
-../../../nunit-extension-*/**/tools/*/   # nuget v3 layout

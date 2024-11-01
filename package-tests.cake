@@ -210,7 +210,7 @@ StandardRunnerTests.Add(new PackageTest(
     KnownExtensions.NUnitProjectLoader));
 
 // V2 Result Writer Test
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "V2ResultWriterTest",
     "Run mock-assembly under .NET 6.0 and produce V2 output",
     "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",

@@ -1,7 +1,0 @@
-# Extensions built for a single runtime target
-../../../../nunit-extension-*/tools/     # find extensions installed under chocolatey
-../../../../../nunit-extension-*/tools/     # find extensions installed under chocolatey
-
-# Extensions built for multiple targets
-../../../../nunit-extension-*/tools/*/   # find extensions installed under chocolatey
-../../../../../nunit-extension-*/tools/*/   # find extensions installed under chocolatey

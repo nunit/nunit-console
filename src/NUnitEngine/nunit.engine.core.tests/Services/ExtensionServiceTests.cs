@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,12 +52,12 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void StartServiceInitializesExtensionManager()
         {
-            var workingDir = AssemblyHelper.GetDirectoryName(typeof(ExtensionService).Assembly);
+            Assembly hostAssembly = typeof(ExtensionService).Assembly;
 
             _extensionService.StartService();
 
             _extensionManager.ReceivedWithAnyArgs().FindExtensionPoints(typeof(ExtensionService).Assembly, typeof(ITestEngine).Assembly);
-            _extensionManager.Received().FindExtensions(workingDir);
+            _extensionManager.Received().FindStandardExtensions(hostAssembly);
             Assert.That(_extensionService.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
