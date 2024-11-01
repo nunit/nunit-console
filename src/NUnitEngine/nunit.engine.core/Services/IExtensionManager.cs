@@ -23,13 +23,11 @@ namespace NUnit.Engine.Services
         void FindExtensions(string initialDirectory);
 
         /// <summary>
-        /// Find and install extensions starting from a given base directory,
-        /// and using the provided list of patterns to direct the search using
-        /// a built-in algorithm.
+        /// Find and install standard extensions for a host assembly using
+        /// a built-in algorithm that searches in certain known locations.
         /// </summary>
-        /// <param name="initialDirectory">Path to the initial directory.</param>
-        /// <param name="patterns">A list of patterns used to identify potential candidates.</param>
-        void FindExtensions(string initialDirectory, string[] patterns);
+        /// <param name="hostAssembly">An assembly that supports NUnit extensions.</param>
+        void FindStandardExtensions(Assembly hostAssembly);
 
         IExtensionPoint GetExtensionPoint(string path);
         

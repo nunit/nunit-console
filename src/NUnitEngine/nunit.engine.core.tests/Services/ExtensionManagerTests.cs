@@ -12,7 +12,7 @@ using NSubstitute;
 using NUnit.Engine.Internal.FileSystemAccess;
 using System.Diagnostics;
 
-namespace NUnit.Engine.Services
+namespace NUnit.Engine.Services.Tests
 {
     public class ExtensionManagerTests
     {

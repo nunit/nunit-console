@@ -19,13 +19,6 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
-        private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionService).Assembly;
-
-        private static readonly string[] CHOCO_PATTERNS = new[] {
-            "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" };
-        private static readonly string[] NUGET_PATTERNS = new[] {
-            "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
-
         private readonly IExtensionManager _extensionManager;
 
         public ExtensionService()
@@ -83,16 +76,13 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
+            Assembly thisAssembly = Assembly.GetExecutingAssembly();
+            Assembly apiAssembly = typeof(ITestEngine).Assembly;
+                      
             try
             {
-                _extensionManager.FindExtensionPoints(
-                    Assembly.GetExecutingAssembly(),
-                    typeof(ITestEngine).Assembly);
-
-                var initialDirectory = AssemblyHelper.GetDirectoryName(THIS_ASSEMBLY);
-                bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(THIS_ASSEMBLY.Location, "VERIFICATION.txt"));
-
-                _extensionManager.FindExtensions(initialDirectory, isChocolateyPackage ? CHOCO_PATTERNS : NUGET_PATTERNS);
+                _extensionManager.FindExtensionPoints(thisAssembly, apiAssembly);
+                _extensionManager.FindStandardExtensions(thisAssembly);
 
                 Status = ServiceStatus.Started;
             }
