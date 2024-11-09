@@ -1,8 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests
@@ -72,6 +69,19 @@ namespace NUnit.Engine.Tests
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.String, "string at start")));
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.String, "may contain \" char")));
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.String, "string at end")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Eof)));
+        }
+
+        [Test]
+        public void TestNameWithParameters()
+        {
+            var tokenizer = new Tokenizer("test==Issue1510.TestSomething(Option1,\"ABC\")");
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "test")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "==")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "Issue1510.TestSomething")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "(")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "Option1,\"ABC\"")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, ")")));
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Eof)));
         }
 
