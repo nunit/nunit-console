@@ -75,13 +75,10 @@ namespace NUnit.Engine.Tests
         [Test]
         public void TestNameWithParameters()
         {
-            var tokenizer = new Tokenizer("test==Issue1510.TestSomething(Option1,\"ABC\")");
+            var tokenizer = new Tokenizer("test=='Issue1510.TestSomething(Option1,\"ABC\")'");
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "test")));
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "==")));
-            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "Issue1510.TestSomething")));
-            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "(")));
-            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "Option1,\"ABC\"")));
-            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, ")")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.String, "Issue1510.TestSomething(Option1,\"ABC\")")));
             Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Eof)));
         }
 
