@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using NUnit.Framework;
+using System;
+using System.Xml;
 
 namespace NUnit.Engine.Tests
 {
@@ -40,6 +38,7 @@ namespace NUnit.Engine.Tests
         [TestCase("test='My.Test.Fixture.Method(\"abc\\'s\")'", "<test>My.Test.Fixture.Method(&quot;abc&apos;s&quot;)</test>")]
         [TestCase("test='My.Test.Fixture.Method(\"x&y&z\")'", "<test>My.Test.Fixture.Method(&quot;x&amp;y&amp;z&quot;)</test>")]
         [TestCase("test='My.Test.Fixture.Method(\"<xyz>\")'", "<test>My.Test.Fixture.Method(&quot;&lt;xyz&gt;&quot;)</test>")]
+        [TestCase("test=='Issue1510.TestSomething(Option1,\"ABC\")'", "<test>Issue1510.TestSomething(Option1,&quot;ABC&quot;)</test>")]
         [TestCase("cat==Urgent && test=='My.Tests'", "<and><cat>Urgent</cat><test>My.Tests</test></and>")]
         [TestCase("cat==Urgent and test=='My.Tests'", "<and><cat>Urgent</cat><test>My.Tests</test></and>")]
         [TestCase("cat==Urgent || test=='My.Tests'", "<or><cat>Urgent</cat><test>My.Tests</test></or>")]
