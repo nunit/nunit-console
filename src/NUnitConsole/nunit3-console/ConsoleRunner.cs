@@ -25,6 +25,9 @@ namespace NUnit.ConsoleRunner
         // ourselves so as to stay in that range.
         private const int MAXIMUM_RETURN_CODE_ALLOWED = 100; // In case we are running on Unix
 
+        private const string EVENT_LISTENER_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/ITestEventListener";
+        private const string TEAMCITY_EVENT_LISTENER = "NUnit.Engine.Listeners.TeamCityEventListener";
+
         public static readonly int OK = 0;
         public static readonly int INVALID_ARG = -1;
         public static readonly int INVALID_ASSEMBLY = -2;
@@ -58,8 +61,19 @@ namespace NUnit.ConsoleRunner
             _filterService = _engine.Services.GetService<ITestFilterService>();
             _extensionService = _engine.Services.GetService<IExtensionService>();
 
+            // TODO: Exit with error if any of the services are not found
+
+            if (_options.TeamCity)
+            {
+                bool teamcityInstalled = false;
+                foreach (var node in _extensionService.GetExtensionNodes(EVENT_LISTENER_EXTENSION_PATH))
+                    if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER)
+                        break;
+                if (!teamcityInstalled) throw new NUnitEngineException("Option --teamcity specified but the extension is not installed.");
+            }
+
             // Enable TeamCityEventListener immediately, before the console is redirected
-            _extensionService?.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
+            _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
         }
 
         /// <summary>
