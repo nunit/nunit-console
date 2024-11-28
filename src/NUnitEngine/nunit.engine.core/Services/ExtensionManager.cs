@@ -15,8 +15,9 @@ namespace NUnit.Engine.Services
 {
     public class ExtensionManager : IExtensionManager
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionService));
-        static readonly Version ENGINE_VERSION = typeof(ExtensionService).Assembly.GetName().Version;
+        static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
         private readonly IFileSystem _fileSystem;
         //private readonly IAddinsFileReader _addinsReader;
@@ -120,6 +121,11 @@ namespace NUnit.Engine.Services
             }
         }
 
+        /// <summary>
+        /// Find and install extensions starting from a given base directory,
+        /// and using the contained '.addins' files to direct the search.
+        /// </summary>
+        /// <param name="startDir"></param>
         public void FindExtensions(string startDir)
         {
             // Create the list of possible extension assemblies,
@@ -127,6 +133,24 @@ namespace NUnit.Engine.Services
             FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
 
             // Check each assembly to see if it contains extensions
+            foreach (var candidate in _assemblies)
+                FindExtensionsInAssembly(candidate);
+        }
+
+        /// <summary>
+        /// Find and install standard extensions for a host assembly using
+        /// a built-in algorithm that searches in certain known locations.
+        /// </summary>
+        /// <param name="hostAssembly">An assembly that supports extensions.</param>
+        public void FindStandardExtensions(Assembly hostAssembly)
+        {
+            bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(hostAssembly.Location, "VERIFICATION.txt"));
+            string[] extensionPatterns = isChocolateyPackage
+                ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
+                : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
+
+            FindExtensionAssemblies(hostAssembly, extensionPatterns);
+
             foreach (var candidate in _assemblies)
                 FindExtensionsInAssembly(candidate);
         }
@@ -233,14 +257,35 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Find candidate extension assemblies starting from a
-        /// given base directory.
+        /// Find candidate extension assemblies starting from a given base directory
+        /// and using the contained '.addins' files to direct the search.
         /// </summary>
-        /// <param name="startDir"></param>
-        private void FindExtensionAssemblies(IDirectory startDir)
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        private void FindExtensionAssemblies(IDirectory initialDirectory)
         {
-            // First check the directory itself
-            ProcessAddinsFiles(startDir, false);
+            // Since no patterns are provided, look for addins files
+            ProcessAddinsFiles(initialDirectory, false);
+        }
+
+        /// <summary>
+        /// Find candidate extension assemblies for a given host assembly,
+        /// using the provided list of patterns to direct the search using
+        /// a built-in algorithm.
+        /// </summary>
+        /// <param name="hostAssembly">An assembly that supports extensions</param>
+        /// <param name="patterns">A list of patterns used to identify potential candidates.</param>
+        private void FindExtensionAssemblies(Assembly hostAssembly, string[] patterns)
+        {
+            IDirectory startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
+
+            while (startDir != null)
+            {               
+                foreach (var pattern in patterns)
+                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
+                        ProcessDirectory(dir, true);
+
+                startDir = startDir.Parent;
+            }
         }
 
         /// <summary>
@@ -416,18 +461,27 @@ namespace NUnit.Engine.Services
             }
 #endif
 
-            foreach (var type in assembly.MainModule.GetTypes())
+            foreach (var extensionType in assembly.MainModule.GetTypes())
             {
-                CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
+                CustomAttribute extensionAttr = extensionType.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
 
                 if (extensionAttr == null)
                     continue;
 
-                object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
-                if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
-                    continue;
+                // TODO: This is a remnant of older code. In principle, this should be generalized
+                // to something like "HostVersion". However, this can safely remain until
+                // we separate ExtensionManager into its own assembly.
+                string versionArg = extensionAttr.GetNamedArgument("EngineVersion") as string;
+                if (versionArg != null)
+                {
+                    if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
+                    {
+                        log.Warning($"  Ignoring {extensionType.Name}. It requires version {versionArg}.");
+                        continue;
+                    }
+                }
 
-                var node = new ExtensionNode(assembly.FilePath, assembly.AssemblyVersion, type.FullName, assemblyTargetFramework)
+                var node = new ExtensionNode(assembly.FilePath, assembly.AssemblyVersion, extensionType.FullName, assemblyTargetFramework)
                 {
                     Path = extensionAttr.GetNamedArgument("Path") as string,
                     Description = extensionAttr.GetNamedArgument("Description") as string
@@ -436,9 +490,9 @@ namespace NUnit.Engine.Services
                 object enabledArg = extensionAttr.GetNamedArgument("Enabled");
                 node.Enabled = enabledArg == null || (bool)enabledArg;
 
-                log.Info("  Found ExtensionAttribute on Type " + type.Name);
+                log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
 
-                foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
+                foreach (var attr in extensionType.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
                 {
                     string name = attr.ConstructorArguments[0].Value as string;
                     string value = attr.ConstructorArguments[1].Value as string;
@@ -455,12 +509,12 @@ namespace NUnit.Engine.Services
                 ExtensionPoint ep;
                 if (node.Path == null)
                 {
-                    ep = DeduceExtensionPointFromType(type);
+                    ep = DeduceExtensionPointFromType(extensionType);
                     if (ep == null)
                     {
                         string msg = string.Format(
                             "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
-                            type.FullName);
+                            extensionType.FullName);
                         throw new NUnitEngineException(msg);
                     }
 
@@ -474,7 +528,7 @@ namespace NUnit.Engine.Services
                     {
                         string msg = string.Format(
                             "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
-                            type.FullName,
+                            extensionType.FullName,
                             node.Path);
                         throw new NUnitEngineException(msg);
                     }

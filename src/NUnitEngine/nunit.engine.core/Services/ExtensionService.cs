@@ -8,6 +8,7 @@ using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+using System.IO;
 
 namespace NUnit.Engine.Services
 {
@@ -75,14 +76,13 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
+            Assembly thisAssembly = Assembly.GetExecutingAssembly();
+            Assembly apiAssembly = typeof(ITestEngine).Assembly;
+                      
             try
             {
-                _extensionManager.FindExtensionPoints(
-                    Assembly.GetExecutingAssembly(),
-                    typeof(ITestEngine).Assembly);
-
-                var thisAssembly = Assembly.GetExecutingAssembly();
-                _extensionManager.FindExtensions(AssemblyHelper.GetDirectoryName(thisAssembly));
+                _extensionManager.FindExtensionPoints(thisAssembly, apiAssembly);
+                _extensionManager.FindStandardExtensions(thisAssembly);
 
                 Status = ServiceStatus.Started;
             }
