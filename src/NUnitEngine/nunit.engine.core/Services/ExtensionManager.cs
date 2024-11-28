@@ -15,6 +15,8 @@ namespace NUnit.Engine.Services
 {
     public class ExtensionManager : IExtensionManager
     {
+        static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
         private readonly IFileSystem _fileSystem;
@@ -472,9 +474,7 @@ namespace NUnit.Engine.Services
                 string versionArg = extensionAttr.GetNamedArgument("EngineVersion") as string;
                 if (versionArg != null)
                 {
-                    Assembly THIS_ASSEMBLY = Assembly.GetExecutingAssembly();
-                    Version ENGINE_VERSION = THIS_ASSEMBLY.GetName().Version;
-                    if (new Version(versionArg) > ENGINE_VERSION)
+                    if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
                     {
                         log.Warning($"  Ignoring {extensionType.Name}. It requires version {versionArg}.");
                         continue;
