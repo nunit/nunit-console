@@ -83,7 +83,7 @@ namespace NUnit.Engine
         private int _index;
 
         private const char EOF_CHAR = '\0';
-        private const string WORD_BREAK_CHARS = "=!()&|";
+        private const string WORD_BREAK_CHARS = "=!()&| \t,";
         private readonly string[] DOUBLE_CHAR_SYMBOLS = new string[] { "==", "=~", "!=", "!~", "&&", "||" };
 
         private Token _lookahead;
@@ -130,6 +130,7 @@ namespace NUnit.Engine
                 // Single char symbols
                 case '(':
                 case ')':
+                case ',':
                     GetChar();
                     return new Token(TokenKind.Symbol, ch) { Pos = pos };
 
