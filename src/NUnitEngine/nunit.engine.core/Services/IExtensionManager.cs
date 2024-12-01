@@ -10,9 +10,19 @@ namespace NUnit.Engine.Services
 {
     public interface IExtensionManager : IDisposable
     {
+        /// <summary>
+        /// Gets an enumeration of all ExtensionPoints in the engine.
+        /// </summary>
         IEnumerable<IExtensionPoint> ExtensionPoints { get; }
+
+        /// <summary>
+        /// Gets an enumeration of all installed Extensions.
+        /// </summary>
         IEnumerable<IExtensionNode> Extensions { get; }
 
+        /// <summary>
+        /// Find the extension points in a loaded assembly.
+        /// </summary>
         void FindExtensionPoints(params Assembly[] targetAssemblies);
 
         /// <summary>
@@ -29,27 +39,37 @@ namespace NUnit.Engine.Services
         /// <param name="hostAssembly">An assembly that supports NUnit extensions.</param>
         void FindStandardExtensions(Assembly hostAssembly);
 
+        /// <summary>
+        /// Get an ExtensionPoint based on its unique identifying path.
+        /// </summary>
         IExtensionPoint GetExtensionPoint(string path);
         
+        /// <summary>
+        /// Get extension objects for all nodes of a given type
+        /// </summary>
         IEnumerable<T> GetExtensions<T>();
 
-        IEnumerable<IExtensionNode> GetExtensionNodes(string path);
-        IExtensionNode GetExtensionNode(string path);
         /// <summary>
-        /// Returns all extension nodes for a given Type.
+        /// Get all ExtensionNodes for a give path
         /// </summary>
-        /// <typeparam name="T">The Type of the node</typeparam>
+        IEnumerable<IExtensionNode> GetExtensionNodes(string path);
+
+        /// <summary>
+        /// Get the first or only ExtensionNode for a given ExtensionPoint
+        /// </summary>
+        /// <param name="path">The identifying path for an ExtensionPoint</param>
+        /// <returns></returns>
+        IExtensionNode GetExtensionNode(string path);
+
+        /// <summary>
+        /// Get all extension nodes of a given Type.
+        /// </summary>
         /// <param name="includeDisabled">If true, disabled nodes are included</param>
-        /// <returns>An enumeration of ExtensionNodes</returns>
-        /// <remarks>
-        /// Unlike other methods, this method returns an actual ExtensionNode rather 
-        /// than an IExtensionNode. It is required in order for classes that support
-        /// extensions to create the actual extension object.
-        /// 
-        /// </remarks>
-        // NOTE: 
         IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false);
 
+        /// <summary>
+        /// Enable or disable an extension
+        /// </summary>
         void EnableExtension(string typeName, bool enabled);
     }
 
