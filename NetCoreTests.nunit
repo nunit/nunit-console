@@ -1,0 +1,11 @@
+﻿<NUnitProject>
+  <Settings processModel="Default" domainUsage="Default" />
+  <Config name="Debug" appbase="bin/Debug">
+      <assembly path="testdata/net6.0/mock-assembly.dll" />
+      <assembly path="testdata/net8.0/mock-assembly.dll" />
+  </Config>
+  <Config name="Release" appbase="bin/Release">
+      <assembly path="testdata/net6.0/mock-assembly.dll" />
+      <assembly path="testdata/net8.0/mock-assembly.dll" />
+  </Config>
+</NUnitProject>
