@@ -201,12 +201,19 @@ AddToBothLists(new PackageTest(
 // RUN TESTS USING EACH OF OUR EXTENSIONS
 //////////////////////////////////////////////////////////////////////
 
-// NUnit Project Loader Test
+// NUnit Project Loader Tests
 StandardRunnerTests.Add(new PackageTest(
     1, "NUnitProjectTest",
     "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
-    "../../NetFXTests.nunit --config=Release --trace=Debug",
-    new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0"),
+    "../../MixedTests.nunit --config=Release",
+    new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
+    KnownExtensions.NUnitProjectLoader));
+
+NetCoreRunnerTests.Add(new PackageTest(
+    1, "NUnitProjectTest",
+    "Run NUnit project with mock-assembly.dll built for .NET 6.0 and 8.0",
+    "../../NetCoreTests.nunit --config=Release",
+    new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
     KnownExtensions.NUnitProjectLoader));
 
 // V2 Result Writer Test
