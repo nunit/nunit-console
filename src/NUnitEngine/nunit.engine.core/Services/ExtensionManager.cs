@@ -47,25 +47,19 @@ namespace NUnit.Engine.Services
 
         #region IExtensionManager Implementation
 
-        /// <summary>
-        /// Gets an enumeration of all ExtensionPoints in the engine.
-        /// </summary>
+        /// <inheritdoc/>
         public IEnumerable<IExtensionPoint> ExtensionPoints
         {
             get { return _extensionPoints.ToArray(); }
         }
 
-        /// <summary>
-        /// Gets an enumeration of all installed Extensions.
-        /// </summary>
+        /// <inheritdoc/>
         public IEnumerable<IExtensionNode> Extensions
         {
             get { return _extensions.ToArray(); }
         }
 
-        /// <summary>
-        /// Find the extension points in a loaded assembly.
-        /// </summary>
+        /// <inheritdoc/>
         public virtual void FindExtensionPoints(params Assembly[] targetAssemblies)
         {
             foreach (var assembly in targetAssemblies)
@@ -121,11 +115,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        /// <summary>
-        /// Find and install extensions starting from a given base directory,
-        /// and using the contained '.addins' files to direct the search.
-        /// </summary>
-        /// <param name="startDir"></param>
+        /// <inheritdoc/>
         public void FindExtensions(string startDir)
         {
             // Create the list of possible extension assemblies,
@@ -137,11 +127,7 @@ namespace NUnit.Engine.Services
                 FindExtensionsInAssembly(candidate);
         }
 
-        /// <summary>
-        /// Find and install standard extensions for a host assembly using
-        /// a built-in algorithm that searches in certain known locations.
-        /// </summary>
-        /// <param name="hostAssembly">An assembly that supports extensions.</param>
+        /// <inheritdoc/>
         public void FindStandardExtensions(Assembly hostAssembly)
         {
             bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(hostAssembly.Location, "VERIFICATION.txt"));
@@ -155,14 +141,20 @@ namespace NUnit.Engine.Services
                 FindExtensionsInAssembly(candidate);
         }
 
-        /// <summary>
-        /// Get an ExtensionPoint based on its unique identifying path.
-        /// </summary>
+        /// <inheritdoc/>
         public IExtensionPoint GetExtensionPoint(string path)
         {
             return _pathIndex.ContainsKey(path) ? _pathIndex[path] : null;
         }
 
+        /// <inheritdoc/>
+        public IEnumerable<T> GetExtensions<T>()
+        {
+            foreach (var node in GetExtensionNodes<T>())
+                yield return (T)((ExtensionNode)node).ExtensionObject; // HACK
+        }
+
+        /// <inheritdoc/>
         public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
         {
             var ep = GetExtensionPoint(path);
@@ -171,6 +163,7 @@ namespace NUnit.Engine.Services
                     yield return node;
         }
 
+        /// <inheritdoc/>
         public IExtensionNode GetExtensionNode(string path)
         {
             // TODO: Remove need for the cast
@@ -179,6 +172,7 @@ namespace NUnit.Engine.Services
             return ep != null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
         {
             var ep = GetExtensionPoint(typeof(T));
@@ -188,15 +182,7 @@ namespace NUnit.Engine.Services
                         yield return node;
         }
 
-        public IEnumerable<T> GetExtensions<T>()
-        {
-            foreach (var node in GetExtensionNodes<T>())
-                yield return (T)((ExtensionNode)node).ExtensionObject; // HACK
-        }
-
-        /// <summary>
-        /// Enable or disable an extension
-        /// </summary>
+        /// <inheritdoc/>
         public void EnableExtension(string typeName, bool enabled)
         {
             foreach (var node in _extensions)
