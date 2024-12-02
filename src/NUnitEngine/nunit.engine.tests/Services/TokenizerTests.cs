@@ -43,6 +43,40 @@ namespace NUnit.Engine.Tests
         }
 
         [Test]
+        public void WordsWithSpecialCharacters()
+        {
+            var tokenizer = new Tokenizer("word_with_underscores word-with-dashes word.with.dots");
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "word_with_underscores")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "word-with-dashes")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "word.with.dots")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Eof)));
+        }
+
+        private const string WORD_BREAK_CHARS = "=!()&| \t,";
+        [Test]
+        public void WordBreakCharacters()
+        {
+            var tokenizer = new Tokenizer("word1==word2!=word3 func(arg1, arg2) this&&that||both");
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "word1")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "==")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "word2")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "!=")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "word3")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "func")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "(")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "arg1")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, ",")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "arg2")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, ")")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "this")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "&&")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "that")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Symbol, "||")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Word, "both")));
+            Assert.That(tokenizer.NextToken(), Is.EqualTo(new Token(TokenKind.Eof)));
+        }
+
+        [Test]
         public void StringWithDoubleQuotes()
         {
             var tokenizer = new Tokenizer("\"string at start\" \"may contain ' char\" \"string at end\"");
