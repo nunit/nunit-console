@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 // Missing XML Docs
@@ -37,6 +38,7 @@ namespace NUnit.Engine
         private static readonly Token[] REL_OPS = new Token[] { EQ_OP1, EQ_OP2, NE_OP, MATCH_OP, NOMATCH_OP };
 
         private static readonly Token EOF = new Token(TokenKind.Eof);
+        private static readonly Token COMMA = new Token(TokenKind.Symbol, ",");
 
         public string Parse(string input)
         {
@@ -116,21 +118,29 @@ namespace NUnit.Engine
                 return ParseExpressionInParentheses();
 
             Token lhs = Expect(TokenKind.Word);
+            Token op;
+            Token rhs;
 
             switch (lhs.Text)
             {
-                case "id":
+                case "test":
+                    op = Expect(REL_OPS);
+                    rhs = GetTestName();
+                    return EmitFilterElement(lhs, op, rhs);
+
                 case "cat":
                 case "method":
                 case "class":
                 case "name":
-                case "test":
                 case "namespace":
                 case "partition":
-                    Token op = lhs.Text == "id"
-                        ? Expect(EQ_OPS)
-                        : Expect(REL_OPS);
-                    Token rhs = Expect(TokenKind.String, TokenKind.Word);
+                    op = Expect(REL_OPS);
+                    rhs = Expect(TokenKind.String, TokenKind.Word);
+                    return EmitFilterElement(lhs, op, rhs);
+
+                case "id":
+                    op = Expect(EQ_OPS);
+                    rhs = Expect(TokenKind.String, TokenKind.Word);
                     return EmitFilterElement(lhs, op, rhs);
 
                 default:
@@ -140,6 +150,75 @@ namespace NUnit.Engine
                     return EmitPropertyElement(lhs, op, rhs);
                     //throw InvalidTokenError(lhs);
             }
+        }
+
+        // TODO: We do extra work for test names due to the fact that
+        // Windows drops double quotes from arguments in many situations.
+        // It would be better to parse the command-line directly but
+        // that will mean a significant rewrite.
+        private Token GetTestName()
+        {
+            var result = Expect(TokenKind.String, TokenKind.Word);
+            var sb = new StringBuilder();
+
+            if (result.Kind == TokenKind.String)
+            {
+                int index = result.Text.IndexOf('(');
+
+                if (index < 0)
+                    return result;
+
+                // Remove white space around arguments
+                string testName = result.Text;
+                sb = new StringBuilder(testName.Substring(0, index).Trim());
+                sb.Append('(');
+                bool done = false;
+
+                while (++index < testName.Length && !done)
+                {
+                    char ch = testName[index];
+                    switch (ch)
+                    {
+                        case '"':
+                            sb.Append(ch);
+                            while (++index < testName.Length && testName[index] != '"')
+                                sb.Append(testName[index]);
+                            sb.Append('"');
+                            break;
+                        case ' ':
+                            break;
+                        default:
+                            sb.Append(ch);
+                            done = ch == ')';
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                // Word Token - check to see if it's followed by a left parenthesis
+                if (_tokenizer.LookAhead != LPAREN) return result;
+
+                // We have a "Word" token followed by a left parenthesis
+                // This may be a testname entered without quotes or one
+                // using double quotes, which were removed by the shell.
+
+                sb = new StringBuilder(result.Text);
+                var token = NextToken();
+
+                while (token != EOF)
+                {
+                    bool isString = token.Kind == TokenKind.String;
+
+                    if (isString) sb.Append('"');
+                    sb.Append(token.Text);
+                    if (isString) sb.Append('"');
+
+                    token = NextToken();
+                }
+            }
+
+            return new Token(TokenKind.String, sb.ToString());
         }
 
         private static string EmitFilterElement(Token lhs, Token op, Token rhs)
