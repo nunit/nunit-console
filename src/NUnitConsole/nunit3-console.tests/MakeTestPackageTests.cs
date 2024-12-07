@@ -65,7 +65,7 @@ namespace NUnit.ConsoleRunner.Tests
             var options = ConsoleMocks.Options("test.dll", option);
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.Settings.ContainsKey(key), "Setting not included for {0}", option);
+            Assert.That(package.Settings.ContainsKey(key), $"Setting not included for {option}");
             Assert.That(package.Settings[key], Is.EqualTo(val), "NumberOfTestWorkers not set correctly for {0}", option);
         }
 

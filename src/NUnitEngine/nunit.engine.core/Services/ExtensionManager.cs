@@ -29,6 +29,8 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
+        private readonly List<string> _extensionDirectories = new List<string>();
+
         public ExtensionManager()
             : this(new FileSystem())
         {
@@ -118,13 +120,19 @@ namespace NUnit.Engine.Services
         /// <inheritdoc/>
         public void FindExtensions(string startDir)
         {
-            // Create the list of possible extension assemblies,
-            // eliminating duplicates, start in the provided directory.
-            FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
+            // Ignore a call for a directory we have already used
+            if (!_extensionDirectories.Contains(startDir))
+            {
+                _extensionDirectories.Add(startDir);
 
-            // Check each assembly to see if it contains extensions
-            foreach (var candidate in _assemblies)
-                FindExtensionsInAssembly(candidate);
+                // Create the list of possible extension assemblies,
+                // eliminating duplicates, start in the provided directory.
+                FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
+
+                // Check each assembly to see if it contains extensions
+                foreach (var candidate in _assemblies)
+                    FindExtensionsInAssembly(candidate);
+            }
         }
 
         /// <inheritdoc/>
