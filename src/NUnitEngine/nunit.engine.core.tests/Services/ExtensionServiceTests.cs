@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -58,6 +59,19 @@ namespace NUnit.Engine.Services.Tests
 
             _extensionManager.ReceivedWithAnyArgs().FindExtensionPoints(typeof(ExtensionService).Assembly, typeof(ITestEngine).Assembly);
             _extensionManager.Received().FindStandardExtensions(hostAssembly);
+            Assert.That(_extensionService.Status, Is.EqualTo(ServiceStatus.Started));
+        }
+
+        [Test]
+        public void StartServiceInitializesExtensionManagerUsingAdditionalDirectories()
+        {
+            Assembly hostAssembly = typeof(ExtensionService).Assembly;
+            _extensionService.StartService();
+
+            var tempPath = Path.GetTempPath();
+            _extensionService.FindExtensions(tempPath);
+
+            _extensionManager.Received().FindExtensions(tempPath);
             Assert.That(_extensionService.Status, Is.EqualTo(ServiceStatus.Started));
         }
 

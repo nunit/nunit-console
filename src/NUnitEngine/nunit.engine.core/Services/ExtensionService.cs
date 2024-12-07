@@ -1,14 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using TestCentric.Metadata;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
-using NUnit.Engine.Internal.FileSystemAccess.Default;
-using System.IO;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace NUnit.Engine.Services
 {
@@ -42,31 +38,40 @@ namespace NUnit.Engine.Services
             _extensionManager = new ExtensionManager(fileSystem, directoryFinder);
         }
 
+        #region IExtensionService Implementation
+
+        /// <inheritdoc/>
         public IEnumerable<IExtensionPoint> ExtensionPoints => _extensionManager.ExtensionPoints;
 
+        /// <inheritdoc/>
         public IEnumerable<IExtensionNode> Extensions => _extensionManager.Extensions;
 
-        /// <summary>
-        /// Get an ExtensionPoint based on its unique identifying path.
-        /// </summary>
+        /// <inheritdoc/>
+        public void FindExtensions(string initialDirectory)
+        {
+            _extensionManager.FindExtensions(initialDirectory);
+        }
+
+        /// <inheritdoc/>
         IExtensionPoint IExtensionService.GetExtensionPoint(string path)
         {
             return _extensionManager.GetExtensionPoint(path);
         }
 
-        /// <summary>
-        /// Get an enumeration of ExtensionNodes based on their identifying path.
-        /// </summary>
+        /// <inheritdoc/>
         IEnumerable<IExtensionNode> IExtensionService.GetExtensionNodes(string path)
         {
             foreach (var node in _extensionManager.GetExtensionNodes(path))
                 yield return node;
         }
 
+        /// <inheritdoc/>
         public void EnableExtension(string typeName, bool enabled)
         {
             _extensionManager.EnableExtension(typeName, enabled);
         }
+
+        #endregion
 
         public IEnumerable<T> GetExtensions<T>() => _extensionManager.GetExtensions<T>();
 
@@ -78,7 +83,7 @@ namespace NUnit.Engine.Services
         {
             Assembly thisAssembly = Assembly.GetExecutingAssembly();
             Assembly apiAssembly = typeof(ITestEngine).Assembly;
-                      
+
             try
             {
                 _extensionManager.FindExtensionPoints(thisAssembly, apiAssembly);

@@ -859,6 +859,13 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.DisplayTestLabels, Is.EqualTo(newOption));
         }
 
+        public void UserExtensionDirectoryTest()
+        {
+            ConsoleOptions options = ConsoleMocks.Options("--extensionDirectory=/a/b/c");
+            Assert.That(options.Validate);
+            Assert.That(options.ExtensionDirectories.Contains("/a/b/c"));
+        }
+
         private static IFileSystem GetFileSystemContainingFile(string fileName)
         {
             var fileSystem = new VirtualFileSystem();

@@ -26,7 +26,10 @@ namespace NUnit.ConsoleRunner
         private const int MAXIMUM_RETURN_CODE_ALLOWED = 100; // In case we are running on Unix
 
         private const string EVENT_LISTENER_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/ITestEventListener";
-        private const string TEAMCITY_EVENT_LISTENER = "NUnit.Engine.Listeners.TeamCityEventListener";
+        private const string TEAMCITY_EVENT_LISTENER_FULLNAME = "NUnit.Engine.Listeners.TeamCityEventListener";
+        private const string TEAMCITY_EVENT_LISTENER_NAME = "TeamCityEventListener";
+
+        private const string NUNIT_EXTENSION_DIRECTORIES = "NUNIT_EXTENSION_DIRECTORIES";
 
         public static readonly int OK = 0;
         public static readonly int INVALID_ARG = -1;
@@ -48,28 +51,40 @@ namespace NUnit.ConsoleRunner
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
-            _engine = engine;
-            _options = options;
-            _outWriter = writer;
-
-            _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
-
-            if (!Directory.Exists(_workDirectory))
-                Directory.CreateDirectory(_workDirectory);
+            Guard.ArgumentNotNull(_engine = engine, nameof(engine));
+            Guard.ArgumentNotNull(_options = options, nameof(options));
+            Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
 
             _resultService = _engine.Services.GetService<IResultService>();
-            _filterService = _engine.Services.GetService<ITestFilterService>();
-            _extensionService = _engine.Services.GetService<IExtensionService>();
+            Guard.OperationValid(_resultService != null, "Internal Error: ResultService was not found");
 
-            // TODO: Exit with error if any of the services are not found
+            _filterService = _engine.Services.GetService<ITestFilterService>();
+            Guard.OperationValid(_filterService != null, "Internal Error: TestFilterService was not found");
+
+            _extensionService = _engine.Services.GetService<IExtensionService>();
+            Guard.OperationValid(_extensionService != null, "Internal Error: ExtensionService was not found");
+
+            var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
+            if (!string.IsNullOrEmpty(extensionPath))
+                foreach (string extensionDirectory in extensionPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries))
+                    _extensionService.FindExtensions(extensionDirectory);
+
+            foreach (string extensionDirectory in _options.ExtensionDirectories)
+               _extensionService.FindExtensions(extensionDirectory);
+
+            _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
+            if (!Directory.Exists(_workDirectory))
+                Directory.CreateDirectory(_workDirectory);
 
             if (_options.TeamCity)
             {
                 bool teamcityInstalled = false;
                 foreach (var node in _extensionService.GetExtensionNodes(EVENT_LISTENER_EXTENSION_PATH))
-                    if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER)
+                    if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER_FULLNAME)
                         break;
-                if (!teamcityInstalled) throw new NUnitEngineException("Option --teamcity specified but the extension is not installed.");
+                //Guard.ArgumentValid(teamcityInstalled, "Option --teamcity specified but the extension is not installed.", "--teamCity");
+                if (!teamcityInstalled)
+                    throw new RequiredExtensionException(TEAMCITY_EVENT_LISTENER_NAME, "--teamcity");
             }
 
             // Enable TeamCityEventListener immediately, before the console is redirected
@@ -310,6 +325,14 @@ namespace NUnit.ConsoleRunner
 
         private void DisplayExtensionList()
         {
+            if (_options.ExtensionDirectories.Count > 0)
+            {
+                _outWriter.WriteLine(ColorStyle.SectionHeader, "User Extension Directories");
+                foreach (var dir in _options.ExtensionDirectories)
+                    _outWriter.WriteLine($"  {Path.GetFullPath(dir)}");
+                _outWriter.WriteLine();
+            }
+
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
             foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])

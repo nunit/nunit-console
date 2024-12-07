@@ -41,13 +41,18 @@ namespace NUnit.ConsoleRunner
                 Parse(args);
         }
 
-        // Action to Perform
+        // Action to Perform ( Default is to run the tests )
 
         public bool Explore { get; private set; }
 
         public bool ShowHelp { get; private set; }
 
         public bool ShowVersion { get; private set; }
+
+        public bool ListExtensions { get; private set; }
+
+        // Additional directories to be used to search for user extensions
+        public IList<string> ExtensionDirectories { get; } = new List<string>();
 
         // Select tests
 
@@ -152,8 +157,6 @@ namespace NUnit.ConsoleRunner
         public bool DebugTests { get; private set; }
 
         public bool DebugAgent { get; private set; }
-
-        public bool ListExtensions { get; private set; }
 
         public bool PauseBeforeRun { get; private set; }
 
@@ -382,6 +385,9 @@ namespace NUnit.ConsoleRunner
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
+
+            this.Add("extensionDirectory=", "Specifies an additional directory to be examined for extensions. May be repeated.",
+                v => { ExtensionDirectories.Add(Path.GetFullPath(v)); });
 
             this.AddNetFxOnlyOption("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
                 NetFxOnlyOption("set-principal-policy=", v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal")));

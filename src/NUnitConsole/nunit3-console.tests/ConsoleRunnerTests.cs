@@ -39,9 +39,9 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void ThrowsNUnitExceptionWhenTeamcityOptionIsSpecifiedButNotAvailable()
+        public void ThrowsRequiredExtensionExceptionWhenTeamcityOptionIsSpecifiedButNotAvailable()
         {
-            var ex = Assert.Throws<NUnitEngineException>(
+            var ex = Assert.Throws<RequiredExtensionException>(
                 () => new ConsoleRunner(_testEngine, ConsoleMocks.Options("mock-assembly.dll", "--teamcity"), new ColorConsoleWriter()));
 
             Assert.That(ex, Has.Message.Contains("teamcity"));
