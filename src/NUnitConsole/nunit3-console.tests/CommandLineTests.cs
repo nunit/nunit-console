@@ -144,6 +144,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DisposeRunners", "dispose-runners")]
         [TestCase("TeamCity", "teamcity")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
+        [TestCase("NoResult", "noresult")]
 #if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
@@ -503,20 +504,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(spec.OutputPath, Is.EqualTo("TestResult.xml"));
             Assert.That(spec.Format, Is.EqualTo("nunit3"));
             Assert.That(spec.Transform, Is.Null);
-        }
-
-        [Test]
-        public void NoResultSuppressesDefaultResultSpecification()
-        {
-            var options = ConsoleMocks.Options("test.dll", "-noresult");
-            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void NoResultSuppressesAllResultSpecifications()
-        {
-            var options = ConsoleMocks.Options("test.dll", "-result:results.xml", "-noresult", "-result:nunit2results.xml;format=nunit2");
-            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
         }
 
         [Test]

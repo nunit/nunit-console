@@ -15,7 +15,7 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
-        private readonly IExtensionManager _extensionManager;
+        private readonly ExtensionManager _extensionManager;
 
         public ExtensionService()
         {

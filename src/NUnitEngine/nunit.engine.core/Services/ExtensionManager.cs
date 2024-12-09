@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace NUnit.Engine.Services
 {
-    public class ExtensionManager : IExtensionManager
+    public class ExtensionManager
     {
         static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -29,7 +29,11 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
         private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
 
+        // List of all extensionDirectories specified on command-line or in environment
         private readonly List<string> _extensionDirectories = new List<string>();
+
+        // Dictionary containing all directory paths already examined
+        private readonly Dictionary<string, object> _directoriesExamined = new Dictionary<string, object>();
 
         public ExtensionManager()
             : this(new FileSystem())
@@ -66,7 +70,7 @@ namespace NUnit.Engine.Services
         {
             foreach (var assembly in targetAssemblies)
             {
-                log.Info("Scanning {0} assembly for extension points", assembly.GetName().Name);
+                log.Info("FindExtensionPoints scanning {0} assembly", assembly.GetName().Name);
 
                 foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
                 {
@@ -86,7 +90,7 @@ namespace NUnit.Engine.Services
                     _extensionPoints.Add(ep);
                     _pathIndex.Add(ep.Path, ep);
 
-                    log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
+                    log.Info("  Found ExtensionPoint: Path={0}, Type={1}", ep.Path, ep.TypeName);
                 }
 
                 foreach (Type type in assembly.GetExportedTypes())
@@ -111,7 +115,7 @@ namespace NUnit.Engine.Services
                         _extensionPoints.Add(ep);
                         _pathIndex.Add(path, ep);
 
-                        log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
+                        log.Info("  Found ExtensionPoint: Path={0}, Type={1}", ep.Path, ep.TypeName);
                     }
                 }
             }
@@ -124,6 +128,8 @@ namespace NUnit.Engine.Services
             if (!_extensionDirectories.Contains(startDir))
             {
                 _extensionDirectories.Add(startDir);
+
+                log.Info($"FindExtensions examining extension directory {startDir}");
 
                 // Create the list of possible extension assemblies,
                 // eliminating duplicates, start in the provided directory.
@@ -138,6 +144,8 @@ namespace NUnit.Engine.Services
         /// <inheritdoc/>
         public void FindStandardExtensions(Assembly hostAssembly)
         {
+            log.Info($"FindStandardExtensions called for host {hostAssembly.FullName}");
+
             bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(hostAssembly.Location, "VERIFICATION.txt"));
             string[] extensionPatterns = isChocolateyPackage
                 ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
@@ -273,7 +281,7 @@ namespace NUnit.Engine.Services
             IDirectory startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
 
             while (startDir != null)
-            {               
+            {
                 foreach (var pattern in patterns)
                     foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
                         ProcessDirectory(dir, true);
@@ -290,7 +298,7 @@ namespace NUnit.Engine.Services
         private void ProcessDirectory(IDirectory startDir, bool fromWildCard)
         {
             var directoryName = startDir.FullName;
-            if (WasVisited(startDir.FullName, fromWildCard))
+            if (WasVisited(directoryName, fromWildCard))
             {
                 log.Warning($"Skipping directory '{directoryName}' because it was already visited.");
             }
@@ -371,7 +379,7 @@ namespace NUnit.Engine.Services
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
-            if (WasVisited(filePath, fromWildCard)) 
+            if (WasVisited(filePath, fromWildCard))
                 return;
 
             MarkAsVisited(filePath, fromWildCard);
@@ -410,16 +418,14 @@ namespace NUnit.Engine.Services
             }
         }
 
-        private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
-
         private bool WasVisited(string filePath, bool fromWildcard)
         {
-            return _visited.ContainsKey($"path={ filePath }_visited={fromWildcard}");
+            return _directoriesExamined.ContainsKey($"path={filePath}_visited={fromWildcard}");
         }
 
         private void MarkAsVisited(string filePath, bool fromWildcard)
         {
-            _visited.Add($"path={ filePath }_visited={fromWildcard}", null);
+            _directoriesExamined.Add($"path={filePath}_visited={fromWildcard}", null);
         }
 
         /// <summary>

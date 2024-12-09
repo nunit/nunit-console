@@ -21,8 +21,7 @@ namespace NUnit.ConsoleRunner
     {
         private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
 
-        private bool validated;
-        private bool noresult;
+        private bool _validated;
 
         /// <summary>
         /// An abstraction of the file system
@@ -52,13 +51,13 @@ namespace NUnit.ConsoleRunner
         public bool ListExtensions { get; private set; }
 
         // Additional directories to be used to search for user extensions
-        public IList<string> ExtensionDirectories { get; } = new List<string>();
+        public List<string> ExtensionDirectories { get; } = new List<string>();
 
         // Select tests
 
-        public IList<string> InputFiles { get; } = new List<string>();
+        public List<string> InputFiles { get; } = new List<string>();
 
-        public IList<string> TestList { get; } = new List<string>();
+        public List<string> TestList { get; } = new List<string>();
 
         public IDictionary<string, string> TestParameters { get; } = new Dictionary<string, string>();
 
@@ -104,13 +103,15 @@ namespace NUnit.ConsoleRunner
         public string InternalTraceLevel { get; private set; }
         public bool InternalTraceLevelSpecified { get { return InternalTraceLevel != null; } }
 
+        public bool NoResult { get; private set; }
+
         private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
-        public IList<OutputSpecification> ResultOutputSpecifications
+        public List<OutputSpecification> ResultOutputSpecifications
         {
             get
             {
-                if (noresult)
-                    return new OutputSpecification[0];
+                //if (noresult)
+                //    return new List<OutputSpecification>();
 
                 if (resultOutputSpecifications.Count == 0)
                     resultOutputSpecifications.Add(
@@ -120,7 +121,7 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        public IList<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
+        public List<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
 
         public string ActiveConfig { get; private set; }
         public bool ActiveConfigSpecified { get { return ActiveConfig != null; } }
@@ -162,9 +163,9 @@ namespace NUnit.ConsoleRunner
 
         public string PrincipalPolicy { get; private set; }
 
-        public IList<string> WarningMessages { get; } = new List<string>();
+        public List<string> WarningMessages { get; } = new List<string>();
 
-        public IList<string> ErrorMessages { get; } = new List<string>();
+        public List<string> ErrorMessages { get; } = new List<string>();
 
         private void ConfigureOptions()
         {
@@ -277,7 +278,7 @@ namespace NUnit.ConsoleRunner
             });
 
             this.Add("noresult", "Don't save any test results.",
-                v => noresult = v != null);
+                v => NoResult = v != null);
 
             this.Add("labels=", "Specify whether to write test case names to the output. Values: Off, OnOutputOnly, Before, After, BeforeAndAfter",
                 v => {
@@ -419,11 +420,11 @@ namespace NUnit.ConsoleRunner
 
         public bool Validate()
         {
-            if (!validated)
+            if (!_validated)
             {
                 CheckOptionCombinations();
 
-                validated = true;
+                _validated = true;
             }
 
             return ErrorMessages.Count == 0;

@@ -11,6 +11,7 @@ using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Linq;
 
 namespace NUnit.ConsoleRunner
 {
@@ -72,9 +73,11 @@ namespace NUnit.ConsoleRunner
             foreach (string extensionDirectory in _options.ExtensionDirectories)
                _extensionService.FindExtensions(extensionDirectory);
 
-            _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
-            if (!Directory.Exists(_workDirectory))
+            _workDirectory = options.WorkDirectory;
+            if (_workDirectory != null)
                 Directory.CreateDirectory(_workDirectory);
+            else
+                _workDirectory = null;
 
             if (_options.TeamCity)
             {
@@ -164,48 +167,48 @@ namespace NUnit.ConsoleRunner
         {
             var writer = new ColorConsoleWriter(!_options.NoColor);
 
-            foreach (var spec in _options.ResultOutputSpecifications)
-            {
-                var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
+            if (!_options.NoResult)
+                foreach (var spec in _options.ResultOutputSpecifications)
+                {
+                    var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
                 
-                IResultWriter resultWriter;
+                    IResultWriter resultWriter;
                 
-                try
-                {
-                    resultWriter = GetResultWriter(spec);
-                }
-                catch (Exception ex)
-                {
-                    throw new NUnitEngineException($"Error encountered in resolving output specification: {spec}", ex);
-                }
+                    try
+                    {
+                        resultWriter = GetResultWriter(spec);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new NUnitEngineException($"Error encountered in resolving output specification: {spec}", ex);
+                    }
 
-                try
-                {
-                    var outputDirectory = Path.GetDirectoryName(outputPath);
-                    Directory.CreateDirectory(outputDirectory);
-                }
-                catch (Exception ex)
-                {
-                    writer.WriteLine(ColorStyle.Error, String.Format(
-                        "The directory in --result {0} could not be created",
-                        spec.OutputPath));
-                    writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
-                    return ConsoleRunner.UNEXPECTED_ERROR;
-                }
+                    try
+                    {
+                        var outputDirectory = Path.GetDirectoryName(outputPath);
+                        Directory.CreateDirectory(outputDirectory);
+                    }
+                    catch (Exception ex)
+                    {
+                        writer.WriteLine(ColorStyle.Error, String.Format(
+                            "The directory in --result {0} could not be created",
+                            spec.OutputPath));
+                        writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(ex));
+                        return ConsoleRunner.UNEXPECTED_ERROR;
+                    }
 
-                try
-                {
-                    resultWriter.CheckWritability(outputPath);
+                    try
+                    {
+                        resultWriter.CheckWritability(outputPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new NUnitEngineException(
+                            String.Format(
+                                "The path specified in --result {0} could not be written to",
+                                spec.OutputPath), ex);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw new NUnitEngineException(
-                        String.Format(
-                            "The path specified in --result {0} could not be written to",
-                            spec.OutputPath), ex);
-                }
-
-            }
 
             var labels = _options.DisplayTestLabels != null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
@@ -335,7 +338,7 @@ namespace NUnit.ConsoleRunner
 
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
-            foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])
+            foreach (var ep in _extensionService.ExtensionPoints)
             {
                 _outWriter.WriteLabelLine("  Extension Point: ", ep.Path);
                 foreach (var node in ep.Extensions)
