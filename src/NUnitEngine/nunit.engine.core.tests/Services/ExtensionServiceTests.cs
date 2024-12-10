@@ -58,7 +58,7 @@ namespace NUnit.Engine.Services.Tests
             _extensionService.StartService();
 
             _extensionManager.ReceivedWithAnyArgs().FindExtensionPoints(typeof(ExtensionService).Assembly, typeof(ITestEngine).Assembly);
-            _extensionManager.Received().FindStandardExtensions(hostAssembly);
+            _extensionManager.Received().FindExtensionAssemblies(hostAssembly);
             Assert.That(_extensionService.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
@@ -69,9 +69,9 @@ namespace NUnit.Engine.Services.Tests
             _extensionService.StartService();
 
             var tempPath = Path.GetTempPath();
-            _extensionService.FindExtensions(tempPath);
+            _extensionService.FindExtensionAssemblies(tempPath);
 
-            _extensionManager.Received().FindExtensions(tempPath);
+            _extensionManager.Received().FindExtensionAssemblies(tempPath);
             Assert.That(_extensionService.Status, Is.EqualTo(ServiceStatus.Started));
         }
 

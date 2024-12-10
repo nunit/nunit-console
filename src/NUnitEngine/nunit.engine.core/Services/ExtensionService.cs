@@ -47,9 +47,9 @@ namespace NUnit.Engine.Services
         public IEnumerable<IExtensionNode> Extensions => _extensionManager.Extensions;
 
         /// <inheritdoc/>
-        public void FindExtensions(string initialDirectory)
+        public void FindExtensionAssemblies(string initialDirectory)
         {
-            _extensionManager.FindExtensions(initialDirectory);
+            _extensionManager.FindExtensionAssemblies(initialDirectory);
         }
 
         /// <inheritdoc/>
@@ -87,7 +87,7 @@ namespace NUnit.Engine.Services
             try
             {
                 _extensionManager.FindExtensionPoints(thisAssembly, apiAssembly);
-                _extensionManager.FindStandardExtensions(thisAssembly);
+                _extensionManager.FindExtensionAssemblies(thisAssembly);
 
                 Status = ServiceStatus.Started;
             }

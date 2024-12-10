@@ -26,7 +26,7 @@ namespace NUnit.Engine
         /// and using the contained '.addins' files to direct the search.
         /// </summary>
         /// <param name="initialDirectory">Path to the initial directory.</param>
-        void FindExtensions(string initialDirectory);
+        void FindExtensionAssemblies(string initialDirectory);
 
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.

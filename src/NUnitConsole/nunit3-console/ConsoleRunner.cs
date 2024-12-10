@@ -56,6 +56,7 @@ namespace NUnit.ConsoleRunner
             Guard.ArgumentNotNull(_options = options, nameof(options));
             Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
 
+            // NOTE: Accessing Services triggerss the engine to initialize all services
             _resultService = _engine.Services.GetService<IResultService>();
             Guard.OperationValid(_resultService != null, "Internal Error: ResultService was not found");
 
@@ -68,10 +69,14 @@ namespace NUnit.ConsoleRunner
             var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
             if (!string.IsNullOrEmpty(extensionPath))
                 foreach (string extensionDirectory in extensionPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries))
-                    _extensionService.FindExtensions(extensionDirectory);
+                    _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             foreach (string extensionDirectory in _options.ExtensionDirectories)
-               _extensionService.FindExtensions(extensionDirectory);
+               _extensionService.FindExtensionAssemblies(extensionDirectory);
+
+            // Trigger lazy loading of extensions
+            var dummy = _extensionService.Extensions;
+
 
             _workDirectory = options.WorkDirectory;
             if (_workDirectory != null)
