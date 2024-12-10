@@ -22,6 +22,13 @@ namespace NUnit.Engine
         IEnumerable<IExtensionNode> Extensions { get; }
 
         /// <summary>
+        /// Find and install extensions starting from a given base directory,
+        /// and using the contained '.addins' files to direct the search.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        void FindExtensionAssemblies(string initialDirectory);
+
+        /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
         IExtensionPoint GetExtensionPoint(string path);
@@ -34,8 +41,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Enable or disable an extension
         /// </summary>
-        /// <param name="typeName"></param>
-        /// <param name="enabled"></param>
         void EnableExtension(string typeName, bool enabled);
     }
 }
