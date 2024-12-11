@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using TestCentric.Metadata;
 using NUnit.Engine.Internal;
@@ -14,26 +15,26 @@ namespace NUnit.Engine.Extensibility
             FilePath = filePath;
             FromWildCard = fromWildCard;
             Assembly = GetAssemblyDefinition();
+            AssemblyName = Assembly.Name.Name;
+            AssemblyVersion = Assembly.Name.Version;
+        }
+
+        // Internal constructor used for certain tests. AssemblyDefinition is not initialized.
+        internal ExtensionAssembly(string filePath, bool fromWildCard, string assemblyName, Version version)
+        {
+            FilePath = filePath;
+            FromWildCard = fromWildCard;
+            AssemblyName = assemblyName;
+            AssemblyVersion = version;
         }
 
         public string FilePath { get; }
         public bool FromWildCard { get; }
         public AssemblyDefinition Assembly { get; }
 
-        public string AssemblyName
-        {
-            get { return Assembly.Name.Name; }
-        }
+        public string AssemblyName { get; }
 
-        public Version AssemblyVersion
-        {
-            get { return Assembly.Name.Version; }
-        }
-
-        public ModuleDefinition MainModule
-        {
-            get { return Assembly.MainModule; }
-        }
+        public Version AssemblyVersion { get; }
 
 #if NETFRAMEWORK
         public RuntimeFramework TargetFramework

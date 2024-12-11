@@ -10,6 +10,7 @@ using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
 using System.Linq;
+using System.Diagnostics;
 
 namespace NUnit.Engine.Services
 {
@@ -27,25 +28,20 @@ namespace NUnit.Engine.Services
         private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
 
         // Index to ExtensionPoints based on the Path
-        private readonly Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
+        private readonly Dictionary<string, ExtensionPoint> _extensionPointIndex = new Dictionary<string, ExtensionPoint>();
 
         // List of ExtensionNodes for all extensions discovered.
         private List<ExtensionNode> _extensions = new List<ExtensionNode>();
 
         private bool _extensionsAreLoaded;
 
-        // List of candidate ExtensionAssemblies, which should be examined for extensions.
-        // This list must be completely built before we examine any of the assemblies, since
-        // it's possible that the same assembly may be found in multiple versions.
-        private readonly List<ExtensionAssembly> _candidateAssemblies = new List<ExtensionAssembly>();
-
+        // AssemblyTracker is a List of candidate ExtensionAssemblies, with built-in indexing
+        // by file path and assembly name, eliminating the need to update indices separately.
+        private readonly ExtensionAssemblyTracker _assemblies = new ExtensionAssemblyTracker();
+    
         // List of all extensionDirectories specified on command-line or in environment,
-        // used to ignore duplicate calls to FindExtensions.
+        // used to ignore duplicate calls to FindExtensionAssemblies.
         private readonly List<string> _extensionDirectories = new List<string>();
-
-        // Dictionary containing all directory paths and assembly paths already processed,
-        // used to prevent processing a directory or assembly more than once.
-        private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
 
         public ExtensionManager()
             : this(new FileSystem())
@@ -97,7 +93,7 @@ namespace NUnit.Engine.Services
 
                 foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
                 {
-                    if (_pathIndex.ContainsKey(attr.Path))
+                    if (_extensionPointIndex.ContainsKey(attr.Path))
                     {
                         string msg = string.Format(
                             "The Path {0} is already in use for another extension point.",
@@ -111,7 +107,7 @@ namespace NUnit.Engine.Services
                     };
 
                     _extensionPoints.Add(ep);
-                    _pathIndex.Add(ep.Path, ep);
+                    _extensionPointIndex.Add(ep.Path, ep);
 
                     log.Info("  Found ExtensionPoint: Path={0}, Type={1}", ep.Path, ep.TypeName);
                 }
@@ -122,7 +118,7 @@ namespace NUnit.Engine.Services
                     {
                         string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
 
-                        if (_pathIndex.ContainsKey(path))
+                        if (_extensionPointIndex.ContainsKey(path))
                         {
                             string msg = string.Format(
                                 "The Path {0} is already in use for another extension point.",
@@ -136,7 +132,7 @@ namespace NUnit.Engine.Services
                         };
 
                         _extensionPoints.Add(ep);
-                        _pathIndex.Add(path, ep);
+                        _extensionPointIndex.Add(path, ep);
 
                         log.Info("  Found ExtensionPoint: Path={0}, Type={1}", ep.Path, ep.TypeName);
                     }
@@ -179,22 +175,16 @@ namespace NUnit.Engine.Services
                 ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
                 : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
 
-            FindExtensionAssemblies(hostAssembly, extensionPatterns);
-        }
 
-        /// <summary>
-        /// We can only load extensions after all candidate assemblies are identified.
-        /// This method is called internally to ensure the load happens before any
-        /// extensions are used.
-        /// </summary>
-        private void EnsureExtensionsAreLoaded()
-        {
-            if (!_extensionsAreLoaded)
+            IDirectory startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
+
+            while (startDir != null)
             {
-                _extensionsAreLoaded = true;
+                foreach (var pattern in extensionPatterns)
+                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
+                        ProcessDirectory(dir, true);
 
-                foreach (var candidate in _candidateAssemblies)
-                    FindExtensionsInAssembly(candidate);
+                startDir = startDir.Parent;
             }
         }
 
@@ -203,7 +193,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         public IExtensionPoint GetExtensionPoint(string path)
         {
-            return _pathIndex.ContainsKey(path) ? _pathIndex[path] : null;
+            return _extensionPointIndex.ContainsKey(path) ? _extensionPointIndex[path] : null;
         }
 
         /// <summary>
@@ -323,23 +313,18 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Find candidate extension assemblies for a given host assembly,
-        /// using the provided list of patterns to direct the search using
-        /// a built-in algorithm.
+        /// We can only load extensions after all candidate assemblies are identified.
+        /// This method is called internally to ensure the load happens before any
+        /// extensions are used.
         /// </summary>
-        /// <param name="hostAssembly">An assembly that supports extensions</param>
-        /// <param name="patterns">A list of patterns used to identify potential candidates.</param>
-        private void FindExtensionAssemblies(Assembly hostAssembly, string[] patterns)
+        private void EnsureExtensionsAreLoaded()
         {
-            IDirectory startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
-
-            while (startDir != null)
+            if (!_extensionsAreLoaded)
             {
-                foreach (var pattern in patterns)
-                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
-                        ProcessDirectory(dir, true);
+                _extensionsAreLoaded = true;
 
-                startDir = startDir.Parent;
+                foreach (var candidate in _assemblies)
+                    FindExtensionsInAssembly(candidate);
             }
         }
 
@@ -354,20 +339,15 @@ namespace NUnit.Engine.Services
             if (WasVisited(directoryName, fromWildCard))
             {
                 log.Warning($"Skipping directory '{directoryName}' because it was already visited.");
+                return;
             }
-            else
-            {
-                log.Info($"Scanning directory '{directoryName}' for extensions.");
-                MarkAsVisited(directoryName, fromWildCard);
 
-                if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
-                {
-                    foreach (var file in startDir.GetFiles("*.dll"))
-                    {
-                        ProcessCandidateAssembly(file.FullName, true);
-                    }
-                }
-            }
+            log.Info($"Scanning directory '{directoryName}' for extensions.");
+            Visit(directoryName, fromWildCard);
+
+            if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
+                foreach (var file in startDir.GetFiles("*.dll"))
+                    ProcessCandidateAssembly(file.FullName, true);
         }
 
         /// <summary>
@@ -432,32 +412,29 @@ namespace NUnit.Engine.Services
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
-            if (WasVisited(filePath, fromWildCard))
+            // Did we already process this file?
+            if (_assemblies.ByPath.ContainsKey(filePath))
                 return;
-
-            MarkAsVisited(filePath, fromWildCard);
 
             try
             {
-                var candidate = new ExtensionAssembly(filePath, fromWildCard);
+                var candidateAssembly = new ExtensionAssembly(filePath, fromWildCard);
+                string assemblyName = candidateAssembly.AssemblyName;
 
-                if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidate))
+                // We never add assemblies unless the host can load them
+                if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidateAssembly))
                     return;
-
-                for (var i = 0; i < _candidateAssemblies.Count; i++)
+                
+                // Do we already have a copy of the same assembly at a diffrent path?
+                if (_assemblies.ByName.ContainsKey(assemblyName))
                 {
-                    var assembly = _candidateAssemblies[i];
+                    if (candidateAssembly.IsBetterVersionOf(_assemblies.ByName[assemblyName]))
+                        _assemblies.ByName[assemblyName] = candidateAssembly;
 
-                    if (candidate.IsDuplicateOf(assembly))
-                    {
-                        if (candidate.IsBetterVersionOf(assembly))
-                            _candidateAssemblies[i] = candidate;
-
-                        return;
-                    }
+                    return;
                 }
 
-                _candidateAssemblies.Add(candidate);
+                _assemblies.Add(candidateAssembly);
             }
             catch (BadImageFormatException e)
             {
@@ -471,12 +448,15 @@ namespace NUnit.Engine.Services
             }
         }
 
+        // Dictionary containing all directory paths already visited.
+        private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
+
         private bool WasVisited(string path, bool fromWildcard)
         {
             return _visited.ContainsKey($"path={path}_visited={fromWildcard}");
         }
 
-        private void MarkAsVisited(string path, bool fromWildcard)
+        private void Visit(string path, bool fromWildcard)
         {
             _visited.Add($"path={path}_visited={fromWildcard}", null);
         }
@@ -486,35 +466,35 @@ namespace NUnit.Engine.Services
         /// For each extension, create an ExtensionNode and link it to the
         /// correct ExtensionPoint. Public for testing.
         /// </summary>
-        internal void FindExtensionsInAssembly(ExtensionAssembly assembly)
+        internal void FindExtensionsInAssembly(ExtensionAssembly extensionAssembly)
         {
-            log.Info($"Scanning {assembly.FilePath} for Extensions");
+            log.Info($"Scanning {extensionAssembly.FilePath} for Extensions");
 
-            if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), assembly))
+            if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), extensionAssembly))
             {
-                log.Info($"{assembly.FilePath} cannot be loaded on this runtime");
+                log.Info($"{extensionAssembly.FilePath} cannot be loaded on this runtime");
                 return;
             }
 
             IRuntimeFramework assemblyTargetFramework = null;
 #if NETFRAMEWORK
             var currentFramework = RuntimeFramework.CurrentFramework;
-            assemblyTargetFramework = assembly.TargetFramework;
+            assemblyTargetFramework = extensionAssembly.TargetFramework;
             if (!currentFramework.CanLoad(assemblyTargetFramework))
             {
-                if (!assembly.FromWildCard)
+                if (!extensionAssembly.FromWildCard)
                 {
-                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+                    throw new NUnitEngineException($"Extension {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
                 }
                 else
                 {
-                    log.Info($"Assembly {assembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+                    log.Info($"Assembly {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
                     return;
                 }
             }
 #endif
 
-            foreach (var extensionType in assembly.MainModule.GetTypes())
+            foreach (var extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
             {
                 CustomAttribute extensionAttr = extensionType.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
 
@@ -534,7 +514,7 @@ namespace NUnit.Engine.Services
                     }
                 }
 
-                var node = new ExtensionNode(assembly.FilePath, assembly.AssemblyVersion, extensionType.FullName, assemblyTargetFramework)
+                var node = new ExtensionNode(extensionAssembly.FilePath, extensionAssembly.AssemblyVersion, extensionType.FullName, assemblyTargetFramework)
                 {
                     Path = extensionAttr.GetNamedArgument("Path") as string,
                     Description = extensionAttr.GetNamedArgument("Description") as string
@@ -679,9 +659,9 @@ namespace NUnit.Engine.Services
         public void Dispose()
         {
             // Make sure all assemblies release the underlying file streams. 
-            foreach (var assembly in _candidateAssemblies)
+            foreach (var candidate in _assemblies)
             {
-                assembly.Dispose();
+                candidate.Dispose();
             }
         }
     }
