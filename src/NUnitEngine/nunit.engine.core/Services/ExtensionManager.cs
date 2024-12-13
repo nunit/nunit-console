@@ -193,7 +193,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         public IExtensionPoint GetExtensionPoint(string path)
         {
-            return _extensionPointIndex.ContainsKey(path) ? _extensionPointIndex[path] : null;
+            return _extensionPointIndex.TryGetValue(path, out ExtensionPoint ep) ? ep : null;
         }
 
         /// <summary>
@@ -425,10 +425,11 @@ namespace NUnit.Engine.Services
                 if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidateAssembly))
                     return;
                 
-                // Do we already have a copy of the same assembly at a diffrent path?
-                if (_assemblies.ByName.ContainsKey(assemblyName))
+                // Do we already have a copy of the same assembly at a different path?
+                //if (_assemblies.ByName.ContainsKey(assemblyName))
+                if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly existing))
                 {
-                    if (candidateAssembly.IsBetterVersionOf(_assemblies.ByName[assemblyName]))
+                    if (candidateAssembly.IsBetterVersionOf(existing))
                         _assemblies.ByName[assemblyName] = candidateAssembly;
 
                     return;

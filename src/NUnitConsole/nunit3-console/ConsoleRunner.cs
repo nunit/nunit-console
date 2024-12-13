@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner
             Guard.ArgumentNotNull(_options = options, nameof(options));
             Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
 
-            // NOTE: Accessing Services triggerss the engine to initialize all services
+            // NOTE: Accessing Services triggers the engine to initialize all services
             _resultService = _engine.Services.GetService<IResultService>();
             Guard.OperationValid(_resultService != null, "Internal Error: ResultService was not found");
 
@@ -74,10 +74,6 @@ namespace NUnit.ConsoleRunner
             foreach (string extensionDirectory in _options.ExtensionDirectories)
                _extensionService.FindExtensionAssemblies(extensionDirectory);
 
-            // Trigger lazy loading of extensions
-            var dummy = _extensionService.Extensions;
-
-
             _workDirectory = options.WorkDirectory;
             if (_workDirectory != null)
                 Directory.CreateDirectory(_workDirectory);
@@ -90,7 +86,6 @@ namespace NUnit.ConsoleRunner
                 foreach (var node in _extensionService.GetExtensionNodes(EVENT_LISTENER_EXTENSION_PATH))
                     if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER_FULLNAME)
                         break;
-                //Guard.ArgumentValid(teamcityInstalled, "Option --teamcity specified but the extension is not installed.", "--teamCity");
                 if (!teamcityInstalled)
                     throw new RequiredExtensionException(TEAMCITY_EVENT_LISTENER_NAME, "--teamcity");
             }

@@ -110,9 +110,6 @@ namespace NUnit.ConsoleRunner
         {
             get
             {
-                //if (noresult)
-                //    return new List<OutputSpecification>();
-
                 if (resultOutputSpecifications.Count == 0)
                     resultOutputSpecifications.Add(
                         new OutputSpecification("TestResult.xml", CURRENT_DIRECTORY_ON_ENTRY));
