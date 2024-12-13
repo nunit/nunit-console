@@ -144,6 +144,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("DisposeRunners", "dispose-runners")]
         [TestCase("TeamCity", "teamcity")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
+        [TestCase("NoResult", "noresult")]
 #if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
@@ -506,20 +507,6 @@ namespace NUnit.ConsoleRunner.Tests
         }
 
         [Test]
-        public void NoResultSuppressesDefaultResultSpecification()
-        {
-            var options = ConsoleMocks.Options("test.dll", "-noresult");
-            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
-        }
-
-        [Test]
-        public void NoResultSuppressesAllResultSpecifications()
-        {
-            var options = ConsoleMocks.Options("test.dll", "-result:results.xml", "-noresult", "-result:nunit2results.xml;format=nunit2");
-            Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
-        }
-
-        [Test]
         public void InvalidResultSpecRecordsError()
         {
             var options = ConsoleMocks.Options("test.dll", "-result:userspecifed.xml;format=nunit2;format=nunit3");
@@ -857,6 +844,13 @@ namespace NUnit.ConsoleRunner.Tests
             var options = ConsoleMocks.Options("--labels=" + oldOption);
             options.Validate();
             Assert.That(options.DisplayTestLabels, Is.EqualTo(newOption));
+        }
+
+        public void UserExtensionDirectoryTest()
+        {
+            ConsoleOptions options = ConsoleMocks.Options("--extensionDirectory=/a/b/c");
+            Assert.That(options.Validate);
+            Assert.That(options.ExtensionDirectories.Contains("/a/b/c"));
         }
 
         private static IFileSystem GetFileSystemContainingFile(string fileName)

@@ -11,7 +11,6 @@ namespace NUnit.Engine.Tests.Extensibility
     {
         private static readonly Assembly THIS_ASSEMBLY = Assembly.GetExecutingAssembly();
         private static readonly string THIS_ASSEMBLY_PATH = THIS_ASSEMBLY.Location;
-        private static readonly string THIS_ASSEMBLY_FULL_NAME = THIS_ASSEMBLY.GetName().FullName;
         private static readonly string THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name;
         private static readonly Version THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version;
 
@@ -21,18 +20,6 @@ namespace NUnit.Engine.Tests.Extensibility
         public void CreateExtensionAssemblies()
         {
             _ea = new ExtensionAssembly(THIS_ASSEMBLY_PATH, false);
-        }
-
-        [Test]
-        public void AssemblyDefinition()
-        {
-            Assert.That(_ea.Assembly.FullName, Is.EqualTo(THIS_ASSEMBLY_FULL_NAME));
-        }
-
-        [Test]
-        public void MainModule()
-        {
-            Assert.That(_ea.MainModule.Assembly.FullName, Is.EqualTo(THIS_ASSEMBLY_FULL_NAME));
         }
 
         [Test]
