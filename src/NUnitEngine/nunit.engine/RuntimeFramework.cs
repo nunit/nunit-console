@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 using NUnit.Common;
-using NUnit.Engine.Compatibility;
 
 namespace NUnit.Engine
 {

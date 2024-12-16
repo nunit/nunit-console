@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,11 +27,7 @@ namespace NUnit.Engine.TestHelpers
             {
                 var dependency = Assembly.ReflectionOnlyLoad(dependencyName.FullName);
 
-#if NET5_0_OR_GREATER
-                if (r.Add(Path.GetFullPath(dependency.Location)))
-#else
                 if (!dependency.GlobalAssemblyCache && r.Add(Path.GetFullPath(dependency.Location)))
-#endif
                 {
                     dependencies.Recurse(dependency.GetReferencedAssemblies());
                 }
@@ -40,3 +37,4 @@ namespace NUnit.Engine.TestHelpers
         }
     }
 }
+#endif

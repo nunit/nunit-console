@@ -8,7 +8,7 @@
 
 // We build two console runners. If version of either is upgraded, change it here
 const string NETFX_CONSOLE_TARGET = "net462";
-const string NETCORE_CONSOLE_TARGET = "net6.0";
+const string NETCORE_CONSOLE_TARGET = "net8.0";
 
 // Directories
 // NOTE: All paths use '/' as a separator because some usage requires it and

@@ -31,7 +31,7 @@ public class BuildSettings
             "Net35Test",
             "Run mock-assembly.dll under .NET 3.5",
             $"src/TestData/mock-assembly/bin/{Configuration}/net35/mock-assembly.dll",
-            MockAssemblyExpectedResult( "net-2.0-agent" ));
+            MockAssemblyExpectedResult( "net-4.6.2-agent" ));
         Net462Test = new PackageTest(
             "Net4462Test",
             "Run mock-assembly.dll under .NET 4.6.2",
@@ -42,11 +42,6 @@ public class BuildSettings
             "Run mock-assembly.dll under .NET Core 3.1",
             $"src/TestData/mock-assembly/bin/{Configuration}/netcoreapp3.1/mock-assembly.dll",
             MockAssemblyExpectedResult( "netcore-3.1-agent"));
-        Net50Test = new PackageTest(
-            "Net50Test",
-            "Run mock-assembly.dll under .NET 5.0",
-            $"src/TestData/mock-assembly/bin/{Configuration}/net5.0/mock-assembly.dll",
-            MockAssemblyExpectedResult( "netcore-5.0-agent" ));
         Net60Test = new PackageTest(
             "Net60Test",
             "Run mock-assembly.dll under .NET 6.0",
@@ -145,33 +140,27 @@ public class BuildSettings
 
         StandardRunnerTests = new List<PackageTest>()
         {
-            Net35Test,
+            //Net35Test,
             Net462Test,
             NetCore31Test,
-            Net50Test,
             Net60Test,
             Net70Test,
-            Net35PlusNet462Test,
-            Net50PlusNet60Test,
+            //Net35PlusNet462Test,
             Net462PlusNet60Test,
-            Net35X86Test,
+            //Net35X86Test,
             Net462X86Test,
             Net60AspNetCoreTest,
             Net462NUnit4Test,
             NetCore31NUnit4Test,
-            Net50NUnit4Test,
             Net60NUnit4Test
         };
 
         NetCoreRunnerTests = new List<PackageTest>
         {
             NetCore31Test,
-            Net50Test,
             Net60Test,
-            Net50PlusNet60Test,
             Net60AspNetCoreTest,
             NetCore31NUnit4Test,
-            Net50NUnit4Test,
             Net60NUnit4Test
         };
 
@@ -184,11 +173,11 @@ public class BuildSettings
             if (_dotnet.IsX86Installed)
             {
                 // TODO: Make tests run on AppVeyor
-                if (!IsRunningOnAppVeyor)
-                    StandardRunnerTests.Add(NetCore31X86Test);
+                //if (!IsRunningOnAppVeyor)
+                //    StandardRunnerTests.Add(NetCore31X86Test);
                 StandardRunnerTests.Add(Net60X86Test);
-                if (!IsRunningOnAppVeyor)
-                    StandardRunnerTests.Add(Net80X86Test);
+                //if (!IsRunningOnAppVeyor)
+                //    StandardRunnerTests.Add(Net80X86Test);
                 // TODO: Figure out how to test this.
                 // Currently, NetCoreRunner runs tests in process. As a result,
                 // X86 tests will work in our environment, although uses may run

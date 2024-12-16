@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 using Mono.Cecil;
-#if NETFRAMEWORK
-using NUnit.Engine.Compatibility;
-#endif
 
 namespace NUnit.Engine.Extensibility
 {
