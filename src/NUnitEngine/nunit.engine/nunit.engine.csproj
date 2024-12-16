@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
-    <TargetFrameworks>net462;netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>portable</DebugType>
@@ -19,7 +19,7 @@
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="..\agents\AgentExitCodes.cs" LinkBase="Agents" />
     <Compile Include="..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Internal\ExceptionHelper.cs" />

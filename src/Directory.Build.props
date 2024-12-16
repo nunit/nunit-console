@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <LangVersion>7</LangVersion>
+    <LangVersion>11</LangVersion>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Company>NUnit Software</Company>

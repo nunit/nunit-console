@@ -12,8 +12,8 @@ static string Target; Target = Argument("target", Argument("t", "Default"));
 
 // Install Tools
 #tool NuGet.CommandLine&version=6.0.0
-#tool dotnet:?package=GitVersion.Tool&version=5.6.3
-#tool dotnet:?package=GitReleaseManager.Tool&version=0.12.1
+#tool dotnet:?package=GitVersion.Tool&version=5.12.0
+#tool dotnet:?package=GitReleaseManager.Tool&version=0.17.0
 
 var UnreportedErrors = new List<string>();
 var installedNetCoreRuntimes = GetInstalledNetCoreRuntimes();
@@ -183,33 +183,20 @@ Task("CheckForTestErrors")
     .Does(() => DisplayUnreportedErrors());
 
 //////////////////////////////////////////////////////////////////////
-// TEST .NET 2.0 ENGINE CORE
+// TEST .NET 4.6.2 ENGINE CORE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNet20EngineCore")
-    .Description("Tests the engine core assembly")
+Task("TestNet462EngineCore")
+    .Description("Tests the Net 4.6.2 engine core assembly")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does<BuildSettings>(settings =>
     {
-        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "net35");
+        RunNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "net462");
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 2.0 ENGINE CORE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetStandard20EngineCore")
-    .Description("Tests the .NET Standard Engine core assembly")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does<BuildSettings>(settings =>
-    {
-        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "netcoreapp2.1");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETCORE 3.1 ENGINE CORE
+// TEST .NET CORE 3.1 ENGINE CORE
 //////////////////////////////////////////////////////////////////////
 
 Task("TestNetCore31EngineCore")
@@ -219,6 +206,32 @@ Task("TestNetCore31EngineCore")
     .Does<BuildSettings>(settings =>
     {
         RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "netcoreapp3.1");
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST .NET 6.0 ENGINE CORE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNet60EngineCore")
+    .Description("Tests the .NET 6.0 Engine core assembly")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does<BuildSettings>(settings =>
+    {
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "net6.0");
+    });
+
+//////////////////////////////////////////////////////////////////////
+// TEST .NET 8.0 ENGINE CORE
+//////////////////////////////////////////////////////////////////////
+
+Task("TestNet80EngineCore")
+    .Description("Tests the .NET 8.0 Engine core assembly")
+    .IsDependentOn("Build")
+    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
+    .Does<BuildSettings>(settings =>
+    {
+        RunDotnetNUnitLiteTests(ENGINE_CORE_TESTS_PROJECT, settings.Configuration, "net8.0");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -235,29 +248,16 @@ Task("TestNetFxEngine")
     });
 
 //////////////////////////////////////////////////////////////////////
-// TEST NETSTANDARD 2.0 ENGINE
+// TEST NETCORE ENGINE
 //////////////////////////////////////////////////////////////////////
 
-Task("TestNetStandard20Engine")
-    .Description("Tests the .NET Standard Engine")
+Task("TestNetCoreEngine")
+    .Description("Tests the .NET Core 8.0 Engine")
     .IsDependentOn("Build")
     .OnError(exception => { UnreportedErrors.Add(exception.Message); })
     .Does<BuildSettings>(settings =>
     {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "netcoreapp2.1");
-    });
-
-//////////////////////////////////////////////////////////////////////
-// TEST NETCORE 3.1 ENGINE
-//////////////////////////////////////////////////////////////////////
-
-Task("TestNetCore31Engine")
-    .Description("Tests the .NET Core 3.1 Engine")
-    .IsDependentOn("Build")
-    .OnError(exception => { UnreportedErrors.Add(exception.Message); })
-    .Does<BuildSettings>(settings =>
-    {
-        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "netcoreapp3.1");
+        RunDotnetNUnitLiteTests(ENGINE_TESTS_PROJECT, settings.Configuration, "net8.0");
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ Task("PackageExistingBuild")
     .IsDependentOn("PackageConsoleRunner")
     .IsDependentOn("PackageDotNetConsoleRunner")
     .IsDependentOn("PackageChocolateyConsoleRunner")
-    .IsDependentOn("PackageMsi")
+    //.IsDependentOn("PackageMsi")
     .IsDependentOn("PackageZip")
     .IsDependentOn("PackageEngine")
     .IsDependentOn("PackageEngineApi");
@@ -712,15 +712,15 @@ Task("TestConsole")
 
 Task("TestEngineCore")
     .Description("Builds and tests the engine core assembly")
-    .IsDependentOn("TestNet20EngineCore")
-    //.IsDependentOn("TestNetStandard20EngineCore")
-    .IsDependentOn("TestNetCore31EngineCore");
+    .IsDependentOn("TestNet462EngineCore")
+    .IsDependentOn("TestNetCore31EngineCore")
+    .IsDependentOn("TestNet60EngineCore")
+    .IsDependentOn("TestNet80EngineCore");
 
 Task("TestEngine")
     .Description("Builds and tests the engine assembly")
     .IsDependentOn("TestNetFxEngine")
-    //.IsDependentOn("TestNetStandard20Engine")
-    .IsDependentOn("TestNetCore31Engine");
+    .IsDependentOn("TestNetCoreEngine");
 
 Task("Test")
     .Description("Builds and tests the engine and console runner")
@@ -740,10 +740,11 @@ Task("BuildTestAndPackage")
     .IsDependentOn("Test")
     .IsDependentOn("PackageExistingBuild");
 
-Task("Appveyor")
-    .Description("Target we run in our AppVeyor CI")
-    .IsDependentOn("DotnetInfo")
-    .IsDependentOn("BuildTestAndPackage")
+Task("ContinuousIntegration")
+    .Description("Perform continuous integration run")
+    .IsDependentOn("Build")
+    .IsDependentOn("Test")
+    .IsDependentOn("Package")
     .IsDependentOn("PublishPackages")
     .IsDependentOn("CreateDraftRelease")
     .IsDependentOn("CreateProductionRelease");

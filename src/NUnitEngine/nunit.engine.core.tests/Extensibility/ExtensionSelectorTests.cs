@@ -3,8 +3,8 @@
 
 #if NETFRAMEWORK
 using System;
+using System.Runtime.Versioning;
 using NSubstitute;
-using NUnit.Engine.Compatibility;
 using NUnit.Engine.Extensibility;
 using NUnit.Framework;
 

@@ -1,12 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-
-#if NETFRAMEWORK
-using FrameworkName = NUnit.Engine.Compatibility.FrameworkName;
-#else
-using FrameworkName = System.Runtime.Versioning.FrameworkName;
-#endif
+using System.Runtime.Versioning;
 
 namespace NUnit.Engine.Extensibility
 {

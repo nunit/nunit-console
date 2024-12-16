@@ -1,0 +1,33 @@
+﻿name: Publish Draft Release on GitHub
+
+on:
+  workflow_dispatch:
+    inputs:
+      packageVersion:
+        description: "Package version for release (must match an existing milestone)"
+        required: true
+        type: string
+    
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⤵️ Checkout Source
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.100
+
+    - name: 🛠️ Install dotnet tools
+      run: dotnet tool restore
+
+    - name: 🔨 Create Draft Release
+      env:
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
+
+      run: dotnet cake --target=CreateDraftRelease --packageVersion="${{ inputs.packageVersion }}"
