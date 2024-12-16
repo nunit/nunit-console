@@ -11,7 +11,7 @@ using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
 
 using Backports = NUnit.Engine.Internal.Backports;
-#if NET20 || NETSTANDARD2_0
+#if NETFRAMEWORK || NETSTANDARD2_0
 using Path = NUnit.Engine.Internal.Backports.Path;
 #else
 using Path = System.IO.Path;

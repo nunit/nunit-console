@@ -41,18 +41,7 @@ namespace NUnit.Engine.Runners
             }
 
             string domainName = "domain-" + hashCode + package.Name;
-            // Setup the Evidence
             Evidence evidence = new Evidence(AppDomain.CurrentDomain.Evidence);
-            if (evidence.Count == 0)
-            {
-                Zone zone = new Zone(SecurityZone.MyComputer);
-                evidence.AddHost(zone);
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                Url url = new Url(assembly.CodeBase);
-                evidence.AddHost(url);
-                Hash hash = new Hash(assembly);
-                evidence.AddHost(hash);
-            }
 
             log.Info("Creating application domain " + domainName);
 

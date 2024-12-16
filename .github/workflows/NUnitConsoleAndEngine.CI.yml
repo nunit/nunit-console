@@ -1,0 +1,78 @@
+﻿name: NUnitConsoleAndEngine.CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches-ignore:
+      - "azure-*"
+    paths-ignore:
+      - "*.txt"
+      - "*.md"
+
+env:
+  DOTNET_NOLOGO: true # Disable the .NET logo
+  DOTNET_CLI_TELEMETRY_OPTOUT: true # Disable sending .NET CLI telemetry
+
+jobs:
+  ContinuousIntegration:
+    name: Continuous Integration
+    runs-on: windows-latest
+
+    env:
+        MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
+        NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
+        CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
+
+    steps:
+      - name: ⤵️ Checkout Source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🛠️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.100
+
+      - name: 🔧 Install dotnet tools
+        run: dotnet tool restore
+
+      - name: 🍰 Run cake
+        env:
+            MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
+            NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
+            CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
+
+        # If you need to get more verbose logging, add the following to the dotnet-cake above:  --verbosity=diagnostic
+        run: dotnet cake --target=ContinuousIntegration --configuration=Release
+
+      - name: 🪵 Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NUnitConsoleLogs
+          # This path is defined in build-settings.cake
+          path: "build-results/*.binlog"
+          # if-no-files-found: error
+
+      - name: 🪵 Upload InternalTrace logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: InternalTraceLogs
+          # This path is defined in build-settings.cake
+          path: "*.log"
+          # if-no-files-found: error
+
+      - name: 💾 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "Test Results"
+          path: test-results

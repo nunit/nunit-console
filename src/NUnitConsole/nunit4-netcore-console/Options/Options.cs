@@ -772,6 +772,7 @@ namespace NUnit.ConsoleRunner.Options
         }
 
 #if !PCL
+        [Obsolete]
         protected OptionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -785,6 +786,7 @@ namespace NUnit.ConsoleRunner.Options
         }
 
 #if !PCL
+        [Obsolete]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);

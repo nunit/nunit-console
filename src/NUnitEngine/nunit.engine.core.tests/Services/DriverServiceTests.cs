@@ -29,7 +29,7 @@ namespace NUnit.Engine.Services
 
         static IEnumerable<TestCaseData> DriverData()
         {
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1_OR_GREATER
             yield return new TestCaseData(TestData.MockAssemblyPath("netcoreapp3.1"), false, typeof(NUnitNetCore31Driver));
             yield return new TestCaseData(TestData.MockAssemblyPath("netcoreapp3.1"), true, typeof(NUnitNetCore31Driver));
             yield return new TestCaseData(TestData.NoTestAssemblyPath("netcoreapp3.1"), false, typeof(NUnitNetCore31Driver));
