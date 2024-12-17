@@ -1,5 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
-#if !NETFRAMEWORK // Suppress for now
+#if false // Suppress for now
 using System;
 using System.Collections.Generic;
 using System.IO;

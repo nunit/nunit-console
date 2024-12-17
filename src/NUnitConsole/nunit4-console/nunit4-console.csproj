@@ -5,6 +5,7 @@
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit4-console</AssemblyName>
     <TargetFrameworks>net462</TargetFrameworks>
+    <OutputPath>../../../bin/$(Configuration)</OutputPath>
     <RollForward>Major</RollForward>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>

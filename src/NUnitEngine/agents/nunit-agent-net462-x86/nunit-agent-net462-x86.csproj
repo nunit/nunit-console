@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
     <TargetFrameworks>net462</TargetFrameworks>
+    <OutputPath>..\..\..\..\bin\$(Configuration)\agents</OutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>

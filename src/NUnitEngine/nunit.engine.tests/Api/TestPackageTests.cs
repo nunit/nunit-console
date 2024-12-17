@@ -28,8 +28,8 @@ namespace NUnit.Engine.Api
         [Test]
         public void PackageIsAnonymous()
         {
-            Assert.Null(_package.Name);
-            Assert.Null(_package.FullName);
+            Assert.That(_package.Name, Is.Null);
+            Assert.That(_package.FullName, Is.Null);
         }
 
         [Test]

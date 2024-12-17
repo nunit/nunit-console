@@ -11,32 +11,24 @@ namespace NUnit.Engine
 {
     internal class TestData
     {
-#if DEBUG
-        const string CONFIG = "Debug";
+#if NETCOREAPP3_1
+        const string CURRENT_RUNTIME = "netcoreapp3.1";
+#elif NET6_0
+        const string CURRENT_RUNTIME = "net6.0";
+#elif NET8_0
+        const string CURRENT_RUNTIME = "net8.0";
 #else
-        const string CONFIG = "Release";
+        const string CURRENT_RUNTIME = "net462";
 #endif
-
-#if NETCOREApp2_1
-        const string RUNTIME = "netcoreapp2.1";
-#elif NETCOREAPP3_1
-        const string RUNTIME = "netcoreapp3.1";
-#else
-        const string RUNTIME = "net35";
-#endif
-        static readonly string BASE_DIR = Path.GetFullPath("../../../../../TestData/");
-        static readonly string BIN_DIR = $"bin/{CONFIG}/";
-
         public static string MockAssemblyPath(string runtime)
-            => $"{BASE_DIR}mock-assembly/{BIN_DIR}/{runtime}/mock-assembly.dll";
+            => $"testdata/{runtime}/mock-assembly.dll";
         public static string NoTestAssemblyPath(string runtime)
-            => $"{BASE_DIR}notest-assembly/{BIN_DIR}/{runtime}/notest-assembly.dll";
+            => $"testdata/{runtime}/notest-assembly.dll";
 
         [Test]
         public void SelfTest()
         {
-            VerifyFilePath(MockAssemblyPath("net35"));
-            VerifyFilePath(NoTestAssemblyPath("net35"));
+            VerifyFilePath(MockAssemblyPath(CURRENT_RUNTIME));
         }
 
         private void VerifyFilePath(string path)

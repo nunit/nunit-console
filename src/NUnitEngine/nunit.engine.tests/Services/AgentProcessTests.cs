@@ -33,24 +33,28 @@ namespace NUnit.Engine.Services
         const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
 #endif
 
-        [TestCase("net-4.8", false, "nunit-agent-net462/nunit-agent-net462.exe")]
-        [TestCase("net-4.8", true, "nunit-agent-net462/nunit-agent-net462-x86.exe")]
-        [TestCase("net-4.6.2", false, "nunit-agent-net462/nunit-agent-net462.exe")]
-        [TestCase("net-4.6.2", true, "nunit-agent-net462/nunit-agent-net462-x86.exe")]
-        [TestCase("net-4.0", false, "nunit-agent-net462/nunit-agent-net462.exe")]
-        [TestCase("net-4.0", true, "nunit-agent-net462/nunit-agent-net462-x86.exe")]
-        [TestCase("net-3.5", false, "nunit-agent-net20/nunit-agent-net20.exe")]
-        [TestCase("net-3.5", true, "nunit-agent-net20/nunit-agent-net20-x86.exe")]
-        [TestCase("net-2.0", false, "nunit-agent-net20/nunit-agent-net20.exe")]
-        [TestCase("net-2.0", true, "nunit-agent-net20/nunit-agent-net20-x86.exe")]
-        [TestCase("netcore-2.1", false, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
-        [TestCase("netcore-2.1", true, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
-        [TestCase("netcore-3.1", false, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
-        [TestCase("netcore-3.1", true, "nunit-agent-netcore31/nunit-agent-netcore31.dll")]
-        [TestCase("netcore-5.0", false, "nunit-agent-net50/nunit-agent-net50.dll")]
-        [TestCase("netcore-5.0", true, "nunit-agent-net50/nunit-agent-net50.dll")]
-        [TestCase("netcore-6.0", false, "nunit-agent-net60/nunit-agent-net60.dll")]
-        [TestCase("netcore-6.0", true, "nunit-agent-net60/nunit-agent-net60.dll")]
+        [TestCase("net-4.8", false, "net462/nunit-agent-net462.exe")]
+        [TestCase("net-4.8", true, "net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-4.6.2", false, "net462/nunit-agent-net462.exe")]
+        [TestCase("net-4.6.2", true, "net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-4.0", false, "net462/nunit-agent-net462.exe")]
+        [TestCase("net-4.0", true, "net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-3.5", false, "net462/nunit-agent-net462.exe")]
+        [TestCase("net-3.5", true, "net462/nunit-agent-net462-x86.exe")]
+        [TestCase("net-2.0", false, "net462/nunit-agent-net462.exe")]
+        [TestCase("net-2.0", true, "net462/nunit-agent-net462-x86.exe")]
+        [TestCase("netcore-2.1", false, "netcoreapp3.1/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-2.1", true, "netcoreapp3.1/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-3.1", false, "netcoreapp3.1/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-3.1", true, "netcoreapp3.1/nunit-agent-netcore31.dll")]
+        [TestCase("netcore-5.0", false, "net6.0/nunit-agent-net60.dll")]
+        [TestCase("netcore-5.0", true, "net6.0/nunit-agent-net60.dll")]
+        [TestCase("netcore-6.0", false, "net6.0/nunit-agent-net60.dll")]
+        [TestCase("netcore-6.0", true, "net6.0/nunit-agent-net60.dll")]
+        [TestCase("netcore-7.0", false, "net7.0/nunit-agent-net70.dll")]
+        [TestCase("netcore-7.0", true, "net7.0/nunit-agent-net70.dll")]
+        [TestCase("netcore-8.0", false, "net8.0/nunit-agent-net80.dll")]
+        [TestCase("netcore-8.0", true, "net8.0/nunit-agent-net80.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)
         {
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = runtime;
@@ -78,12 +82,12 @@ namespace NUnit.Engine.Services
 
             Assert.That(process.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS));
 
-            Assert.True(process.EnableRaisingEvents, "EnableRaisingEvents");
+            Assert.That(process.EnableRaisingEvents, Is.True, "EnableRaisingEvents");
 
             var startInfo = process.StartInfo;
-            Assert.False(startInfo.UseShellExecute, "UseShellExecute");
-            Assert.True(startInfo.CreateNoWindow, "CreateNoWindow");
-            Assert.False(startInfo.LoadUserProfile, "LoadUserProfile");
+            Assert.That(startInfo.UseShellExecute, Is.False, "UseShellExecute");
+            Assert.That(startInfo.CreateNoWindow, Is.True, "CreateNoWindow");
+            Assert.That(startInfo.LoadUserProfile, Is.False, "LoadUserProfile");
 
             var targetRuntime = RuntimeFramework.Parse(framework);
             if (targetRuntime.Runtime == Runtime.Mono)

@@ -123,8 +123,8 @@ namespace NUnit.Engine.Services
             switch (targetRuntime.Runtime.FrameworkIdentifier)
             {
                 case FrameworkIdentifiers.NetFramework:
-                    runtimeIdentifier = major >= 4 ? "net462" : "net20";
-                    agentName = agentSubDir = "nunit-agent-" + runtimeIdentifier;
+                    runtimeIdentifier = agentSubDir = "net462";
+                    agentName = "nunit-agent-net462";
                     if (requires32Bit)
                         agentName += "-x86";
                     agentExtension = ".exe";
@@ -132,21 +132,23 @@ namespace NUnit.Engine.Services
                 case FrameworkIdentifiers.NetCoreApp:
                     switch (major)
                     {
+                        case 9:
+                        case 8:
+                            runtimeIdentifier = agentSubDir = "net8.0";
+                            agentName = "nunit-agent-net80";
+                            break;
                         case 7:
-                            runtimeIdentifier = "net7.0";
-                            agentName = agentSubDir = "nunit-agent-net70";
+                            runtimeIdentifier = agentSubDir = "net7.0";
+                            agentName = "nunit-agent-net70";
                             break;
                         case 6:
-                            runtimeIdentifier = "net6.0";
-                            agentName = agentSubDir = "nunit-agent-net60";
-                            break;
                         case 5:
-                            runtimeIdentifier = "net5.0";
-                            agentName = agentSubDir = "nunit-agent-net50";
+                            runtimeIdentifier = agentSubDir = "net6.0";
+                            agentName = "nunit-agent-net60";
                             break;
                         default:
-                            runtimeIdentifier = "netcoreapp3.1";
-                            agentName = agentSubDir = "nunit-agent-netcore31";
+                            runtimeIdentifier = agentSubDir = "netcoreapp3.1";
+                            agentName = "nunit-agent-netcore31";
                             break;
                     }
                     agentExtension = ".dll";

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <OutputPath>../../../bin/$(Configuration)</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>portable</DebugType>
