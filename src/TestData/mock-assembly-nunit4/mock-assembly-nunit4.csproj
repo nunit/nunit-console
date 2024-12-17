@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.TestData</RootNamespace>
-    <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0;net8.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <RestoreAdditionalProjectSource>https://www.myget.org/F/nunit/api/v3/index.json</RestoreAdditionalProjectSource>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="4.0.0-dev-07273" />
+    <PackageReference Include="NUnit" Version="4.2.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\mock-assembly\*.cs" />
