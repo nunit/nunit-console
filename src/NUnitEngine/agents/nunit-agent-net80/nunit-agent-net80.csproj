@@ -3,11 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <OutputPath>..\..\..\..\bin\$(Configuration)\agents</OutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
+    <NoWarn>1505</NoWarn>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -39,8 +41,8 @@
 
   <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net462/"))</ConsoleDestination>
-      <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net462/"))</EngineDestination>
+      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net80/"))</ConsoleDestination>
+      <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net80/"))</EngineDestination>
     </PropertyGroup>
 
     <ItemGroup>

@@ -109,7 +109,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, "*");
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories("*", SIO.SearchOption.TopDirectoryOnly);
             this.GetFakeDirectory("tools", "frobuscator").DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
@@ -126,7 +126,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, "*");
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             this.GetFakeDirectory("tools", "frobuscator").DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
@@ -144,7 +144,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, "**");
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories("*", SIO.SearchOption.AllDirectories);
             this.GetFakeDirectory("tools", "frobuscator").DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
@@ -171,7 +171,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, "**");
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories("*", SIO.SearchOption.AllDirectories);
             this.GetFakeDirectory("tools", "frobuscator").DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
@@ -207,7 +207,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, pattern);
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories(pattern, SIO.SearchOption.TopDirectoryOnly);
         }
@@ -225,7 +225,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, pattern);
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories(pattern, SIO.SearchOption.TopDirectoryOnly);
         }
@@ -285,7 +285,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, pattern);
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [TestCase("*/tests/v*")]
@@ -307,7 +307,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, pattern);
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             testsDir.Received().GetDirectories("v*", SIO.SearchOption.TopDirectoryOnly);
         }
@@ -331,7 +331,7 @@ namespace NUnit.Engine.Internal
             var result = finder.GetDirectories(baseDir, pattern);
             var actual = result.Select(x => x.FullName);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             testsDir.Received().GetDirectories("v?", SIO.SearchOption.TopDirectoryOnly);
         }
@@ -346,7 +346,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetDirectories(baseDir, pattern);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories("*", SIO.SearchOption.AllDirectories);
             foreach (var dir in this.fakedDirectories.Values.Where(x => x != baseDir))
@@ -375,7 +375,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetDirectories(baseDir, "**/tests/**");
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories("*", SIO.SearchOption.AllDirectories);
             this.GetFakeDirectory("tools", "frobuscator").Received().GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly);
@@ -396,7 +396,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetDirectories(baseDir, "meta*/**/v1");
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Received().GetDirectories("meta*", SIO.SearchOption.TopDirectoryOnly);
             this.GetFakeDirectory("tools", "frobuscator").DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
@@ -413,7 +413,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetDirectories(baseDir, "../");
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
         }
@@ -429,7 +429,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetDirectories(baseDir, "../../metamorphosator/addins");
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());
             baseDir.Parent.Parent.Received().GetDirectories("metamorphosator", SIO.SearchOption.TopDirectoryOnly);
@@ -476,7 +476,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetFiles(baseDir, pattern);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Received().GetFiles(pattern);
             baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
         }
@@ -497,7 +497,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetFiles(baseDir, pattern);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             abcDir.Received().GetFiles(filePattern);
             defDir.Received().GetFiles(filePattern);
             baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
@@ -534,7 +534,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetFiles(baseDir, pattern);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             foreach (var dir in this.fakedDirectories.Values.Where(x => x.FullName != GetRoot()))
             {
                 dir.Received().GetFiles(filePattern);
@@ -561,7 +561,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetFiles(baseDir, pattern);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             targetDir.Received().GetFiles(filename);
             foreach (var dir in this.fakedDirectories.Values.Where(x => x != targetDir))
             {
@@ -583,7 +583,7 @@ namespace NUnit.Engine.Internal
 
             var actual = finder.GetFiles(baseDir, pattern);
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
             baseDir.Received().GetFiles("*");
             baseDir.Parent.DidNotReceive().GetFiles(Arg.Any<string>());
             baseDir.Parent.DidNotReceive().GetDirectories(Arg.Any<string>(), Arg.Any<SIO.SearchOption>());

@@ -18,8 +18,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var directory = new Directory(path);
 
-            Assert.AreEqual(path, directory.FullName);
-            Assert.AreEqual(parent, directory.Parent.FullName);
+            Assert.That(path, Is.EqualTo(directory.FullName));
+            Assert.That(parent, Is.EqualTo(directory.Parent.FullName));
         }
 
         [Test]
@@ -53,8 +53,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var directory = new Directory(path);
 
-            Assert.AreEqual(path, directory.FullName);
-            Assert.AreEqual(parent, directory.Parent.FullName);
+            Assert.That(path, Is.EqualTo(directory.FullName));
+            Assert.That(parent, Is.EqualTo(directory.Parent.FullName));
         }
 
         // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends '\\server\share' to the current working-directory, making this test useless.
@@ -64,8 +64,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var path = "\\\\server\\share";
             var directory = new Directory(path);
 
-            Assert.AreEqual(path, directory.FullName);
-            Assert.IsNull(directory.Parent);
+            Assert.That(path, Is.EqualTo(directory.FullName));
+            Assert.That(directory.Parent, Is.Null);
         }
 
         // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends 'x:\' to the current working-directory, making this test useless.
@@ -75,8 +75,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var path = "x:\\";
             var directory = new Directory(path);
 
-            Assert.AreEqual(path, directory.FullName);
-            Assert.IsNull(directory.Parent);
+            Assert.That(path, Is.EqualTo(directory.FullName));
+            Assert.That(directory.Parent, Is.Null);
         }
 
         [Test]
@@ -87,8 +87,8 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             var directory = new Directory(path);
 
-            Assert.AreEqual(expected, directory.FullName);
-            Assert.IsNull(directory.Parent);
+            Assert.That(expected, Is.EqualTo(directory.FullName));
+            Assert.That(directory.Parent, Is.Null);
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var actualFiles = directory.GetFiles("*");
 
             var actual = actualFiles.Select(x => x.FullName);
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var actualFiles = directory.GetFiles("*.dll");
 
             var actual = actualFiles.Select(x => x.FullName);
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]

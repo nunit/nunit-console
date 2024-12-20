@@ -24,73 +24,86 @@
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
   </metadata>
   <files>
-    <file src="../../../../../../LICENSE.txt" />
-    <file src="../../../../../../NOTICES.txt" />
+    <file src="../../LICENSE.txt" />
+    <file src="../../NOTICES.txt" />
 
-    <file src="agents/nunit-agent-net462/nunit-agent-net462.exe" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit-agent-net462.pdb" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit-agent-net462.exe.config" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit-agent-net462-x86.exe" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit-agent-net462-x86.pdb" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit-agent-net462-x86.exe.config" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit.engine.api.dll" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit.engine.api.pdb" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit.engine.api.xml" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit.engine.core.dll" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net462" />
-    <file src="agents/nunit-agent-net462/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net462" />
+    <file src="agents/net462/nunit-agent-net462.exe" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462.exe.config" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.exe" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit-agent-net462-x86.exe.config" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.dll" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.core.dll" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.engine.core.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/testcentric.engine.metadata.dll" target="tools/agents/net462" />
 
-    <file src="agents/nunit-agent-netcore31/nunit-agent-netcore31.dll" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit-agent-netcore31.pdb" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit-agent-netcore31.dll.config" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit-agent-netcore31.deps.json" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit-agent-netcore31.runtimeconfig.json" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit.engine.api.dll" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit.engine.api.pdb" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit.engine.api.xml" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit.engine.core.dll" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/nunit.engine.core.pdb" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-netcore31" />
-    <file src="agents/nunit-agent-netcore31/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-netcore31" />
+    <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit-agent-netcore31.pdb" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll.config" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit-agent-netcore31.deps.json" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit-agent-netcore31.runtimeconfig.json" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.engine.api.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.engine.api.pdb" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.engine.api.xml" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.engine.core.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.engine.core.pdb" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/testcentric.engine.metadata.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/netcoreapp3.1" />
 
-    <file src="agents/nunit-agent-net60/nunit-agent-net60.dll" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit-agent-net60.pdb" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit-agent-net60.dll.config" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit-agent-net60.deps.json" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit-agent-net60.runtimeconfig.json" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit.engine.api.dll" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit.engine.api.pdb" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit.engine.api.xml" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit.engine.core.dll" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net60" />
-    <file src="agents/nunit-agent-net60/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-net60" />
+    <file src="agents/net6.0/nunit-agent-net60.dll" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit-agent-net60.pdb" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit-agent-net60.dll.config" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit-agent-net60.deps.json" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit-agent-net60.runtimeconfig.json" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.engine.api.dll" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.engine.api.pdb" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.engine.api.xml" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.engine.core.dll" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.engine.core.pdb" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net6.0" />
 
-    <file src="agents/nunit-agent-net70/nunit-agent-net70.dll" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit-agent-net70.pdb" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit-agent-net70.dll.config" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit-agent-net70.deps.json" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit-agent-net70.runtimeconfig.json" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit.engine.api.dll" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit.engine.api.pdb" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit.engine.api.xml" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit.engine.core.dll" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/nunit.engine.core.pdb" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/testcentric.engine.metadata.dll" target="tools/agents/nunit-agent-net70" />
-    <file src="agents/nunit-agent-net70/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/nunit-agent-net70" />
+    <file src="agents/net7.0/nunit-agent-net70.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent-net70.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent-net70.dll.config" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent-net70.deps.json" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit-agent-net70.runtimeconfig.json" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.api.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.api.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.api.xml" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.core.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.engine.core.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/testcentric.engine.metadata.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
 
-    <file src="nunit4-console.exe" target="tools" />
-    <file src="nunit4-console.pdb" target="tools" />
-    <file src="nunit4-console.exe.config" target="tools" />
-    <file src="nunit.engine.api.dll" target="tools" />
-    <file src="nunit.engine.api.pdb" target="tools" />
-    <file src="nunit.engine.api.xml" target="tools" />
-    <file src="nunit.engine.core.dll" target="tools" />
-    <file src="nunit.engine.core.pdb" target="tools" />
-    <file src="nunit.engine.dll" target="tools" />
-    <file src="nunit.engine.pdb" target="tools" />
-    <file src="testcentric.engine.metadata.dll" target="tools" />
-    <file src="../../../../../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
-    <file src="../../../../../../nunit_256.png" target="images"/>
+    <file src="agents/net8.0/nunit-agent-net80.dll" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit-agent-net80.pdb" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit-agent-net80.dll.config" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit-agent-net80.deps.json" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit-agent-net80.runtimeconfig.json" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.engine.api.dll" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.engine.api.pdb" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.engine.api.xml" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.engine.core.dll" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.engine.core.pdb" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/testcentric.engine.metadata.dll" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
+
+    <file src="net462/nunit4-console.exe" target="tools" />
+    <file src="net462/nunit4-console.pdb" target="tools" />
+    <file src="net462/nunit4-console.exe.config" target="tools" />
+    <file src="net462/nunit.engine.api.dll" target="tools" />
+    <file src="net462/nunit.engine.api.pdb" target="tools" />
+    <file src="net462/nunit.engine.api.xml" target="tools" />
+    <file src="net462/nunit.engine.core.dll" target="tools" />
+    <file src="net462/nunit.engine.core.pdb" target="tools" />
+    <file src="net462/nunit.engine.dll" target="tools" />
+    <file src="net462/nunit.engine.pdb" target="tools" />
+    <file src="net462/testcentric.engine.metadata.dll" target="tools" />
+    <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
+    <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>

@@ -51,16 +51,13 @@ namespace NUnit.Engine.Services
 #endif
 
         [TestCase("net35", false)]
-        [TestCase("net35", true)]
         [TestCase("net462", false)]
         [TestCase("net462", true)]
         public void SelectRuntimeFramework(string runtime, bool runAsX86)
         {
-            var assemblyPath = runAsX86
-                ? TestData.MockAssemblyX86Path(runtime)
-                : TestData.MockAssemblyPath(runtime);
+            var assemblyPath = Path.GetFullPath($"testdata/{runtime}/{(runAsX86 ? "mock-assembly-x86.dll" : "mock-assembly.dll")}");
 
-            FileAssert.Exists(assemblyPath);
+            Assert.That(File.Exists(assemblyPath), $"File does not exist: {assemblyPath}");
             var package = new TestPackage(assemblyPath);
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
@@ -91,7 +88,7 @@ namespace NUnit.Engine.Services
         {
             var current = _runtimeService.CurrentFramework;
             Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
-            Assert.That(_runtimeService.IsAvailable(current.Id, false), "{0} not available", current);
+            Assert.That(_runtimeService.IsAvailable(current.Id, false), "{current} not available");
         }
 
         [Test]

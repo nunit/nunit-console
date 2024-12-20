@@ -21,7 +21,9 @@ namespace NUnit.Agent
     {
         static readonly string CURRENT_RUNTIME = RuntimeInformation.FrameworkDescription;
         const string AGENT_RUNTIME =
-#if NET7_0
+#if NET8_0
+                ".NET 8.0";
+#elif NET7_0
                 ".NET 7.0";
 #elif NET6_0
                 ".NET 6.0";

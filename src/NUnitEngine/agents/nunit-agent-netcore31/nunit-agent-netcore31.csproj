@@ -4,10 +4,12 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <OutputPath>..\..\..\..\bin\$(Configuration)\agents</OutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
-    <NoWarn>1505</NoWarn>
+    <!-- TODO: Get rid of obsolete stuff -->
+    <NoWarn>$(NoWarn);SYSLIB0011;SYSLIB0012;1505</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

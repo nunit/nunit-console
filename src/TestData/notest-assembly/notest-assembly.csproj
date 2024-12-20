@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.TestData</RootNamespace>
-    <TargetFrameworks>net35;net462;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <OutputPath>../../../bin/$(Configuration)/testdata</OutputPath>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
@@ -13,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit" Version="4.2.2" />
   </ItemGroup>
 
 </Project>
