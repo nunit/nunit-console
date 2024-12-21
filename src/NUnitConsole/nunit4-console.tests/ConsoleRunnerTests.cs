@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using NSubstitute;
+using NUnit.ConsoleRunner;
 using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
@@ -14,27 +16,46 @@ namespace NUnit.ConsoleRunner
 {
     class ConsoleRunnerTests
     {
+        private ITestEngine _testEngine;
+        private IResultService _resultService;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _testEngine = Substitute.For<ITestEngine>();
+            _resultService = new FakeResultService();
+
+            _testEngine.Services.GetService<IResultService>().Returns(_resultService);
+        }
+
         [Test]
         public void ThrowsNUnitEngineExceptionWhenTestResultsAreNotWriteable()
         {
-            using (var testEngine = new TestEngine())
-            {
-                testEngine.Services.Add(new FakeResultService());
-                testEngine.Services.Add(new TestFilterService());
-                testEngine.Services.Add(Substitute.For<IService, IExtensionService>());
+            ((FakeResultService)_resultService).ThrowsUnauthorizedAccessException = true;
 
-                var consoleRunner = new ConsoleRunner(testEngine, ConsoleMocks.Options("mock-assembly.dll"), new ColorConsoleWriter());
+            var consoleRunner = new ConsoleRunner(_testEngine, ConsoleMocks.Options("mock-assembly.dll"), new ColorConsoleWriter());
 
-                var ex = Assert.Throws<NUnitEngineException>(() => { consoleRunner.Execute(); });
-                Assert.That(ex, Has.Message.EqualTo("The path specified in --result TestResult.xml could not be written to"));
-            }
+            var ex = Assert.Throws<NUnitEngineException>(() => { consoleRunner.Execute(); });
+            Assert.That(ex, Has.Message.EqualTo("The path specified in --result TestResult.xml could not be written to"));
+        }
+
+        [Test]
+        public void ThrowsNUnitExceptionWhenTeamcityOptionIsSpecifiedButNotAvailable()
+        {
+            var ex = Assert.Throws<NUnitEngineException>(
+                () => new ConsoleRunner(_testEngine, ConsoleMocks.Options("mock-assembly.dll", "--teamcity"), new ColorConsoleWriter()));
+
+            Assert.That(ex, Has.Message.Contains("teamcity"));
         }
     }
 
     internal class FakeResultService : Service, IResultService
     {
+        public bool ThrowsUnauthorizedAccessException;
+
         public string[] Formats
         {
+
             get
             {
                 return new[] { "nunit3" };
@@ -43,15 +64,23 @@ namespace NUnit.ConsoleRunner
 
         public IResultWriter GetResultWriter(string format, object[] args)
         {
-            return new FakeResultWriter();
+            return new FakeResultWriter(this);
         }
     }
 
     internal class FakeResultWriter : IResultWriter
     {
+        private FakeResultService _service;
+
+        public FakeResultWriter(FakeResultService service)
+        { 
+            _service = service;
+        }
+
         public void CheckWritability(string outputPath)
         {
-            throw new UnauthorizedAccessException();
+            if (_service.ThrowsUnauthorizedAccessException)
+                throw new UnauthorizedAccessException();
         }
 
         public void WriteResultFile(XmlNode resultNode, string outputPath)
