@@ -7,10 +7,10 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services.RuntimeLocators;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Services
 {

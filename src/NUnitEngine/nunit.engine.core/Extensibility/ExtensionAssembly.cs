@@ -3,52 +3,74 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TestCentric.Metadata;
+using NUnit.Engine.Internal;
 using System.Runtime.Versioning;
-using Mono.Cecil;
 
 namespace NUnit.Engine.Extensibility
 {
     internal class ExtensionAssembly : IExtensionAssembly, IDisposable
     {
-        private AssemblyDefinition _assemblyDefinition;
-
         public ExtensionAssembly(string filePath, bool fromWildCard)
         {
             FilePath = filePath;
             FromWildCard = fromWildCard;
+            Assembly = GetAssemblyDefinition();
+            AssemblyName = Assembly.Name.Name;
+            AssemblyVersion = Assembly.Name.Version;
+        }
 
+        // Internal constructor used for certain tests. AssemblyDefinition is not initialized.
+        internal ExtensionAssembly(string filePath, bool fromWildCard, string assemblyName, Version version)
+        {
+            FilePath = filePath;
+            FromWildCard = fromWildCard;
+            AssemblyName = assemblyName;
+            AssemblyVersion = version;
+        }
+
+        public string FilePath { get; }
+        public bool FromWildCard { get; }
+        public AssemblyDefinition Assembly { get; }
+
+        public string AssemblyName { get; }
+
+        public Version AssemblyVersion { get; }
+
+//#if NETFRAMEWORK
+//        public RuntimeFramework TargetFramework
+//        {
+//            get { return new RuntimeFramework(RuntimeType.Any, Assembly.GetRuntimeVersion()); }
+//        }
+//#endif
+
+        public FrameworkName FrameworkName
+        {
+            get
+            {
+                var framework = Assembly.GetFrameworkName();
+                if (framework != null)
+                    return new FrameworkName(framework);
+
+                // No TargetFrameworkAttribute - Assume .NET Framework
+                var runtimeVersion = Assembly.GetRuntimeVersion();
+                return new FrameworkName(".NETFramework", new Version(runtimeVersion.Major, runtimeVersion.Minor));
+            }
+        }
+
+        private AssemblyDefinition GetAssemblyDefinition()
+        {
             var resolver = new DefaultAssemblyResolver();
             resolver.AddSearchDirectory(Path.GetDirectoryName(FilePath));
             resolver.AddSearchDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
             var parameters = new ReaderParameters { AssemblyResolver = resolver };
 
-            _assemblyDefinition = AssemblyDefinition.ReadAssembly(FilePath, parameters);
+            return AssemblyDefinition.ReadAssembly(FilePath, parameters);
         }
 
-        public string FilePath { get; }
-        public bool FromWildCard { get; }
-        public string AssemblyName => _assemblyDefinition.Name.Name;
-        public Version AssemblyVersion => _assemblyDefinition.Name.Version;
-        public IEnumerable<TypeDefinition> GetTypes() => _assemblyDefinition.MainModule.GetTypes();
-
-        public FrameworkName TargetRuntime
+        public void Dispose()
         {
-            get
-            {
-                string frameworkName = _assemblyDefinition.GetFrameworkName();
-
-                if (frameworkName != null)
-                    return new FrameworkName(frameworkName);
-
-                // We rely on TargetRuntime being available for all assemblies later than .NET 2.0
-                var runtimeVersion = _assemblyDefinition.GetRuntimeVersion();
-                var frameworkVersion = new Version(runtimeVersion.Major, runtimeVersion.Minor);
-                return new FrameworkName(FrameworkIdentifiers.NetFramework, frameworkVersion);
-            }
+            Assembly?.Dispose();
         }
-
-        
-
-        public void Dispose() => _assemblyDefinition?.Dispose();
     }
 }

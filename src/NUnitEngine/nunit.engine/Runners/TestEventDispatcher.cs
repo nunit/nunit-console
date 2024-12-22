@@ -21,8 +21,12 @@ namespace NUnit.Engine.Runners
 
         public void OnTestEvent(string report)
         {
+            const string badchar = "\xffff";
+
             lock (_eventLock)
             {
+                report = report.Replace(badchar, "?");
+
                 foreach (var listener in Listeners)
                     listener.OnTestEvent(report);
             }

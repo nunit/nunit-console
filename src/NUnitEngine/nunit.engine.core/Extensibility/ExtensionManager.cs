@@ -2,68 +2,63 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
-using Mono.Cecil;
-using NUnit.Engine.Extensibility;
+using TestCentric.Metadata;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
-
-using Backports = NUnit.Engine.Internal.Backports;
-#if NETFRAMEWORK || NETSTANDARD2_0
-using Path = NUnit.Engine.Internal.Backports.Path;
-#else
-using Path = System.IO.Path;
-#endif
+using System.Linq;
+using NUnit.Engine.Internal.Backports;
 
 namespace NUnit.Engine.Extensibility
 {
-    public sealed class ExtensionManager : IDisposable
+    public class ExtensionManager
     {
+        static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
-        static readonly Version ENGINE_VERSION = typeof(ExtensionManager).Assembly.GetName().Version;
 
         private readonly IFileSystem _fileSystem;
-        private readonly IAddinsFileReader _addinsReader;
+        //private readonly IAddinsFileReader _addinsReader;
         private readonly IDirectoryFinder _directoryFinder;
 
+        // List of all ExtensionPoints discovered
         private readonly List<ExtensionPoint> _extensionPoints = new List<ExtensionPoint>();
-        private readonly Dictionary<string, ExtensionPoint> _pathIndex = new Dictionary<string, ExtensionPoint>();
 
-        private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
-        private readonly List<ExtensionAssembly> _assemblies = new List<ExtensionAssembly>();
+        // Index to ExtensionPoints based on the Path
+        private readonly Dictionary<string, ExtensionPoint> _extensionPointIndex = new Dictionary<string, ExtensionPoint>();
+
+        // List of ExtensionNodes for all extensions discovered.
+        private List<ExtensionNode> _extensions = new List<ExtensionNode>();
+
+        private bool _extensionsAreLoaded;
+
+        // AssemblyTracker is a List of candidate ExtensionAssemblies, with built-in indexing
+        // by file path and assembly name, eliminating the need to update indices separately.
+        private readonly ExtensionAssemblyTracker _assemblies = new ExtensionAssemblyTracker();
+
+        // List of all extensionDirectories specified on command-line or in environment,
+        // used to ignore duplicate calls to FindExtensionAssemblies.
+        private readonly List<string> _extensionDirectories = new List<string>();
 
         public ExtensionManager()
-            : this(new AddinsFileReader(), new FileSystem())
+            : this(new FileSystem())
         {
         }
 
-        // TODO: Temporarily public
-        public ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem)
-            : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
+        public ExtensionManager(IFileSystem fileSystem)
+            : this(fileSystem, new DirectoryFinder(fileSystem))
         {
         }
 
-        // TODO: Temporarily public
-        public ExtensionManager(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        public ExtensionManager(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _addinsReader = addinsReader;
             _fileSystem = fileSystem;
             _directoryFinder = directoryFinder;
         }
 
-        // TODO: Temporarily public
-        public void FindExtensions(string startDir)
-        {
-            // Create the list of possible extension assemblies,
-            // eliminating duplicates, start in the provided directory.
-            FindExtensionAssemblies(_fileSystem.GetDirectory(startDir));
-
-            // Check each assembly to see if it contains extensions
-            foreach (var candidate in _assemblies)
-                FindExtensionsInAssembly(candidate);
-        }
+        #region IExtensionManager Implementation
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -78,7 +73,178 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         public IEnumerable<IExtensionNode> Extensions
         {
-            get { return _extensions.ToArray(); }
+            get
+            {
+                EnsureExtensionsAreLoaded();
+
+                return _extensions.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Find the extension points in a loaded assembly.
+        /// </summary>
+        public virtual void FindExtensionPoints(params Assembly[] targetAssemblies)
+        {
+            foreach (var assembly in targetAssemblies)
+            {
+                log.Info("FindExtensionPoints scanning {0} assembly", assembly.GetName().Name);
+
+                foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
+                {
+                    if (_extensionPointIndex.ContainsKey(attr.Path))
+                    {
+                        string msg = string.Format(
+                            "The Path {0} is already in use for another extension point.",
+                            attr.Path);
+                        throw new NUnitEngineException(msg);
+                    }
+
+                    var ep = new ExtensionPoint(attr.Path, attr.Type)
+                    {
+                        Description = attr.Description,
+                    };
+
+                    _extensionPoints.Add(ep);
+                    _extensionPointIndex.Add(ep.Path, ep);
+
+                    log.Info("  Found ExtensionPoint: Path={0}, Type={1}", ep.Path, ep.TypeName);
+                }
+
+                foreach (Type type in assembly.GetExportedTypes())
+                {
+                    foreach (TypeExtensionPointAttribute attr in type.GetCustomAttributes(typeof(TypeExtensionPointAttribute), false))
+                    {
+                        string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
+
+                        if (_extensionPointIndex.ContainsKey(path))
+                        {
+                            string msg = string.Format(
+                                "The Path {0} is already in use for another extension point.",
+                                attr.Path);
+                            throw new NUnitEngineException(msg);
+                        }
+
+                        var ep = new ExtensionPoint(path, type)
+                        {
+                            Description = attr.Description,
+                        };
+
+                        _extensionPoints.Add(ep);
+                        _extensionPointIndex.Add(path, ep);
+
+                        log.Info("  Found ExtensionPoint: Path={0}, Type={1}", ep.Path, ep.TypeName);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Find extension assemblies starting from a given base directory,
+        /// and using the contained '.addins' files to direct the search.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        public void FindExtensionAssemblies(string startDir)
+        {
+            // Ignore a call for a directory we have already used
+            if (!_extensionDirectories.Contains(startDir))
+            {
+                _extensionDirectories.Add(startDir);
+
+                log.Info($"FindExtensionAssemblies examining extension directory {startDir}");
+
+                // Create the list of possible extension assemblies,
+                // eliminating duplicates, start in the provided directory.
+                // In this top level directory, we only look at .addins files.
+                ProcessAddinsFiles(_fileSystem.GetDirectory(startDir), false);
+            }
+        }
+
+        /// <summary>
+        /// Find ExtensionAssemblies for a host assembly using
+        /// a built-in algorithm that searches in certain known locations.
+        /// </summary>
+        /// <param name="hostAssembly">An assembly that supports NUnit extensions.</param>
+        public void FindExtensionAssemblies(Assembly hostAssembly)
+        {
+            log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
+
+            bool isChocolateyPackage = System.IO.File.Exists(System.IO.Path.Combine(hostAssembly.Location, "VERIFICATION.txt"));
+            string[] extensionPatterns = isChocolateyPackage
+                ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
+                : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
+
+
+            IDirectory startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
+
+            while (startDir != null)
+            {
+                foreach (var pattern in extensionPatterns)
+                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
+                        ProcessDirectory(dir, true);
+
+                startDir = startDir.Parent;
+            }
+        }
+
+        /// <summary>
+        /// Get an ExtensionPoint based on its unique identifying path.
+        /// </summary>
+        public IExtensionPoint GetExtensionPoint(string path)
+        {
+            return _extensionPointIndex.TryGetValue(path, out ExtensionPoint ep) ? ep : null;
+        }
+
+        /// <summary>
+        /// Get extension objects for all nodes of a given type
+        /// </summary>
+        public IEnumerable<T> GetExtensions<T>()
+        {
+            foreach (var node in GetExtensionNodes<T>())
+                yield return (T)node.ExtensionObject;
+        }
+
+        /// <summary>
+        /// Get all ExtensionNodes for a path
+        /// </summary>
+        public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
+        {
+            EnsureExtensionsAreLoaded();
+
+            var ep = GetExtensionPoint(path);
+            if (ep != null)
+                foreach (var node in ep.Extensions)
+                    yield return node;
+        }
+
+        /// <summary>
+        /// Get the first or only ExtensionNode for a given ExtensionPoint
+        /// </summary>
+        /// <param name="path">The identifying path for an ExtensionPoint</param>
+        /// <returns></returns>
+        public IExtensionNode GetExtensionNode(string path)
+        {
+            EnsureExtensionsAreLoaded();
+
+            // TODO: Remove need for the cast
+            var ep = GetExtensionPoint(path) as ExtensionPoint;
+
+            return ep != null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
+        }
+
+        /// <summary>
+        /// Get all extension nodes of a given Type.
+        /// </summary>
+        /// <param name="includeDisabled">If true, disabled nodes are included</param>
+        public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
+        {
+            EnsureExtensionsAreLoaded();
+
+            var ep = GetExtensionPoint(typeof(T));
+            if (ep != null)
+                foreach (var node in ep.Extensions)
+                    if (includeDisabled || node.Enabled)
+                        yield return node;
         }
 
         /// <summary>
@@ -86,18 +252,14 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         public void EnableExtension(string typeName, bool enabled)
         {
+            EnsureExtensionsAreLoaded();
+
             foreach (var node in _extensions)
                 if (node.TypeName == typeName)
                     node.Enabled = enabled;
         }
 
-        /// <summary>
-        /// Get an ExtensionPoint based on its unique identifying path.
-        /// </summary>
-        public ExtensionPoint GetExtensionPoint(string path)
-        {
-            return _pathIndex.ContainsKey(path) ? _pathIndex[path] : null;
-        }
+        #endregion
 
         /// <summary>
         /// Get an ExtensionPoint based on the required Type for extensions.
@@ -123,94 +285,6 @@ namespace NUnit.Engine.Extensibility
             return null;
         }
 
-        public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
-        {
-            var ep = GetExtensionPoint(path);
-            if (ep != null)
-                foreach (var node in ep.Extensions)
-                    yield return node;
-        }
-
-        public ExtensionNode GetExtensionNode(string path)
-        {
-            var ep = GetExtensionPoint(path);
-
-            return ep != null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
-        }
-
-        public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
-        {
-            var ep = GetExtensionPoint(typeof(T));
-            if (ep != null)
-                foreach (var node in ep.Extensions)
-                    if (includeDisabled || node.Enabled)
-                        yield return node;
-        }
-
-        public IEnumerable<T> GetExtensions<T>()
-        {
-            foreach (var node in GetExtensionNodes<T>())
-                yield return (T)node.ExtensionObject;
-        }
-
-        /// <summary>
-        /// Find the extension points in a loaded assembly.
-        /// </summary>
-        public void FindExtensionPoints(params Assembly[] targetAssemblies)
-        {
-            foreach (var assembly in targetAssemblies)
-            {
-                log.Info("Scanning {0} assembly for extension points", assembly.GetName().Name);
-
-                foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
-                {
-                    if (_pathIndex.ContainsKey(attr.Path))
-                    {
-                        string msg = string.Format(
-                            "The Path {0} is already in use for another extension point.",
-                            attr.Path);
-                        throw new NUnitEngineException(msg);
-                    }
-
-                    var ep = new ExtensionPoint(attr.Path, attr.Type)
-                    {
-                        Description = attr.Description,
-                    };
-
-                    _extensionPoints.Add(ep);
-                    _pathIndex.Add(ep.Path, ep);
-
-                    log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
-                }
-
-                foreach (Type type in assembly.GetExportedTypes())
-                {
-                    foreach (TypeExtensionPointAttribute attr in type.GetCustomAttributes(typeof(TypeExtensionPointAttribute), false))
-                    {
-                        string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
-
-                        if (_pathIndex.ContainsKey(path))
-                        {
-                            string msg = string.Format(
-                                "The Path {0} is already in use for another extension point.",
-                                attr.Path);
-                            throw new NUnitEngineException(msg);
-                        }
-
-                        var ep = new ExtensionPoint(path, type)
-                        {
-                            Description = attr.Description,
-                        };
-
-                        _extensionPoints.Add(ep);
-                        _pathIndex.Add(path, ep);
-
-                        log.Info("  Found Path={0}, Type={1}", ep.Path, ep.TypeName);
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Deduce the extension point based on the Type of an extension.
         /// Returns null if no extension point can be found that would
@@ -218,8 +292,6 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         private ExtensionPoint DeduceExtensionPointFromType(TypeReference typeRef)
         {
-            log.Debug("Trying to deduce ExtensionPoint from " + typeRef.Name);
-
             var ep = GetExtensionPoint(typeRef);
             if (ep != null)
                 return ep;
@@ -240,14 +312,19 @@ namespace NUnit.Engine.Extensibility
         }
 
         /// <summary>
-        /// Find candidate extension assemblies starting from a
-        /// given base directory.
+        /// We can only load extensions after all candidate assemblies are identified.
+        /// This method is called internally to ensure the load happens before any
+        /// extensions are used.
         /// </summary>
-        /// <param name="startDir"></param>
-        private void FindExtensionAssemblies(IDirectory startDir)
+        private void EnsureExtensionsAreLoaded()
         {
-            // First check the directory itself
-            ProcessAddinsFiles(startDir, false);
+            if (!_extensionsAreLoaded)
+            {
+                _extensionsAreLoaded = true;
+
+                foreach (var candidate in _assemblies)
+                    FindExtensionsInAssembly(candidate);
+            }
         }
 
         /// <summary>
@@ -258,23 +335,18 @@ namespace NUnit.Engine.Extensibility
         private void ProcessDirectory(IDirectory startDir, bool fromWildCard)
         {
             var directoryName = startDir.FullName;
-            if (WasVisited(startDir.FullName, fromWildCard))
+            if (WasVisited(directoryName, fromWildCard))
             {
                 log.Warning($"Skipping directory '{directoryName}' because it was already visited.");
+                return;
             }
-            else
-            {
-                log.Info($"Scanning directory '{directoryName}' for extensions.");
-                MarkAsVisited(directoryName, fromWildCard);
 
-                if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
-                {
-                    foreach (var file in startDir.GetFiles("*.dll"))
-                    {
-                        ProcessCandidateAssembly(file.FullName, true);
-                    }
-                }
-            }
+            log.Info($"Scanning directory '{directoryName}' for extensions.");
+            Visit(directoryName, fromWildCard);
+
+            if (ProcessAddinsFiles(startDir, fromWildCard) == 0)
+                foreach (var file in startDir.GetFiles("*.dll"))
+                    ProcessCandidateAssembly(file.FullName, true);
         }
 
         /// <summary>
@@ -285,14 +357,12 @@ namespace NUnit.Engine.Extensibility
             var addinsFiles = startDir.GetFiles("*.addins");
             var addinsFileCount = 0;
 
-            if (addinsFiles.Any())
+            foreach (var file in addinsFiles)
             {
-                foreach (var file in addinsFiles)
-                {
-                    ProcessAddinsFile(startDir, file, fromWildCard);
-                    addinsFileCount += 1;
-                }
+                ProcessAddinsFile(file, fromWildCard);
+                addinsFileCount++;
             }
+
             return addinsFileCount;
         }
 
@@ -302,78 +372,69 @@ namespace NUnit.Engine.Extensibility
         /// path or a wildcard pattern used to find assemblies. Blank
         /// lines and comments started by # are ignored.
         /// </summary>
-        private void ProcessAddinsFile(IDirectory baseDir, IFile addinsFile, bool fromWildCard)
+        private void ProcessAddinsFile(IFile addinsFile, bool fromWildCard)
         {
             log.Info("Processing file " + addinsFile.FullName);
 
-            foreach (var entry in _addinsReader.Read(addinsFile))
+            foreach (var entry in AddinsFile.Read(addinsFile).Where(e => e.Text != string.Empty))
             {
-                bool isWild = fromWildCard || entry.Contains("*");
-                var args = GetBaseDirAndPattern(baseDir, entry);
-                if (entry.EndsWith("/"))
-                {
-                    foreach (var dir in _directoryFinder.GetDirectories(args.Item1, args.Item2))
-                    {
-                        ProcessDirectory(dir, isWild);
-                    }
-                }
-                else
-                {
-                    foreach (var file in _directoryFinder.GetFiles(args.Item1, args.Item2))
-                    {
-                        ProcessCandidateAssembly(file.FullName, isWild);
-                    }
-                }
-            }
-        }
+                bool isWild = fromWildCard || entry.IsPattern;
+                IDirectory baseDir = addinsFile.Parent;
+                string entryDir = entry.DirectoryName;
+                string entryFile = entry.FileName;
 
-        private Backports.Tuple<IDirectory, string> GetBaseDirAndPattern(IDirectory baseDir, string path)
-        {
-            if (Path.IsPathFullyQualified(path))
-            {
-                if (path.EndsWith("/"))
+                if (entry.IsDirectory)
                 {
-                    return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(path), string.Empty);
+                    if (entry.IsFullyQualified)
+                    {
+                        baseDir = _fileSystem.GetDirectory(entry.Text);
+                        foreach (var dir in _directoryFinder.GetDirectories(_fileSystem.GetDirectory(entryDir), ""))
+                            ProcessDirectory(dir, isWild);
+                    }
+                    else
+                        foreach (var dir in _directoryFinder.GetDirectories(baseDir, entry.Text))
+                            ProcessDirectory(dir, isWild);
                 }
                 else
                 {
-                    return new Backports.Tuple<IDirectory, string>(_fileSystem.GetDirectory(System.IO.Path.GetDirectoryName(path)), System.IO.Path.GetFileName(path));
+                    if (entry.IsFullyQualified)
+                    {
+                        foreach (var file in _directoryFinder.GetFiles(_fileSystem.GetDirectory(entryDir), entryFile))
+                            ProcessCandidateAssembly(file.FullName, isWild);
+                    }
+                    else
+                        foreach (var file in _directoryFinder.GetFiles(baseDir, entry.Text))
+                            ProcessCandidateAssembly(file.FullName, isWild);
                 }
-            }
-            else
-            {
-                return new Backports.Tuple<IDirectory, string>(baseDir, path);
             }
         }
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
-            if (WasVisited(filePath, fromWildCard)) 
+            // Did we already process this file?
+            if (_assemblies.ByPath.ContainsKey(filePath))
                 return;
-
-            MarkAsVisited(filePath, fromWildCard);
 
             try
             {
-                var candidate = new ExtensionAssembly(filePath, fromWildCard);
+                var candidateAssembly = new ExtensionAssembly(filePath, fromWildCard);
+                string assemblyName = candidateAssembly.AssemblyName;
 
-                if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidate))
+                // We never add assemblies unless the host can load them
+                if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidateAssembly))
                     return;
 
-                for (var i = 0; i < _assemblies.Count; i++)
+                // Do we already have a copy of the same assembly at a different path?
+                //if (_assemblies.ByName.ContainsKey(assemblyName))
+                if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly existing))
                 {
-                    var assembly = _assemblies[i];
+                    if (candidateAssembly.IsBetterVersionOf(existing))
+                        _assemblies.ByName[assemblyName] = candidateAssembly;
 
-                    if (candidate.IsDuplicateOf(assembly))
-                    {
-                        if (candidate.IsBetterVersionOf(assembly))
-                            _assemblies[i] = candidate;
-
-                        return;
-                    }
+                    return;
                 }
 
-                _assemblies.Add(candidate);
+                _assemblies.Add(candidateAssembly);
             }
             catch (BadImageFormatException e)
             {
@@ -387,16 +448,17 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
+        // Dictionary containing all directory paths already visited.
         private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
 
-        private bool WasVisited(string filePath, bool fromWildcard)
+        private bool WasVisited(string path, bool fromWildcard)
         {
-            return _visited.ContainsKey($"path={ filePath }_visited={fromWildcard}");
+            return _visited.ContainsKey($"path={path}_visited={fromWildcard}");
         }
 
-        private void MarkAsVisited(string filePath, bool fromWildcard)
+        private void Visit(string path, bool fromWildcard)
         {
-            _visited.Add($"path={ filePath }_visited={fromWildcard}", null);
+            _visited.Add($"path={path}_visited={fromWildcard}", null);
         }
 
         /// <summary>
@@ -404,13 +466,13 @@ namespace NUnit.Engine.Extensibility
         /// For each extension, create an ExtensionNode and link it to the
         /// correct ExtensionPoint. Public for testing.
         /// </summary>
-        internal void FindExtensionsInAssembly(ExtensionAssembly assembly)
+        internal void FindExtensionsInAssembly(ExtensionAssembly extensionAssembly)
         {
-            log.Info($"Scanning {assembly.FilePath} for Extensions");
+            log.Info($"Scanning {extensionAssembly.FilePath} for Extensions");
 
-            if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), assembly))
+            if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), extensionAssembly))
             {
-                log.Info($"{assembly.FilePath} cannot be loaded on this runtime");
+                log.Info($"{extensionAssembly.FilePath} cannot be loaded on this runtime");
                 return;
             }
 
@@ -418,34 +480,43 @@ namespace NUnit.Engine.Extensibility
 #if NETFRAMEWORK
             // Use special properties provided by our backport of RuntimeInformation
             Version currentVersion = RuntimeInformation.FrameworkVersion;
-            var frameworkName = assembly.TargetRuntime;
+            var frameworkName = extensionAssembly.FrameworkName;
 
             if (frameworkName.Identifier != FrameworkIdentifiers.NetFramework || frameworkName.Version > currentVersion)
             {
-                if (!assembly.FromWildCard)
+                if (!extensionAssembly.FromWildCard)
                 {
-                    throw new NUnitEngineException($"Extension {assembly.FilePath} targets {frameworkName}, which is not available.");
+                    throw new NUnitEngineException($"Extension {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
                 }
                 else
                 {
-                    log.Info($"Assembly {assembly.FilePath} targets {frameworkName}, which is not available. Assembly found via wildcard.");
+                    log.Info($"Assembly {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
                     return;
                 }
             }
 #endif
 
-            foreach (var type in assembly.GetTypes())
+            foreach (var extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
             {
-                CustomAttribute extensionAttr = type.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
+                CustomAttribute extensionAttr = extensionType.GetAttribute("NUnit.Engine.Extensibility.ExtensionAttribute");
 
                 if (extensionAttr == null)
                     continue;
 
-                object versionArg = extensionAttr.GetNamedArgument("EngineVersion");
-                if (versionArg != null && new Version((string)versionArg) > ENGINE_VERSION)
-                    continue;
+                // TODO: This is a remnant of older code. In principle, this should be generalized
+                // to something like "HostVersion". However, this can safely remain until
+                // we separate ExtensionManager into its own assembly.
+                string versionArg = extensionAttr.GetNamedArgument("EngineVersion") as string;
+                if (versionArg != null)
+                {
+                    if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
+                    {
+                        log.Warning($"  Ignoring {extensionType.Name}. It requires version {versionArg}.");
+                        continue;
+                    }
+                }
 
-                var node = new ExtensionNode(assembly.FilePath, assembly.AssemblyVersion, type.FullName, assemblyTargetFramework)
+                var node = new ExtensionNode(extensionAssembly.FilePath, extensionAssembly.AssemblyVersion, extensionType.FullName, assemblyTargetFramework)
                 {
                     Path = extensionAttr.GetNamedArgument("Path") as string,
                     Description = extensionAttr.GetNamedArgument("Description") as string
@@ -454,9 +525,9 @@ namespace NUnit.Engine.Extensibility
                 object enabledArg = extensionAttr.GetNamedArgument("Enabled");
                 node.Enabled = enabledArg == null || (bool)enabledArg;
 
-                log.Info("  Found ExtensionAttribute on Type " + type.Name);
+                log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
 
-                foreach (var attr in type.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
+                foreach (var attr in extensionType.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
                 {
                     string name = attr.ConstructorArguments[0].Value as string;
                     string value = attr.ConstructorArguments[1].Value as string;
@@ -473,12 +544,12 @@ namespace NUnit.Engine.Extensibility
                 ExtensionPoint ep;
                 if (node.Path == null)
                 {
-                    ep = DeduceExtensionPointFromType(type);
+                    ep = DeduceExtensionPointFromType(extensionType);
                     if (ep == null)
                     {
                         string msg = string.Format(
                             "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
-                            type.FullName);
+                            extensionType.FullName);
                         throw new NUnitEngineException(msg);
                     }
 
@@ -486,12 +557,13 @@ namespace NUnit.Engine.Extensibility
                 }
                 else
                 {
-                    ep = GetExtensionPoint(node.Path);
+                    // TODO: Remove need for the cast
+                    ep = GetExtensionPoint(node.Path) as ExtensionPoint;
                     if (ep == null)
                     {
                         string msg = string.Format(
                             "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
-                            type.FullName,
+                            extensionType.FullName,
                             node.Path);
                         throw new NUnitEngineException(msg);
                     }
@@ -501,46 +573,97 @@ namespace NUnit.Engine.Extensibility
             }
         }
 
+        private const string NETFRAMEWORK = ".NETFramework";
+        private const string NETCOREAPP = ".NETCoreApp";
+        private const string NETSTANDARD = ".NETStandard";
+
         /// <summary>
         /// Checks that the target framework of the current runner can load the extension assembly. For example, .NET Core
         /// cannot load .NET Framework assemblies and vice-versa.
         /// </summary>
         /// <param name="runnerAsm">The executing runner</param>
         /// <param name="extensionAsm">The extension we are attempting to load</param>
-        internal static bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        internal bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
         {
             if (runnerAsm == null)
                 return true;
 
-            string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
-            string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
-            if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
+            var runnerFrameworkName = GetTargetRuntime(runnerAsm.Location);
+            var extensionFrameworkName = GetTargetRuntime(extensionAsm.FilePath);
+
+            switch (runnerFrameworkName.Identifier)
             {
-                throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
-            }
-            else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
-            {
-                if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
-                {
-                    log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
-                    return false;
-                }
-            }
-            else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
-            {
-                log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
-                return false;
+                case NETSTANDARD:
+                    throw new Exception($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
+
+                case NETCOREAPP:
+                    switch (extensionFrameworkName.Identifier)
+                    {
+                        case NETSTANDARD:
+                        case NETCOREAPP:
+                            return true;
+                        case NETFRAMEWORK:
+                        default:
+                            log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
+                            return false;
+                    }
+                case NETFRAMEWORK:
+                default:
+                    switch (extensionFrameworkName.Identifier)
+                    {
+                        case NETFRAMEWORK:
+                            return runnerFrameworkName.Version.Major == 4 || extensionFrameworkName.Version.Major < 4;
+                        // For .NET Framework calling .NET Standard, we only support if framework is 4.7.2 or higher
+                        case NETSTANDARD:
+                            return extensionFrameworkName.Version >= new Version(4, 7, 2);
+                        case NETCOREAPP:
+                        default:
+                            log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
+                            return false;
+                    }
             }
 
-            return true;
+            //string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
+            //string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
+            //if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
+            //{
+            //    throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
+            //}
+            //else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
+            //{
+            //    if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
+            //    {
+            //        log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
+            //        return false;
+            //    }
+            //}
+            //else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
+            //{
+            //    log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
+            //    return false;
+            //}
+
+            //return true;
+        }
+
+        private System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
+        {
+            var assemblyDef = AssemblyDefinition.ReadAssembly(filePath);
+            var frameworkName = assemblyDef.GetFrameworkName();
+            if (string.IsNullOrEmpty(frameworkName))
+            {
+                var runtimeVersion = assemblyDef.GetRuntimeVersion();
+                frameworkName = $".NETFramework,Version=v{runtimeVersion.ToString(3)}";
+            }
+            return new System.Runtime.Versioning.FrameworkName(frameworkName);
         }
 
         public void Dispose()
         {
             // Make sure all assemblies release the underlying file streams. 
-            foreach (var assembly in _assemblies)
+            foreach (var candidate in _assemblies)
             {
-                assembly.Dispose();
+                candidate.Dispose();
             }
         }
     }

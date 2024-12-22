@@ -1,46 +1,50 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.IO;
-using System.Runtime.Versioning;
+using System.Reflection;
+using NUnit.Engine.Extensibility;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Engine.Tests.Extensibility
 {
-    // TODO: This should actually give us 3.5
-    [TestFixture("net462", FrameworkIdentifiers.NetFramework, "4.6.2")]
-    [TestFixture("netcoreapp3.1", FrameworkIdentifiers.NetCoreApp, "3.1")]
-    [TestFixture("net6.0", FrameworkIdentifiers.NetCoreApp, "6.0")]
     public class ExtensionAssemblyTests
     {
-        private string _assemblyPath;
-        private string _assemblyFileName;
-        private FrameworkName _expectedTargetRuntime;
-        private ExtensionAssembly _ea;
+        private static readonly Assembly THIS_ASSEMBLY = Assembly.GetExecutingAssembly();
+        private static readonly string THIS_ASSEMBLY_PATH = THIS_ASSEMBLY.Location;
+        private static readonly string THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name;
+        private static readonly Version THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version;
 
-        public ExtensionAssemblyTests(string runtimeDir, string expectedRuntime, string expectedVersion)
-        {
-            _assemblyPath = TestData.MockAssemblyPath(runtimeDir);
-            _assemblyFileName = Path.GetFileNameWithoutExtension(_assemblyPath);
-            _expectedTargetRuntime = new FrameworkName(expectedRuntime, new Version(expectedVersion));
-        }
+        private ExtensionAssembly _ea;
 
         [OneTimeSetUp]
         public void CreateExtensionAssemblies()
         {
-            _ea = new ExtensionAssembly(_assemblyPath, false);
+            _ea = new ExtensionAssembly(THIS_ASSEMBLY_PATH, false);
         }
 
         [Test]
         public void AssemblyName()
         {
-            Assert.That(_ea.AssemblyName, Is.EqualTo(_assemblyFileName));
+            Assert.That(_ea.AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
         }
 
         [Test]
-        public void TargetFramework()
+        public void AssemblyVersion()
         {
-            Assert.That(_ea.TargetRuntime, Is.EqualTo(_expectedTargetRuntime));
+            Assert.That(_ea.AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
         }
+
+#if NET462
+        [Test]
+        public void FrameworkName()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(_ea.FrameworkName.Identifier, Is.EqualTo(".NETFramework"));
+                Assert.That(_ea.FrameworkName.Version, Is.EqualTo(new Version(4,6,2)));
+            });
+        }
+#endif
     }
 }

@@ -144,10 +144,10 @@ namespace NUnit.Engine.Internal
 
             // if lengths are the same, check for equality
             if ( length1 == length2 )
-                return string.Compare( path1, path2, IsWindows() ) == 0;
+                return string.Compare( path1, path2, RunningOnWindows ) == 0;
 
             // path 2 is longer than path 1: see if initial parts match
-            if ( string.Compare( path1, path2.Substring( 0, length1 ), IsWindows() ) != 0 )
+            if ( string.Compare( path1, path2.Substring( 0, length1 ), RunningOnWindows ) != 0 )
                 return false;
             
             // must match through or up to a directory separator boundary
@@ -164,6 +164,19 @@ namespace NUnit.Engine.Internal
             foreach (string path in morePaths)
                 result = Path.Combine(result, path);
             return result;
+        }
+
+        /// <summary>
+        /// Returns a value that indicates whether the specified file path is fully qualified.
+        /// </summary>
+        /// <param name="path">Path to check</param>
+        /// <returns><see langword="true"/> if <paramref name="path"/> is an absolute path; otherwhise, false.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
+        public static bool IsFullyQualifiedPath(string path)
+        {
+            return RunningOnWindows
+                ? IsFullyQualifiedWindowsPath(path)
+                : IsFullyQualifiedUnixPath(path);
         }
 
         /// <summary>
@@ -206,6 +219,27 @@ namespace NUnit.Engine.Internal
             return path.Length > 0 && path[0] == '/';
         }
 
+        public static bool IsValidPath(string path)
+        {
+            try
+            {
+                var info = GetFileSystemInfo(path);
+#if NETCOREAPP2_1_OR_GREATER
+                var creation = info.CreationTime;
+#endif
+                return true; // Whether it exists or not!
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static FileSystemInfo GetFileSystemInfo(string path) =>
+            path.EndsWith("/") || path.EndsWith(@"\\")
+                ? new DirectoryInfo(path) as FileSystemInfo
+                : new FileInfo(path) as FileSystemInfo;
+
         private static bool IsWindowsDirectorySeparator(char c)
         {
             return c == '\\' || c == '/';
@@ -216,10 +250,7 @@ namespace NUnit.Engine.Internal
             return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
         }
 
-        private static bool IsWindows()
-        {
-            return PathUtils.DirectorySeparatorChar == '\\';
-        }
+        private static bool RunningOnWindows => DirectorySeparatorChar == '\\';
 
         private static string[] SplitPath(string path)
         {
@@ -246,7 +277,7 @@ namespace NUnit.Engine.Internal
 
         private static bool PathsEqual(string path1, string path2)
         {
-            if (PathUtils.IsWindows())
+            if (PathUtils.RunningOnWindows)
                 return path1.ToLower().Equals(path2.ToLower());
             else
                 return path1.Equals(path2);

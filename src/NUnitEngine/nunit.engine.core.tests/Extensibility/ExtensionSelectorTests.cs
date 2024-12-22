@@ -113,7 +113,7 @@ namespace NUnit.Engine.Tests.Extensibility
             sub.AssemblyName.Returns(assemblyName);
             sub.AssemblyVersion.Returns(assemblyVersion ?? new Version(1, 0));
             targetFramework = targetFramework ?? new Version(2, 0);
-            sub.TargetRuntime.Returns(new FrameworkName(FrameworkIdentifiers.NetFramework, targetFramework));
+            sub.FrameworkName.Returns(new FrameworkName(FrameworkIdentifiers.NetFramework, targetFramework));
             sub.FromWildCard.Returns(fromWildcard);
             return sub;
         }
