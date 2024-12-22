@@ -3,12 +3,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Mono.Cecil;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+using TestCentric.Metadata;
 
 using Backports = NUnit.Engine.Internal.Backports;
 #if NET20 || NETSTANDARD2_0
@@ -33,20 +33,30 @@ namespace NUnit.Engine.Services
             _extensionManager = new ExtensionManager();
         }
 
-        internal ExtensionService(IAddinsFileReader addinsReader, IFileSystem fileSystem)
-            : this(addinsReader, fileSystem, new DirectoryFinder(fileSystem))
+        internal ExtensionService(IFileSystem fileSystem)
+            : this(fileSystem, new DirectoryFinder(fileSystem))
         {
-            _extensionManager = new ExtensionManager(addinsReader, fileSystem);
+            _extensionManager = new ExtensionManager(fileSystem);
         }
 
-        internal ExtensionService(IAddinsFileReader addinsReader, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        internal ExtensionService(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _extensionManager = new ExtensionManager(addinsReader, fileSystem, directoryFinder);
+            _extensionManager = new ExtensionManager(fileSystem, directoryFinder);
         }
 
         public IEnumerable<IExtensionPoint> ExtensionPoints => _extensionManager.ExtensionPoints;
 
         public IEnumerable<IExtensionNode> Extensions => _extensionManager.Extensions;
+
+        /// <summary>
+        /// Find candidate extension assemblies starting from a given base directory,
+        /// and using the contained '.addins' files to direct the search.
+        /// </summary>
+        /// <param name="initialDirectory">Path to the initial directory.</param>
+        public void FindExtensionAssemblies(string initialDirectory)
+        {
+            _extensionManager.FindExtensionAssemblies(initialDirectory);
+        }
 
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
@@ -72,7 +82,7 @@ namespace NUnit.Engine.Services
 
         public IEnumerable<T> GetExtensions<T>() => _extensionManager.GetExtensions<T>();
 
-        public ExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
+        public IExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
 
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>() => _extensionManager.GetExtensionNodes<T>();
 
@@ -85,7 +95,7 @@ namespace NUnit.Engine.Services
                     typeof(ITestEngine).Assembly);
 
                 var thisAssembly = Assembly.GetExecutingAssembly();
-                _extensionManager.FindExtensions(AssemblyHelper.GetDirectoryName(thisAssembly));
+                _extensionManager.FindExtensionAssemblies(thisAssembly);
 
                 Status = ServiceStatus.Started;
             }

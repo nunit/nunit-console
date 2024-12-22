@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Mono.Cecil;
 using NUnit.Common;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Drivers
 {
@@ -28,13 +28,14 @@ namespace NUnit.Engine.Drivers
             var extensionManager = new ExtensionManager();
 
             extensionManager.FindExtensionPoints(thisAssembly);
-            extensionManager.FindExtensions(AssemblyHelper.GetDirectoryName(thisAssembly));
+            extensionManager.FindExtensionAssemblies(thisAssembly);
 
             foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
                 _factories.Add(factory);
 
 #if NETFRAMEWORK
-            var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
+            // HACK
+            var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver") as ExtensionNode;
             if (node != null)
                 _factories.Add(new NUnit2DriverFactory(node));
 #endif

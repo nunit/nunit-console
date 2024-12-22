@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		NuGet.config = NuGet.config
 		nunit.ico = nunit.ico
 		old-build.cake = old-build.cake
+		package-tests.cake = package-tests.cake
 		README.md = README.md
 		VERSIONING.md = VERSIONING.md
 	EndProjectSection
@@ -152,6 +153,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-net80", "src\NU
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-agent-netcore31", "src\NUnitEngine\agents\nunit-agent-netcore31\nunit-agent-netcore31.csproj", "{446DAD12-87E5-47A4-B19E-D9F269ADEF72}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeExtensions", "src\TestData\FakeExtensions\FakeExtensions.csproj", "{1D84092C-32D7-4074-9FA6-5FA97335F173}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppContextTest", "src\TestData\AppContextTest\AppContextTest.csproj", "{E79A3CCD-07E2-4C50-B8BF-1C5844720725}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvalidTestNames", "src\TestData\InvalidTestNames\InvalidTestNames.csproj", "{48DF1E40-93BA-436A-B460-5D1130316ADA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfTest", "src\TestData\wpf-test\WpfTest.csproj", "{2F9D8932-2186-464F-BED6-7D7979C8FFA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -234,6 +243,22 @@ Global
 		{446DAD12-87E5-47A4-B19E-D9F269ADEF72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{446DAD12-87E5-47A4-B19E-D9F269ADEF72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{446DAD12-87E5-47A4-B19E-D9F269ADEF72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D84092C-32D7-4074-9FA6-5FA97335F173}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D84092C-32D7-4074-9FA6-5FA97335F173}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D84092C-32D7-4074-9FA6-5FA97335F173}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D84092C-32D7-4074-9FA6-5FA97335F173}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E79A3CCD-07E2-4C50-B8BF-1C5844720725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E79A3CCD-07E2-4C50-B8BF-1C5844720725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E79A3CCD-07E2-4C50-B8BF-1C5844720725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E79A3CCD-07E2-4C50-B8BF-1C5844720725}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48DF1E40-93BA-436A-B460-5D1130316ADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48DF1E40-93BA-436A-B460-5D1130316ADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48DF1E40-93BA-436A-B460-5D1130316ADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48DF1E40-93BA-436A-B460-5D1130316ADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F9D8932-2186-464F-BED6-7D7979C8FFA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F9D8932-2186-464F-BED6-7D7979C8FFA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F9D8932-2186-464F-BED6-7D7979C8FFA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F9D8932-2186-464F-BED6-7D7979C8FFA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -271,6 +296,10 @@ Global
 		{0F76DA4A-58B9-4B45-BEC5-259105570D11} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 		{CD357A8B-BE40-4F63-92DA-A71B94EE47E4} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
 		{446DAD12-87E5-47A4-B19E-D9F269ADEF72} = {1704B7B2-5AD3-44EA-AB26-445C4E4E2C54}
+		{1D84092C-32D7-4074-9FA6-5FA97335F173} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
+		{E79A3CCD-07E2-4C50-B8BF-1C5844720725} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
+		{48DF1E40-93BA-436A-B460-5D1130316ADA} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
+		{2F9D8932-2186-464F-BED6-7D7979C8FFA6} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

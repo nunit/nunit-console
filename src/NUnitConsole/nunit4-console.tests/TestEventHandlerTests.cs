@@ -21,6 +21,12 @@ namespace NUnit.ConsoleRunner
             _writer = new ExtendedTextWrapper(new StringWriter(_output));
         }
 
+        [TestCase(char.MaxValue)]
+        public void TestNameContainsInvalidChar(char c)
+        {
+            Console.WriteLine($"Test for char {c}");
+        }
+
         [TestCaseSource("SingleEventData")]
         public void SingleEventsWriteExpectedOutput(string report, string labels, string expected)
         {

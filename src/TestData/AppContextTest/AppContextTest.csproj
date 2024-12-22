@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
+    <OutputPath>..\..\..\bin\$(Configuration)\testdata\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <PackageReference Include="nunit" Version="3.14.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
+    <PackageReference Include="nunit" Version="4.2.2" />
+  </ItemGroup>
+
+</Project>

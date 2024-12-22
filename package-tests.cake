@@ -327,43 +327,43 @@ StandardRunnerTests.Add(new PackageTest(
 // SPECIAL CASES
 //////////////////////////////////////////////////////////////////////
 
-// TODO: These are bugs fixed in V3 not yet ported
-//StandardRunnerTests.Add(new PackageTest(
-//    1, "InvalidTestNameTest_Net462",
-//    "Ensure we handle invalid test names correctly under .NET 4.6.2",
-//    "testdata/net462/InvalidTestNames.dll --trace:Debug",
-//    new ExpectedResult("Passed")
-//    {
-//        Assemblies = new ExpectedAssemblyResult[]
-//        {
-//            new ExpectedAssemblyResult("InvalidTestNames.dll", "net-4.6.2")
-//        }
-//    }));
+StandardRunnerTests.Add(new PackageTest(
+    1, "InvalidTestNameTest_Net462",
+    "Ensure we handle invalid test names correctly under .NET 4.6.2",
+    "testdata/net462/InvalidTestNames.dll --trace:Debug",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "net-4.6.2")
+        }
+    }));
 
-//AddToBothLists(new PackageTest(
-//    1, "InvalidTestNameTest_Net60",
-//    "Ensure we handle invalid test names correctly under .NET 6.0",
-//    "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
-//    new ExpectedResult("Passed")
-//    {
-//        Assemblies = new ExpectedAssemblyResult[]
-//        {
-//            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-6.0")
-//        }
-//    }));
+AddToBothLists(new PackageTest(
+    1, "InvalidTestNameTest_Net60",
+    "Ensure we handle invalid test names correctly under .NET 6.0",
+    "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-6.0")
+        }
+    }));
 
-//AddToBothLists(new PackageTest(
-//    1, "InvalidTestNameTest_Net80",
-//    "Ensure we handle invalid test names correctly under .NET 8.0",
-//    "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
-//    new ExpectedResult("Passed")
-//    {
-//        Assemblies = new ExpectedAssemblyResult[]
-//        {
-//            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-8.0")
-//        }
-//    }));
+AddToBothLists(new PackageTest(
+    1, "InvalidTestNameTest_Net80",
+    "Ensure we handle invalid test names correctly under .NET 8.0",
+    "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-8.0")
+        }
+    }));
 
+// TODO: Bug fixed in V3 not yet ported
 //StandardRunnerTests.Add(new PackageTest(
 //    1, "AppContextBaseDirectory_NET80",
 //    "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
