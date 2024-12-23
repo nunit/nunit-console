@@ -29,8 +29,8 @@
     <dependencies>
       <group>
         <dependency id="NUnit.ConsoleRunner" version="$version$" />
-        <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.6.0" />
-        <dependency id="NUnit.Extension.VSProjectLoader" version="3.8.0" />
+        <dependency id="NUnit.Extension.NUnitProjectLoader" version="3.8.0" />
+        <dependency id="NUnit.Extension.VSProjectLoader" version="3.9.0" />
       </group>
     </dependencies>
   </metadata>
