@@ -11,9 +11,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Product>NUnit Console</Product>
-    <AssemblyTitle>NUnit Console Runner ($(TargetFramework))</AssemblyTitle>
-    <Description>The console command-line runner for NUnit</Description>
+    <Product>NUnit NetCore Console Runner</Product>
+    <AssemblyTitle>NUnit NetCore Console Runner ($(TargetFramework))</AssemblyTitle>
+    <Description>The dotnet command-line runner for NUnit</Description>
   </PropertyGroup>
 
   <PropertyGroup>
