@@ -198,7 +198,14 @@ namespace NUnit.ConsoleRunner
             OutWriter.WriteLine();
             OutWriter.WriteLine(ColorStyle.Header, "NUNIT4-CONSOLE [inputfiles] [options]");
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.Default, "Runs a set of NUnit tests from the console.");
+            OutWriter.WriteLine(ColorStyle.SectionHeader, "Operation:");
+            using (new ColorConsole(ColorStyle.Default))
+            {
+                OutWriter.WriteLine("      The standard NUnit Console Runner runs a set of NUnit tests from the");
+                OutWriter.WriteLine("      console command-line. By default, all tests are run using separate agents");
+                OutWriter.WriteLine("      for each test assembly. This allows each assembly to run independently");
+                OutWriter.WriteLine("      and allows each assembly to run under the appropriate target runtime.");
+            }
             OutWriter.WriteLine();
             OutWriter.WriteLine(ColorStyle.SectionHeader, "InputFiles:");
             OutWriter.WriteLine(ColorStyle.Default, "      One or more assemblies or test projects of a recognized type.");
@@ -256,9 +263,6 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      extension NUnitProjectLoader is required. For Visual Studio projects");
                 OutWriter.WriteLine("      and solutions the engine extension VSProjectLoader is required.");
                 OutWriter.WriteLine();
-                //writer.WriteLine("Options that take values may use an equal sign, a colon");
-                //writer.WriteLine("or a space to separate the option from its value.");
-                //writer.WriteLine();
             }
         }
 
