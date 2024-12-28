@@ -36,9 +36,9 @@ namespace NUnit.Engine.Services.RuntimeLocators
             }
         }
 
-        private static IEnumerable<string> GetRuntimeDirectories(bool isX86)
+        private static IEnumerable<string> GetRuntimeDirectories(bool x86)
         {
-            string installDir = GetDotNetInstallDirectory(isX86);
+            string installDir = DotNet.GetInstallDirectory(x86);
 
             if (installDir != null && Directory.Exists(installDir) &&
                 File.Exists(Path.Combine(installDir, "dotnet.exe")))
@@ -109,27 +109,6 @@ namespace NUnit.Engine.Services.RuntimeLocators
                 newVersion = new Version();
                 return false;
             }
-        }
-
-        internal static string GetDotNetInstallDirectory(bool isX86)
-        {
-            if (Path.DirectorySeparatorChar == '\\')
-            {
-                if (isX86)
-                {
-                    RegistryKey key =
-                        Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\");
-                    return (string)key?.GetValue("InstallLocation");
-                }
-                else
-                {
-                    RegistryKey key =
-                        Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
-                    return (string)key?.GetValue("Path");
-                }
-            }
-            else
-                return "/usr/shared/dotnet/";
         }
     }
 }

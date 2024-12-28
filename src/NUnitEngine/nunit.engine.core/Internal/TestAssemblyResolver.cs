@@ -30,7 +30,7 @@ namespace NUnit.Engine.Internal
 
         static TestAssemblyResolver()
         {
-            INSTALL_DIR = GetDotNetInstallDirectory();
+            INSTALL_DIR = DotNet.GetInstallDirectory();
             WINDOWS_DESKTOP_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.WindowsDesktop.App");
             ASP_NET_CORE_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.AspNetCore.App");
 
@@ -166,27 +166,6 @@ namespace NUnit.Engine.Internal
             }
 
             return false;
-        }
-
-        private static string GetDotNetInstallDirectory()
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                if (Environment.Is64BitProcess)
-                {
-                    RegistryKey key =
-                        Registry.LocalMachine.OpenSubKey(@"Software\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
-                    return (string)key?.GetValue("Path");
-                }
-                else
-                {
-                    RegistryKey key =
-                        Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\");
-                    return (string)key?.GetValue("InstallLocation");
-                }
-            }
-            else // For now, we assume linux with a fixed path
-                return "/usr/shared/dotnet/";
         }
 
         private static string FindBestVersionDir(string libraryDir, Version targetVersion)
