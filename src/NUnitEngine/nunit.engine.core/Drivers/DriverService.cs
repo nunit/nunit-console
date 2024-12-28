@@ -69,7 +69,11 @@ namespace NUnit.Engine.Drivers
                     : targetFramework.Split(new char[] { ',' })[0];
 
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
-                    return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + " test assemblies are not supported by this version of the engine");
+                    if (skipNonTestAssemblies)
+                        return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                    else
+                        return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + 
+                            " test assemblies are not supported by this version of the engine");
             }
 
             try
