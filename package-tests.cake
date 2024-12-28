@@ -363,12 +363,11 @@ AddToBothLists(new PackageTest(
         }
     }));
 
-// TODO: Bug fixed in V3 not yet ported
-//StandardRunnerTests.Add(new PackageTest(
-//    1, "AppContextBaseDirectory_NET80",
-//    "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
-//    "testdata/net8.0/AppContextTest.dll",
-//    new ExpectedResult("Passed")
-//    {
-//        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
-//    }));
+StandardRunnerTests.Add(new PackageTest(
+    1, "AppContextBaseDirectory_NET80",
+    "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
+    "testdata/net8.0/AppContextTest.dll",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
+    }));
