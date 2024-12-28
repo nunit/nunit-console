@@ -73,7 +73,7 @@ namespace NUnit.Engine.Services
                     if (Path.DirectorySeparatorChar != '\\')
                         throw new Exception("Running .NET Core as X86 is currently only supported on Windows");
 
-                    var x86_dotnet_exe = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+                    var x86_dotnet_exe = Path.Combine(DotNet.GetX86InstallDirectory(), "dotnet.exe");
                     if (!File.Exists(x86_dotnet_exe))
                         throw new Exception("The X86 version of dotnet.exe is not installed");
 
