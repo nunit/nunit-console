@@ -207,15 +207,15 @@ StandardRunnerTests.Add(new PackageTest(
 // WPF TESTS
 //////////////////////////////////////////////////////////////////////
 
-//AddToBothLists(new PackageTest(
-//    1, "Net60WPFTest", "Run test using WPF under .NET 6.0",
-//    "testdata/net6.0-windows/WpfTest.dll --trace=Debug",
-//    new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }));
+AddToBothLists(new PackageTest(
+    1, "Net60WPFTest", "Run test using WPF under .NET 6.0",
+    "testdata/net6.0-windows/WpfTest.dll --trace=Debug",
+    new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }));
 
-//AddToBothLists(new PackageTest(
-//    1, "Net80WPFTest", "Run test using WPF under .NET 8.0",
-//    "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
-//    new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }));
+AddToBothLists(new PackageTest(
+    1, "Net80WPFTest", "Run test using WPF under .NET 8.0",
+    "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
+    new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }));
 
 //////////////////////////////////////////////////////////////////////
 // RUN TESTS USING EACH OF OUR EXTENSIONS
@@ -363,7 +363,7 @@ AddToBothLists(new PackageTest(
         }
     }));
 
-StandardRunnerTests.Add(new PackageTest(
+AddToBothLists(new PackageTest(
     1, "AppContextBaseDirectory_NET80",
     "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
     "testdata/net8.0/AppContextTest.dll",
