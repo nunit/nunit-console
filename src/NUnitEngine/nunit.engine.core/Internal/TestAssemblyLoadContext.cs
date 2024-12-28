@@ -26,6 +26,9 @@ namespace NUnit.Engine.Internal
             _resolver = new TestAssemblyResolver(this, testAssemblyPath);
             _basePath = Path.GetDirectoryName(testAssemblyPath);
             _runtimeResolver = new AssemblyDependencyResolver(testAssemblyPath);
+#if NET8_0_OR_GREATER
+            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", _basePath);
+#endif
         }
 
         protected override Assembly Load(AssemblyName name)
