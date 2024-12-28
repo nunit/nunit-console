@@ -15,14 +15,12 @@ namespace NUnit.Engine.Internal
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyLoadContext));
 
-        private readonly string _testAssemblyPath;
         private readonly string _basePath;
         private readonly TestAssemblyResolver _resolver;
         private readonly System.Runtime.Loader.AssemblyDependencyResolver _runtimeResolver;
 
         public TestAssemblyLoadContext(string testAssemblyPath)
         {
-            _testAssemblyPath = testAssemblyPath;
             _resolver = new TestAssemblyResolver(this, testAssemblyPath);
             _basePath = Path.GetDirectoryName(testAssemblyPath);
             _runtimeResolver = new AssemblyDependencyResolver(testAssemblyPath);
