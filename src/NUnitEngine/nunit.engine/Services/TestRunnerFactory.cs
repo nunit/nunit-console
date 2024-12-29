@@ -52,6 +52,8 @@ namespace NUnit.Engine.Services
                 }
             }
 #else
+            if (package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
+                return new UnmanagedExecutableTestRunner(package.FullName);
 
             bool isNested = false;
             foreach (TestPackage subPackage in package.SubPackages)
