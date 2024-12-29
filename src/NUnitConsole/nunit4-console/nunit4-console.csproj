@@ -22,13 +22,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\NUnitEngine\nunit.engine.core\EnginePackageSettings.cs" Link="EnginePackageSettings.cs" />
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
     <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
-    <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>
 
 </Project>

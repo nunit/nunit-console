@@ -86,7 +86,8 @@ namespace NUnit.ConsoleRunner
         /// <param name="valueStyle">The color to display the value with</param>
         public override void WriteLabel(string label, object option, ColorStyle valueStyle)
         {
-            Guard.ArgumentNotNull(option, nameof(option));
+            if (option == null)
+                throw new NullReferenceException(nameof(option));
 
             Write(ColorStyle.Label, label);
             Write(valueStyle, option.ToString());
