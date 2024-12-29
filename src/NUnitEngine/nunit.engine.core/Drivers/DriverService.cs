@@ -25,19 +25,19 @@ namespace NUnit.Engine.Drivers
         public DriverService()
         {
 #if NETFRAMEWORK // TODO: Restore extensibility to .NET 8.0 build
-            var thisAssembly = Assembly.GetExecutingAssembly();
-            var extensionManager = new ExtensionManager();
+            //var thisAssembly = Assembly.GetExecutingAssembly();
+            //var extensionManager = new ExtensionManager();
 
-            extensionManager.FindExtensionPoints(thisAssembly);
-            extensionManager.FindExtensionAssemblies(thisAssembly);
+            //extensionManager.FindExtensionPoints(thisAssembly);
+            //extensionManager.FindExtensionAssemblies(thisAssembly);
 
-            foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
-                _factories.Add(factory);
+            //foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
+            //    _factories.Add(factory);
 
-            // HACK
-            var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver") as ExtensionNode;
-            if (node != null)
-                _factories.Add(new NUnit2DriverFactory(node));
+            //// HACK
+            //var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver") as ExtensionNode;
+            //if (node != null)
+            //    _factories.Add(new NUnit2DriverFactory(node));
 #endif
 
             _factories.Add(new NUnit3DriverFactory());

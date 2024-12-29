@@ -177,6 +177,8 @@ namespace NUnit.Engine.Services
                         targetRuntime = Runtime.NetCore;
                         targetVersion = new Version(3, 1);
                         break;
+                    case "Unmanaged":
+                        return null;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
                 }
@@ -379,25 +381,34 @@ namespace NUnit.Engine.Services
                 if (!File.Exists(packageName))
                     log.Error($"Could not find {packageName}");
                 else
-                    using (var assembly = AssemblyDefinition.ReadAssembly(packageName))
+                    try
                     {
-                        targetVersion = assembly.GetRuntimeVersion();
-                        log.Debug($"Assembly {packageName} uses version {targetVersion}");
-
-                        frameworkName = assembly.GetFrameworkName();
-                        log.Debug($"Assembly {packageName} targets {frameworkName}");
-
-                        if (assembly.RequiresX86())
+                        using (var assembly = AssemblyDefinition.ReadAssembly(packageName))
                         {
-                            requiresX86 = true;
-                            log.Debug($"Assembly {packageName} will be run x86");
-                        }
+                            targetVersion = assembly.GetRuntimeVersion();
+                            log.Debug($"Assembly {packageName} uses version {targetVersion}");
 
-                        if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
-                        {
-                            requiresAssemblyResolver = true;
-                            log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
+                            frameworkName = assembly.GetFrameworkName();
+                            log.Debug($"Assembly {packageName} targets {frameworkName}");
+
+                            if (assembly.RequiresX86())
+                            {
+                                requiresX86 = true;
+                                log.Debug($"Assembly {packageName} will be run x86");
+                            }
+
+                            if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
+                            {
+                                requiresAssemblyResolver = true;
+                                log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
+                            }
                         }
+                    }
+                    catch (BadImageFormatException)
+                    {
+                        // "Unmanaged" is not a valid framework identifier but we handle it upstream
+                        // using UnmanagedCodeTestRunner, which doesn't actually try to run it.
+                        frameworkName = "Unmanaged,Version=0.0";
                     }
             }
 

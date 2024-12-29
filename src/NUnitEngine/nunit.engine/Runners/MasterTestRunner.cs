@@ -22,7 +22,7 @@ namespace NUnit.Engine.Runners
         // MasterTestRunner is the only runner that is passed back
         // to users asking for an ITestRunner. The actual details of
         // execution are handled by various internal runners, which
-        // impement ITestEngineRunner.
+        // implement ITestEngineRunner.
         //
         // Explore and execution results from MasterTestRunner are
         // returned as XmlNodes, created from the internal 
