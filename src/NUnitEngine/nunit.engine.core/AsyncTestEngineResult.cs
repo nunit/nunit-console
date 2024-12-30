@@ -13,7 +13,7 @@ namespace NUnit.Engine
     [Serializable]
     public class AsyncTestEngineResult : ITestRun
     {
-        private volatile TestEngineResult _result;
+        private volatile TestEngineResult? _result;
         private readonly ManualResetEvent _waitHandle = new ManualResetEvent(false);
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace NUnit.Engine
             {
                 Guard.OperationValid(_result != null, "Cannot retrieve Result from an incomplete or cancelled TestRun.");
 
-                return _result;
+                return _result!;
             }
         }
 

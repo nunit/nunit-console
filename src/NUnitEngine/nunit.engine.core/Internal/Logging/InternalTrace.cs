@@ -1,6 +1,8 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
@@ -21,13 +23,14 @@ namespace NUnit.Engine.Internal
     /// </summary>
     public static class InternalTrace
     {
-        private static InternalTraceWriter _traceWriter;
+        private static InternalTraceWriter? _traceWriter;
 
         public static InternalTraceLevel DefaultTraceLevel { get; private set; }
 
         /// <summary>
         /// Gets a flag indicating whether the InternalTrace is initialized
         /// </summary>
+        [MemberNotNullWhen(true, nameof(_traceWriter))]
         public static bool Initialized { get; private set; }
 
         /// <summary>
@@ -63,7 +66,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(string name, InternalTraceLevel level)
         {
-            return new Logger(name, level, _traceWriter);
+            return new Logger(name, level, _traceWriter.ShouldNotBeNull());
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(Type type, InternalTraceLevel level)
         {
-            return GetLogger(type.FullName, level);
+            return GetLogger(type.FullName!, level);
         }
 
         /// <summary>
@@ -79,7 +82,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(string name)
         {
-            return new Logger(name, DefaultTraceLevel, _traceWriter);
+            return new Logger(name, DefaultTraceLevel, _traceWriter.ShouldNotBeNull());
         }
 
         /// <summary>
@@ -87,7 +90,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(Type type)
         {
-            return GetLogger(type.FullName, DefaultTraceLevel);
+            return GetLogger(type.FullName!, DefaultTraceLevel);
         }
     }
 }

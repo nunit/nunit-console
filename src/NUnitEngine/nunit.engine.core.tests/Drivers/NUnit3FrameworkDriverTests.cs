@@ -40,7 +40,7 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("Runnable"));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo(MockAssembly.Tests.ToString()));
-            Assert.That(result.SelectNodes("test-suite").Count, Is.EqualTo(0), "Load result should not have child tests");
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Load result should not have child tests");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("Runnable"));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo(MockAssembly.Tests.ToString()));
-            Assert.That(result.SelectNodes("test-suite").Count, Is.GreaterThan(0), "Explore result should have child tests");
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.GreaterThan(0), "Explore result should have child tests");
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.GetAttribute("failed"), Is.EqualTo(MockAssembly.Failed.ToString()));
             Assert.That(result.GetAttribute("skipped"), Is.EqualTo(MockAssembly.Skipped.ToString()));
             Assert.That(result.GetAttribute("inconclusive"), Is.EqualTo(MockAssembly.Inconclusive.ToString()));
-            Assert.That(result.SelectNodes("test-suite").Count, Is.GreaterThan(0), "Explore result should have child tests");
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.GreaterThan(0), "Explore result should have child tests");
         }
 
         [Test]
@@ -119,17 +119,11 @@ namespace NUnit.Engine.Drivers
             Assert.That(ex, Is.TypeOf<NUnitEngineException>());
         }
 
-        private static string GetSkipReason(XmlNode result)
-        {
-            var propNode = result.SelectSingleNode(string.Format("properties/property[@name='{0}']", PropertyNames.SkipReason));
-            return propNode == null ? null : propNode.GetAttribute("value");
-        }
-
         private class CallbackEventHandler : System.Web.UI.ICallbackEventHandler
         {
-            private string _result;
+            private string? _result;
 
-            public string GetCallbackResult()
+            public string? GetCallbackResult()
             {
                 return _result;
             }

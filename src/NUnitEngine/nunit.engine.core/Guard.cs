@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace NUnit.Common
 {
@@ -19,6 +20,22 @@ namespace NUnit.Common
         {
             if (value == null)
                 throw new ArgumentNullException("Argument " + name + " must not be null", name);
+        }
+
+        /// <summary>
+        /// Throws an exception if a result is null
+        /// </summary>
+        /// <typeparam name="T">The type of the <paramref name="result"/> to check.</typeparam>
+        /// <param name="result">The value to check.</param>
+        /// <param name="expression">Compiler supplied parameter for the <paramref name="result"/> expression.</param>
+        /// <returns>Value of <paramref name="result"/> if not null, throws otherwise.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static T ShouldNotBeNull<T>(this T? result, [CallerArgumentExpression(nameof(result))] string expression = "") where T : class
+        {
+            if (result == null)
+                throw new InvalidOperationException($"Result {expression} must not be null");
+
+            return result;
         }
 
         /// <summary>

@@ -12,6 +12,7 @@ using System.Security.Policy;
 using System.Security.Principal;
 using NUnit.Common;
 using NUnit.Engine.Internal;
+using System.Linq;
 
 namespace NUnit.Engine.Runners
 {
@@ -21,10 +22,10 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class DomainManager
     {
-        static Logger log = InternalTrace.GetLogger(typeof(DomainManager));
+        static readonly Logger log = InternalTrace.GetLogger(typeof(DomainManager));
 
         private static readonly PropertyInfo TargetFrameworkNameProperty =
-            typeof(AppDomainSetup).GetProperty("TargetFrameworkName", BindingFlags.Public | BindingFlags.Instance);
+            typeof(AppDomainSetup).GetProperty("TargetFrameworkName", BindingFlags.Public | BindingFlags.Instance)!;
 
         /// <summary>
         /// Construct an application domain for running a test package
@@ -67,7 +68,7 @@ namespace NUnit.Engine.Runners
             //For parallel tests, we need to use distinct application name
             setup.ApplicationName = "Tests" + "_" + Environment.TickCount;
 
-            string appBase = GetApplicationBase(package);
+            string appBase = GetApplicationBase(package).ShouldNotBeNull();
             setup.ApplicationBase = appBase;
             setup.ConfigurationFile = GetConfigFile(appBase, package);
             setup.PrivateBinPath = GetPrivateBinPath(appBase, package);
@@ -108,8 +109,8 @@ namespace NUnit.Engine.Runners
         class DomainUnloader
         {
             private readonly AppDomain _domain;
-            private Thread _unloadThread;
-            private NUnitEngineException _unloadException;
+            private Thread? _unloadThread;
+            private NUnitEngineException? _unloadException;
 
             public DomainUnloader(AppDomain domain)
             {
@@ -123,7 +124,7 @@ namespace NUnit.Engine.Runners
 
                 var timeout = TimeSpan.FromSeconds(30);
 
-                if (!_unloadThread.Join((int)timeout.TotalMilliseconds))
+                if (!_unloadThread.Join(timeout))
                 {
                     var msg = DomainDetailsBuilder.DetailsFor(_domain,
                         $"Unable to unload application domain: unload thread timed out after {timeout.TotalSeconds} seconds.");
@@ -168,7 +169,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         /// <param name="package">The package</param>
         /// <returns>The ApplicationBase</returns>
-        public static string GetApplicationBase(TestPackage package)
+        public static string? GetApplicationBase(TestPackage package)
         {
             Guard.ArgumentNotNull(package, "package");
 
@@ -189,7 +190,7 @@ namespace NUnit.Engine.Runners
             return appBase;
         }
 
-        public static string GetConfigFile(string appBase, TestPackage package)
+        public static string? GetConfigFile(string appBase, TestPackage package)
         {
             Guard.ArgumentNotNullOrEmpty(appBase, "appBase");
             Guard.ArgumentNotNull(package, "package");
@@ -202,7 +203,7 @@ namespace NUnit.Engine.Runners
             // The ProjectService adds any project config to the settings.
             // So, at this point, we only want to handle assemblies or an
             // anonymous package created from the command-line.
-            string fullName = package.FullName;
+            string? fullName = package.FullName;
             if (IsExecutable(fullName))
                 return fullName + ".config";
 
@@ -218,7 +219,7 @@ namespace NUnit.Engine.Runners
             return null;
         }
 
-        private static bool IsExecutable(string fileName)
+        private static bool IsExecutable(string? fileName)
         {
             if (string.IsNullOrEmpty(fileName))
                 return false;
@@ -227,37 +228,39 @@ namespace NUnit.Engine.Runners
             return ext == ".dll" || ext == ".exe";
         }
 
-        public static string GetCommonAppBase(IList<TestPackage> packages)
+        public static string? GetCommonAppBase(IList<TestPackage> packages)
         {
             var assemblies = new List<string>();
-            foreach (var package in packages)
-                assemblies.Add(package.FullName);
+
+            // All subpackages have full names, but this is a public method in a public class so we have no control.
+            foreach (var package in packages.Where(p => p.FullName != null))
+                assemblies.Add(package.FullName!); 
 
             return GetCommonAppBase(assemblies);
         }
 
-        public static string GetCommonAppBase(IList<string> assemblies)
+        public static string? GetCommonAppBase(IList<string> assemblies)
         {
-            string commonBase = null;
+            string? commonBase = null;
 
             foreach (string assembly in assemblies)
             {
-                string dir = Path.GetDirectoryName(Path.GetFullPath(assembly));
+                string? dir = Path.GetDirectoryName(Path.GetFullPath(assembly))!;
                 if (commonBase == null)
                     commonBase = dir;
-                else while (!PathUtils.SamePathOrUnder(commonBase, dir) && commonBase != null)
-                        commonBase = Path.GetDirectoryName(commonBase);
+                else while (commonBase != null && !PathUtils.SamePathOrUnder(commonBase, dir))
+                        commonBase = Path.GetDirectoryName(commonBase)!;
             }
 
             return commonBase;
         }
 
-        public static string GetPrivateBinPath(string basePath, string fileName)
+        public static string? GetPrivateBinPath(string basePath, string fileName)
         {
             return GetPrivateBinPath(basePath, new string[] { fileName });
         }
 
-        public static string GetPrivateBinPath(string appBase, TestPackage package)
+        public static string? GetPrivateBinPath(string appBase, TestPackage package)
         {
             var binPath = package.GetSetting(EnginePackageSettings.PrivateBinPath, string.Empty);
 
@@ -271,25 +274,25 @@ namespace NUnit.Engine.Runners
             return binPath;
         }
 
-        public static string GetPrivateBinPath(string basePath, IList<TestPackage> packages)
+        public static string? GetPrivateBinPath(string basePath, IList<TestPackage> packages)
         {
             var assemblies = new List<string>();
-            foreach (var package in packages)
-                assemblies.Add(package.FullName);
+            foreach (var package in packages.Where(p => p.FullName != null))
+                assemblies.Add(package.FullName!);
 
             return GetPrivateBinPath(basePath, assemblies);
         }
 
-        public static string GetPrivateBinPath(string basePath, IList<string> assemblies)
+        public static string? GetPrivateBinPath(string basePath, IList<string> assemblies)
         {
             List<string> dirList = new List<string>();
             StringBuilder sb = new StringBuilder(200);
 
             foreach( string assembly in assemblies )
             {
-                string dir = PathUtils.RelativePath(
+                string? dir = PathUtils.RelativePath(
                     Path.GetFullPath(basePath),
-                    Path.GetDirectoryName( Path.GetFullPath(assembly) ) );
+                    Path.GetDirectoryName( Path.GetFullPath(assembly) )! );
                 if ( dir != null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
                 {
                     dirList.Add( dir );

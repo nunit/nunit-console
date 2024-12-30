@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NUnit.Engine.Drivers
 {
@@ -27,13 +28,13 @@ namespace NUnit.Engine.Drivers
         private static readonly string RUN_ACTION = CONTROLLER_TYPE + "+RunTestsAction";
         private static readonly string STOP_RUN_ACTION = CONTROLLER_TYPE + "+StopRunAction";
 
-        static ILogger log = InternalTrace.GetLogger("NUnitFrameworkDriver");
+        static readonly ILogger log = InternalTrace.GetLogger("NUnitFrameworkDriver");
 
-        AppDomain _testDomain;
-        AssemblyName _reference;
-        string _testAssemblyPath;
+        readonly AppDomain _testDomain;
+        readonly AssemblyName _reference;
+        string? _testAssemblyPath;
 
-        object _frameworkController;
+        object? _frameworkController;
 
         /// <summary>
         /// Construct an NUnit3FrameworkDriver
@@ -46,7 +47,7 @@ namespace NUnit.Engine.Drivers
             _reference = reference;
         }
 
-        public string ID { get; set; }
+        public string ID { get; set; } = string.Empty;
 
         /// <summary>
         /// Loads the tests in an assembly.
@@ -87,7 +88,7 @@ namespace NUnit.Engine.Drivers
 
             log.Info("Loaded {0}", fileName);
 
-            return handler.Result;
+            return handler.Result.ShouldNotBeNull();
         }
 
         public int CountTestCases(string filter)
@@ -96,9 +97,9 @@ namespace NUnit.Engine.Drivers
 
             CallbackHandler handler = new CallbackHandler();
 
-            CreateObject(COUNT_ACTION, _frameworkController, filter, handler);
+            CreateObject(COUNT_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
 
-            return int.Parse(handler.Result);
+            return int.Parse(handler.Result.ShouldNotBeNull());
         }
 
         /// <summary>
@@ -107,16 +108,16 @@ namespace NUnit.Engine.Drivers
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        public string Run(ITestEventListener listener, string filter)
+        public string Run(ITestEventListener? listener, string filter)
         {
             CheckLoadWasCalled();
 
             var handler = new RunTestsCallbackHandler(listener);
 
-            log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
-            CreateObject(RUN_ACTION, _frameworkController, filter, handler);
+            log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
+            CreateObject(RUN_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
 
-            return handler.Result;
+            return handler.Result.ShouldNotBeNull();
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace NUnit.Engine.Drivers
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public void StopRun(bool force)
         {
-            CreateObject(STOP_RUN_ACTION, _frameworkController, force, new CallbackHandler());
+            CreateObject(STOP_RUN_ACTION, _frameworkController.ShouldNotBeNull(), force, new CallbackHandler());
         }
 
         /// <summary>
@@ -139,10 +140,10 @@ namespace NUnit.Engine.Drivers
 
             CallbackHandler handler = new CallbackHandler();
 
-            log.Info("Exploring {0} - see separate log file", Path.GetFileName(_testAssemblyPath));
-            CreateObject(EXPLORE_ACTION, _frameworkController, filter, handler);
+            log.Info("Exploring {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
+            CreateObject(EXPLORE_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
 
-            return handler.Result;
+            return handler.Result.ShouldNotBeNull();
         }
 
         private void CheckLoadWasCalled()
@@ -156,7 +157,7 @@ namespace NUnit.Engine.Drivers
             try
             {
                 return _testDomain.CreateInstanceAndUnwrap(
-                    _reference.FullName, typeName, false, 0, null, args, null, null );
+                    _reference.FullName, typeName, false, 0, null, args, null, null )!;
             }
             catch (TargetInvocationException ex)
             {

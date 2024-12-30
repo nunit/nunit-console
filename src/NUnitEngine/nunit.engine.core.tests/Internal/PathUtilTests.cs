@@ -55,13 +55,13 @@ namespace NUnit.Engine.Internal
         [Test]
         public void IsFullyQualifiedUnixPath_PathIsNull()
         {
-            Assert.That(() => PathUtils.IsFullyQualifiedUnixPath(null), Throws.ArgumentNullException);
+            Assert.That(() => PathUtils.IsFullyQualifiedUnixPath(null!), Throws.ArgumentNullException);
         }
 
         [Test]
         public void IsFullyQualifiedWindowsPath_PathIsNull()
         {
-            Assert.That(() => PathUtils.IsFullyQualifiedWindowsPath(null), Throws.ArgumentNullException);
+            Assert.That(() => PathUtils.IsFullyQualifiedWindowsPath(null!), Throws.ArgumentNullException);
         }
     }
 
@@ -81,14 +81,12 @@ namespace NUnit.Engine.Internal
 	{
 		public static void SamePathOrUnder( string path1, string path2 )
 		{
-			string msg = "\r\n\texpected: Same path or under <{0}>\r\n\t but was: <{1}>";
-			Assert.That(PathUtils.SamePathOrUnder( path1, path2 ), Is.True, msg, path1, path2);
+			Assert.That(PathUtils.SamePathOrUnder( path1, path2 ), Is.True, $"\r\n\texpected: Same path or under <{path1}>\r\n\t but was: <{path2}>");
 		}
 
 		public static void NotSamePathOrUnder( string path1, string path2 )
 		{
-			string msg = "\r\n\texpected: Not same path or under <{0}>\r\n\t but was: <{1}>";
-			Assert.That(PathUtils.SamePathOrUnder( path1, path2 ), Is.False, msg, path1, path2);
+			Assert.That(PathUtils.SamePathOrUnder( path1, path2 ), Is.False, $"\r\n\texpected: Not same path or under <{path1}>\r\n\t but was: <{path2}>");
 		}
 	}
 

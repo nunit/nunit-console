@@ -98,7 +98,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         {
             var fileSystem = new FileSystem();
 
-            Assert.That(() => fileSystem.Exists((IFile)null), Throws.ArgumentNullException);
+            Assert.That(() => fileSystem.Exists((IFile)null!), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -135,12 +135,12 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         {
             var fileSystem = new FileSystem();
 
-            Assert.That(() => fileSystem.Exists((IDirectory)null), Throws.ArgumentNullException);
+            Assert.That(() => fileSystem.Exists((IDirectory)null!), Throws.ArgumentNullException);
         }
 
         private string GetTestFileLocation()
         {
-            return Assembly.GetAssembly(typeof(FileTests)).Location;
+            return Assembly.GetAssembly(typeof(FileTests))!.Location;
         }
     }
 }

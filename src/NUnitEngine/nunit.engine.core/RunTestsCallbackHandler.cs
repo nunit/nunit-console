@@ -9,18 +9,18 @@ namespace NUnit.Engine
 {
     public class RunTestsCallbackHandler : MarshalByRefObject, ICallbackEventHandler
     {
-        private ITestEventListener _listener;
+        private readonly ITestEventListener _listener;
 
-        public string Result { get; private set; }
+        public string? Result { get; private set; }
 
-        public RunTestsCallbackHandler(ITestEventListener listener)
+        public RunTestsCallbackHandler(ITestEventListener? listener)
         {
             _listener = listener ?? new NullListener();
         }
 
         public override object InitializeLifetimeService()
         {
-            return null;
+            return null!;
         }
 
         public string GetCallbackResult()

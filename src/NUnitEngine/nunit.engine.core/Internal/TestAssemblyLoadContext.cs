@@ -22,14 +22,14 @@ namespace NUnit.Engine.Internal
         public TestAssemblyLoadContext(string testAssemblyPath)
         {
             _resolver = new TestAssemblyResolver(this, testAssemblyPath);
-            _basePath = Path.GetDirectoryName(testAssemblyPath);
+            _basePath = Path.GetDirectoryName(testAssemblyPath)!;
             _runtimeResolver = new AssemblyDependencyResolver(testAssemblyPath);
 #if NET8_0_OR_GREATER
             AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", _basePath);
 #endif
         }
 
-        protected override Assembly Load(AssemblyName name)
+        protected override Assembly? Load(AssemblyName name)
         {
             log.Debug("Loading {0} assembly", name);
 
@@ -78,7 +78,7 @@ namespace NUnit.Engine.Internal
                 return loadedAssembly;
             }
 
-            return loadedAssembly;
+            return null;
         }
 
         protected override IntPtr LoadUnmanagedDll(string name)
@@ -92,7 +92,7 @@ namespace NUnit.Engine.Internal
                 return loadedDllHandle;
             }
 
-            string runtimeResolverPath = _runtimeResolver.ResolveUnmanagedDllToPath(name);
+            string? runtimeResolverPath = _runtimeResolver.ResolveUnmanagedDllToPath(name);
             if (string.IsNullOrEmpty(runtimeResolverPath) == false &&
                 File.Exists(runtimeResolverPath))
             {
@@ -101,7 +101,7 @@ namespace NUnit.Engine.Internal
 
             if (loadedDllHandle != IntPtr.Zero)
             {
-                log.Info("Unmanaged DLL {0} ({1}) is loaded using the deps.json info", name, runtimeResolverPath);
+                log.Info("Unmanaged DLL {0} ({1}) is loaded using the deps.json info", name, runtimeResolverPath!);
                 return loadedDllHandle;
             }
 

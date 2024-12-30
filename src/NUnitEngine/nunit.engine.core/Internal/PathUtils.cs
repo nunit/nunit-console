@@ -38,17 +38,19 @@ namespace NUnit.Engine.Internal
         /// Returns the relative path from a base directory to another
         /// directory or file.
         /// </summary>
-        public static string RelativePath( string from, string to )
+        public static string? RelativePath( string from, string to )
         {
             if (from == null)
                 throw new ArgumentNullException (from);
             if (to == null)
                 throw new ArgumentNullException (to);
 
-            string toPathRoot = Path.GetPathRoot(to);
+            string? toPathRoot = Path.GetPathRoot(to);
             if (toPathRoot == null || toPathRoot == string.Empty)
                 return to;
-            string fromPathRoot = Path.GetPathRoot(from);
+            string? fromPathRoot = Path.GetPathRoot(from);
+            if (fromPathRoot == null || fromPathRoot == string.Empty)
+                return null;
 
             if (!PathsEqual(toPathRoot, fromPathRoot))
                 return null;

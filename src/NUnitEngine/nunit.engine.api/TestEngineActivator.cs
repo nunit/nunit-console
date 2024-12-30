@@ -28,8 +28,8 @@ namespace NUnit.Engine
             var directoryName = Path.GetDirectoryName(apiLocation);
             var enginePath = directoryName == null ? DefaultAssemblyName : Path.Combine(directoryName, DefaultAssemblyName);
             var assembly = Assembly.LoadFrom(enginePath);
-            var engineType = assembly.GetType(DefaultTypeName);
-            return Activator.CreateInstance(engineType) as ITestEngine;
+            var engineType = assembly.GetType(DefaultTypeName, throwOnError: true)!;
+            return (ITestEngine)Activator.CreateInstance(engineType)!;
         }
 #else
 
@@ -51,16 +51,18 @@ namespace NUnit.Engine
         /// <param name="unused">This parameter is no longer used but has not been removed to ensure API compatibility.</param>
         /// <exception cref="NUnitEngineNotFoundException">Thrown when a test engine of the required minimum version is not found</exception>
         /// <returns>An <see cref="ITestEngine"/></returns>
+#pragma warning disable IDE0060 // Remove unused parameter
         public static ITestEngine CreateInstance(Version minVersion, bool unused = false)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             try
             {
-                Assembly engine = FindNewestEngine(minVersion);
+                Assembly? engine = FindNewestEngine(minVersion);
                 if (engine == null)
                 {
                     throw new NUnitEngineNotFoundException(minVersion);
                 }
-                return (ITestEngine)AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(engine.CodeBase, DefaultTypeName);
+                return (ITestEngine)AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(engine.CodeBase!, DefaultTypeName)!;
             }
             catch (NUnitEngineNotFoundException)
             {
@@ -72,13 +74,13 @@ namespace NUnit.Engine
             }
         }
 
-        private static Assembly FindNewestEngine(Version minVersion)
+        private static Assembly? FindNewestEngine(Version minVersion)
         {
             var newestVersionFound = new Version();
 
             // Check the Application BaseDirectory
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DefaultAssemblyName);
-            Assembly newestAssemblyFound = CheckPathForEngine(path, minVersion, ref newestVersionFound, null);
+            Assembly? newestAssemblyFound = CheckPathForEngine(path, minVersion, ref newestVersionFound, null);
 
             // Check Probing Path is not found in Base Directory. This
             // allows the console or other runner to be executed with
@@ -98,7 +100,7 @@ namespace NUnit.Engine
             return newestAssemblyFound;
         }
 
-        private static Assembly CheckPathForEngine(string path, Version minVersion, ref Version newestVersionFound, Assembly newestAssemblyFound)
+        private static Assembly? CheckPathForEngine(string path, Version minVersion, ref Version newestVersionFound, Assembly? newestAssemblyFound)
         {
             try
             {

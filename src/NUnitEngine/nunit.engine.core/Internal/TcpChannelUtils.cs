@@ -28,7 +28,9 @@ namespace NUnit.Engine.Internal
         /// <param name="limit">The rate limit of the channel to create.</param>
         /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>A <see cref="TcpChannel"/> configured with the given name and port.</returns>
-        private static TcpChannel CreateTcpChannel(string name, int port, int limit, CurrentMessageCounter currentMessageCounter = null)
+#pragma warning disable IDE0060 // Remove unused parameter
+        private static TcpChannel CreateTcpChannel(string name, int port, int limit, CurrentMessageCounter? currentMessageCounter = null)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             var props = new Dictionary<string, object>
             {
@@ -58,7 +60,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
-        public static TcpChannel GetTcpChannel(CurrentMessageCounter currentMessageCounter = null)
+        public static TcpChannel? GetTcpChannel(CurrentMessageCounter? currentMessageCounter = null)
         {
             return GetTcpChannel("", 0, 2, currentMessageCounter);
         }
@@ -72,7 +74,7 @@ namespace NUnit.Engine.Internal
         /// <param name="port">The port to use if the channel must be created.</param>
         /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
-        public static TcpChannel GetTcpChannel(string name, int port, CurrentMessageCounter currentMessageCounter = null)
+        public static TcpChannel? GetTcpChannel(string name, int port, CurrentMessageCounter? currentMessageCounter = null)
         {
             return GetTcpChannel(name, port, 2, currentMessageCounter);
         }
@@ -87,7 +89,7 @@ namespace NUnit.Engine.Internal
         /// <param name="limit">The client connection limit or negative for the default.</param>
         /// <param name="currentMessageCounter">An optional counter to provide the ability to wait for all current messages.</param>
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
-        public static TcpChannel GetTcpChannel(string name, int port, int limit, CurrentMessageCounter currentMessageCounter = null)
+        public static TcpChannel? GetTcpChannel(string name, int port, int limit, CurrentMessageCounter? currentMessageCounter = null)
         {
             var existingChannel = ChannelServices.GetChannel(name) as TcpChannel;
             if (existingChannel != null) return existingChannel;

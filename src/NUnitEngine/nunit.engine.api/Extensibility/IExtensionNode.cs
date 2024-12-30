@@ -32,12 +32,12 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Gets an optional description of what the extension does.
         /// </summary>
-        string Description { get; }
+        string? Description { get; }
 
         /// <summary>
         /// The TargetFramework of the extension assembly.
         /// </summary>
-        IRuntimeFramework TargetFramework { get; }
+        IRuntimeFramework? TargetFramework { get; }
 
         /// <summary>
         /// Gets a collection of the names of all this extension's properties

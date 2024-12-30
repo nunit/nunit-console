@@ -18,7 +18,7 @@ namespace NUnit.Engine.Internal
         public bool IsPattern => Text.Contains("*");
         public bool IsValid => PathUtils.IsValidPath(Text.Replace('*', 'X'));
 
-        public string DirectoryName => Path.GetDirectoryName(Text);
+        public string DirectoryName => Path.GetDirectoryName(Text)!;
         public string FileName => Path.GetFileName(Text);
 
         public AddinsFileEntry(int lineNumber, string rawText)
@@ -34,7 +34,7 @@ namespace NUnit.Engine.Internal
             return $"{LineNumber}: {RawText}";
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var other = obj as AddinsFileEntry;
             if (other == null) return false;

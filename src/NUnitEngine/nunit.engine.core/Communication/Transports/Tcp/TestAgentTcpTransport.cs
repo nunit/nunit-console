@@ -20,9 +20,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentTcpTransport));
 
-        private string _agencyUrl;
-        private Socket _clientSocket;
-        private ITestEngineRunner _runner;
+        private readonly string _agencyUrl;
+        private Socket? _clientSocket;
+        private ITestEngineRunner? _runner;
 
         public TestAgentTcpTransport(RemoteTestAgent agent, string serverUrl)
         {
@@ -72,7 +72,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         private void CommandLoop()
         {
             bool keepRunning = true;
-            var socketReader = new SocketReader(_clientSocket, new BinarySerializationProtocol());
+            var socketReader = new SocketReader(_clientSocket.ShouldNotBeNull(), new BinarySerializationProtocol());
 
             while (keepRunning)
             {
@@ -82,33 +82,34 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                 {
                     case "CreateRunner":
                         var package = (TestPackage)command.Arguments[0];
+                        _runner?.Unload();
                         _runner = CreateRunner(package);
                         break;
                     case "Load":
-                        SendResult(_runner.Load());
+                        SendResult(_runner.ShouldNotBeNull().Load());
                         break;
                     case "Reload":
-                        SendResult(_runner.Reload());
+                        SendResult(_runner.ShouldNotBeNull().Reload());
                         break;
                     case "Unload":
-                        _runner.Unload();
+                        _runner.ShouldNotBeNull().Unload();
                         break;
                     case "Explore":
                         var filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.Explore(filter));
+                        SendResult(_runner.ShouldNotBeNull().Explore(filter));
                         break;
                     case "CountTestCases":
                         filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.CountTestCases(filter));
+                        SendResult(_runner.ShouldNotBeNull().CountTestCases(filter));
                         break;
                     case "Run":
                         filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.Run(this, filter));
+                        SendResult(_runner.ShouldNotBeNull().Run(this, filter));
                         break;
 
                     case "RunAsync":
                         filter = (TestFilter)command.Arguments[0];
-                        _runner.RunAsync(this, filter);
+                        _runner.ShouldNotBeNull().RunAsync(this, filter);
                         break;
 
                     case "Stop":
@@ -124,14 +125,14 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         {
             var resultMessage = new CommandReturnMessage(result);
             var bytes = new BinarySerializationProtocol().Encode(resultMessage);
-            _clientSocket.Send(bytes);
+            _clientSocket.ShouldNotBeNull().Send(bytes);
         }
 
         public void OnTestEvent(string report)
         {
             var progressMessage = new ProgressMessage(report);
             var bytes = new BinarySerializationProtocol().Encode(progressMessage);
-            _clientSocket.Send(bytes);
+            _clientSocket.ShouldNotBeNull().Send(bytes);
         }
     }
 }

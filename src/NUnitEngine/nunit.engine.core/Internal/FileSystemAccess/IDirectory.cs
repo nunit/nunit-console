@@ -14,7 +14,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess
         /// Gets the parent directory.
         /// </summary>
         /// <value>The parent directory or <see langword="null"/> if the instance denotes a root (such as '\', 'c:\' , '\\server\share').</value>
-        IDirectory Parent { get; }
+        IDirectory? Parent { get; }
 
         /// <summary>
         /// Gets the full path of the directory.

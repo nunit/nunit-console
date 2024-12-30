@@ -105,8 +105,8 @@ namespace NUnit.Engine.Tests.Extensibility
         }
 
         private static IExtensionAssembly MockExtension(string assemblyName = "ExtensionSelectorTestsExtension",
-            Version assemblyVersion = null,
-            Version targetFramework = null,
+            Version? assemblyVersion = null,
+            Version? targetFramework = null,
             bool fromWildcard = false)
         {
             var sub = Substitute.For<IExtensionAssembly>();

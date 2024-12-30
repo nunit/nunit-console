@@ -7,6 +7,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Company>NUnit Software</Company>
     <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Version)'==''">

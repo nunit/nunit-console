@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using NUnit.Common;
 using SIO = System.IO;
 
 namespace NUnit.Engine.Internal.FileSystemAccess.Default
@@ -42,7 +43,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
                 throw new ArgumentException("Filename contains invalid characters.", nameof(path));
             }
 
-            var directory = SIO.Path.GetDirectoryName(path);
+            var directory = SIO.Path.GetDirectoryName(path)!;
             if (directory.IndexOfAny(SIO.Path.GetInvalidPathChars()) > -1)
             {
                 throw new ArgumentException("Directory contains invalid characters.", nameof(path));

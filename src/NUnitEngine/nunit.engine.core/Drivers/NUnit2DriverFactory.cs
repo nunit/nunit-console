@@ -13,10 +13,10 @@ namespace NUnit.Engine.Drivers
     {
         private const string NUNIT_FRAMEWORK = "nunit.framework";
         private const string NUNITLITE_FRAMEWORK = "nunitlite";
-        private ExtensionNode _driverNode;
+        private readonly ExtensionNode _driverNode;
 
         // TODO: This should be a central service but for now it's local
-        private ProvidedPathsAssemblyResolver _resolver;
+        private readonly ProvidedPathsAssemblyResolver _resolver;
         bool _resolverInstalled;
 
         public NUnit2DriverFactory(ExtensionNode driverNode)
@@ -32,8 +32,8 @@ namespace NUnit.Engine.Drivers
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         public bool IsSupportedTestFramework(AssemblyName reference)
         {
-            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 2
-                || NUNITLITE_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version.Major == 1;
+            return NUNIT_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version?.Major == 2
+                || NUNITLITE_FRAMEWORK.Equals(reference.Name, StringComparison.OrdinalIgnoreCase) && reference.Version?.Major == 1;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace NUnit.Engine.Drivers
                 _resolver.AddPathFromFile(_driverNode.AssemblyPath);
             }
 
-            return _driverNode.CreateExtensionObject(domain) as IFrameworkDriver;
+            return (IFrameworkDriver)_driverNode.CreateExtensionObject(domain);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace NUnit.Engine.Extensibility
 {
     public class ExtensionManager
     {
-        static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version;
+        static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
 
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
@@ -30,7 +30,7 @@ namespace NUnit.Engine.Extensibility
         private readonly Dictionary<string, ExtensionPoint> _extensionPointIndex = new Dictionary<string, ExtensionPoint>();
 
         // List of ExtensionNodes for all extensions discovered.
-        private List<ExtensionNode> _extensions = new List<ExtensionNode>();
+        private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
 
         private bool _extensionsAreLoaded;
 
@@ -88,7 +88,7 @@ namespace NUnit.Engine.Extensibility
         {
             foreach (var assembly in targetAssemblies)
             {
-                log.Info("FindExtensionPoints scanning {0} assembly", assembly.GetName().Name);
+                log.Info("FindExtensionPoints scanning {0} assembly", assembly.GetName().Name!);
 
                 foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
                 {
@@ -175,7 +175,7 @@ namespace NUnit.Engine.Extensibility
                 : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
 
 
-            IDirectory startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
+            IDirectory? startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
 
             while (startDir != null)
             {
@@ -190,9 +190,9 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
-        public IExtensionPoint GetExtensionPoint(string path)
+        public IExtensionPoint? GetExtensionPoint(string path)
         {
-            return _extensionPointIndex.TryGetValue(path, out ExtensionPoint ep) ? ep : null;
+            return _extensionPointIndex.TryGetValue(path, out ExtensionPoint? ep) ? ep : null;
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="path">The identifying path for an ExtensionPoint</param>
         /// <returns></returns>
-        public IExtensionNode GetExtensionNode(string path)
+        public IExtensionNode? GetExtensionNode(string path)
         {
             EnsureExtensionsAreLoaded();
 
@@ -264,7 +264,7 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Get an ExtensionPoint based on the required Type for extensions.
         /// </summary>
-        public ExtensionPoint GetExtensionPoint(Type type)
+        public ExtensionPoint? GetExtensionPoint(Type type)
         {
             foreach (var ep in _extensionPoints)
                 if (ep.TypeName == type.FullName)
@@ -276,7 +276,7 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Get an ExtensionPoint based on a Cecil TypeReference.
         /// </summary>
-        public ExtensionPoint GetExtensionPoint(TypeReference type)
+        public ExtensionPoint? GetExtensionPoint(TypeReference type)
         {
             foreach (var ep in _extensionPoints)
                 if (ep.TypeName == type.FullName)
@@ -290,7 +290,7 @@ namespace NUnit.Engine.Extensibility
         /// Returns null if no extension point can be found that would
         /// be satisfied by the provided Type.
         /// </summary>
-        private ExtensionPoint DeduceExtensionPointFromType(TypeReference typeRef)
+        private ExtensionPoint? DeduceExtensionPointFromType(TypeReference typeRef)
         {
             var ep = GetExtensionPoint(typeRef);
             if (ep != null)
@@ -305,7 +305,7 @@ namespace NUnit.Engine.Extensibility
                     return ep;
             }
 
-            TypeReference baseType = typeDef.BaseType;
+            TypeReference? baseType = typeDef.BaseType;
             return baseType != null && baseType.FullName != "System.Object"
                 ? DeduceExtensionPointFromType(baseType)
                 : null;
@@ -426,7 +426,7 @@ namespace NUnit.Engine.Extensibility
 
                 // Do we already have a copy of the same assembly at a different path?
                 //if (_assemblies.ByName.ContainsKey(assemblyName))
-                if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly existing))
+                if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly? existing))
                 {
                     if (candidateAssembly.IsBetterVersionOf(existing))
                         _assemblies.ByName[assemblyName] = candidateAssembly;
@@ -449,7 +449,7 @@ namespace NUnit.Engine.Extensibility
         }
 
         // Dictionary containing all directory paths already visited.
-        private readonly Dictionary<string, object> _visited = new Dictionary<string, object>();
+        private readonly Dictionary<string, object?> _visited = new Dictionary<string, object?>();
 
         private bool WasVisited(string path, bool fromWildcard)
         {
@@ -476,8 +476,9 @@ namespace NUnit.Engine.Extensibility
                 return;
             }
 
-            IRuntimeFramework assemblyTargetFramework = null;
+            IRuntimeFramework? assemblyTargetFramework = null;
 #if NETFRAMEWORK
+#if FIXED
             // Use special properties provided by our backport of RuntimeInformation
             Version currentVersion = RuntimeInformation.FrameworkVersion;
             var frameworkName = extensionAssembly.FrameworkName;
@@ -495,6 +496,7 @@ namespace NUnit.Engine.Extensibility
                 }
             }
 #endif
+#endif
 
             foreach (var extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
             {
@@ -506,7 +508,7 @@ namespace NUnit.Engine.Extensibility
                 // TODO: This is a remnant of older code. In principle, this should be generalized
                 // to something like "HostVersion". However, this can safely remain until
                 // we separate ExtensionManager into its own assembly.
-                string versionArg = extensionAttr.GetNamedArgument("EngineVersion") as string;
+                string? versionArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.EngineVersion)) as string;
                 if (versionArg != null)
                 {
                     if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
@@ -516,21 +518,21 @@ namespace NUnit.Engine.Extensibility
                     }
                 }
 
+                string? extensionAttrPath = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Path));
                 var node = new ExtensionNode(extensionAssembly.FilePath, extensionAssembly.AssemblyVersion, extensionType.FullName, assemblyTargetFramework)
                 {
-                    Path = extensionAttr.GetNamedArgument("Path") as string,
-                    Description = extensionAttr.GetNamedArgument("Description") as string
+                    Description = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Description)),
                 };
 
-                object enabledArg = extensionAttr.GetNamedArgument("Enabled");
+                object? enabledArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Enabled));
                 node.Enabled = enabledArg == null || (bool)enabledArg;
 
                 log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
 
                 foreach (var attr in extensionType.GetAttributes("NUnit.Engine.Extensibility.ExtensionPropertyAttribute"))
                 {
-                    string name = attr.ConstructorArguments[0].Value as string;
-                    string value = attr.ConstructorArguments[1].Value as string;
+                    string? name = attr.ConstructorArguments[0].Value as string;
+                    string? value = attr.ConstructorArguments[1].Value as string;
 
                     if (name != null && value != null)
                     {
@@ -541,8 +543,8 @@ namespace NUnit.Engine.Extensibility
 
                 _extensions.Add(node);
 
-                ExtensionPoint ep;
-                if (node.Path == null)
+                ExtensionPoint? ep;
+                if (extensionAttrPath == null)
                 {
                     ep = DeduceExtensionPointFromType(extensionType);
                     if (ep == null)
@@ -557,6 +559,8 @@ namespace NUnit.Engine.Extensibility
                 }
                 else
                 {
+                    node.Path = extensionAttrPath;
+
                     // TODO: Remove need for the cast
                     ep = GetExtensionPoint(node.Path) as ExtensionPoint;
                     if (ep == null)
@@ -583,7 +587,7 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="runnerAsm">The executing runner</param>
         /// <param name="extensionAsm">The extension we are attempting to load</param>
-        internal bool CanLoadTargetFramework(Assembly runnerAsm, ExtensionAssembly extensionAsm)
+        internal bool CanLoadTargetFramework(Assembly? runnerAsm, ExtensionAssembly extensionAsm)
         {
             if (runnerAsm == null)
                 return true;

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
+using NUnit.Common;
 
 namespace System.Runtime.CompilerServices
 {
@@ -27,14 +28,14 @@ namespace NUnit.Engine.Internal
         {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml( "<" + name + "/>" );
-            return doc.FirstChild;
+            return doc.FirstChild.ShouldNotBeNull();
         }
 
         public static XmlNode CreateXmlNode(string xml)
         {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xml);
-            return doc.FirstChild;
+            return doc.FirstChild.ShouldNotBeNull();
         }
 
         /// <summary>
@@ -45,9 +46,11 @@ namespace NUnit.Engine.Internal
         /// <param name="value">The value of the attribute.</param>
         public static void AddAttribute(this XmlNode node, string name, string value)
         {
-            XmlAttribute attr = node.OwnerDocument.CreateAttribute(name);
+            XmlAttribute attr = node.OwnerDocument.ShouldNotBeNull().CreateAttribute(name);
             attr.Value = value;
-            node.Attributes.Append(attr);
+
+            // TODO: How to create the Attributes collection if it doesn't exist?
+            node.Attributes!.Append(attr);
         }
 
         /// <summary>
@@ -58,7 +61,7 @@ namespace NUnit.Engine.Internal
         /// <returns>The newly created child element</returns>
         public static XmlNode AddElement(this XmlNode node, string name)
         {
-            XmlNode childNode = node.OwnerDocument.CreateElement(name);
+            XmlNode childNode = node.OwnerDocument.ShouldNotBeNull().CreateElement(name);
             node.AppendChild(childNode);
             return childNode;
         }
@@ -74,7 +77,7 @@ namespace NUnit.Engine.Internal
         public static XmlNode AddElementWithCDataSection(this XmlNode node, string name, string data)
         {
             XmlNode childNode = node.AddElement(name);
-            childNode.AppendChild(node.OwnerDocument.CreateCDataSection(data));
+            childNode.AppendChild(node.OwnerDocument.ShouldNotBeNull().CreateCDataSection(data));
             return childNode;
         }
 
@@ -84,9 +87,9 @@ namespace NUnit.Engine.Internal
         /// <param name="result">The result.</param>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public static string GetAttribute(this XmlNode result, string name)
+        public static string? GetAttribute(this XmlNode result, string name)
         {
-            XmlAttribute attr = result.Attributes[name];
+            XmlAttribute? attr = result.Attributes?[name];
 
             return attr == null ? null : attr.Value;
         }
@@ -100,7 +103,7 @@ namespace NUnit.Engine.Internal
         /// <returns></returns>
         public static int GetAttribute(this XmlNode result, string name, int defaultValue)
         {
-            XmlAttribute attr = result.Attributes[name];
+            XmlAttribute? attr = result.Attributes?[name];
 
             return attr == null
                 ? defaultValue
@@ -116,7 +119,7 @@ namespace NUnit.Engine.Internal
         /// <returns></returns>
         public static double GetAttribute(this XmlNode result, string name, double defaultValue)
         {
-            XmlAttribute attr = result.Attributes[name];
+            XmlAttribute? attr = result.Attributes?[name];
 
             return attr == null
                 ? defaultValue
@@ -132,7 +135,7 @@ namespace NUnit.Engine.Internal
         /// <returns></returns>
         public static DateTime GetAttribute(this XmlNode result, string name, DateTime defaultValue)
         {
-            string dateStr = GetAttribute(result, name);
+            string? dateStr = GetAttribute(result, name);
             if (dateStr == null)
                 return defaultValue;
 

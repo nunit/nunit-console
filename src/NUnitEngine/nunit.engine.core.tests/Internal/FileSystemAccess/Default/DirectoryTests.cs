@@ -14,18 +14,18 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         public void Init()
         {
             var path = SIO.Directory.GetCurrentDirectory();
-            var parent = new SIO.DirectoryInfo(path).Parent.FullName;
+            var parent = new SIO.DirectoryInfo(path).Parent!.FullName;
 
             var directory = new Directory(path);
 
             Assert.That(path, Is.EqualTo(directory.FullName));
-            Assert.That(parent, Is.EqualTo(directory.Parent.FullName));
+            Assert.That(parent, Is.EqualTo(directory.Parent!.FullName));
         }
 
         [Test]
         public void Init_PathIsNull()
         {
-            Assert.That(() => new Directory(null), Throws.ArgumentNullException);
+            Assert.That(() => new Directory(null!), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -49,12 +49,12 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         public void Init_TrailingDirectorySeparator()
         {
             var path = SIO.Directory.GetCurrentDirectory() + SIO.Path.DirectorySeparatorChar;
-            var parent = new SIO.DirectoryInfo(SIO.Directory.GetCurrentDirectory()).Parent.FullName;
+            var parent = new SIO.DirectoryInfo(SIO.Directory.GetCurrentDirectory()).Parent!.FullName;
 
             var directory = new Directory(path);
 
             Assert.That(path, Is.EqualTo(directory.FullName));
-            Assert.That(parent, Is.EqualTo(directory.Parent.FullName));
+            Assert.That(parent, Is.EqualTo(directory.Parent!.FullName));
         }
 
         // Skip this test on non-Windows systems since System.IO.DirectoryInfo appends '\\server\share' to the current working-directory, making this test useless.
@@ -136,7 +136,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var path = SIO.Directory.GetCurrentDirectory();
             var directory = new Directory(path);
 
-            Assert.That(() => directory.GetFiles(null), Throws.ArgumentNullException);
+            Assert.That(() => directory.GetFiles(null!), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             var path = SIO.Directory.GetCurrentDirectory();
             var directory = new Directory(path);
 
-            Assert.That(() => directory.GetDirectories(null, SIO.SearchOption.TopDirectoryOnly), Throws.ArgumentNullException);
+            Assert.That(() => directory.GetDirectories(null!, SIO.SearchOption.TopDirectoryOnly), Throws.ArgumentNullException);
         }
 
         [Test]

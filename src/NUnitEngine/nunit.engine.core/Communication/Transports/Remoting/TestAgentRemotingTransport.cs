@@ -22,10 +22,10 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentRemotingTransport));
 
         private readonly string _agencyUrl;
-        private ITestEngineRunner _runner;
+        private ITestEngineRunner? _runner;
 
-        private TcpChannel _channel;
-        private ITestAgency _agency;
+        private TcpChannel? _channel;
+        private ITestAgency? _agency;
         private readonly CurrentMessageCounter _currentMessageCounter = new CurrentMessageCounter();
 
         public TestAgentRemotingTransport(RemoteTestAgent agent, string agencyUrl)
@@ -54,6 +54,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
             catch (Exception ex)
             {
                 log.Error("Unable to connect: {0}", ExceptionHelper.BuildMessageAndStackTrace(ex));
+                return false;
             }
 
             try
@@ -72,6 +73,8 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
         public void Stop()
         {
+            Guard.OperationValid(_channel != null, "Channel is not open");
+
             log.Info("Stopping");
 
             // Do this on a different thread since we need to wait until all messages are through,
@@ -86,7 +89,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
                 log.Info("Attempting shut down channel");
 
                 // Shut down nicely
-                _channel.StopListening(null);
+                _channel!.StopListening(null);
                 ChannelServices.UnregisterChannel(_channel);
 
                 // Signal to other threads that it's okay to exit the process or start a new channel, etc.
@@ -97,6 +100,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
         public ITestEngineRunner CreateRunner(TestPackage package)
         {
+            _runner?.Dispose();
             _runner = Agent.CreateRunner(package);
             return this;
         }
@@ -104,7 +108,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         public void Dispose()
         {
             Agent.Dispose();
-            _runner.Dispose();
+            _runner?.Dispose();
         }
 
         #region ITestEngineRunner Implementation
@@ -117,23 +121,22 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// <returns>A TestEngineResult.</returns>
         public TestEngineResult Explore(TestFilter filter)
         {
-            return _runner.Explore(filter);
+            return _runner.ShouldNotBeNull().Explore(filter);
         }
 
         public TestEngineResult Load()
         {
-            return _runner.Load();
+            return _runner.ShouldNotBeNull().Load();
         }
 
         public void Unload()
         {
-            if (_runner != null)
-                _runner.Unload();
+            _runner?.Unload();
         }
 
         public TestEngineResult Reload()
         {
-            return _runner.Reload();
+            return _runner.ShouldNotBeNull().Reload();
         }
 
         /// <summary>
@@ -144,7 +147,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// <returns>The count of test cases</returns>
         public int CountTestCases(TestFilter filter)
         {
-            return _runner.CountTestCases(filter);
+            return _runner.ShouldNotBeNull().CountTestCases(filter);
         }
 
         /// <summary>
@@ -156,7 +159,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
         {
-            return _runner.Run(listener, filter);
+            return _runner.ShouldNotBeNull().Run(listener, filter);
         }
 
         /// <summary>
@@ -168,7 +171,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// <returns>A <see cref="AsyncTestEngineResult"/> that will provide the result of the test execution</returns>
         public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            return _runner.RunAsync(listener, filter);
+            return _runner.ShouldNotBeNull().RunAsync(listener, filter);
         }
 
         /// <summary>
@@ -177,8 +180,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public void StopRun(bool force)
         {
-            if (_runner != null)
-                _runner.StopRun(force);
+            _runner?.StopRun(force);
         }
 
         #endregion
@@ -188,7 +190,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// </summary>
         public override object InitializeLifetimeService()
         {
-            return null;
+            return null!;
         }
     }
 }

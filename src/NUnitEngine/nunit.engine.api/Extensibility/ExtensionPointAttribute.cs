@@ -27,17 +27,17 @@ namespace NUnit.Engine.Extensibility
         /// is typically formatted as a path using '/' and the set of extension 
         /// points is sometimes viewed as forming a tree.
         /// </summary>
-        public string Path { get; private set; }
+        public string Path { get; }
 
         /// <summary>
         /// The required Type (usually an interface) of any extension that is 
         /// installed at this ExtensionPoint.
         /// </summary>
-        public Type Type { get; private set; }
+        public Type Type { get; }
 
         /// <summary>
         /// An optional description of the purpose of the ExtensionPoint
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

@@ -31,6 +31,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the XML representation of this filter as a string.
         /// </summary>
-        public string Text { get; private set; }
+        public string Text { get; }
     }
 }

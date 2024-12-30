@@ -2,9 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using NUnit.Engine;
+
+#nullable enable
 
 namespace NUnit.Common
 {
@@ -65,13 +68,15 @@ namespace NUnit.Common
         /// <returns>A string representation of the stack trace.</returns>
         private static string GetSafeStackTrace(Exception exception)
         {
+            const string NoStackTrace = "No stack trace available";
+
             try
             {
-                return exception.StackTrace;
+                return exception.StackTrace ?? NoStackTrace;
             }
             catch (Exception)
             {
-                return "No stack trace available";
+                return NoStackTrace;
             }
         }
 
@@ -89,11 +94,11 @@ namespace NUnit.Common
             }
 
             var reflectionException = exception as ReflectionTypeLoadException;
-            if (reflectionException != null)
+            if (reflectionException != null && reflectionException.LoaderExceptions != null)
             {
-                result.AddRange(reflectionException.LoaderExceptions);
+                result.AddRange(reflectionException.LoaderExceptions.WhereNotNull());
 
-                foreach (var innerException in reflectionException.LoaderExceptions)
+                foreach (var innerException in reflectionException.LoaderExceptions.WhereNotNull())
                     result.AddRange(FlattenExceptionHierarchy(innerException));
             }
 
@@ -118,6 +123,20 @@ namespace NUnit.Common
             }
 
             return ex.Message;
+        }
+
+        /// <summary>
+        /// Returns the specified sequence with all null references removed.
+        /// </summary>
+        /// <typeparam name="T">The type of items in source.</typeparam>
+        /// <param name="source">An <see cref="IEnumerable{T}"/> to filter.</param>
+        /// <returns>
+        /// The sequence with all null references removed.
+        /// </returns>
+        private static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
+            where T : class
+        {
+            return source.Where(x => x is not null)!;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace NUnit.Engine
         {
         }
 
-        private static string CreateMessage(Version minVersion = null)
+        private static string CreateMessage(Version? minVersion = null)
         {
             return string.Format("{0} with a version greater than or equal to {1} not found",
                 TestEngineActivator.DefaultTypeName, minVersion ?? TestEngineActivator.DefaultMinimumVersion);

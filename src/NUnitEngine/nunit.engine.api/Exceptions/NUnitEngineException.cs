@@ -23,7 +23,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Construct with a message and inner exception
         /// </summary>
-        public NUnitEngineException(string message, Exception innerException) : base(message, innerException)
+        public NUnitEngineException(string message, Exception? innerException) : base(message, innerException)
         {
         }
 

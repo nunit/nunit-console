@@ -16,11 +16,11 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     {
         private const int BUFFER_SIZE = 1024;
 
-        private Socket _socket;
-        private ISerializationProtocol _wireProtocol;
+        private readonly Socket _socket;
+        private readonly ISerializationProtocol _wireProtocol;
 
-        private Queue<TestEngineMessage> _msgQueue;
-        private byte[] _buffer;
+        private readonly Queue<TestEngineMessage> _msgQueue;
+        private readonly byte[] _buffer;
 
         public SocketReader(Socket socket, ISerializationProtocol protocol)
         {

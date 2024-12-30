@@ -19,6 +19,6 @@ namespace NUnit.Engine.Drivers
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
-        IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string targetFramework, bool skipNonTestAssemblies);
+        IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string? targetFramework, bool skipNonTestAssemblies);
     }
 }

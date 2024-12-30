@@ -295,14 +295,14 @@ namespace NUnit.Engine.Services.Tests
         private static string GetSiblingDirectory(string dir)
         {
             var file = new FileInfo(typeof(ExtensionManagerTests).Assembly.Location);
-            return Path.Combine(file.Directory.Parent.FullName, dir);
+            return Path.Combine(file.Directory!.Parent!.FullName, dir);
         }
 
         private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionManagerTests).Assembly;
-        private static readonly string THIS_ASSEMBLY_DIRECTORY = Path.GetDirectoryName(THIS_ASSEMBLY.Location);
+        private static readonly string THIS_ASSEMBLY_DIRECTORY = Path.GetDirectoryName(THIS_ASSEMBLY.Location)!;
         private const string FAKE_EXTENSIONS_FILENAME = "FakeExtensions.dll";
         private static readonly string FAKE_EXTENSIONS_PARENT_DIRECTORY =
-            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent.FullName, "fakes");
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakes");
 
         /// <summary>
         /// Returns an ExtensionAssembly referring to a particular build of the fake test extensions

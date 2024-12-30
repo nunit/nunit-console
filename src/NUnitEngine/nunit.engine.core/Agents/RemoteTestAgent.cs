@@ -25,19 +25,20 @@ namespace NUnit.Engine.Agents
         /// </remarks>
         public RemoteTestAgent(Guid agentId) : base(agentId) { }
 
-        public ITestAgentTransport Transport;
+        public ITestAgentTransport? Transport;
 
         public int ProcessId => System.Diagnostics.Process.GetCurrentProcess().Id;
 
         public override bool Start()
         {
             Guard.OperationValid(Transport != null, "Transport must be set before calling Start().");
-            return Transport.Start();
+            return Transport!.Start();
         }
 
         public override void Stop()
         {
-            Transport.Stop();
+            Guard.OperationValid(Transport != null, "Transport must be set before calling Stop().");
+            Transport!.Stop();
         }
 
         public override ITestEngineRunner CreateRunner(TestPackage package)

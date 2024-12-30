@@ -9,6 +9,7 @@ using NUnit.Engine.Internal;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
 using System.Diagnostics;
+using NUnit.Common;
 
 namespace NUnit.Engine.Drivers
 {
@@ -35,17 +36,17 @@ namespace NUnit.Engine.Drivers
 
         static ILogger log = InternalTrace.GetLogger(nameof(NUnitNetCore31Driver));
 
-        Assembly _testAssembly;
-        Assembly _frameworkAssembly;
-        object _frameworkController;
-        Type _frameworkControllerType;
-        TestAssemblyLoadContext _assemblyLoadContext;
+        Assembly? _testAssembly;
+        Assembly? _frameworkAssembly;
+        object? _frameworkController;
+        Type? _frameworkControllerType;
+        TestAssemblyLoadContext? _assemblyLoadContext;
 
         /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
         /// test ids created.
         /// </summary>
-        public string ID { get; set; }
+        public string ID { get; set; } = string.Empty;
 
         /// <summary>
         /// Loads the tests in an assembly.
@@ -73,7 +74,7 @@ namespace NUnit.Engine.Drivers
             }
             log.Debug($"Loaded {assemblyPath}");
 
-            var nunitRef = _testAssembly.GetReferencedAssemblies().FirstOrDefault(reference => reference.Name.Equals("nunit.framework", StringComparison.OrdinalIgnoreCase));
+            var nunitRef = _testAssembly.GetReferencedAssemblies().FirstOrDefault(reference => string.Equals(reference.Name, "nunit.framework", StringComparison.OrdinalIgnoreCase));
             if (nunitRef == null)
             {
                 log.Error(FAILED_TO_LOAD_NUNIT);
@@ -101,8 +102,8 @@ namespace NUnit.Engine.Drivers
             _frameworkControllerType = _frameworkController.GetType();
             log.Debug($"Created FrameworkControler {_frameworkControllerType.Name}");
 
-            log.Info("Loading {0} - see separate log file", _testAssembly.FullName);
-            return ExecuteMethod(LOAD_METHOD) as string;
+            log.Info("Loading {0} - see separate log file", _testAssembly.FullName!);
+            return (string)ExecuteMethod(LOAD_METHOD);
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace NUnit.Engine.Drivers
         public int CountTestCases(string filter)
         {
             CheckLoadWasCalled();
-            object count = ExecuteMethod(COUNT_METHOD, filter);
+            object? count = ExecuteMethod(COUNT_METHOD, filter);
             return count != null ? (int)count : 0;
         }
 
@@ -123,12 +124,12 @@ namespace NUnit.Engine.Drivers
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        public string Run(ITestEventListener listener, string filter)
+        public string Run(ITestEventListener? listener, string filter)
         {
             CheckLoadWasCalled();
-            log.Info("Running {0} - see separate log file", _testAssembly.FullName);
-            Action<string> callback = listener != null ? listener.OnTestEvent : (Action<string>)null;
-            return ExecuteMethod(RUN_METHOD, new[] { typeof(Action<string>), typeof(string) }, callback, filter) as string;
+            log.Info("Running {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
+            Action<string>? callback = listener != null ? listener.OnTestEvent : (Action<string>?)null;
+            return (string)ExecuteMethod(RUN_METHOD, new[] { typeof(Action<string>), typeof(string) }, callback, filter);
         }
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace NUnit.Engine.Drivers
         public void RunAsync(Action<string> callback, string filter)
         {
             CheckLoadWasCalled();
-            log.Info("Running {0} - see separate log file", _testAssembly.FullName);
+            log.Info("Running {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
             ExecuteMethod(RUN_ASYNC_METHOD, new[] { typeof(Action<string>), typeof(string) }, callback, filter);
         }
 
@@ -161,8 +162,8 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
 
-            log.Info("Exploring {0} - see separate log file", _testAssembly.FullName);
-            return ExecuteMethod(EXPLORE_METHOD, filter) as string;
+            log.Info("Exploring {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
+            return (string)ExecuteMethod(EXPLORE_METHOD, filter);
         }
 
         void CheckLoadWasCalled()
@@ -173,39 +174,33 @@ namespace NUnit.Engine.Drivers
 
         object CreateObject(string typeName, params object[] args)
         {
-            var typeinfo = _frameworkAssembly.DefinedTypes.FirstOrDefault(t => t.FullName == typeName);
-            if (typeinfo == null)
-            {
-                log.Error("Could not find type {0}", typeName);
-            }
-            return Activator.CreateInstance(typeinfo.AsType(), args);
+            var type = _frameworkAssembly.ShouldNotBeNull().GetType(typeName, throwOnError: true)!;
+            return Activator.CreateInstance(type, args)!;
         }
 
-        object ExecuteMethod(string methodName, params object[] args)
+        object ExecuteMethod(string methodName, params object?[] args)
         {
-            var method = _frameworkControllerType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
-            if (method == null)
-                log.Error($"Method {methodName} was not found in {_frameworkControllerType.Name}");
-            log.Debug($"Executing {method.DeclaringType}.{method.Name}");
+            var method = _frameworkControllerType.ShouldNotBeNull().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
             return ExecuteMethod(method, args);
         }
 
-        object ExecuteMethod(string methodName, Type[] ptypes, params object[] args)
+        object ExecuteMethod(string methodName, Type[] ptypes, params object?[] args)
         {
-            var method = _frameworkControllerType.GetMethod(methodName, ptypes);
+            var method = _frameworkControllerType.ShouldNotBeNull().GetMethod(methodName, ptypes);
             return ExecuteMethod(method, args);
         }
 
-        object ExecuteMethod(MethodInfo method, params object[] args)
+        object ExecuteMethod(MethodInfo? method, params object?[] args)
         {
             if (method == null)
             {
                 throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
             }
 
-            using (_assemblyLoadContext.EnterContextualReflection())
+            using (_assemblyLoadContext.ShouldNotBeNull().EnterContextualReflection())
             {
-                return method.Invoke(_frameworkController, args);
+                log.Debug($"Executing {method.DeclaringType}.{method.Name}");
+                return method.Invoke(_frameworkController, args).ShouldNotBeNull();
             }
         }
     }
