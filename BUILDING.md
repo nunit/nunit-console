@@ -1,9 +1,6 @@
 # Building NUnit 3 Console and Engine
 
-NUnit 3 consists of three separate layers: the Framework, the Engine and the Console Runner. This
-repository contains the Engine and Console Runner. The source code is kept in the GitHub repository
-at https://github.com/nunit/nunit-console. Source for the framework can be found
-at https://github.com/nunit/nunit
+NUnit 3 consists of three separate layers: the Framework, the Engine and the Console Runner. This repository contains the Engine and Console Runner. The source code is kept in the GitHub repository at https://github.com/nunit/nunit-console. Source for the framework can be found at https://github.com/nunit/nunit
 
 Note that assemblies in one layer must not reference those in any other layer, except as follows:
  * The console runner references the nunit.engine.api assembly, but not the nunit.engine assembly.
@@ -16,7 +13,7 @@ See also [Building and testing for Linux on a Windows machine](#building-and-tes
 ## Prerequisites
 
 - Visual Studio 2022 or newer to build on Windows
-- .NET 6.0.100 or newer
+- .NET 8.0 or newer
 
 ## Solution Build
 
@@ -24,30 +21,29 @@ All projects are built together using a single Visual Studio solution NUnitConso
 built with Visual Studio or on the command line using Cake. The projects all place their output in
 a common bin directory.
 
+The solution build is useful for verifying that everything builds correctly but doesn't create packages or run any tests. Developers working on this project are advised to run the build script periodically.
+
 ## Build Script
 
-We use **Cake** (https://cakebuild.net) to build NUnit for distribution. The primary script that controls
-building, running tests and packaging is build.cake. We modify build.cake when we need to add new
-targets or change the way the build is done. Normally build.cake is not invoked directly but through
-build.ps1 (on Windows) or build.sh (on Linux). These two scripts are provided by the Cake project
-and ensure that Cake is properly installed before trying to run the cake script. This helps the
-build to work on CI servers using newly created agents to run the build and we generally run it
-the same way on our own machines.
+We use **Cake** (https://cakebuild.net) to build NUnit for distribution. Our standard script targets are all wrapped in what **Cake** calls a recipe. `NUnit.Cake.Recpe` is currently used for building the runner, engine and a number of our extensions. To see all the various targets and options our recipe supports, enter `build --usage` at the command-line. **Note:** We cannot use `--help` because **Cake** uses that option for it's own help.
 
-Key arguments to build.cmd / build.ps1 / build.sh :
- * --target=<task>                 The task to run (default is Build)
- * --configuration=[Release|Debug] The configuration to use (default is Release)
+The primary script that sets our options for building, running tests and packaging is `build.cake`. To reduce the size of `build.cake`, our package test definitions are included from a separate file, `package-tests.cake`. There are two places in the script where we specify options.
+
+ 1. In the call to `BuildSettings.Initialize`, general options for he entire build are given. Eventually, we hope to add a help screen that explains the available options. At this time, you will need to examine the [source code](https://github.com/nunit/NUnit.Cake.Recipe/blob/main/recipe/build-settings.cake). 
+ 2. Our packages are all defined in `build.cake` by instantiating objects of type `NuGetPackage` or `ChocolateyPackage`. Once again, for documentation of available constructor arguments, you should examine the code for [NuGetPackage](https://github.com/nunit/NUnit.Cake.Recipe/blob/main/recipe/nuget-package.cake) and [ChocolatePackage](https://github.com/nunit/NUnit.Cake.Recipe/blob/main/recipe/chocolatey-package.cake).
+
+The build is normally started by running `build` or `build.ps1` on Windows or `build.sh` on Linux. The three comands are functionally identical. They check that the necessary software is installed and then run `dotnet cake`. When running on a local machine where you know that everything is properly installed, you may use `dotnet cake` directly but it should not be used on uninitialized build agents.
  
-The build.cake script contains a large number of interdependent tasks. The most
-important top-level tasks to use are listed here:
-
-```
- * Build               Builds everything. This is the default if no target is given.
- * Test                Runs all unit tests. Dependent on Build.
- * Package             Builds, Verifies and Tests all packages. Dependent on Build.
-```
+For development purposes, the usual commands to run are...
+ * `build` alone, to simply compile everything.
+ * `build -t Test` to compile and run unit tests.
+ * `build -t Package` to compile, create packages and test them.
+ * `build -t Test -t Package` to compile, unit test and create and test packages.
 
 ### Building and testing for Linux on a Windows machine
+
+> _**NOTE:** Instructions in this section have not yet been verified on the latest build of the console and engine.
+If you find problems, please file an issue._
 
 Most of the time, it's not necessary to build or run tests on platforms other than your primary
 platform. The continuous integration which runs on every PR is enough to catch any problems.

@@ -119,56 +119,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit4-console.exe"),
         tests: StandardRunnerTests),
 
-    //NUnitConsoleZipPackage = new ZipPackage(
-    //    id: "NUnit.Console",
-    //    source: BuildSettings.ZipImageDirectory,
-    //    checks: new PackageCheck[] {
-    //        HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
-    //        HasDirectory("bin/net462").WithFiles(
-    //            "nunit4-console.exe", "nunit4-console.exe.config", "nunit4-console.pdb",
-    //            "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-    //            "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-    //        //HasDirectory("bin/net462/addins").WithFiles(
-    //        //    "nunit.core.dll", "nunit.core.interfaces.dll", "nunit.engine.api.dll",
-    //        //    "nunit.v2.driver.dll", "nunit-project-loader.dll", "nunit-v2-result-writer.dll",
-    //        //    "teamcity-event-listener.dll", "vs-project-loader.dll"),
-    //        HasDirectory("bin/netcoreapp3.1").WithFiles(
-    //            "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-    //            "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-    //        HasDirectory("bin/agents/net462").WithFiles(
-    //            "nunit-agent-net462.exe", "nunit-agent-net462.exe.config",
-    //            "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
-    //            "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-    //            "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-    //        HasDirectory("bin/agents/net6.0").WithFiles(
-    //            "nunit-agent-net60.dll", "nunit-agent-net60.dll.config",
-    //            "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-    //            "Microsoft.Extensions.DependencyModel.dll",
-    //            "nunit-agent-net60.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-    //        HasDirectory("bin/agents/net7.0").WithFiles(
-    //            "nunit-agent-net70.dll", "nunit-agent-net70.dll.config",
-    //            "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-    //            "Microsoft.Extensions.DependencyModel.dll",
-    //            "nunit-agent-net70.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-    //        HasDirectory("bin/agents/net8.0").WithFiles(
-    //            "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
-    //            "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
-    //            "Microsoft.Extensions.DependencyModel.dll",
-    //            "nunit-agent-net80.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb")
-    //    },
-    //    testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory
-    //        + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit4-console.exe"),
-    //    tests: StandardRunnerTests,
-    //    bundledExtensions: new [] {
-    //        KnownExtensions.VSProjectLoader.NuGetPackage,
-    //        KnownExtensions.NUnitProjectLoader.NuGetPackage,
-    //        //KnownExtensions.NUnitV2Driver.NuGetPackage,
-    //        KnownExtensions.NUnitV2ResultWriter.NuGetPackage,
-    //        KnownExtensions.TeamCityEventListener.NuGetPackage
-    //    }),
-
-    // NOTE: Packages below this point have no direct tests
-
     NUnitEnginePackage = new NuGetPackage(
         id: "NUnit.Engine",
         source: BuildSettings.NuGetDirectory + "engine/nunit.engine.nuspec",
@@ -209,38 +159,8 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         })
 });
 
-Task("BuildZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.BuildPackage();
-    });
-
-Task("InstallZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.InstallPackage();
-    });
-
-Task("VerifyZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.VerifyPackage();
-    });
-
-Task("TestZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.RunPackageTests();
-    });
-
-Task("TestNetCorePackage")
-    .Does(() =>
-    {
-        NUnitConsoleRunnerNetCorePackage.RunPackageTests();
-    });
-
 //////////////////////////////////////////////////////////////////////
-// TEST RUNNERS
+// PACKAGE TEST RUNNER
 //////////////////////////////////////////////////////////////////////
 
 // Use the console runner we just built to run package tests
