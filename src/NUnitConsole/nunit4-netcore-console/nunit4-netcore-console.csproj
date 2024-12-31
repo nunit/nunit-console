@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <AssemblyName>nunit4-netcore-console</AssemblyName>
+    <AssemblyName>nunit-netcore-console</AssemblyName>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <OutputPath>../../../bin/$(Configuration)</OutputPath>
     <RollForward>Major</RollForward>

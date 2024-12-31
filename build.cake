@@ -35,7 +35,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         checks: new PackageCheck[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(
-                "nunit4-console.exe", "nunit4-console.exe.config",
+                "nunit-console.exe", "nunit-console.exe.config",
                 "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
@@ -55,7 +55,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         symbols: new PackageCheck[] {
             HasDirectory("tools").WithFiles(
-                "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb", "nunit4-console.pdb"),
+                "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
             HasDirectory("tools/agents/netcoreapp3.1").WithFiles(
@@ -68,7 +68,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
-            + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit4-console.exe"),
+            + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
         tests: StandardRunnerTests),
 
     // NOTE: Must follow ConsoleRunner, upon which it depends
@@ -84,7 +84,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         {
             HasFiles("nunit.exe"),
             HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
-                "nunit4-netcore-console.dll", "nunit4-netcore-console.dll.config",
+                "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
                 "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll",
                 "Microsoft.Extensions.DependencyModel.dll")
         },
@@ -93,11 +93,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         tests: NetCoreRunnerTests),
 
     NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
-        id: "nunit-console-runner",
+        id: "nunit-console-runner-v4",
         source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
         checks: new PackageCheck[] {
             HasDirectory("tools").WithFiles(
-                "LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit4-console.exe", "nunit4-console.exe.config",
+                "LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit-console.exe", "nunit-console.exe.config",
                 "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
@@ -116,7 +116,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.engine.metadata.dll")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit4-console.exe"),
+            + $"nunit-console-runner-v4.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
         tests: StandardRunnerTests),
 
     NUnitEnginePackage = new NuGetPackage(

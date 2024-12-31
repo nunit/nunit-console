@@ -29,12 +29,12 @@
   <files>
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
-    <file src="net8.0/nunit4-netcore-console.exe" target="tools/net8.0/any" />
-    <file src="net8.0/nunit4-netcore-console.pdb" target="tools/net8.0/any" />
-    <file src="net8.0/nunit4-netcore-console.dll" target="tools/net8.0/any" />
-    <file src="net8.0/nunit4-netcore-console.dll.config" target="tools/net8.0/any" />
-    <file src="net8.0/nunit4-netcore-console.deps.json" target="tools/net8.0/any" />
-    <file src="net8.0/nunit4-netcore-console.runtimeconfig.json" target="tools/net8.0/any" />
+    <file src="net8.0/nunit-netcore-console.exe" target="tools/net8.0/any" />
+    <file src="net8.0/nunit-netcore-console.pdb" target="tools/net8.0/any" />
+    <file src="net8.0/nunit-netcore-console.dll" target="tools/net8.0/any" />
+    <file src="net8.0/nunit-netcore-console.dll.config" target="tools/net8.0/any" />
+    <file src="net8.0/nunit-netcore-console.deps.json" target="tools/net8.0/any" />
+    <file src="net8.0/nunit-netcore-console.runtimeconfig.json" target="tools/net8.0/any" />
     <file src="net8.0/nunit.engine.core.dll" target="tools/net8.0/any" />
     <file src="net8.0/nunit.engine.core.pdb" target="tools/net8.0/any" />
     <file src="net8.0/nunit.engine.dll" target="tools/net8.0/any" />

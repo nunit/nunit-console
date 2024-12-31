@@ -14,7 +14,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Console runner for the NUnit unit-testing framework with selected extensions.</summary>
     <description>
-      This package includes the nunit4-console runner and test engine for the NUnit unit-testing framework.
+      This package includes the nunit-console runner and test engine for the NUnit unit-testing framework.
 
       The following extensions are included with this package:
       * NUnitProjectLoader     - loads tests from NUnit projects
