@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <AssemblyName>nunit4-console</AssemblyName>
+    <AssemblyName>nunit-console</AssemblyName>
     <TargetFrameworks>net462</TargetFrameworks>
     <OutputPath>../../../bin/$(Configuration)</OutputPath>
     <RollForward>Major</RollForward>

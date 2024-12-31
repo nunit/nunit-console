@@ -2,12 +2,12 @@
 <!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <id>nunit-console-runner</id>
+    <id>nunit-console-runner-v4</id>
     <version>0.0.0</version>
-    <title>NUnit 3 Console Runner</title>
-    <summary>Console runner for the NUnit 3 unit-testing framework.</summary>
+    <title>NUnit Console Runner V4</title>
+    <summary>Console runner for the NUnit unit-testing framework.</summary>
     <description>
-      This package includes the nunit3-console runner and test engine for version 3 of the NUnit unit-testing framework.
+      This package includes version 4 of the NUnit Console Runner and test engine.
     </description>
     <projectUrl>https://nunit.org</projectUrl>
     <projectSourceUrl>https://github.com/nunit/nunit-console</projectSourceUrl>
@@ -31,8 +31,8 @@
     <file src = "VERIFICATION.txt" target = "tools" />
     <file src = "nunit.choco.addins" target = "tools" />
 
-    <file src = "$BIN_DIR$net462/nunit4-console.exe" target="tools" />
-    <file src = "$BIN_DIR$net462/nunit4-console.exe.config" target="tools" />
+    <file src = "$BIN_DIR$net462/nunit-console.exe" target="tools" />
+    <file src = "$BIN_DIR$net462/nunit-console.exe.config" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.api.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.api.xml" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.core.dll" target="tools" />

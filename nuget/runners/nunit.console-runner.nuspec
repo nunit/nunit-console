@@ -92,9 +92,9 @@
     <file src="agents/net8.0/testcentric.engine.metadata.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
 
-    <file src="net462/nunit4-console.exe" target="tools" />
-    <file src="net462/nunit4-console.pdb" target="tools" />
-    <file src="net462/nunit4-console.exe.config" target="tools" />
+    <file src="net462/nunit-console.exe" target="tools" />
+    <file src="net462/nunit-console.pdb" target="tools" />
+    <file src="net462/nunit-console.exe.config" target="tools" />
     <file src="net462/nunit.engine.api.dll" target="tools" />
     <file src="net462/nunit.engine.api.pdb" target="tools" />
     <file src="net462/nunit.engine.api.xml" target="tools" />
