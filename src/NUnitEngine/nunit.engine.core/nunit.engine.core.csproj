@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="TestCentric.Metadata" Version="2.0.0" />
+    <PackageReference Include="TestCentric.Metadata" Version="3.0.3" />
   </ItemGroup>
 
   <ItemGroup>
