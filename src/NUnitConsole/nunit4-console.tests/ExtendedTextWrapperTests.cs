@@ -25,6 +25,12 @@ namespace NUnit.ConsoleRunner
             writer = new ExtendedTextWrapper(new StringWriter(sb));
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            writer.Dispose();
+        }
+
         [Test]
         public void Write()
         {

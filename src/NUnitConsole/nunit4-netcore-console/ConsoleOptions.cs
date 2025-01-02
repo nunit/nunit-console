@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -52,7 +53,9 @@ namespace NUnit.ConsoleRunner.Options
 
         public IDictionary<string, string> TestParameters { get; } = new Dictionary<string, string>();
 
-        public string WhereClause { get; private set; }
+        public string? WhereClause { get; private set; }
+
+        [MemberNotNullWhen(true, nameof(WhereClause))]
         public bool WhereClauseSpecified { get { return WhereClause != null; } }
 
         public int DefaultTestCaseTimeout { get; private set; } = -1;
@@ -61,7 +64,7 @@ namespace NUnit.ConsoleRunner.Options
         public int RandomSeed { get; private set; } = -1;
         public bool RandomSeedSpecified { get { return RandomSeed >= 0; } }
 
-        public string DefaultTestNamePattern { get; private set; }
+        public string? DefaultTestNamePattern { get; private set; }
         public int NumberOfTestWorkers { get; private set; } = -1;
         public bool NumberOfTestWorkersSpecified { get { return NumberOfTestWorkers >= 0; } }
 
@@ -71,7 +74,7 @@ namespace NUnit.ConsoleRunner.Options
 
         // Output Control
 
-        public string ConsoleEncoding { get; private set; }
+        public string? ConsoleEncoding { get; private set; }
 
         public bool NoHeader { get; private set; }
 
@@ -79,19 +82,23 @@ namespace NUnit.ConsoleRunner.Options
 
         public bool TeamCity { get; private set; }
 
-        public string OutFile { get; private set; }
+        public string? OutFile { get; private set; }
+
+        [MemberNotNullWhen(true, nameof(OutFile))]
         public bool OutFileSpecified { get { return OutFile != null; } }
 
-        public string DisplayTestLabels { get; private set; }
+        public string? DisplayTestLabels { get; private set; }
 
-        private string workDirectory = null;
+        private string? workDirectory = null;
         public string WorkDirectory
         {
             get { return workDirectory ?? CURRENT_DIRECTORY_ON_ENTRY; }
         }
         public bool WorkDirectorySpecified { get { return workDirectory != null; } }
 
-        public string InternalTraceLevel { get; private set; }
+        public string? InternalTraceLevel { get; private set; }
+
+        [MemberNotNullWhen(true, nameof(InternalTraceLevel))]
         public bool InternalTraceLevelSpecified { get { return InternalTraceLevel != null; } }
 
         private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
@@ -114,15 +121,19 @@ namespace NUnit.ConsoleRunner.Options
 
         public IList<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
 
-        public string ActiveConfig { get; private set; }
+        public string? ActiveConfig { get; private set; }
+
+        [MemberNotNullWhen(true, nameof(ActiveConfig))]
         public bool ActiveConfigSpecified { get { return ActiveConfig != null; } }
 
         // How to Run Tests
 
-        public string RuntimeFramework { get; private set; }
+        public string? RuntimeFramework { get; private set; }
+
+        [MemberNotNullWhen(true, nameof(RuntimeFramework))]
         public bool RuntimeFrameworkSpecified { get { return RuntimeFramework != null; } }
 
-        public string ConfigurationFile { get; private set; }
+        public string? ConfigurationFile { get; private set; }
 
         public bool RunAsX86 { get; private set; }
 
@@ -146,7 +157,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public bool PauseBeforeRun { get; private set; }
 
-        public string PrincipalPolicy { get; private set; }
+        public string? PrincipalPolicy { get; private set; }
 
         public IList<string> WarningMessages { get; } = new List<string>();
 
@@ -179,7 +190,7 @@ namespace NUnit.ConsoleRunner.Options
                             {
                                 while (!rdr.EndOfStream)
                                 {
-                                    var line = rdr.ReadLine().Trim();
+                                    var line = rdr.ReadLine()?.Trim();
 
                                     if (!string.IsNullOrEmpty(line) && line[0] != '#')
                                         ((List<string>)TestList).Add(line);
@@ -216,10 +227,10 @@ namespace NUnit.ConsoleRunner.Options
                 v => NumberOfTestWorkers = parser.RequiredInt(v, "--workers"));
 
             this.Add("stoponerror", "Stop run immediately upon any test failure or error.",
-                v => StopOnError = v != null);
+                v => StopOnError = !string.IsNullOrEmpty(v));
 
             this.Add("wait", "Wait for input before closing console window.",
-                v => WaitBeforeExit = v != null);
+                v => WaitBeforeExit = !string.IsNullOrEmpty(v));
 
             // Output Control
             this.Add("work=", "{PATH} of the directory to use for output files. If not specified, defaults to the current directory.",
@@ -243,7 +254,7 @@ namespace NUnit.ConsoleRunner.Options
             });
 
             this.Add("noresult", "Don't save any test results.",
-                v => NoResultSpecified = v != null);
+                v => NoResultSpecified = !string.IsNullOrEmpty(v));
 
             this.Add("labels=", "Specify whether to write test case names to the output. Values: Off (Default), On, OnOutput, Before, After, BeforeAndAfter. On is currently an alias for OnOutput, but is subject to change.",
                 v => {
@@ -257,19 +268,19 @@ namespace NUnit.ConsoleRunner.Options
                 v => InternalTraceLevel = parser.RequiredValue(v, "--trace", "Off", "Error", "Warning", "Info", "Verbose", "Debug"));
 
             this.Add("teamcity", "Turns on use of TeamCity service messages. TeamCity engine extension is required.",
-                v => TeamCity = v != null);
+                v => TeamCity = !string.IsNullOrEmpty(v));
 
             this.Add("noheader|noh", "Suppress display of program information at start of run.",
-                v => NoHeader = v != null);
+                v => NoHeader = !string.IsNullOrEmpty(v));
 
             this.Add("nocolor|noc", "Displays console output without color.",
-                v => NoColor = v != null);
+                v => NoColor = !string.IsNullOrEmpty(v));
 
             this.Add("help|h", "Display this message and exit.",
-                v => ShowHelp = v != null);
+                v => ShowHelp = !string.IsNullOrEmpty(v));
 
             this.Add("version|V", "Display the header and exit.",
-                v => ShowVersion = v != null);
+                v => ShowVersion = !string.IsNullOrEmpty(v));
 
             this.Add("encoding=", "Specifies the encoding to use for Console standard output, for example utf-8, ascii, unicode.",
                 v => ConsoleEncoding = parser.RequiredValue(v, "--encoding"));
@@ -294,38 +305,38 @@ namespace NUnit.ConsoleRunner.Options
                 NetFxOnlyOption("framework=", v => RuntimeFramework = parser.RequiredValue(v, "--framework")));
 
             this.AddNetFxOnlyOption("x86", "Run tests in an x86 process on 64 bit systems",
-                NetFxOnlyOption("x86", v => RunAsX86 = v != null));
+                NetFxOnlyOption("x86", v => RunAsX86 = !string.IsNullOrEmpty(v)));
 
             this.Add("dispose-runners", "Dispose each test runner after it has finished running its tests.",
-                v => DisposeRunners = v != null);
+                v => DisposeRunners = !string.IsNullOrEmpty(v));
 
             this.AddNetFxOnlyOption("shadowcopy", "Shadow copy test files",
-                NetFxOnlyOption("shadowcopy", v => ShadowCopyFiles = v != null));
+                NetFxOnlyOption("shadowcopy", v => ShadowCopyFiles = !string.IsNullOrEmpty(v)));
 
             this.AddNetFxOnlyOption("loaduserprofile", "Load user profile in test runner processes",
-                NetFxOnlyOption("loaduserprofile", v => LoadUserProfile = v != null));
+                NetFxOnlyOption("loaduserprofile", v => LoadUserProfile = !string.IsNullOrEmpty(v)));
 
             this.Add("skipnontestassemblies", "Skip any non-test assemblies specified, without error.",
-                v => SkipNonTestAssemblies = v != null);
+                v => SkipNonTestAssemblies = !string.IsNullOrEmpty(v));
 
             this.AddNetFxOnlyOption("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
                 NetFxOnlyOption("agents=", v => _maxAgents = parser.RequiredInt(v, "--agents")));
 
             this.AddNetFxOnlyOption("debug", "Launch debugger to debug tests.",
-                NetFxOnlyOption("debug", v => DebugTests = v != null));
+                NetFxOnlyOption("debug", v => DebugTests = !string.IsNullOrEmpty(v)));
 
             this.AddNetFxOnlyOption("pause", "Pause before running to allow attaching a debugger.",
-                NetFxOnlyOption("pause", v => PauseBeforeRun = v != null));
+                NetFxOnlyOption("pause", v => PauseBeforeRun = !string.IsNullOrEmpty(v)));
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
-                v => ListExtensions = v != null);
+                v => ListExtensions = !string.IsNullOrEmpty(v));
 
             this.AddNetFxOnlyOption("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
                 NetFxOnlyOption("set-principal-policy=", v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal")));
 
 #if DEBUG
             this.AddNetFxOnlyOption("debug-agent", "Launch debugger in nunit-agent when it starts.",
-                NetFxOnlyOption("debug-agent", v => DebugAgent = v != null));
+                NetFxOnlyOption("debug-agent", v => DebugAgent = !string.IsNullOrEmpty(v)));
 #endif
         }
 
@@ -431,7 +442,7 @@ namespace NUnit.ConsoleRunner.Options
             return GetArgs(sb.ToString());
         }
 
-        private string ExpandToFullPath(string path)
+        private string? ExpandToFullPath(string path)
         {
             if (path == null) return null;
 

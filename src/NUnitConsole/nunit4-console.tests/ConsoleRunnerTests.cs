@@ -28,6 +28,13 @@ namespace NUnit.ConsoleRunner
             _testEngine.Services.GetService<IResultService>().Returns(_resultService);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            (_resultService as IDisposable)?.Dispose();
+            _testEngine.Dispose();
+        }
+
         [Test]
         public void ThrowsNUnitEngineExceptionWhenTestResultsAreNotWriteable()
         {
@@ -62,7 +69,7 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        public IResultWriter GetResultWriter(string format, object[] args)
+        public IResultWriter GetResultWriter(string format, params object?[]? args)
         {
             return new FakeResultWriter(this);
         }

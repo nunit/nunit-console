@@ -95,7 +95,7 @@ namespace NUnit.ConsoleRunner.Options
             return false;
         }
 
-        public OutputSpecification ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications, IFileSystem fileSystem, string currentDir)
+        public OutputSpecification? ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications, IFileSystem fileSystem, string currentDir)
         {
             if (value == null)
                 return null;

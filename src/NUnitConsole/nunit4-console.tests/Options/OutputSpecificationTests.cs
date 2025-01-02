@@ -11,7 +11,7 @@ namespace NUnit.ConsoleRunner.Options
         public void SpecMayNotBeNull()
         {
             Assert.That(
-                () => new OutputSpecification(null, null),
+                () => new OutputSpecification(null!, null),
                 Throws.TypeOf<ArgumentNullException>());
         }
 
@@ -109,7 +109,7 @@ namespace NUnit.ConsoleRunner.Options
         [TestCase(@"C:\")]
         [TestCase(@"C:\Temp")]
 
-        public void TransformFolderIsUsedToSpecifyTransform(string transformFolder)
+        public void TransformFolderIsUsedToSpecifyTransform(string? transformFolder)
         {
             const string fileName = "transform.xslt";
             var spec = new OutputSpecification($"MyFile.xml;transform=transform.xslt", transformFolder);

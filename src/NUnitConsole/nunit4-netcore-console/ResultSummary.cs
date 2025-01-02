@@ -3,11 +3,10 @@
 using System;
 using System.Globalization;
 using System.Xml;
+using NUnit.ConsoleRunner.Utilities;
 
 namespace NUnit.ConsoleRunner
 {
-    using Utilities;
-
     /// <summary>
     /// Summary description for ResultSummary.
     /// </summary>
@@ -138,10 +137,10 @@ namespace NUnit.ConsoleRunner
 
         private void Summarize(XmlNode node, bool failedInFixtureTearDown)
         {
-            string type = node.GetAttribute("type");
-            string status = node.GetAttribute("result");
-            string label = node.GetAttribute("label");
-            string site = node.GetAttribute("site");
+            string? type = node.GetAttribute("type");
+            string? status = node.GetAttribute("result");
+            string? label = node.GetAttribute("label");
+            string? site = node.GetAttribute("site");
 
             switch (node.Name)
             {

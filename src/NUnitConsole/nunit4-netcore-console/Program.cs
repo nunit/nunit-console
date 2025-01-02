@@ -21,7 +21,7 @@ namespace NUnit.ConsoleRunner
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
         static readonly ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem());
-        private static ExtendedTextWriter _outWriter;
+        private static ExtendedTextWriter? _outWriter;
 
         // This has to be lazy otherwise NoColor command line option is not applied correctly
         private static ExtendedTextWriter OutWriter
@@ -173,7 +173,7 @@ namespace NUnit.ConsoleRunner
 
         private static void WriteHeader()
         {
-            Assembly entryAssembly = Assembly.GetEntryAssembly();
+            Assembly entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
             var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
 
             var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
@@ -187,7 +187,7 @@ namespace NUnit.ConsoleRunner
             }
 
             OutWriter.WriteLine(ColorStyle.Header, header);
-            OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright);
+            OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright ?? "No Copyright statement found");
             OutWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
             OutWriter.WriteLine();
         }
@@ -195,9 +195,9 @@ namespace NUnit.ConsoleRunner
         private static void WriteHelpText()
         {
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.Header, "NUNIT3-CONSOLE [inputfiles] [options]");
+            OutWriter.WriteLine(ColorStyle.Header, "NUNIT4-CONSOLE [inputfiles] [options]");
             OutWriter.WriteLine();
-            OutWriter.WriteLine(ColorStyle.SectionHeader, "Operation");
+            OutWriter.WriteLine(ColorStyle.SectionHeader, "Operation:");
             using (new ColorConsole(ColorStyle.Default))
             {
                 OutWriter.WriteLine("      The NetCore Console Runner runs a set of NUnit tests from the console");
@@ -294,7 +294,7 @@ namespace NUnit.ConsoleRunner
             OutWriter.WriteLine(ColorStyle.Error, msg);
         }
 
-        private static void CancelHandler(object sender, ConsoleCancelEventArgs args)
+        private static void CancelHandler(object? sender, ConsoleCancelEventArgs args)
         {
             Console.ResetColor();
         }

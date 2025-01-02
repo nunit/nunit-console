@@ -17,7 +17,7 @@ namespace NUnit.ConsoleRunner.Options
         /// </summary>
         /// <param name="spec">The option value string.</param>
         /// <param name="transformFolder">The folder containing the transform.</param>
-        public OutputSpecification(string spec, string transformFolder)
+        public OutputSpecification(string spec, string? transformFolder)
         {
             if (spec == null)
                 throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
@@ -78,7 +78,7 @@ namespace NUnit.ConsoleRunner.Options
         /// <summary>
         /// Gets the file name of a transform to be applied
         /// </summary>
-        public string Transform { get; private set; }
+        public string? Transform { get; private set; }
 
         public override string ToString()
         {

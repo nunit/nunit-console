@@ -23,9 +23,9 @@ namespace NUnit.ConsoleRunner
         /// <param name="result">The result.</param>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public static string GetAttribute(this XmlNode result, string name)
+        public static string? GetAttribute(this XmlNode result, string name)
         {
-            XmlAttribute attr = result.Attributes[name];
+            XmlAttribute? attr = result.Attributes?[name];
 
             return attr == null ? null : attr.Value;
         }
@@ -39,7 +39,7 @@ namespace NUnit.ConsoleRunner
         /// <returns></returns>
         public static double GetAttribute(this XmlNode result, string name, double defaultValue)
         {
-            XmlAttribute attr = result.Attributes[name];
+            XmlAttribute? attr = result.Attributes?[name];
 
             return attr == null
                 ? defaultValue
@@ -55,7 +55,7 @@ namespace NUnit.ConsoleRunner
         /// <returns></returns>
         public static DateTime GetAttribute(this XmlNode result, string name, DateTime defaultValue)
         {
-            string dateStr = GetAttribute(result, name);
+            string? dateStr = GetAttribute(result, name);
             if (dateStr == null)
                 return defaultValue;
 

@@ -3,11 +3,10 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Common;
+using System.IO;
 
 namespace NUnit.ConsoleRunner
 {
-    using System.IO;
-
     internal class VirtualFileSystem: IFileSystem
     {
         private readonly Dictionary<string, IEnumerable<string>> files = new Dictionary<string, IEnumerable<string>>();
@@ -19,7 +18,7 @@ namespace NUnit.ConsoleRunner
 
         public IEnumerable<string> ReadLines(string fileName)
         {
-            IEnumerable<string> lines;
+            IEnumerable<string>? lines;
             if (!files.TryGetValue(fileName, out lines))
             {
                 throw new FileNotFoundException("File not found", fileName);

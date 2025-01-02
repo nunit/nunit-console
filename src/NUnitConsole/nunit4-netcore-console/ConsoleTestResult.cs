@@ -31,23 +31,23 @@ namespace NUnit.ConsoleRunner
             Label = resultNode.GetAttribute("label");
             Site = resultNode.GetAttribute("site");
 
-            Status = Label ?? Result;
+            Status = Label ?? Result ?? "Unkown";
             if (Status == "Failed" || Status == "Error")
                 if (Site == "SetUp" || Site == "TearDown")
                     Status = Site + " " + Status;
 
-            FullName = resultNode.GetAttribute("fullname");
+            FullName = resultNode.GetAttribute("fullname") ?? "Unknown";
         }
 
-        public string Result { get; private set; }
-        public string Label { get; private set; }
-        public string Site { get; private set; }
+        public string? Result { get; private set; }
+        public string? Label { get; private set; }
+        public string? Site { get; private set; }
         public string FullName { get; private set; }
 
         public string ReportID { get; private set; }
         public string Status { get; private set; }
 
-        public string Message
+        public string? Message
         {
             get
             {
@@ -56,12 +56,12 @@ namespace NUnit.ConsoleRunner
             }
         }
 
-        public string StackTrace
+        public string? StackTrace
         {
             get { return GetTrimmedInnerText(_resultNode.SelectSingleNode("failure/stack-trace")); }
         }
 
-        private List<AssertionResult> _assertions;
+        private List<AssertionResult>? _assertions;
         public List<AssertionResult> Assertions
         {
             get
@@ -69,8 +69,10 @@ namespace NUnit.ConsoleRunner
                 if (_assertions == null)
                 {
                     _assertions = new List<AssertionResult>();
-                    foreach (XmlNode assertion in _resultNode.SelectNodes("assertions/assertion"))
-                        Assertions.Add(new ConsoleTestResult.AssertionResult(assertion));
+                    XmlNodeList? assertions = _resultNode.SelectNodes("assertions/assertion");
+                    if (assertions is not null)
+                        foreach (XmlNode assertion in assertions)
+                            Assertions.Add(new ConsoleTestResult.AssertionResult(assertion));
                 }
 
                 return _assertions;
@@ -98,7 +100,7 @@ namespace NUnit.ConsoleRunner
                 WriteResult(writer, ReportID, Status, FullName, Message, StackTrace);
         }
 
-        private void WriteResult(ExtendedTextWriter writer, string reportID, string status, string fullName, string message, string stackTrace)
+        private void WriteResult(ExtendedTextWriter writer, string reportID, string status, string fullName, string? message, string? stackTrace)
         {
             ColorStyle style = GetColorStyle();
 
@@ -123,7 +125,7 @@ namespace NUnit.ConsoleRunner
                     : ColorStyle.Output;
         }
 
-        private static string GetTrimmedInnerText(XmlNode node)
+        private static string? GetTrimmedInnerText(XmlNode? node)
         {
             // In order to control the format, we trim any line-end chars
             // from end of the strings we write and supply them via calls
@@ -141,8 +143,8 @@ namespace NUnit.ConsoleRunner
                 StackTrace = GetTrimmedInnerText(assertion.SelectSingleNode("stack-trace"));
             }
 
-            public string Message { get; private set; }
-            public string StackTrace { get; private set; }
+            public string? Message { get; private set; }
+            public string? StackTrace { get; private set; }
         }
     }
 }
