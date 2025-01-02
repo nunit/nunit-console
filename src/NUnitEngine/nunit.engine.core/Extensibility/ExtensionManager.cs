@@ -483,7 +483,7 @@ namespace NUnit.Engine.Extensibility
             Version currentVersion = RuntimeInformation.FrameworkVersion;
             var frameworkName = extensionAssembly.FrameworkName;
 
-            if (frameworkName.Identifier != FrameworkIdentifiers.NetFramework || frameworkName.Version > currentVersion)
+            if (frameworkName.Identifier != ".NETFramework" || frameworkName.Version > currentVersion)
             {
                 if (!extensionAssembly.FromWildCard)
                 {
