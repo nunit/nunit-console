@@ -11,6 +11,7 @@ using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using System.Runtime.InteropServices;
 using System.Text;
+using NUnit.Engine.Services;
 
 namespace NUnit.ConsoleRunner
 {

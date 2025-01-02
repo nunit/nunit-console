@@ -21,4 +21,8 @@
     <FileVersion>3.99.0.0</FileVersion>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
 </Project>

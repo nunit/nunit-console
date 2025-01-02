@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-namespace NUnit.Engine
+namespace NUnit.Engine.Services
 {
     /// <summary>
     /// The TestFilterService provides builders that can create TestFilters

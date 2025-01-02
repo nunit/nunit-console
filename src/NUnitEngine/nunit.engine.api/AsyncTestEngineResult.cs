@@ -17,28 +17,37 @@ namespace NUnit.Engine
         private readonly ManualResetEvent _waitHandle = new ManualResetEvent(false);
 
         /// <summary>
-        /// Get the result of this run.
+        /// Get the result of this test run.
         /// </summary>
         /// <exception cref="InvalidOperationException">Cannot retrieve Result from an incomplete or cancelled TestRun.</exception>
         public TestEngineResult EngineResult
         {
             get
             {
-                Guard.OperationValid(_result != null, "Cannot retrieve Result from an incomplete or cancelled TestRun.");
+                if (_result == null)
+                    throw new InvalidOperationException("Cannot retrieve Result from an incomplete or cancelled TestRun.");
 
                 return _result;
             }
         }
 
+        /// <summary>
+        /// Get a handle for use in waiting for the test run to complete.
+        /// </summary>
         public EventWaitHandle WaitHandle
         {
             get { return _waitHandle; }
         }
         
+        /// <summary>
+        /// Set the result of a completed test run.
+        /// </summary>
         public void SetResult(TestEngineResult result)
         {
-            Guard.ArgumentNotNull(result, "result");
-            Guard.OperationValid(_result == null, "Cannot set the Result of an TestRun more than once");
+            if (result == null) throw new ArgumentNullException(nameof (result));
+
+            if (_result != null)
+                    throw new InvalidOperationException("Cannot set the Result of a TestRun more than once");
             
             _result = result;
             _waitHandle.Set();

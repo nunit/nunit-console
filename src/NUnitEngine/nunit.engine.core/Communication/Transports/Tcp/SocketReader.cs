@@ -3,8 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
+using NUnit.Engine.Communication.Messages;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {

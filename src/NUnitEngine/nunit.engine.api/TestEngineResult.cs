@@ -2,10 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Xml;
-using NUnit.Common;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine
 {
@@ -85,7 +82,8 @@ namespace NUnit.Engine
                 {
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(_xmlText[i]);
-                    _xmlNodes.Add(doc.FirstChild.ShouldNotBeNull());
+                    if (doc.FirstChild != null)
+                        _xmlNodes.Add(doc.FirstChild);
                 }
 
                 return _xmlNodes;
@@ -110,11 +108,19 @@ namespace NUnit.Engine
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="xml"></param>
         public void Add(string xml)
         {
             this._xmlText.Add(xml);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="xml"></param>
         public void Add(XmlNode xml)
         {
             this._xmlText.Add(xml.OuterXml);

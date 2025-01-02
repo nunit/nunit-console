@@ -209,12 +209,12 @@ StandardRunnerTests.Add(new PackageTest(
 
 AddToBothLists(new PackageTest(
     1, "Net60WPFTest", "Run test using WPF under .NET 6.0",
-    "testdata/net6.0-windows/WpfTest.dll --trace=Debug",
+    "testdata/net6.0-windows/WpfTest.dll",
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }));
 
 AddToBothLists(new PackageTest(
     1, "Net80WPFTest", "Run test using WPF under .NET 8.0",
-    "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
+    "testdata/net8.0-windows/WpfTest.dll",
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }));
 
 //////////////////////////////////////////////////////////////////////
@@ -265,7 +265,7 @@ StandardRunnerTests.Add(new PackageTest(
 //StandardRunnerTests.Add(new PackageTest(
 //    1, "VSProjectLoaderTest_Solution",
 //    "Run mock-assembly using the .sln file",
-//    "../../src/TestData/TestData.sln --config=Release --trace=Debug",
+//    "../../src/TestData/TestData.sln --config=Release",
 //    new ExpectedResult("Failed")
 //    {
 //        Total = 37 * 5,
@@ -337,7 +337,7 @@ StandardRunnerTests.Add(new PackageTest(
 StandardRunnerTests.Add(new PackageTest(
     1, "InvalidTestNameTest_Net462",
     "Ensure we handle invalid test names correctly under .NET 4.6.2",
-    "testdata/net462/InvalidTestNames.dll --trace:Debug",
+    "testdata/net462/InvalidTestNames.dll",
     new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -349,7 +349,7 @@ StandardRunnerTests.Add(new PackageTest(
 AddToBothLists(new PackageTest(
     1, "InvalidTestNameTest_Net60",
     "Ensure we handle invalid test names correctly under .NET 6.0",
-    "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
+    "testdata/net6.0/InvalidTestNames.dll",
     new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -361,7 +361,7 @@ AddToBothLists(new PackageTest(
 AddToBothLists(new PackageTest(
     1, "InvalidTestNameTest_Net80",
     "Ensure we handle invalid test names correctly under .NET 8.0",
-    "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
+    "testdata/net8.0/InvalidTestNames.dll",
     new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]

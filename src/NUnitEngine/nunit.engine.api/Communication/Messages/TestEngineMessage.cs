@@ -4,6 +4,9 @@ using System;
 
 namespace NUnit.Engine.Communication.Messages
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public abstract class TestEngineMessage
     {

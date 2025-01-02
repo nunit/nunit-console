@@ -5,6 +5,9 @@ using NUnit.Engine.Communication.Messages;
 
 namespace NUnit.Engine.Communication.Protocols
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ISerializationProtocol
     {
         /// <summary>
