@@ -9,7 +9,9 @@ using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
 using System.Linq;
+#if NET462
 using NUnit.Engine.Internal.Backports;
+#endif
 
 namespace NUnit.Engine.Extensibility
 {
