@@ -42,15 +42,12 @@ namespace NUnit.Engine.Internal
             {
                 DefaultTraceLevel = level;
 
-                if (_traceWriter == null)
-                {
-                    // We create the trace writer even if tracing is off, because
-                    // individual loggers are able to override the default level.
-                    _traceWriter = new InternalTraceWriter(logName);
+                // We create the trace writer even if tracing is off, because
+                // individual loggers are able to override the default level.
+                _traceWriter = new InternalTraceWriter(logName);
 
-                    if (DefaultTraceLevel > InternalTraceLevel.Off)
-                        _traceWriter.WriteLine("InternalTrace: Initializing at level {0}", DefaultTraceLevel);
-                }
+                if (DefaultTraceLevel > InternalTraceLevel.Off)
+                    _traceWriter.WriteLine("InternalTrace: Initializing at level {0}", DefaultTraceLevel);
 
                 Initialized = true;
             }
@@ -63,7 +60,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(string name, InternalTraceLevel level)
         {
-            return new Logger(name, level, _traceWriter);
+            return new Logger(name, () => level, () => _traceWriter);
         }
 
         /// <summary>
@@ -79,7 +76,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(string name)
         {
-            return new Logger(name, DefaultTraceLevel, _traceWriter);
+            return new Logger(name, () => DefaultTraceLevel, () => _traceWriter);
         }
 
         /// <summary>
@@ -87,7 +84,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(Type type)
         {
-            return GetLogger(type.FullName, DefaultTraceLevel);
+            return GetLogger(type.FullName);
         }
     }
 }
