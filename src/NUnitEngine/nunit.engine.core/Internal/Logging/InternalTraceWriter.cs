@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 using System.IO;
+using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
@@ -30,6 +31,8 @@ namespace NUnit.Engine.Internal
         /// <param name="writer"></param>
         public InternalTraceWriter(TextWriter writer)
         {
+            Guard.ArgumentNotNull(writer, nameof(writer));
+
             _writer = writer;
         }
 
@@ -62,7 +65,7 @@ namespace NUnit.Engine.Internal
         {
             lock (_myLock)
             {
-                base.Write(value);
+                _writer.Write(value);
             }
         }
 
@@ -102,8 +105,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public override void Flush()
         {
-            if ( _writer != null )
-                _writer.Flush();
+            _writer.Flush();
         }
     }
 }

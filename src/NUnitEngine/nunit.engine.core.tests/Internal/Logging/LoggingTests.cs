@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System.IO;
-using NUnit.Engine.Internal;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Internal.Logging
@@ -16,7 +15,7 @@ namespace NUnit.Engine.Internal.Logging
             [ValueSource(nameof(LEVELS))] InternalTraceLevel msgLevel)
         {
             var writer = new StringWriter();
-            var logger = new Logger("MyLogger", logLevel, writer);
+            var logger = new Logger("MyLogger", () => logLevel, () => writer);
 
             Assert.That(logger.TraceLevel, Is.EqualTo(logLevel));
 
