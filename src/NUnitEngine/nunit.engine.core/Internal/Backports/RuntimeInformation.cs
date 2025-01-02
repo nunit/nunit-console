@@ -36,13 +36,14 @@ namespace NUnit.Engine.Internal.Backports
             {
                 FrameworkName = ".NET Framework";
 
+                RegistryKey? key = null;
                 switch (version.Major)
                 {
                     case 2:
-                        RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
+                        key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
                         if (key != null)
                         {
-                            string installRoot = key.GetValue("InstallRoot") as string;
+                            string? installRoot = key.GetValue("InstallRoot") as string;
                             if (installRoot != null)
                             {
                                 if (Directory.Exists(System.IO.Path.Combine(installRoot, "v3.5")))
@@ -68,6 +69,8 @@ namespace NUnit.Engine.Internal.Backports
                         }
                         break;
                 }
+
+                key?.Dispose();
             }
 
             FrameworkVersion = version;

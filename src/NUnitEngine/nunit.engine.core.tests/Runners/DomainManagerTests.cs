@@ -47,8 +47,8 @@ namespace NUnit.Engine.Runners
         [Test, Platform("Linux,Net", Reason = "get_SetupInformation() fails on Windows+Mono")]
         public void CanCreateDomainWithApplicationBaseSpecified()
         {
-            string assemblyDir = Path.GetDirectoryName(_package.FullName);
-            string basePath = Path.GetDirectoryName(Path.GetDirectoryName(assemblyDir));
+            string assemblyDir = Path.GetDirectoryName(_package.FullName)!;
+            string basePath = Path.GetDirectoryName(Path.GetDirectoryName(assemblyDir))!;
             string relPath = assemblyDir.Substring(basePath.Length + 1);
 
             _package.Settings["BasePath"] = basePath;

@@ -17,7 +17,7 @@ namespace NUnit.Engine
             ServiceManager = new ServiceManager();
         }
 
-        public ServiceManager ServiceManager { get; private set; }
+        public ServiceManager ServiceManager { get; }
 
         public int ServiceCount { get { return ServiceManager.ServiceCount; } }
 
@@ -29,7 +29,7 @@ namespace NUnit.Engine
 
         public T GetService<T>() where T : class
         {
-            return ServiceManager.GetService(typeof(T)) as T;
+            return (T)ServiceManager.GetService(typeof(T));
         }
 
         public object GetService(Type serviceType)

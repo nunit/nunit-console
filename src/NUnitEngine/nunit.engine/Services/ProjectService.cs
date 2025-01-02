@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Common;
@@ -16,11 +17,10 @@ namespace NUnit.Engine.Services
 
         public bool CanLoadFrom(string path)
         {
-            ExtensionNode node = GetNodeForPath(path);
+            ExtensionNode? node = GetNodeForPath(path);
             if (node != null)
             {
-                var loader = node.ExtensionObject as IProjectLoader;
-                if (loader.CanLoadFrom(path))
+                if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
                     return true;
             }
 
@@ -39,14 +39,13 @@ namespace NUnit.Engine.Services
             Guard.ArgumentNotNull(package, "package");
             Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", "package");
 
-            string path = package.FullName;
+            string path = package.FullName!;
             if (!File.Exists(path))
                 return;
 
-            IProject project = LoadFrom(path);
-            Guard.ArgumentValid(project != null, "Unable to load project " + path, "package");
+            IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
 
-            string activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string)null);
+            string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string?)null);
             if (activeConfig == null)
                 activeConfig = project.ActiveConfigName;
             else
@@ -84,6 +83,9 @@ namespace NUnit.Engine.Services
             {
                 try
                 {
+                    if (ServiceContext == null)
+                        throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
+
                     var extensionService = ServiceContext.GetService<ExtensionService>();
 
                     if (extensionService == null)
@@ -118,15 +120,14 @@ namespace NUnit.Engine.Services
             }
         }
 
-        private IProject LoadFrom(string path)
+        private IProject? LoadFrom(string path)
         {
             if (File.Exists(path))
             {
-                ExtensionNode node = GetNodeForPath(path);
+                ExtensionNode? node = GetNodeForPath(path);
                 if (node != null)
                 {
-                    var loader = node.ExtensionObject as IProjectLoader;
-                    if (loader.CanLoadFrom(path))
+                    if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
                         return loader.LoadFrom(path);
                 }
             }
@@ -134,14 +135,14 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        private ExtensionNode GetNodeForPath(string path)
+        private ExtensionNode? GetNodeForPath(string path)
         {
             var ext = Path.GetExtension(path);
 
-            if (string.IsNullOrEmpty(ext) || !_extensionIndex.ContainsKey(ext))
+            if (string.IsNullOrEmpty(ext) || !_extensionIndex.TryGetValue(ext, out ExtensionNode? node))
                 return null;
 
-            return _extensionIndex[ext];
+            return node;
         }
     }
 }

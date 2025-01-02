@@ -1,8 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
+using NUnitLite;
 
 namespace NUnit.Engine.Services.TestRunnerFactoryTests
 {
@@ -36,6 +39,19 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             ((IService)fakeRuntimeService).StartService();
             _services.Add(fakeRuntimeService);
             Assert.That(((IService)fakeRuntimeService).Status, Is.EqualTo(ServiceStatus.Started));
+
+#if NETFRAMEWORK
+            var testAgency = new TestAgency();
+            _services.Add(testAgency);
+            ((IService)testAgency).StartService();
+            Assert.That(testAgency.Status, Is.EqualTo(ServiceStatus.Started));
+#endif
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            _factory.Dispose();
         }
 
         [TestCaseSource(typeof(TestRunnerFactoryData), nameof(TestRunnerFactoryData.TestCases))]
@@ -49,12 +65,12 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
 
         private static RunnerResult GetRunnerResult(ITestEngineRunner runner)
         {
-            var result = new RunnerResult(runner.GetType());
+            var runnerType = runner.GetType();
 
             if (runner is AggregatingTestRunner aggRunner)
-                result.SubRunners = aggRunner.Runners.Select(GetRunnerResult).ToList();
+                return new RunnerResult(runnerType, aggRunner.Runners.Select(GetRunnerResult).ToArray());
 
-            return result;
+            return new RunnerResult(runnerType);
         }
     }
 }

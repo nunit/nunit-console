@@ -61,7 +61,7 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
-        IExtensionPoint IExtensionService.GetExtensionPoint(string path)
+        IExtensionPoint? IExtensionService.GetExtensionPoint(string path)
         {
             return _extensionManager.GetExtensionPoint(path);
         }
@@ -82,7 +82,7 @@ namespace NUnit.Engine.Services
 
         public IEnumerable<T> GetExtensions<T>() => _extensionManager.GetExtensions<T>();
 
-        public IExtensionNode GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
+        public IExtensionNode? GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
 
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>() => _extensionManager.GetExtensionNodes<T>();
 

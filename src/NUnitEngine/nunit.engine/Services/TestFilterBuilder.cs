@@ -11,7 +11,7 @@ namespace NUnit.Engine
     public class TestFilterBuilder : ITestFilterBuilder
     {
         private List<string> _testList = new List<string>();
-        private string _whereClause;
+        private string? _whereClause;
 
         /// <summary>
         /// Add a test to be selected
@@ -51,7 +51,7 @@ namespace NUnit.Engine
 
 
             if (_whereClause != null)
-                filter.Append(new TestSelectionParser().Parse(_whereClause));
+                filter.Append(TestSelectionParser.Parse(_whereClause));
 
             filter.Append("</filter>");
 

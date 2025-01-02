@@ -15,6 +15,7 @@ namespace NUnit.Engine.Internal
             XmlNode node = XmlHelper.CreateTopLevelElement("myelement");
 
             Assert.That(node.Name, Is.EqualTo("myelement"));
+            Assert.That(node.Attributes, Is.Not.Null);
             Assert.That(node.Attributes.Count, Is.EqualTo(0));
             Assert.That(node.ChildNodes.Count, Is.EqualTo(0));
         }
@@ -28,11 +29,12 @@ namespace NUnit.Engine.Internal
             XmlHelper.AddAttribute(node, "quotes", "'c' is a char but \"c\" is a string");
 
             Assert.That(node.Name, Is.EqualTo("person"));
+            Assert.That(node.Attributes, Is.Not.Null);
             Assert.That(node.Attributes.Count, Is.EqualTo(3));
             Assert.That(node.ChildNodes.Count, Is.EqualTo(0));
-            Assert.That(node.Attributes["name"].Value, Is.EqualTo("Fred"));
-            Assert.That(node.Attributes["age"].Value, Is.EqualTo("42"));
-            Assert.That(node.Attributes["quotes"].Value, Is.EqualTo("'c' is a char but \"c\" is a string"));
+            Assert.That(node.Attributes["name"]?.Value, Is.EqualTo("Fred"));
+            Assert.That(node.Attributes["age"]?.Value, Is.EqualTo("42"));
+            Assert.That(node.Attributes["quotes"]?.Value, Is.EqualTo("'c' is a char but \"c\" is a string"));
         }
 
         [Test]
@@ -42,7 +44,7 @@ namespace NUnit.Engine.Internal
             XmlNode message = top.AddElement("message");
             message.InnerText = "This is my message";
 
-            Assert.That(top.SelectSingleNode("message").InnerText, Is.EqualTo("This is my message"));
+            Assert.That(top.SelectSingleNode("message")?.InnerText, Is.EqualTo("This is my message"));
         }
 
         [Test]
@@ -51,7 +53,7 @@ namespace NUnit.Engine.Internal
             XmlNode top = XmlHelper.CreateTopLevelElement("top");
             top.AddElementWithCDataSection("message", "x > 5 && x < 7");
 
-            Assert.That(top.SelectSingleNode("message").InnerText, Is.EqualTo("x > 5 && x < 7"));
+            Assert.That(top.SelectSingleNode("message")?.InnerText, Is.EqualTo("x > 5 && x < 7"));
         }
 
         [Test]

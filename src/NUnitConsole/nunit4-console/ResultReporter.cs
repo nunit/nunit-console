@@ -5,11 +5,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 using NUnit.ConsoleRunner.Options;
+using NUnit.ConsoleRunner.Utilities;
 
 namespace NUnit.ConsoleRunner
 {
-    using Utilities;
-
     public class ResultReporter
     {
         public ResultReporter(XmlNode resultNode, ExtendedTextWriter writer, ConsoleOptions options)
@@ -18,12 +17,13 @@ namespace NUnit.ConsoleRunner
             Writer = writer;
             Options = options;
 
-            OverallResult = resultNode.GetAttribute("result");
-            if (OverallResult == "Skipped")
+            string? overallResult = resultNode.GetAttribute("result");
+            if (overallResult == "Skipped")
                 OverallResult = "Warning";
-            if (OverallResult == null)
+            if (overallResult == null)
                 OverallResult = "Unknown";
-
+            else
+                OverallResult = overallResult;
             Summary = new ResultSummary(resultNode);
         }
 
@@ -60,7 +60,7 @@ namespace NUnit.ConsoleRunner
             {
                 var settings = firstSuite.SelectNodes("settings/setting");
 
-                if (settings.Count > 0)
+                if (settings is not null && settings.Count > 0)
                 {
                     Writer.WriteLine(ColorStyle.SectionHeader, "Run Settings");
 
@@ -78,13 +78,18 @@ namespace NUnit.ConsoleRunner
             var name = node.GetAttribute("name");
             var val = node.GetAttribute("value") ?? string.Empty;
 
-            Writer.WriteLabelLine($"    {name}:", items.Count > 0 ? string.Empty : $" |{val}|");
-
-            foreach (XmlNode item in items)
+            if (items is null || items.Count == 0)
+                Writer.WriteLabelLine($"    {name}:", $" |{val}|");
+            else
             {
-                var key = item.GetAttribute("key");
-                var value = item.GetAttribute("value");
-                Writer.WriteLine(ColorStyle.Value, $"        {key} -> |{value}|");
+                Writer.WriteLabelLine($"    {name}:", string.Empty);
+
+                foreach (XmlNode item in items)
+                {
+                    var key = item.GetAttribute("key");
+                    var value = item.GetAttribute("value");
+                    Writer.WriteLine(ColorStyle.Value, $"        {key} -> |{value}|");
+                }
             }
         }
 
@@ -154,7 +159,7 @@ namespace NUnit.ConsoleRunner
 
         private void WriteErrorsFailuresAndWarnings(XmlNode resultNode)
         {
-            string resultState = resultNode.GetAttribute("result");
+            string? resultState = resultNode.GetAttribute("result");
 
             switch (resultNode.Name)
             {
@@ -225,7 +230,7 @@ namespace NUnit.ConsoleRunner
             switch (resultNode.Name)
             {
                 case "test-case":
-                    string status = resultNode.GetAttribute("result");
+                    string? status = resultNode.GetAttribute("result");
 
                     if (status == "Skipped")
                         new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);

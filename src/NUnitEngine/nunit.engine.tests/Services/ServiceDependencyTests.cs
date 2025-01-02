@@ -20,7 +20,7 @@ namespace NUnit.Engine.Services
         {
             var service = new TestRunnerFactory();
             _services.Add(service);
-            service.StartService();
+            Assert.That(service.StartService, Throws.Exception);
             Assert.That(service.Status, Is.EqualTo(ServiceStatus.Error));
         }
     }

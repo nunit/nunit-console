@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
+
 namespace NUnit.ConsoleRunner.Options
 {
-    using System;
-
     internal sealed class DefaultOptionsProvider : IDefaultOptionsProvider
     {
         private const string EnvironmentVariableTeamcityProjectName = "TEAMCITY_PROJECT_NAME";

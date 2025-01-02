@@ -13,7 +13,7 @@ namespace NUnit.ConsoleRunner
         {
             Console.WriteLine("OneTimeSetUp: Console.WriteLine()");
             Console.Error.WriteLine("OneTimeSetUp: Console.Error.WriteLine()");
-            TestContext.WriteLine("OneTimeSetUp: TestContext.WriteLine()");
+            TestContext.Out.WriteLine("OneTimeSetUp: TestContext.WriteLine()");
 
         }
 
@@ -22,7 +22,7 @@ namespace NUnit.ConsoleRunner
         {
             Console.WriteLine("SetUp: Console.WriteLine()");
             Console.Error.WriteLine("SetUp: Console.Error.WriteLine()");
-            TestContext.WriteLine("SetUp: TestContext.WriteLine()");
+            TestContext.Out.WriteLine("SetUp: TestContext.WriteLine()");
         }
 
         [TearDown]
@@ -30,7 +30,7 @@ namespace NUnit.ConsoleRunner
         {
             Console.WriteLine("TearDown: Console.WriteLine()");
             Console.Error.WriteLine("TearDown: Console.Error.WriteLine()");
-            TestContext.WriteLine("TearDown: TestContext.WriteLine()");
+            TestContext.Out.WriteLine("TearDown: TestContext.WriteLine()");
         }
 
         [OneTimeTearDown]
@@ -38,7 +38,7 @@ namespace NUnit.ConsoleRunner
         {
             Console.WriteLine("OneTimeTearDown: Console.WriteLine()");
             Console.Error.WriteLine("OneTimeTearDown: Console.Error.WriteLine()");
-            TestContext.WriteLine("OneTimeTearDown: TestContext.WriteLine()");
+            TestContext.Out.WriteLine("OneTimeTearDown: TestContext.WriteLine()");
         }
 
         [Test]
@@ -46,13 +46,13 @@ namespace NUnit.ConsoleRunner
         {
             Console.WriteLine("Test: Console.WriteLine()");
             Console.Error.WriteLine("Test: Console.Error.WriteLine()");
-            TestContext.WriteLine("Test: TestContext.WriteLine()");
+            TestContext.Out.WriteLine("Test: TestContext.WriteLine()");
         }
 
         [Test]
         public void ConsoleEncoding()
         {
-            TestContext.WriteLine("•ÑÜńĭŧ·");
+            TestContext.Out.WriteLine("•ÑÜńĭŧ·");
         }
     }
 }

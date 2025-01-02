@@ -28,7 +28,7 @@ namespace NUnit.Engine.Runners
 
             _package = new TestPackage(mockAssemblyPath).SubPackages[0];
 
-            _runner = (TRunner)Activator.CreateInstance(typeof(TRunner), _package);
+            _runner = (TRunner)Activator.CreateInstance(typeof(TRunner), _package)!;
         }
 
         [TearDown]

@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
@@ -24,9 +25,10 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private ITestAgent _agent;
-        private ITestEngineRunner _remoteRunner;
-        private TestAgency _agency;
+        private readonly TestAgency _agency;
+
+        private ITestAgent? _agent;
+        private ITestEngineRunner? _remoteRunner;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
@@ -204,7 +206,7 @@ namespace NUnit.Engine.Runners
             {
                 _disposed = true;
 
-                Exception unloadException = null;
+                Exception? unloadException = null;
 
                 try
                 {
@@ -241,6 +243,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
+        [MemberNotNull(nameof(_agent), nameof(_remoteRunner))]
         private void CreateAgentAndRunnerIfNeeded()
         {
             if (_agent == null)
@@ -264,8 +267,8 @@ namespace NUnit.Engine.Runners
             var suite = XmlHelper.CreateTopLevelElement("test-suite");
             XmlHelper.AddAttribute(suite, "type", "Assembly");
             XmlHelper.AddAttribute(suite, "id", TestPackage.ID);
-            XmlHelper.AddAttribute(suite, "name", TestPackage.Name);
-            XmlHelper.AddAttribute(suite, "fullname", TestPackage.FullName);
+            XmlHelper.AddAttribute(suite, "name", TestPackage.Name ?? string.Empty);
+            XmlHelper.AddAttribute(suite, "fullname", TestPackage.FullName ?? string.Empty);
             XmlHelper.AddAttribute(suite, "runstate", "NotRunnable");
             XmlHelper.AddAttribute(suite, "testcasecount", "1");
             XmlHelper.AddAttribute(suite, "result", "Failed");

@@ -18,7 +18,7 @@ namespace NUnit.Engine.Internal
         /// <returns>The path.</returns>
         public static string GetDirectoryName(Assembly assembly)
         {
-            return Path.GetDirectoryName(GetAssemblyPath(assembly));
+            return Path.GetDirectoryName(GetAssemblyPath(assembly))!;
         }
 
         /// <summary>
@@ -30,17 +30,24 @@ namespace NUnit.Engine.Internal
         /// <returns>The path.</returns>
         public static string GetAssemblyPath(Assembly assembly)
         {
-            string codeBase = assembly.CodeBase;
+#if NETFRAMEWORK
+            // https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.location
+            // .NET Framework only:
+            // If the loaded file was shadow-copied, the location is that of the file after being shadow-copied.
+            // To get the location before the file has been shadow-copied, use the CodeBase property.
+            string? codeBase = assembly.CodeBase;
 
-            if (IsFileUri(codeBase))
+            if (codeBase != null && IsFileUri(codeBase))
                 return GetAssemblyPathFromCodeBase(codeBase);
+#endif
 
             return assembly.Location;
         }
 
+#if NETFRAMEWORK
         private static bool IsFileUri(string uri)
         {
-            return uri.ToLower().StartsWith(Uri.UriSchemeFile);
+            return uri.StartsWith(Uri.UriSchemeFile, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -69,5 +76,6 @@ namespace NUnit.Engine.Internal
 
             return codeBase.Substring(start);
         }
+#endif
     }
 }

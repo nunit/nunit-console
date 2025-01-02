@@ -10,14 +10,6 @@ namespace NUnit.Engine.Services
 {
     public class TestSelectionParserTests
     {
-        private TestSelectionParser _parser;
-
-        [SetUp]
-        public void CreateParser()
-        {
-            _parser = new TestSelectionParser();
-        }
-
         [TestCase("cat=Urgent", "<cat>Urgent</cat>")]
         [TestCase("cat==Urgent", "<cat>Urgent</cat>")]
         [TestCase("cat!=Urgent", "<not><cat>Urgent</cat></not>")]
@@ -52,19 +44,19 @@ namespace NUnit.Engine.Services
         [TestCase("!(cat!=Urgent)", "<not><not><cat>Urgent</cat></not></not>")]
         public void TestParser(string input, string output)
         {
-            Assert.That(_parser.Parse(input), Is.EqualTo(output));
+            Assert.That(TestSelectionParser.Parse(input), Is.EqualTo(output));
 
             XmlDocument doc = new XmlDocument();
             Assert.DoesNotThrow(() => doc.LoadXml(output));
         }
 
-        [TestCase(null, typeof(ArgumentNullException))]
+        [TestCase(null!, typeof(ArgumentNullException))]
         [TestCase("", typeof(TestSelectionParserException))]
         [TestCase("   ", typeof(TestSelectionParserException))]
         [TestCase("  \t\t ", typeof(TestSelectionParserException))]
         public void TestParser_InvalidInput(string input, Type type)
         {
-            Assert.That(() => _parser.Parse(input), Throws.TypeOf(type));
+            Assert.That(() => TestSelectionParser.Parse(input), Throws.TypeOf(type));
         }
     }
 }

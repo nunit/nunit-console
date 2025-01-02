@@ -37,7 +37,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// The result of the last call to LoadPackage
         /// </summary>
-        protected TestEngineResult LoadResult { get; set; }
+        protected TestEngineResult? LoadResult { get; set; }
 
         /// <summary>
         /// Gets an indicator of whether the package has been loaded.

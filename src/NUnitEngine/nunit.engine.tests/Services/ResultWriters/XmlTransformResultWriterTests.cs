@@ -11,7 +11,10 @@ namespace NUnit.Engine.Services.ResultWriters
     [Ignore("Temporarily ignoring this fixture")]
     public class XmlTransformResultWriterTests
     {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        // NUnit.Analyzer DiagnosticSuppressor doesn't check inside using statement because it cannot check if the returned item is still valid.
         private XmlNode _engineResult;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         private const string AssemblyName = "mock-assembly.dll";
 
         [SetUp]
@@ -43,13 +46,15 @@ namespace NUnit.Engine.Services.ResultWriters
             StringWriter writer = new StringWriter();
             new XmlTransformResultWriter(new object[] { transformPath }).WriteResultFile(_engineResult, writer);
 
+            Assert.That(_engineResult.Attributes, Is.Not.Null);
+
             string summary = string.Format(
                 "Tests Run: {0}, Passed: {1}, Failed: {2}, Inconclusive: {3}, Skipped: {4}",
-                _engineResult.Attributes["total"].Value,
-                _engineResult.Attributes["passed"].Value,
-                _engineResult.Attributes["failed"].Value,
-                _engineResult.Attributes["inconclusive"].Value,
-                _engineResult.Attributes["skipped"].Value);
+                _engineResult.Attributes["total"]?.Value,
+                _engineResult.Attributes["passed"]?.Value,
+                _engineResult.Attributes["failed"]?.Value,
+                _engineResult.Attributes["inconclusive"]?.Value,
+                _engineResult.Attributes["skipped"]?.Value);
 
             string output = writer.GetStringBuilder().ToString();
 

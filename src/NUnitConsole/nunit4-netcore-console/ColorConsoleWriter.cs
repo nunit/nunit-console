@@ -89,7 +89,7 @@ namespace NUnit.ConsoleRunner
             Guard.ArgumentNotNull(option, nameof(option));
 
             Write(ColorStyle.Label, label);
-            Write(valueStyle, option.ToString());
+            Write(valueStyle, option.ToString() ?? string.Empty);
         }
 
         /// <summary>

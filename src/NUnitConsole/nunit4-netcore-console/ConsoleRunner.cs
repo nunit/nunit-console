@@ -142,7 +142,7 @@ namespace NUnit.ConsoleRunner
             {
                 foreach (OutputSpecification spec in _options.ExploreOutputSpecifications)
                 {
-                    _resultService.GetResultWriter(spec.Format, new object[] {spec.Transform}).WriteResultFile(result, spec.OutputPath);
+                    _resultService.GetResultWriter(spec.Format, spec.Transform).WriteResultFile(result, spec.OutputPath);
                     _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
             }
@@ -172,7 +172,7 @@ namespace NUnit.ConsoleRunner
 
                 try
                 {
-                    var outputDirectory = Path.GetDirectoryName(outputPath);
+                    var outputDirectory = Path.GetDirectoryName(outputPath)!;
                     Directory.CreateDirectory(outputDirectory);
                 }
                 catch (Exception ex)
@@ -202,9 +202,9 @@ namespace NUnit.ConsoleRunner
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
 
-            XmlNode result = null;
-            NUnitEngineUnloadException unloadException = null;
-            NUnitEngineException engineException = null;
+            XmlNode? result = null;
+            NUnitEngineUnloadException? unloadException = null;
+            NUnitEngineException? engineException = null;
 
             try
             {
@@ -380,7 +380,7 @@ namespace NUnit.ConsoleRunner
 
         private IResultWriter GetResultWriter(OutputSpecification spec)
         {
-            return _resultService.GetResultWriter(spec.Format, new object[] {spec.Transform});
+            return _resultService.GetResultWriter(spec.Format, spec.Transform);
         }
 
         // This is public static for ease of testing

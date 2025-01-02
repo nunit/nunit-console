@@ -3,13 +3,15 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
-    <OutputPath>../../../bin/$(Configuration)</OutputPath>
+    <OutputPath>$(MSBuildThisFileDirectory)/../../../bin/$(Configuration)</OutputPath>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/../../nunit.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <PropertyGroup>
     <Product>NUnit Engine</Product>
@@ -19,8 +21,4 @@
     <FileVersion>3.99.0.0</FileVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20'">
-    <Reference Include="System.Web" />
-  </ItemGroup>
-  
 </Project>

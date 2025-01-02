@@ -191,7 +191,7 @@ namespace NUnit.ConsoleRunner
         {
             var rdr = new StringReader(GetReport(del));
 
-            string line;
+            string? line;
             var lines = new List<string>();
             while ((line = rdr.ReadLine()) != null)
                 lines.Add(line);

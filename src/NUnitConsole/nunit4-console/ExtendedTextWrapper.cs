@@ -31,7 +31,7 @@ namespace NUnit.ConsoleRunner
         /// <summary>
         /// Write a string value
         /// </summary>
-        public override void Write(string value)
+        public override void Write(string? value)
         {
             _writer.Write(value);
         }
@@ -39,7 +39,7 @@ namespace NUnit.ConsoleRunner
         /// <summary>
         /// Write a string value followed by a NewLine
         /// </summary>
-        public override void WriteLine(string value)
+        public override void WriteLine(string? value)
         {
             _writer.WriteLine(value);
         }

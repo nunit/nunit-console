@@ -22,6 +22,7 @@ namespace NUnit.Engine.Internal
             Assert.That(File.Exists(path));
         }
 
+#if NETFRAMEWORK
         // The following tests are only useful to the extent that the test cases
         // match what will actually be provided to the method in production.
         // As currently used, NUnit's codebase can only use the file: schema,
@@ -54,5 +55,6 @@ namespace NUnit.Engine.Internal
             string localPath = AssemblyHelper.GetAssemblyPathFromCodeBase(uri);
             Assert.That(localPath, Is.SamePath(expectedPath));
         }
+#endif
     }
 }

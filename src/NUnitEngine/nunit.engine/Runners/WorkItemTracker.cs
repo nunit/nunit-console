@@ -53,10 +53,13 @@ namespace NUnit.Engine.Runners
             public string Name { get; }
             public Dictionary<string, string> Properties { get; }
 
-            public int CompareTo(InProgressItem other)
+            public int CompareTo(InProgressItem? other)
             {
                 // for signaling purposes, return in reverse order
-                return _order.CompareTo(other._order) * -1;
+                if (other == null)
+                    return -1;
+
+                return  _order.CompareTo(other._order) * -1;
             }
         }
 
@@ -159,7 +162,9 @@ namespace NUnit.Engine.Runners
 
                         case "test-case":
                         case "test-suite":
-                            RemoveItem(reader.GetAttribute("id"));
+                            string? id = reader.GetAttribute("id");
+                            if (id != null) // TODO: Should we throw if id is null?
+                                RemoveItem(id);
 
                             if (_itemsInProcess.Count == 0)
                                 _allItemsComplete.Set();

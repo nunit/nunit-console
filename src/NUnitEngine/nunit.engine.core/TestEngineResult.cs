@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
+using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine
@@ -29,7 +30,7 @@ namespace NUnit.Engine
     [Serializable]
     public class TestEngineResult
     {
-        private List<string> _xmlText = new List<string>();
+        private readonly List<string> _xmlText = new List<string>();
 
         [NonSerialized]
         private List<XmlNode> _xmlNodes = new List<XmlNode>();
@@ -84,7 +85,7 @@ namespace NUnit.Engine
                 {
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(_xmlText[i]);
-                    _xmlNodes.Add(doc.FirstChild);
+                    _xmlNodes.Add(doc.FirstChild.ShouldNotBeNull());
                 }
 
                 return _xmlNodes;

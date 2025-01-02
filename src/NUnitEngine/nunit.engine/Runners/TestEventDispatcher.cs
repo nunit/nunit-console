@@ -37,7 +37,7 @@ namespace NUnit.Engine.Runners
 #endif
         public override object InitializeLifetimeService()
         {
-            return null;
+            return null!;
         }
     }
 }

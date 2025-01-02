@@ -18,6 +18,7 @@ namespace NUnit.Engine.Internal
         public void GetTcpChannelReturnsSameChannelForSameNameDifferentPort()
         {
             var first = TcpChannelUtils.GetTcpChannel("test", 1234);
+            Assert.That(first, Is.Not.Null);
             using (CleanUpOnDispose(first))
             {
                 var second = TcpChannelUtils.GetTcpChannel("test", 4321);
@@ -29,6 +30,7 @@ namespace NUnit.Engine.Internal
         public void GetTcpChannelReturnsSameChannelForSameNameUnspecifiedPorts()
         {
             var first = TcpChannelUtils.GetTcpChannel("test", 0);
+            Assert.That(first, Is.Not.Null);
             using (CleanUpOnDispose(first))
             {
                 var second = TcpChannelUtils.GetTcpChannel("test", 0);
@@ -40,6 +42,7 @@ namespace NUnit.Engine.Internal
         public void GetTcpChannelReturnsChannelWithCorrectName()
         {
             var channel = TcpChannelUtils.GetTcpChannel("test", 1234);
+            Assert.That(channel, Is.Not.Null);
             using (CleanUpOnDispose(channel))
             {
                 Assert.That(channel, HasChannelName().EqualTo("test"));
@@ -50,6 +53,7 @@ namespace NUnit.Engine.Internal
         public void GetTcpChannelReturnsChannelWithCorrectNameForUnspecifiedPort()
         {
             var channel = TcpChannelUtils.GetTcpChannel("test", 0);
+            Assert.That(channel, Is.Not.Null);
             using (CleanUpOnDispose(channel))
             {
                 Assert.That(channel, HasChannelName().EqualTo("test"));
@@ -60,6 +64,7 @@ namespace NUnit.Engine.Internal
         public void GetTcpChannelReturnsChannelWithCorrectURI()
         {
             var channel = TcpChannelUtils.GetTcpChannel("test", 1234);
+            Assert.That(channel, Is.Not.Null);
             using (CleanUpOnDispose(channel))
             {
                 Assert.That(channel, HasChannelUris().EqualTo(new[] { "tcp://127.0.0.1:1234" }));

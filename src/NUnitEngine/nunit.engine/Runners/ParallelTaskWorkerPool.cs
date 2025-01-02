@@ -49,7 +49,7 @@ namespace NUnit.Engine.Runners
         {
             while (true)
             {
-                ITestExecutionTask task = null;
+                ITestExecutionTask? task = null;
                 lock (_taskLock)
                 {
                     if (_tasks.Count > 0)

@@ -21,6 +21,12 @@ namespace NUnit.Engine.Services
             services.ServiceManager.StartServices();
         }
 
+        [TearDown]
+        public void StopServices()
+        {
+            _projectService.Dispose();
+        }
+
         [Test]
         public void ServiceIsStarted()
         {

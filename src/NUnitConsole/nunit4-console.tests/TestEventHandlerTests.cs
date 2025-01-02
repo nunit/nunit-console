@@ -21,13 +21,19 @@ namespace NUnit.ConsoleRunner
             _writer = new ExtendedTextWrapper(new StringWriter(_output));
         }
 
+        [TearDown]
+        public void DisposeWriter()
+        {
+            _writer.Dispose();
+        }
+
         [TestCase(char.MaxValue)]
         public void TestNameContainsInvalidChar(char c)
         {
             Console.WriteLine($"Test for char {c}");
         }
 
-        [TestCaseSource("SingleEventData")]
+        [TestCaseSource(nameof(SingleEventData))]
         public void SingleEventsWriteExpectedOutput(string report, string labels, string expected)
         {
             var handler = new TestEventHandler(_writer, labels);
@@ -39,7 +45,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(Output, Is.EqualTo(expected));
         }
 
-        [TestCaseSource("MultipleEventData")]
+        [TestCaseSource(nameof(MultipleEventData))]
         public void MultipleEvents(string[] reports, string labels, string expected)
         {
             var handler = new TestEventHandler(_writer, labels);
@@ -56,8 +62,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(Output, Is.EqualTo(expected));
         }
 
-#pragma warning disable 414
-        static TestCaseData[] SingleEventData = new TestCaseData[]
+        static readonly TestCaseData[] SingleEventData = new TestCaseData[]
         {
             // Start Events
             new TestCaseData("<start-test fullname='SomeName'/>", "Off", ""),
@@ -269,7 +274,7 @@ namespace NUnit.ConsoleRunner
             "<test-case fullname='TEST1' result='Failed'><output>Output from first test</output></test-case>"
         };
 
-        static TestCaseData[] MultipleEventData = new TestCaseData[]
+        static readonly TestCaseData[] MultipleEventData = new TestCaseData[]
         {
             new TestCaseData(
                 SingleTest_StartAndFinish,

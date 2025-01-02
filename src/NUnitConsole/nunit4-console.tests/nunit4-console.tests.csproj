@@ -16,6 +16,8 @@
     <Description>Tests of the NUnit Console Runner</Description>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
+
   <ItemGroup>
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnitLite" Version="4.2.2" />
@@ -24,7 +26,11 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="NSubstitute" Version="4.3.0" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <PackageReference Include="NUnit.Analyzers" Version="4.5.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="TestListWithEmptyLine.tst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

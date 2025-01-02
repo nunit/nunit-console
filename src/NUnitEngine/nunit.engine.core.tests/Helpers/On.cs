@@ -11,7 +11,7 @@ namespace NUnit.Engine.Tests.Helpers
 
         private sealed class OnDisposeAction : IDisposable
         {
-            private Action action;
+            private Action? action;
 
             public OnDisposeAction(Action action)
             {

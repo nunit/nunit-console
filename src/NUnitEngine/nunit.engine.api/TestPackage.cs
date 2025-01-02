@@ -76,7 +76,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the name of the package
         /// </summary>
-        public string Name
+        public string? Name
         {
             get { return FullName == null ? null : Path.GetFileName(FullName); }
         }
@@ -85,7 +85,7 @@ namespace NUnit.Engine
         /// Gets the path to the file containing tests. It may be
         /// an assembly or a recognized project type.
         /// </summary>
-        public string FullName { get; private set; }
+        public string? FullName { get; private init; }
 
         /// <summary>
         /// Gets the list of SubPackages contained in this package
@@ -149,8 +149,8 @@ namespace NUnit.Engine
         /// <returns></returns>
         public T GetSetting<T>(string name, T defaultSetting)
         {
-            return Settings.ContainsKey(name)
-                ? (T)Settings[name]
+            return (Settings.TryGetValue(name, out object? setting) && setting is not null)
+                ? (T)setting
                 : defaultSetting;
         }
     }

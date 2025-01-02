@@ -54,7 +54,7 @@ namespace NUnit.Engine.Internal.Backports
         [Test]
         public void IsPathFullyQualified_PathIsNull()
         {
-            Assert.That(() => Path.IsPathFullyQualified(null), Throws.ArgumentNullException);
+            Assert.That(() => Path.IsPathFullyQualified(null!), Throws.ArgumentNullException);
         }
     }
 }

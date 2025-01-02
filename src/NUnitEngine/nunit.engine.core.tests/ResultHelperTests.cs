@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System.Xml;
+using NUnit.Framework;
 
 namespace NUnit.Engine.Internal
 {
-    using Framework;
-
     public class ResultHelperTests
     {
         private const string resultText1 = "<test-assembly result=\"Passed\" total=\"23\" passed=\"23\" failed=\"0\" inconclusive=\"0\" skipped=\"0\" warnings=\"0\" asserts=\"40\" />";
@@ -46,17 +45,18 @@ namespace NUnit.Engine.Internal
             XmlNode combinedNode = combined.Xml;
 
             Assert.That(combinedNode.Name, Is.EqualTo("test-run"));
-            Assert.That(combinedNode.Attributes["id"].Value, Is.EqualTo("ID"));
-            Assert.That(combinedNode.Attributes["name"].Value, Is.EqualTo("NAME"));
-            Assert.That(combinedNode.Attributes["fullname"].Value, Is.EqualTo("FULLNAME"));
-            Assert.That(combinedNode.Attributes["result"].Value, Is.EqualTo("Failed"));
-            Assert.That(combinedNode.Attributes["total"].Value, Is.EqualTo("42"));
-            Assert.That(combinedNode.Attributes["passed"].Value, Is.EqualTo("31"));
-            Assert.That(combinedNode.Attributes["failed"].Value, Is.EqualTo("3"));
-            Assert.That(combinedNode.Attributes["warnings"].Value, Is.EqualTo("1"));
-            Assert.That(combinedNode.Attributes["inconclusive"].Value, Is.EqualTo("5"));
-            Assert.That(combinedNode.Attributes["skipped"].Value, Is.EqualTo("2"));
-            Assert.That(combinedNode.Attributes["asserts"].Value, Is.EqualTo("53"));
+            Assert.That(combinedNode.Attributes, Is.Not.Null);
+            Assert.That(combinedNode.Attributes["id"]?.Value, Is.EqualTo("ID"));
+            Assert.That(combinedNode.Attributes["name"]?.Value, Is.EqualTo("NAME"));
+            Assert.That(combinedNode.Attributes["fullname"]?.Value, Is.EqualTo("FULLNAME"));
+            Assert.That(combinedNode.Attributes["result"]?.Value, Is.EqualTo("Failed"));
+            Assert.That(combinedNode.Attributes["total"]?.Value, Is.EqualTo("42"));
+            Assert.That(combinedNode.Attributes["passed"]?.Value, Is.EqualTo("31"));
+            Assert.That(combinedNode.Attributes["failed"]?.Value, Is.EqualTo("3"));
+            Assert.That(combinedNode.Attributes["warnings"]?.Value, Is.EqualTo("1"));
+            Assert.That(combinedNode.Attributes["inconclusive"]?.Value, Is.EqualTo("5"));
+            Assert.That(combinedNode.Attributes["skipped"]?.Value, Is.EqualTo("2"));
+            Assert.That(combinedNode.Attributes["asserts"]?.Value, Is.EqualTo("53"));
         }
 
         [Test]
@@ -68,18 +68,19 @@ namespace NUnit.Engine.Internal
             XmlNode combinedNode = combined.Xml;
 
             Assert.That(combinedNode.Name, Is.EqualTo("test-suite"));
-            Assert.That(combinedNode.Attributes["type"].Value, Is.EqualTo("Project"));
-            Assert.That(combinedNode.Attributes["id"].Value, Is.EqualTo("ID"));
-            Assert.That(combinedNode.Attributes["name"].Value, Is.EqualTo("NAME"));
-            Assert.That(combinedNode.Attributes["fullname"].Value, Is.EqualTo("FULLNAME"));
-            Assert.That(combinedNode.Attributes["result"].Value, Is.EqualTo("Failed"));
-            Assert.That(combinedNode.Attributes["total"].Value, Is.EqualTo("65"));
-            Assert.That(combinedNode.Attributes["passed"].Value, Is.EqualTo("54"));
-            Assert.That(combinedNode.Attributes["failed"].Value, Is.EqualTo("3"));
-            Assert.That(combinedNode.Attributes["warnings"].Value, Is.EqualTo("1"));
-            Assert.That(combinedNode.Attributes["inconclusive"].Value, Is.EqualTo("5"));
-            Assert.That(combinedNode.Attributes["skipped"].Value, Is.EqualTo("2"));
-            Assert.That(combinedNode.Attributes["asserts"].Value, Is.EqualTo("93"));
+            Assert.That(combinedNode.Attributes, Is.Not.Null);
+            Assert.That(combinedNode.Attributes["type"]?.Value, Is.EqualTo("Project"));
+            Assert.That(combinedNode.Attributes["id"]?.Value, Is.EqualTo("ID"));
+            Assert.That(combinedNode.Attributes["name"]?.Value, Is.EqualTo("NAME"));
+            Assert.That(combinedNode.Attributes["fullname"]?.Value, Is.EqualTo("FULLNAME"));
+            Assert.That(combinedNode.Attributes["result"]?.Value, Is.EqualTo("Failed"));
+            Assert.That(combinedNode.Attributes["total"]?.Value, Is.EqualTo("65"));
+            Assert.That(combinedNode.Attributes["passed"]?.Value, Is.EqualTo("54"));
+            Assert.That(combinedNode.Attributes["failed"]?.Value, Is.EqualTo("3"));
+            Assert.That(combinedNode.Attributes["warnings"]?.Value, Is.EqualTo("1"));
+            Assert.That(combinedNode.Attributes["inconclusive"]?.Value, Is.EqualTo("5"));
+            Assert.That(combinedNode.Attributes["skipped"]?.Value, Is.EqualTo("2"));
+            Assert.That(combinedNode.Attributes["asserts"]?.Value, Is.EqualTo("93"));
         }
 
         [Test]
@@ -88,17 +89,18 @@ namespace NUnit.Engine.Internal
             XmlNode combined = ResultHelper.Aggregate("test-run", "ID", "NAME", "FULLNAME", twoNodes);
 
             Assert.That(combined.Name, Is.EqualTo("test-run"));
-            Assert.That(combined.Attributes["id"].Value, Is.EqualTo("ID"));
-            Assert.That(combined.Attributes["name"].Value, Is.EqualTo("NAME"));
-            Assert.That(combined.Attributes["fullname"].Value, Is.EqualTo("FULLNAME"));
-            Assert.That(combined.Attributes["result"].Value, Is.EqualTo("Failed"));
-            Assert.That(combined.Attributes["total"].Value, Is.EqualTo("65"));
-            Assert.That(combined.Attributes["passed"].Value, Is.EqualTo("54"));
-            Assert.That(combined.Attributes["failed"].Value, Is.EqualTo("3"));
-            Assert.That(combined.Attributes["warnings"].Value, Is.EqualTo("1"));
-            Assert.That(combined.Attributes["inconclusive"].Value, Is.EqualTo("5"));
-            Assert.That(combined.Attributes["skipped"].Value, Is.EqualTo("2"));
-            Assert.That(combined.Attributes["asserts"].Value, Is.EqualTo("93"));
+            Assert.That(combined.Attributes, Is.Not.Null);
+            Assert.That(combined.Attributes["id"]?.Value, Is.EqualTo("ID"));
+            Assert.That(combined.Attributes["name"]?.Value, Is.EqualTo("NAME"));
+            Assert.That(combined.Attributes["fullname"]?.Value, Is.EqualTo("FULLNAME"));
+            Assert.That(combined.Attributes["result"]?.Value, Is.EqualTo("Failed"));
+            Assert.That(combined.Attributes["total"]?.Value, Is.EqualTo("65"));
+            Assert.That(combined.Attributes["passed"]?.Value, Is.EqualTo("54"));
+            Assert.That(combined.Attributes["failed"]?.Value, Is.EqualTo("3"));
+            Assert.That(combined.Attributes["warnings"]?.Value, Is.EqualTo("1"));
+            Assert.That(combined.Attributes["inconclusive"]?.Value, Is.EqualTo("5"));
+            Assert.That(combined.Attributes["skipped"]?.Value, Is.EqualTo("2"));
+            Assert.That(combined.Attributes["asserts"]?.Value, Is.EqualTo("93"));
         }
 
         [TestCase("Skipped", "Skipped", "Skipped")]
@@ -126,7 +128,7 @@ namespace NUnit.Engine.Internal
             var secondEngineResult = new TestEngineResult(secondResultText);
             var data = new XmlNode[]{ firstEngineResult.Xml, secondEngineResult.Xml };
             XmlNode combined = ResultHelper.Aggregate("test-run", "ID", "NAME", "FULLNAME", data);
-            Assert.That(combined.Attributes["result"].Value, Is.EqualTo(aggregateResult));
+            Assert.That(combined.Attributes?["result"]?.Value, Is.EqualTo(aggregateResult));
         }
     }
 }

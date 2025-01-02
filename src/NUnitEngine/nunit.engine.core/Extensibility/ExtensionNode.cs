@@ -2,11 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-
-#if !NETFRAMEWORK
 using System.Linq;
-#endif
+using System.Reflection;
 
 namespace NUnit.Engine.Extensibility
 {
@@ -17,8 +14,8 @@ namespace NUnit.Engine.Extensibility
     /// </summary>
     public class ExtensionNode : IExtensionNode
     {
-        private object _extensionObject;
-        private Dictionary<string, List<string>> _properties = new Dictionary<string, List<string>>();
+        private object? _extensionObject;
+        private readonly Dictionary<string, List<string>> _properties = new Dictionary<string, List<string>>();
 
 
         /// <summary>
@@ -28,7 +25,7 @@ namespace NUnit.Engine.Extensibility
         /// <param name="assemblyVersion">The version of the extension assembly.</param>
         /// <param name="typeName">The full name of the Type of the extension object.</param>
         /// <param name="targetFramework">The target framework of the extension assembly.</param>
-        public ExtensionNode(string assemblyPath, Version assemblyVersion, string typeName, IRuntimeFramework targetFramework)
+        public ExtensionNode(string assemblyPath, Version assemblyVersion, string typeName, IRuntimeFramework? targetFramework)
         {
             AssemblyPath = assemblyPath;
             AssemblyVersion = assemblyVersion;
@@ -45,7 +42,7 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// The TargetFramework of the extension assembly.
         /// </summary>
-        public IRuntimeFramework TargetFramework { get; }
+        public IRuntimeFramework? TargetFramework { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="NUnit.Engine.Extensibility.ExtensionNode"/> is enabled.
@@ -58,12 +55,12 @@ namespace NUnit.Engine.Extensibility
         /// this Extension is intended. This identifier may be supplied by the attribute
         /// marking the extension or deduced by NUnit from the Type of the extension class.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; set; } = string.Empty; // TODO: Set in non-public constructor and remove public setter.
 
         /// <summary>
         /// An optional description of what the extension does.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets a collection of the names of all this extension's properties
@@ -84,7 +81,7 @@ namespace NUnit.Engine.Extensibility
             if (_properties.ContainsKey(name))
                 return _properties[name];
             else
-                return new string[0];
+                return Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -121,25 +118,20 @@ namespace NUnit.Engine.Extensibility
         {
 #if !NETFRAMEWORK
             var assembly = Assembly.LoadFrom(AssemblyPath);
-            var typeinfo = assembly.DefinedTypes.FirstOrDefault(t => t.FullName == TypeName);
-            if (typeinfo == null)
-            {
-                return null;
-            }
-            return Activator.CreateInstance(typeinfo.AsType(), args);
+            var type = assembly.GetType(TypeName, throwOnError: true)!;
+            return Activator.CreateInstance(type, args)!;
 #else
-            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null);
+            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null)!;
 #endif
         }
 
         public void AddProperty(string name, string val)
         {
-            if (_properties.ContainsKey(name))
-                _properties[name].Add(val);
+            if (_properties.TryGetValue(name, out List<string>? list))
+                list.Add(val);
             else
             {
-                var list = new List<string>();
-                list.Add(val);
+                list = new List<string> { val };
                 _properties.Add(name, list);
             }
         }

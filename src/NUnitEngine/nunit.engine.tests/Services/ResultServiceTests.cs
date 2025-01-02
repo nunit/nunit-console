@@ -21,6 +21,13 @@ namespace NUnit.Engine.Services
             services.ServiceManager.StartServices();
         }
 
+        [TearDown]
+        public void StopService()
+        {
+            _resultService.StopService();
+            _resultService.Dispose();
+        }
+
         [Test]
         public void ServiceIsStarted()
         {
@@ -37,7 +44,7 @@ namespace NUnit.Engine.Services
         //[TestCase("nunit2", null, ExpectedResult = "NUnit2XmlResultWriter")]
         [TestCase("cases", null, ExpectedResult = "TestCaseResultWriter")]
         //[TestCase("user", new object[] { "TextSummary.xslt" }, ExpectedResult = "XmlTransformResultWriter")]
-        public string CanGetWriter(string format, object[] args)
+        public string CanGetWriter(string format, object[]? args)
         {
             var writer = _resultService.GetResultWriter(format, args);
 

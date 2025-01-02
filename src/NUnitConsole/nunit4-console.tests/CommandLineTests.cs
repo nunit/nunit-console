@@ -160,7 +160,7 @@ namespace NUnit.ConsoleRunner
             string[] prototypes = pattern.Split('|');
 
             PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.That(property.PropertyType, Is.EqualTo(typeof(bool)), "Property '{0}' is wrong type", propertyName);
+            Assert.That(property.PropertyType, Is.EqualTo(typeof(bool)), $"Property '{propertyName}' is wrong type");
 
             foreach (string option in prototypes)
             {
@@ -169,22 +169,22 @@ namespace NUnit.ConsoleRunner
                 if (option.Length == 1)
                 {
                     options = ConsoleMocks.Options("-" + option);
-                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize -" + option);
+                    Assert.That((bool?)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize -" + option);
 
                     options = ConsoleMocks.Options("-" + option + "+");
-                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize -" + option + "+");
+                    Assert.That((bool?)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize -" + option + "+");
 
                     options = ConsoleMocks.Options("-" + option + "-");
-                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(false), "Didn't recognize -" + option + "-");
+                    Assert.That((bool?)property.GetValue(options, null), Is.EqualTo(false), "Didn't recognize -" + option + "-");
                 }
                 else
                 {
                     options = ConsoleMocks.Options("--" + option);
-                    Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize --" + option);
+                    Assert.That((bool?)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize --" + option);
                 }
 
                 options = ConsoleMocks.Options("/" + option);
-                Assert.That((bool)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize /" + option);
+                Assert.That((bool?)property.GetValue(options, null), Is.EqualTo(true), "Didn't recognize /" + option);
             }
         }
 
@@ -217,7 +217,7 @@ namespace NUnit.ConsoleRunner
                     string optionPlusValue = string.Format("--{0}:{1}", option, value);
                     ConsoleOptions options = ConsoleMocks.Options(optionPlusValue);
                     Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "Should be valid: " + optionPlusValue);
-                    Assert.That((string)property.GetValue(options, null), Is.EqualTo(value), "Didn't recognize " + optionPlusValue);
+                    Assert.That((string?)property.GetValue(options, null), Is.EqualTo(value), "Didn't recognize " + optionPlusValue);
                 }
 
                 foreach (string value in badValues)
@@ -242,7 +242,7 @@ namespace NUnit.ConsoleRunner
                 string optionPlusValue = string.Format("--{0}:{1}", optionName, lowercaseValue);
                 ConsoleOptions options = ConsoleMocks.Options(optionPlusValue);
                 Assert.That(options.ErrorMessages.Count, Is.EqualTo(0), "Should be valid: " + optionPlusValue);
-                Assert.That((string)property.GetValue(options, null), Is.EqualTo(canonicalValue), "Didn't recognize " + optionPlusValue);
+                Assert.That((string?)property.GetValue(options, null), Is.EqualTo(canonicalValue), "Didn't recognize " + optionPlusValue);
             }
         }
 
@@ -262,7 +262,7 @@ namespace NUnit.ConsoleRunner
             foreach (string option in prototypes)
             {
                 ConsoleOptions options = ConsoleMocks.Options("--" + option + ":42");
-                Assert.That((int)property.GetValue(options, null), Is.EqualTo(42), "Didn't recognize --" + option + ":42");
+                Assert.That((int?)property.GetValue(options, null), Is.EqualTo(42), "Didn't recognize --" + option + ":42");
             }
         }
 
@@ -750,14 +750,14 @@ namespace NUnit.ConsoleRunner
 
         private static FieldInfo GetFieldInfo(string fieldName)
         {
-            FieldInfo field = typeof(ConsoleOptions).GetField(fieldName);
+            FieldInfo? field = typeof(ConsoleOptions).GetField(fieldName);
             Assert.That(field, Is.Not.Null, $"The field '{fieldName}' is not defined");
             return field;
         }
 
         private static PropertyInfo GetPropertyInfo(string propertyName)
         {
-            PropertyInfo property = typeof(ConsoleOptions).GetProperty(propertyName);
+            PropertyInfo? property = typeof(ConsoleOptions).GetProperty(propertyName);
             Assert.That(property, Is.Not.Null, $"The property '{propertyName}' is not defined");
             return property;
         }

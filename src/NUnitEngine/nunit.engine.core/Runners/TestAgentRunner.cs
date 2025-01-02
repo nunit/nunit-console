@@ -19,12 +19,12 @@ namespace NUnit.Engine.Runners
     {
         private readonly List<IFrameworkDriver> _drivers = new List<IFrameworkDriver>();
 
-        private readonly ProvidedPathsAssemblyResolver _assemblyResolver;
+        private readonly ProvidedPathsAssemblyResolver? _assemblyResolver;
 
-        protected AppDomain TestDomain { get; set; }
+        protected AppDomain? TestDomain { get; set; }
 
         // Used to inject DriverService for testing
-        internal IDriverService DriverService { get; set; }
+        internal IDriverService? DriverService { get; set; }
 
         /// <summary>
         /// The TestPackage for which this is the runner
@@ -34,7 +34,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// The result of the last call to Load
         /// </summary>
-        protected TestEngineResult LoadResult { get; set; }
+        protected TestEngineResult? LoadResult { get; set; }
 
         /// <summary>
         /// Gets an indicator of whether the package has been loaded.
@@ -100,6 +100,9 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         public virtual TestEngineResult Load()
         {
+            Guard.OperationValid(TestDomain != null, "TestDomain is not set");
+            AppDomain testDomain = TestDomain;
+
             var result = new TestEngineResult();
 
             // DirectRunner may be called with a single-assembly package,
@@ -115,12 +118,12 @@ namespace NUnit.Engine.Runners
 
             foreach (var subPackage in packagesToLoad)
             {
-                var testFile = subPackage.FullName;
+                var testFile = subPackage.FullName!; // We know it's an assembly
 
-                string targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string)null);
+                string? targetFramework = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string?)null);
                 bool skipNonTestAssemblies = subPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
-                if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
+                if (_assemblyResolver != null && !testDomain.IsDefaultAppDomain()
                     && subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
                 {
                     // It's OK to do this in the loop because the Add method
@@ -128,7 +131,7 @@ namespace NUnit.Engine.Runners
                     _assemblyResolver.AddPathFromFile(testFile);
                 }
 
-                IFrameworkDriver driver = DriverService.GetDriver(TestDomain, testFile, targetFramework, skipNonTestAssemblies);
+                IFrameworkDriver driver = DriverService.GetDriver(testDomain, testFile, targetFramework, skipNonTestAssemblies);
 
                 driver.ID = subPackage.ID;
                 result.Add(LoadDriver(driver, testFile, subPackage));
@@ -146,7 +149,7 @@ namespace NUnit.Engine.Runners
             {
                 return driver.Load(testFile, subPackage.Settings);
             }
-            catch (Exception ex) when (!(ex is NUnitEngineException))
+            catch (Exception ex) when (ex is not NUnitEngineException)
             {
                 throw new NUnitEngineException("An exception occurred in the driver while loading tests.", ex);
             }
@@ -188,7 +191,7 @@ namespace NUnit.Engine.Runners
         /// <returns>
         /// A TestEngineResult giving the result of the test execution
         /// </returns>
-        public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
+        public TestEngineResult Run(ITestEventListener? listener, TestFilter filter)
         {
             EnsurePackageIsLoaded();
 
@@ -213,13 +216,13 @@ namespace NUnit.Engine.Runners
             if (_assemblyResolver != null)
             {
                 foreach (var package in TestPackage.Select(p => p.IsAssemblyPackage()))
-                    _assemblyResolver.RemovePathFromFile(package.FullName);
+                    _assemblyResolver.RemovePathFromFile(package.FullName!); // IsAssemblyPackage guarantees FullName is not null
             }
 
             return result;
         }
 
-        public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
+        public AsyncTestEngineResult RunAsync(ITestEventListener? listener, TestFilter filter)
         {
             var testRun = new AsyncTestEngineResult();
 

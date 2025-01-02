@@ -15,6 +15,12 @@ namespace NUnit.Engine.Services
         private static readonly Guid DummyAgentId = Guid.NewGuid();
         private static readonly ITestAgent DummyAgent = new DummyTestAgent(DummyAgentId);
 
+        [OneTimeTearDown]
+        public static void OneTimeTearDown()
+        {
+            DummyProcess.Dispose();
+        }
+
         [Test]
         public static void IdCannotBeReused()
         {

@@ -10,7 +10,7 @@ namespace NUnit.Engine.Internal
 {
     public class ProvidedPathsAssemblyResolver
     {
-        static ILogger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
+        static readonly ILogger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
 
         public ProvidedPathsAssemblyResolver()
         {
@@ -34,7 +34,7 @@ namespace NUnit.Engine.Internal
 
         public void AddPathFromFile(string filePath)
         {
-            string dirPath = Path.GetDirectoryName(filePath);
+            string dirPath = Path.GetDirectoryName(filePath)!;
             AddPath(dirPath);
         }
 
@@ -45,15 +45,15 @@ namespace NUnit.Engine.Internal
 
         public void RemovePathFromFile(string filePath)
         {
-            string dirPath = Path.GetDirectoryName(filePath);
+            string dirPath = Path.GetDirectoryName(filePath)!;
             RemovePath(dirPath);
         }
 
-        Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+        Assembly? AssemblyResolve(object? sender, ResolveEventArgs args)
         {
             foreach (string path in _resolutionPaths)
             {
-                string filename = new AssemblyName(args.Name).Name + ".dll";
+                string filename = new AssemblyName(args.Name!).Name + ".dll";
                 string fullPath = Path.Combine(path, filename);
                 try
                 {
@@ -71,6 +71,6 @@ namespace NUnit.Engine.Internal
             return null;
         }
 
-        List<string> _resolutionPaths;
+        readonly List<string> _resolutionPaths;
     }
 }

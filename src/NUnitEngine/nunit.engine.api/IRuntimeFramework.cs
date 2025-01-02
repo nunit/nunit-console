@@ -30,6 +30,6 @@ namespace NUnit.Engine
         /// or null if there is no profile. Currently. the only defined 
         /// values are Full and Client.
         /// </summary>
-        string Profile { get; }
+        string? Profile { get; }
     }
 }

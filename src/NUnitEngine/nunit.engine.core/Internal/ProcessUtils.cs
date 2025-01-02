@@ -34,7 +34,7 @@ namespace NUnit.Engine.Internal
         /// Escapes arbitrary values so that the process receives the exact string you intend and injection is impossible.
         /// Spec: https://docs.microsoft.com/en-gb/windows/desktop/api/shellapi/nf-shellapi-commandlinetoargvw
         /// </summary>
-        public static void EscapeProcessArgument(this StringBuilder builder, string literalValue, bool alwaysQuote = false)
+        public static void EscapeProcessArgument(this StringBuilder builder, string? literalValue, bool alwaysQuote = false)
         {
             if (string.IsNullOrEmpty(literalValue))
             {

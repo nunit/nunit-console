@@ -49,6 +49,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the collection of exceptions .
         /// </summary>
-        public ICollection<Exception> AggregatedExceptions { get; }
+        public ICollection<Exception>? AggregatedExceptions { get; }
     }
 }

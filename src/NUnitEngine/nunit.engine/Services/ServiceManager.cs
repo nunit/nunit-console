@@ -24,7 +24,7 @@ namespace NUnit.Engine.Services
 
         public IService GetService( Type serviceType )
         {
-            IService theService = null;
+            IService? theService = null;
 
             if (_serviceIndex.ContainsKey(serviceType))
                 theService = _serviceIndex[serviceType];
@@ -40,9 +40,13 @@ namespace NUnit.Engine.Services
                 }
 
             if (theService == null)
-                log.Error(string.Format("Requested service {0} was not found", serviceType.FullName));
-            else
-                log.Debug(string.Format("Request for service {0} satisfied by {1}", serviceType.Name, theService.GetType().Name));
+            {
+                string message = $"Requested service {serviceType.FullName} was not found";
+                log.Error(message);
+                throw new NUnitEngineException(message);
+            }
+
+            log.Debug(string.Format("Request for service {0} satisfied by {1}", serviceType.Name, theService.GetType().Name));
 
             return theService;
         }
@@ -127,8 +131,7 @@ namespace NUnit.Engine.Services
                 if (disposing)
                     foreach (IService service in _services)
                     {
-                        IDisposable disposable = service as IDisposable;
-                        if (disposable != null)
+                        if (service is IDisposable disposable)
                             disposable.Dispose();
                     }
 

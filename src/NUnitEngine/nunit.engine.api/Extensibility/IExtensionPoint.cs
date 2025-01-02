@@ -19,7 +19,7 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Gets the description of this extension point. May be null.
         /// </summary>
-        string Description { get; }
+        string? Description { get; }
 
         /// <summary>
         /// Gets the FullName of the Type required for any extension to be installed at this extension point.

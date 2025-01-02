@@ -2,11 +2,10 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace NUnit.ConsoleRunner
 {
-    using System;
-
     internal class FileSystem : IFileSystem
     {
         public bool FileExists(string fileName)
@@ -22,7 +21,7 @@ namespace NUnit.ConsoleRunner
 
             using (var file = File.OpenText(fileName))
             {
-                string line;
+                string? line;
                 while ((line = file.ReadLine()) != null)
                 {
                     yield return line;

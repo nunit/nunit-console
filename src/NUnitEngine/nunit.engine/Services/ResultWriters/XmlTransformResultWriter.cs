@@ -12,13 +12,13 @@ namespace NUnit.Engine.Services
 {
     public class XmlTransformResultWriter : IResultWriter
     {
-        private string _xsltFile;
+        private string? _xsltFile;
         private readonly XslCompiledTransform _transform = new XslCompiledTransform();
 
-        public XmlTransformResultWriter(object[] args)
+        public XmlTransformResultWriter(object?[] args)
         {
             Guard.ArgumentNotNull(args, "args");
-            _xsltFile = args[0] as string;
+            _xsltFile = (string?)args[0];
 
             Guard.ArgumentValid(
                 !string.IsNullOrEmpty(_xsltFile),

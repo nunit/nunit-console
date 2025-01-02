@@ -20,6 +20,13 @@ namespace NUnit.Engine.Services
             _serviceManager.AddService(new ExtensionService());
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _serviceManager.StopServices();
+            _serviceManager.Dispose();
+        }
+
         [Test]
         public void InitializeServices()
         {

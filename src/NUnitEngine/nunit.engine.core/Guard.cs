@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace NUnit.Common
 {
@@ -22,6 +24,22 @@ namespace NUnit.Common
         }
 
         /// <summary>
+        /// Throws an exception if a result is null
+        /// </summary>
+        /// <typeparam name="T">The type of the <paramref name="result"/> to check.</typeparam>
+        /// <param name="result">The value to check.</param>
+        /// <param name="expression">Compiler supplied parameter for the <paramref name="result"/> expression.</param>
+        /// <returns>Value of <paramref name="result"/> if not null, throws otherwise.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static T ShouldNotBeNull<T>(this T? result, [CallerArgumentExpression(nameof(result))] string expression = "") where T : class
+        {
+            if (result == null)
+                throw new InvalidOperationException($"Result {expression} must not be null");
+
+            return result;
+        }
+
+        /// <summary>
         /// Throws an exception if a string argument is null or empty
         /// </summary>
         /// <param name="value">The value to be tested</param>
@@ -40,7 +58,7 @@ namespace NUnit.Common
         /// <param name="condition">The condition that must be met</param>
         /// <param name="message">The exception message to be used</param>
         /// <param name="paramName">The name of the argument</param>
-        public static void ArgumentInRange(bool condition, string message, string paramName)
+        public static void ArgumentInRange([DoesNotReturnIf(false)] bool condition, string message, string paramName)
         {
             if (!condition)
                 throw new ArgumentOutOfRangeException(paramName, message);
@@ -52,7 +70,7 @@ namespace NUnit.Common
         /// <param name="condition">The condition that must be met</param>
         /// <param name="message">The exception message to be used</param>
         /// <param name="paramName">The name of the argument</param>
-        public static void ArgumentValid(bool condition, string message, string paramName)
+        public static void ArgumentValid([DoesNotReturnIf(false)] bool condition, string message, string paramName)
         {
             if (!condition)
                 throw new ArgumentException(message, paramName);
@@ -63,7 +81,7 @@ namespace NUnit.Common
         /// </summary>
         /// <param name="condition">The condition that must be met</param>
         /// <param name="message">The exception message to be used</param>
-        public static void OperationValid(bool condition, string message)
+        public static void OperationValid([DoesNotReturnIf(false)] bool condition, string message)
         {
             if (!condition)
                 throw new InvalidOperationException(message);

@@ -31,7 +31,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
-        IExtensionPoint GetExtensionPoint(string path);
+        IExtensionPoint? GetExtensionPoint(string path);
 
         /// <summary>
         /// Get an enumeration of ExtensionNodes based on their identifying path.

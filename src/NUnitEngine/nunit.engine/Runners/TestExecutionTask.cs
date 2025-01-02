@@ -10,10 +10,10 @@ namespace NUnit.Engine.Runners
         private readonly ITestEngineRunner _runner;
         private readonly ITestEventListener _listener;
         private readonly TestFilter _filter;
-        private volatile TestEngineResult _result;
+        private volatile TestEngineResult? _result;
         private readonly bool _disposeRunner;
         private bool _hasExecuted = false;
-        private Exception _unloadException;
+        private Exception? _unloadException;
 
         public TestExecutionTask(ITestEngineRunner runner, ITestEventListener listener, TestFilter filter, bool disposeRunner)
         {
@@ -44,7 +44,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        public TestEngineResult Result
+        public TestEngineResult? Result
         {
             get
             {
@@ -56,7 +56,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// Stored exception thrown during test assembly unload.
         /// </summary>
-        public Exception UnloadException
+        public Exception? UnloadException
         {
             get
             {

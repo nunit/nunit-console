@@ -2,10 +2,8 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
-using Microsoft.Win32;
 using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
@@ -38,10 +36,9 @@ namespace NUnit.Agent
 #endif
 
         static Guid AgentId;
-        static string AgencyUrl;
-        static Process AgencyProcess;
-        static RemoteTestAgent Agent;
-        private static Logger log;
+        static string? AgencyUrl;
+        static Process? AgencyProcess;
+        static RemoteTestAgent? Agent;
 
         /// <summary>
         /// The main entry point for the application.
@@ -84,15 +81,15 @@ namespace NUnit.Agent
 
             var logName = $"nunit-agent_{pid}.log";
             //InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);
-            log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
+            Logger log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
             log.Info($"Agent process {pid} starting");
             log.Info($"Running {AGENT_RUNTIME} agent under {CURRENT_RUNTIME}");
 
             if (debugArgPassed)
-                TryLaunchDebugger();
+                TryLaunchDebugger(log);
 
-            LocateAgencyProcess(agencyPid);
+            AgencyProcess = LocateAgencyProcess(log, agencyPid);
 
             log.Info("Starting RemoteTestAgent");
             Agent = new RemoteTestAgent(AgentId);
@@ -106,7 +103,7 @@ namespace NUnit.Agent
             try
             {
                 if (Agent.Start())
-                    WaitForStop();
+                    WaitForStop(log, Agent, AgencyProcess);
                 else
                 {
                     log.Error("Failed to start RemoteTestAgent");
@@ -123,28 +120,29 @@ namespace NUnit.Agent
             Environment.Exit(AgentExitCodes.OK);
         }
 
-        private static void LocateAgencyProcess(string agencyPid)
+        private static Process LocateAgencyProcess(Logger log, string agencyPid)
         {
             var agencyProcessId = int.Parse(agencyPid);
             try
             {
-                AgencyProcess = Process.GetProcessById(agencyProcessId);
+                return Process.GetProcessById(agencyProcessId);
             }
             catch (Exception e)
             {
                 log.Error($"Unable to connect to agency process with PID: {agencyProcessId}");
                 log.Error($"Failed with exception: {e.Message} {e.StackTrace}");
                 Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_AGENCY);
+                return null; // Will never reach here
             }
         }
 
-        private static void WaitForStop()
+        private static void WaitForStop(Logger log, RemoteTestAgent agent, Process agencyProcess)
         {
             log.Debug("Waiting for stopSignal");
 
-            while (!Agent.WaitForStop(500))
+            while (!agent.WaitForStop(500))
             {
-                if (AgencyProcess.HasExited)
+                if (agencyProcess.HasExited)
                 {
                     log.Error("Parent process has been terminated.");
                     Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
@@ -154,7 +152,7 @@ namespace NUnit.Agent
             log.Debug("Stop signal received");
         }
 
-        private static void TryLaunchDebugger()
+        private static void TryLaunchDebugger(Logger log)
         {
             if (Debugger.IsAttached)
                 return;

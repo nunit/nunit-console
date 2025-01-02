@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services.Tests
             {
                 // Third argument is the Type of the driver
                 var driverType = testcase.Arguments[2] as Type;
-                if (!(driverType.BaseType == typeof(NotRunnableFrameworkDriver)))
+                if (driverType is null || !(driverType.BaseType == typeof(NotRunnableFrameworkDriver)))
                     break;
 
                 // All expected drivers derive from NotRunnableFrameworkDriver

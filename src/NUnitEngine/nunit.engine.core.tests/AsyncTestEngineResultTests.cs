@@ -19,14 +19,13 @@ namespace NUnit.Engine
         [Test]
         public void Result_ThrowsIfNotSet()
         {
-            XmlNode result = null;
-            Assert.Throws<InvalidOperationException>(() => result = _asyncResult.EngineResult.Xml);
+            Assert.Throws<InvalidOperationException>(() => _ = _asyncResult.EngineResult.Xml);
         }
 
         [Test]
         public void SetResult_ThrowsIfNull()
         {
-            Assert.Throws<ArgumentNullException>(() => _asyncResult.SetResult(null));
+            Assert.Throws<ArgumentNullException>(() => _asyncResult.SetResult(null!));
         }
 
         [Test]

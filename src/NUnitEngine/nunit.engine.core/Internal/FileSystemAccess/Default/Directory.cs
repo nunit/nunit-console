@@ -39,7 +39,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
         }
 
         /// <inheritdoc/>
-        public IDirectory Parent { get; private set; }
+        public IDirectory? Parent { get; private set; }
 
         /// <inheritdoc/>
         public string FullName => this.directory.FullName;

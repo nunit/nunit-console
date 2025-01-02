@@ -24,12 +24,12 @@ namespace NUnit.Engine.Extensibility
         /// intended. This is an optional field provided NUnit is able to deduce the
         /// ExtensionPoint from the Type of the extension class.
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         /// <summary>
         /// An optional description of what the extension does.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Flag indicating whether the extension is enabled.
@@ -40,6 +40,6 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// The minimum Engine version for which this extension is designed
         /// </summary>
-        public string EngineVersion { get; set; }
+        public string? EngineVersion { get; set; }
     }
 }

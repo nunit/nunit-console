@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Runners;
 
@@ -12,17 +14,28 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class TestRunnerFactory : Service, ITestRunnerFactory
     {
-        private IProjectService _projectService;
+        private IProjectService? _projectService;
 
         public override void StartService()
         {
-            // TestRunnerFactory requires the ProjectService
-            _projectService = ServiceContext.GetService<IProjectService>();
+            try
+            {
+                if (ServiceContext == null)
+                    throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
-            // Anything returned from ServiceContext is known to be an IService
-            Status = _projectService != null && ((IService)_projectService).Status == ServiceStatus.Started
-                ? ServiceStatus.Started
-                : ServiceStatus.Error;
+                // TestRunnerFactory requires the ProjectService
+                _projectService = ServiceContext.GetService<IProjectService>();
+
+                // Anything returned from ServiceContext is known to be an IService
+                Status = ((IService)_projectService).Status == ServiceStatus.Started
+                    ? ServiceStatus.Started
+                    : ServiceStatus.Error;
+            }
+            catch
+            {
+                Status = ServiceStatus.Error;
+                throw;
+            }
         }
 
         /// <summary>
@@ -35,6 +48,9 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public ITestEngineRunner MakeTestRunner(TestPackage package)
         {
+            if (ServiceContext == null)
+                throw new InvalidOperationException("ServiceContext not set.");
+
 #if !NETFRAMEWORK
             if (package.SubPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
@@ -53,7 +69,7 @@ namespace NUnit.Engine.Services
             }
 #else
             if (package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
-                return new UnmanagedExecutableTestRunner(package.FullName);
+                return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
 
             bool isNested = false;
             foreach (TestPackage subPackage in package.SubPackages)

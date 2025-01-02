@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -25,9 +26,9 @@ namespace NUnit.Engine.Services
         /// Gets a RuntimeFramework instance representing the runtime under
         /// which the code is currently running.
         /// </summary>
-        public IRuntimeFramework CurrentFramework { get; private set; }
+        public IRuntimeFramework? CurrentFramework { get; private set; }
 
-        private static string MonoPrefix;
+        private static string? MonoPrefix;
 
         /// <summary>
         /// The path to the mono executable, if we are running on Mono.
@@ -56,7 +57,7 @@ namespace NUnit.Engine.Services
         {
             Guard.ArgumentNotNullOrEmpty(name, nameof(name));
 
-            if (!RuntimeFramework.TryParse(name, out RuntimeFramework requestedFramework))
+            if (!RuntimeFramework.TryParse(name, out RuntimeFramework? requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
 
             var runtimes = needX86 ? _availableX86Runtimes : _availableRuntimes;
@@ -119,6 +120,9 @@ namespace NUnit.Engine.Services
 
         private RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
         {
+            if (CurrentFramework == null)
+                throw new InvalidOperationException("Service not Started");
+
             foreach (var subPackage in package.SubPackages)
             {
                 SelectRuntimeFrameworkInner(subPackage);
@@ -133,7 +137,7 @@ namespace NUnit.Engine.Services
 
             if (frameworkSetting.Length > 0)
             {
-                if (!RuntimeFramework.TryParse(frameworkSetting, out RuntimeFramework requestedFramework))
+                if (!RuntimeFramework.TryParse(frameworkSetting, out RuntimeFramework? requestedFramework))
                     throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
 
                 log.Debug($"Requested framework for {package.Name} is {requestedFramework}");
@@ -178,7 +182,6 @@ namespace NUnit.Engine.Services
                         targetVersion = new Version(3, 1);
                         break;
                     case "Unmanaged":
-                        return null;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
                 }
@@ -204,29 +207,29 @@ namespace NUnit.Engine.Services
             {
                 SetCurrentFramework();
                 FindAvailableRuntimes();
+
+                Status = ServiceStatus.Started;
             }
             catch
             {
                 Status = ServiceStatus.Error;
                 throw;
             }
-
-            Status = ServiceStatus.Started;
         }
 
+        [MemberNotNull(nameof(CurrentFramework))]
         private void SetCurrentFramework()
         {
-            Type monoRuntimeType = Type.GetType("Mono.Runtime", false);
-            bool isMono = monoRuntimeType != null;
+            Type? monoRuntimeType = Type.GetType("Mono.Runtime", throwOnError: false);
 
-            Runtime runtime = isMono
+            Runtime runtime = monoRuntimeType != null
                 ? Runtime.Mono
                 : Runtime.Net;
 
             int major = Environment.Version.Major;
             int minor = Environment.Version.Minor;
 
-            if (isMono)
+            if (monoRuntimeType != null)
             {
                 switch (major)
                 {
@@ -242,10 +245,10 @@ namespace NUnit.Engine.Services
             else /* It's windows */
                 if (major == 2)
             {
-                RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
+                using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
                 if (key != null)
                 {
-                    string installRoot = key.GetValue("InstallRoot") as string;
+                    string? installRoot = key.GetValue("InstallRoot") as string;
                     if (installRoot != null)
                     {
                         if (Directory.Exists(Path.Combine(installRoot, "v3.5")))
@@ -268,15 +271,15 @@ namespace NUnit.Engine.Services
 
             var currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
 
-            if (isMono)
+            if (monoRuntimeType != null)
             {
                 MonoPrefix = GetMonoPrefixFromAssembly(monoRuntimeType.Assembly);
 
-                MethodInfo getDisplayNameMethod = monoRuntimeType.GetMethod(
+                MethodInfo? getDisplayNameMethod = monoRuntimeType.GetMethod(
                     "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
                 if (getDisplayNameMethod != null)
                 {
-                    string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0]);
+                    string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0])!;
 
                     int space = displayName.IndexOf(' ');
                     if (space >= 3) // Minimum length of a version
@@ -303,7 +306,7 @@ namespace NUnit.Engine.Services
             // files have been copied to some non-standard place, we check.
             for (int i = 0; i < 4; i++)
             {
-                string dir = Path.GetDirectoryName(prefix);
+                string? dir = Path.GetDirectoryName(prefix);
                 if (string.IsNullOrEmpty(dir)) break;
 
                 prefix = dir;
@@ -336,10 +339,10 @@ namespace NUnit.Engine.Services
         /// <param name="package"></param>
         private static void ApplyImageData(TestPackage package)
         {
-            string packageName = package.FullName;
+            string packageName = package.FullName ?? string.Empty;
 
             Version targetVersion = new Version(0, 0);
-            string frameworkName = null;
+            string? frameworkName = null;
             bool requiresX86 = false;
             bool requiresAssemblyResolver = false;
 

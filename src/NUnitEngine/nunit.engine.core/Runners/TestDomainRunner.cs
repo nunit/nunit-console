@@ -9,7 +9,7 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class TestDomainRunner : TestAgentRunner
     {
-        private DomainManager _domainManager;
+        private readonly DomainManager _domainManager;
 
         public TestDomainRunner(TestPackage package) : base(package)
         {

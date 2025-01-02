@@ -135,7 +135,7 @@ namespace NUnit.Engine
             throw new NotImplementedException();
         }
 
-        public string Run(ITestEventListener listener, string filter)
+        public string Run(ITestEventListener? listener, string filter)
         {
             throw new NotImplementedException();
         }

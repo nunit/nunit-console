@@ -22,7 +22,7 @@ namespace NUnit.ConsoleRunner
         private readonly bool _displayAfterTest;
         private readonly bool _displayBeforeOutput;
 
-        private string _lastTestOutput;
+        private string? _lastTestOutput;
         private bool _wantNewLine = false;
 
         public TestEventHandler(ExtendedTextWriter outWriter, string labelsOption)
@@ -41,6 +41,9 @@ namespace NUnit.ConsoleRunner
             doc.LoadXml(report);
 
             var testEvent = doc.FirstChild;
+            if (testEvent == null)
+                return;
+
             switch (testEvent.Name)
             {
                 case "start-test":
@@ -63,16 +66,20 @@ namespace NUnit.ConsoleRunner
 
         private void TestStarted(XmlNode testResult)
         {
-            var testName = testResult.Attributes["fullname"].Value;
+            var testName = testResult.Attributes?["fullname"]?.Value;
 
-            if (_displayBeforeTest)
+            if (_displayBeforeTest && testName != null)
                 WriteLabelLine(testName);
         }
 
         private void TestFinished(XmlNode testResult)
         {
-            var testName = testResult.Attributes["fullname"].Value;
-            var status = testResult.GetAttribute("label") ?? testResult.GetAttribute("result");
+            var testName = testResult.Attributes?["fullname"]?.Value;
+
+            if (testName == null)
+                return;
+
+            var status = testResult.GetAttribute("label") ?? testResult.GetAttribute("result") ?? "Unknown";
             var outputNode = testResult.SelectSingleNode("output");
 
             if (outputNode != null)
@@ -90,10 +97,10 @@ namespace NUnit.ConsoleRunner
 
         private void SuiteFinished(XmlNode testResult)
         {
-            var suiteName = testResult.Attributes["fullname"].Value;
+            var suiteName = testResult.Attributes?["fullname"]?.Value;
             var outputNode = testResult.SelectSingleNode("output");
 
-            if (outputNode != null)
+            if (suiteName != null && outputNode != null)
             {
                 if (_displayBeforeOutput)
                     WriteLabelLine(suiteName);
@@ -106,15 +113,18 @@ namespace NUnit.ConsoleRunner
         private void TestOutput(XmlNode outputNode)
         {
             var testName = outputNode.GetAttribute("testname");
-            var stream = outputNode.GetAttribute("stream");
 
-            if (_displayBeforeOutput && testName != null)
-                WriteLabelLine(testName);
+            if (testName != null)
+            {
+                if (_displayBeforeOutput)
+                    WriteLabelLine(testName);
 
-            WriteOutputLine(testName, outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
+                var stream = outputNode.GetAttribute("stream");
+                WriteOutputLine(testName, outputNode.InnerText, stream == "Error" ? ColorStyle.Error : ColorStyle.Output);
+            }
         }
 
-        private string _currentLabel;
+        private string? _currentLabel;
 
         private void WriteLabelLine(string label)
         {
@@ -198,7 +208,7 @@ namespace NUnit.ConsoleRunner
 #if NETFRAMEWORK
         public override object InitializeLifetimeService()
         {
-            return null;
+            return null!;
         }
 #endif
     }

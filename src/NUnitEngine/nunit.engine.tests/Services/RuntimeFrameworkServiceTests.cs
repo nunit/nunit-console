@@ -36,6 +36,7 @@ namespace NUnit.Engine.Services
         public void StopService()
         {
             _runtimeService.StopService();
+            _runtimeService.Dispose();
         }
 
         [Test]
@@ -70,7 +71,7 @@ namespace NUnit.Engine.Services
         public void CanGetCurrentFramework()
         {
             var framework = _runtimeService.CurrentFramework as RuntimeFramework;
-
+            Assert.That(framework, Is.Not.Null);
             Assert.That(framework.Runtime, Is.EqualTo(_currentRuntime));
         }
 
@@ -87,6 +88,7 @@ namespace NUnit.Engine.Services
         public void CurrentFrameworkMustBeAvailable()
         {
             var current = _runtimeService.CurrentFramework;
+            Assert.That(current, Is.Not.Null);
             Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
             Assert.That(_runtimeService.IsAvailable(current.Id, false), "{current} not available");
         }
@@ -95,9 +97,15 @@ namespace NUnit.Engine.Services
         public void AvailableFrameworksList_IncludesCurrentFramework()
         {
             var current = _runtimeService.CurrentFramework as RuntimeFramework;
+            Assert.That(current, Is.Not.Null);
+
             foreach (var framework in _runtimeService.AvailableRuntimes)
-                if (current.Supports(framework as RuntimeFramework))
+            {
+                RuntimeFramework? runtimeFramework = framework as RuntimeFramework;
+                Assert.That(runtimeFramework, Is.Not.Null);
+                if (current.Supports(runtimeFramework))
                     return;
+            }
 
             Assert.Fail("CurrentFramework not listed as available");
         }
@@ -123,7 +131,7 @@ namespace NUnit.Engine.Services
             package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, requested);
 
             _runtimeService.SelectRuntimeFramework(package);
-            Assert.That(package.GetSetting<string>(EnginePackageSettings.RequestedRuntimeFramework, null), Is.EqualTo(requested));
+            Assert.That(package.GetSetting<string>(EnginePackageSettings.RequestedRuntimeFramework, string.Empty), Is.EqualTo(requested));
         }
 
         [Test]

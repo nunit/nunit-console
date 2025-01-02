@@ -11,7 +11,7 @@ namespace NUnit.Engine.Internal
     internal class InternalTraceWriter : TextWriter
     {
         TextWriter _writer;
-        object _myLock = new object();
+        readonly object _myLock = new object();
 
         /// <summary>
         /// Construct an InternalTraceWriter that writes to a file.
@@ -61,7 +61,7 @@ namespace NUnit.Engine.Internal
         /// Writes a string to the text string or stream.
         /// </summary>
         /// <param name="value">The string to write.</param>
-        public override void Write(string value)
+        public override void Write(string? value)
         {
             lock (_myLock)
             {
@@ -73,7 +73,7 @@ namespace NUnit.Engine.Internal
         /// Writes a string followed by a line terminator to the text string or stream.
         /// </summary>
         /// <param name="value">The string to write. If <paramref name="value" /> is null, only the line terminator is written.</param>
-        public override void WriteLine(string value)
+        public override void WriteLine(string? value)
         {
             lock (_myLock)
             {
@@ -93,7 +93,7 @@ namespace NUnit.Engine.Internal
                 {
                     _writer.Flush();
                     _writer.Dispose();
-                    _writer = null;
+                    _writer = null!;
                 }
             }
 
