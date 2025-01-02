@@ -22,7 +22,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         /// <param name="domain">Application domain to get details on.</param>
         /// <param name="errMsg">An optional overall error message.</param>
-        public static string DetailsFor(AppDomain domain, string errMsg = null)
+        public static string DetailsFor(AppDomain domain, string? errMsg = null)
         {
             var sb = new StringBuilder();
             if (errMsg != null) sb.AppendLine(errMsg);

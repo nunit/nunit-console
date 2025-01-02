@@ -26,7 +26,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_PathIsNull()
         {
-            Assert.That(() => new File(null), Throws.ArgumentNullException);
+            Assert.That(() => new File(null!), Throws.ArgumentNullException);
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
         private string GetTestFileLocation()
         {
-            return Assembly.GetAssembly(typeof(FileTests)).Location;
+            return Assembly.GetAssembly(typeof(FileTests))!.Location;
         }
     }
 }

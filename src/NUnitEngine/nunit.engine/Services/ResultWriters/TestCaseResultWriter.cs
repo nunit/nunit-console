@@ -28,8 +28,10 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode resultNode, TextWriter writer)
         {
-            foreach (XmlNode node in resultNode.SelectNodes("//test-case"))
-                writer.WriteLine(node.Attributes["fullname"].Value);
+            XmlNodeList? testCases = resultNode.SelectNodes("//test-case");
+            if (testCases != null)
+                foreach (XmlNode node in testCases)
+                    writer.WriteLine(node.Attributes?["fullname"]?.Value);
         }
     }
 }

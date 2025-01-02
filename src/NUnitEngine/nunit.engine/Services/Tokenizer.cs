@@ -34,9 +34,9 @@ namespace NUnit.Engine
 
         public int Pos { get; set; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return obj is Token && this == (Token)obj;
+            return obj is Token token && this == token;
         }
 
         public override int GetHashCode()
@@ -51,15 +51,12 @@ namespace NUnit.Engine
                 : Kind.ToString();
         }
 
-        public static bool operator ==(Token t1, Token t2)
+        public static bool operator ==(Token? t1, Token? t2)
         {
-            bool t1Null = ReferenceEquals(t1, null);
-            bool t2Null = ReferenceEquals(t2, null);
-
-            if (t1Null && t2Null)
+            if (ReferenceEquals(t1, t2))
                 return true;
 
-            if (t1Null || t2Null)
+            if (t1 is null || t2 is null)
                 return false;
 
             return t1.Kind == t2.Kind && t1.Text == t2.Text;
@@ -86,7 +83,7 @@ namespace NUnit.Engine
         private const string WORD_BREAK_CHARS = "=!()&|";
         private readonly string[] DOUBLE_CHAR_SYMBOLS = new string[] { "==", "=~", "!=", "!~", "&&", "||" };
 
-        private Token _lookahead;
+        private Token? _lookahead;
 
         public Tokenizer(string input)
         {

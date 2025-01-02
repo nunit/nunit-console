@@ -9,7 +9,7 @@ namespace NUnit.Engine.Services
 
     public class FakeService : IFakeService, IService
     {
-        IServiceLocator IService.ServiceContext { get; set; }
+        IServiceLocator? IService.ServiceContext { get; set; }
 
         private ServiceStatus _status;
         ServiceStatus IService.Status

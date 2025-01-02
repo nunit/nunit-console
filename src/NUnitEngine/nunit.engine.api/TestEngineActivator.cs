@@ -24,8 +24,8 @@ namespace NUnit.Engine
             var directoryName = Path.GetDirectoryName(apiLocation);
             var enginePath = directoryName == null ? DEFAULT_ENGINE_ASSEMBLY : Path.Combine(directoryName, DEFAULT_ENGINE_ASSEMBLY);
             var assembly = Assembly.LoadFrom(enginePath);
-            var engineType = assembly.GetType(DEFAULT_ENGINE_TYPE);
-            return Activator.CreateInstance(engineType) as ITestEngine;
+            var engineType = assembly.GetType(DEFAULT_ENGINE_TYPE, throwOnError: true)!;
+            return (ITestEngine)Activator.CreateInstance(engineType)!;
         }
     }
 }

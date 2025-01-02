@@ -19,7 +19,7 @@ namespace NUnit.Engine.Extensibility
         public ExtensionPoint(string path, Type type)
         {
             Path = path;
-            TypeName = type.FullName;
+            TypeName = type.FullName!;
             Extensions = new List<ExtensionNode>();
         }
 
@@ -31,7 +31,7 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Gets and sets the optional description of this extension point.
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets the FullName of the Type required for any extension to be installed at this extension point.

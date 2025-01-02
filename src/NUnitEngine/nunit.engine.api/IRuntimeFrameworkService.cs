@@ -15,7 +15,7 @@ namespace NUnit.Engine
         /// Gets a RuntimeFramework instance representing the runtime under
         /// which the code is currently running.
         /// </summary>
-        IRuntimeFramework CurrentFramework { get; }
+        IRuntimeFramework? CurrentFramework { get; }
 
         /// <summary>
         /// Returns true if the runtime framework represented by

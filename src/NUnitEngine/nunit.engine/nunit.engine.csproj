@@ -10,6 +10,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
+
   <PropertyGroup>
     <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Engine ($(TargetFramework))</AssemblyTitle>

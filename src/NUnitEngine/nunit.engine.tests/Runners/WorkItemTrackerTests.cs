@@ -17,7 +17,8 @@ namespace NUnit.Engine.Runners
         [SetUp]
         public void CreateTracker()
         {
-            _listener = _tracker = new WorkItemTracker();
+            _tracker = new WorkItemTracker();
+            _listener = _tracker;
             _pendingNotices = new List<string>();
         }
 

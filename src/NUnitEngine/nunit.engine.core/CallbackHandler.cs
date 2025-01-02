@@ -8,11 +8,11 @@ namespace NUnit.Engine
 {
     public class CallbackHandler : MarshalByRefObject, ICallbackEventHandler
     {
-        public string Result { get; private set; }
+        public string? Result { get; private set; }
 
         public override object InitializeLifetimeService()
         {
-            return null;
+            return null!;
         }
 
         public string GetCallbackResult()

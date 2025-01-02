@@ -39,7 +39,7 @@ namespace NUnit.Engine.Extensibility
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A XML string representing the filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        string Run(ITestEventListener listener, string filter);
+        string Run(ITestEventListener? listener, string filter);
 
         /// <summary>
         /// Returns information about the tests in an assembly.

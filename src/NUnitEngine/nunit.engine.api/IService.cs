@@ -1,6 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine
@@ -30,7 +31,8 @@ namespace NUnit.Engine
         /// <summary>
         /// The ServiceContext
         /// </summary>
-        IServiceLocator ServiceContext { get; set; }
+        [DisallowNull]
+        IServiceLocator? ServiceContext { get; set; }
 
         /// <summary>
         /// Gets the ServiceStatus of this service

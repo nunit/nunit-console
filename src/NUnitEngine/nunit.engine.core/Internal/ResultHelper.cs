@@ -29,7 +29,7 @@ namespace NUnit.Engine.Internal
         /// <param name="name">The name of the <see cref="TestEngineResult"/>.</param>
         /// <param name="fullName">The full name of the <see cref="TestEngineResult"/>.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string suiteType, string id, string name, string fullName)
+        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string suiteType, string id, string? name, string? fullName)
         {
             return new TestEngineResult(Aggregate(elementName, suiteType, id, name, fullName, result.XmlNodes));
         }
@@ -43,7 +43,7 @@ namespace NUnit.Engine.Internal
         /// <param name="name">The name of the <see cref="TestEngineResult"/>.</param>
         /// <param name="fullName">The full name of the <see cref="TestEngineResult"/>.</param>
         /// <returns>A TestEngineResult with a single top-level element.</returns>
-        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string id, string name, string fullName)
+        public static TestEngineResult Aggregate(this TestEngineResult result, string elementName, string id, string? name, string? fullName)
         {
             return new TestEngineResult(Aggregate(elementName, id, name, fullName, result.XmlNodes));
         }
@@ -96,7 +96,7 @@ namespace NUnit.Engine.Internal
         /// <param name="fullName">The full name to associated with the root node.</param>
         /// <param name="resultNodes">A collection of XmlNodes to aggregate</param>
         /// <returns>A single XmlNode containing the aggregated list of XmlNodes.</returns>
-        public static XmlNode Aggregate(string elementName, string id, string name, string fullName, IList<XmlNode> resultNodes)
+        public static XmlNode Aggregate(string elementName, string id, string? name, string? fullName, IList<XmlNode> resultNodes)
         {
             return Aggregate(elementName, null, id, name, fullName, resultNodes);
         }
@@ -110,7 +110,7 @@ namespace NUnit.Engine.Internal
         /// <param name="fullName">The full name to associated with the root node.</param>
         /// <param name="resultNodes">A collection of XmlNodes to aggregate</param>
         /// <returns>A single XmlNode containing the aggregated list of XmlNodes.</returns>
-        public static XmlNode Aggregate(string elementName, string testType, string id, string name, string fullName, IList<XmlNode> resultNodes)
+        public static XmlNode Aggregate(string elementName, string? testType, string id, string? name, string? fullName, IList<XmlNode> resultNodes)
         {
             XmlNode combinedNode = XmlHelper.CreateTopLevelElement(elementName);
             if (testType != null)
@@ -123,8 +123,8 @@ namespace NUnit.Engine.Internal
             combinedNode.AddAttribute("runstate", "Runnable"); // If not, we would not have gotten this far
 
             string aggregateResult = "Inconclusive";
-            string aggregateLabel = null;
-            string aggregateSite = null;
+            string? aggregateLabel = null;
+            string? aggregateSite = null;
 
             //double totalDuration = 0.0d;
             int testcasecount = 0;
@@ -142,12 +142,12 @@ namespace NUnit.Engine.Internal
             {
                 testcasecount += node.GetAttribute("testcasecount", 0);
 
-                XmlAttribute resultAttribute = node.Attributes["result"];
+                XmlAttribute? resultAttribute = node.Attributes?["result"];
                 if (resultAttribute != null)
                 {
                     isTestRunResult = true;
 
-                    string label = node.GetAttribute("label");
+                    string? label = node.GetAttribute("label");
 
                     switch (resultAttribute.Value)
                     {
@@ -183,8 +183,11 @@ namespace NUnit.Engine.Internal
                     asserts += node.GetAttribute("asserts", 0);
                 }
 
-                XmlNode import = combinedNode.OwnerDocument.ImportNode(node, true);
-                combinedNode.AppendChild(import);
+                if (combinedNode.OwnerDocument != null)
+                {
+                    XmlNode import = combinedNode.OwnerDocument.ImportNode(node, true);
+                    combinedNode.AppendChild(import);
+                }
             }
 
             combinedNode.AddAttribute("testcasecount", testcasecount.ToString());

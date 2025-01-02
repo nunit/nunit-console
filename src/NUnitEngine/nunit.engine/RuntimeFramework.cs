@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -37,7 +38,7 @@ namespace NUnit.Engine
         /// <param name="runtime">A Runtime instance.</param>
         /// <param name="version">The Version of the framework.</param>
         /// <param name="profile">A string representing the profile of the framework. Null if unspecified.</param>
-        public RuntimeFramework(Runtime runtime, Version version, string profile)
+        public RuntimeFramework(Runtime runtime, Version version, string? profile)
         {
             Guard.ArgumentNotNull(runtime, nameof(runtime));
             Guard.ArgumentValid(IsValidFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
@@ -85,7 +86,7 @@ namespace NUnit.Engine
         /// May be null and will have different sets of
         /// values for each Runtime.
         /// </summary>
-        public string Profile { get; private set; }
+        public string? Profile { get; private set; }
 
         /// <summary>
         /// Returns the Display name for this framework
@@ -114,7 +115,7 @@ namespace NUnit.Engine
             return new RuntimeFramework(runtime, version);
         }
 
-        public static bool TryParse(string s, out RuntimeFramework runtimeFramework)
+        public static bool TryParse(string s, [NotNullWhen(true)] out RuntimeFramework? runtimeFramework)
         {
             try
             {
@@ -168,7 +169,7 @@ namespace NUnit.Engine
             return FrameworkVersion >= requested.FrameworkVersion;
         }
 
-        private static string GetDefaultDisplayName(Runtime runtime, Version version, string profile)
+        private static string GetDefaultDisplayName(Runtime runtime, Version version, string? profile)
         {
             string displayName = $"{runtime.DisplayName} {version}";
 
@@ -187,7 +188,7 @@ namespace NUnit.Engine
             // files have been copied to some non-standard place, we check.
             for (int i = 0; i < 4; i++)
             {
-                string dir = Path.GetDirectoryName(prefix);
+                string? dir = Path.GetDirectoryName(prefix);
                 if (string.IsNullOrEmpty(dir)) break;
 
                 prefix = dir;

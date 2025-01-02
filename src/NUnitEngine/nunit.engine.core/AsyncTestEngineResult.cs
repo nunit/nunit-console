@@ -13,7 +13,7 @@ namespace NUnit.Engine
     [Serializable]
     public class AsyncTestEngineResult : ITestRun
     {
-        private volatile TestEngineResult _result;
+        private volatile TestEngineResult? _result;
         private readonly ManualResetEvent _waitHandle = new ManualResetEvent(false);
 
         /// <summary>

@@ -4,12 +4,14 @@
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
     <OutputPath>../../../bin/$(Configuration)</OutputPath>
-    <NoWarn>$(NoWarn);SYSLIB0011;SYSLIB0012</NoWarn><!-- TODO: Get rid of obsolete stuff -->
+    <NoWarn>$(NoWarn);SYSLIB0011</NoWarn><!-- TODO: Get rid of obsolete stuff -->
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <PropertyGroup>
     <Product>NUnit Engine ($(TargetFramework))</Product>

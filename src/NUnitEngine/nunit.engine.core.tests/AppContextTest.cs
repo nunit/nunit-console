@@ -11,7 +11,7 @@ namespace NUnit.Engine.Core.Tests
         [Test]
         public void VerifyBasePath()
         {
-            var expectedPath = Path.GetDirectoryName(GetType().Assembly.Location);
+            var expectedPath = Path.GetDirectoryName(GetType().Assembly.Location)!;
 #if NETCORAPP
             Assert.That(AppContext.GetData("APP_CONTEXT_BASE_DIRECTORY"), Is.EqualTo(expectedPath));
 #endif

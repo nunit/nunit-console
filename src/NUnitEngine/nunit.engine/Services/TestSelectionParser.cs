@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 // Missing XML Docs
@@ -11,7 +12,7 @@ namespace NUnit.Engine
 {
     public class TestSelectionParser
     {
-        private Tokenizer _tokenizer;
+        private readonly Tokenizer _tokenizer;
 
         private static readonly Token LPAREN = new Token(TokenKind.Symbol, "(");
         private static readonly Token RPAREN = new Token(TokenKind.Symbol, ")");
@@ -38,10 +39,20 @@ namespace NUnit.Engine
 
         private static readonly Token EOF = new Token(TokenKind.Eof);
 
-        public string Parse(string input)
+        public static string Parse(string input)
         {
-            _tokenizer = new Tokenizer(input);
+            var parser = new TestSelectionParser(new Tokenizer(input));
 
+            return parser.Parse();
+        }
+
+        private TestSelectionParser(Tokenizer tokenizer)
+        {
+            _tokenizer = tokenizer;
+        }
+
+        private string Parse()
+        {
             if (_tokenizer.LookAhead == EOF)
                 throw new TestSelectionParserException("No input provided for test selection.");
 
@@ -55,7 +66,7 @@ namespace NUnit.Engine
         /// Parse a single term or an or expression, returning the xml
         /// </summary>
         /// <returns></returns>
-        public string ParseFilterExpression()
+        private string ParseFilterExpression()
         {
             var terms = new List<string>();
             terms.Add(ParseFilterTerm());
@@ -82,7 +93,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Parse a single element or an and expression and return the xml
         /// </summary>
-        public string ParseFilterTerm()
+        private string ParseFilterTerm()
         {
             var elements = new List<string>();
             elements.Add(ParseFilterElement());
@@ -110,7 +121,7 @@ namespace NUnit.Engine
         /// Parse a single filter element such as a category expression
         /// and return the xml representation of the filter.
         /// </summary>
-        public string ParseFilterElement()
+        private string ParseFilterElement()
         {
             if (LookingAt(LPAREN, NOT_OP))
                 return ParseExpressionInParentheses();
@@ -144,7 +155,7 @@ namespace NUnit.Engine
 
         private static string EmitFilterElement(Token lhs, Token op, Token rhs)
         {
-            string fmt = null;
+            string? fmt = null;
 
             if (op == EQ_OP1 || op == EQ_OP2)
                 fmt = "<{0}>{1}</{0}>";
@@ -162,7 +173,7 @@ namespace NUnit.Engine
 
         private static string EmitPropertyElement(Token lhs, Token op, Token rhs)
         {
-            string fmt = null;
+            string? fmt = null;
 
             if (op == EQ_OP1 || op == EQ_OP2)
                 fmt = "<prop name='{0}'>{1}</prop>";

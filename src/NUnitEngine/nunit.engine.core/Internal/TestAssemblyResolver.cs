@@ -5,8 +5,10 @@
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Win32;
+using NUnit.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -31,7 +33,7 @@ namespace NUnit.Engine.Internal
 
         static TestAssemblyResolver()
         {
-            INSTALL_DIR = GetDotNetInstallDirectory();
+            INSTALL_DIR = GetDotNetInstallDirectory().ShouldNotBeNull();
             WINDOWS_DESKTOP_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.WindowsDesktop.App");
             ASP_NET_CORE_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.AspNetCore.App");
         }
@@ -45,6 +47,7 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving += OnResolving;
         }
 
+        [MemberNotNull(nameof(ResolutionStrategies))]
         private void InitializeResolutionStrategies(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
             // First, looking only at direct references by the test assembly, try to determine if
@@ -82,16 +85,16 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
-        public Assembly Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
+        public Assembly? Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
         {
             return OnResolving(context, assemblyName);
         }
 
-        private Assembly OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
+        private Assembly? OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
             if (loadContext == null) throw new ArgumentNullException("context");
 
-            Assembly loadedAssembly;
+            Assembly? loadedAssembly;
             foreach (var strategy in ResolutionStrategies)
                 if (strategy.TryToResolve(loadContext, assemblyName, out loadedAssembly))
                     return loadedAssembly;
@@ -105,19 +108,19 @@ namespace NUnit.Engine.Internal
         public abstract class ResolutionStrategy
         {
             public abstract bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly);
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly);
         }
 
         public class TrustedPlatformAssembliesStrategy : ResolutionStrategy
         {
             public override bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
             {
                 return TryLoadFromTrustedPlatformAssemblies(loadContext, assemblyName, out loadedAssembly);
             }
 
             private static bool TryLoadFromTrustedPlatformAssemblies(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
             {
                 // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
                 loadedAssembly = null;
@@ -149,7 +152,7 @@ namespace NUnit.Engine.Internal
 
         public class RuntimeLibrariesStrategy : ResolutionStrategy
         {
-            private DependencyContext _dependencyContext;
+            private DependencyContext? _dependencyContext;
             private readonly ICompilationAssemblyResolver _assemblyResolver;
 
             public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
@@ -158,15 +161,22 @@ namespace NUnit.Engine.Internal
 
                 _assemblyResolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
                 {
-                    new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssemblyPath)),
+                    new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssemblyPath)!),
                     new ReferenceAssemblyPathResolver(),
                     new PackageCompilationAssemblyResolver()
                 });
             }
 
             public override bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
             {
+                if (_dependencyContext == null)
+                {
+                    // TODO: Is this the intended behavior?
+                    loadedAssembly = null;
+                    return false;
+                }
+
                 foreach (var library in _dependencyContext.RuntimeLibraries)
                 {
                     var wrapper = new CompilationLibrary(
@@ -211,7 +221,7 @@ namespace NUnit.Engine.Internal
             }
 
             public override bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
             {
                 loadedAssembly = null;
                 if (assemblyName.Version == null)
@@ -248,27 +258,27 @@ namespace NUnit.Engine.Internal
 
         #region HelperMethods
 
-        private static string GetDotNetInstallDirectory()
+        private static string? GetDotNetInstallDirectory()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Running on Windows so use registry
                 if (Environment.Is64BitProcess)
                 {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
-                    return (string)key?.GetValue("Path");
+                    using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\SetUp\InstalledVersions\x64\sharedHost\"))
+                        return (string?)key?.GetValue("Path");
                 }
                 else
                 {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\");
-                    return (string)key?.GetValue("InstallLocation");
+                    using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\"))
+                        return (string?)key?.GetValue("InstallLocation");
                 }
             }
             else
                 return "/usr/shared/dotnet/";
         }
 
-        private static string FindBestVersionDir(string libraryDir, Version targetVersion)
+        private static string? FindBestVersionDir(string libraryDir, Version targetVersion)
         {
             string target = targetVersion.ToString();
             Version bestVersion = new Version(0, 0);

@@ -19,7 +19,7 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void Read_IFile_Null()
         {
-            Assert.That(() => AddinsFile.Read((IFile)null), Throws.ArgumentNullException);
+            Assert.That(() => AddinsFile.Read((IFile)null!), Throws.ArgumentNullException);
         }
 
         [Test]

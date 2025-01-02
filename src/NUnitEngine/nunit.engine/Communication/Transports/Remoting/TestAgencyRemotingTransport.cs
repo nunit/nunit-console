@@ -27,7 +27,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         private string _uri;
         private int _port;
 
-        private TcpChannel _channel;
+        private TcpChannel? _channel;
         private bool _isMarshalled;
 
         private object _theLock = new object();
@@ -56,7 +56,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
             if (_port == 0)
             {
-                ChannelDataStore store = this._channel.ChannelData as ChannelDataStore;
+                ChannelDataStore? store = _channel!.ChannelData as ChannelDataStore;
                 if (store != null)
                 {
                     string channelUri = store.ChannelUris[0];
@@ -133,7 +133,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         /// </summary>
         public override object InitializeLifetimeService()
         {
-            return null;
+            return null!;
         }
     }
 }

@@ -17,10 +17,10 @@ namespace NUnit.Engine.Drivers
         private const string DRIVER_ID = "99";
         private const string EXPECTED_ID = "99-1";
 
-        protected string _expectedRunState;
-        protected string _expectedReason;
-        protected string _expectedResult;
-        protected string _expectedLabel;
+        protected string? _expectedRunState;
+        protected string? _expectedReason;
+        protected string? _expectedResult;
+        protected string? _expectedLabel;
 
         [TestCase("junk.dll", "Assembly")]
         [TestCase("junk.exe", "Assembly")]
@@ -38,7 +38,7 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo(_expectedRunState));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
             Assert.That(GetSkipReason(result), Is.EqualTo(_expectedReason));
-            Assert.That(result.SelectNodes("test-suite").Count, Is.EqualTo(0), "Load result should not have child tests");
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Load result should not have child tests");
         }
 
         [TestCase("junk.dll", "Assembly")]
@@ -57,7 +57,7 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo(_expectedRunState));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
             Assert.That(GetSkipReason(result), Is.EqualTo(_expectedReason));
-            Assert.That(result.SelectNodes("test-suite").Count, Is.EqualTo(0), "Result should not have child tests");
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Result should not have child tests");
         }
 
         [TestCase("junk.dll")]
@@ -84,10 +84,10 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo(_expectedRunState));
             Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
             Assert.That(GetSkipReason(result), Is.EqualTo(_expectedReason));
-            Assert.That(result.SelectNodes("test-suite").Count, Is.EqualTo(0), "Load result should not have child tests");
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Load result should not have child tests");
             Assert.That(result.GetAttribute("result"), Is.EqualTo(_expectedResult));
             Assert.That(result.GetAttribute("label"), Is.EqualTo(_expectedLabel));
-            Assert.That(result.SelectSingleNode("reason/message").InnerText, Is.EqualTo(_expectedReason));
+            Assert.That(result.SelectSingleNode("reason/message")?.InnerText, Is.EqualTo(_expectedReason));
         }
 
         protected abstract IFrameworkDriver CreateDriver(string filePath);
@@ -99,7 +99,7 @@ namespace NUnit.Engine.Drivers
             return driver;
         }
 
-        private static string GetSkipReason(XmlNode result)
+        private static string? GetSkipReason(XmlNode result)
         {
             var propNode = result.SelectSingleNode(string.Format("properties/property[@name='{0}']", PropertyNames.SkipReason));
             return propNode == null ? null : propNode.GetAttribute("value");
@@ -126,7 +126,7 @@ namespace NUnit.Engine.Drivers
 
         protected override IFrameworkDriver CreateDriver(string filePath)
         {
-            return new InvalidAssemblyFrameworkDriver(filePath, _expectedReason);
+            return new InvalidAssemblyFrameworkDriver(filePath, _expectedReason ?? "Not Specified");
         }
     }
 

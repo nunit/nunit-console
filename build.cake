@@ -12,7 +12,7 @@ BuildSettings.Initialize(
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.sln",
     buildWithMSBuild: true,
-    exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs" });
+    exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs", "CallerArgumentExpressionAttribute.cs" });
 
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE DEFINITIONS

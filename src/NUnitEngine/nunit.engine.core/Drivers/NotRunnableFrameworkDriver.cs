@@ -26,16 +26,18 @@ namespace NUnit.Engine.Drivers
                 "</reason>" +
             "</test-suite>";
 
-        private string _name;
-        private string _fullname;
-        private string _message;
-        private string _type;
+        private readonly string _name;
+        private readonly string _fullname;
+        private readonly string _message;
+        private readonly string _type;
 
         protected string _runstate;
         protected string _result;
         protected string _label;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public NotRunnableFrameworkDriver(string assemblyPath, string message)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
             _name = Escape(Path.GetFileName(assemblyPath));
             _fullname = Escape(Path.GetFullPath(assemblyPath));
@@ -56,7 +58,7 @@ namespace NUnit.Engine.Drivers
             return 0;
         }
 
-        public string Run(ITestEventListener listener, string filter)
+        public string Run(ITestEventListener? listener, string filter)
         {
             return string.Format(RUN_RESULT_FORMAT, 
                 _type, TestID, _name, _fullname, _runstate, _result, _label, _message);

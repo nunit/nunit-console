@@ -10,10 +10,13 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
     {
         public static readonly RunnerResultComparer Instance = new RunnerResultComparer();
 
-        public bool Equals(RunnerResult x, RunnerResult y)
+        public bool Equals(RunnerResult? x, RunnerResult? y)
         {
-            x = x ?? throw new ArgumentNullException(nameof(x));
-            y = y ?? throw new ArgumentNullException(nameof(y));
+            if (ReferenceEquals(x, y))
+                return true;
+
+            if (x is null || y is null)
+                return false;
 
             return x.TestRunner == y.TestRunner &&
                    x.SubRunners.SequenceEqual(y.SubRunners, Instance);

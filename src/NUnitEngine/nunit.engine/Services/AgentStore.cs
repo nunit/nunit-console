@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NUnit.Engine.Services
 {
@@ -41,12 +42,11 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public bool IsReady(Guid agentId, out ITestAgent agent)
+        public bool IsReady(Guid agentId, [NotNullWhen(true)] out ITestAgent? agent)
         {
             lock (_agentsById)
             {
-                if (_agentsById.TryGetValue(agentId, out var record)
-                    && record.Status == AgentStatus.Ready)
+                if (_agentsById.TryGetValue(agentId, out var record) && record.IsReady)
                 {
                     agent = record.Agent;
                     return true;
@@ -57,7 +57,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public bool IsAgentProcessActive(Guid agentId, out Process process)
+        public bool IsAgentProcessActive(Guid agentId, [NotNullWhen(true)] out Process? process)
         {
             lock (_agentsById)
             {

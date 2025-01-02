@@ -12,6 +12,8 @@
     <NoWarn>1505</NoWarn>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
+
   <PropertyGroup>
     <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Engine Tests ($(TargetFramework))</AssemblyTitle>
@@ -22,6 +24,10 @@
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnitLite" Version="4.2.2" />
     <PackageReference Include="NSubstitute" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit.Analyzers" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">

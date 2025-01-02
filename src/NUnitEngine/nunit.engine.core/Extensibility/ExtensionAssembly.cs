@@ -20,6 +20,7 @@ namespace NUnit.Engine.Extensibility
             AssemblyVersion = Assembly.Name.Version;
         }
 
+#if ACTUALLY_USED
         // Internal constructor used for certain tests. AssemblyDefinition is not initialized.
         internal ExtensionAssembly(string filePath, bool fromWildCard, string assemblyName, Version version)
         {
@@ -28,6 +29,7 @@ namespace NUnit.Engine.Extensibility
             AssemblyName = assemblyName;
             AssemblyVersion = version;
         }
+#endif
 
         public string FilePath { get; }
         public bool FromWildCard { get; }

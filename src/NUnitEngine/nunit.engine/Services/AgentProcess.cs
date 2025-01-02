@@ -73,7 +73,11 @@ namespace NUnit.Engine.Services
                     if (Path.DirectorySeparatorChar != '\\')
                         throw new Exception("Running .NET Core as X86 is currently only supported on Windows");
 
-                    var x86_dotnet_exe = Path.Combine(DotNet.GetX86InstallDirectory(), "dotnet.exe");
+                    string? installDirectory = DotNet.GetX86InstallDirectory();
+                    if (installDirectory == null)
+                        throw new Exception("The X86 version of dotnet.exe is not installed");
+
+                    var x86_dotnet_exe = Path.Combine(installDirectory, "dotnet.exe");
                     if (!File.Exists(x86_dotnet_exe))
                         throw new Exception("The X86 version of dotnet.exe is not installed");
 
@@ -155,7 +159,7 @@ namespace NUnit.Engine.Services
                     break;
                 default:
                     log.Error($"Unknown runtime type: {targetRuntime.Runtime}");
-                    return null;
+                    throw new NotSupportedException($"Unknown runtime type: {targetRuntime.Runtime}");
             }
 
             return Path.Combine(agentsDir, agentSubDir, agentName + agentExtension);

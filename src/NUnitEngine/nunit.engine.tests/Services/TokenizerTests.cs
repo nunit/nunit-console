@@ -12,7 +12,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void NullInputThrowsException()
         {
-            Assert.That(() => new Tokenizer(null), Throws.ArgumentNullException);
+            Assert.That(() => new Tokenizer(null!), Throws.ArgumentNullException);
         }
 
         [Test]

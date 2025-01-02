@@ -11,6 +11,8 @@
     <NoWarn>1505</NoWarn>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/../../../Nullable.props" />
+
   <PropertyGroup>
     <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Agent ($(TargetFramework))</AssemblyTitle>

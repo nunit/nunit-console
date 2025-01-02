@@ -34,7 +34,7 @@ namespace NUnit.Engine.Runners
         // TODO: Determine whether AggregatingTestRunner needs to create an XML result
         // node for a project or if that responsibility can be delegated to the individual
         // runners it creates.
-        private List<ITestEngineRunner> _runners;
+        private List<ITestEngineRunner>? _runners;
 
         // Exceptions from unloading individual runners are caught and rethrown
         // on AggregatingTestRunner disposal, to allow TestResults to be

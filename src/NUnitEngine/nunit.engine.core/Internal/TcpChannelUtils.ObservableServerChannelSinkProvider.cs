@@ -32,7 +32,7 @@ namespace NUnit.Engine.Internal
                 return new ObservableServerChannelSink(_currentMessageCounter, Next.CreateSink(channel));
             }
 
-            public IServerChannelSinkProvider Next { get; set; }
+            public IServerChannelSinkProvider? Next { get; set; }
 
 
             private sealed class ObservableServerChannelSink : IServerChannelSink

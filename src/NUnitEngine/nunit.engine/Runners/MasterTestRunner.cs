@@ -32,7 +32,7 @@ namespace NUnit.Engine.Runners
         // element, which wraps all the individual assembly and project
         // results.
 
-        private ITestEngineRunner _engineRunner;
+        private ITestEngineRunner? _engineRunner;
         private readonly IServiceLocator _services;
         private readonly ExtensionService _extensionService;
 #if NETFRAMEWORK
@@ -77,7 +77,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// The result of the last call to LoadPackage
         /// </summary>
-        protected TestEngineResult LoadResult { get; set; }
+        protected TestEngineResult? LoadResult { get; set; }
 
         /// <summary>
         /// Gets an indicator of whether the package has been loaded.
@@ -145,7 +145,7 @@ namespace NUnit.Engine.Runners
         /// <param name="listener">An ITestEventHandler to receive events</param>
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns>An XmlNode giving the result of the test execution</returns>
-        public XmlNode Run(ITestEventListener listener, TestFilter filter)
+        public XmlNode Run(ITestEventListener? listener, TestFilter filter)
         {
             return RunTests(listener, filter).Xml;
         }
@@ -158,7 +158,7 @@ namespace NUnit.Engine.Runners
         /// <param name="listener">The listener that is notified as the run progresses</param>
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns></returns>
-        public ITestRun RunAsync(ITestEventListener listener, TestFilter filter)
+        public ITestRun RunAsync(ITestEventListener? listener, TestFilter filter)
         {
             return RunTestsAsync(listener, filter);
         }
@@ -169,6 +169,9 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public void StopRun(bool force)
         {
+            if (_engineRunner is null)
+                return; // No test is was even started.
+
             _engineRunner.StopRun(force);
 
             if (force)
@@ -386,8 +389,7 @@ namespace NUnit.Engine.Runners
         private void UnloadPackage()
         {
             LoadResult = null;
-            if (_engineRunner != null)
-                _engineRunner.Unload();
+            _engineRunner?.Unload();
         }
 
         /// <summary>
@@ -411,7 +413,7 @@ namespace NUnit.Engine.Runners
         /// <param name="listener">An ITestEventHandler to receive events</param>
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
-        private TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
+        private TestEngineResult RunTests(ITestEventListener? listener, TestFilter filter)
         {
             _workItemTracker.Clear();
             _eventDispatcher.Listeners.Clear();
@@ -429,7 +431,7 @@ namespace NUnit.Engine.Runners
             string engineVersion;
 
             clrVersion = Environment.Version.ToString();
-            engineVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            engineVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0";
 
             var startTime = DateTime.UtcNow;
             var startRunNode = XmlHelper.CreateTopLevelElement("start-run");
@@ -465,7 +467,7 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
-        private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
+        private AsyncTestEngineResult RunTestsAsync(ITestEventListener? listener, TestFilter filter)
         {
             var testRun = new AsyncTestEngineResult();
 

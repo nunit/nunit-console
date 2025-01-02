@@ -26,24 +26,19 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
 
         public static RunnerResult AggregatingTestRunner(RunnerResult subRunnerType, int numSubRunners)
         {
-            return new RunnerResult()
-            {
-                TestRunner = typeof(AggregatingTestRunner),
-                SubRunners = GetSubRunners(subRunnerType, numSubRunners)
-            };
+            return new RunnerResult(typeof(AggregatingTestRunner), GetSubRunners(subRunnerType, numSubRunners));
         }
 
         public static RunnerResult AggregatingTestRunner(params RunnerResult[] subRunners)
         {
-            return new RunnerResult()
-            {
-                TestRunner = typeof(AggregatingTestRunner),
-                SubRunners = subRunners
-            };
+            return new RunnerResult(typeof(AggregatingTestRunner), subRunners);
         }
 
-        public RunnerResult()
-        { }
+        public RunnerResult(Type testRunner)
+        {
+            TestRunner = testRunner;
+            SubRunners = Array.Empty<RunnerResult>();
+        }
 
         public RunnerResult(Type testRunner, params RunnerResult[] subRunners)
         {
@@ -53,7 +48,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
 
         public Type TestRunner { get; set; }
 
-        public ICollection<RunnerResult> SubRunners { get; set; } = new List<RunnerResult>();
+        public ICollection<RunnerResult> SubRunners { get; }
 
         public override string ToString()
         {

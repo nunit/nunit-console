@@ -24,11 +24,11 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// The name of the property.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// The property value
         /// </summary>
-        public string Value { get; private set; }
+        public string Value { get; }
     }
 }

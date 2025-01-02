@@ -49,11 +49,11 @@ namespace NUnit.Engine.TestHelpers
             Recurse((IEnumerable<T>)newCurrent);
         }
 
-        public StackEnumerator(IEnumerator<T> initial)
+        public StackEnumerator(IEnumerator<T>? initial)
         {
             current = initial ?? Enumerable.Empty<T>().GetEnumerator();
         }
-        public StackEnumerator(IEnumerable<T> initial) : this(initial?.GetEnumerator())
+        public StackEnumerator(IEnumerable<T>? initial) : this(initial?.GetEnumerator())
         {
         }
         public StackEnumerator(params T[] initial) : this((IEnumerable<T>)initial)

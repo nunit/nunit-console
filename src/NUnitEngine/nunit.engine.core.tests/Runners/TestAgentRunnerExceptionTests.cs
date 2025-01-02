@@ -32,6 +32,12 @@ namespace NUnit.Engine.Runners
             };
         }
 
+        [TearDown]
+        public void Cleanup()
+        {
+            _runner.Dispose();
+        }
+
         [Test]
         public void Explore_Passes_Along_NUnitEngineException()
         {
@@ -45,7 +51,8 @@ namespace NUnit.Engine.Runners
         {
             _driver.Explore(Arg.Any<string>()).Throws(new ArgumentException("Message"));
             var ex = Assert.Throws<NUnitEngineException>(() => _runner.Explore(new TestFilter(string.Empty)));
-            Assert.That(ex.InnerException is ArgumentException);
+            Assert.That(ex.InnerException, Is.Not.Null);
+            Assert.That(ex.InnerException, Is.InstanceOf<ArgumentException>());
             Assert.That(ex.InnerException.Message, Is.EqualTo("Message"));
         }
 
@@ -62,7 +69,8 @@ namespace NUnit.Engine.Runners
         {
             _driver.Load(Arg.Any<string>(), Arg.Any<Dictionary<string, object>>()).Throws(new ArgumentException("Message"));
             var ex = Assert.Throws<NUnitEngineException>(() => _runner.Load());
-            Assert.That(ex.InnerException is ArgumentException);
+            Assert.That(ex.InnerException, Is.Not.Null);
+            Assert.That(ex.InnerException, Is.InstanceOf<ArgumentException>());
             Assert.That(ex.InnerException.Message, Is.EqualTo("Message"));
         }
 
@@ -79,7 +87,8 @@ namespace NUnit.Engine.Runners
         {
             _driver.CountTestCases(Arg.Any<string>()).Throws(new ArgumentException("Message"));
             var ex = Assert.Throws<NUnitEngineException>(() => _runner.CountTestCases(_testFilter));
-            Assert.That(ex.InnerException is ArgumentException);
+            Assert.That(ex.InnerException, Is.Not.Null);
+            Assert.That(ex.InnerException, Is.InstanceOf<ArgumentException>());
             Assert.That(ex.InnerException.Message, Is.EqualTo("Message"));
         }
 
@@ -96,7 +105,8 @@ namespace NUnit.Engine.Runners
         {
             _driver.Run(Arg.Any<ITestEventListener>(), Arg.Any<string>()).Throws(new ArgumentException("Message"));
             var ex = Assert.Throws<NUnitEngineException>(() => _runner.Run(Substitute.For<ITestEventListener>(), _testFilter));
-            Assert.That(ex.InnerException is ArgumentException);
+            Assert.That(ex.InnerException, Is.Not.Null);
+            Assert.That(ex.InnerException, Is.InstanceOf<ArgumentException>());
             Assert.That(ex.InnerException.Message, Is.EqualTo("Message"));
         }
 
@@ -117,7 +127,8 @@ namespace NUnit.Engine.Runners
                 .Do(x => { throw new ArgumentException("Message"); });
 
             var ex = Assert.Throws<NUnitEngineException>(() => _runner.StopRun(true));
-            Assert.That(ex.InnerException is ArgumentException);
+            Assert.That(ex.InnerException, Is.Not.Null);
+            Assert.That(ex.InnerException, Is.InstanceOf<ArgumentException>());
             Assert.That(ex.InnerException.Message, Is.EqualTo("Message"));
         }
     }

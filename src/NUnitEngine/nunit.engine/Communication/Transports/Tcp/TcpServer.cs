@@ -15,12 +15,12 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         private const int GUID_BUFFER_SIZE = 16;
 
         TcpListener _tcpListener;
-        Thread _listenerThread;
+        Thread? _listenerThread;
         volatile bool _running;
 
         public delegate void ConnectionEventHandler(Socket clientSocket, Guid id);
 
-        public event ConnectionEventHandler ClientConnected;
+        public event ConnectionEventHandler? ClientConnected;
 
         public TcpServer(int port = 0)
         {

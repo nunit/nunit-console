@@ -12,8 +12,8 @@ namespace NUnit.Engine.Tests.Extensibility
     {
         private static readonly Assembly THIS_ASSEMBLY = Assembly.GetExecutingAssembly();
         private static readonly string THIS_ASSEMBLY_PATH = THIS_ASSEMBLY.Location;
-        private static readonly string THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name;
-        private static readonly Version THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version;
+        private static readonly string? THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name;
+        private static readonly Version? THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version;
 
         private ExtensionAssembly _ea;
 
@@ -21,6 +21,12 @@ namespace NUnit.Engine.Tests.Extensibility
         public void CreateExtensionAssemblies()
         {
             _ea = new ExtensionAssembly(THIS_ASSEMBLY_PATH, false);
+        }
+
+        [OneTimeTearDown]
+        public void DisposeExtensionAssemblies()
+        {
+            _ea.Dispose();
         }
 
         [Test]

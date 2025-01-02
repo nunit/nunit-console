@@ -73,6 +73,8 @@ namespace NUnit.Engine
             return runtime.Major == target.Major && runtime.Minor >= target.Minor;
         }
 
+        public abstract override string ToString();
+
         #endregion
 
         #region Nested Runtime Classes

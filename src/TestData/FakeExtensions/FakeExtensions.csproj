@@ -8,6 +8,8 @@
     <OutputPath>..\..\..\bin\$(Configuration)\fakes</OutputPath>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
+
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>

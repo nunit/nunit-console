@@ -8,6 +8,7 @@ using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NUnit.Engine.Services
 {
@@ -28,8 +29,8 @@ namespace NUnit.Engine.Services
 
         private readonly AgentStore _agentStore = new AgentStore();
 
-        private IRuntimeFrameworkService _runtimeService;
-        private IAvailableRuntimes _availableRuntimeService;
+        private IRuntimeFrameworkService? _runtimeService;
+        private IAvailableRuntimes? _availableRuntimeService;
 
         // Transports used for various target runtimes
         private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
@@ -51,8 +52,11 @@ namespace NUnit.Engine.Services
             _agentStore.Register(agent);
         }
 
-        public ITestAgent GetAgent(TestPackage package)
+        public ITestAgent? GetAgent(TestPackage package)
         {
+            if (_runtimeService == null || _availableRuntimeService == null)
+                throw new InvalidOperationException("TestAgency needs to be Started first");
+
             // Target Runtime must be specified by this point
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
@@ -75,7 +79,7 @@ namespace NUnit.Engine.Services
             var agentName = targetRuntime.Id + (runAsX86 ? "-x86" : "") + "-agent";
             package.AddSetting("SelectedAgentName", agentName);
 
-            agentProcess.Exited += (sender, e) => OnAgentExit((Process)sender, agentId);
+            agentProcess.Exited += (sender, e) => OnAgentExit((Process)sender!, agentId);
 
             agentProcess.Start();
             log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", agentProcess.Id);
@@ -110,7 +114,7 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        internal bool IsAgentProcessActive(Guid agentId, out Process process)
+        internal bool IsAgentProcessActive(Guid agentId, out Process? process)
         {
             return _agentStore.IsAgentProcessActive(agentId, out process);
         }
@@ -162,7 +166,7 @@ namespace NUnit.Engine.Services
             throw new NUnitEngineException(errorMsg);
         }
 
-        public IServiceLocator ServiceContext { get; set; }
+        public IServiceLocator? ServiceContext { get; set; }
 
         public ServiceStatus Status { get; private set; }
 
@@ -181,19 +185,17 @@ namespace NUnit.Engine.Services
             }
         }
 
+        [MemberNotNull(nameof(_runtimeService), nameof(_availableRuntimeService))]
         public void StartService()
         {
-            _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();
-            _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>();
-
-            if (_runtimeService == null || _availableRuntimeService == null)
-            {
-                Status = ServiceStatus.Error;
-                return;
-            }
-
             try
             {
+                if (ServiceContext == null)
+                    throw new InvalidOperationException("ServiceContext is required for TestAgency");
+
+                _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();
+                _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>();
+
                 _remotingTransport.Start();
                 _tcpTransport.Start();
                 Status = ServiceStatus.Started;

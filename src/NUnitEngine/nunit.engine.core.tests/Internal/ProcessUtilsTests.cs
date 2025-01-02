@@ -29,7 +29,7 @@ namespace NUnit.Engine.Tests.Internal
 {
     public static class ProcessUtilsTests
     {
-        private static string EscapeProcessArgument(string value, bool alwaysQuote = false)
+        private static string EscapeProcessArgument(string? value, bool alwaysQuote = false)
         {
             var builder = new StringBuilder();
             ProcessUtils.EscapeProcessArgument(builder, value, alwaysQuote);

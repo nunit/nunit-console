@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using NUnit.Framework;
 
@@ -85,7 +86,7 @@ namespace NUnit.Engine.Runners
 
         [TestCase("/path/to/mytest.dll", null, "/path/to/")]
         [TestCase("/path/to/mytest.dll", "/path", "/path/")]
-        public static void ApplicationBaseTests(string filePath, string appBase, string expected)
+        public static void ApplicationBaseTests(string filePath, string? appBase, string expected)
         {
             filePath = TestPath(filePath);
             appBase = TestPath(appBase);
@@ -100,7 +101,7 @@ namespace NUnit.Engine.Runners
 
         [TestCase("/path/to/mytest.dll", "/path/to", null)]
         [TestCase("/path/to/mytest.dll", "/path", "to")]
-        public static void PrivateBinPathTests(string filePath, string appBase, string expected)
+        public static void PrivateBinPathTests(string filePath, string appBase, string? expected)
         {
             filePath = TestPath(filePath);
             appBase = TestPath(appBase);
@@ -115,7 +116,7 @@ namespace NUnit.Engine.Runners
         [TestCase("/path/to/mytest.dll", "/path", null, "/path/to/mytest.dll.config")]
         [TestCase("/path/to/mytest.nunit", "/path/to", null, null)]
         [TestCase("/path/to/mytest.nunit", "/path/to", "/path/to/mytest.config", "/path/to/mytest.config")]
-        public static void ConfigFileTests(string filePath, string appBase, string configSetting, string expected)
+        public static void ConfigFileTests(string filePath, string appBase, string? configSetting, string? expected)
         {
             filePath = TestPath(filePath);
             appBase = TestPath(appBase);
@@ -134,7 +135,8 @@ namespace NUnit.Engine.Runners
         /// if we are on Windows. Change slashes to backslashes and, if the
         /// filePath starts with a slash, add C: in front of it.
         /// </summary>
-        private static string TestPath(string path)
+        [return: NotNullIfNotNull(nameof(path))]
+        private static string? TestPath(string? path)
         {
             if (path != null && Path.DirectorySeparatorChar != '/')
             {

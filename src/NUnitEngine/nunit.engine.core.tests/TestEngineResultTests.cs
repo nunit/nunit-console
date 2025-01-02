@@ -17,13 +17,14 @@ namespace NUnit.Engine
             TestEngineResult result = new TestEngineResult(xmlText);
             Assert.That(result.IsSingle, Is.True);
             Assert.That(result.Xml.Name, Is.EqualTo("test-assembly"));
-            Assert.That(result.Xml.Attributes["result"].Value, Is.EqualTo("Passed"));
-            Assert.That(result.Xml.Attributes["total"].Value, Is.EqualTo("23"));
-            Assert.That(result.Xml.Attributes["passed"].Value, Is.EqualTo("23"));
-            Assert.That(result.Xml.Attributes["failed"].Value, Is.EqualTo("0"));
-            Assert.That(result.Xml.Attributes["inconclusive"].Value, Is.EqualTo("0"));
-            Assert.That(result.Xml.Attributes["skipped"].Value, Is.EqualTo("0"));
-            Assert.That(result.Xml.Attributes["asserts"].Value, Is.EqualTo("40"));
+            Assert.That(result.Xml.Attributes, Is.Not.Null);
+            Assert.That(result.Xml.Attributes["result"]?.Value, Is.EqualTo("Passed"));
+            Assert.That(result.Xml.Attributes["total"]?.Value, Is.EqualTo("23"));
+            Assert.That(result.Xml.Attributes["passed"]?.Value, Is.EqualTo("23"));
+            Assert.That(result.Xml.Attributes["failed"]?.Value, Is.EqualTo("0"));
+            Assert.That(result.Xml.Attributes["inconclusive"]?.Value, Is.EqualTo("0"));
+            Assert.That(result.Xml.Attributes["skipped"]?.Value, Is.EqualTo("0"));
+            Assert.That(result.Xml.Attributes["asserts"]?.Value, Is.EqualTo("40"));
         }
 
         [Test]

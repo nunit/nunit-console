@@ -9,14 +9,14 @@ namespace NUnit.Engine
 {
     public static class DotNet
     {
-        public static string GetInstallDirectory() => Environment.Is64BitProcess
+        public static string? GetInstallDirectory() => Environment.Is64BitProcess
             ? GetX64InstallDirectory() : GetX86InstallDirectory();
 
-        public static string GetInstallDirectory(bool x86) => x86
+        public static string? GetInstallDirectory(bool x86) => x86
             ? GetX86InstallDirectory() : GetX64InstallDirectory();
 
-        private static string _x64InstallDirectory;
-        public static string GetX64InstallDirectory()
+        private static string? _x64InstallDirectory;
+        public static string? GetX64InstallDirectory()
         {
             if (_x64InstallDirectory == null)
                 _x64InstallDirectory = Environment.GetEnvironmentVariable("DOTNET_ROOT");
@@ -29,8 +29,8 @@ namespace NUnit.Engine
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
                 {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\SetUp\InstalledVersions\x64\sharedHost\");
-                    _x64InstallDirectory = (string)key?.GetValue("Path");
+                    using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\SetUp\InstalledVersions\x64\sharedHost\"))
+                        _x64InstallDirectory = (string?)key?.GetValue("Path");
                 }
                 else
                     _x64InstallDirectory = "/usr/shared/dotnet/";
@@ -39,8 +39,8 @@ namespace NUnit.Engine
             return _x64InstallDirectory;
         }
 
-        private static string _x86InstallDirectory;
-        public static string GetX86InstallDirectory()
+        private static string? _x86InstallDirectory;
+        public static string? GetX86InstallDirectory()
         {
             if (_x86InstallDirectory == null)
                 _x86InstallDirectory = Environment.GetEnvironmentVariable("DOTNET_ROOT_X86");
@@ -53,8 +53,8 @@ namespace NUnit.Engine
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 #endif
                 {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\");
-                    _x86InstallDirectory = (string)key?.GetValue("InstallLocation");
+                    using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\"))
+                        _x86InstallDirectory = (string?)key?.GetValue("InstallLocation");
                 }
                 else
                     _x86InstallDirectory = "/usr/shared/dotnet/";

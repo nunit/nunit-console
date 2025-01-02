@@ -18,7 +18,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
             foreach (var framework in FindExtremelyOldDotNetFrameworkVersions())
                 yield return framework;
 
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\NET Framework Setup\NDP");
+            using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\NET Framework Setup\NDP");
             if (key != null)
             {
                 foreach (string name in key.GetSubKeyNames())
@@ -48,7 +48,8 @@ namespace NUnit.Engine.Services.RuntimeLocators
 
         private static IEnumerable<RuntimeFramework> FindExtremelyOldDotNetFrameworkVersions()
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\.NETFramework\policy\v1.0");
+            using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\.NETFramework\policy\v1.0");
+
             if (key == null)
                 yield break;
 

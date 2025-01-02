@@ -24,9 +24,14 @@ namespace NUnit.Engine.Services
 
         void IProjectService.ExpandProjectPackage(TestPackage package)
         {
-            if (_projects.ContainsKey(package.Name))
+            if (package.Name == null)
             {
-                foreach (string assembly in _projects[package.Name])
+                throw new ArgumentException("Package must have a name", nameof(package));
+            }
+
+            if (_projects.TryGetValue(package.Name, out string[]? projects))
+            {
+                foreach (string assembly in projects)
                     package.AddSubPackage(new TestPackage(assembly));
             }
         }
