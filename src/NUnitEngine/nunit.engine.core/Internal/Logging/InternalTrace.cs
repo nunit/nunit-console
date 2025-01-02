@@ -63,7 +63,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(string name, InternalTraceLevel level)
         {
-            return new Logger(name, level, _traceWriter);
+            return new Logger(name, () => level, () => _traceWriter);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(string name)
         {
-            return new Logger(name, DefaultTraceLevel, _traceWriter);
+            return new Logger(name, () => DefaultTraceLevel, () => _traceWriter);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace NUnit.Engine.Internal
         /// </summary>
         public static Logger GetLogger(Type type)
         {
-            return GetLogger(type.FullName, DefaultTraceLevel);
+            return GetLogger(type.FullName);
         }
     }
 }

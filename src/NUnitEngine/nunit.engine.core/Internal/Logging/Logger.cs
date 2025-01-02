@@ -14,20 +14,21 @@ namespace NUnit.Engine.Internal
         private const string TraceFmt = "{0} {1,-5} [{2,2}] {3}: {4}";
 
         private readonly string _name;
-        private readonly TextWriter _writer;
+        private readonly Func<TextWriter> _getWriterFn;
+        private readonly Func<InternalTraceLevel> _getLevelFn;
 
-        public InternalTraceLevel TraceLevel { get; }
+        public InternalTraceLevel TraceLevel => _getLevelFn.Invoke();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Logger"/> class.
         /// </summary>
         /// <param name="fullName">The name.</param>
-        /// <param name="level">The log level.</param>
-        /// <param name="writer">The writer where logs are sent.</param>
-        public Logger(string fullName, InternalTraceLevel level, TextWriter writer)
+        /// <param name="getLevelFn">The log level.</param>
+        /// <param name="getWriterFn">The writer where logs are sent.</param>
+        public Logger(string fullName, Func<InternalTraceLevel> getLevelFn, Func<TextWriter> getWriterFn)
         {
-            TraceLevel = level;
-            _writer = writer;
+            _getLevelFn = getLevelFn;
+            _getWriterFn = getWriterFn;
 
             var index = fullName.LastIndexOf('.');
             _name = index >= 0 ? fullName.Substring(index + 1) : fullName;
@@ -111,7 +112,7 @@ namespace NUnit.Engine.Internal
 
         private void Log(InternalTraceLevel level, string message)
         {
-            if (_writer != null && TraceLevel >= level)
+            if (TraceLevel >= level)
                 WriteLog(level, message);
         }
 
@@ -123,7 +124,7 @@ namespace NUnit.Engine.Internal
 
         private void WriteLog(InternalTraceLevel level, string message)
         {
-            _writer.WriteLine(TraceFmt,
+            _getWriterFn.Invoke().WriteLine(TraceFmt,
                 DateTime.Now.ToString(TimeFmt),
                 level,
 #if NET20
