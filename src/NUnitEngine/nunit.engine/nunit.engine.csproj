@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
+    <ProjectReference Include="..\NUnit.Extensibility\NUnit.Extensibility.csproj" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">

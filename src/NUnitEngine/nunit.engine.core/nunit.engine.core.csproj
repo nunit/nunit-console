@@ -42,4 +42,8 @@
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensibility\" />
+  </ItemGroup>
+
 </Project>

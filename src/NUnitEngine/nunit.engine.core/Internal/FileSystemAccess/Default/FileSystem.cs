@@ -8,7 +8,7 @@ namespace NUnit.Engine.Internal.FileSystemAccess.Default
     /// <summary>
     /// Default implementation of <see cref="IFileSystem"/> that relies on <see cref="System.IO"/>.
     /// </summary>
-    internal sealed class FileSystem : IFileSystem
+    public sealed class FileSystem : IFileSystem
     {
         /// <inheritdoc/>
         public bool Exists(IDirectory directory)
