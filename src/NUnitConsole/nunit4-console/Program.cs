@@ -97,7 +97,6 @@ namespace NUnit.ConsoleRunner
                         return ConsoleRunner.INVALID_ARG;
                     }
 
-#if NETFRAMEWORK
                     if (Options.RuntimeFrameworkSpecified)
                     {
                         var availableRuntimeService = engine.Services.GetService<IAvailableRuntimes>();
@@ -118,7 +117,6 @@ namespace NUnit.ConsoleRunner
                         if (!runtimeAvailable)
                             WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
                     }
-#endif
 
                     if (Options.WorkDirectory != null)
                         engine.WorkDirectory = Options.WorkDirectory;
