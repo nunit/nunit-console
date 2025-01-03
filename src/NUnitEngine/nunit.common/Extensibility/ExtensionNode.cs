@@ -4,8 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NUnit.Engine;
+using NUnit.Engine.Extensibility;
+using NUnit.Engine.Internal;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Extensibility
 {
     /// <summary>
     /// The ExtensionNode class represents a single extension being installed

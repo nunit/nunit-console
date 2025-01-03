@@ -6,6 +6,7 @@ using System;
 using System.Runtime.Versioning;
 using NSubstitute;
 using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Tests.Extensibility

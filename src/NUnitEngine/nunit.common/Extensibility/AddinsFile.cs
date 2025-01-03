@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 using NUnit.Engine.Internal.FileSystemAccess;
 
-namespace NUnit.Engine.Internal
+namespace NUnit.Extensibility
 {
     internal class AddinsFile : List<AddinsFileEntry>
     {

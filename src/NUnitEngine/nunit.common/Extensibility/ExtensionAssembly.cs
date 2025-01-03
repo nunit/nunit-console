@@ -7,7 +7,7 @@ using TestCentric.Metadata;
 using NUnit.Engine.Internal;
 using System.Runtime.Versioning;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Extensibility
 {
     internal class ExtensionAssembly : IExtensionAssembly, IDisposable
     {

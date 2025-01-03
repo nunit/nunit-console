@@ -4,6 +4,7 @@ using NUnit.Common;
 using NUnit.Engine.Internal.FileSystemAccess;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace NUnit.Engine.Internal
 {

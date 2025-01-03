@@ -7,6 +7,7 @@ using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
+using NUnit.Extensibility;
 using TestCentric.Metadata;
 
 #if NETFRAMEWORK

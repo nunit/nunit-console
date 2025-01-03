@@ -9,6 +9,7 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <ExposedInternals>true</ExposedInternals>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
@@ -40,6 +41,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\nunit.common\nunit.common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

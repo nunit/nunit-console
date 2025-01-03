@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Engine;
+using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Extensibility
 {
     /// <summary>
     /// An ExtensionPoint represents a single point in the TestEngine

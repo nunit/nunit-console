@@ -3,7 +3,7 @@
 using System;
 using NUnit.Common;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Extensibility
 {
     internal static class ExtensionSelector
     {

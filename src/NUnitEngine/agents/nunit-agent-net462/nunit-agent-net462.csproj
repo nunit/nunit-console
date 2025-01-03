@@ -24,7 +24,6 @@
   
   <ItemGroup>
     <Compile Include="..\Program.cs" Link="Program.cs" />
-    <Compile Include="..\..\nunit.engine.core\Internal\ExceptionHelper.cs" Link="ExceptionHelper.cs" />
   </ItemGroup>
   
   <ItemGroup>
@@ -36,7 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\..\nunit.engine.core\nunit.engine.core.csproj" />
-    <ProjectReference Include="..\..\NUnit.Extensibility\NUnit.Extensibility.csproj" />
+    <ProjectReference Include="..\..\nunit.common\nunit.common.csproj" />
   </ItemGroup>
 
   <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">

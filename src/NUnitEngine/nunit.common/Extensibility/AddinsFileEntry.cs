@@ -3,8 +3,9 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using NUnit.Engine.Internal;
 
-namespace NUnit.Engine.Internal
+namespace NUnit.Extensibility
 {
     // Class representing a single line in an Addins file
     internal class AddinsFileEntry

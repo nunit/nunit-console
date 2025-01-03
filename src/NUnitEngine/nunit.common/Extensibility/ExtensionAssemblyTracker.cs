@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using NUnit.Engine.Extensibility;
 using System.Collections.Generic;
 
-namespace NUnit.Engine.Internal
+namespace NUnit.Extensibility
 {
     /// <summary>
     /// This is a simple utility class used by the ExtensionManager to keep track of ExtensionAssemblies.

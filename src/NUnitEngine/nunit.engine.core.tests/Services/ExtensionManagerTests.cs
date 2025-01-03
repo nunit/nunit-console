@@ -11,6 +11,7 @@ using NUnit.Engine.Internal;
 using NSubstitute;
 using NUnit.Engine.Internal.FileSystemAccess;
 using System.Diagnostics;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services.Tests
 {

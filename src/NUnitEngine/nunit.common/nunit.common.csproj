@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>NUnit.Extensibility</RootNamespace>
+    <RootNamespace>NUnit</RootNamespace>
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
     <OutputPath>../../../bin/$(Configuration)</OutputPath>
     <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
@@ -10,7 +10,6 @@
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <ExposedInternals>true</ExposedInternals>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
@@ -21,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
-    <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
   </ItemGroup>
 
 </Project>

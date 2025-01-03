@@ -11,7 +11,7 @@ using NUnit.Engine;
 
 namespace NUnit.Common
 {
-    internal static class ExceptionHelper
+    public static class ExceptionHelper
     {
         /// <summary>
         /// Builds up a message, using the Message field of the specified exception

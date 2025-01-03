@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using TestCentric.Metadata;
+using NUnit.Engine;
+using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
@@ -13,7 +15,7 @@ using System.Linq;
 using NUnit.Engine.Internal.Backports;
 #endif
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Extensibility
 {
     public class ExtensionManager
     {

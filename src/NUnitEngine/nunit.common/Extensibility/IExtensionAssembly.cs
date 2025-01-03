@@ -3,7 +3,7 @@
 using System;
 using System.Runtime.Versioning;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Extensibility
 {
     internal interface IExtensionAssembly
     {

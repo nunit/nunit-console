@@ -2,7 +2,7 @@
 
 using System;
 using System.Reflection;
-using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 

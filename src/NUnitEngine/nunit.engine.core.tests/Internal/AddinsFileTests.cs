@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Extensibility;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

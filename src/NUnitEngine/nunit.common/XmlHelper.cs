@@ -6,12 +6,6 @@ using System.Globalization;
 using System.Xml;
 using NUnit.Common;
 
-namespace System.Runtime.CompilerServices
-{
-    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
-    sealed class ExtensionAttribute : Attribute { }
-}
-
 namespace NUnit.Engine.Internal
 {
     /// <summary>
