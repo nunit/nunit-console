@@ -97,28 +97,6 @@ namespace NUnit.ConsoleRunner
                         return ConsoleRunner.INVALID_ARG;
                     }
 
-#if NETFRAMEWORK
-                    if (Options.RuntimeFrameworkSpecified)
-                    {
-                        var availableRuntimeService = engine.Services.GetService<IAvailableRuntimes>();
-                        if (availableRuntimeService == null)
-                        {
-                            WriteErrorMessage("Unable to acquire AvailableRuntimeService from engine");
-                            return ConsoleRunner.UNEXPECTED_ERROR;
-                        }
-
-                        bool runtimeAvailable = false;
-                        foreach (var runtime in availableRuntimeService.AvailableRuntimes)
-                        {
-                            if (runtimeAvailable = runtime.Id == Options.RuntimeFramework)
-                                break;
-                        }
-
-                        if (!runtimeAvailable)
-                            WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
-                    }
-#endif
-
                     if (Options.WorkDirectory != null)
                         engine.WorkDirectory = Options.WorkDirectory;
 
@@ -263,7 +241,6 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      extension NUnitProjectLoader is required. For Visual Studio projects");
                 OutWriter.WriteLine("      and solutions the engine extension VSProjectLoader is required.");
                 OutWriter.WriteLine();
-#if NETCOREAPP
                 OutWriter.WriteLine(ColorStyle.SectionHeader, "Limitations:");
                 OutWriter.WriteLine("      The NetCore Runner is primarily intended for use as a dotnet  tool.");
                 OutWriter.WriteLine("      When used in this way, a single assembly is usually being tested and");
@@ -285,7 +262,6 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("        --pause                   Used for debugging agents.");
                 OutWriter.WriteLine("        --set-principal-policy    Not available.");
                 OutWriter.WriteLine("        --debug-agent             No agents are used.");
-#endif
             }
         }
 
