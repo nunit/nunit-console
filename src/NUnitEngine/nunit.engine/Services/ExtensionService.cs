@@ -5,17 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
-using NUnit.Engine.Internal.Backports;
 using NUnit.Engine.Internal.FileSystemAccess;
-using NUnit.Engine.Internal.FileSystemAccess.Default;
-using TestCentric.Metadata;
-
-using Backports = NUnit.Engine.Internal.Backports;
-#if NET20 || NETSTANDARD2_0
-using Path = NUnit.Engine.Internal.Backports.Path;
-#else
-using Path = System.IO.Path;
-#endif
 
 namespace NUnit.Engine.Services
 {
