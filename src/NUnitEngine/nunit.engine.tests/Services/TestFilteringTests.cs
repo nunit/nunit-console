@@ -24,10 +24,10 @@ namespace NUnit.Engine.Services
         public void LoadAssembly()
         {
             var mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
+            var assemblyName = typeof(TestAttribute).Assembly.GetName();
 #if NETCOREAPP3_1_OR_GREATER
-            _driver = new NUnitNetCore31Driver();
+            _driver = new NUnitNetCore31Driver(assemblyName);
 #else
-            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
             _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName);
 #endif
             _driver.Load(mockAssemblyPath, new Dictionary<string, object>());

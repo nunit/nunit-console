@@ -9,7 +9,6 @@ using System.Runtime.Serialization;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
-using System.Diagnostics.CodeAnalysis;
 
 namespace NUnit.Engine.Drivers
 {
@@ -19,8 +18,10 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnit3FrameworkDriver : IFrameworkDriver
     {
+        // Messages
         private const string LOAD_MESSAGE = "Method called without calling Load first";
 
+        // API Constants
         private static readonly string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
         private static readonly string LOAD_ACTION = CONTROLLER_TYPE + "+LoadTestsAction";
         private static readonly string EXPLORE_ACTION = CONTROLLER_TYPE + "+ExploreTestsAction";
@@ -28,42 +29,49 @@ namespace NUnit.Engine.Drivers
         private static readonly string RUN_ACTION = CONTROLLER_TYPE + "+RunTestsAction";
         private static readonly string STOP_RUN_ACTION = CONTROLLER_TYPE + "+StopRunAction";
 
-        static readonly ILogger log = InternalTrace.GetLogger("NUnitFrameworkDriver");
+        static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnit3FrameworkDriver));
 
         readonly AppDomain _testDomain;
-        readonly AssemblyName _reference;
+        readonly AssemblyName _nunitRef;
         string? _testAssemblyPath;
 
         object? _frameworkController;
+        Type? _frameworkControllerType;
 
         /// <summary>
         /// Construct an NUnit3FrameworkDriver
         /// </summary>
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
-        /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        public NUnit3FrameworkDriver(AppDomain testDomain, AssemblyName reference)
+        /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
+        public NUnit3FrameworkDriver(AppDomain testDomain, AssemblyName nunitRef)
         {
             _testDomain = testDomain;
-            _reference = reference;
+            _nunitRef = nunitRef;
         }
 
+        /// <summary>
+        /// An id prefix that will be passed to the test framework and used as part of the
+        /// test ids created.
+        /// </summary>
         public string ID { get; set; } = string.Empty;
 
         /// <summary>
         /// Loads the tests in an assembly.
         /// </summary>
-        /// <returns>An Xml string representing the loaded test</returns>
+        /// <param name="testAssemblyPath">The path to the test assembly</param>
+        /// <param name="settings">The test settings</param>
+        /// <returns>An XML string representing the loaded test</returns>
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
-            Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver constructor called with a file name that doesn't exist.", "testAssemblyPath");
-
+            Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", "testAssemblyPath");
+            log.Debug($"Loading {testAssemblyPath}");
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
-            // Normally, the runner should check for an invalid requested runtime, but we make sure here
+            // Normally, the caller should check for an invalid requested runtime, but we make sure here
             var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
                 ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
             
-            _testAssemblyPath = testAssemblyPath;
+            _testAssemblyPath = Path.GetFullPath(testAssemblyPath);
 
             try
             {
@@ -78,6 +86,9 @@ namespace NUnit.Engine.Drivers
                 throw new NUnitEngineException("The NUnit 3 driver cannot support this test assembly. Use a platform specific runner.", ex);
             }
 
+            _frameworkControllerType = _frameworkController.GetType();
+            log.Debug($"Created FrameworkControler {_frameworkControllerType.Name}");
+
             CallbackHandler handler = new CallbackHandler();
 
             var fileName = Path.GetFileName(_testAssemblyPath);
@@ -86,19 +97,21 @@ namespace NUnit.Engine.Drivers
 
             CreateObject(LOAD_ACTION, _frameworkController, handler);
 
-            log.Info("Loaded {0}", fileName);
+            log.Debug($"Loaded {testAssemblyPath}");
 
             return handler.Result.ShouldNotBeNull();
         }
 
+        /// <summary>
+        /// Counts the number of test cases for the loaded test assembly
+        /// </summary>
+        /// <param name="filter">The XML test filter</param>
+        /// <returns>The number of test cases</returns>
         public int CountTestCases(string filter)
         {
             CheckLoadWasCalled();
-
             CallbackHandler handler = new CallbackHandler();
-
             CreateObject(COUNT_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
-
             return int.Parse(handler.Result.ShouldNotBeNull());
         }
 
@@ -111,12 +124,9 @@ namespace NUnit.Engine.Drivers
         public string Run(ITestEventListener? listener, string filter)
         {
             CheckLoadWasCalled();
-
-            var handler = new RunTestsCallbackHandler(listener);
-
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
+            var handler = new RunTestsCallbackHandler(listener);
             CreateObject(RUN_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
-
             return handler.Result.ShouldNotBeNull();
         }
 
@@ -137,12 +147,9 @@ namespace NUnit.Engine.Drivers
         public string Explore(string filter)
         {
             CheckLoadWasCalled();
-
-            CallbackHandler handler = new CallbackHandler();
-
             log.Info("Exploring {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
+            CallbackHandler handler = new CallbackHandler();
             CreateObject(EXPLORE_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
-
             return handler.Result.ShouldNotBeNull();
         }
 
@@ -157,7 +164,7 @@ namespace NUnit.Engine.Drivers
             try
             {
                 return _testDomain.CreateInstanceAndUnwrap(
-                    _reference.FullName, typeName, false, 0, null, args, null, null )!;
+                    _nunitRef.FullName, typeName, false, 0, null, args, null, null )!;
             }
             catch (TargetInvocationException ex)
             {

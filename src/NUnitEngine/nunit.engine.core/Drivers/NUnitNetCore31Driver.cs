@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETCOREAPP3_1_OR_GREATER
+#if NETCOREAPP
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Engine.Internal;
 using System.Reflection;
-using NUnit.Engine.Extensibility;
-using System.Diagnostics;
 using NUnit.Common;
+using NUnit.Engine.Internal;
+using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Drivers
 {
@@ -21,26 +20,39 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnitNetCore31Driver : IFrameworkDriver
     {
-        const string LOAD_MESSAGE = "Method called without calling Load first";
+        private const string LOAD_MESSAGE = "Method called without calling Load first";
         const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
-        const string FAILED_TO_LOAD_TEST_ASSEMBLY = "Failed to load the test assembly {0}";
+        const string FAILED_TO_LOAD_ASSEMBLY = "Failed to load assembly ";
         const string FAILED_TO_LOAD_NUNIT = "Failed to load the NUnit Framework in the test assembly";
 
-        static readonly string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
-        static readonly string LOAD_METHOD = "LoadTests";
-        static readonly string EXPLORE_METHOD = "ExploreTests";
-        static readonly string COUNT_METHOD = "CountTests";
-        static readonly string RUN_METHOD = "RunTests";
-        static readonly string RUN_ASYNC_METHOD = "RunTests";
-        static readonly string STOP_RUN_METHOD = "StopRun";
+        private static readonly string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
+        private static readonly string LOAD_METHOD = "LoadTests";
+        private static readonly string EXPLORE_METHOD = "ExploreTests";
+        private static readonly string COUNT_METHOD = "CountTests";
+        private static readonly string RUN_METHOD = "RunTests";
+        private static readonly string RUN_ASYNC_METHOD = "RunTests";
+        private static readonly string STOP_RUN_METHOD = "StopRun";
 
-        static ILogger log = InternalTrace.GetLogger(nameof(NUnitNetCore31Driver));
+        static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnitNetCore31Driver));
 
-        Assembly? _testAssembly;
-        Assembly? _frameworkAssembly;
+        readonly AssemblyName _nunitRef;
+        string? _testAssemblyPath;
+
         object? _frameworkController;
         Type? _frameworkControllerType;
+        Assembly? _testAssembly;
+        Assembly? _frameworkAssembly;
         TestAssemblyLoadContext? _assemblyLoadContext;
+
+        /// <summary>
+        /// Construct an NUnitNetCore31Driver
+        /// </summary>
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        public NUnitNetCore31Driver(AssemblyName nunitRef)
+        {
+            Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+            _nunitRef = nunitRef;
+        }
 
         /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
@@ -51,46 +63,24 @@ namespace NUnit.Engine.Drivers
         /// <summary>
         /// Loads the tests in an assembly.
         /// </summary>
-        /// <param name="assemblyPath">The path to the test assembly</param>
+        /// <param name="testAssemblyPath">The path to the test assembly</param>
         /// <param name="settings">The test settings</param>
         /// <returns>An XML string representing the loaded test</returns>
-        public string Load(string assemblyPath, IDictionary<string, object> settings)
+        public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
-            log.Debug($"Loading {assemblyPath}");
+            Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", "testAssemblyPath");
+            log.Debug($"Loading {testAssemblyPath}");
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
-            assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
-            _assemblyLoadContext = new TestAssemblyLoadContext(assemblyPath);
+            // Normally, the caller should check for an invalid requested runtime, but we make sure here
+            var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
+                ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
 
-            try
-            {
-                _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
-            }
-            catch (Exception e)
-            {
-                var msg = string.Format(FAILED_TO_LOAD_TEST_ASSEMBLY, assemblyPath);
-                log.Error(msg);
-                throw new NUnitEngineException(msg, e);
-            }
-            log.Debug($"Loaded {assemblyPath}");
+            _testAssemblyPath = Path.GetFullPath(testAssemblyPath);
+            _assemblyLoadContext = new TestAssemblyLoadContext(_testAssemblyPath);
 
-            var nunitRef = _testAssembly.GetReferencedAssemblies().FirstOrDefault(reference => string.Equals(reference.Name, "nunit.framework", StringComparison.OrdinalIgnoreCase));
-            if (nunitRef == null)
-            {
-                log.Error(FAILED_TO_LOAD_NUNIT);
-                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT);
-            }
-
-            try
-            {
-                _frameworkAssembly = _assemblyLoadContext.LoadFromAssemblyName(nunitRef);
-            }
-            catch (Exception e)
-            {
-                log.Error($"{FAILED_TO_LOAD_NUNIT}\r\n{e}");
-                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT, e);
-            }
-            log.Debug("Loaded nunit.framework");
+            _testAssembly = LoadAssembly(_testAssemblyPath!);
+            _frameworkAssembly = LoadAssembly(_nunitRef);
 
             _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
             if (_frameworkController == null)
@@ -161,21 +151,62 @@ namespace NUnit.Engine.Drivers
         public string Explore(string filter)
         {
             CheckLoadWasCalled();
-
             log.Info("Exploring {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
             return (string)ExecuteMethod(EXPLORE_METHOD, filter);
         }
 
-        void CheckLoadWasCalled()
+        private void CheckLoadWasCalled()
         {
             if (_frameworkController == null)
                 throw new InvalidOperationException(LOAD_MESSAGE);
         }
 
-        object CreateObject(string typeName, params object?[]? args)
+        private object CreateObject(string typeName, params object?[]? args)
         {
             var type = _frameworkAssembly.ShouldNotBeNull().GetType(typeName, throwOnError: true)!;
             return Activator.CreateInstance(type, args)!;
+        }
+
+        private Assembly LoadAssembly(string assemblyPath)
+        {
+            Assembly assembly;
+
+            try
+            {
+                assembly = _assemblyLoadContext?.LoadFromAssemblyPath(assemblyPath)!;
+                if (assembly == null)
+                    throw new Exception("LoadFromAssemblyPath returned null");
+            }
+            catch (Exception e)
+            {
+                var msg = string.Format(FAILED_TO_LOAD_ASSEMBLY + assemblyPath);
+                log.Error(msg);
+                throw new NUnitEngineException(msg, e);
+            }
+
+            log.Debug($"Loaded {assemblyPath}");
+            return assembly;
+        }
+
+        private Assembly LoadAssembly(AssemblyName assemblyName)
+        {
+            Assembly assembly;
+
+            try
+            {
+                assembly = _assemblyLoadContext?.LoadFromAssemblyName(assemblyName)!;
+                if (assembly == null)
+                    throw new Exception("LoadFromAssemblyName returned null");
+            }
+            catch (Exception e)
+            {
+                var msg = string.Format(FAILED_TO_LOAD_ASSEMBLY + assemblyName.FullName);
+                log.Error($"{FAILED_TO_LOAD_ASSEMBLY}\r\n{e}");
+                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT, e);
+            }
+
+            log.Debug($"Loaded {assemblyName.FullName}");
+            return assembly;
         }
 
         object ExecuteMethod(string methodName, params object?[] args)
