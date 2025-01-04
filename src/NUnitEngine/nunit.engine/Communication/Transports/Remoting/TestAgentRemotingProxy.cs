@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETSTANDARD2_0
 using System;
 using NUnit.Engine;
 
@@ -39,4 +38,3 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         }
     }
 }
-#endif

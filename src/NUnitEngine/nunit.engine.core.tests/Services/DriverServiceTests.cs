@@ -38,16 +38,10 @@ namespace NUnit.Engine.Services.Tests
             new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetCore31Driver)),
             new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetCore31Driver)),
             //new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-#elif NETCOREAPP3_1
+#else
             new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetCore31Driver)),
             new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetCore31Driver)),
             //new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-// TODO: This is never used. We need to test net standard driver in some way, possibly
-// by forcing it's use in a separate test.
-#elif NETCOREAPP2_1
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetStandardDriver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetStandardDriver)),
-            new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetStandardDriver)),
 #endif
 // Invalid cases should work with all target runtimes
             new TestCaseData("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver)),

@@ -47,13 +47,8 @@ namespace NUnit.Engine.Drivers
         public IFrameworkDriver GetDriver(AssemblyName reference)
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
-#if NETSTANDARD            
-            log.Info("Using NUnitNetStandardDriver");
-            return new NUnitNetStandardDriver();
-#else
             log.Info("Using NUnitNetCore31Driver");
             return new NUnitNetCore31Driver();
-#endif
         }
 #endif
     }

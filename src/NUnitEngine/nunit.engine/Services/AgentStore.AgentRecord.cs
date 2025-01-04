@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETSTANDARD2_0
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -49,4 +48,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif

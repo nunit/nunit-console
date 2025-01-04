@@ -226,7 +226,7 @@ namespace NUnit.Engine.Internal
             try
             {
                 var info = GetFileSystemInfo(path);
-#if NETCOREAPP2_1_OR_GREATER
+#if NETCOREAPP
                 var creation = info.CreationTime;
 #endif
                 return true; // Whether it exists or not!

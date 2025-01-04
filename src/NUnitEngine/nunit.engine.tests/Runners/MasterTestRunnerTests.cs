@@ -65,7 +65,7 @@ namespace NUnit.Engine.Runners
             // 1. These tests document current behavior. In some cases we may want to change that behavior.
             // 2. The .NET Standard build does not seem to handle notest-assembly correctly, so those entries are commented out.
             // 3. The .NET Standard build is not intended to handle projects.
-#if NETCOREAPP2_1_OR_GREATER
+#if NETCOREAPP
             new TestRunData( MOCK_ASSEMBLY, MockAssemblyData ),
             new TestRunData( $"{MOCK_ASSEMBLY},{MOCK_ASSEMBLY}", MockAssemblyData, MockAssemblyData ),
             //new TestRunData( "notest-assembly.dll", NoTestAssemblyData ),

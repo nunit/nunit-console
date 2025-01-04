@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if !NETSTANDARD2_0
 namespace NUnit.Engine.Services
 {
     /// <summary>
@@ -28,4 +27,3 @@ namespace NUnit.Engine.Services
         Terminated
     }
 }
-#endif
