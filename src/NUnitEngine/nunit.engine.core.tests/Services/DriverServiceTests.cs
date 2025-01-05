@@ -30,29 +30,18 @@ namespace NUnit.Engine.Services.Tests
         static TestCaseData[] DriverSelectionTestCases = new[]
         {
             // TODO: make commented tests work
-#if NETFRAMEWORK
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnit3FrameworkDriver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnit3FrameworkDriver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnit3FrameworkDriver)),
-#elif NET5_0_OR_GREATER
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetCore31Driver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-#else
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetCore31Driver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-#endif
-// Invalid cases should work with all target runtimes
+            new TestCaseData("mock-assembly.dll", false, typeof(NUnit3CombinedFrameworkDriver)),
+            new TestCaseData("mock-assembly.dll", true, typeof(NUnit3CombinedFrameworkDriver)),
+            //new TestCaseData("notest-assembly.dll", false, typeof(NUnit3CombinedFrameworkDriver)),
+            //new TestCaseData"notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))
+
+            // Invalid cases should work with all target runtimes
             new TestCaseData("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("nunit.engine.core.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("nunit.engine.core.dll", true, typeof(SkippedAssemblyFrameworkDriver))
-//#if !NET5_0_OR_GREATER // Not yet working
-//            new TestCaseData"notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))
-//#endif
         };
 
         [Test]
