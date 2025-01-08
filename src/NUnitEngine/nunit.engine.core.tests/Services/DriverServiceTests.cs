@@ -30,9 +30,9 @@ namespace NUnit.Engine.Services.Tests
         static TestCaseData[] DriverSelectionTestCases = new[]
         {
             // TODO: make commented tests work
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnit3CombinedFrameworkDriver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnit3CombinedFrameworkDriver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnit3CombinedFrameworkDriver)),
+            new TestCaseData("mock-assembly.dll", false, typeof(NUnitFrameworkDriver)),
+            new TestCaseData("mock-assembly.dll", true, typeof(NUnitFrameworkDriver)),
+            //new TestCaseData("notest-assembly.dll", false, typeof(NUnitFrameworkDriver)),
             //new TestCaseData"notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))
 
             // Invalid cases should work with all target runtimes

@@ -33,8 +33,8 @@ namespace NUnit.Engine.Drivers
         public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
-            log.Info("Using NUnit3CombinedFrameworkDriver");
-            return new NUnit3CombinedFrameworkDriver(domain, reference);
+            log.Info("Using NUnitFrameworkDriver");
+            return new NUnitFrameworkDriver(domain, reference);
         }
 #else
         /// <summary>
@@ -45,8 +45,8 @@ namespace NUnit.Engine.Drivers
         public IFrameworkDriver GetDriver(AssemblyName reference)
         {
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
-            log.Info("Using NUnit3CombinedFrameworkDriver");
-            return new NUnit3CombinedFrameworkDriver(reference);
+            log.Info("Using NUnitFrameworkDriver");
+            return new NUnitFrameworkDriver(reference);
         }
 #endif
     }

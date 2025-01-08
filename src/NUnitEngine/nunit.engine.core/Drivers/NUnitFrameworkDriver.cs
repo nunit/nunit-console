@@ -12,10 +12,10 @@ using NUnit.Engine.Extensibility;
 namespace NUnit.Engine.Drivers
 {
     /// <summary>
-    /// NUnit3CombinedFrameworkDriver is used by the test-runner to load and run
-    /// tests using the NUnit framework assembly.
+    /// NUnitFrameworkDriver is used by the test-runner to load and run
+    /// tests using the NUnit framework assembly, versions 3 and up.
     /// </summary>
-    public class NUnit3CombinedFrameworkDriver : IFrameworkDriver
+    public class NUnitFrameworkDriver : IFrameworkDriver
     {
         const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
         const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
@@ -24,28 +24,30 @@ namespace NUnit.Engine.Drivers
 
         const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
 
-        static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnit3CombinedFrameworkDriver));
+        static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
         readonly FrameworkApi _api;
 
 #if NETFRAMEWORK
         /// <summary>
-        /// Construct an NUnit3CombinedFrameworkDriver
+        /// Construct an NUnitFrameworkDriver
         /// </summary>
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
-        public NUnit3CombinedFrameworkDriver(AppDomain testDomain, AssemblyName nunitRef)
+        /// <param name="api">Api to use, either "2018" or "2009". Provided for testing.</param>
+        public NUnitFrameworkDriver(AppDomain testDomain, AssemblyName nunitRef)
         {
-            Guard.ArgumentNotNull(nunitRef, nameof(testDomain));
+            Guard.ArgumentNotNull(testDomain, nameof(testDomain));
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
-            _api = new Api2009(this, testDomain, nunitRef);
+
+           _api = new Api2009(this, testDomain, nunitRef);
         }
 #else
         /// <summary>
-        /// Construct an NUnitNetCore31Driver
+        /// Construct an NUnitFrameworkDriver
         /// </summary>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        public NUnit3CombinedFrameworkDriver(AssemblyName nunitRef)
+        public NUnitFrameworkDriver(AssemblyName nunitRef)
         {
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
             _api = new Api2018(this, nunitRef);
@@ -110,7 +112,7 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         class Api2009 : FrameworkApi
         {
-            NUnit3CombinedFrameworkDriver _driver;
+            NUnitFrameworkDriver _driver;
 
             AppDomain _testDomain;
             AssemblyName _nunitRef;
@@ -120,8 +122,8 @@ namespace NUnit.Engine.Drivers
             object? _frameworkController;
             Type? _frameworkControllerType;
 
-            public Api2009(NUnit3CombinedFrameworkDriver driver, AppDomain testDomain, AssemblyName nunitRef) 
-            { 
+            public Api2009(NUnitFrameworkDriver driver, AppDomain testDomain, AssemblyName nunitRef)
+            {
                 _driver = driver;
                 _testDomain = testDomain;
                 _nunitRef = nunitRef;
@@ -157,62 +159,68 @@ namespace NUnit.Engine.Drivers
                 log.Debug($"Created FrameworkController {_frameworkControllerType.Name}");
 
                 return ExecuteAction(LOAD_ACTION);
-                //log.Debug($"Loaded {_testAssemblyPath}");
             }
 
             public int CountTestCases(string filter)
             {
                 CheckLoadWasCalled();
-                CallbackHandler handler = new CallbackHandler();
-                CreateObject(COUNT_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
-                return int.Parse(handler.Result.ShouldNotBeNull());
+                return int.Parse(ExecuteAction(COUNT_ACTION, filter));
             }
 
             public string Run(ITestEventListener? listener, string filter)
             {
                 CheckLoadWasCalled();
                 log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
-                var handler = new RunTestsCallbackHandler(listener);
-                CreateObject(RUN_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
-                return handler.Result.ShouldNotBeNull();
+                return ExecuteAction(RUN_ACTION, listener, filter);
             }
 
             public void RunAsync(Action<string> callback, string filter) => throw new NotImplementedException();
 
-            public void StopRun(bool force)
-            {
-                CreateObject(STOP_RUN_ACTION, _frameworkController.ShouldNotBeNull(), force, new CallbackHandler());
-            }
+            public void StopRun(bool force) => ExecuteAction(STOP_RUN_ACTION, force);
 
             public string Explore(string filter)
             {
                 CheckLoadWasCalled();
                 log.Info("Exploring {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
-                CallbackHandler handler = new CallbackHandler();
-                CreateObject(EXPLORE_ACTION, _frameworkController.ShouldNotBeNull(), filter, handler);
-                return handler.Result.ShouldNotBeNull();
+                return ExecuteAction(EXPLORE_ACTION, filter);
             }
 
-            public void CheckLoadWasCalled()
+            private void CheckLoadWasCalled()
             {
                 if (_frameworkController == null)
                     throw new InvalidOperationException(LOAD_MESSAGE);
             }
 
+            // Actions with no extra arguments beyond controller and handler
             const string LOAD_ACTION = CONTROLLER_TYPE + "+LoadTestsAction";
-            const string EXPLORE_ACTION = CONTROLLER_TYPE + "+ExploreTestsAction";
-            const string COUNT_ACTION = CONTROLLER_TYPE + "+CountTestsAction";
-            const string RUN_ACTION = CONTROLLER_TYPE + "+RunTestsAction";
-            const string STOP_RUN_ACTION = CONTROLLER_TYPE + "+StopRunAction";
-
-            public string ExecuteAction(string action, params object?[] args)
+            private string ExecuteAction(string action)
             {
                 CallbackHandler handler = new CallbackHandler();
                 CreateObject(action, _frameworkController, handler);
                 return handler.Result.ShouldNotBeNull();
             }
 
-            public object CreateObject(string typeName, params object?[]? args)
+            // Actions with one extra argument
+            const string EXPLORE_ACTION = CONTROLLER_TYPE + "+ExploreTestsAction";
+            const string COUNT_ACTION = CONTROLLER_TYPE + "+CountTestsAction";
+            const string STOP_RUN_ACTION = CONTROLLER_TYPE + "+StopRunAction";
+            private string ExecuteAction(string action, object arg1)
+            {
+                CallbackHandler handler = new CallbackHandler();
+                CreateObject(action, _frameworkController, arg1, handler);
+                return handler.Result.ShouldNotBeNull();
+            }
+
+            // Run action has two extra arguments and uses a special handler
+            const string RUN_ACTION = CONTROLLER_TYPE + "+RunTestsAction";
+            private string ExecuteAction(string action, ITestEventListener? listener, string filter)
+            {
+                RunTestsCallbackHandler handler = new RunTestsCallbackHandler(listener);
+                CreateObject(action, _frameworkController, filter, handler);
+                return handler.Result.ShouldNotBeNull();
+            }
+
+            private object CreateObject(string typeName, params object?[]? args)
             {
                 try
                 {
@@ -228,14 +236,17 @@ namespace NUnit.Engine.Drivers
 #else
         /// <summary>
         /// This is the revised API, designed for use with .NET Core. It first
-        /// appears in our source code in 2018.
+        /// appears in our source code in 2018. This implementation is modified
+        /// to make it work under the .NET Framework as well as .NET Core. It
+        /// may be used for NUnit 3.10 or higher.
         /// </summary>
         class Api2018 : FrameworkApi
         {
-            NUnit3CombinedFrameworkDriver _driver;
-            AssemblyName _nunitRef;
+            NUnitFrameworkDriver _driver;
 
+            AssemblyName _nunitRef;
             string? _testAssemblyPath;
+
             TestAssemblyLoadContext? _assemblyLoadContext;
             Assembly? _testAssembly;
             Assembly? _frameworkAssembly;
@@ -243,7 +254,7 @@ namespace NUnit.Engine.Drivers
             object? _frameworkController;
             Type? _frameworkControllerType;
 
-            public Api2018(NUnit3CombinedFrameworkDriver driver, AssemblyName nunitRef) 
+            public Api2018(NUnitFrameworkDriver driver, AssemblyName nunitRef)
             {
                 _driver = driver;
                 _nunitRef = nunitRef;
@@ -252,26 +263,24 @@ namespace NUnit.Engine.Drivers
             public string Load(string testAssemblyPath, IDictionary<string, object> settings)
             {
                 Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", "testAssemblyPath");
-
                 log.Info($"Loading {testAssemblyPath} - see separate log file");
 
                 _testAssemblyPath = Path.GetFullPath(testAssemblyPath);
-
+                var idPrefix = string.IsNullOrEmpty(_driver.ID) ? "" : _driver.ID + "-";
                 _assemblyLoadContext = new TestAssemblyLoadContext(testAssemblyPath);
 
                 _testAssembly = LoadAssembly(testAssemblyPath);
                 _frameworkAssembly = LoadAssembly(_nunitRef);
 
-                var idPrefix = string.IsNullOrEmpty(_driver.ID) ? "" : _driver.ID + "-";
-                _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
+                _frameworkController = CreateInstance(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
                 if (_frameworkController == null)
                 {
                     log.Error(INVALID_FRAMEWORK_MESSAGE);
                     throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
                 }
 
-                _frameworkControllerType = _frameworkController.GetType();
-                log.Debug($"Created FrameworkController {_frameworkControllerType.Name}");
+                _frameworkControllerType = _frameworkController?.GetType();
+                log.Debug($"Created FrameworkController {_frameworkControllerType?.Name}");
 
                 log.Debug($"Loaded {testAssemblyPath}");
                 return (string)ExecuteMethod(LOAD_METHOD);
@@ -287,7 +296,7 @@ namespace NUnit.Engine.Drivers
             public string Run(ITestEventListener? listener, string filter)
             {
                 CheckLoadWasCalled();
-                log.Info("Running {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
+                log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
                 Action<string>? callback = listener != null ? listener.OnTestEvent : (Action<string>?)null;
                 return (string)ExecuteMethod(RUN_METHOD, new[] { typeof(Action<string>), typeof(string) }, callback, filter);
             }
@@ -295,7 +304,7 @@ namespace NUnit.Engine.Drivers
             public void RunAsync(Action<string> callback, string filter)
             {
                 CheckLoadWasCalled();
-                log.Info("Running {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
+                log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
                 ExecuteMethod(RUN_ASYNC_METHOD, new[] { typeof(Action<string>), typeof(string) }, callback, filter);
             }
 
@@ -307,24 +316,23 @@ namespace NUnit.Engine.Drivers
             public string Explore(string filter)
             {
                 CheckLoadWasCalled();
-                log.Info("Exploring {0} - see separate log file", _testAssembly.ShouldNotBeNull().FullName!);
+                log.Info("Exploring {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
                 return (string)ExecuteMethod(EXPLORE_METHOD, filter);
             }
 
-            public void CheckLoadWasCalled()
+            private void CheckLoadWasCalled()
             {
                 if (_frameworkController == null)
                     throw new InvalidOperationException(LOAD_MESSAGE);
             }
 
-
-            public object CreateObject(string typeName, params object?[]? args)
+            private object CreateInstance(string typeName, params object?[]? args)
             {
                 var type = _frameworkAssembly.ShouldNotBeNull().GetType(typeName, throwOnError: true)!;
                 return Activator.CreateInstance(type, args)!;
             }
 
-            public Assembly LoadAssembly(string assemblyPath)
+            private Assembly LoadAssembly(string assemblyPath)
             {
                 Assembly assembly;
 
@@ -345,7 +353,7 @@ namespace NUnit.Engine.Drivers
                 return assembly;
             }
 
-            public Assembly LoadAssembly(AssemblyName assemblyName)
+            private Assembly LoadAssembly(AssemblyName assemblyName)
             {
                 Assembly assembly;
 
@@ -366,40 +374,46 @@ namespace NUnit.Engine.Drivers
                 return assembly;
             }
 
+            // API methods with no overloads
             private static readonly string LOAD_METHOD = "LoadTests";
             private static readonly string EXPLORE_METHOD = "ExploreTests";
             private static readonly string COUNT_METHOD = "CountTests";
-            private static readonly string RUN_METHOD = "RunTests";
-            private static readonly string RUN_ASYNC_METHOD = "RunTests";
             private static readonly string STOP_RUN_METHOD = "StopRun";
 
-            public object ExecuteMethod(string methodName, params object?[] args)
+            // Execute methods with no overloads
+            private object ExecuteMethod(string methodName, params object?[] args)
             {
+                log.Debug($"Calling API method {methodName} with args {string.Join("+", args)}");
                 var method = _frameworkControllerType.ShouldNotBeNull().GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
                 return ExecuteMethod(method, args);
             }
 
-            public object ExecuteMethod(string methodName, Type[] ptypes, params object?[] args)
+            // API methods with overloads
+            private static readonly string RUN_METHOD = "RunTests";
+            private static readonly string RUN_ASYNC_METHOD = "RunTests";
+
+            // Execute overloaded methods specifying argument types
+            private object ExecuteMethod(string methodName, Type[] ptypes, params object?[] args)
             {
+                log.Debug($"Calling API method {methodName} with arg types {string.Join<Type>("+", ptypes)}");
                 var method = _frameworkControllerType.ShouldNotBeNull().GetMethod(methodName, ptypes);
                 return ExecuteMethod(method, args);
             }
 
-            public object ExecuteMethod(MethodInfo? method, params object?[] args)
+            private object ExecuteMethod(MethodInfo? method, params object?[] args)
             {
                 if (method == null)
-                {
                     throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
-                }
 
-                //using (_assemblyLoadContext.ShouldNotBeNull().EnterContextualReflection())
-                //{
                 log.Debug($"Executing {method.DeclaringType}.{method.Name}");
-                return method.Invoke(_frameworkController, args).ShouldNotBeNull();
-                //}
+                using (_assemblyLoadContext.ShouldNotBeNull().EnterContextualReflection())
+                {
+                    return method.Invoke(_frameworkController, args).ShouldNotBeNull();
+                }
             }
         }
 #endif
+
         interface FrameworkApi
         {
             string Load(string testAssemblyPath, IDictionary<string, object> settings);
