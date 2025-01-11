@@ -384,6 +384,7 @@ namespace NUnit.Engine.Services
                 string entryDir = entry.DirectoryName;
                 string entryFile = entry.FileName;
 
+                log.Debug($"Processing entry {entry.Text}");
                 if (entry.IsDirectory)
                 {
                     if (entry.IsFullyQualified)
@@ -412,9 +413,14 @@ namespace NUnit.Engine.Services
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
+            log.Debug($"Processing candidate assembly {filePath}");
+
             // Did we already process this file?
             if (_assemblies.ByPath.ContainsKey(filePath))
+            {
+                log.Debug("  Skipping assembly already processed");
                 return;
+            }
 
             try
             {
@@ -423,10 +429,12 @@ namespace NUnit.Engine.Services
 
                 // We never add assemblies unless the host can load them
                 if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidateAssembly))
+                {
+                    log.Debug("  Unable to load this assembly");
                     return;
+                }
                 
                 // Do we already have a copy of the same assembly at a different path?
-                //if (_assemblies.ByName.ContainsKey(assemblyName))
                 if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly existing))
                 {
                     if (candidateAssembly.IsBetterVersionOf(existing))
@@ -435,6 +443,7 @@ namespace NUnit.Engine.Services
                     return;
                 }
 
+                log.Debug("  Adding this assembly");
                 _assemblies.Add(candidateAssembly);
             }
             catch (BadImageFormatException e)
