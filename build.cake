@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.3.0
+#load nuget:?package=NUnit.Cake.Recipe&version=1.3.1-alpha.1
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -121,10 +121,15 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("LICENSE.txt", "NOTICES.txt", "CHANGES.txt"),
             HasDirectory("bin/net462").WithFiles("nunit3-console.exe", "nunit3-console.exe.config", 
                 "nunit3-console.pdb").AndFiles(ENGINE_FILES).AndFiles(ENGINE_PDB_FILES),
-            HasDirectory("bin/net462/addins").WithFiles(
-                "nunit.core.dll", "nunit.core.interfaces.dll", "nunit.engine.api.dll", 
-                "nunit.v2.driver.dll", "nunit-project-loader.dll", "nunit-v2-result-writer.dll", 
-                "teamcity-event-listener.dll", "vs-project-loader.dll"),
+            HasDirectory("NUnit.Extension.NUnitProjectLoader.3.8.0"),
+            HasDirectory("NUnit.Extension.NUnitV2Driver.3.9.0"),
+            HasDirectory("NUnit.Extension.NUnitV2ResultWriter.3.8.0"),
+            HasDirectory("NUnit.Extension.TeamCityEventListener.1.0.7"),
+            HasDirectory("NUnit.Extension.VSProjectLoader.3.9.0"),
+            //HasDirectory("bin/net462/addins").WithFiles(
+            //    "nunit.core.dll", "nunit.core.interfaces.dll", "nunit.engine.api.dll", 
+            //    "nunit.v2.driver.dll", "nunit-project-loader.dll", "nunit-v2-result-writer.dll", 
+            //    "teamcity-event-listener.dll", "vs-project-loader.dll"),
             HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
