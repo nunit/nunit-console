@@ -15,13 +15,8 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class ProcessRunner : TestEngineRunner
     {
-        // ProcessRunner is given a TestPackage containing a single assembly
-        // multiple assemblies, a project, multiple projects or a mix. It loads
-        // and runs all tests in a single remote agent process.
-        //
-        // If the input contains projects, which are not summarized at a lower
-        // level, the ProcessRunner should create an XML node for the entire
-        // project, aggregating the assembly results.
+        // ProcessRunner is given a TestPackage containing a single assembly.
+        // It loads and runs the test assembly in a single remote agent process.
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 

@@ -12,7 +12,9 @@ namespace NUnit.Engine.Drivers
 {
     /// <summary>
     /// This is the revised API, designed for use with .NET Core. It first
-    /// appears in our source code in 2018.
+    /// appears in our source code in 2018. This implementation is modified
+    /// to make it work under the .NET Framework as well as .NET Core. It
+    /// may be used for NUnit 3.10 or higher.
     /// </summary>
     public class NUnitFrameworkApi2018 : NUnitFrameworkApi
     {
@@ -30,18 +32,29 @@ namespace NUnit.Engine.Drivers
         AssemblyName _nunitRef;
         string? _testAssemblyPath;
 
+        object? _frameworkController;
+        Type? _frameworkControllerType;
+
+#if NETFRAMEWORK
+        private AppDomain _testDomain;
+
+        public NUnitFrameworkApi2018(NUnitFrameworkDriver driver, AppDomain testDomain, AssemblyName nunitRef)
+        {
+            _driver = driver;
+            _testDomain = testDomain;
+            _nunitRef = nunitRef;
+        }
+#else
         TestAssemblyLoadContext? _assemblyLoadContext;
         Assembly? _testAssembly;
         Assembly? _frameworkAssembly;
-
-        object? _frameworkController;
-        Type? _frameworkControllerType;
 
         public NUnitFrameworkApi2018(NUnitFrameworkDriver driver, AssemblyName nunitRef)
         {
             _driver = driver;
             _nunitRef = nunitRef;
         }
+#endif
 
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
@@ -50,10 +63,12 @@ namespace NUnit.Engine.Drivers
 
             _testAssemblyPath = Path.GetFullPath(testAssemblyPath);
             var idPrefix = string.IsNullOrEmpty(_driver.ID) ? "" : _driver.ID + "-";
+#if NETCOREAPP
             _assemblyLoadContext = new TestAssemblyLoadContext(testAssemblyPath);
 
             _testAssembly = LoadAssembly(testAssemblyPath);
             _frameworkAssembly = LoadAssembly(_nunitRef);
+#endif
 
             _frameworkController = CreateInstance(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
             if (_frameworkController == null)
@@ -115,6 +130,7 @@ namespace NUnit.Engine.Drivers
             return Activator.CreateInstance(type, args)!;
         }
 
+#if NETCOREAPP
         private Assembly LoadAssembly(string assemblyPath)
         {
             Assembly assembly;
@@ -156,6 +172,7 @@ namespace NUnit.Engine.Drivers
             log.Debug($"Loaded {assemblyName.FullName}");
             return assembly;
         }
+#endif
 
         // API methods with no overloads
         private static readonly string LOAD_METHOD = "LoadTests";
@@ -189,10 +206,15 @@ namespace NUnit.Engine.Drivers
                 throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
 
             log.Debug($"Executing {method.DeclaringType}.{method.Name}");
+
+#if NETFRAMEWORK
+            return method.Invoke(_frameworkController, args).ShouldNotBeNull();
+#else
             using (_assemblyLoadContext.ShouldNotBeNull().EnterContextualReflection())
             {
                 return method.Invoke(_frameworkController, args).ShouldNotBeNull();
             }
+#endif
         }
     }
 }
