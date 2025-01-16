@@ -22,8 +22,9 @@ namespace NUnit.Engine.Runners
             var driverService = Substitute.For<Drivers.IDriverService>();
             driverService.GetDriver(
                 AppDomain.CurrentDomain,
+                new TestPackage(),
                 string.Empty,
-                string.Empty, 
+                string.Empty,
                 false).ReturnsForAnyArgs(_driver);
 
             _runner = new FakeTestAgentRunner(new TestPackage("mock-assembly.dll").SubPackages[0])

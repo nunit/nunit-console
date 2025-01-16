@@ -28,9 +28,9 @@ namespace NUnit.Engine.Drivers
             var nunitRef = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
             _mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
 #if NETFRAMEWORK
-            _driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, nunitRef);
+            _driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, "99", nunitRef);
 #else
-            _driver = new NUnitFrameworkDriver(nunitRef);
+            _driver = new NUnitFrameworkDriver("99", nunitRef);
 #endif
         }
 

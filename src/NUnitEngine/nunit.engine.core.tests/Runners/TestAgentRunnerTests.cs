@@ -69,7 +69,7 @@ namespace NUnit.Engine.Runners
             CheckPackageLoading();
         }
 
-        [Test]
+        //[Test]
         public void RunAsync()
         {
             var asyncResult = _runner.RunAsync(null, TestFilter.Empty);

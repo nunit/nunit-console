@@ -35,7 +35,7 @@ class MockAssemblyExpectedResult : ExpectedResult
 StandardRunnerTests.Add(new PackageTest(
     1, "Net462Test",
     "Run mock-assembly.dll under .NET 4.6.2",
-    "testdata/net462/mock-assembly.dll",
+    "testdata/net462/mock-assembly.dll --trace:Debug",
     new MockAssemblyExpectedResult("net-4.6.2")));
 
 AddToBothLists(new PackageTest(

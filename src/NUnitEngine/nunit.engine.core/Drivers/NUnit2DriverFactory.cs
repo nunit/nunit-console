@@ -43,7 +43,7 @@ namespace NUnit.Engine.Drivers
         /// <param name="domain">The domain in which the assembly will be loaded</param>
         /// <param name="reference">The name of the test framework reference</param>
         /// <returns></returns>
-        public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
+        public IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference)
         {
             if (!IsSupportedTestFramework(reference))
                 throw new ArgumentException("Invalid framework", "reference");

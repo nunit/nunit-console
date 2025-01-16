@@ -23,7 +23,8 @@ namespace NUnit.Engine.Services.Tests
         [TestCaseSource(nameof(DriverSelectionTestCases))]
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
-            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), null, skipNonTestAssemblies);
+            var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, fileName);
+            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, new TestPackage(assemblyPath), assemblyPath, null, skipNonTestAssemblies);
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
 

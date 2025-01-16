@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Serialization;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
@@ -27,23 +26,46 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
-        public NUnitFrameworkDriver(AppDomain testDomain, AssemblyName nunitRef)
+        public NUnitFrameworkDriver(AppDomain testDomain, string id, AssemblyName nunitRef)
         {
             Guard.ArgumentNotNull(testDomain, nameof(testDomain));
+            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
 
-           _api = new NUnitFrameworkApi2009(this, testDomain, nunitRef);
+            ID = id;
+
+            // Under .NET Framework, the Api class must be injected in the test domain
+            //testDomain.AssemblyResolve += TestDomain_AssemblyResolve;
+
+            _api = (NUnitFrameworkApi2018)testDomain.CreateInstanceFromAndUnwrap(
+                Assembly.GetExecutingAssembly().Location,
+                typeof(NUnitFrameworkApi2018).FullName!,
+                false,
+                0,
+                null,
+                new object[] { ID, nunitRef },
+                null,
+                null).ShouldNotBeNull();
+        }
+
+        private Assembly? TestDomain_AssemblyResolve(object? sender, ResolveEventArgs args)
+        {
+            //var fileName = args.Name;
+            return null;
         }
 #else
         /// <summary>
         /// Construct an NUnitFrameworkDriver
         /// </summary>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        public NUnitFrameworkDriver(AssemblyName nunitRef)
+        public NUnitFrameworkDriver(string id, AssemblyName nunitRef)
         {
+            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
 
-            _api = new NUnitFrameworkApi2018(this, nunitRef);
+            ID = id;
+
+            _api = new NUnitFrameworkApi2018(ID, nunitRef);
         }
 #endif
 
@@ -75,7 +97,7 @@ namespace NUnit.Engine.Drivers
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        public string Run(ITestEventListener? listener, string filter) => _api.Run(listener, filter);
+        public string Run(ITestEventListener? listener, string filter) => _api.Run(null, filter);
 
         /// <summary>
         /// Executes the tests in an assembly asynchronously.

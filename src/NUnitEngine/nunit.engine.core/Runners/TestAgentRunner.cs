@@ -48,10 +48,11 @@ namespace NUnit.Engine.Runners
         public TestAgentRunner(TestPackage package)
         {
             Guard.ArgumentNotNull(package, nameof(package));
+            //Guard.ArgumentValid(package.IsAssemblyPackage(), "TestAgentRunner requires a package with a single assembly", nameof(package));
             var assemblyPackages = package.Select(p => !p.HasSubPackages());
             Guard.ArgumentValid(assemblyPackages.Count == 1, "TestAgentRunner requires a package with a single assembly", nameof(package));
 
-            TestPackage = assemblyPackages[0];
+            TestPackage = package;
 
             // Bypass the resolver if not in the default AppDomain. This prevents trying to use the resolver within
             // NUnit's own automated tests (in a test AppDomain) which does not make sense anyway.
@@ -89,7 +90,6 @@ namespace NUnit.Engine.Runners
         public virtual TestEngineResult Load()
         {
             Guard.OperationValid(TestDomain != null, "TestDomain is not set");
-            AppDomain testDomain = TestDomain;
 
             var result = new TestEngineResult();
 
@@ -105,7 +105,7 @@ namespace NUnit.Engine.Runners
             string? targetFramework = assemblyPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, (string?)null);
             bool skipNonTestAssemblies = assemblyPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
-            if (_assemblyResolver != null && !testDomain.IsDefaultAppDomain()
+            if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
                 && assemblyPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
             {
                 // It's OK to do this in the loop because the Add method
@@ -113,7 +113,7 @@ namespace NUnit.Engine.Runners
                 _assemblyResolver.AddPathFromFile(testFile);
             }
 
-            _driver = DriverService.GetDriver(testDomain, testFile, targetFramework, skipNonTestAssemblies);
+            _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
 
             _driver.ID = assemblyPackage.ID;
 

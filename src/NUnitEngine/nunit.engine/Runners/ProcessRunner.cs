@@ -28,6 +28,9 @@ namespace NUnit.Engine.Runners
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
             _agency = Services.GetService<TestAgency>();
+
+            var assemblyPackages = package.Select(p => !p.HasSubPackages());
+            Guard.ArgumentValid(assemblyPackages.Count == 1, $"{GetType().Name} requires a package with a single assembly", nameof(package));
         }
 
         /// <summary>
