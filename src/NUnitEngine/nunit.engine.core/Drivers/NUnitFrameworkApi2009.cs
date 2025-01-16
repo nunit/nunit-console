@@ -27,7 +27,7 @@ namespace NUnit.Engine.Drivers
 
             const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
 
-            NUnitFrameworkDriver _driver;
+            string _driverId;
 
             AppDomain _testDomain;
             AssemblyName _nunitRef;
@@ -37,10 +37,14 @@ namespace NUnit.Engine.Drivers
             object? _frameworkController;
             Type? _frameworkControllerType;
 
-            public NUnitFrameworkApi2009(NUnitFrameworkDriver driver, AppDomain testDomain, AssemblyName nunitRef)
+            public NUnitFrameworkApi2009(AppDomain testDomain, string driverId, AssemblyName nunitRef)
             {
-                _driver = driver;
+                Guard.ArgumentNotNull(testDomain, nameof(testDomain));
+                Guard.ArgumentNotNull(driverId, nameof(driverId));
+                Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+
                 _testDomain = testDomain;
+                _driverId = driverId;
                 _nunitRef = nunitRef;
             }
 
@@ -56,7 +60,8 @@ namespace NUnit.Engine.Drivers
                 var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
                     ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
 
-                var idPrefix = string.IsNullOrEmpty(_driver.ID) ? "" : _driver.ID + "-";
+                var idPrefix = string.IsNullOrEmpty(_driverId) ? "" : _driverId + "-";
+
                 try
                 {
                     _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssemblyPath, idPrefix, settings);

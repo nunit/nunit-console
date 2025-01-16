@@ -7,6 +7,7 @@ using System.Reflection;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
+using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Drivers
 {
@@ -27,25 +28,34 @@ namespace NUnit.Engine.Drivers
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
         public NUnitFrameworkDriver(AppDomain testDomain, string id, AssemblyName nunitRef)
+            : this(testDomain, nunitRef.Version >= new Version(3,2,0) ? "2018" : "2009", id, nunitRef) { }
+
+        /// <summary>
+        /// Internal generic constructor used directly by our tests.
+        /// </summary>
+        /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
+        /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
+        internal NUnitFrameworkDriver(AppDomain testDomain, string api, string id, AssemblyName nunitRef)
         {
             Guard.ArgumentNotNull(testDomain, nameof(testDomain));
+            Guard.ArgumentNotNull(api, nameof(api));
+            Guard.ArgumentValid(api == "2009" || api == "2018", $"Invalid API specified: {api}", nameof(api));
             Guard.ArgumentNotNullOrEmpty(id, nameof(id));
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
 
             ID = id;
 
-            // Under .NET Framework, the Api class must be injected in the test domain
-            //testDomain.AssemblyResolve += TestDomain_AssemblyResolve;
-
-            _api = (NUnitFrameworkApi2018)testDomain.CreateInstanceFromAndUnwrap(
-                Assembly.GetExecutingAssembly().Location,
-                typeof(NUnitFrameworkApi2018).FullName!,
-                false,
-                0,
-                null,
-                new object[] { ID, nunitRef },
-                null,
-                null).ShouldNotBeNull();
+            _api = api == "2018"
+                ? (NUnitFrameworkApi)testDomain.CreateInstanceFromAndUnwrap(
+                    Assembly.GetExecutingAssembly().Location,
+                    $"NUnit.Engine.Drivers.NUnitFrameworkApi{api}",
+                    false,
+                    0,
+                    null,
+                    new object[] { ID, nunitRef },
+                    null,
+                    null).ShouldNotBeNull()
+                : new NUnitFrameworkApi2009(testDomain, ID, nunitRef);
         }
 
         private Assembly? TestDomain_AssemblyResolve(object? sender, ResolveEventArgs args)

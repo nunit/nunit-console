@@ -12,6 +12,10 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Drivers
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
+#if NETFRAMEWORK
+    [TestFixture("2009")]
+    [TestFixture("2018")]
+#endif
     public class NUnitFrameworkDriverTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
@@ -22,13 +26,22 @@ namespace NUnit.Engine.Drivers
         private NUnitFrameworkDriver _driver;
         private string _mockAssemblyPath;
 
+#if NETFRAMEWORK
+        private string _whichApi;
+        public NUnitFrameworkDriverTests(string whichApi)
+        {
+            _whichApi = whichApi;
+        }
+#endif
+
         [SetUp]
         public void CreateDriver()
         {
-            var nunitRef = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
+            var nunitRef = typeof(TestAttribute).Assembly.GetName();
             _mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
+
 #if NETFRAMEWORK
-            _driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, "99", nunitRef);
+            _driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, _whichApi, "99", nunitRef);
 #else
             _driver = new NUnitFrameworkDriver("99", nunitRef);
 #endif

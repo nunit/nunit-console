@@ -143,6 +143,46 @@ StandardRunnerTests.Add(new PackageTest(
     new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0")));
 
 //////////////////////////////////////////////////////////////////////
+// TEST OLDER VERSIONS OF NUNIT SWITCHING API IF NEEDED
+//////////////////////////////////////////////////////////////////////
+
+StandardRunnerTests.Add(new PackageTest(
+    1, "NUnit30Test",
+    "Run a test under NUnit 3.0 using 2009 API",
+    "testdata/NUnit3.0/net462/NUnit3.0.dll",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("NUnit3.0.dll", "net462") }
+    }));
+
+StandardRunnerTests.Add(new PackageTest(
+    1, "NUnit301Test",
+    "Run a test under NUnit 3.0.1 using 2009 API",
+    "testdata/NUnit3.0/net462/NUnit3.0.1.dll",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("NUnit3.0.1.dll", "net462") }
+    }));
+
+StandardRunnerTests.Add(new PackageTest(
+    1, "NUnit32Test",
+    "Run a test under NUnit 3.2 using 20018 API",
+    "testdata/NUnit3.0/net462/NUnit3.2.dll",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("NUnit3.2.dll", "net462") }
+    }));
+
+StandardRunnerTests.Add(new PackageTest(
+    1, "NUnit310Test",
+    "Run a test under NUnit 3.10 using 2018 API",
+    "testdata/NUnit3.0/net462/NUnit3.10.dll",
+    new ExpectedResult("Passed")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("NUnit3.10.dll", "net462") }
+    }));
+
+//////////////////////////////////////////////////////////////////////
 // ASP.NETCORE TESTS
 //////////////////////////////////////////////////////////////////////
 
