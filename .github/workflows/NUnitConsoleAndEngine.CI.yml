@@ -31,12 +31,14 @@ jobs:
         with:
           fetch-depth: 0
 
+        # Ensure all required runtimes are available
       - name: 🛠️ Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             3.1.x
             6.0.x
+            7.0.x
             8.0.100
 
       - name: 🔧 Install dotnet tools

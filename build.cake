@@ -63,17 +63,13 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles("nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
             HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE),
-            HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE)
         },
         symbols: new PackageCheck[] {
             HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
             HasDirectory("tools/agents/net462").WithFiles(AGENT_PDB_FILES),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_PDB_FILES_NETCORE),
-            HasDirectory("tools/agents/net7.0").WithFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_PDB_FILES_NETCORE)
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
@@ -105,9 +101,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         checks: new PackageCheck[] {
             HasDirectory("tools").WithFiles("LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit3-console.exe", "nunit3-console.exe.config").AndFiles(ENGINE_FILES),
             HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(AGENT_FILES_NETCORE),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE),
-            HasDirectory("tools/agents/net7.0").WithFiles(AGENT_FILES_NETCORE),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE)
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
@@ -126,14 +120,8 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("NUnit.Extension.NUnitV2ResultWriter.3.8.0"),
             HasDirectory("NUnit.Extension.TeamCityEventListener.1.0.7"),
             HasDirectory("NUnit.Extension.VSProjectLoader.3.9.0"),
-            //HasDirectory("bin/net462/addins").WithFiles(
-            //    "nunit.core.dll", "nunit.core.interfaces.dll", "nunit.engine.api.dll", 
-            //    "nunit.v2.driver.dll", "nunit-project-loader.dll", "nunit-v2-result-writer.dll", 
-            //    "teamcity-event-listener.dll", "vs-project-loader.dll"),
-            HasDirectory("bin/netcoreapp3.1").WithFiles(ENGINE_CORE_FILES).AndFiles(ENGINE_CORE_PDB_FILES),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
-            HasDirectory("bin/agents/net7.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory
