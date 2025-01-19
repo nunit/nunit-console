@@ -137,14 +137,10 @@ namespace NUnit.Engine.Services
                     switch (major)
                     {
                         case 9:
-                        case 8:
-                        case 7:
+                            // Case for .NET 9.0 agent will go here
+                        default:
                             runtimeIdentifier = agentSubDir = "net8.0";
                             agentName = "nunit-agent-net80";
-                            break;
-                        default:
-                            runtimeIdentifier = agentSubDir = "net6.0";
-                            agentName = "nunit-agent-net60";
                             break;
                     }
                     agentExtension = ".dll";

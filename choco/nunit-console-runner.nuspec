@@ -50,16 +50,6 @@
     <file src = "nunit-agent.exe.ignore" target="tools/agents/net462" />
     <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net462" />
 
-    <file src = "$BIN_DIR$agents/net6.0/nunit-agent-net60.dll" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/nunit-agent-net60.dll.config" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/nunit-agent-net60.deps.json" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/nunit-agent-net60.runtimeconfig.json" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/nunit.engine.api.dll" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/nunit.engine.api.xml" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/nunit.engine.core.dll" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/testcentric.metadata.dll" target="tools/agents/net6.0" />
-    <file src = "$BIN_DIR$agents/net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net6.0" />
-
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.dll.config" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.deps.json" target="tools/agents/net8.0" />
