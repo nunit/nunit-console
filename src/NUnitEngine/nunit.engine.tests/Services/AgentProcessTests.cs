@@ -51,8 +51,8 @@ namespace NUnit.Engine.Services
         [TestCase("netcore-5.0", true, "net6.0/nunit-agent-net60.dll")]
         [TestCase("netcore-6.0", false, "net6.0/nunit-agent-net60.dll")]
         [TestCase("netcore-6.0", true, "net6.0/nunit-agent-net60.dll")]
-        [TestCase("netcore-7.0", false, "net7.0/nunit-agent-net70.dll")]
-        [TestCase("netcore-7.0", true, "net7.0/nunit-agent-net70.dll")]
+        [TestCase("netcore-7.0", false, "net8.0/nunit-agent-net80.dll")]
+        [TestCase("netcore-7.0", true, "net8.0/nunit-agent-net80.dll")]
         [TestCase("netcore-8.0", false, "net8.0/nunit-agent-net80.dll")]
         [TestCase("netcore-8.0", true, "net8.0/nunit-agent-net80.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)

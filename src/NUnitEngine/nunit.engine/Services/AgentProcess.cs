@@ -138,12 +138,9 @@ namespace NUnit.Engine.Services
                     {
                         case 9:
                         case 8:
+                        case 7:
                             runtimeIdentifier = agentSubDir = "net8.0";
                             agentName = "nunit-agent-net80";
-                            break;
-                        case 7:
-                            runtimeIdentifier = agentSubDir = "net7.0";
-                            agentName = "nunit-agent-net70";
                             break;
                         case 6:
                         case 5:

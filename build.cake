@@ -46,9 +46,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net6.0").WithFiles(
                 "nunit-agent-net60.dll", "nunit-agent-net60.dll.config",
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDirectory("tools/agents/net7.0").WithFiles(
-                "nunit-agent-net70.dll", "nunit-agent-net70.dll.config",
-                "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll")
@@ -107,9 +104,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net6.0").WithFiles(
                 "nunit-agent-net60.dll", "nunit-agent-net60.dll.config",
-                "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDirectory("tools/agents/net7.0").WithFiles(
-                "nunit-agent-net70.dll", "nunit-agent-net70.dll.config",
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
