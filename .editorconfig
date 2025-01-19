@@ -14,3 +14,8 @@ indent_size = 4
 [*.{proj,csproj,vcxproj,xproj,json,config,nuspec,xml,yml}]
 indent_style = space
 indent_size = 2
+
+[*.cs]
+# This relates to classes that have finalizers, but we should not have any finalizer
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = none
