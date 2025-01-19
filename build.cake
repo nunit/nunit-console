@@ -40,9 +40,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(
-                "nunit-agent-netcore31.dll", "nunit-agent-netcore31.dll.config",
-                "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net6.0").WithFiles(
                 "nunit-agent-net60.dll", "nunit-agent-net60.dll.config",
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
@@ -55,11 +52,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(
-                "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
             HasDirectory("tools/agents/net6.0").WithFiles(
-                "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
-            HasDirectory("tools/agents/net7.0").WithFiles(
                 "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.engine.api.pdb")
@@ -98,9 +91,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.dll", "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
-                "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDirectory("tools/agents/netcoreapp3.1").WithFiles(
-                "nunit-agent-netcore31.dll", "nunit-agent-netcore31.dll.config",
                 "nunit.engine.core.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net6.0").WithFiles(
                 "nunit-agent-net60.dll", "nunit-agent-net60.dll.config",
