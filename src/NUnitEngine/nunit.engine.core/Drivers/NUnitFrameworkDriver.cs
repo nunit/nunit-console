@@ -2,12 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
-using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Drivers
 {
@@ -17,6 +15,7 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnitFrameworkDriver : IFrameworkDriver
     {
+        static readonly Version MINIMUM_NUNIT_VERSION = new Version(3, 2, 0);
         static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
         readonly NUnitFrameworkApi _api;
@@ -28,10 +27,35 @@ namespace NUnit.Engine.Drivers
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
         public NUnitFrameworkDriver(AppDomain testDomain, string id, AssemblyName nunitRef)
-            : this(testDomain, nunitRef.Version >= new Version(3,2,0) ? "2018" : "2009", id, nunitRef) { }
+        {
+            Guard.ArgumentNotNull(testDomain, nameof(testDomain));
+            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
+            Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+
+            ID = id;
+
+            if (nunitRef.Version >= MINIMUM_NUNIT_VERSION)
+            {
+                API = "2018";
+                _api = (NUnitFrameworkApi)testDomain.CreateInstanceFromAndUnwrap(
+                    Assembly.GetExecutingAssembly().Location,
+                    "NUnit.Engine.Drivers.NUnitFrameworkApi2018",
+                    false,
+                    0,
+                    null,
+                    new object[] { ID, nunitRef },
+                    null,
+                    null).ShouldNotBeNull();
+            }
+            else
+            {
+                API = "2009";
+                _api = new NUnitFrameworkApi2009(testDomain, ID, nunitRef);
+            }
+        }
 
         /// <summary>
-        /// Internal generic constructor used directly by our tests.
+        /// Internal generic constructor used by our tests.
         /// </summary>
         /// <param name="testDomain">The application domain in which to create the FrameworkController</param>
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
@@ -44,11 +68,12 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
 
             ID = id;
+            API = api;
 
             _api = api == "2018"
                 ? (NUnitFrameworkApi)testDomain.CreateInstanceFromAndUnwrap(
                     Assembly.GetExecutingAssembly().Location,
-                    $"NUnit.Engine.Drivers.NUnitFrameworkApi{api}",
+                    typeof(NUnitFrameworkApi2018).FullName!,
                     false,
                     0,
                     null,
@@ -56,12 +81,6 @@ namespace NUnit.Engine.Drivers
                     null,
                     null).ShouldNotBeNull()
                 : new NUnitFrameworkApi2009(testDomain, ID, nunitRef);
-        }
-
-        private Assembly? TestDomain_AssemblyResolve(object? sender, ResolveEventArgs args)
-        {
-            //var fileName = args.Name;
-            return null;
         }
 #else
         /// <summary>
@@ -74,16 +93,22 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
 
             ID = id;
+            API = "2018";
 
             _api = new NUnitFrameworkApi2018(ID, nunitRef);
         }
 #endif
 
         /// <summary>
+        /// String naming the API in use, for use by tests
+        /// </summary>
+        internal string API { get; } = string.Empty;
+
+        /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
         /// test ids created.
         /// </summary>
-        public string ID { get; set; } = string.Empty;
+        public string ID { get; } = string.Empty;
 
         /// <summary>
         /// Loads the tests in an assembly.

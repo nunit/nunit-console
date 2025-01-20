@@ -18,7 +18,7 @@ namespace NUnit.Engine.Extensibility
         /// Gets and sets the unique identifier for this driver,
         /// used to ensure that test ids are unique across drivers.
         /// </summary>
-        string ID { get; set; }
+        string ID { get; }
 
         /// <summary>
         /// Loads the tests in an assembly.

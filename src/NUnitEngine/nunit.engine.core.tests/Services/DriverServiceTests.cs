@@ -7,7 +7,7 @@ using NUnit.Framework;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     [TestFixture]
     public class DriverServiceTests
@@ -30,11 +30,10 @@ namespace NUnit.Engine.Services.Tests
 
         static TestCaseData[] DriverSelectionTestCases = new[]
         {
-            // TODO: make commented tests work
             new TestCaseData("mock-assembly.dll", false, typeof(NUnitFrameworkDriver)),
             new TestCaseData("mock-assembly.dll", true, typeof(NUnitFrameworkDriver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnitFrameworkDriver)),
-            //new TestCaseData"notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))
+            new TestCaseData("notest-assembly.dll", false, typeof(NUnitFrameworkDriver)).Ignore("Assembly not present"),
+            new TestCaseData("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver)).Ignore("Assembly not present"),
 
             // Invalid cases should work with all target runtimes
             new TestCaseData("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver)),

@@ -21,13 +21,18 @@ namespace NUnit.Engine.Drivers
         int CountTestCases(string filter);
 
         /// <summary>
-        /// Executes the tests in an assembly.
+        /// Executes the tests in an assembly synchronously.
         /// </summary>
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A XML string representing the filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
         string Run(ITestEventListener? listener, string filter);
 
+        /// <summary>
+        /// Executes the tests in an assembly asynchronously.
+        /// </summary>
+        /// <param name="callback">A callback that receives XML progress notices</param>
+        /// <param name="filter">A filter that controls which tests are executed</param>
         void RunAsync(Action<string> callback, string filter);
 
         /// <summary>

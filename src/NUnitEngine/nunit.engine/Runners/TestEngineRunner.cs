@@ -3,7 +3,6 @@
 using System;
 using System.ComponentModel;
 using NUnit.Common;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {

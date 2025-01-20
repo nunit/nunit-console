@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,6 @@ using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Drivers
 {
-#if NETFRAMEWORK
         /// <summary>
         /// This is the original NUnit 3 API, which only works for .NET Framework.
         /// As far as I can discover, it first appeared in pre-release 2.9.1,
@@ -27,15 +27,15 @@ namespace NUnit.Engine.Drivers
 
             const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
 
-            string _driverId;
+            private readonly string _driverId;
 
-            AppDomain _testDomain;
-            AssemblyName _nunitRef;
+            private readonly AppDomain _testDomain;
+            private readonly AssemblyName _nunitRef;
 
-            string? _testAssemblyPath;
+            private string? _testAssemblyPath;
             
-            object? _frameworkController;
-            Type? _frameworkControllerType;
+            private object? _frameworkController;
+            private Type? _frameworkControllerType;
 
             public NUnitFrameworkApi2009(AppDomain testDomain, string driverId, AssemblyName nunitRef)
             {
@@ -60,11 +60,19 @@ namespace NUnit.Engine.Drivers
                 var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
                     ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
 
-                var idPrefix = string.IsNullOrEmpty(_driverId) ? "" : _driverId + "-";
+                var idPrefix = _driverId + "-";
 
                 try
                 {
-                    _frameworkController = CreateObject(CONTROLLER_TYPE, _testAssemblyPath, idPrefix, settings);
+                _frameworkController = _testDomain.CreateInstanceAndUnwrap(
+                    _nunitRef.FullName,
+                    CONTROLLER_TYPE,
+                    false,
+                    0,
+                    null,
+                    new object[] { _testAssemblyPath, idPrefix, settings },
+                    null,
+                    null).ShouldNotBeNull();
                 }
                 catch (BadImageFormatException ex) when (requestedRuntime != null)
                 {
@@ -144,8 +152,10 @@ namespace NUnit.Engine.Drivers
             {
                 try
                 {
-                    return _testDomain.CreateInstanceAndUnwrap(
-                        _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
+                return _testDomain.CreateInstanceAndUnwrap(
+                    _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
+                //return _testDomain.CreateInstanceAndUnwrap(
+                //        _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
                 }
                 catch (TargetInvocationException ex)
                 {
@@ -153,5 +163,5 @@ namespace NUnit.Engine.Drivers
                 }
             }
         }
-#endif
 }
+#endif

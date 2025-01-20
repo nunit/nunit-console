@@ -126,14 +126,41 @@ namespace NUnit.Engine.Drivers
         }
 
 #if NETFRAMEWORK
-        //[Test]
-        public void RunTestsAction_WithInvalidFilterElement_ThrowsNUnitEngineException()
+        // Nested Class tests Api Selection in the driver
+        public class ApiSelectionTests()
+        {
+            [TestCase("4.2.2", "2018")]
+            [TestCase("3.14.0", "2018")]
+            [TestCase("3.2.0", "2018")]
+            [TestCase("3.0.1", "2009")]
+            [TestCase("3.0.0", "2009")]
+            public void CorrectApiIsSelected(string nunitVersion, string apiVersion)
+            {
+                var driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, "99", new AssemblyName()
+                {
+                    Name = "nunit.framework",
+                    Version = new Version(nunitVersion)
+                });
+
+                Assert.That(driver.API, Is.EqualTo(apiVersion));
+            }
+        }
+
+        [Test]
+        public void RunTestsAction_WithInvalidFilterElement_ThrowsException()
         {
             _driver.Load(_mockAssemblyPath, _settings);
 
             var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
-            Assert.That(ex, Is.TypeOf<NUnitEngineException>());
+
+            if (_whichApi == "2018")
+            {
+                Assert.That(ex, Is.TypeOf<TargetInvocationException>());
+                Assert.That(ex.InnerException, Is.TypeOf<ArgumentException>());
+            }
+            else
+                Assert.That(ex, Is.TypeOf<NUnitEngineException>());
         }
 
         private class CallbackEventHandler : System.Web.UI.ICallbackEventHandler

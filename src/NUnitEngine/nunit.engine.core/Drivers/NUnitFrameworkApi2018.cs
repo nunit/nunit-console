@@ -4,12 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Remoting;
 using System.Runtime.Serialization;
 using NUnit.Common;
-using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
-using TestCentric.Metadata;
 
 namespace NUnit.Engine.Drivers
 {
@@ -34,14 +31,20 @@ namespace NUnit.Engine.Drivers
 
         const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
 
-        private string _driverId;
+        private readonly string _driverId;
 
-        AssemblyName _nunitRef;
-        string? _testAssemblyPath;
+        private readonly AssemblyName _nunitRef;
 
-        object? _frameworkController;
-        Type? _frameworkControllerType;
+        private object? _frameworkController;
+        private Type? _frameworkControllerType;
 
+#if NETCOREAPP
+        private TestAssemblyLoadContext? _assemblyLoadContext;
+        //private Assembly? _testAssembly;
+        private Assembly? _frameworkAssembly;
+#endif
+
+        private string? _testAssemblyPath;
 
         public NUnitFrameworkApi2018(string driverId, AssemblyName nunitRef)
         {
@@ -49,26 +52,8 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
 
             _driverId = driverId;
-#if NETFRAMEWORK
-            //if (RemotingServices.IsTransparentProxy(driver))
-            //{
-            //    // We need to replace nunitRef with a reference valid in the current domain.
-            //    var frameworkRef = AssemblyNameReference.Parse(nunitRef.FullName);
-            //    var frameworkDef = new DefaultAssemblyResolver().Resolve(frameworkRef);
-            //    frameworkDef.MainModule.
-            //}
-            //if (_nunitRef == null)
-                _nunitRef = nunitRef;
-#else
             _nunitRef = nunitRef;
-#endif
         }
-
-#if NETCOREAPP
-        TestAssemblyLoadContext? _assemblyLoadContext;
-        Assembly? _testAssembly;
-        Assembly? _frameworkAssembly;
-#endif
 
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
@@ -81,10 +66,6 @@ namespace NUnit.Engine.Drivers
             var idPrefix = string.IsNullOrEmpty(_driverId) ? "" : _driverId + "-";
 
 #if NETFRAMEWORK
-            // Normally, the caller should check for an invalid requested runtime, but we make sure here
-            var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
-                ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
-
             try
             {
                 _frameworkController = AppDomain.CurrentDomain.CreateInstanceAndUnwrap(
@@ -96,14 +77,6 @@ namespace NUnit.Engine.Drivers
                     new object[] { _testAssemblyPath, idPrefix, settings }, 
                     null, 
                     null).ShouldNotBeNull();
-            }
-            catch (BadImageFormatException ex) when (requestedRuntime != null)
-            {
-                throw new NUnitEngineException($"Requested runtime {requestedRuntime} is not suitable for use with test assembly {_testAssemblyPath}", ex);
-            }
-            catch (SerializationException ex)
-            {
-                throw new NUnitEngineException("The NUnit 3 driver cannot support this test assembly. Use a platform specific runner.", ex);
             }
             catch (Exception ex) 
             {
@@ -119,10 +92,10 @@ namespace NUnit.Engine.Drivers
 #else
             _assemblyLoadContext = new TestAssemblyLoadContext(testAssemblyPath);
 
-            _testAssembly = LoadAssembly(testAssemblyPath);
+            var testAssembly = LoadAssembly(testAssemblyPath);
             _frameworkAssembly = LoadAssembly(_nunitRef);
 
-            _frameworkController = CreateInstance(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
+            _frameworkController = CreateInstance(CONTROLLER_TYPE, testAssembly, idPrefix, settings);
             if (_frameworkController == null)
             {
                 log.Error(INVALID_FRAMEWORK_MESSAGE);
@@ -148,7 +121,7 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
-            Action<string>? callback = /*listener != null ? listener.OnTestEvent :*/ (Action<string>?)null;
+            Action<string>? callback = null;
             return (string)ExecuteMethod(RUN_METHOD, new[] { typeof(Action<string>), typeof(string) }, callback, filter);
         }
 
@@ -177,20 +150,7 @@ namespace NUnit.Engine.Drivers
                 throw new InvalidOperationException(LOAD_MESSAGE);
         }
 
-#if NETFRAMEWORK
-            //private ObjectHandle? CreateInstance(string typeName, params object?[]? args)
-            //{
-            //    try
-            //    {
-            //        return _testDomain.CreateInstance(
-            //            _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
-            //    }
-            //    catch (TargetInvocationException ex)
-            //    {
-            //        throw new NUnitEngineException("The NUnit 3 driver encountered an error while executing reflected code.", ex.InnerException);
-            //    }
-            //}
-#else
+#if NETCOREAPP
         private object CreateInstance(string typeName, params object?[]? args)
         {
             var type = _frameworkAssembly.ShouldNotBeNull().GetType(typeName, throwOnError: true)!;

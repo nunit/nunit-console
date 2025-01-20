@@ -115,8 +115,6 @@ namespace NUnit.Engine.Runners
 
             _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
 
-            _driver.ID = assemblyPackage.ID;
-
             try
             {
                 return new TestEngineResult(_driver.Load(testFile, assemblyPackage.Settings));
