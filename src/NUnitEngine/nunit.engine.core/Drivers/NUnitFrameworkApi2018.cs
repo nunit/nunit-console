@@ -40,7 +40,6 @@ namespace NUnit.Engine.Drivers
 
 #if NETCOREAPP
         private TestAssemblyLoadContext? _assemblyLoadContext;
-        //private Assembly? _testAssembly;
         private Assembly? _frameworkAssembly;
 #endif
 
@@ -63,7 +62,7 @@ namespace NUnit.Engine.Drivers
             log.Info($"Loading {testAssemblyPath} - see separate log file");
 
             _testAssemblyPath = Path.GetFullPath(testAssemblyPath);
-            var idPrefix = string.IsNullOrEmpty(_driverId) ? "" : _driverId + "-";
+            var idPrefix = _driverId + "-";
 
 #if NETFRAMEWORK
             try
@@ -236,10 +235,10 @@ namespace NUnit.Engine.Drivers
 #if NETFRAMEWORK
             return method.Invoke(_frameworkController, args).ShouldNotBeNull();
 #else
-            using (_assemblyLoadContext.ShouldNotBeNull().EnterContextualReflection())
-            {
-                return method.Invoke(_frameworkController, args).ShouldNotBeNull();
-            }
+            //using (_assemblyLoadContext.ShouldNotBeNull().EnterContextualReflection())
+            //{
+            return method.Invoke(_frameworkController, args).ShouldNotBeNull();
+            //}
 #endif
         }
 

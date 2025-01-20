@@ -64,15 +64,15 @@ namespace NUnit.Engine.Drivers
 
                 try
                 {
-                _frameworkController = _testDomain.CreateInstanceAndUnwrap(
-                    _nunitRef.FullName,
-                    CONTROLLER_TYPE,
-                    false,
-                    0,
-                    null,
-                    new object[] { _testAssemblyPath, idPrefix, settings },
-                    null,
-                    null).ShouldNotBeNull();
+                    _frameworkController = _testDomain.CreateInstanceAndUnwrap(
+                        _nunitRef.FullName,
+                        CONTROLLER_TYPE,
+                        false,
+                        0,
+                        null,
+                        new object[] { _testAssemblyPath, idPrefix, settings },
+                        null,
+                        null).ShouldNotBeNull();
                 }
                 catch (BadImageFormatException ex) when (requestedRuntime != null)
                 {
@@ -152,10 +152,8 @@ namespace NUnit.Engine.Drivers
             {
                 try
                 {
-                return _testDomain.CreateInstanceAndUnwrap(
-                    _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
-                //return _testDomain.CreateInstanceAndUnwrap(
-                //        _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
+                    return _testDomain.CreateInstanceAndUnwrap(
+                        _nunitRef.FullName, typeName, false, 0, null, args, null, null)!;
                 }
                 catch (TargetInvocationException ex)
                 {

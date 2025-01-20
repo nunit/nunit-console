@@ -108,7 +108,7 @@ namespace NUnit.Engine.Drivers
         /// An id prefix that will be passed to the test framework and used as part of the
         /// test ids created.
         /// </summary>
-        public string ID { get; } = string.Empty;
+        public string ID { get; }
 
         /// <summary>
         /// Loads the tests in an assembly.
