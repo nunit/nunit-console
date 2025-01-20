@@ -70,7 +70,7 @@ namespace NUnit.Engine.Drivers
 
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
                     if (skipNonTestAssemblies)
-                        return new SkippedAssemblyFrameworkDriver(assemblyPath, "X");
+                        return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
                     else
                         return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, platform + 
                             " test assemblies are not supported by this version of the engine");

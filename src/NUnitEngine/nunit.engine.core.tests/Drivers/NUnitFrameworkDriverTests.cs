@@ -14,8 +14,8 @@ namespace NUnit.Engine.Drivers
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
 #if NETFRAMEWORK
     [TestFixture("2009")]
-    [TestFixture("2018")]
 #endif
+    [TestFixture("2018")]
     public class NUnitFrameworkDriverTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
@@ -26,13 +26,11 @@ namespace NUnit.Engine.Drivers
         private NUnitFrameworkDriver _driver;
         private string _mockAssemblyPath;
 
-#if NETFRAMEWORK
         private string _whichApi;
         public NUnitFrameworkDriverTests(string whichApi)
         {
             _whichApi = whichApi;
         }
-#endif
 
         [SetUp]
         public void CreateDriver()
@@ -125,6 +123,23 @@ namespace NUnit.Engine.Drivers
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
         }
 
+        [Test]
+        public void RunTestsAction_WithInvalidFilterElement_ThrowsException()
+        {
+            _driver.Load(_mockAssemblyPath, _settings);
+
+            var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
+            var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
+
+            if (_whichApi == "2018")
+            {
+                Assert.That(ex, Is.TypeOf<TargetInvocationException>());
+                Assert.That(ex.InnerException, Is.TypeOf<ArgumentException>());
+            }
+            else
+                Assert.That(ex, Is.TypeOf<NUnitEngineException>());
+        }
+
 #if NETFRAMEWORK
         // Nested Class tests Api Selection in the driver
         public class ApiSelectionTests()
@@ -144,23 +159,6 @@ namespace NUnit.Engine.Drivers
 
                 Assert.That(driver.API, Is.EqualTo(apiVersion));
             }
-        }
-
-        [Test]
-        public void RunTestsAction_WithInvalidFilterElement_ThrowsException()
-        {
-            _driver.Load(_mockAssemblyPath, _settings);
-
-            var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
-            var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
-
-            if (_whichApi == "2018")
-            {
-                Assert.That(ex, Is.TypeOf<TargetInvocationException>());
-                Assert.That(ex.InnerException, Is.TypeOf<ArgumentException>());
-            }
-            else
-                Assert.That(ex, Is.TypeOf<NUnitEngineException>());
         }
 
         private class CallbackEventHandler : System.Web.UI.ICallbackEventHandler

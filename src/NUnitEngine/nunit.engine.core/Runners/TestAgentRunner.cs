@@ -136,8 +136,6 @@ namespace NUnit.Engine.Runners
         /// <returns>The count of test cases</returns>
         public int CountTestCases(TestFilter filter)
         {
-            GetLoadedDriver();
-
             try
             {
                 return GetLoadedDriver().CountTestCases(filter.Text);
