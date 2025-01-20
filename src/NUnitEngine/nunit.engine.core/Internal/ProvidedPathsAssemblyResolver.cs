@@ -12,6 +12,8 @@ namespace NUnit.Engine.Internal
     {
         static readonly ILogger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
 
+        static readonly string THIS_ASSEMBLY_LOCATION = Assembly.GetExecutingAssembly().Location;
+
         public ProvidedPathsAssemblyResolver()
         {
             _resolutionPaths = new List<string>();
@@ -21,6 +23,8 @@ namespace NUnit.Engine.Internal
         {
             Debug.Assert(AppDomain.CurrentDomain.IsDefaultAppDomain());
             AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
+
+            AddPath(THIS_ASSEMBLY_LOCATION);
         }
 
         public void AddPath(string dirPath)

@@ -51,13 +51,13 @@ namespace NUnit.Engine.Drivers
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         /// <returns></returns>
-        public IFrameworkDriver GetDriver(AppDomain domain, string assemblyPath, string? targetFramework, bool skipNonTestAssemblies)
+        public IFrameworkDriver GetDriver(AppDomain domain, TestPackage package, string assemblyPath, string? targetFramework, bool skipNonTestAssemblies)
         {
             if (!File.Exists(assemblyPath))
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, "File not found: " + assemblyPath);
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, "File not found: " + assemblyPath);
 
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, "File type is not supported");
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, "File type is not supported");
 
             if (targetFramework != null)
             {
@@ -70,9 +70,9 @@ namespace NUnit.Engine.Drivers
 
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
                     if (skipNonTestAssemblies)
-                        return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                        return new SkippedAssemblyFrameworkDriver(assemblyPath, "X");
                     else
-                        return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + 
+                        return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, platform + 
                             " test assemblies are not supported by this version of the engine");
             }
 
@@ -84,25 +84,22 @@ namespace NUnit.Engine.Drivers
                     {
                         foreach (var attr in assemblyDef.CustomAttributes)
                             if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
-                                return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                                return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
                     }
-
-                    var references = new List<AssemblyName>();
-                    foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
-                        references.Add(new AssemblyName(cecilRef.FullName));
 
                     foreach (var factory in _factories)
                     {
                         log.Debug($"Trying {factory.GetType().Name}");
 
-                        foreach (var reference in references)
+                        foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
                         {
-                            if (factory.IsSupportedTestFramework(reference))
+                            var assemblyName = new AssemblyName(cecilRef.FullName);
+                            if (factory.IsSupportedTestFramework(assemblyName))
                             {
 #if NETFRAMEWORK
-                                return factory.GetDriver(domain, reference);
+                                return factory.GetDriver(domain, package.ID, assemblyName);
 #else
-                                return factory.GetDriver(reference);
+                                return factory.GetDriver(package.ID, assemblyName);
 #endif
                             }
                         }
@@ -111,14 +108,14 @@ namespace NUnit.Engine.Drivers
             }
             catch (BadImageFormatException ex)
             {
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, ex.Message);
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, ex.Message);
             }
 
             if (skipNonTestAssemblies)
-                return new SkippedAssemblyFrameworkDriver(assemblyPath);
+                return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
             else
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, string.Format("No suitable tests found in '{0}'.\n" +
-                                                                              "Either assembly contains no tests or proper test driver has not been found.", assemblyPath));
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, 
+                    $"No suitable tests found in '{assemblyPath}'.\r\nEither assembly contains no tests or proper test driver has not been found.");
         }
     }
 }
