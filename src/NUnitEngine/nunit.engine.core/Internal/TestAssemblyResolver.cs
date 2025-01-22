@@ -5,7 +5,6 @@
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Win32;
-using NUnit.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

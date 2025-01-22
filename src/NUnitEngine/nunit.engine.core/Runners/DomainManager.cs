@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Security;
 using System.Security.Policy;
 using System.Security.Principal;
-using NUnit.Common;
 using NUnit.Engine.Internal;
 using System.Linq;
 

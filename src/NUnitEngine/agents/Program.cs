@@ -4,10 +4,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security;
-using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Agents;
-using NUnit.Engine.Internal;
 
 #if NETFRAMEWORK
 using RuntimeInformation = NUnit.Engine.Internal.Backports.RuntimeInformation;

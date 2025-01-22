@@ -9,9 +9,9 @@ using NUnit.Engine;
 
 #nullable enable
 
-namespace NUnit.Common
+namespace NUnit
 {
-    internal static class ExceptionHelper
+    public static class ExceptionHelper
     {
         /// <summary>
         /// Builds up a message, using the Message field of the specified exception

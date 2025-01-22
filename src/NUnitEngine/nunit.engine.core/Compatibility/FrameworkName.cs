@@ -3,7 +3,6 @@
 #if NET20 || NET35
 using System;
 using System.Diagnostics;
-using NUnit.Common;
 
 // NOTE: Since the .NET 4.5 engine refers to this assembly, we can't define
 // FrameworkName in the System.Runtime.Versioning namespace.

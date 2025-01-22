@@ -8,7 +8,6 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
-using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {

@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
