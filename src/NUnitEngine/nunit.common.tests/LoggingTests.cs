@@ -3,7 +3,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Internal.Logging
+namespace NUnit.Engine
 {
     public class LoggingTests
     {
