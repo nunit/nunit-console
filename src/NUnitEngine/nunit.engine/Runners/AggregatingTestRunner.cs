@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Engine.Internal;
 
-using NUnit.Common;
-
 namespace NUnit.Engine.Runners
 {
     /// <summary>

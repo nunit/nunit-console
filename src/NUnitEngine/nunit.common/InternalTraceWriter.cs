@@ -1,8 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 using System.IO;
-using NUnit.Common;
 
-namespace NUnit.Engine.Internal
+namespace NUnit
 {
     /// <summary>
     /// A trace listener that writes to a separate file per domain

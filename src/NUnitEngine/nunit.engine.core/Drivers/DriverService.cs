@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using NUnit.Common;
-using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
 using TestCentric.Metadata;
@@ -18,7 +16,7 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class DriverService : IDriverService
     {
-        static readonly ILogger log = InternalTrace.GetLogger("DriverService");
+        static readonly Logger log = InternalTrace.GetLogger("DriverService");
 
         readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 

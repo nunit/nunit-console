@@ -2,13 +2,14 @@
 
 using System;
 using System.IO;
+using NUnit.Engine;
 
-namespace NUnit.Engine.Internal
+namespace NUnit
 {
     /// <summary>
     /// Provides internal logging to the NUnit framework
     /// </summary>
-    public class Logger : ILogger
+    public class Logger
     {
         private const string TimeFmt = "HH:mm:ss.fff";
         private const string TraceFmt = "{0} {1,-5} [{2,2}] {3}: {4}";

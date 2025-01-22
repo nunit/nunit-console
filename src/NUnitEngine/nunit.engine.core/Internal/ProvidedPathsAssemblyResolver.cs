@@ -10,7 +10,7 @@ namespace NUnit.Engine.Internal
 {
     public class ProvidedPathsAssemblyResolver
     {
-        static readonly ILogger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
 
         static readonly string THIS_ASSEMBLY_LOCATION = Assembly.GetExecutingAssembly().Location;
 

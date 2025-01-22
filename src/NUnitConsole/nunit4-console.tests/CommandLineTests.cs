@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using NUnit.Common;
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.ConsoleRunner.Options;

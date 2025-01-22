@@ -3,7 +3,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using NUnit.Common;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Communication.Messages;

@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Xsl;
-using NUnit.Common;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services

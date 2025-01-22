@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using NSubstitute;
-using NUnit.Common;
 
 namespace NUnit.ConsoleRunner.Options
 {

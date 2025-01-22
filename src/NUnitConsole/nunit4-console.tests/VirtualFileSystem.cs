@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Common;
 using System.IO;
 
 namespace NUnit.ConsoleRunner

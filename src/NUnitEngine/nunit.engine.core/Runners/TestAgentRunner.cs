@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using NUnit.Common;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;

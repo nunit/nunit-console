@@ -149,6 +149,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnit3.2", "src\TestData\NU
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnit3.10", "src\TestData\NUnit3.10\NUnit3.10.csproj", "{0555B97D-E918-455B-951C-74EFCDA8790A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.common", "src\NUnitEngine\nunit.common\nunit.common.csproj", "{542685E5-8C2E-4425-ADD1-C45B55AFB964}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -267,6 +269,10 @@ Global
 		{0555B97D-E918-455B-951C-74EFCDA8790A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0555B97D-E918-455B-951C-74EFCDA8790A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0555B97D-E918-455B-951C-74EFCDA8790A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{542685E5-8C2E-4425-ADD1-C45B55AFB964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{542685E5-8C2E-4425-ADD1-C45B55AFB964}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{542685E5-8C2E-4425-ADD1-C45B55AFB964}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{542685E5-8C2E-4425-ADD1-C45B55AFB964}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -311,6 +317,7 @@ Global
 		{56416AD9-8E7B-4F72-B0E1-E75A024431F8} = {D31607D2-D689-488B-9F9F-92F47AC1D7F6}
 		{8AFBB856-700A-4CCC-AE0E-9B622178E1E0} = {D31607D2-D689-488B-9F9F-92F47AC1D7F6}
 		{0555B97D-E918-455B-951C-74EFCDA8790A} = {D31607D2-D689-488B-9F9F-92F47AC1D7F6}
+		{542685E5-8C2E-4425-ADD1-C45B55AFB964} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

@@ -38,6 +38,8 @@
     <file src="agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
     <file src="agents/net462/nunit.engine.core.dll" target="tools/agents/net462" />
     <file src="agents/net462/nunit.engine.core.pdb" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.common.dll" target="tools/agents/net462" />
+    <file src="agents/net462/nunit.common.pdb" target="tools/agents/net462" />
     <file src="agents/net462/testcentric.metadata.dll" target="tools/agents/net462" />
 
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll" target="tools/agents/netcoreapp3.1" />
@@ -50,6 +52,8 @@
     <file src="agents/netcoreapp3.1/nunit.engine.api.xml" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit.engine.core.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit.engine.core.pdb" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.common.dll" target="tools/agents/netcoreapp3.1" />
+    <file src="agents/netcoreapp3.1/nunit.common.pdb" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/testcentric.metadata.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/netcoreapp3.1" />
 
@@ -63,6 +67,8 @@
     <file src="agents/net6.0/nunit.engine.api.xml" target="tools/agents/net6.0" />
     <file src="agents/net6.0/nunit.engine.core.dll" target="tools/agents/net6.0" />
     <file src="agents/net6.0/nunit.engine.core.pdb" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.common.dll" target="tools/agents/net6.0" />
+    <file src="agents/net6.0/nunit.common.pdb" target="tools/agents/net6.0" />
     <file src="agents/net6.0/testcentric.metadata.dll" target="tools/agents/net6.0" />
     <file src="agents/net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net6.0" />
 
@@ -76,6 +82,8 @@
     <file src="agents/net7.0/nunit.engine.api.xml" target="tools/agents/net7.0" />
     <file src="agents/net7.0/nunit.engine.core.dll" target="tools/agents/net7.0" />
     <file src="agents/net7.0/nunit.engine.core.pdb" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.common.dll" target="tools/agents/net7.0" />
+    <file src="agents/net7.0/nunit.common.pdb" target="tools/agents/net7.0" />
     <file src="agents/net7.0/testcentric.metadata.dll" target="tools/agents/net7.0" />
     <file src="agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
 
@@ -89,6 +97,8 @@
     <file src="agents/net8.0/nunit.engine.api.xml" target="tools/agents/net8.0" />
     <file src="agents/net8.0/nunit.engine.core.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/nunit.engine.core.pdb" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.common.dll" target="tools/agents/net8.0" />
+    <file src="agents/net8.0/nunit.common.pdb" target="tools/agents/net8.0" />
     <file src="agents/net8.0/testcentric.metadata.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
 
@@ -100,6 +110,8 @@
     <file src="net462/nunit.engine.api.xml" target="tools" />
     <file src="net462/nunit.engine.core.dll" target="tools" />
     <file src="net462/nunit.engine.core.pdb" target="tools" />
+    <file src="net462/nunit.common.dll" target="tools" />
+    <file src="net462/nunit.common.pdb" target="tools" />
     <file src="net462/nunit.engine.dll" target="tools" />
     <file src="net462/nunit.engine.pdb" target="tools" />
     <file src="net462/testcentric.metadata.dll" target="tools" />
