@@ -19,23 +19,25 @@ namespace NUnit.Engine.Extensibility
         /// <param name="reference">An AssemblyName referring to the possible test framework.</param>
         bool IsSupportedTestFramework(AssemblyName reference);
 
-#if NETSTANDARD || NETCOREAPP
-        /// <summary>
-        /// Gets a driver for a given test assembly and a framework
-        /// which the assembly is already known to reference.
-        /// </summary>
-        /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        /// <returns></returns>
-        IFrameworkDriver GetDriver(AssemblyName reference);
-#else
+#if NETFRAMEWORK
         /// <summary>
         /// Gets a driver for a given test assembly and a framework
         /// which the assembly is already known to reference.
         /// </summary>
         /// <param name="domain">The domain in which the assembly will be loaded</param>
+        /// <param name="id">The driver id.</param>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
         /// <returns></returns>
-        IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference);
+        IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference);
+#else
+        /// <summary>
+        /// Gets a driver for a given test assembly and a framework
+        /// which the assembly is already known to reference.
+        /// </summary>
+        /// <param name="id">The driver id.</param>
+        /// <param name="reference">An AssemblyName referring to the test framework.</param>
+        /// <returns></returns>
+        IFrameworkDriver GetDriver(string id, AssemblyName reference);
 #endif
     }
 }

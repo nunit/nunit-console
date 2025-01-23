@@ -7,7 +7,7 @@ using NUnit.Framework;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 
-namespace NUnit.Engine.Services.Tests
+namespace NUnit.Engine.Services
 {
     [TestFixture]
     public class DriverServiceTests
@@ -23,42 +23,25 @@ namespace NUnit.Engine.Services.Tests
         [TestCaseSource(nameof(DriverSelectionTestCases))]
         public void CorrectDriverIsUsed(string fileName, bool skipNonTestAssemblies, Type expectedType)
         {
-            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, Path.Combine(TestContext.CurrentContext.TestDirectory, fileName), null, skipNonTestAssemblies);
+            var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, fileName);
+            var driver = _driverService.GetDriver(AppDomain.CurrentDomain, new TestPackage(assemblyPath), assemblyPath, null, skipNonTestAssemblies);
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
 
         static TestCaseData[] DriverSelectionTestCases = new[]
         {
-            // TODO: make commented tests work
-#if NETFRAMEWORK
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnit3FrameworkDriver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnit3FrameworkDriver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnit3FrameworkDriver)),
-#elif NET5_0_OR_GREATER
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetCore31Driver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-#elif NETCOREAPP3_1
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetCore31Driver)),
-            //new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetCore31Driver)),
-// TODO: This is never used. We need to test net standard driver in some way, possibly
-// by forcing it's use in a separate test.
-#elif NETCOREAPP2_1
-            new TestCaseData("mock-assembly.dll", false, typeof(NUnitNetStandardDriver)),
-            new TestCaseData("mock-assembly.dll", true, typeof(NUnitNetStandardDriver)),
-            new TestCaseData("notest-assembly.dll", false, typeof(NUnitNetStandardDriver)),
-#endif
-// Invalid cases should work with all target runtimes
+            new TestCaseData("mock-assembly.dll", false, typeof(NUnitFrameworkDriver)),
+            new TestCaseData("mock-assembly.dll", true, typeof(NUnitFrameworkDriver)),
+            new TestCaseData("notest-assembly.dll", false, typeof(NUnitFrameworkDriver)).Ignore("Assembly not present"),
+            new TestCaseData("notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver)).Ignore("Assembly not present"),
+
+            // Invalid cases should work with all target runtimes
             new TestCaseData("mock-assembly.pdb", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("nunit.engine.core.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("nunit.engine.core.dll", true, typeof(SkippedAssemblyFrameworkDriver))
-//#if !NET5_0_OR_GREATER // Not yet working
-//            new TestCaseData"notest-assembly.dll", true, typeof(SkippedAssemblyFrameworkDriver))
-//#endif
         };
 
         [Test]

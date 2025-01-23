@@ -46,6 +46,27 @@
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Guard.cs" Link="Guard.cs" />
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\CallerArgumentExpressionAttribute.cs" Link="CallerArgumentExpressionAttribute.cs" />
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
+    <Compile Include="..\nunit4-console\ColorConsole.cs" Link="ColorConsole.cs" />
+    <Compile Include="..\nunit4-console\ColorConsoleWriter.cs" Link="ColorConsoleWriter.cs" />
+    <Compile Include="..\nunit4-console\ColorStyle.cs" Link="ColorStyle.cs" />
+    <Compile Include="..\nunit4-console\ConsoleOptions.cs" Link="ConsoleOptions.cs" />
+    <Compile Include="..\nunit4-console\ConsoleRunner.cs" Link="ConsoleRunner.cs" />
+    <Compile Include="..\nunit4-console\ConsoleTestResult.cs" Link="ConsoleTestResult.cs" />
+    <Compile Include="..\nunit4-console\ExtendedTextWrapper.cs" Link="ExtendedTextWrapper.cs" />
+    <Compile Include="..\nunit4-console\ExtendedTextWriter.cs" Link="ExtendedTextWriter.cs" />
+    <Compile Include="..\nunit4-console\FileSystem.cs" Link="FileSystem.cs" />
+    <Compile Include="..\nunit4-console\FrameworkPackageSettings.cs" Link="FrameworkPackageSettings.cs" />
+    <Compile Include="..\nunit4-console\Options\DefaultOptionsProvider.cs" Link="Options\DefaultOptionsProvider.cs" />
+    <Compile Include="..\nunit4-console\Options\IDefaultOptionsProvider.cs" Link="Options\IDefaultOptionsProvider.cs" />
+    <Compile Include="..\nunit4-console\Options\OptionParser.cs" Link="Options\OptionParser.cs" />
+    <Compile Include="..\nunit4-console\Options\Options.cs" Link="Options\Options.cs" />
+    <Compile Include="..\nunit4-console\Options\OutputSpecification.cs" Link="Options\OutputSpecification.cs" />
+    <Compile Include="..\nunit4-console\Options\TestNameParser.cs" Link="Options\TestNameParser.cs" />
+    <Compile Include="..\nunit4-console\ResultReporter.cs" Link="ResultReporter.cs" />
+    <Compile Include="..\nunit4-console\ResultSummary.cs" Link="ResultSummary.cs" />
+    <Compile Include="..\nunit4-console\SafeAttributeAccess.cs" Link="SafeAttributeAccess.cs" />
+    <Compile Include="..\nunit4-console\TestEventHandler.cs" Link="TestEventHandler.cs" />
+    <Compile Include="..\nunit4-console\Utilities\SaveConsoleOutput.cs" Link="Utilities\SaveConsoleOutput.cs" />
     <Content Include="..\..\..\LICENSE.txt" Link="LICENSE.txt" />
     <Content Include="..\..\..\NOTICES.txt" Link="NOTICES.txt" />
     <None Include="..\..\..\README.md">
