@@ -8,11 +8,7 @@ namespace NUnit.Engine.Tests
     {
         static int Main(string[] args)
         {
-#if NETFRAMEWORK
             return new NUnitLite.TextRunner(typeof(Program).Assembly).Execute(args);
-#else
-            return new NUnitLite.TextRunner(typeof(Program).GetTypeInfo().Assembly).Execute(args);
-#endif
         }
     }
 }

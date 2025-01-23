@@ -65,8 +65,4 @@
     <None Include="App.config" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Internal\Logging\" />
-  </ItemGroup>
-
 </Project>
