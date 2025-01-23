@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Drivers
@@ -18,7 +17,7 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         class NUnitFrameworkApi2009 : NUnitFrameworkApi
         {
-            static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnitFrameworkApi2009));
+            static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkApi2009));
 
             const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
             const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";

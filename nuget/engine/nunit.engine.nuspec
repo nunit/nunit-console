@@ -39,6 +39,8 @@
     <file src="net462/nunit.engine.pdb" target="lib/net462" />
     <file src="net462/nunit.engine.core.dll" target="lib/net462" />
     <file src="net462/nunit.engine.core.pdb" target="lib/net462" />
+    <file src="net462/nunit.common.dll" target="lib/net462" />
+    <file src="net462/nunit.common.pdb" target="lib/net462" />
     <file src="net462/nunit.engine.api.dll" target="lib/net462" />
     <file src="net462/nunit.engine.api.pdb" target="lib/net462" />
     <file src="net462/testcentric.metadata.dll" target="lib/net462" />
@@ -48,6 +50,8 @@
     <file src="net8.0/nunit.engine.pdb" target="lib/net8.0" />
     <file src="net8.0/nunit.engine.core.dll" target="lib/net8.0" />
     <file src="net8.0/nunit.engine.core.pdb" target="lib/net8.0" />
+    <file src="net8.0/nunit.common.dll" target="lib/net8.0" />
+    <file src="net8.0/nunit.common.pdb" target="lib/net8.0" />
     <file src="net8.0/nunit.engine.api.dll" target="lib/net8.0" />
     <file src="net8.0/nunit.engine.api.pdb" target="lib/net8.0" />
     <file src="net8.0/testcentric.metadata.dll" target="lib/net8.0" />
@@ -62,6 +66,8 @@
     <file src="agents/net462/nunit-agent-net462-x86.exe.config" target="agents/net462" />
     <file src="agents/net462/nunit.engine.core.dll" target="agents/net462" />
     <file src="agents/net462/nunit.engine.core.pdb" target="agents/net462" />
+    <file src="agents/net462/nunit.common.dll" target="agents/net462" />
+    <file src="agents/net462/nunit.common.pdb" target="agents/net462" />
     <file src="agents/net462/nunit.engine.api.dll" target="agents/net462" />
     <file src="agents/net462/nunit.engine.api.pdb" target="agents/net462" />
     <file src="agents/net462/testcentric.metadata.dll" target="agents/net462" />
@@ -73,6 +79,8 @@
     <file src="agents/net8.0/nunit-agent-net80.runtimeconfig.json" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.engine.core.dll" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.engine.core.pdb" target="agents/net8.0" />
+    <file src="agents/net8.0/nunit.common.dll" target="agents/net8.0" />
+    <file src="agents/net8.0/nunit.common.pdb" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.engine.api.dll" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.engine.api.pdb" target="agents/net8.0" />
     <file src="agents/net8.0/testcentric.metadata.dll" target="agents/net8.0" />

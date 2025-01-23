@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
-using NUnit.Common;
 using NUnit.Engine.Internal;
 
 namespace NUnit.Engine

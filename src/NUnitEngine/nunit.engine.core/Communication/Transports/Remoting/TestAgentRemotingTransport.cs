@@ -5,7 +5,6 @@ using System;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
-using NUnit.Common;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 

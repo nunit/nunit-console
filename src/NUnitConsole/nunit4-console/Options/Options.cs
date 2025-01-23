@@ -171,7 +171,6 @@ using System.Security.Permissions;
 #endif
 using System.Text;
 using System.Text.RegularExpressions;
-using NUnit.Common;
 
 
 #if LINQ

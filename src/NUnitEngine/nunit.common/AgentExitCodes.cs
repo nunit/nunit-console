@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-namespace NUnit.Common
+namespace NUnit
 {
-    internal static class AgentExitCodes
+    public static class AgentExitCodes
     {
         public const int OK = 0;
         public const int PARENT_PROCESS_TERMINATED = -1;

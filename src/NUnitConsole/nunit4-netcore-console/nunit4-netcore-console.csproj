@@ -42,10 +42,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\NUnitEngine\nunit.engine.core\EnginePackageSettings.cs" Link="EnginePackageSettings.cs" />
-    <Compile Include="..\..\NUnitEngine\nunit.engine.core\Guard.cs" Link="Guard.cs" />
-    <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\CallerArgumentExpressionAttribute.cs" Link="CallerArgumentExpressionAttribute.cs" />
-    <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
     <Compile Include="..\nunit4-console\ColorConsole.cs" Link="ColorConsole.cs" />
     <Compile Include="..\nunit4-console\ColorConsoleWriter.cs" Link="ColorConsoleWriter.cs" />
     <Compile Include="..\nunit4-console\ColorStyle.cs" Link="ColorStyle.cs" />
@@ -78,6 +74,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\NUnitEngine\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
 

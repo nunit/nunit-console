@@ -16,7 +16,7 @@ namespace NUnit.Engine.Internal
 
             Assert.That(node.Name, Is.EqualTo("myelement"));
             Assert.That(node.Attributes, Is.Not.Null);
-            Assert.That(node.Attributes.Count, Is.EqualTo(0));
+            Assert.That(node.Attributes!.Count, Is.EqualTo(0));
             Assert.That(node.ChildNodes.Count, Is.EqualTo(0));
         }
 
@@ -30,7 +30,7 @@ namespace NUnit.Engine.Internal
 
             Assert.That(node.Name, Is.EqualTo("person"));
             Assert.That(node.Attributes, Is.Not.Null);
-            Assert.That(node.Attributes.Count, Is.EqualTo(3));
+            Assert.That(node.Attributes!.Count, Is.EqualTo(3));
             Assert.That(node.ChildNodes.Count, Is.EqualTo(0));
             Assert.That(node.Attributes["name"]?.Value, Is.EqualTo("Fred"));
             Assert.That(node.Attributes["age"]?.Value, Is.EqualTo("42"));

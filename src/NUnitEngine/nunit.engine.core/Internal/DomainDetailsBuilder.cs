@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using NUnit.Common;
 
 namespace NUnit.Engine.Internal
 {
@@ -14,7 +13,7 @@ namespace NUnit.Engine.Internal
     /// </summary>
     internal static class DomainDetailsBuilder
     {
-        private static readonly ILogger Log = InternalTrace.GetLogger(nameof(DomainDetailsBuilder));
+        private static readonly Logger Log = InternalTrace.GetLogger(nameof(DomainDetailsBuilder));
 
         /// <summary>
         /// Get human readable string containing details of application domain.

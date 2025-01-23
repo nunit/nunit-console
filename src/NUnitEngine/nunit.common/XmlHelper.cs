@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
-using NUnit.Common;
 
 namespace System.Runtime.CompilerServices
 {
@@ -12,7 +11,7 @@ namespace System.Runtime.CompilerServices
     sealed class ExtensionAttribute : Attribute { }
 }
 
-namespace NUnit.Engine.Internal
+namespace NUnit
 {
     /// <summary>
     /// XmlHelper provides static methods for basic XML operations.

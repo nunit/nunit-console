@@ -2,9 +2,9 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using NUnit.Common;
+using NUnit.Engine;
 
-namespace NUnit.Engine.Internal
+namespace NUnit
 {
     /// <summary>
     /// InternalTrace provides facilities for tracing the execution

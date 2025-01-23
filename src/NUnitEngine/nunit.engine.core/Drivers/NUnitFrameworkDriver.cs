@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Common;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Extensibility;
 
@@ -16,7 +15,7 @@ namespace NUnit.Engine.Drivers
     public class NUnitFrameworkDriver : IFrameworkDriver
     {
         static readonly Version MINIMUM_NUNIT_VERSION = new Version(3, 2, 0);
-        static readonly ILogger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
+        static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
         readonly NUnitFrameworkApi _api;
 

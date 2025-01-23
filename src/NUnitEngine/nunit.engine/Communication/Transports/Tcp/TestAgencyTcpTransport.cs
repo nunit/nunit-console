@@ -3,8 +3,6 @@
 using System;
 using System.Net;
 using System.Threading;
-using NUnit.Common;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
