@@ -1,7 +1,9 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Engine.Internal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -62,6 +64,8 @@ namespace NUnit.Engine.Runners
                 return  _order.CompareTo(other._order) * -1;
             }
         }
+
+        private static readonly ILogger log = InternalTrace.GetLogger(nameof(InProgressItem));
 
         // items are keyed by id
         private readonly Dictionary<string, InProgressItem> _itemsInProcess = new Dictionary<string, InProgressItem>();

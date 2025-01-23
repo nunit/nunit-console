@@ -2,24 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Xml;
 
-namespace NUnit.Engine.Extensibility
+namespace NUnit.Engine.Drivers
 {
-    /// <summary>
-    /// The IFrameworkDriver interface is implemented by a class that
-    /// is able to use an external framework to explore or run tests
-    /// under the engine.
-    /// </summary>
-    public interface IFrameworkDriver
+    public interface NUnitFrameworkApi
     {
-        /// <summary>
-        /// Gets and sets the unique identifier for this driver,
-        /// used to ensure that test ids are unique across drivers.
-        /// </summary>
-        string ID { get; }
-
         /// <summary>
         /// Loads the tests in an assembly.
         /// </summary>
@@ -34,12 +21,19 @@ namespace NUnit.Engine.Extensibility
         int CountTestCases(string filter);
 
         /// <summary>
-        /// Executes the tests in an assembly.
+        /// Executes the tests in an assembly synchronously.
         /// </summary>
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A XML string representing the filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
         string Run(ITestEventListener? listener, string filter);
+
+        /// <summary>
+        /// Executes the tests in an assembly asynchronously.
+        /// </summary>
+        /// <param name="callback">A callback that receives XML progress notices</param>
+        /// <param name="filter">A filter that controls which tests are executed</param>
+        void RunAsync(Action<string> callback, string filter);
 
         /// <summary>
         /// Returns information about the tests in an assembly.

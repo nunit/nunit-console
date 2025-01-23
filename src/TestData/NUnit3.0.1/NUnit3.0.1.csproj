@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>NUnit.TestData</RootNamespace>
+    <TargetFramework>net462</TargetFramework>
+    <OutputPath>../../../bin/$(Configuration)/testdata/nunit3.0.1</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.0.1" />
+  </ItemGroup>
+
+</Project>

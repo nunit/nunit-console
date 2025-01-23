@@ -14,7 +14,6 @@ namespace NUnit.Engine.Drivers
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
     public abstract class NotRunnableFrameworkDriverTests
     {
-        private const string DRIVER_ID = "99";
         private const string EXPECTED_ID = "99-1";
 
         protected string? _expectedRunState;
@@ -95,7 +94,6 @@ namespace NUnit.Engine.Drivers
         private IFrameworkDriver GetDriver(string filePath)
         {
             IFrameworkDriver driver = CreateDriver(filePath);
-            driver.ID = DRIVER_ID;
             return driver;
         }
 
@@ -126,7 +124,7 @@ namespace NUnit.Engine.Drivers
 
         protected override IFrameworkDriver CreateDriver(string filePath)
         {
-            return new InvalidAssemblyFrameworkDriver(filePath, _expectedReason ?? "Not Specified");
+            return new InvalidAssemblyFrameworkDriver(filePath, "99", _expectedReason ?? "Not Specified");
         }
     }
 
@@ -142,7 +140,7 @@ namespace NUnit.Engine.Drivers
 
         protected override IFrameworkDriver CreateDriver(string filePath)
         {
-            return new SkippedAssemblyFrameworkDriver(filePath);
+            return new SkippedAssemblyFrameworkDriver(filePath, "99");
         }
     }
 }

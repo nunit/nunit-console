@@ -36,16 +36,17 @@ namespace NUnit.Engine.Drivers
         protected string _label;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public NotRunnableFrameworkDriver(string assemblyPath, string message)
+        public NotRunnableFrameworkDriver(string assemblyPath, string id, string message)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         {
             _name = Escape(Path.GetFileName(assemblyPath));
             _fullname = Escape(Path.GetFullPath(assemblyPath));
             _message = Escape(message);
             _type = new List<string> { ".dll", ".exe" }.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
+            ID = id;
         }
 
-        public string ID { get; set; }
+        public string ID { get; }
 
         
         public string Load(string assemblyPath, IDictionary<string, object> settings)
@@ -90,21 +91,13 @@ namespace NUnit.Engine.Drivers
                 _type, TestID, _name, _fullname, _runstate, _message);
         }
 
-        private string TestID
-        {
-            get
-            {
-                return string.IsNullOrEmpty(ID)
-                    ? "1"
-                    : ID + "-1";
-            }
-        }
+        private string TestID => ID + "-1";
     }
 
     public class InvalidAssemblyFrameworkDriver :NotRunnableFrameworkDriver
     {
-        public InvalidAssemblyFrameworkDriver(string assemblyPath, string message)
-            : base(assemblyPath, message)
+        public InvalidAssemblyFrameworkDriver(string assemblyPath, string id, string message)
+            : base(assemblyPath, id, message)
         {
             _runstate = "NotRunnable";
             _result = "Failed";
@@ -114,8 +107,8 @@ namespace NUnit.Engine.Drivers
 
     public class SkippedAssemblyFrameworkDriver : NotRunnableFrameworkDriver
     {
-        public SkippedAssemblyFrameworkDriver(string assemblyPath)
-            : base(assemblyPath, "Skipping non-test assembly")
+        public SkippedAssemblyFrameworkDriver(string assemblyPath, string id)
+            : base(assemblyPath, id, "Skipping non-test assembly")
         {
             _runstate = "Runnable";
             _result = "Skipped";

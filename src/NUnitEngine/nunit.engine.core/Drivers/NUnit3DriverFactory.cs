@@ -25,30 +25,31 @@ namespace NUnit.Engine.Drivers
 
 #if NETFRAMEWORK
         /// <summary>
-        /// Gets a driver for a given test assembly and a framework
-        /// which the assembly is already known to reference.
+        /// Gets a driver for a given test framework.
         /// </summary>
         /// <param name="domain">The domain in which the assembly will be loaded</param>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        /// <returns></returns>
-        public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
+        /// <returns>An IFrameworkDriver</returns>
+        public IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference)
         {
+            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
 
-            return new NUnit3FrameworkDriver(domain, reference);
+            log.Info("Using NUnitFrameworkDriver");
+            return new NUnitFrameworkDriver(domain, id, reference);
         }
 #else
         /// <summary>
-        /// Gets a driver for a given test assembly and a framework
-        /// which the assembly is already known to reference.
+        /// Gets a driver for a given test framework.
         /// </summary>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
         /// <returns></returns>
-        public IFrameworkDriver GetDriver(AssemblyName reference)
+        public IFrameworkDriver GetDriver(string id, AssemblyName reference)
         {
+            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
-            log.Info("Using NUnitNetCore31Driver");
-            return new NUnitNetCore31Driver();
+            log.Info("Using NUnitFrameworkDriver");
+            return new NUnitFrameworkDriver(id, reference);
         }
 #endif
     }

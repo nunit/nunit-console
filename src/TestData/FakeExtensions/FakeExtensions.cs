@@ -12,10 +12,10 @@ namespace NUnit.Engine.Tests
     [Extension]
     public class DummyFrameworkDriverExtension : IDriverFactory
     {
-#if !NETFRAMEWORK
-        public IFrameworkDriver GetDriver(AssemblyName reference)
+#if NETFRAMEWORK
+        public IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference)
 #else
-        public IFrameworkDriver GetDriver(AppDomain domain, AssemblyName reference)
+        public IFrameworkDriver GetDriver(string id, AssemblyName reference)
 #endif
         {
             throw new NotImplementedException();

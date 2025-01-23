@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -13,22 +12,37 @@ using NUnit.Engine.Internal;
 namespace NUnit.Engine.Drivers
 {
     // Functional tests of the NUnitFrameworkDriver calling into the framework.
-    public class NUnit3FrameworkDriverTests
+#if NETFRAMEWORK
+    [TestFixture("2009")]
+#endif
+    [TestFixture("2018")]
+    public class NUnitFrameworkDriverTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
-        private const string LOAD_MESSAGE = "Method called without calling Load first";
+        private const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
 
         private IDictionary<string, object> _settings = new Dictionary<string, object>();
 
-        private NUnit3FrameworkDriver _driver;
+        private NUnitFrameworkDriver _driver;
         private string _mockAssemblyPath;
+
+        private string _whichApi;
+        public NUnitFrameworkDriverTests(string whichApi)
+        {
+            _whichApi = whichApi;
+        }
 
         [SetUp]
         public void CreateDriver()
         {
-            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
+            var nunitRef = typeof(TestAttribute).Assembly.GetName();
             _mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
-            _driver = new NUnit3FrameworkDriver(AppDomain.CurrentDomain, assemblyName);
+
+#if NETFRAMEWORK
+            _driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, _whichApi, "99", nunitRef);
+#else
+            _driver = new NUnitFrameworkDriver("99", nunitRef);
+#endif
         }
 
         [Test]
@@ -110,13 +124,41 @@ namespace NUnit.Engine.Drivers
         }
 
         [Test]
-        public void RunTestsAction_WithInvalidFilterElement_ThrowsNUnitEngineException()
+        public void RunTestsAction_WithInvalidFilterElement_ThrowsException()
         {
             _driver.Load(_mockAssemblyPath, _settings);
 
             var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
-            Assert.That(ex, Is.TypeOf<NUnitEngineException>());
+
+            if (_whichApi == "2018")
+            {
+                Assert.That(ex, Is.TypeOf<TargetInvocationException>());
+                Assert.That(ex.InnerException, Is.TypeOf<ArgumentException>());
+            }
+            else
+                Assert.That(ex, Is.TypeOf<NUnitEngineException>());
+        }
+
+#if NETFRAMEWORK
+        // Nested Class tests Api Selection in the driver
+        public class ApiSelectionTests()
+        {
+            [TestCase("4.2.2", "2018")]
+            [TestCase("3.14.0", "2018")]
+            [TestCase("3.2.0", "2018")]
+            [TestCase("3.0.1", "2009")]
+            [TestCase("3.0.0", "2009")]
+            public void CorrectApiIsSelected(string nunitVersion, string apiVersion)
+            {
+                var driver = new NUnitFrameworkDriver(AppDomain.CurrentDomain, "99", new AssemblyName()
+                {
+                    Name = "nunit.framework",
+                    Version = new Version(nunitVersion)
+                });
+
+                Assert.That(driver.API, Is.EqualTo(apiVersion));
+            }
         }
 
         private class CallbackEventHandler : System.Web.UI.ICallbackEventHandler
@@ -133,6 +175,7 @@ namespace NUnit.Engine.Drivers
                 _result = eventArgument;
             }
         }
+#endif
 
         public class NullListener : ITestEventListener
         {
@@ -143,4 +186,3 @@ namespace NUnit.Engine.Drivers
         }
     }
 }
-#endif
