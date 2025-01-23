@@ -42,6 +42,7 @@
     <file src="agents/net462/nunit.common.pdb" target="tools/agents/net462" />
     <file src="agents/net462/testcentric.metadata.dll" target="tools/agents/net462" />
 
+<<<<<<< HEAD
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.pdb" target="tools/agents/netcoreapp3.1" />
     <file src="agents/netcoreapp3.1/nunit-agent-netcore31.dll.config" target="tools/agents/netcoreapp3.1" />
@@ -87,6 +88,8 @@
     <file src="agents/net7.0/testcentric.metadata.dll" target="tools/agents/net7.0" />
     <file src="agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
 
+=======
+>>>>>>> version4
     <file src="agents/net8.0/nunit-agent-net80.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/nunit-agent-net80.pdb" target="tools/agents/net8.0" />
     <file src="agents/net8.0/nunit-agent-net80.dll.config" target="tools/agents/net8.0" />

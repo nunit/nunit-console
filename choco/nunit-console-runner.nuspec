@@ -52,6 +52,7 @@
     <file src = "nunit-agent.exe.ignore" target="tools/agents/net462" />
     <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net462" />
 
+<<<<<<< HEAD
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent-netcore31.dll" target="tools/agents/netcoreapp3.1" />
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent-netcore31.dll.config" target="tools/agents/netcoreapp3.1" />
     <file src = "$BIN_DIR$agents/netcoreapp3.1/nunit-agent-netcore31.deps.json" target="tools/agents/netcoreapp3.1" />
@@ -85,6 +86,8 @@
     <file src = "$BIN_DIR$agents/net7.0/testcentric.metadata.dll" target="tools/agents/net7.0" />
     <file src = "$BIN_DIR$agents/net7.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net7.0" />
 
+=======
+>>>>>>> version4
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.dll.config" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.deps.json" target="tools/agents/net8.0" />

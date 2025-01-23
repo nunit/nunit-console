@@ -8,9 +8,11 @@ namespace NUnit.Engine.Communication.Transports
     /// The ITestAgentTransport interface is implemented by a
     /// class providing communication for a TestAgent.
     /// </summary>
-    public interface ITestAgentTransport : ITransport
+    public interface ITestAgentTransport
     {
         TestAgent Agent { get; }
         ITestEngineRunner CreateRunner(TestPackage package);
+        bool Start();
+        void Stop();
     }
 }
