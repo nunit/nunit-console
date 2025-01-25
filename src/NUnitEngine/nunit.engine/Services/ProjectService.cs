@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {

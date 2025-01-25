@@ -8,6 +8,7 @@ using NUnit.ConsoleRunner.Utilities;
 using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -324,8 +325,8 @@ namespace NUnit.ConsoleRunner
                 {
                     _outWriter.Write(INDENT6 + "Extension: ");
                     _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-                    if(node.TargetFramework != null)
-                        _outWriter.Write(ColorStyle.Value, $"(.NET {node.TargetFramework?.FrameworkVersion})");
+                    //if(node.TargetFramework != null)
+                    //    _outWriter.Write(ColorStyle.Value, $"(.NET {node.TargetFramework?.FrameworkVersion})");
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
 
                     _outWriter.Write(INDENT8 + "Version: ");

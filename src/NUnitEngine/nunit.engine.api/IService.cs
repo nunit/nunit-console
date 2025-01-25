@@ -2,7 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine
 {

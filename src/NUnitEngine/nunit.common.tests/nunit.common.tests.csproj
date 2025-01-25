@@ -12,8 +12,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
-
   <ItemGroup>
     <ProjectReference Include="..\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />

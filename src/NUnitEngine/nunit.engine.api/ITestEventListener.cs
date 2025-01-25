@@ -1,6 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine
 {
