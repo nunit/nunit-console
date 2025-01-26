@@ -30,7 +30,6 @@ namespace NUnit.Extensibility
             AssemblyPath = assemblyPath;
             AssemblyVersion = assemblyVersion;
             TypeName = typeName;
-            //TargetFramework = targetFramework;
             Enabled = true; // By default
         }
 

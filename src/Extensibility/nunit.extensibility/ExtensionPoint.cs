@@ -61,7 +61,7 @@ namespace NUnit.Extensibility
             if (node.Path != Path)
             {
                 string msg = $"Non-matching extension path. Expected {Path} but got {node.Path}.";
-                throw new Exception(msg);
+                throw new NUnitExtensibilityException(msg);
             }
 
             // TODO: Verify that the type is correct using Cecil or Reflection

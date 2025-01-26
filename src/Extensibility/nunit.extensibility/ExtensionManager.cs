@@ -91,7 +91,7 @@ namespace NUnit.Extensibility
                 foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
                 {
                     if (_extensionPointIndex.ContainsKey(attr.Path))
-                        throw new Exception("The Path {attr.Path} is already in use for another extension point.");
+                        throw new NUnitExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
 
                     var ep = new ExtensionPoint(attr.Path, attr.Type)
                     {
@@ -111,12 +111,7 @@ namespace NUnit.Extensibility
                         string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
 
                         if (_extensionPointIndex.ContainsKey(path))
-                        {
-                            string msg = string.Format(
-                                "The Path {0} is already in use for another extension point.",
-                                attr.Path);
-                            throw new Exception(msg);
-                        }
+                            throw new NUnitExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
 
                         var ep = new ExtensionPoint(path, type)
                         {
@@ -429,15 +424,10 @@ namespace NUnit.Extensibility
 
                 _assemblies.Add(candidateAssembly);
             }
-            catch (BadImageFormatException e)
+            catch (Exception) when(fromWildCard)
             {
-                if (!fromWildCard)
-                    throw new Exception($"Specified extension {filePath} could not be read", e);
-            }
-            catch (Exception)
-            {
-                if (!fromWildCard)
-                    throw;
+                // When we are using wildcards, we may reach assemblies built for some other
+                // runtime, which we cannot load. We ignore those assemblies.
             }
         }
 
@@ -540,12 +530,7 @@ namespace NUnit.Extensibility
                 {
                     ep = DeduceExtensionPointFromType(extensionType);
                     if (ep == null)
-                    {
-                        string msg = string.Format(
-                            "Unable to deduce ExtensionPoint for Type {0}. Specify Path on ExtensionAttribute to resolve.",
-                            extensionType.FullName);
-                        throw new Exception(msg);
-                    }
+                        throw new NUnitExtensibilityException($"Unable to deduce ExtensionPoint for Type {extensionType.FullName}. Specify Path on ExtensionAttribute to resolve.");
 
                     node.Path = ep.Path;
                 }
@@ -556,13 +541,7 @@ namespace NUnit.Extensibility
                     // TODO: Remove need for the cast
                     ep = GetExtensionPoint(node.Path) as ExtensionPoint;
                     if (ep == null)
-                    {
-                        string msg = string.Format(
-                            "Unable to locate ExtensionPoint for Type {0}. The Path {1} cannot be found.",
-                            extensionType.FullName,
-                            node.Path);
-                        throw new Exception(msg);
-                    }
+                        throw new NUnitExtensibilityException($"Unable to locate ExtensionPoint for Type {extensionType.FullName}. The Path {node.Path} cannot be found.");
                 }
 
                 ep.Install(node);
@@ -590,7 +569,7 @@ namespace NUnit.Extensibility
             switch (runnerFrameworkName.Identifier)
             {
                 case NETSTANDARD:
-                    throw new Exception($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
+                    throw new NUnit.Engine.NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
 
                 case NETCOREAPP:
                     switch (extensionFrameworkName.Identifier)

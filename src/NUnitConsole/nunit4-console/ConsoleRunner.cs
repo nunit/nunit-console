@@ -325,8 +325,6 @@ namespace NUnit.ConsoleRunner
                 {
                     _outWriter.Write(INDENT6 + "Extension: ");
                     _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-                    //if(node.TargetFramework != null)
-                    //    _outWriter.Write(ColorStyle.Value, $"(.NET {node.TargetFramework?.FrameworkVersion})");
                     _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
 
                     _outWriter.Write(INDENT8 + "Version: ");

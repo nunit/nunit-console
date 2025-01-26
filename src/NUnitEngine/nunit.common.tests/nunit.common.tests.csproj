@@ -12,6 +12,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
+
   <ItemGroup>
     <ProjectReference Include="..\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
@@ -20,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnitLite" Version="4.2.2" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.5.0" />
   </ItemGroup>
 
 </Project>

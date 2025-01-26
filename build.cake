@@ -25,7 +25,6 @@ PackageDefinition NUnitConsoleRunnerNet80Package;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
-//PackageDefinition NUnitConsoleZipPackage;
 
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
 

@@ -2,7 +2,6 @@
 
 using System;
 using System.Reflection;
-using NUnit.Extensibility;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -12,8 +11,8 @@ namespace NUnit.Extensibility
     {
         private static readonly Assembly THIS_ASSEMBLY = Assembly.GetExecutingAssembly();
         private static readonly string THIS_ASSEMBLY_PATH = THIS_ASSEMBLY.Location;
-        private static readonly string THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name;
-        private static readonly Version THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version;
+        private static readonly string THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name.ShouldNotBeNull();
+        private static readonly Version THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version.ShouldNotBeNull();
 
         private ExtensionAssembly _ea;
 

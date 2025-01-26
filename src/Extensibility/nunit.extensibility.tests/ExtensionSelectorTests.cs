@@ -13,10 +13,10 @@ namespace NUnit.Extensibility
     internal class ExtensionSelectorTests
     {
         [Test]
-        public void IsDuplicateOfWithSame()
+        public void IsDuplicateOfWithSameName()
         {
-            var first = MockExtension("Extension1");
-            var second = MockExtension("Extension1");
+            var first = MockExtension("SameExtension");
+            var second = MockExtension("SameExtension");
             Assert.Multiple(() =>
             {
                 Assert.That(first.IsDuplicateOf(second), Is.True);
@@ -25,7 +25,7 @@ namespace NUnit.Extensibility
         }
 
         [Test]
-        public void IsDuplicateOfWithDifferent()
+        public void IsDuplicateOfWithDifferentNames()
         {
             var first = MockExtension("Extension1");
             var second = MockExtension("Extension2");
@@ -47,8 +47,8 @@ namespace NUnit.Extensibility
         [Test]
         public void IsBetterVersionOfChoosesHighestAssemblyVersion()
         {
-            var first = MockExtension(assemblyVersion: new Version(2, 0));
-            var second = MockExtension(assemblyVersion: new Version(4, 7));
+            var first = MockExtension("SameExtension", assemblyVersion: new Version(2, 0));
+            var second = MockExtension("SameExtension", assemblyVersion: new Version(4, 7));
             Assert.Multiple(() =>
             {
                 Assert.That(first.IsBetterVersionOf(second), Is.False);
@@ -59,8 +59,8 @@ namespace NUnit.Extensibility
         [Test]
         public void IsBetterVersionOfChoosesHighestTargetFramework()
         {
-            var first = MockExtension(targetFramework: new Version(2, 0));
-            var second = MockExtension(targetFramework: new Version(4, 7));
+            var first = MockExtension("SameExtension", targetFramework: new Version(2, 0));
+            var second = MockExtension("SameExtension", targetFramework: new Version(4, 7));
             Assert.Multiple(() =>
             {
                 Assert.That(first.IsBetterVersionOf(second), Is.False);
@@ -71,8 +71,8 @@ namespace NUnit.Extensibility
         [Test]
         public void IsBetterVersionOfPrioritisesAssemblyVersionOverTargetFramework()
         {
-            var first = MockExtension(assemblyVersion: new Version(2, 0), targetFramework: new Version(2, 0));
-            var second = MockExtension(assemblyVersion: new Version(1, 0), targetFramework: new Version(4, 7));
+            var first = MockExtension("SameExtension", assemblyVersion: new Version(2, 0), targetFramework: new Version(2, 0));
+            var second = MockExtension("SameExtension", assemblyVersion: new Version(1, 0), targetFramework: new Version(4, 7));
             Assert.Multiple(() =>
             {
                 Assert.That(first.IsBetterVersionOf(second), Is.True);
@@ -83,8 +83,8 @@ namespace NUnit.Extensibility
         [Test]
         public void IsBetterVersionOfPrefersDirectlySpecifiedToWildcard()
         {
-            var first = MockExtension(fromWildcard: false);
-            var second = MockExtension(fromWildcard: true);
+            var first = MockExtension("SameExtension", fromWildcard: false);
+            var second = MockExtension("SameExtension", fromWildcard: true);
             Assert.Multiple(() =>
             {
                 Assert.That(first.IsBetterVersionOf(second), Is.True);
@@ -95,8 +95,8 @@ namespace NUnit.Extensibility
         [Test]
         public void IsBetterVersionOfPrefersNoChangeIfFromWildcard()
         {
-            var first = MockExtension(fromWildcard: true);
-            var second = MockExtension(fromWildcard: true);
+            var first = MockExtension("SameExtension", fromWildcard: true);
+            var second = MockExtension("SameExtension", fromWildcard: true);
             Assert.Multiple(() =>
             {
                 Assert.That(first.IsBetterVersionOf(second), Is.False);
@@ -104,9 +104,10 @@ namespace NUnit.Extensibility
             });
         }
 
-        private static IExtensionAssembly MockExtension(string assemblyName = "ExtensionSelectorTestsExtension",
-            Version assemblyVersion = null,
-            Version targetFramework = null,
+        private static IExtensionAssembly MockExtension(
+            string assemblyName,
+            Version? assemblyVersion = null,
+            Version? targetFramework = null,
             bool fromWildcard = false)
         {
             var sub = Substitute.For<IExtensionAssembly>();
