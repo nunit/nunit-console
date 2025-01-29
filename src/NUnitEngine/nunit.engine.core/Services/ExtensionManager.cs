@@ -170,7 +170,7 @@ namespace NUnit.Engine.Services
         {
             log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
 
-            bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(hostAssembly.Location, "VERIFICATION.txt"));
+            bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(hostAssembly.Location)!, "VERIFICATION.txt"));
             string[] extensionPatterns = isChocolateyPackage
                 ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
                 : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
