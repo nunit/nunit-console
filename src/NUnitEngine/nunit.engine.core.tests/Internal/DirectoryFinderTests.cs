@@ -5,7 +5,7 @@ using System.Linq;
 using SIO = System.IO;
 using NUnit.Framework;
 using NSubstitute;
-using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.FileSystemAccess;
 
 namespace NUnit.Engine.Internal
 {

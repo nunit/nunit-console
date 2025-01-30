@@ -2,10 +2,10 @@
 
 #if NETFRAMEWORK
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine.Drivers
 {
@@ -13,13 +13,13 @@ namespace NUnit.Engine.Drivers
     {
         private const string NUNIT_FRAMEWORK = "nunit.framework";
         private const string NUNITLITE_FRAMEWORK = "nunitlite";
-        private readonly ExtensionNode _driverNode;
+        private readonly IExtensionNode _driverNode;
 
         // TODO: This should be a central service but for now it's local
         private readonly ProvidedPathsAssemblyResolver _resolver;
         bool _resolverInstalled;
 
-        public NUnit2DriverFactory(ExtensionNode driverNode)
+        public NUnit2DriverFactory(IExtensionNode driverNode)
         {
             _driverNode = driverNode;
             _resolver = new ProvidedPathsAssemblyResolver();
@@ -55,7 +55,15 @@ namespace NUnit.Engine.Drivers
                 _resolver.AddPathFromFile(_driverNode.AssemblyPath);
             }
 
-            return (IFrameworkDriver)_driverNode.CreateExtensionObject(domain);
+            return (IFrameworkDriver)AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(
+                _driverNode.AssemblyPath, 
+                _driverNode.TypeName,
+                false, 
+                0, 
+                null, 
+                new object[] { domain, id, reference }, 
+                null, 
+                null).ShouldNotBeNull();
         }
     }
 }

@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnitLite" Version="4.2.2" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.5.0" />
   </ItemGroup>
 
 </Project>

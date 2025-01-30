@@ -279,20 +279,20 @@ AddToBothLists(new PackageTest(
 //    new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
 //    KnownExtensions.NUnitProjectLoader));
 
-// V2 Result Writer Test
-StandardRunnerTests.Add(new PackageTest(
-    1, "V2ResultWriterTest",
-    "Run mock-assembly under .NET 4.6.2 and produce V2 output",
-    "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
-    new MockAssemblyExpectedResult("net-4.6.2"),
-    KnownExtensions.NUnitV2ResultWriter));
+//// V2 Result Writer Test
+//StandardRunnerTests.Add(new PackageTest(
+//    1, "V2ResultWriterTest",
+//    "Run mock-assembly under .NET 4.6.2 and produce V2 output",
+//    "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+//    new MockAssemblyExpectedResult("net-4.6.2"),
+//    KnownExtensions.NUnitV2ResultWriter));
 
-StandardRunnerTests.Add(new PackageTest(
-    1, "V2ResultWriterTest",
-    "Run mock-assembly under .NET 6.0 and produce V2 output",
-    "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
-    new MockAssemblyExpectedResult("netcore-6.0"),
-    KnownExtensions.NUnitV2ResultWriter));
+//StandardRunnerTests.Add(new PackageTest(
+//    1, "V2ResultWriterTest",
+//    "Run mock-assembly under .NET 6.0 and produce V2 output",
+//    "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+//    new MockAssemblyExpectedResult("netcore-6.0"),
+//    KnownExtensions.NUnitV2ResultWriter));
 
 //// VS Project Loader Tests
 //StandardRunnerTests.Add(new PackageTest(

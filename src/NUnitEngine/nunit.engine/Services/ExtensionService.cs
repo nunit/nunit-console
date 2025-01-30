@@ -3,9 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Engine.Extensibility;
-using NUnit.Engine.Internal;
-using NUnit.Engine.Internal.FileSystemAccess;
+using NUnit.Extensibility;
+using NUnit.FileSystemAccess;
 
 namespace NUnit.Engine.Services
 {
