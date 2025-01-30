@@ -5,18 +5,12 @@
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit-console</AssemblyName>
     <TargetFrameworks>net462</TargetFrameworks>
-    <OutputPath>../../../bin/$(Configuration)</OutputPath>
-    <RollForward>Major</RollForward>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Product>NUnit Console Runner</Product>
     <AssemblyTitle>NUnit Console Runner ($(TargetFramework))</AssemblyTitle>
     <Description>The standard command-line runner for NUnit</Description>
   </PropertyGroup>
-
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>

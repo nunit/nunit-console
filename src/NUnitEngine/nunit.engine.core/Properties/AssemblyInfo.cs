@@ -1,8 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-[assembly: AssemblyTrademark("NUnit is a trademark of NUnit Software")]
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("nunit.engine.core.tests, PublicKey=" +
     "002400000480000094000000060200000024000052534131000400000100010031eea370b1984b" +

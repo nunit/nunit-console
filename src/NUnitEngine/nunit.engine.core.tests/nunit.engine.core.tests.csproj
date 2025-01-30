@@ -4,16 +4,9 @@
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <OutputPath>../../../bin/$(Configuration)</OutputPath>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <DebugType>Full</DebugType>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <NoWarn>1505</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Engine Core Tests ($(TargetFramework))</AssemblyTitle>
     <Description>Tests of nunit.engine.core assembly</Description>
   </PropertyGroup>
@@ -21,8 +14,6 @@
   <PropertyGroup>
     <ExposedInternals>true</ExposedInternals>
   </PropertyGroup>
-
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net6.0' OR '$(TargetFramework)'=='net8.0'">
     <PackageReference Include="NUnit" Version="4.2.2" />

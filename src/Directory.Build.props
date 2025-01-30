@@ -1,19 +1,30 @@
+<!-- Top level Directory.Build.props -->
 <Project>
 
     <PropertyGroup>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <!-- Compile and Build Settings -->
         <LangVersion>12</LangVersion>
+        <Features>strict</Features>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Version Condition="'$(Version)'==''">4.0.0.0</Version>
+        <OutputPath>$(MSBuildThisFileDirectory)\..\bin\$(Configuration)\</OutputPath>
+        <CheckEolTargetFramework>false</CheckEolTargetFramework>
+        <RollForward>Major</RollForward>
         <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <!-- Signing Assemblies -->
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/nunit.snk</AssemblyOriginatorKeyFile>
+        <!-- Debugging -->
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <!-- Commonly Used Package Versions -->
+        <AnnotatedReferenceAssemblyVersion>8.0.0</AnnotatedReferenceAssemblyVersion>
+        <!-- Informatinal Settings -->
         <Company>NUnit Software</Company>
+        <Product>NUnit 4 Runner and Engine</Product>
         <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
-        <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Version)'==''">
-        <AssemblyVersion>3.99.0.0</AssemblyVersion>
-        <FileVersion>3.99.0.0</FileVersion>
-        <InformationalVersion>3.99.0.0-VSIDE</InformationalVersion>
+        <Trademark>NUnit is a trademark of NUnit Software</Trademark>
     </PropertyGroup>
 
 </Project>

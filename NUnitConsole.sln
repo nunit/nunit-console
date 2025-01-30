@@ -146,6 +146,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.common.tests", "src\NUnitEngine\nunit.common.tests\nunit.common.tests.csproj", "{F546CFE1-74B0-45D3-A06A-8972D73F4419}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensibility", "Extensibility", "{3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}"
+	ProjectSection(SolutionItems) = preProject
+		src\Extensibility\Directory.Build.props = src\Extensibility\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility.api", "src\Extensibility\nunit.extensibility.api\nunit.extensibility.api.csproj", "{71DE0F2C-C72B-4CBF-99BE-F2DC0FBEDA24}"
 EndProject

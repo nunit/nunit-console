@@ -3,22 +3,12 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
-    <OutputPath>$(MSBuildThisFileDirectory)/../../../bin/$(Configuration)</OutputPath>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/../../nunit.snk</AssemblyOriginatorKeyFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
-
   <PropertyGroup>
-    <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Engine API ($(TargetFramework))</AssemblyTitle>
     <Description>Defines the interfaces used to access the NUnit Engine</Description>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.99.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

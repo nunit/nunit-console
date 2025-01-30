@@ -5,13 +5,9 @@
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit-netcore-console</AssemblyName>
     <TargetFrameworks>net8.0</TargetFrameworks>
-    <OutputPath>../../../bin/$(Configuration)</OutputPath>
-    <RollForward>Major</RollForward>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Product>NUnit NetCore Console Runner</Product>
     <AssemblyTitle>NUnit NetCore Console Runner ($(TargetFramework))</AssemblyTitle>
     <Description>The dotnet command-line runner for NUnit</Description>
   </PropertyGroup>
@@ -33,8 +29,6 @@
     <PackageTags>nunit test testing tdd runner</PackageTags>
     <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
   </PropertyGroup>
-
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <PropertyGroup>
     <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
