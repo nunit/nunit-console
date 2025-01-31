@@ -11,10 +11,7 @@
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)/../../../Nullable.props" />
-
   <PropertyGroup>
-    <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit X86 Agent ($(TargetFramework))</AssemblyTitle>
     <Description>Agent used to run X86 tests out of process under .NET framework</Description>
   </PropertyGroup>

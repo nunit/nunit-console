@@ -19,7 +19,7 @@ namespace NUnit.Engine.Runners
         {
             _tracker = new WorkItemTracker();
             _listener = _tracker;
-            _pendingNotices = new List<string>();
+            _pendingNotices = [];
         }
 
         [TestCaseSource(nameof(AllItemsComplete))]
@@ -29,7 +29,7 @@ namespace NUnit.Engine.Runners
 
             _tracker.SendPendingTestCompletionEvents(this);
 
-            Assert.That(_pendingNotices.Count, Is.EqualTo(0));
+            Assert.That(_pendingNotices, Is.Empty);
         }
 
         [TestCaseSource(nameof(SomeItemsIncomplete))]
@@ -42,14 +42,9 @@ namespace NUnit.Engine.Runners
             Assert.That(_pendingNotices, Is.EqualTo(expectedNotices.Reports));
         }
 
-        public class ReportSequence
+        public class ReportSequence(params string[] reports)
         {
-            public ReportSequence(params string[] reports)
-            {
-                Reports = reports;
-            }
-
-            public string[] Reports { get; }
+            public string[] Reports { get; } = reports;
 
             public void SendTo(ITestEventListener listener)
             {
@@ -79,8 +74,8 @@ namespace NUnit.Engine.Runners
         static readonly string CANCEL_FIXTURE_1 = END_FIXTURE_1.Replace("/>", CANCEL_INFO);
         static readonly string CANCEL_FIXTURE_2 = END_FIXTURE_2.Replace("/>", CANCEL_INFO);
 
-        static TestCaseData[] AllItemsComplete = new TestCaseData[]
-        {
+        static readonly TestCaseData[] AllItemsComplete =
+        [
             new TestCaseData(new ReportSequence(
                 START_ASSEMBLY, START_NS_1, START_NS_2,
                 START_FIXTURE_1, END_FIXTURE_1,
@@ -91,10 +86,10 @@ namespace NUnit.Engine.Runners
                 START_FIXTURE_1, START_FIXTURE_2,
                 END_FIXTURE_1, END_FIXTURE_2,
                 END_NS_2, END_NS_1, END_ASSEMBLY ))
-        };
+        ];
 
-        static TestCaseData[] SomeItemsIncomplete = new TestCaseData[]
-        {
+        static readonly TestCaseData[] SomeItemsIncomplete =
+        [
             new TestCaseData(
                 new ReportSequence(
                     START_ASSEMBLY, START_NS_1, START_NS_2,
@@ -116,7 +111,7 @@ namespace NUnit.Engine.Runners
                     START_FIXTURE_2  ), // Both fixtures hang!
                 new ReportSequence(
                     CANCEL_FIXTURE_2, CANCEL_FIXTURE_1, CANCEL_NS_2, CANCEL_NS_1, CANCEL_ASSEMBLY)),
-        };
+        ];
 
         void ITestEventListener.OnTestEvent(string report)
         {

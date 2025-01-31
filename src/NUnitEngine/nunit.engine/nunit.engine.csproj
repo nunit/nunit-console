@@ -3,17 +3,14 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
-    <OutputPath>../../../bin/$(Configuration)</OutputPath>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
+  <ItemGroup>
+    <InternalsVisibleTo Include="nunit.engine.tests, PublicKey=$(NUnitPublicKey)" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
+  </ItemGroup>
 
   <PropertyGroup>
-    <Product>NUnit Engine</Product>
     <AssemblyTitle>NUnit Engine ($(TargetFramework))</AssemblyTitle>
     <Description>Provides for loading, exploring and running NUnit tests</Description>
   </PropertyGroup>
@@ -27,12 +24,6 @@
     <ProjectReference Include="..\..\Extensibility\nunit.extensibility\nunit.extensibility.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.engine.core\nunit.engine.core.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
-    <Content Include="nunit.engine.addins">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

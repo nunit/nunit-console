@@ -4,15 +4,7 @@
     <RootNamespace>NUnit</RootNamespace>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <NoWarn>$(NoWarn);618</NoWarn>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\nunit.common\nunit.common.csproj" />

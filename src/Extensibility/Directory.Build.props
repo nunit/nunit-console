@@ -1,0 +1,7 @@
+<!-- Directory.Build.props for Extensibility -->
+<Project>
+
+    <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.props" />
+    <Import Project="$(MSBuildThisFileDirectory)../Nullable.props" />
+
+</Project>

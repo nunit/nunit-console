@@ -3,15 +3,9 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Extensibility</RootNamespace>
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
-    <OutputPath>../../../bin/$(Configuration)</OutputPath>
+    <!-- TODO: Get rid of obsolete BinaryFormatter -->
     <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
-  <Import Project="$(MSBuildThisFileDirectory)/../../Nullable.props" />
 
   <ItemGroup>
     <PackageReference Include="TestCentric.Metadata" Version="3.0.3" />
