@@ -7,6 +7,11 @@
     <TargetFrameworks>net462</TargetFrameworks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="nunit4-console.tests, PublicKey=$(NUnitPublicKey)" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
+  </ItemGroup>
+
   <PropertyGroup>
     <AssemblyTitle>NUnit Console Runner ($(TargetFramework))</AssemblyTitle>
     <Description>The standard command-line runner for NUnit</Description>

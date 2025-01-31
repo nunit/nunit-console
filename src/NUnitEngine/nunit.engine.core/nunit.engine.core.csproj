@@ -3,9 +3,15 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);SYSLIB0011</NoWarn><!-- TODO: Get rid of obsolete stuff -->
+    <!-- TODO: Get rid of obsolete BinaryFormatter -->
+    <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="nunit.engine.core.tests, PublicKey=$(NUnitPublicKey)" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <AssemblyTitle>NUnit Engine Core</AssemblyTitle>
     <Description>Common code used by both the engine and agents</Description>

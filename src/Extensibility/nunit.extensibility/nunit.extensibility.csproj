@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>NUnit.Extensibility</RootNamespace>
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
+    <!-- TODO: Get rid of obsolete BinaryFormatter -->
     <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 

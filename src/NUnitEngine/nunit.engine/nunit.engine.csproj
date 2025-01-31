@@ -5,6 +5,11 @@
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="nunit.engine.tests, PublicKey=$(NUnitPublicKey)" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
+  </ItemGroup>
+
   <PropertyGroup>
     <AssemblyTitle>NUnit Engine ($(TargetFramework))</AssemblyTitle>
     <Description>Provides for loading, exploring and running NUnit tests</Description>
