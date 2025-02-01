@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using NUnit.FileSystemAccess;
@@ -157,7 +158,7 @@ namespace NUnit.Extensibility
         {
             log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
 
-            bool isChocolateyPackage = System.IO.File.Exists(System.IO.Path.Combine(hostAssembly.Location, "VERIFICATION.txt"));
+            bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(hostAssembly.Location)!, "VERIFICATION.txt"));
             string[] extensionPatterns = isChocolateyPackage
                 ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
                 : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
