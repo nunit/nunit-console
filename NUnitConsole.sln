@@ -35,6 +35,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{A972031D-2F61-4183-AF75-99EE1A9F6B32}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitEngine", "NUnitEngine", "{31B45C4C-206F-4F31-9CC6-33BF11DFEE39}"
+	ProjectSection(SolutionItems) = preProject
+		src\NUnitEngine\Directory.Build.props = src\NUnitEngine\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.api", "src\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj", "{775FAD50-3623-4922-97C4-DFB29A8BE4C7}"
 EndProject
@@ -46,6 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.tests", "src\N
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitConsole", "NUnitConsole", "{576DB1E6-C5EC-4FEF-A826-EC19D8BEE572}"
+	ProjectSection(SolutionItems) = preProject
+		src\NUnitConsole\Directory.Build.props = src\NUnitConsole\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219A8-2995-4884-806F-FDB9CD25D403}"
 	ProjectSection(SolutionItems) = preProject
