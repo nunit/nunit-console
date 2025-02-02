@@ -151,18 +151,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.common", "src\NUnitEn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.common.tests", "src\NUnitEngine\nunit.common.tests\nunit.common.tests.csproj", "{F546CFE1-74B0-45D3-A06A-8972D73F4419}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensibility", "Extensibility", "{3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitCommon", "NUnitCommon", "{3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}"
 	ProjectSection(SolutionItems) = preProject
-		src\Extensibility\Directory.Build.props = src\Extensibility\Directory.Build.props
+		src\NUnitCommon\Directory.Build.props = src\NUnitCommmon\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility.api", "src\Extensibility\nunit.extensibility.api\nunit.extensibility.api.csproj", "{71DE0F2C-C72B-4CBF-99BE-F2DC0FBEDA24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility.api", "src\NUnitCommon\nunit.extensibility.api\nunit.extensibility.api.csproj", "{71DE0F2C-C72B-4CBF-99BE-F2DC0FBEDA24}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility", "src\Extensibility\nunit.extensibility\nunit.extensibility.csproj", "{49E8B583-37C2-4166-8007-3DB780D01004}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility", "src\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj", "{49E8B583-37C2-4166-8007-3DB780D01004}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility.tests", "src\Extensibility\nunit.extensibility.tests\nunit.extensibility.tests.csproj", "{B22FEE5B-83D4-4021-B066-1B958332D391}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility.tests", "src\NUnitCommon\nunit.extensibility.tests\nunit.extensibility.tests.csproj", "{B22FEE5B-83D4-4021-B066-1B958332D391}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeExtensions", "src\Extensibility\FakeExtensions\FakeExtensions.csproj", "{E2A4C099-E35D-4E27-B89D-957140ED970F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeExtensions", "src\NUnitCommon\FakeExtensions\FakeExtensions.csproj", "{E2A4C099-E35D-4E27-B89D-957140ED970F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

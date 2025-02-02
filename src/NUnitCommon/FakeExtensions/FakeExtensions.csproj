@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
-    <RootNamespace>TestCentric.Extensibility</RootNamespace>
+    <RootNamespace>NUnit.Extensibility</RootNamespace>
     <OutputPath>..\..\..\bin\$(Configuration)\fakes</OutputPath>
   </PropertyGroup>
 
