@@ -44,6 +44,7 @@
     <ProjectReference Condition="'$(TargetFramework)'=='net462'" Include="..\nunit4-console\nunit4-console.csproj" />
     <ProjectReference Condition="'$(TargetFramework)'=='net8.0'" Include="..\nunit4-netcore-console\nunit4-netcore-console.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
   </ItemGroup>
   
   <ItemGroup>
