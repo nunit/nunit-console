@@ -71,8 +71,6 @@
     <file src="net462/nunit.engine.api.dll" target="tools" />
     <file src="net462/nunit.engine.api.pdb" target="tools" />
     <file src="net462/nunit.engine.api.xml" target="tools" />
-    <file src="net462/nunit.engine.core.dll" target="tools" />
-    <file src="net462/nunit.engine.core.pdb" target="tools" />
     <file src="net462/nunit.extensibility.dll" target="tools" />
     <file src="net462/nunit.extensibility.pdb" target="tools" />
     <file src="net462/nunit.extensibility.api.dll" target="tools" />

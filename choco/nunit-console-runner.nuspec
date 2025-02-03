@@ -35,7 +35,6 @@
     <file src = "$BIN_DIR$net462/nunit-console.exe.config" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.api.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.api.xml" target="tools" />
-    <file src = "$BIN_DIR$net462/nunit.engine.core.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.extensibility.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.extensibility.api.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.common.dll" target="tools" />

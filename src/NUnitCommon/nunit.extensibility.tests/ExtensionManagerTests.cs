@@ -153,11 +153,11 @@ namespace NUnit.Extensibility
             Assume.That(Assembly.GetEntryAssembly(), Is.Not.Null, "Entry assembly is null, framework loading validation will be skipped.");
 
 #if NETCOREAPP
-            // Attempt to load the .NET 3.5 version of the extensions from the .NET Core 2.0 tests
-            var assemblyName = Path.Combine(GetSiblingDirectory("net462"), "nunit.engine.core.tests.exe");
+            // Attempt to load the .NET 4.6.2 version of the extensions from the .NET 8.0 tests
+            var assemblyName = Path.Combine(GetSiblingDirectory("net462"), "nunit.extensibility.tests.exe");
 #else
-            // Attempt to load the .NET Core 3.1 version of the extensions from the .NET 3.5 tests
-            var assemblyName = Path.Combine(GetSiblingDirectory("netcoreapp3.1"), "nunit.engine.core.tests.dll");
+            // Attempt to load the .NET 8.0 version of the extensions from the .NET 4.6.2 tests
+            var assemblyName = Path.Combine(GetSiblingDirectory("net8.0"), "nunit.extensibility.tests.dll");
 #endif
             Assert.That(assemblyName, Does.Exist);
             Console.WriteLine($"{assemblyName} does exist");

@@ -9,16 +9,16 @@ namespace NUnit.Engine.Internal
     public class AssemblyHelperTests
     {
 #if NETFRAMEWORK
-        private static readonly string THIS_ASSEMBLY_PATH = "nunit.engine.core.tests.exe";
+        private static readonly string THIS_ASSEMBLY_FILENAME = "nunit.common.tests.exe";
 #else
-        private static readonly string THIS_ASSEMBLY_PATH = "nunit.engine.core.tests.dll";
+        private static readonly string THIS_ASSEMBLY_FILENAME = "nunit.common.tests.dll";
 #endif
 
         [Test]
         public void GetPathForAssembly()
         {
             string path = AssemblyHelper.GetAssemblyPath(this.GetType().Assembly);
-            Assert.That(Path.GetFileName(path), Is.EqualTo(THIS_ASSEMBLY_PATH).IgnoreCase);
+            Assert.That(Path.GetFileName(path), Is.EqualTo(THIS_ASSEMBLY_FILENAME).IgnoreCase);
             Assert.That(File.Exists(path));
         }
 
