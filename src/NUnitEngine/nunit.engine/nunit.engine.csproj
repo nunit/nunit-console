@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
+    <ProjectReference Condition="'$(TargetFramework)'=='net8.0'"
+                      Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />

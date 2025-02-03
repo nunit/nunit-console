@@ -37,6 +37,8 @@
     <file src="net8.0/nunit-netcore-console.runtimeconfig.json" target="tools/net8.0/any" />
     <file src="net8.0/nunit.engine.core.dll" target="tools/net8.0/any" />
     <file src="net8.0/nunit.engine.core.pdb" target="tools/net8.0/any" />
+    <file src="net8.0/nunit.agent.core.dll" target="tools/net8.0/any" />
+    <file src="net8.0/nunit.agent.core.pdb" target="tools/net8.0/any" />
     <file src="net8.0/nunit.extensibility.dll" target="tools/net8.0/any" />
     <file src="net8.0/nunit.extensibility.pdb" target="tools/net8.0/any" />
     <file src="net8.0/nunit.extensibility.api.dll" target="tools/net8.0/any" />

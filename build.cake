@@ -39,11 +39,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
-                "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
-                "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll")
         },
         symbols: new PackageCheck[] {
@@ -51,10 +51,10 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.pdb", "nunit.engine.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
             HasDirectory("tools/agents/net462").WithFiles(
-                "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", 
+                "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.agent.core.pdb", 
                 "nunit.extensibility.pdb", "nunit.extensibility.api.pdb", "nunit.common.pdb", "nunit.engine.api.pdb"),
             HasDirectory("tools/agents/net8.0").WithFiles(
-                "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+                "nunit-agent.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
@@ -75,7 +75,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("nunit.exe"),
             HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
                 "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-                "nunit.engine.dll", "nunit.engine.core.dll", "nunit.extensibility.dll", 
+                "nunit.engine.dll", "nunit.engine.core.dll", "nunit.agent.core.dll", "nunit.extensibility.dll", 
                 "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
                 "Microsoft.Extensions.DependencyModel.dll")
         },
@@ -93,11 +93,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
-                "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
-                "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
@@ -113,16 +113,16 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.dll", "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("lib/net8.0").WithFiles(
-                "nunit.engine.dll", "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+                "nunit.engine.dll", "nunit.engine.core.dll", "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll", "Microsoft.Extensions.DependencyModel.dll"),
             HasDirectory("agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config",
                 "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
-                "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("agents/net8.0").WithFiles(
                 "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
-                "nunit.engine.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll") },
         symbols: new PackageCheck[] {
             HasDirectory("lib/net462").WithFiles(

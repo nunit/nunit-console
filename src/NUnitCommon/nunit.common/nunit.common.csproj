@@ -17,8 +17,4 @@
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Runners\" />
-  </ItemGroup>
-
 </Project>

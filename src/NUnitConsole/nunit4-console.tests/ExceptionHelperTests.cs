@@ -6,7 +6,6 @@ using System.IO;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Engine;
-using NUnit.Engine.Internal;
 using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner
