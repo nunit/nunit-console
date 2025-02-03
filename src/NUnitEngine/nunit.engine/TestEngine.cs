@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 
 namespace NUnit.Engine

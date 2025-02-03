@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Services
 {

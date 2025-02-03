@@ -6,7 +6,6 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using NUnit.Engine.Internal;
 using NUnit.Engine.Services;
 using System.ComponentModel;
 

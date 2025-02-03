@@ -8,8 +8,6 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    using Internal;
-
     /// <summary>
     /// NUnit3XmlResultWriter is responsible for writing the results
     /// of a test to a file in NUnit 3 format.

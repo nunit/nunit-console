@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using NUnit.Engine.Internal;
 using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Services
@@ -68,7 +67,7 @@ namespace NUnit.Engine.Services
                 }
             }
 #else
-            if (package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
+            if (package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
                 return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
 
             bool isNested = false;
