@@ -27,8 +27,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitEngine\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
   </ItemGroup>
 
 </Project>

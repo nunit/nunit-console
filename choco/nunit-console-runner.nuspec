@@ -35,7 +35,6 @@
     <file src = "$BIN_DIR$net462/nunit-console.exe.config" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.api.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.api.xml" target="tools" />
-    <file src = "$BIN_DIR$net462/nunit.engine.core.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.extensibility.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.extensibility.api.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.common.dll" target="tools" />
@@ -48,7 +47,7 @@
     <file src = "$BIN_DIR$agents/net462/nunit-agent-net462-x86.exe.config" target="tools/agents/net462" />
     <file src = "$BIN_DIR$agents/net462/nunit.engine.api.dll" target="tools/agents/net462" />
     <file src = "$BIN_DIR$agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.engine.core.dll" target="tools/agents/net462" />
+    <file src = "$BIN_DIR$agents/net462/nunit.agent.core.dll" target="tools/agents/net462" />
     <file src = "$BIN_DIR$agents/net462/nunit.extensibility.dll" target="tools/agents/net462" />
     <file src = "$BIN_DIR$agents/net462/nunit.extensibility.api.dll" target="tools/agents/net462" />
     <file src = "$BIN_DIR$agents/net462/nunit.common.dll" target="tools/agents/net462" />
@@ -62,7 +61,7 @@
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.runtimeconfig.json" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit.engine.api.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit.engine.api.xml" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.engine.core.dll" target="tools/agents/net8.0" />
+    <file src = "$BIN_DIR$agents/net8.0/nunit.agent.core.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit.extensibility.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit.extensibility.api.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit.common.dll" target="tools/agents/net8.0" />

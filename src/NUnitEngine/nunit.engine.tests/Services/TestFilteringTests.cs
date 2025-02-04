@@ -2,13 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 using NUnit.TestData.Assemblies;
+using NUnit.Engine.Drivers;
 
 namespace NUnit.Engine.Services
 {
-    using Drivers;
 
     public class TestFilteringTests
     {

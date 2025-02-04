@@ -37,8 +37,6 @@
 
     <file src="net462/nunit.engine.dll" target="lib/net462" />
     <file src="net462/nunit.engine.pdb" target="lib/net462" />
-    <file src="net462/nunit.engine.core.dll" target="lib/net462" />
-    <file src="net462/nunit.engine.core.pdb" target="lib/net462" />
     <file src="net462/nunit.extensibility.dll" target="lib/net462" />
     <file src="net462/nunit.extensibility.pdb" target="lib/net462" />
     <file src="net462/nunit.extensibility.api.dll" target="lib/net462" />
@@ -52,8 +50,8 @@
 
     <file src="net8.0/nunit.engine.dll" target="lib/net8.0" />
     <file src="net8.0/nunit.engine.pdb" target="lib/net8.0" />
-    <file src="net8.0/nunit.engine.core.dll" target="lib/net8.0" />
-    <file src="net8.0/nunit.engine.core.pdb" target="lib/net8.0" />
+    <file src="net8.0/nunit.agent.core.dll" target="lib/net8.0" />
+    <file src="net8.0/nunit.agent.core.pdb" target="lib/net8.0" />
     <file src="net8.0/nunit.extensibility.dll" target="lib/net8.0" />
     <file src="net8.0/nunit.extensibility.pdb" target="lib/net8.0" />
     <file src="net8.0/nunit.extensibility.api.dll" target="lib/net8.0" />
@@ -72,8 +70,8 @@
     <file src="agents/net462/nunit-agent-net462-x86.exe" target="agents/net462" />
     <file src="agents/net462/nunit-agent-net462-x86.pdb" target="agents/net462" />
     <file src="agents/net462/nunit-agent-net462-x86.exe.config" target="agents/net462" />
-    <file src="agents/net462/nunit.engine.core.dll" target="agents/net462" />
-    <file src="agents/net462/nunit.engine.core.pdb" target="agents/net462" />
+    <file src="agents/net462/nunit.agent.core.dll" target="agents/net462" />
+    <file src="agents/net462/nunit.agent.core.pdb" target="agents/net462" />
     <file src="agents/net462/nunit.extensibility.dll" target="agents/net462" />
     <file src="agents/net462/nunit.extensibility.pdb" target="agents/net462" />
     <file src="agents/net462/nunit.extensibility.api.dll" target="agents/net462" />
@@ -89,8 +87,8 @@
     <file src="agents/net8.0/nunit-agent-net80.dll.config" target="agents/net8.0" />
     <file src="agents/net8.0/nunit-agent-net80.deps.json" target="agents/net8.0" />
     <file src="agents/net8.0/nunit-agent-net80.runtimeconfig.json" target="agents/net8.0" />
-    <file src="agents/net8.0/nunit.engine.core.dll" target="agents/net8.0" />
-    <file src="agents/net8.0/nunit.engine.core.pdb" target="agents/net8.0" />
+    <file src="agents/net8.0/nunit.agent.core.dll" target="agents/net8.0" />
+    <file src="agents/net8.0/nunit.agent.core.pdb" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.extensibility.dll" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.extensibility.pdb" target="agents/net8.0" />
     <file src="agents/net8.0/nunit.extensibility.api.dll" target="agents/net8.0" />

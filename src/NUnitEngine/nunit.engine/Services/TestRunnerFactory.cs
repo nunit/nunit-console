@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using NUnit.Engine.Internal;
 using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Services
@@ -51,26 +50,10 @@ namespace NUnit.Engine.Services
             if (ServiceContext == null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
-#if !NETFRAMEWORK
-            if (package.SubPackages.Count > 1)
-                return new AggregatingTestRunner(ServiceContext, package);
-            else
-            {
-                var assemblyPackages = package.Select(p => p.IsAssemblyPackage());
-                switch (assemblyPackages.Count)
-                {
-                    default:
-                        return new AggregatingTestRunner(ServiceContext, package);
-                    case 1:
-                        return new LocalTestRunner(assemblyPackages[0]);
-                    case 0:
-                        return new LocalTestRunner(package);
-                }
-            }
-#else
-            if (package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
+            if (package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "").StartsWith("Unmanaged,"))
                 return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
 
+#if NETFRAMEWORK
             bool isNested = false;
             foreach (TestPackage subPackage in package.SubPackages)
             {
@@ -86,6 +69,22 @@ namespace NUnit.Engine.Services
                 return new MultipleTestProcessRunner(ServiceContext, package);
             else
                 return new ProcessRunner(ServiceContext, package);
+#else
+            if (package.SubPackages.Count > 1)
+                return new AggregatingTestRunner(ServiceContext, package);
+            else
+            {
+                var assemblyPackages = package.Select(p => p.IsAssemblyPackage());
+                switch (assemblyPackages.Count)
+                {
+                    default:
+                        return new AggregatingTestRunner(ServiceContext, package);
+                    case 1:
+                        return new LocalTestRunner(assemblyPackages[0]);
+                    case 0:
+                        return new LocalTestRunner(package);
+                }
+            }
 #endif
         }
     }

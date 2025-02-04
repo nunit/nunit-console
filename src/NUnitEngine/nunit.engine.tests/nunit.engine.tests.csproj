@@ -29,6 +29,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
     <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.engine\nunit.engine.csproj" />

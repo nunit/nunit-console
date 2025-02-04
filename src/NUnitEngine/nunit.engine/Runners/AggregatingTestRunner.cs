@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {

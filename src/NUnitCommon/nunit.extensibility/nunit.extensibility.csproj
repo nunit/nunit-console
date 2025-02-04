@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>NUnit.Extensibility</RootNamespace>
+    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
+    <!-- TODO: Get rid of obsolete BinaryFormatter -->
+    <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TestCentric.Metadata" Version="3.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\nunit.extensibility.api\nunit.extensibility.api.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
+  </ItemGroup>
+
+</Project>

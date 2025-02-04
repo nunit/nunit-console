@@ -2,7 +2,6 @@
 
 #if NETFRAMEWORK
 using System;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Runners
 {

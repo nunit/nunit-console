@@ -8,7 +8,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using NUnit.Engine.Internal;
 using NUnit.Engine.Services.RuntimeLocators;
 using TestCentric.Metadata;
 
@@ -151,7 +150,7 @@ namespace NUnit.Engine.Services
 
             log.Debug($"No specific framework requested for {package.Name}");
 
-            string imageTargetFrameworkNameSetting = package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
+            string imageTargetFrameworkNameSetting = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
             Runtime targetRuntime;
             Version targetVersion;
 
@@ -159,7 +158,7 @@ namespace NUnit.Engine.Services
             {
                 // Assume .NET Framework
                 targetRuntime = Runtime.Net;
-                var trialVersion = package.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
+                var trialVersion = package.GetSetting(EnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
                 targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
             else
@@ -358,12 +357,12 @@ namespace NUnit.Engine.Services
                     ApplyImageData(subPackage);
 
                     // Collect the highest version required
-                    Version v = subPackage.GetSetting(InternalEnginePackageSettings.ImageRuntimeVersion, new Version(0, 0));
+                    Version v = subPackage.GetSetting(EnginePackageSettings.ImageRuntimeVersion, new Version(0, 0));
                     if (v > targetVersion) targetVersion = v;
 
                     // Collect highest framework name
                     // TODO: This assumes lexical ordering is valid - check it
-                    string fn = subPackage.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
+                    string fn = subPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
                     if (fn != "")
                     {
                         if (frameworkName == null || fn.CompareTo(frameworkName) < 0)
@@ -371,10 +370,10 @@ namespace NUnit.Engine.Services
                     }
 
                     // If any assembly requires X86, then the aggregate package requires it
-                    if (subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresX86, false))
+                    if (subPackage.GetSetting(EnginePackageSettings.ImageRequiresX86, false))
                         requiresX86 = true;
 
-                    if (subPackage.GetSetting(InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
+                    if (subPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
                         requiresAssemblyResolver = true;
                 }
             }
@@ -415,16 +414,16 @@ namespace NUnit.Engine.Services
             }
 
             if (targetVersion.Major > 0)
-                package.Settings[InternalEnginePackageSettings.ImageRuntimeVersion] = targetVersion;
+                package.Settings[EnginePackageSettings.ImageRuntimeVersion] = targetVersion;
 
             if (!string.IsNullOrEmpty(frameworkName))
-                package.Settings[InternalEnginePackageSettings.ImageTargetFrameworkName] = frameworkName;
+                package.Settings[EnginePackageSettings.ImageTargetFrameworkName] = frameworkName;
 
-            package.Settings[InternalEnginePackageSettings.ImageRequiresX86] = requiresX86;
+            package.Settings[EnginePackageSettings.ImageRequiresX86] = requiresX86;
             if (requiresX86)
                 package.Settings[EnginePackageSettings.RunAsX86] = true;
 
-            package.Settings[InternalEnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver] = requiresAssemblyResolver;
+            package.Settings[EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver] = requiresAssemblyResolver;
         }
     }
 }
