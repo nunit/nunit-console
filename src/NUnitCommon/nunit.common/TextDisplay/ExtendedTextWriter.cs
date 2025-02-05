@@ -2,7 +2,7 @@
 
 using System.IO;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     /// <summary>
     /// ExtendedTextWriter extends the TextWriter abstract class 

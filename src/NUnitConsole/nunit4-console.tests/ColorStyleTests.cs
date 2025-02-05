@@ -3,7 +3,7 @@
 using System;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     [TestFixture]
     public class ColorStyleTests

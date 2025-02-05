@@ -3,7 +3,7 @@
 using System.IO;
 using System.Text;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     /// <summary>
     /// ExtendedTextWrapper wraps a TextWriter and makes it

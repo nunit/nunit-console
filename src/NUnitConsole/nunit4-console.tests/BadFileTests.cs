@@ -7,6 +7,7 @@ using NUnit.Engine;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services;
 using NUnit.Framework;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {

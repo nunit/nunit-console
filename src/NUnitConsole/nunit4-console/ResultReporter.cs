@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
 using NUnit.ConsoleRunner.Options;
-using NUnit.ConsoleRunner.Utilities;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {

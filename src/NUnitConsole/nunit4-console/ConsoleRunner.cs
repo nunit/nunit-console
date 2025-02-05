@@ -9,6 +9,7 @@ using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
+using NUnit.TextDisplay;
 using System.Runtime.InteropServices;
 using System.Text;
 

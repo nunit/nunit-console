@@ -3,6 +3,7 @@
 using System;
 using System.Xml;
 using NUnit.Engine;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {
