@@ -2,7 +2,7 @@
 
 using System;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     public class ColorConsoleWriter : ExtendedTextWrapper
     {

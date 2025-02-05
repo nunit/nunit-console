@@ -41,14 +41,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\nunit4-console\ColorConsole.cs" Link="ColorConsole.cs" />
-    <Compile Include="..\nunit4-console\ColorConsoleWriter.cs" Link="ColorConsoleWriter.cs" />
-    <Compile Include="..\nunit4-console\ColorStyle.cs" Link="ColorStyle.cs" />
     <Compile Include="..\nunit4-console\ConsoleOptions.cs" Link="ConsoleOptions.cs" />
     <Compile Include="..\nunit4-console\ConsoleRunner.cs" Link="ConsoleRunner.cs" />
     <Compile Include="..\nunit4-console\ConsoleTestResult.cs" Link="ConsoleTestResult.cs" />
-    <Compile Include="..\nunit4-console\ExtendedTextWrapper.cs" Link="ExtendedTextWrapper.cs" />
-    <Compile Include="..\nunit4-console\ExtendedTextWriter.cs" Link="ExtendedTextWriter.cs" />
     <Compile Include="..\nunit4-console\FileSystem.cs" Link="FileSystem.cs" />
     <Compile Include="..\nunit4-console\FrameworkPackageSettings.cs" Link="FrameworkPackageSettings.cs" />
     <Compile Include="..\nunit4-console\Options\DefaultOptionsProvider.cs" Link="Options\DefaultOptionsProvider.cs" />

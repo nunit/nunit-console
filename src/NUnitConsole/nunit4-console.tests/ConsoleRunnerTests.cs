@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using NSubstitute;
-using NUnit.ConsoleRunner;
 using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Services;
 using NUnit.Framework;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     /// <summary>
     /// Sets the console color in the constructor and resets it in the dispose

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using NUnit.Engine;
+using NUnit.TextDisplay;
 
 using NUnit.ConsoleRunner.Options;
 

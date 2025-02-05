@@ -10,6 +10,7 @@ using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
 using NUnit.TestData.Assemblies;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {

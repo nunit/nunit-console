@@ -3,10 +3,8 @@
 using System;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
-    using Utilities;
-
     [TestFixture, Parallelizable(ParallelScope.None)]
     public class ColorConsoleTests
     {
