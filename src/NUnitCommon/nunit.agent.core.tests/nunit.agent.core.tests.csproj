@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <ExposedInternals>true</ExposedInternals>
   </PropertyGroup>
 
@@ -28,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
+    <ProjectReference Include="..\DirectTestAgent\DirectTestAgent.csproj" />
     <ProjectReference Include="..\nunit.agent.core\nunit.agent.core.csproj" />
     <ProjectReference Include="..\nunit.common\nunit.common.csproj" />
   </ItemGroup>

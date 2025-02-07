@@ -16,11 +16,7 @@ namespace NUnit.Engine.Runners
         private static string path2 = TestPath("/test/bin/debug/test2.dll");
         private static string path3 = TestPath("/test/utils/test3.dll");
 
-#if NETFRAMEWORK
         private const string STANDARD_CONFIG_FILE = "nunit.engine.core.tests.exe.config";
-#else
-        const string STANDARD_CONFIG_FILE = "nunit.engine.core.tests.dll.config";
-#endif
         private const string ALTERNATE_CONFIG_FILE = "alt.config";
 
         [Test]
