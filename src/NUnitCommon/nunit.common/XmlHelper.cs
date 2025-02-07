@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace System.Runtime.CompilerServices
 {
@@ -35,6 +37,8 @@ namespace NUnit
             doc.LoadXml(xml);
             return doc.FirstChild.ShouldNotBeNull();
         }
+
+        #region XMLNode Extensions
 
         /// <summary>
         /// Adds an attribute with a specified name and value to an existing XmlNode.
@@ -143,5 +147,29 @@ namespace NUnit
 
             return date;
         }
+
+        public static IEnumerable<XmlNode> NonNullChildNodes(this XmlNode node)
+        {
+            foreach (XmlNode childNode in node.ChildNodes)
+                if (childNode != null) yield return childNode;
+        }
+
+        public static void ForEachChildNode(this XmlNode node, Action<XmlNode> action)
+        {
+            foreach (XmlNode childNode in node.ChildNodes)
+                if (childNode != null) action.Invoke(childNode);
+        }
+
+        #endregion
+
+        #region XmlNodeList Extensions
+
+        public static void ForEachNode(this XmlNodeList nodeList, Action<XmlNode> action)
+        {
+            foreach (XmlNode childNode in nodeList)
+                if (childNode != null) action.Invoke(childNode);
+        }
+
+        #endregion
     }
 }
