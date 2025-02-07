@@ -164,6 +164,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.agent.core.tests", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeExtensions", "src\TestData\FakeExtensions\FakeExtensions.csproj", "{608AA86D-4090-33CA-0031-BD324E5A766E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectTestAgent", "src\NUnitCommon\DirectTestAgent\DirectTestAgent.csproj", "{0E415863-1621-41DB-9DB0-36B5664DFF35}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -290,6 +292,10 @@ Global
 		{608AA86D-4090-33CA-0031-BD324E5A766E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{608AA86D-4090-33CA-0031-BD324E5A766E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{608AA86D-4090-33CA-0031-BD324E5A766E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E415863-1621-41DB-9DB0-36B5664DFF35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E415863-1621-41DB-9DB0-36B5664DFF35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E415863-1621-41DB-9DB0-36B5664DFF35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E415863-1621-41DB-9DB0-36B5664DFF35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -336,6 +342,7 @@ Global
 		{4FCFAF1C-1579-4A1C-BAF9-9627E39D7CDA} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{89258A3E-5B62-487A-9AE7-D7672CBF61F1} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{608AA86D-4090-33CA-0031-BD324E5A766E} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
+		{0E415863-1621-41DB-9DB0-36B5664DFF35} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}

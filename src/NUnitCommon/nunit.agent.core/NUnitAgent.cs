@@ -38,6 +38,16 @@ namespace NUnit.Agents
             if (options.DebugAgent || options.DebugTests)
                 TryLaunchDebugger();
 
+            if (!string.IsNullOrEmpty(options.AgencyUrl))
+                RegisterAndWaitForCommands(options);
+            else if (options.Files.Count != 0)
+                new AgentDirectRunner(options).ExecuteTestsDirectly();
+            else
+                throw new ArgumentException("No file specified for direct execution");
+        }
+
+        private static void RegisterAndWaitForCommands(AgentOptions options)
+        {
             log.Info($"  AgentId:   {options.AgentId}");
             log.Info($"  AgencyUrl: {options.AgencyUrl}");
             log.Info($"  AgencyPid: {options.AgencyPid}");
