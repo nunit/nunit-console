@@ -49,10 +49,9 @@ namespace NUnit.Agents
                         val = option.Substring(delim + 1);
                     }
 
-                    if (!VALID_OPTIONS.ContainsKey(opt))
+                    // Simultaneously check that the option is valid and determine if it takes an argument
+                    if (!VALID_OPTIONS.TryGetValue(opt, out bool optionTakesValue))
                         throw new Exception($"Invalid argument: {arg}");
-
-                    bool optionTakesValue = VALID_OPTIONS[opt];
 
                     if (optionTakesValue)
                     {
@@ -119,7 +118,7 @@ namespace NUnit.Agents
 
         private static bool IsOption(string arg)
         {
-            return arg.StartsWith("--");
+            return arg.StartsWith("--", StringComparison.Ordinal);
         }
     }
 }
