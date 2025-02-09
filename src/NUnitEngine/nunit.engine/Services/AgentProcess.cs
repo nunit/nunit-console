@@ -27,7 +27,7 @@ namespace NUnit.Engine.Services
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
             string agencyUrl = TargetRuntime.Runtime == Runtime.NetCore ? agency.TcpEndPoint : agency.RemotingUrl;
-            AgentArgs = new StringBuilder($"{agentId} {agencyUrl} --pid={Process.GetCurrentProcess().Id}");
+            AgentArgs = new StringBuilder($"--agentId={agentId} --agencyUrl={agencyUrl} --pid={Process.GetCurrentProcess().Id}");
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.

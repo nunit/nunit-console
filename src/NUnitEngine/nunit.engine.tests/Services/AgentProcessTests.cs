@@ -15,7 +15,7 @@ namespace NUnit.Engine.Services
         private TestPackage _package;
         private readonly static Guid AGENT_ID = Guid.NewGuid();
         private const string REMOTING_URL = "tcp://127.0.0.1:1234/TestAgency";
-        private readonly string REQUIRED_ARGS = $"{AGENT_ID} {REMOTING_URL} --pid={Process.GetCurrentProcess().Id}";
+        private readonly string REQUIRED_ARGS = $"--agentId={AGENT_ID} --agencyUrl={REMOTING_URL} --pid={Process.GetCurrentProcess().Id}";
 
         [SetUp]
         public void SetUp()
