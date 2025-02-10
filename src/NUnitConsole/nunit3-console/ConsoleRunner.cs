@@ -52,7 +52,7 @@ namespace NUnit.ConsoleRunner
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
-            Guard.ArgumentNotNull(_engine = engine, nameof(engine));
+             Guard.ArgumentNotNull(_engine = engine, nameof(engine));
             Guard.ArgumentNotNull(_options = options, nameof(options));
             Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
 
@@ -71,7 +71,7 @@ namespace NUnit.ConsoleRunner
                 foreach (string extensionDirectory in extensionPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries))
                     _extensionService.FindExtensionAssemblies(extensionDirectory);
 
-            foreach (string extensionDirectory in _options.ExtensionDirectories)
+             foreach (string extensionDirectory in _options.ExtensionDirectories)
                _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             _workDirectory = options.WorkDirectory;

@@ -198,7 +198,7 @@ AddToBothLists(new PackageTest(
     new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }));
 
 //////////////////////////////////////////////////////////////////////
-// RUN TESTS USING EACH OF OUR EXTENSIONS
+// TESTS USING EACH OF OUR EXTENSIONS
 //////////////////////////////////////////////////////////////////////
 
 // NUnit Project Loader Tests
@@ -287,7 +287,7 @@ StandardRunnerTests.Add(new PackageTest(
 StandardRunnerTests.Add(new PackageTest(
     1, "V2FrameworkDriverTest",
     "Run mock-assembly-v2 using the V2 Driver out of process",
-    "v2-tests/net462/mock-assembly-v2.dll --list-extensions",
+    "v2-tests/net462/mock-assembly-v2.dll",
     new ExpectedResult("Failed")
     {
         Total = 28,

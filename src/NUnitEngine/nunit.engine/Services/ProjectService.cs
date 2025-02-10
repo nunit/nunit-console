@@ -12,10 +12,14 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ProjectService : Service, IProjectService
     {
-        Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
+        Dictionary<string, ExtensionNode> _extensionIndex;
+        ExtensionService _extensionService;
 
         public bool CanLoadFrom(string path)
         {
+            if (_extensionIndex == null)
+                InitializeExtensionIndex();
+
             ExtensionNode node = GetNodeForPath(path);
             if (node != null)
             {
@@ -84,36 +88,34 @@ namespace NUnit.Engine.Services
             {
                 try
                 {
-                    var extensionService = ServiceContext.GetService<ExtensionService>();
+                    _extensionService = ServiceContext.GetService<ExtensionService>();
 
-                    if (extensionService == null)
-                        Status = ServiceStatus.Started;
-                    else if (extensionService.Status != ServiceStatus.Started)
-                        Status = ServiceStatus.Error;
-                    else
-                    {
-                        Status = ServiceStatus.Started;
-
-                        foreach (var node in extensionService.GetExtensionNodes<IProjectLoader>())
-                        {
-                            foreach (string ext in node.GetValues("FileExtension"))
-                            {
-                                if (ext != null)
-                                {
-                                    if (_extensionIndex.ContainsKey(ext))
-                                        throw new NUnitEngineException(string.Format("ProjectLoader extension {0} is already handled by another extension.", ext));
-
-                                    _extensionIndex.Add(ext, node);
-                                }
-                            }
-                        }
-                    }
+                    Status = _extensionService == null || _extensionService.Status == ServiceStatus.Started
+                        ? ServiceStatus.Started : ServiceStatus.Error;
                 }
                 catch
                 {
-                    // TODO: Should we just ignore any addin that doesn't load?
                     Status = ServiceStatus.Error;
                     throw;
+                }
+            }
+        }
+
+        private void InitializeExtensionIndex()
+        {
+            _extensionIndex = new Dictionary<string, ExtensionNode>();
+
+            foreach (var node in _extensionService.GetExtensionNodes<IProjectLoader>())
+            {
+                foreach (string ext in node.GetValues("FileExtension"))
+                {
+                    if (ext != null)
+                    {
+                        if (_extensionIndex.ContainsKey(ext))
+                            throw new NUnitEngineException(string.Format("ProjectLoader extension {0} is already handled by another extension.", ext));
+
+                        _extensionIndex.Add(ext, node);
+                    }
                 }
             }
         }

@@ -20,7 +20,8 @@ namespace NUnit.Engine.Services
     {
         static ILogger log = InternalTrace.GetLogger("DriverService");
 
-        readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
+        private ExtensionService _extensionService;
+        private IList<IDriverFactory> _factories;
 
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
@@ -54,6 +55,9 @@ namespace NUnit.Engine.Services
                         return new InvalidAssemblyFrameworkDriver(assemblyPath, platform + 
                             " test assemblies are not supported by this version of the engine");
             }
+
+            if (_factories == null)
+                InitializeDriverFactories();
 
             try
             {
@@ -104,20 +108,7 @@ namespace NUnit.Engine.Services
 
             try
             {
-                var extensionService = ServiceContext.GetService<ExtensionService>();
-                if (extensionService != null)
-                {
-                    foreach (IDriverFactory factory in extensionService.GetExtensions<IDriverFactory>())
-                        _factories.Add(factory);
-
-#if NETFRAMEWORK
-                    var node = extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
-                    if (node != null)
-                        _factories.Add(new NUnit2DriverFactory(node));
-#endif
-                }
-
-                _factories.Add(new NUnit3DriverFactory());
+                _extensionService = ServiceContext.GetService<ExtensionService>();
 
                 Status = ServiceStatus.Started;
             }
@@ -126,6 +117,25 @@ namespace NUnit.Engine.Services
                 Status = ServiceStatus.Error;
                 throw;
             }
+        }
+
+        private void InitializeDriverFactories()
+        {
+            _factories = new List<IDriverFactory>();
+
+            if (_extensionService != null)
+            {
+                foreach (IDriverFactory factory in _extensionService.GetExtensions<IDriverFactory>())
+                    _factories.Add(factory);
+
+#if NETFRAMEWORK
+                var node = _extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
+                if (node != null)
+                    _factories.Add(new NUnit2DriverFactory(node));
+#endif
+            }
+
+            _factories.Add(new NUnit3DriverFactory());
         }
     }
 }
