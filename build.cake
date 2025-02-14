@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.3.1-alpha.1
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.1
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -74,7 +74,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
             + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
-        tests: StandardRunnerTests),
+        tests: PackageTests.StandardRunnerTests),
 
     // NOTE: Must follow ConsoleRunner, upon which it depends
     NUnitConsoleNuGetPackage = new NuGetPackage(
@@ -91,9 +91,8 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any")
                 .WithFiles(ENGINE_FILES).AndFiles(ConsoleFiles).AndFile("Microsoft.Extensions.DependencyModel.dll")
         },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
-            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
-        tests: NetCoreRunnerTests),
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
+        tests: PackageTests.NetCoreRunnerTests),
 
     NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
         id: "nunit-console-runner",
@@ -106,7 +105,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
             + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
-        tests: StandardRunnerTests),
+        tests: PackageTests.StandardRunnerTests),
 
     NUnitConsoleZipPackage = new ZipPackage(
         id: "NUnit.Console",
@@ -126,7 +125,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory
             + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit3-console.exe"),
-        tests: StandardRunnerTests,
+        tests: PackageTests.ZipRunnerTests,
         bundledExtensions: new [] {
             KnownExtensions.VSProjectLoader.NuGetPackage,
             KnownExtensions.NUnitProjectLoader.NuGetPackage,
@@ -168,36 +167,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         })
 });
 
-Task("BuildZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.BuildPackage();
-    });
-
-Task("InstallZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.InstallPackage();
-    });
-
-Task("VerifyZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.VerifyPackage();
-    });
-
-Task("TestZipPackage")
-    .Does(() =>
-    {
-        NUnitConsoleZipPackage.RunPackageTests();
-    });
-
-Task("TestNetCorePackage")
-    .Does(() =>
-    {
-        NUnitConsoleRunnerNetCorePackage.RunPackageTests();
-    });
-
 //////////////////////////////////////////////////////////////////////
 // TEST RUNNERS
 //////////////////////////////////////////////////////////////////////
@@ -212,10 +181,10 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
         _executablePath = executablePath;
     }
 
-    public int RunPackageTest(string arguments)
+    public int RunPackageTest(string arguments, bool redirectOutput = false)
     {
         Console.WriteLine("Running package test");
-        return base.RunTest(_executablePath, arguments);
+        return base.RunPackageTest(_executablePath, new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectOutput });
     }
 }
 

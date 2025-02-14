@@ -21,7 +21,7 @@ namespace NUnit.Engine.Services
         static ILogger log = InternalTrace.GetLogger("DriverService");
 
         private ExtensionService _extensionService;
-        private IList<IDriverFactory> _factories;
+        private List<IDriverFactory> _factories;
 
         /// <summary>
         /// Get a driver suitable for use with a particular test assembly.
@@ -76,7 +76,8 @@ namespace NUnit.Engine.Services
 
                     foreach (var factory in _factories)
                     {
-                        log.Debug($"Trying {factory.GetType().Name}");
+                        string factoryName = factory.GetType().Name;
+                        log.Debug($"Trying {factoryName}");
 
                         foreach (var reference in references)
                         {
@@ -87,6 +88,8 @@ namespace NUnit.Engine.Services
                             return factory.GetDriver(reference);
 #endif
                         }
+
+                        log.Debug($"No driver found using {factoryName}");
                     }
                 }
             }
@@ -98,8 +101,8 @@ namespace NUnit.Engine.Services
             if (skipNonTestAssemblies)
                 return new SkippedAssemblyFrameworkDriver(assemblyPath);
             else
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, string.Format("No suitable tests found in '{0}'.\n" +
-                                                                              "Either assembly contains no tests or proper test driver has not been found.", assemblyPath));
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, string.Format(
+                    $"No suitable tests found in '{assemblyPath}'.\r\nEither assembly contains no tests or proper test driver has not been found."));
         }
 
         public override void StartService()
@@ -123,10 +126,11 @@ namespace NUnit.Engine.Services
         {
             _factories = new List<IDriverFactory>();
 
-            if (_extensionService != null)
+            if (_extensionService == null)
+                log.Debug("ExtensionService is not available, no driver extensions will be loaded");
+            else
             {
-                foreach (IDriverFactory factory in _extensionService.GetExtensions<IDriverFactory>())
-                    _factories.Add(factory);
+                _factories.AddRange(_extensionService.GetExtensions<IDriverFactory>());
 
 #if NETFRAMEWORK
                 var node = _extensionService.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");

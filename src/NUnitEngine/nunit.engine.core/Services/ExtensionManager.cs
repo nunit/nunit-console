@@ -10,7 +10,6 @@ using NUnit.Engine.Internal;
 using NUnit.Engine.Internal.FileSystemAccess;
 using NUnit.Engine.Internal.FileSystemAccess.Default;
 using System.Linq;
-using System.Diagnostics;
 
 namespace NUnit.Engine.Services
 {
@@ -21,7 +20,6 @@ namespace NUnit.Engine.Services
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
         private readonly IFileSystem _fileSystem;
-        //private readonly IAddinsFileReader _addinsReader;
         private readonly IDirectoryFinder _directoryFinder;
 
         // List of all ExtensionPoints discovered
@@ -154,10 +152,7 @@ namespace NUnit.Engine.Services
 
                 log.Info($"FindExtensionAssemblies examining extension directory {startDir}");
 
-                // Create the list of possible extension assemblies,
-                // eliminating duplicates, start in the provided directory.
-                // In this top level directory, we only look at .addins files.
-                ProcessAddinsFiles(_fileSystem.GetDirectory(startDir), false);
+                ProcessDirectory(_fileSystem.GetDirectory(startDir), false);
             }
         }
 
@@ -242,7 +237,9 @@ namespace NUnit.Engine.Services
             EnsureExtensionsAreLoaded();
 
             var ep = GetExtensionPoint(typeof(T));
-            if (ep != null)
+            if (ep == null)
+                log.Debug("There is no extension point of type {typeof(T).Name}");
+            else
                 foreach (var node in ep.Extensions)
                     if (includeDisabled || node.Enabled)
                         yield return node;
@@ -631,27 +628,6 @@ namespace NUnit.Engine.Services
                     }
             }
 
-            //string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
-            //string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
-            //if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
-            //{
-            //    throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
-            //}
-            //else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
-            //{
-            //    if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
-            //    {
-            //        log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
-            //        return false;
-            //    }
-            //}
-            //else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
-            //{
-            //    log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
-            //    return false;
-            //}
-
-            //return true;
         }
 
         private System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
