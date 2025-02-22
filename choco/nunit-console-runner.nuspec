@@ -28,6 +28,7 @@
   <files>
     <file src = "../LICENSE.txt" target = "tools" />
     <file src = "../NOTICES.txt" target = "tools" />
+    <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
     <file src = "VERIFICATION.txt" target = "tools" />
 
     <file src = "$BIN_DIR$net462/nunit3-console.exe" target="tools" />
@@ -48,6 +49,8 @@
     <file src = "$BIN_DIR$agents/net462/testcentric.engine.metadata.dll" target="tools/agents/net462" />
     <file src = "nunit-agent.exe.ignore" target="tools/agents/net462" />
     <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net462" />
+    <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
+    <file src = "VERIFICATION.txt" target = "tools/agents/net462" />
 
     <file src = "$BIN_DIR$agents/net6.0/nunit-agent.dll" target="tools/agents/net6.0" />
     <file src = "$BIN_DIR$agents/net6.0/nunit-agent.dll.config" target="tools/agents/net6.0" />
@@ -58,6 +61,8 @@
     <file src = "$BIN_DIR$agents/net6.0/nunit.engine.core.dll" target="tools/agents/net6.0" />
     <file src = "$BIN_DIR$agents/net6.0/testcentric.engine.metadata.dll" target="tools/agents/net6.0" />
     <file src = "$BIN_DIR$agents/net6.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net6.0" />
+    <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
+    <file src = "VERIFICATION.txt" target = "tools/agents/net6.0" />
 
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/nunit-agent.dll.config" target="tools/agents/net8.0" />
@@ -68,5 +73,7 @@
     <file src = "$BIN_DIR$agents/net8.0/nunit.engine.core.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/testcentric.engine.metadata.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
+    <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
+    <file src = "VERIFICATION.txt" target = "tools/agents/net8.0" />
   </files>
 </package>

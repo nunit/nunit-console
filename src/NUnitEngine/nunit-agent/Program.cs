@@ -62,8 +62,8 @@ namespace NUnit.Agent
                 }
             }
 
-            // var logName = $"nunit-agent_{pid}.log";
-            // InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);  // See PR 1214 https://github.com/nunit/nunit-console/pull/1214/files
+            var logName = $"nunit-agent_{pid}.log";
+            InternalTrace.Initialize(Path.Combine(workDirectory, logName), traceLevel);  // See PR 1214 https://github.com/nunit/nunit-console/pull/1214/files
             log = InternalTrace.GetLogger(typeof(NUnitTestAgent));
 
             log.Info("Agent process {0} starting", pid);
