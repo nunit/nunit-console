@@ -29,6 +29,7 @@ namespace NUnit.ConsoleRunner
         private const string EVENT_LISTENER_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/ITestEventListener";
         private const string TEAMCITY_EVENT_LISTENER_FULLNAME = "NUnit.Engine.Listeners.TeamCityEventListener";
         private const string TEAMCITY_EVENT_LISTENER_NAME = "TeamCityEventListener";
+        private const string TEAMCITY_PROJECT_NAME = "TEAMCITY_PROJECT_NAME";
 
         private const string NUNIT_EXTENSION_DIRECTORIES = "NUNIT_EXTENSION_DIRECTORIES";
 
@@ -80,19 +81,24 @@ namespace NUnit.ConsoleRunner
             else
                 _workDirectory = null;
 
-            if (_options.TeamCity)
+            if (_options.TeamCity || RunningUnderTeamCity)
             {
                 bool teamcityInstalled = false;
                 foreach (var node in _extensionService.GetExtensionNodes(EVENT_LISTENER_EXTENSION_PATH))
                     if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER_FULLNAME)
                         break;
-                if (!teamcityInstalled)
+
+                if (teamcityInstalled)
+                    // Enable TeamCityEventListener immediately, before the console is redirected
+                    _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", true);
+                else if (_options.TeamCity)
                     throw new RequiredExtensionException(TEAMCITY_EVENT_LISTENER_NAME, "--teamcity");
             }
-
-            // Enable TeamCityEventListener immediately, before the console is redirected
-            _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
         }
+
+        private bool RunningUnderTeamCity =>
+            !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
+
 
         /// <summary>
         /// Executes tests according to the provided commandline options.

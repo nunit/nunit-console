@@ -92,7 +92,7 @@ namespace NUnit.ConsoleRunner.Tests
             var fileSystem = new VirtualFileSystem();
             fileSystem.SetupFiles(files);
 
-            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem);
+            var options = new ConsoleOptions(fileSystem);
 
             // When
             var expandedArgs = options.PreParse(commandline.Split(' '));
@@ -106,7 +106,7 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--arg1 @ --arg2", "You must include a file name after @.")]
         public void GetArgsFromFiles_FailureTests(string args, string errorMessage)
         {
-            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), new VirtualFileSystem());
+            var options = new ConsoleOptions(new VirtualFileSystem());
 
             options.PreParse(args.Split(' '));
 
@@ -119,7 +119,7 @@ namespace NUnit.ConsoleRunner.Tests
             var fileSystem = new VirtualFileSystem();
             var lines = new string[] { "@file1.txt" };
             fileSystem.SetupFile("file1.txt", lines);
-            var options = new ConsoleOptions(new DefaultOptionsProviderStub(false), fileSystem);
+            var options = new ConsoleOptions(fileSystem);
             var expectedErrors = new string[] { "Arguments file nesting exceeds maximum depth of 3." };
 
             var arglist = options.PreParse(lines);
@@ -431,7 +431,6 @@ namespace NUnit.ConsoleRunner.Tests
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
-                new DefaultOptionsProviderStub(false),
                 fileSystem,
                 "tests.dll", $"-result:results.xml;transform={transformFile}");
             Assert.That(options.Validate(), Is.True);
@@ -469,7 +468,6 @@ namespace NUnit.ConsoleRunner.Tests
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
 
             ConsoleOptions options = new ConsoleOptions(
-                new DefaultOptionsProviderStub(false),
                 fileSystem,
                 "tests.dll", "-result:results.xml", "-result:nunit2results.xml;format=nunit2", $"-result:myresult.xml;transform={transformFile}");
             Assert.That(options.Validate(), Is.True, "Should be valid");
@@ -521,7 +519,6 @@ namespace NUnit.ConsoleRunner.Tests
             const string missingXslt = "missing.xslt";
 
             var options = new ConsoleOptions(
-                new DefaultOptionsProviderStub(false),
                 new VirtualFileSystem(),
                 "test.dll", $"-result:userspecifed.xml;transform={missingXslt}");
             Assert.That(options.ResultOutputSpecifications, Has.Exactly(1).Items
@@ -573,7 +570,6 @@ namespace NUnit.ConsoleRunner.Tests
             string transformFile = Path.Combine(TestContext.CurrentContext.TestDirectory, "TextSummary.xslt");
             IFileSystem fileSystem = GetFileSystemContainingFile(transformFile);
             ConsoleOptions options = new ConsoleOptions(
-                new DefaultOptionsProviderStub(false),
                 fileSystem,
                 "tests.dll", $"-explore:results.xml;transform={transformFile}");
             Assert.That(options.Validate(), Is.True);
@@ -599,14 +595,9 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ExploreOutputSpecifications[0].OutputPath, Is.EqualTo("C:/nunit/tests/bin/Debug/console-test.xml"));
         }
 
-        [Test]
-        [TestCase(true, null, true)]
-        [TestCase(false, null, false)]
-        [TestCase(true, false, true)]
-        [TestCase(false, false, false)]
-        [TestCase(true, true, true)]
-        [TestCase(false, true, true)]
-        public void ShouldSetTeamCityFlagAccordingToArgsAndDefaults(bool hasTeamcityInCmd, bool? defaultTeamcity, bool expectedTeamCity)
+        [TestCase(true, true)]
+        [TestCase(false, false)]
+        public void ShouldSetTeamCityFlagAccordingToArgsAndDefaults(bool hasTeamcityInCmd, bool expectedTeamCity)
         {
             // Given
             List<string> args = new List<string> { "tests.dll" };
@@ -615,15 +606,7 @@ namespace NUnit.ConsoleRunner.Tests
                 args.Add("--teamcity");
             }
 
-            ConsoleOptions options;
-            if (defaultTeamcity.HasValue)
-            {
-                options = new ConsoleOptions(new DefaultOptionsProviderStub(defaultTeamcity.Value), new VirtualFileSystem(), args.ToArray());
-            }
-            else
-            {
-                options = ConsoleMocks.Options(args.ToArray());
-            }
+            ConsoleOptions options = ConsoleMocks.Options(args.ToArray());
 
             // When
             var actualTeamCity = options.TeamCity;
@@ -872,16 +855,6 @@ namespace NUnit.ConsoleRunner.Tests
             PropertyInfo property = typeof(ConsoleOptions).GetProperty(propertyName);
             Assert.That(property, Is.Not.Null, "The property '{0}' is not defined", propertyName);
             return property;
-        }
-
-        internal sealed class DefaultOptionsProviderStub : IDefaultOptionsProvider
-        {
-            public DefaultOptionsProviderStub(bool teamCity)
-            {
-                TeamCity = teamCity;
-            }
-
-            public bool TeamCity { get; private set; }
         }
     }
 }

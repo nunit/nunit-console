@@ -28,11 +28,8 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         protected readonly IFileSystem _fileSystem;
 
-        internal ConsoleOptions(IDefaultOptionsProvider defaultOptionsProvider, IFileSystem fileSystem, params string[] args)
+        internal ConsoleOptions(IFileSystem fileSystem, params string[] args)
         {
-            // Apply default options
-            if (defaultOptionsProvider == null) throw new ArgumentNullException(nameof(defaultOptionsProvider));
-            TeamCity = defaultOptionsProvider.TeamCity;
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
             ConfigureOptions();
