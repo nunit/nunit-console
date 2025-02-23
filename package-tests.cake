@@ -319,12 +319,23 @@ public static class PackageTests
         });
 
         // TeamCity Event Listener Test
-        StandardAndZipLists.Add(new PackageTest(1, "TeamCityListenerTest")
+        StandardAndZipLists.Add(new PackageTest(1, "TeamCityListenerTest1")
         {
-            Description = "Run mock-assembly with --teamcity enabled",
+            Description = "Run mock-assembly with --teamcity option",
             Arguments = "testdata/net462/mock-assembly.dll --teamcity",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
-            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener }
+            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            OutputCheck = new OutputContains("##teamcity")
+        });
+
+        // TeamCity Event Listener Test
+        StandardAndZipLists.Add(new PackageTest(1, "TeamCityListenerTest2")
+        {
+            Description = "Run mock-assembly with --enable teamcity option",
+            Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener",
+            ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
+            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            OutputCheck = new OutputContains("##teamcity")
         });
 
         // V2 Framework Driver Tests

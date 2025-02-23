@@ -29,6 +29,7 @@ namespace NUnit.ConsoleRunner
         private const string EVENT_LISTENER_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/ITestEventListener";
         private const string TEAMCITY_EVENT_LISTENER_FULLNAME = "NUnit.Engine.Listeners.TeamCityEventListener";
         private const string TEAMCITY_EVENT_LISTENER_NAME = "TeamCityEventListener";
+        private const string TEAMCITY_PROJECT_NAME = "TEAMCITY_PROJECT_NAME";
 
         private const string NUNIT_EXTENSION_DIRECTORIES = "NUNIT_EXTENSION_DIRECTORIES";
 
@@ -72,7 +73,7 @@ namespace NUnit.ConsoleRunner
                     _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             foreach (string extensionDirectory in _options.ExtensionDirectories)
-               _extensionService.FindExtensionAssemblies(extensionDirectory);
+                _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             _workDirectory = options.WorkDirectory;
             if (_workDirectory != null)
@@ -80,19 +81,41 @@ namespace NUnit.ConsoleRunner
             else
                 _workDirectory = null;
 
-            if (_options.TeamCity)
+            // Attempt to enable extensions as requested by the user
+            foreach (string typeName in options.EnableExtensions)
             {
-                bool teamcityInstalled = false;
-                foreach (var node in _extensionService.GetExtensionNodes(EVENT_LISTENER_EXTENSION_PATH))
-                    if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER_FULLNAME)
-                        break;
-                if (!teamcityInstalled)
-                    throw new RequiredExtensionException(TEAMCITY_EVENT_LISTENER_NAME, "--teamcity");
+                // Throw if requested extension is not installed
+                if (!IsExtensionInstalled(typeName))
+                    throw new RequiredExtensionException(typeName);
+
+                EnableExtension(typeName);
             }
 
-            // Enable TeamCityEventListener immediately, before the console is redirected
-            _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
+            // Also enable TeamCity extension under TeamCity, if it is installed
+            if (RunningUnderTeamCity && IsExtensionInstalled(TEAMCITY_EVENT_LISTENER_FULLNAME))
+                EnableExtension(TEAMCITY_EVENT_LISTENER_FULLNAME);
+
+            // Disable extensions as requested by the user, ignoring any not installed
+            foreach (string typeName in options.DisableExtensions)
+                if (IsExtensionInstalled(typeName))
+                    DisableExtension(typeName);
         }
+
+        private bool RunningUnderTeamCity =>
+            !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
+
+        private bool IsExtensionInstalled(string typeName)
+        {
+            foreach (var node in _extensionService.Extensions)
+                if (node.TypeName == typeName) return true;
+
+            return false;
+        }
+
+        private void EnableExtension(string name) => _extensionService.EnableExtension(name, true);
+
+        private void DisableExtension(string name) => _extensionService.EnableExtension(name, false);
+
 
         /// <summary>
         /// Executes tests according to the provided commandline options.

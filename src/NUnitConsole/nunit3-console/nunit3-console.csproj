@@ -27,9 +27,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ConsoleTests.nunit" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Guard.cs" Link="Utilities\Guard.cs" />
     <Compile Include="..\..\NUnitEngine\nunit.engine.core\Internal\ExceptionHelper.cs" Link="Utilities\ExceptionHelper.cs" />
     <Content Include="..\..\..\nunit.ico" Link="nunit.ico" />
+    <Content Include="ConsoleTests.nunit">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   
   <ItemGroup>

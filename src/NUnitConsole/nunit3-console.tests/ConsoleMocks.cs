@@ -11,8 +11,7 @@ namespace NUnit.ConsoleRunner.Tests
         public static ConsoleOptions Options(params string[] args)
         {
             var mockFileSystem = Substitute.For<IFileSystem>();
-            var mockDefaultsProvider = Substitute.For<IDefaultOptionsProvider>();
-            return new ConsoleOptions(mockDefaultsProvider, mockFileSystem, args);
+            return new ConsoleOptions(mockFileSystem, args);
         }
     }
 }

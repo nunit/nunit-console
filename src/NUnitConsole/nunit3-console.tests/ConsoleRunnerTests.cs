@@ -44,7 +44,16 @@ namespace NUnit.ConsoleRunner.Tests
             var ex = Assert.Throws<RequiredExtensionException>(
                 () => new ConsoleRunner(_testEngine, ConsoleMocks.Options("mock-assembly.dll", "--teamcity"), new ColorConsoleWriter()));
 
-            Assert.That(ex, Has.Message.Contains("teamcity"));
+            Assert.That(ex, Has.Message.EqualTo("Required extension 'NUnit.Engine.Listeners.TeamCityEventListener' is not installed."));
+        }
+
+        [Test]
+        public void ThrowsRequiredExtensionExceptionWhenEnableOptionSpecifiesUnavailableExtension()
+        {
+            var ex = Assert.Throws<RequiredExtensionException>(
+                () => new ConsoleRunner(_testEngine, ConsoleMocks.Options("mock-assembly.dll", "--enable:Not.An.Extension"), new ColorConsoleWriter()));
+
+            Assert.That(ex, Has.Message.EqualTo("Required extension 'Not.An.Extension' is not installed."));
         }
     }
 
