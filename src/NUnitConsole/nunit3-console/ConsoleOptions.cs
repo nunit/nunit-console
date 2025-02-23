@@ -47,6 +47,9 @@ namespace NUnit.ConsoleRunner
 
         public bool ListExtensions { get; private set; }
 
+        public List<string> EnableExtensions { get; private set; } = new List<string>();
+        public List<string> DisableExtensions { get; private set; } = new List<string>();
+
         // Additional directories to be used to search for user extensions
         public List<string> ExtensionDirectories { get; } = new List<string>();
 
@@ -82,8 +85,6 @@ namespace NUnit.ConsoleRunner
         public bool NoHeader { get; private set; }
 
         public bool NoColor { get; private set; }
-
-        public bool TeamCity { get; private set; }
 
         public string OutFile { get; private set; }
         public bool OutFileSpecified { get { return OutFile != null; } }
@@ -301,9 +302,6 @@ namespace NUnit.ConsoleRunner
             this.Add("trace=", "Set internal trace {LEVEL}.\nValues: Off, Error, Warning, Info, Verbose (Debug)",
                 v => InternalTraceLevel = parser.RequiredValue(v, "--trace", "Off", "Error", "Warning", "Info", "Verbose", "Debug"));
 
-            this.Add("teamcity", "Turns on use of TeamCity service messages. TeamCity engine extension is required.",
-                v => TeamCity = v != null);
-
             this.Add("noheader|noh", "Suppress display of program information at start of run.",
                 v => NoHeader = v != null);
 
@@ -381,8 +379,29 @@ namespace NUnit.ConsoleRunner
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = v != null);
 
-            this.Add("extensionDirectory=", "Specifies an additional directory to be examined for extensions. May be repeated.",
-                v => { ExtensionDirectories.Add(Path.GetFullPath(v)); });
+            this.Add("extensionDirectory=", "Specifies an additional directory to be examined for extensions. May be repeated.", v => 
+            {
+                string dir = parser.RequiredValue(v, "--extensionDirectory");
+                if (dir != null)
+                    ExtensionDirectories.Add(dir); 
+            });
+
+            this.Add("teamcity", "Turns on use of TeamCity service messages. TeamCity engine extension is required.",
+                v => EnableExtensions.Add("NUnit.Engine.Listeners.TeamCityEventListener")); //TeamCity = v != null);
+
+            this.Add("enable=", "Enables the specified extension. May be repeated.", v =>
+            {
+                string extension = parser.RequiredValue(v, "--enable");
+                if (!string.IsNullOrEmpty(extension))
+                    EnableExtensions.Add(extension);
+            });
+
+            this.Add("disable=", "Disables the specified extension. May be repeated.", v =>
+            {
+                string extension = parser.RequiredValue(v, "--disable");
+                if (!string.IsNullOrEmpty(extension))
+                    DisableExtensions.Add(extension);
+            });
 
             this.AddNetFxOnlyOption("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
                 NetFxOnlyOption("set-principal-policy=", v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal")));

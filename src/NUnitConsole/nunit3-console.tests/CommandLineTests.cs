@@ -142,7 +142,6 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("WaitBeforeExit", "wait")]
         [TestCase("NoHeader", "noheader|noh")]
         [TestCase("DisposeRunners", "dispose-runners")]
-        [TestCase("TeamCity", "teamcity")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
         [TestCase("NoResult", "noresult")]
 #if NETFRAMEWORK
@@ -289,6 +288,9 @@ namespace NUnit.ConsoleRunner.Tests
         [TestCase("--test-name-format")]
         [TestCase("--params")]
         [TestCase("--encoding")]
+        [TestCase("--extensionDirectory")]
+        [TestCase("--enable")]
+        [TestCase("--disable")]
 #if NETFRAMEWORK
         [TestCase("--process")]
         [TestCase("--domain")]
@@ -595,26 +597,6 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.ExploreOutputSpecifications[0].OutputPath, Is.EqualTo("C:/nunit/tests/bin/Debug/console-test.xml"));
         }
 
-        [TestCase(true, true)]
-        [TestCase(false, false)]
-        public void ShouldSetTeamCityFlagAccordingToArgsAndDefaults(bool hasTeamcityInCmd, bool expectedTeamCity)
-        {
-            // Given
-            List<string> args = new List<string> { "tests.dll" };
-            if (hasTeamcityInCmd)
-            {
-                args.Add("--teamcity");
-            }
-
-            ConsoleOptions options = ConsoleMocks.Options(args.ToArray());
-
-            // When
-            var actualTeamCity = options.TeamCity;
-
-            // Then
-            Assert.That(expectedTeamCity, Is.EqualTo(actualTeamCity));
-        }
-
         [Test]
         public void ShouldNotFailOnEmptyLine()
         {
@@ -829,11 +811,28 @@ namespace NUnit.ConsoleRunner.Tests
             Assert.That(options.DisplayTestLabels, Is.EqualTo(newOption));
         }
 
+        [Test]
         public void UserExtensionDirectoryTest()
         {
             ConsoleOptions options = ConsoleMocks.Options("--extensionDirectory=/a/b/c");
             Assert.That(options.Validate);
             Assert.That(options.ExtensionDirectories.Contains("/a/b/c"));
+        }
+
+        [Test]
+        public void EnableExtensionTest()
+        {
+            ConsoleOptions options = ConsoleMocks.Options("--enable=NUnit.Engine.Listeners.TeamCityEventListener");
+            Assert.That(options.Validate);
+            Assert.That(options.EnableExtensions.Contains("NUnit.Engine.Listeners.TeamCityEventListener"));
+        }
+
+        [Test]
+        public void DisableExtensionTest()
+        {
+            ConsoleOptions options = ConsoleMocks.Options("--disable=NUnit.Engine.Listeners.TeamCityEventListener");
+            Assert.That(options.Validate);
+            Assert.That(options.DisableExtensions.Contains("NUnit.Engine.Listeners.TeamCityEventListener"));
         }
 
         private static IFileSystem GetFileSystemContainingFile(string fileName)
@@ -853,7 +852,7 @@ namespace NUnit.ConsoleRunner.Tests
         private static PropertyInfo GetPropertyInfo(string propertyName)
         {
             PropertyInfo property = typeof(ConsoleOptions).GetProperty(propertyName);
-            Assert.That(property, Is.Not.Null, "The property '{0}' is not defined", propertyName);
+            Assert.That(property, Is.Not.Null, $"The property '{propertyName}' is not defined");
             return property;
         }
     }
