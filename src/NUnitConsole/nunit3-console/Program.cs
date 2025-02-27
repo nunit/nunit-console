@@ -22,7 +22,7 @@ namespace NUnit.ConsoleRunner
     public class Program
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
-        static readonly ConsoleOptions Options = new ConsoleOptions(new DefaultOptionsProvider(), new FileSystem());
+        static readonly ConsoleOptions Options = new ConsoleOptions(new FileSystem());
         private static ExtendedTextWriter _outWriter;
 
         // This has to be lazy otherwise NoColor command line option is not applied correctly
