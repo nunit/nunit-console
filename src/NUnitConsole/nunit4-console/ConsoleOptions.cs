@@ -6,10 +6,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using NUnit.Engine;
 
-namespace NUnit.ConsoleRunner.Options
+namespace NUnit.ConsoleRunner
 {
+    using Options;
+
     /// <summary>
     /// <c>ConsoleOptions</c> encapsulates the option settings for
     /// the nunit4-console program. The class inherits from the Mono
@@ -25,11 +26,8 @@ namespace NUnit.ConsoleRunner.Options
         /// </summary>
         protected readonly IFileSystem _fileSystem;
 
-        internal ConsoleOptions(IDefaultOptionsProvider defaultOptionsProvider, IFileSystem fileSystem, params string[] args)
+        internal ConsoleOptions(IFileSystem fileSystem, params string[] args)
         {
-            // Apply default options
-            if (defaultOptionsProvider == null) throw new ArgumentNullException(nameof(defaultOptionsProvider));
-            TeamCity = defaultOptionsProvider.TeamCity;
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
             ConfigureOptions();
@@ -44,6 +42,14 @@ namespace NUnit.ConsoleRunner.Options
         public bool ShowHelp { get; private set; }
 
         public bool ShowVersion { get; private set; }
+
+        public bool ListExtensions { get; private set; }
+
+        public List<string> EnableExtensions { get; private set; } = new List<string>();
+        public List<string> DisableExtensions { get; private set; } = new List<string>();
+
+        // Additional directories to be used to search for user extensions
+        public List<string> ExtensionDirectories { get; } = new List<string>();
 
         // Select tests
 
@@ -79,8 +85,6 @@ namespace NUnit.ConsoleRunner.Options
         public bool NoHeader { get; private set; }
 
         public bool NoColor { get; private set; }
-
-        public bool TeamCity { get; private set; }
 
         public string? OutFile { get; private set; }
 
@@ -152,8 +156,6 @@ namespace NUnit.ConsoleRunner.Options
         public bool DebugTests { get; private set; }
 
         public bool DebugAgent { get; private set; }
-
-        public bool ListExtensions { get; private set; }
 
         public bool PauseBeforeRun { get; private set; }
 
@@ -261,6 +263,13 @@ namespace NUnit.ConsoleRunner.Options
                         DisplayTestLabels = parser.RequiredValue(v, "--labels", "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter");
                 });
 
+            this.Add("extensionDirectory=", "Specifies an additional directory to be examined for extensions. May be repeated.", v =>
+            {
+                string dir = parser.RequiredValue(v, "--extensionDirectory");
+                if (!string.IsNullOrEmpty(dir))
+                    ExtensionDirectories.Add(dir);
+            });
+
             this.Add("test-name-format=", "Non-standard naming pattern to use in generating test names.",
                 v => DefaultTestNamePattern = parser.RequiredValue(v, "--test-name-format"));
 
@@ -268,7 +277,21 @@ namespace NUnit.ConsoleRunner.Options
                 v => InternalTraceLevel = parser.RequiredValue(v, "--trace", "Off", "Error", "Warning", "Info", "Verbose", "Debug"));
 
             this.Add("teamcity", "Turns on use of TeamCity service messages. TeamCity engine extension is required.",
-                v => TeamCity = !string.IsNullOrEmpty(v));
+                v => EnableExtensions.Add("NUnit.Engine.Listeners.TeamCityEventListener"));
+
+            this.Add("enable=", "Enables the specified extension. May be repeated.", v =>
+            {
+                string extension = parser.RequiredValue(v, "--enable");
+                if (!string.IsNullOrEmpty(extension))
+                    EnableExtensions.Add(extension);
+            });
+
+            this.Add("disable=", "Disables the specified extension. May be repeated.", v =>
+            {
+                string extension = parser.RequiredValue(v, "--disable");
+                if (!string.IsNullOrEmpty(extension))
+                    DisableExtensions.Add(extension);
+            });
 
             this.Add("noheader|noh", "Suppress display of program information at start of run.",
                 v => NoHeader = !string.IsNullOrEmpty(v));

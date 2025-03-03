@@ -46,12 +46,11 @@
     <Compile Include="..\nunit4-console\ConsoleTestResult.cs" Link="ConsoleTestResult.cs" />
     <Compile Include="..\nunit4-console\FileSystem.cs" Link="FileSystem.cs" />
     <Compile Include="..\nunit4-console\FrameworkPackageSettings.cs" Link="FrameworkPackageSettings.cs" />
-    <Compile Include="..\nunit4-console\Options\DefaultOptionsProvider.cs" Link="Options\DefaultOptionsProvider.cs" />
-    <Compile Include="..\nunit4-console\Options\IDefaultOptionsProvider.cs" Link="Options\IDefaultOptionsProvider.cs" />
     <Compile Include="..\nunit4-console\Options\OptionParser.cs" Link="Options\OptionParser.cs" />
     <Compile Include="..\nunit4-console\Options\Options.cs" Link="Options\Options.cs" />
     <Compile Include="..\nunit4-console\Options\OutputSpecification.cs" Link="Options\OutputSpecification.cs" />
     <Compile Include="..\nunit4-console\Options\TestNameParser.cs" Link="Options\TestNameParser.cs" />
+    <Compile Include="..\nunit4-console\RequiredExtensionException.cs" Link="RequiredExtensionException.cs" />
     <Compile Include="..\nunit4-console\ResultReporter.cs" Link="ResultReporter.cs" />
     <Compile Include="..\nunit4-console\ResultSummary.cs" Link="ResultSummary.cs" />
     <Compile Include="..\nunit4-console\SafeAttributeAccess.cs" Link="SafeAttributeAccess.cs" />
