@@ -2,9 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using NUnit.Engine;
 using NUnit.FileSystemAccess;
 using TestCentric.Metadata;
 
@@ -15,6 +17,8 @@ namespace NUnit.Extensibility
         static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
         static readonly string EXTENSION_ATTRIBUTE = typeof(ExtensionAttribute).FullName.ShouldNotBeNull();
         static readonly string EXTENSION_PROPERTY_ATTRIBUTE = typeof(ExtensionPropertyAttribute).FullName.ShouldNotBeNull();
+        static readonly string V3_EXTENSION_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionAttribute";
+        static readonly string V3_EXTENSION_PROPERTY_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionPropertyAttribute";
 
         static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
@@ -372,6 +376,7 @@ namespace NUnit.Extensibility
                 string entryDir = entry.DirectoryName;
                 string entryFile = entry.FileName;
 
+                log.Debug($"Processing entry {entry.Text}");
                 if (entry.IsDirectory)
                 {
                     if (entry.IsFullyQualified)
@@ -400,9 +405,13 @@ namespace NUnit.Extensibility
 
         private void ProcessCandidateAssembly(string filePath, bool fromWildCard)
         {
+            log.Debug($"Processing candidate assembly {filePath}");
             // Did we already process this file?
             if (_assemblies.ByPath.ContainsKey(filePath))
+            {
+                log.Debug("  Skipping assembly already processed");
                 return;
+            }
 
             try
             {
@@ -411,7 +420,10 @@ namespace NUnit.Extensibility
 
                 // We never add assemblies unless the host can load them
                 if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidateAssembly))
+                {
+                    log.Debug("  Unable to load this assembly");
                     return;
+                }
 
                 // Do we already have a copy of the same assembly at a different path?
                 //if (_assemblies.ByName.ContainsKey(assemblyName))
@@ -423,6 +435,7 @@ namespace NUnit.Extensibility
                     return;
                 }
 
+                log.Debug("  Adding this assembly");
                 _assemblies.Add(candidateAssembly);
             }
             catch (Exception) when(fromWildCard)
@@ -461,29 +474,33 @@ namespace NUnit.Extensibility
             }
 
 #if NETFRAMEWORK
-#if FIXED
-            // Use special properties provided by our backport of RuntimeInformation
-            Version currentVersion = RuntimeInformation.FrameworkVersion;
-            var frameworkName = extensionAssembly.FrameworkName;
+            //// Use special properties provided by our backport of RuntimeInformation
+            //Version currentVersion = RuntimeInformation.FrameworkVersion;
+            //var frameworkName = extensionAssembly.FrameworkName;
 
-            if (frameworkName.Identifier != FrameworkIdentifiers.NetFramework || frameworkName.Version > currentVersion)
-            {
-                if (!extensionAssembly.FromWildCard)
-                {
-                    throw new NUnitEngineException($"Extension {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
-                }
-                else
-                {
-                    log.Info($"Assembly {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
-                    return;
-                }
-            }
-#endif
+            //if (frameworkName.Identifier != FrameworkIdentifiers.NetFramework || frameworkName.Version > currentVersion)
+            //{
+            //    if (!extensionAssembly.FromWildCard)
+            //    {
+            //        throw new NUnitEngineException($"Extension {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
+            //    }
+            //    else
+            //    {
+            //        log.Info($"Assembly {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
+            //        return;
+            //    }
+            //}
 #endif
 
             foreach (var extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
             {
+                bool useV3Attribute = false;
                 CustomAttribute extensionAttr = extensionType.GetAttribute(EXTENSION_ATTRIBUTE);
+                if (extensionAttr == null) 
+                {
+                    extensionAttr = extensionType.GetAttribute(V3_EXTENSION_ATTRIBUTE);
+                    useV3Attribute = true;
+                }
 
                 if (extensionAttr == null)
                     continue;
@@ -512,7 +529,11 @@ namespace NUnit.Extensibility
 
                 log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
 
-                foreach (var attr in extensionType.GetAttributes(EXTENSION_PROPERTY_ATTRIBUTE))
+                var propertyAttributes = useV3Attribute
+                    ? extensionType.GetAttributes(V3_EXTENSION_PROPERTY_ATTRIBUTE)
+                    : extensionType.GetAttributes(EXTENSION_PROPERTY_ATTRIBUTE);
+
+                foreach (var attr in propertyAttributes)
                 {
                     string? name = attr.ConstructorArguments[0].Value as string;
                     string? value = attr.ConstructorArguments[1].Value as string;

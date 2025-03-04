@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.3.0
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.1
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -79,8 +79,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
                 "Microsoft.Extensions.DependencyModel.dll")
         },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
-            + $"NUnit.ConsoleRunner.NetCore.{BuildSettings.PackageVersion}/nunit.exe"),
+        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
         tests: NetCoreRunnerTests),
 
     NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
@@ -167,10 +166,10 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
         _executablePath = executablePath;
     }
 
-    public int RunPackageTest(string arguments)
+    public int RunPackageTest(string arguments, bool redirectOutput)
     {
         Console.WriteLine("Running package test");
-        return base.RunTest(_executablePath, arguments);
+        return base.RunPackageTest(_executablePath, new ProcessSettings() { Arguments = arguments, RedirectStandardOutput = redirectOutput });
     }
 }
 

@@ -21,6 +21,8 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ConsoleRunner
     {
+        static Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
+
         // Some operating systems truncate the return code to 8 bits, which
         // only allows us a maximum of 127 in the positive range. We limit
         // ourselves so as to stay in that range.
@@ -68,19 +70,40 @@ namespace NUnit.ConsoleRunner
 
             // TODO: Exit with error if any of the services are not found
 
-            if (_options.TeamCity)
+            // Attempt to enable extensions as requested by the user
+            foreach (string typeName in options.EnableExtensions)
             {
-                bool teamcityInstalled = false;
-                foreach (var node in _extensionService.GetExtensionNodes(EVENT_LISTENER_EXTENSION_PATH))
-                    if (teamcityInstalled = node.TypeName == TEAMCITY_EVENT_LISTENER)
-                        break;
+                // Throw if requested extension is not installed
+                if (!IsExtensionInstalled(typeName))
+                    throw new RequiredExtensionException(typeName);
 
-                if (!teamcityInstalled) throw new NUnitEngineException("Option --teamcity specified but the extension is not installed.");
+                EnableExtension(typeName);
             }
 
-            // Enable TeamCityEventListener immediately, before the console is redirected
-            _extensionService.EnableExtension("NUnit.Engine.Listeners.TeamCityEventListener", _options.TeamCity);
+            // Also enable TeamCity extension under TeamCity, if it is installed
+            if (RunningUnderTeamCity && IsExtensionInstalled(TEAMCITY_EVENT_LISTENER))
+                EnableExtension(TEAMCITY_EVENT_LISTENER);
+
+            // Disable extensions as requested by the user, ignoring any not installed
+            foreach (string typeName in options.DisableExtensions)
+                if (IsExtensionInstalled(typeName))
+                    DisableExtension(typeName);
         }
+
+        private bool RunningUnderTeamCity =>
+            !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
+
+        private bool IsExtensionInstalled(string typeName)
+        {
+            foreach (var node in _extensionService.Extensions)
+                if (node.TypeName == typeName) return true;
+
+            return false;
+        }
+
+        private void EnableExtension(string name) => _extensionService.EnableExtension(name, true);
+
+        private void DisableExtension(string name) => _extensionService.EnableExtension(name, false);
 
         /// <summary>
         /// Executes tests according to the provided command-line options.
@@ -165,6 +188,7 @@ namespace NUnit.ConsoleRunner
                 try
                 {
                     resultWriter = GetResultWriter(spec);
+                    log.Debug($"Got ResultWriter {resultWriter}");
                 }
                 catch (Exception ex)
                 {

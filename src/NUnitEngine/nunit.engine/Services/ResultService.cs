@@ -10,6 +10,8 @@ namespace NUnit.Engine.Services
 {
     public class ResultService : Service, IResultService
     {
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ResultService));
+
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases", "user" };
         private IEnumerable<ExtensionNode>? _extensionNodes;
 
@@ -44,13 +46,18 @@ namespace NUnit.Engine.Services
         /// <returns>An IResultWriter</returns>
         public IResultWriter GetResultWriter(string format, params object?[]? args)
         {
+            log.Debug($"GetResultWriter for format {format}");
+
             switch (format)
             {
                 case "nunit3":
+                    log.Debug("  Returning NUnit3XmlResultWriter");
                     return new NUnit3XmlResultWriter();
                 case "cases":
+                    log.Debug("  Returning TestCaseResultWriter");
                     return new TestCaseResultWriter();
                 case "user":
+                    log.Debug("  Returning XmlTransformResultWriter");
                     return new XmlTransformResultWriter(args!);
 
                 default:
@@ -58,7 +65,10 @@ namespace NUnit.Engine.Services
                         foreach (var node in _extensionNodes)
                             foreach (var supported in node.GetValues("Format"))
                                 if (supported == format)
+                                {
+                                    log.Debug($"  Returning {node.TypeName}");
                                     return (IResultWriter)node.ExtensionObject;
+                                }
                     throw new NUnitEngineException("ResultWriter not found for format: " + format);
             }
         }
