@@ -7,4 +7,16 @@
     <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NUnit.Extensibility.Api</PackageId>
+    <Description>Contains the Types required for creating an NUnit extension of any kind.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\LICENSE.txt" Pack="true">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  
 </Project>

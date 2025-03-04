@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.1
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.2
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -24,6 +24,7 @@ PackageDefinition NUnitConsoleRunnerNetCorePackage;
 PackageDefinition NUnitConsoleRunnerNet80Package;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
+PackageDefinition NUnitExtensibilityApiPackage;
 PackageDefinition NUnitConsoleRunnerChocolateyPackage;
 
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
@@ -51,10 +52,10 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
             HasDirectory("tools/agents/net462").WithFiles(
-                "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.agent.core.pdb", 
+                "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb", "nunit.agent.core.pdb", 
                 "nunit.extensibility.pdb", "nunit.extensibility.api.pdb", "nunit.common.pdb", "nunit.engine.api.pdb"),
             HasDirectory("tools/agents/net8.0").WithFiles(
-                "nunit-agent.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+                "nunit-agent-net80.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
@@ -130,11 +131,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("lib/net8.0").WithFiles(
                 "nunit.engine.pdb","nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb"),
-            HasDirectory("contentFiles/any/agents/net462").WithFiles(
-                "nunit-agent.pdb", "nunit-agent-x86.pdb", "nunit.engine.core.pdb", "nunit.extensibility.pdb",
+            HasDirectory("agents/net462").WithFiles(
+                "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb",
                 "nunit.extensibility.api.pdb", "nunit.common.pdb", "nunit.engine.api.pdb"),
-            HasDirectory("contentFiles/any/agents/net8.0").WithFiles(
-                "nunit-agent.pdb", "nunit.engine.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+            HasDirectory("agents/net8.0").WithFiles(
+                "nunit-agent-net80.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb")
         }),
 
@@ -149,6 +150,19 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         symbols: new PackageCheck[] {
             HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
             HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
+        }),
+
+    NUnitExtensibilityApiPackage = new NuGetPackage(
+        id: "NUnit.Extensibility.Api",
+        source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
+        checks: new PackageCheck[] {
+            HasFile("LICENSE.txt"),
+            HasDirectory("lib/net462").WithFile("nunit.extensibility.api.dll"),
+            HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.dll")
+        },
+        symbols: new PackageCheck[] {
+            HasDirectory("lib/net462").WithFile("nunit.extensibility.api.pdb"),
+            HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
         })
 });
 
