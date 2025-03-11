@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.1
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.5
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -147,8 +147,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         symbols: new PackageCheck[] {
             HasDirectory("lib/net462").WithFiles(ENGINE_PDB_FILES),
-            HasDirectory("lib/netstandard2.0").WithFiles(ENGINE_PDB_FILES),
-            HasDirectory("lib/net6.0").WithFiles(ENGINE_PDB_FILES),
             HasDirectory("lib/net8.0").WithFiles(ENGINE_PDB_FILES),
             HasDirectory("contentFiles/any/agents/net462").WithFiles(AGENT_PDB_FILES)
         }),
