@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.5
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.6
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -117,7 +117,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("NUnit.Extension.NUnitProjectLoader.3.8.0"),
             HasDirectory("NUnit.Extension.NUnitV2Driver.3.9.0"),
             HasDirectory("NUnit.Extension.NUnitV2ResultWriter.3.8.0"),
-            HasDirectory("NUnit.Extension.TeamCityEventListener.1.0.7"),
+            HasDirectory("NUnit.Extension.TeamCityEventListener.1.0.9"),
             HasDirectory("NUnit.Extension.VSProjectLoader.3.9.0"),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
