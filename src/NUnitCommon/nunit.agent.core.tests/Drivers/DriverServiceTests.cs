@@ -38,8 +38,8 @@ namespace NUnit.Engine.Services
             new TestCaseData("mock-assembly.pdb", true, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("junk.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
             new TestCaseData("junk.dll", true, typeof(InvalidAssemblyFrameworkDriver)),
-            new TestCaseData("nunit.engine.core.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
-            new TestCaseData("nunit.engine.core.dll", true, typeof(SkippedAssemblyFrameworkDriver))
+            new TestCaseData("nunit.agent.core.dll", false, typeof(InvalidAssemblyFrameworkDriver)),
+            new TestCaseData("nunit.agent.core.dll", true, typeof(SkippedAssemblyFrameworkDriver))
         };
 
         [Test]

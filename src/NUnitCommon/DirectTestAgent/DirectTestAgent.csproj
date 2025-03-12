@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>NUnit.Agents.Agents</RootNamespace>
+		<OutputType>Exe</OutputType>
+		<TargetFrameworks>net462;net8.0</TargetFrameworks>
+		<OutputPath>..\..\bin\$(Configuration)\direct-test-agent\</OutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+		<ProjectReference Include="..\nunit.agent.core\nunit.agent.core.csproj" />
+		<ProjectReference Include="..\nunit.extensibility\nunit.extensibility.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
+		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
+	</ItemGroup>
+
+</Project>
