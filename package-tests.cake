@@ -26,35 +26,35 @@ public static class PackageTests
 
         StandardAndZipLists.Add(new PackageTest(1, "Net462Test")
         {
-            Description="Run mock-assembly.dll under .NET 4.6.2",
+            Description= "Run mock-assembly.dll targeting .NET 4.6.2",
             Arguments="testdata/net462/mock-assembly.dll",
             ExpectedResult=new MockAssemblyExpectedResult("net-4.6.2")
         });
 
         AllLists.Add(new PackageTest(1, "Net80Test")
         {
-            Description = "Run mock-assembly.dll under .NET 8.0",
+            Description = "Run mock-assembly.dll targeting .NET 8.0",
             Arguments = "testdata/net8.0/mock-assembly.dll",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
         });
 
         AllLists.Add(new PackageTest(1, "Net70Test")
         {
-            Description = "Run mock-assembly.dll under .NET 7.0",
+            Description = "Run mock-assembly.dll targeting .NET 7.0",
             Arguments = "testdata/net7.0/mock-assembly.dll",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-7.0")
         });
 
         AllLists.Add(new PackageTest(1, "Net60Test")
         {
-            Description = "Run mock-assembly.dll under .NET 6.0",
+            Description = "Run mock-assembly.dll targeting .NET 6.0",
             Arguments = "testdata/net6.0/mock-assembly.dll",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0")
         });
 
         AllLists.Add(new PackageTest(1, "NetCore31Test")
         {
-            Description = "Run mock-assembly.dll under .NET Core 3.1",
+            Description = "Run mock-assembly.dll targeting .NET Core 3.1",
             Arguments = "testdata/netcoreapp3.1/mock-assembly.dll",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-3.1")
         });
@@ -70,7 +70,7 @@ public static class PackageTests
         // X86 is always available for .NET Framework
         StandardAndZipLists.Add(new PackageTest(1, "Net462X86Test")
         {
-            Description = "Run mock-assembly-x86.dll under .NET 4.6.2",
+            Description = "Run mock-assembly-x86.dll targeting .NET 4.6.2",
             Arguments = "testdata/net462/mock-assembly-x86.dll",
             ExpectedResult = new MockAssemblyX86ExpectedResult("net-4.6.2")
         });
@@ -82,7 +82,7 @@ public static class PackageTests
 
             StandardAndZipLists.Add(new PackageTest(1, "Net80X86Test")
             {
-                Description = "Run mock-assembly-x86.dll under .NET 8.0",
+                Description = "Run mock-assembly-x86.dll targeting .NET 8.0",
                 Arguments = "testdata/net8.0/mock-assembly-x86.dll",
                 ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-8.0")
             });
@@ -90,14 +90,14 @@ public static class PackageTests
             if (!onGitHubActions)
                 StandardAndZipLists.Add(new PackageTest(1, "Net70X86Test")
                 {
-                    Description = "Run mock-assembly-x86.dll under .NET 7.0",
+                    Description = "Run mock-assembly-x86.dll targeting .NET 7.0",
                     Arguments = "testdata/net7.0/mock-assembly-x86.dll",
                     ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-7.0")
                 });
 
             StandardAndZipLists.Add(new PackageTest(1, "Net60X86Test")
             {
-                Description = "Run mock-assembly-x86.dll under .NET 6.0",
+                Description = "Run mock-assembly-x86.dll targeting .NET 6.0",
                 Arguments = "testdata/net6.0/mock-assembly-x86.dll",
                 ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
             });
@@ -105,7 +105,7 @@ public static class PackageTests
             if (!onGitHubActions)
                 StandardAndZipLists.Add(new PackageTest(1, "NetCore31X86Test")
                 {
-                    Description = "Run mock-assembly-x86.dll under .NET Core 3.1",
+                    Description = "Run mock-assembly-x86.dll targeting .NET Core 3.1",
                     Arguments = "testdata/netcoreapp3.1/mock-assembly-x86.dll",
                     ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-3.1")
                 });
@@ -124,14 +124,14 @@ public static class PackageTests
 
         StandardAndZipLists.Add(new PackageTest(1, "Net60PlusNet80Test")
         {
-            Description = "Run mock-assembly under .NET6.0 and 8.0 together",
+            Description = "Run mock-assembly targeting .NET6.0 and 8.0 together",
             Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0")
         });
 
         StandardAndZipLists.Add(new PackageTest(1, "Net462PlusNet60Test")
         {
-            Description = "Run mock-assembly under .Net Framework 4.6.2 and .Net 6.0 together",
+            Description = "Run mock-assembly targeting .Net Framework 4.6.2 and .Net 6.0 together",
             Arguments = "testdata/net462/mock-assembly.dll testdata/net6.0/mock-assembly.dll",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0")
         });
@@ -178,7 +178,7 @@ public static class PackageTests
 
         AllLists.Add(new PackageTest(1, "Net60WindowsFormsTest")
         {
-            Description = "Run test using windows forms under .NET 6.0",
+            Description = "Run test using windows forms targeting .NET 6.0",
             Arguments = "testdata/net6.0-windows/windows-forms-test.dll",
             ExpectedResult = new ExpectedResult("Passed")
             {
@@ -194,7 +194,7 @@ public static class PackageTests
 
         StandardAndZipLists.Add(new PackageTest(1, "Net80WindowsFormsTest")
         {
-            Description = "Run test using windows forms under .NET 8.0",
+            Description = "Run test using windows forms targeting .NET 8.0",
             Arguments = "testdata/net8.0-windows/windows-forms-test.dll",
             ExpectedResult = new ExpectedResult("Passed")
             {
@@ -214,14 +214,14 @@ public static class PackageTests
 
         AllLists.Add(new PackageTest(1, "Net60WPFTest")
         {
-            Description = "Run test using WPF under .NET 6.0",
+            Description = "Run test using WPF targeting .NET 6.0",
             Arguments = "testdata/net6.0-windows/WpfTest.dll --trace=Debug",
             ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }
         });
 
         AllLists.Add(new PackageTest(1, "Net80WPFTest")
         {
-            Description = "Run test using WPF under .NET 8.0",
+            Description = "Run test using WPF targeting .NET 8.0",
             Arguments = "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
             ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }
         });
@@ -258,7 +258,7 @@ public static class PackageTests
         // NUnit Project Loader Tests
         StandardAndZipLists.Add(new PackageTest(1, "NUnitProjectTest")
         { 
-            Description = "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
+            Description = "Run NUnit project with mock-assembly.dll targeting .NET 4.6.2 and 6.0",
             Arguments = "../../MixedTests.nunit --config=Release",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
             ExtensionsNeeded = new [] { KnownExtensions.NUnitProjectLoader }
@@ -266,7 +266,7 @@ public static class PackageTests
 
         NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
         {
-            Description="Run NUnit project with mock-assembly.dll built for .NET 6.0 and 8.0",
+            Description= "Run NUnit project with mock-assembly.dll targeting .NET 6.0 and 8.0",
             Arguments="../../NetCoreTests.nunit --config=Release",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
             ExtensionsNeeded = new [] { KnownExtensions.NUnitProjectLoader }
@@ -275,7 +275,7 @@ public static class PackageTests
         // V2 Result Writer Test
         AllLists.Add(new PackageTest(1, "V2ResultWriterTest")
         {
-            Description = "Run mock-assembly under .NET 6.0 and produce V2 output",
+            Description = "Run mock-assembly targeting .NET 6.0 and produce V2 output",
             Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0"),
             ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
@@ -318,22 +318,41 @@ public static class PackageTests
             ExtensionsNeeded = new[] { KnownExtensions.VSProjectLoader }
         });
 
-        // TeamCity Event Listener Test
-        StandardAndZipLists.Add(new PackageTest(1, "TeamCityListenerTest1")
+        // TeamCity Event Listener Tests
+        StandardAndZipLists.Add(new PackageTest(1, "Net462TeamCityListenerTest1")
         {
-            Description = "Run mock-assembly with --teamcity option",
-            Arguments = "testdata/net462/mock-assembly.dll --teamcity",
+            Description = "Run mock-assembly targeting .NET 4.6.2 with --teamcity option",
+            Arguments = "testdata/net462/mock-assembly.dll --teamcity --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
             ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
         });
 
         // TeamCity Event Listener Test
-        StandardAndZipLists.Add(new PackageTest(1, "TeamCityListenerTest2")
+        StandardAndZipLists.Add(new PackageTest(1, "Net462TeamCityListenerTest2")
         {
-            Description = "Run mock-assembly with --enable teamcity option",
-            Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener",
+            Description = "Run mock-assembly targeting .NET 4.6.2 with --enable teamcity option",
+            Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
+            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            OutputCheck = new OutputContains("##teamcity")
+        });
+
+        AllLists.Add(new PackageTest(1, "Net60TeamCityListenerTest1")
+        {
+            Description = "Run mock-assembly targeting .NET 6.0 with --teamcity option",
+            Arguments = "testdata/net6.0/mock-assembly.dll --teamcity --trace:Debug",
+            ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
+            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            OutputCheck = new OutputContains("##teamcity")
+        });
+
+        // TeamCity Event Listener Test
+        AllLists.Add(new PackageTest(1, "Net60TeamCityListenerTest2")
+        {
+            Description = "Run mock-assembly targeting .NET 6.0 with --enable teamcity option",
+            Arguments = "testdata/net6.0/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener --trace:Debug",
+            ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
             ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
         });
@@ -379,7 +398,7 @@ public static class PackageTests
 
         StandardAndZipLists.Add(new PackageTest(1, "InvalidTestNameTest_Net462")
         {
-            Description = "Ensure we handle invalid test names correctly under .NET 4.6.2",
+            Description = "Ensure we handle invalid test names correctly targeting .NET 4.6.2",
             Arguments = "testdata/net462/InvalidTestNames.dll --trace:Debug",
             ExpectedResult = new ExpectedResult("Passed")
             {
@@ -389,7 +408,7 @@ public static class PackageTests
 
         AllLists.Add(new PackageTest(1, "InvalidTestNameTest_Net60")
         {
-            Description = "Ensure we handle invalid test names correctly under .NET 6.0",
+            Description = "Ensure we handle invalid test names correctly targeting .NET 6.0",
             Arguments = "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
             ExpectedResult = new ExpectedResult("Passed")
             {
@@ -399,7 +418,7 @@ public static class PackageTests
 
         AllLists.Add(new PackageTest(1, "InvalidTestNameTest_Net80")
         {
-            Description = "Ensure we handle invalid test names correctly under .NET 8.0",
+            Description = "Ensure we handle invalid test names correctly targeting .NET 8.0",
             Arguments = "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
             ExpectedResult = new ExpectedResult("Passed")
             {
@@ -409,7 +428,7 @@ public static class PackageTests
 
         StandardAndZipLists.Add(new PackageTest(1, "AppContextBaseDirectory_NET80")
         {
-            Description = "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
+            Description = "Test Setting the BaseDirectory to match test assembly location targeting .NET 8.0",
             Arguments = "testdata/net8.0/AppContextTest.dll",
             ExpectedResult = new ExpectedResult("Passed")
             {
