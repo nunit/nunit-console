@@ -1,3 +1,18 @@
+public static class Extensions
+{
+    // Extensions used in tests, with version specified.
+    public static ExtensionSpecifier NUnitV2Driver = new ExtensionSpecifier(
+        "NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0");
+    public static ExtensionSpecifier NUnitProjectLoader = new ExtensionSpecifier(
+        "NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader", "3.8.0");
+    public static ExtensionSpecifier VSProjectLoader = new ExtensionSpecifier(
+        "NUnit.Extension.VSProjectLoader", "nunit-extension-vs-project-loader", "3.9.0");
+    public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
+        "NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "3.8.0");
+    public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
+        "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
+}
+
 public static class PackageTests
 {
     // Tests run for the Standard runner packages (both nuget and chocolatey)
@@ -261,7 +276,7 @@ public static class PackageTests
             Description = "Run NUnit project with mock-assembly.dll targeting .NET 4.6.2 and 6.0",
             Arguments = "../../MixedTests.nunit --config=Release",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
-            ExtensionsNeeded = new [] { KnownExtensions.NUnitProjectLoader }
+            ExtensionsNeeded = new [] { Extensions.NUnitProjectLoader }
         });
 
         NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
@@ -269,7 +284,7 @@ public static class PackageTests
             Description= "Run NUnit project with mock-assembly.dll targeting .NET 6.0 and 8.0",
             Arguments="../../NetCoreTests.nunit --config=Release",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
-            ExtensionsNeeded = new [] { KnownExtensions.NUnitProjectLoader }
+            ExtensionsNeeded = new [] { Extensions.NUnitProjectLoader }
         });
 
         // V2 Result Writer Test
@@ -278,7 +293,7 @@ public static class PackageTests
             Description = "Run mock-assembly targeting .NET 6.0 and produce V2 output",
             Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
             ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0"),
-            ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
+            ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
         });
 
         // VS Project Loader Tests
@@ -287,7 +302,7 @@ public static class PackageTests
             Description = "Run mock-assembly using the .csproj file",
             Arguments = "../../src/TestData/mock-assembly/mock-assembly.csproj --config=Release",
             ExpectedResult = new MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0"),
-            ExtensionsNeeded = new[] { KnownExtensions.VSProjectLoader }
+            ExtensionsNeeded = new[] { Extensions.VSProjectLoader }
         });
 
         StandardAndZipLists.Add(new PackageTest(1, "VSProjectLoaderTest_Solution")
@@ -315,7 +330,7 @@ public static class PackageTests
                     new ExpectedAssemblyResult("WpfApp.exe")
                 }
             },
-            ExtensionsNeeded = new[] { KnownExtensions.VSProjectLoader }
+            ExtensionsNeeded = new[] { Extensions.VSProjectLoader }
         });
 
         // TeamCity Event Listener Tests
@@ -324,7 +339,7 @@ public static class PackageTests
             Description = "Run mock-assembly targeting .NET 4.6.2 with --teamcity option",
             Arguments = "testdata/net462/mock-assembly.dll --teamcity --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
-            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
         });
 
@@ -334,7 +349,7 @@ public static class PackageTests
             Description = "Run mock-assembly targeting .NET 4.6.2 with --enable teamcity option",
             Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
-            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
         });
 
@@ -343,7 +358,7 @@ public static class PackageTests
             Description = "Run mock-assembly targeting .NET 6.0 with --teamcity option",
             Arguments = "testdata/net6.0/mock-assembly.dll --teamcity --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
-            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
         });
 
@@ -353,7 +368,7 @@ public static class PackageTests
             Description = "Run mock-assembly targeting .NET 6.0 with --enable teamcity option",
             Arguments = "testdata/net6.0/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
-            ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener },
+            ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
         });
 
@@ -372,7 +387,7 @@ public static class PackageTests
                 Skipped = 4,
                 Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("mock-assembly-v2.dll", "net-4.6.2") }
             },
-            ExtensionsNeeded = new[] { KnownExtensions.NUnitV2Driver }
+            ExtensionsNeeded = new[] { Extensions.NUnitV2Driver }
         });
 
         StandardAndZipLists.Add(new PackageTest(1, "V2FrameworkDriverTest")
@@ -389,7 +404,7 @@ public static class PackageTests
                 Skipped = 4,
                 Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("mock-assembly-v2.dll", "net-4.6.2") }
             },
-            ExtensionsNeeded = new[] { KnownExtensions.NUnitV2Driver }
+            ExtensionsNeeded = new[] { Extensions.NUnitV2Driver }
         });
 
         //////////////////////////////////////////////////////////////////////
