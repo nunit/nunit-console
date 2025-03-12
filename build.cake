@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.6
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.7
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -127,11 +127,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit3-console.exe"),
         tests: PackageTests.ZipRunnerTests,
         bundledExtensions: new [] {
-            KnownExtensions.VSProjectLoader.NuGetPackage,
-            KnownExtensions.NUnitProjectLoader.NuGetPackage,
-            KnownExtensions.NUnitV2Driver.NuGetPackage,
-            KnownExtensions.NUnitV2ResultWriter.NuGetPackage,
-            KnownExtensions.TeamCityEventListener.NuGetPackage
+            Extensions.VSProjectLoader.NuGetPackage,
+            Extensions.NUnitProjectLoader.NuGetPackage,
+            Extensions.NUnitV2Driver.NuGetPackage,
+            Extensions.NUnitV2ResultWriter.NuGetPackage,
+            Extensions.TeamCityEventListener.NuGetPackage
         }),
 
     // NOTE: Packages below this point have no direct tests
