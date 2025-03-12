@@ -1,7 +1,7 @@
 // Load the recipe 
-//#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.3
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.6
 // Comment out above line and uncomment below for local tests of recipe changes
-#load ../NUnit.Cake.Recipe/recipe/*.cake
+//#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 #load package-tests.cake
 
