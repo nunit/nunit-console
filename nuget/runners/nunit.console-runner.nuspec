@@ -66,6 +66,19 @@
     <file src="agents/net8.0/testcentric.engine.metadata.dll" target="tools/agents/net8.0" />
     <file src="agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
 
+    <file src="agents/net9.0/nunit-agent.dll" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit-agent.pdb" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit-agent.dll.config" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit-agent.deps.json" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit-agent.runtimeconfig.json" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit.engine.api.dll" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit.engine.api.pdb" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit.engine.api.xml" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit.engine.core.dll" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/nunit.engine.core.pdb" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/testcentric.engine.metadata.dll" target="tools/agents/net9.0" />
+    <file src="agents/net9.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net9.0" />
+
     <file src="net462/nunit3-console.exe" target="tools" />
     <file src="net462/nunit3-console.pdb" target="tools" />
     <file src="net462/nunit3-console.exe.config" target="tools" />

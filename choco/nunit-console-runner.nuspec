@@ -75,5 +75,17 @@
     <file src = "$BIN_DIR$agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
     <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
     <file src = "VERIFICATION.txt" target = "tools/agents/net8.0" />
+
+    <file src = "$BIN_DIR$agents/net9.0/nunit-agent.dll" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/nunit-agent.dll.config" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/nunit-agent.deps.json" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/nunit-agent.runtimeconfig.json" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/nunit.engine.api.dll" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/nunit.engine.api.xml" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/nunit.engine.core.dll" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/testcentric.engine.metadata.dll" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net9.0" />
+    <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
+    <file src = "VERIFICATION.txt" target = "tools/agents/net9.0" />
   </files>
 </package>
