@@ -85,6 +85,7 @@
     <file src = "$BIN_DIR$agents/net9.0/nunit.engine.core.dll" target="tools/agents/net9.0" />
     <file src = "$BIN_DIR$agents/net9.0/testcentric.engine.metadata.dll" target="tools/agents/net9.0" />
     <file src = "$BIN_DIR$agents/net9.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net9.0" />
+    <file src = "$BIN_DIR$agents/net9.0/System.Runtime.Serialization.Formatters.dll" target="tools/agents/net9.0" />
     <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
     <file src = "VERIFICATION.txt" target = "tools/agents/net9.0" />
   </files>

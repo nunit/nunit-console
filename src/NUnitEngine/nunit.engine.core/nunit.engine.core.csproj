@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.Engine</RootNamespace>
-    <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0;net9.0</TargetFrameworks>
     <NoWarn>$(NoWarn);SYSLIB0011;SYSLIB0012</NoWarn><!-- TODO: Get rid of obsolete stuff -->
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
@@ -27,9 +27,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net8.0' or '$(TargetFramework)'=='net9.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net9.0'">
+    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>

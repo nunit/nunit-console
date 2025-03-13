@@ -46,6 +46,13 @@ public static class PackageTests
             ExpectedResult=new MockAssemblyExpectedResult("net-4.6.2")
         });
 
+        AllLists.Add(new PackageTest(1, "Net90Test")
+        {
+            Description = "Run mock-assembly.dll targeting .NET 9.0",
+            Arguments = "testdata/net9.0/mock-assembly.dll",
+            ExpectedResult = new MockAssemblyExpectedResult("netcore-9.0")
+        });
+
         AllLists.Add(new PackageTest(1, "Net80Test")
         {
             Description = "Run mock-assembly.dll targeting .NET 8.0",
@@ -230,14 +237,14 @@ public static class PackageTests
         AllLists.Add(new PackageTest(1, "Net60WPFTest")
         {
             Description = "Run test using WPF targeting .NET 6.0",
-            Arguments = "testdata/net6.0-windows/WpfTest.dll --trace=Debug",
+            Arguments = "testdata/net6.0-windows/WpfTest.dll",
             ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }
         });
 
         AllLists.Add(new PackageTest(1, "Net80WPFTest")
         {
             Description = "Run test using WPF targeting .NET 8.0",
-            Arguments = "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
+            Arguments = "testdata/net8.0-windows/WpfTest.dll",
             ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }
         });
 
@@ -301,22 +308,22 @@ public static class PackageTests
         {
             Description = "Run mock-assembly using the .csproj file",
             Arguments = "../../src/TestData/mock-assembly/mock-assembly.csproj --config=Release",
-            ExpectedResult = new MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0"),
+            ExpectedResult = new MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0", "netcore-9.0"),
             ExtensionsNeeded = new[] { Extensions.VSProjectLoader }
         });
 
         StandardAndZipLists.Add(new PackageTest(1, "VSProjectLoaderTest_Solution")
         {
             Description = "Run mock-assembly using the .sln file",
-            Arguments = "../../src/TestData/TestData.sln --config=Release --trace=Debug",
+            Arguments = "../../src/TestData/TestData.sln --config=Release",
             ExpectedResult = new ExpectedResult("Failed")
             {
-                Total = 37 * 5,
-                Passed = 23 * 5,
-                Failed = 5 * 5,
-                Warnings = 1 * 5,
-                Inconclusive = 1 * 5,
-                Skipped = 7 * 5,
+                Total = 37 * 6,
+                Passed = 23 * 6,
+                Failed = 5 * 6,
+                Warnings = 1 * 6,
+                Inconclusive = 1 * 6,
+                Skipped = 7 * 6,
                 Assemblies = new ExpectedAssemblyResult[]
                 {
                     new ExpectedAssemblyResult("mock-assembly.dll", "net-4.6.2"),
@@ -324,6 +331,7 @@ public static class PackageTests
                     new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0"),
                     new ExpectedAssemblyResult("mock-assembly.dll", "netcore-7.0"),
                     new ExpectedAssemblyResult("mock-assembly.dll", "netcore-8.0"),
+                    new ExpectedAssemblyResult("mock-assembly.dll", "netcore-9.0"),
                     new ExpectedAssemblyResult("notest-assembly.dll", "net-4.6.2"),
                     new ExpectedAssemblyResult("notest-assembly.dll", "netcore-3.1"),
                     new ExpectedAssemblyResult("notest-assembly.dll", "netstandard-2.0"),
@@ -337,7 +345,7 @@ public static class PackageTests
         StandardAndZipLists.Add(new PackageTest(1, "Net462TeamCityListenerTest1")
         {
             Description = "Run mock-assembly targeting .NET 4.6.2 with --teamcity option",
-            Arguments = "testdata/net462/mock-assembly.dll --teamcity --trace:Debug",
+            Arguments = "testdata/net462/mock-assembly.dll --teamcity",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
@@ -347,7 +355,7 @@ public static class PackageTests
         StandardAndZipLists.Add(new PackageTest(1, "Net462TeamCityListenerTest2")
         {
             Description = "Run mock-assembly targeting .NET 4.6.2 with --enable teamcity option",
-            Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener --trace:Debug",
+            Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
@@ -356,7 +364,7 @@ public static class PackageTests
         AllLists.Add(new PackageTest(1, "Net60TeamCityListenerTest1")
         {
             Description = "Run mock-assembly targeting .NET 6.0 with --teamcity option",
-            Arguments = "testdata/net6.0/mock-assembly.dll --teamcity --trace:Debug",
+            Arguments = "testdata/net6.0/mock-assembly.dll --teamcity",
             ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
@@ -366,7 +374,7 @@ public static class PackageTests
         AllLists.Add(new PackageTest(1, "Net60TeamCityListenerTest2")
         {
             Description = "Run mock-assembly targeting .NET 6.0 with --enable teamcity option",
-            Arguments = "testdata/net6.0/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener --trace:Debug",
+            Arguments = "testdata/net6.0/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener",
             ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
             OutputCheck = new OutputContains("##teamcity")
@@ -414,7 +422,7 @@ public static class PackageTests
         StandardAndZipLists.Add(new PackageTest(1, "InvalidTestNameTest_Net462")
         {
             Description = "Ensure we handle invalid test names correctly targeting .NET 4.6.2",
-            Arguments = "testdata/net462/InvalidTestNames.dll --trace:Debug",
+            Arguments = "testdata/net462/InvalidTestNames.dll",
             ExpectedResult = new ExpectedResult("Passed")
             {
                 Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("InvalidTestNames.dll", "net-4.6.2") }
@@ -424,7 +432,7 @@ public static class PackageTests
         AllLists.Add(new PackageTest(1, "InvalidTestNameTest_Net60")
         {
             Description = "Ensure we handle invalid test names correctly targeting .NET 6.0",
-            Arguments = "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
+            Arguments = "testdata/net6.0/InvalidTestNames.dll",
             ExpectedResult = new ExpectedResult("Passed")
             {
                 Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-6.0") }
@@ -434,7 +442,7 @@ public static class PackageTests
         AllLists.Add(new PackageTest(1, "InvalidTestNameTest_Net80")
         {
             Description = "Ensure we handle invalid test names correctly targeting .NET 8.0",
-            Arguments = "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
+            Arguments = "testdata/net8.0/InvalidTestNames.dll",
             ExpectedResult = new ExpectedResult("Passed")
             {
                 Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-8.0") }
