@@ -80,9 +80,17 @@ namespace NUnit.Engine.Runners
             throw new NotImplementedException();
         }
 
-        void ITestEngineRunner.StopRun(bool force)
-        {
-        }
+        /// <summary>
+        /// Request the current test run to stop. If no tests are running,
+        /// the call is ignored.
+        /// </summary>
+        void ITestEngineRunner.RequestStop() { }
+
+        /// <summary>
+        /// Force the current test run to stop, killing threads or processes if necessary.
+        /// If no tests are running, the call is ignored.
+        /// </summary>
+        void ITestEngineRunner.ForcedStop() { }
 
         TestEngineResult ITestEngineRunner.Explore(TestFilter filter)
         {

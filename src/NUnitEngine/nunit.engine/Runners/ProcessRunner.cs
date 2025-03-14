@@ -174,21 +174,34 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// Cancel the ongoing test run. If no  test is running, the call is ignored.
+        /// Request the current test run to stop. If no tests are running,
+        /// the call is ignored.
         /// </summary>
-        /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
-        public override void StopRun(bool force)
+        public override void RequestStop()
         {
-            if (_remoteRunner != null)
+            try 
+            { 
+                _remoteRunner?.ForcedStop();
+            }
+            catch(Exception e)
             {
-                try
-                {
-                    _remoteRunner.StopRun(force);
-                }
-                catch (Exception e)
-                {
-                    log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
-                }
+                log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
+            }
+        }
+
+        /// <summary>
+        /// Force the current test run to stop, killing threads or processes if necessary.
+        /// If no tests are running, the call is ignored.
+        /// </summary>
+        public override void ForcedStop()
+        {
+            try 
+            { 
+                _remoteRunner?.ForcedStop(); 
+            }
+            catch( Exception e)
+            {
+                log.Error("Failed to stop the remote run. {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
             }
         }
 
