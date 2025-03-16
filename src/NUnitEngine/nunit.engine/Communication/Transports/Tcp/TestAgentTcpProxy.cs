@@ -4,6 +4,7 @@ using System;
 using System.Net.Sockets;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
+using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
@@ -26,7 +27,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public ITestEngineRunner CreateRunner(TestPackage package)
         {
-            SendCommandMessage("CreateRunner", package);
+            SendCommandMessage(MessageCode.CreateRunner, package.ToXml());
 
             // Agent also functions as the runner
             return this;
@@ -34,48 +35,48 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public bool Start()
         {
-            SendCommandMessage("Start");
+            SendCommandMessage(MessageCode.StartAgent);
             return CommandResult<bool>();
         }
 
         public void Stop()
         {
-            SendCommandMessage("Stop");
+            SendCommandMessage(MessageCode.StopAgent);
         }
 
         public TestEngineResult Load()
         {
-            SendCommandMessage("Load");
+            SendCommandMessage(MessageCode.LoadCommand);
             return CommandResult<TestEngineResult>();
         }
 
         public void Unload()
         {
-            SendCommandMessage("Unload");
+            SendCommandMessage(MessageCode.UnloadCommand);
         }
 
         public TestEngineResult Reload()
         {
-            SendCommandMessage("Reload");
+            SendCommandMessage(MessageCode.ReloadCommand);
             return CommandResult<TestEngineResult>();
         }
 
         public int CountTestCases(TestFilter filter)
         {
-            SendCommandMessage("CountTestCases", filter);
+            SendCommandMessage(MessageCode.CountCasesCommand, filter.Text);
             return CommandResult<int>();
         }
 
         public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
         {
-            SendCommandMessage("Run", filter);
+            SendCommandMessage(MessageCode.RunCommand, filter.Text);
 
             return TestRunResult(listener);
         }
 
         public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            SendCommandMessage("RunAsync", filter);
+            SendCommandMessage(MessageCode.RunAsyncCommand, filter.Text);
             // TODO: Should we get the async result from the agent or just use our own?
             return CommandResult<AsyncTestEngineResult>();
             //return new AsyncTestEngineResult();
@@ -87,7 +88,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public TestEngineResult Explore(TestFilter filter)
         {
-            SendCommandMessage("Explore", filter);
+            SendCommandMessage(MessageCode.ExploreCommand, filter.Text);
             return CommandResult<TestEngineResult>();
         }
 
@@ -95,9 +96,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         {
         }
 
-        private void SendCommandMessage(string command, params object[] arguments)
+        private void SendCommandMessage(string command, string data=null)
         {
-            _socket.Send(_wireProtocol.Encode(new CommandMessage(command, arguments)));
+            _socket.Send(_wireProtocol.Encode(new TestEngineMessage(command, data)));
         }
 
         private T CommandResult<T>()

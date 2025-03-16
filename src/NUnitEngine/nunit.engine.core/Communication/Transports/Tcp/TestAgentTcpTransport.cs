@@ -8,6 +8,8 @@ using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
@@ -23,6 +25,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         private string _agencyUrl;
         private Socket _clientSocket;
         private ITestEngineRunner _runner;
+        private XmlSerializer _testPackageSerializer = new XmlSerializer(typeof(TestPackage));
 
         public TestAgentTcpTransport(RemoteTestAgent agent, string serverUrl)
         {
@@ -76,42 +79,42 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             while (keepRunning)
             {
-                var command = socketReader.GetNextMessage<CommandMessage>();
+                var command = socketReader.GetNextMessage<TestEngineMessage>();
 
-                switch (command.CommandName)
+                switch (command.Code)
                 {
-                    case "CreateRunner":
-                        var package = (TestPackage)command.Arguments[0];
+                    case MessageCode.CreateRunner:
+                        var package = new TestPackage().FromXml(command.Data);
                         _runner = CreateRunner(package);
                         break;
-                    case "Load":
+                    case MessageCode.LoadCommand:
                         SendResult(_runner.Load());
                         break;
-                    case "Reload":
+                    case MessageCode.ReloadCommand:
                         SendResult(_runner.Reload());
                         break;
-                    case "Unload":
+                    case MessageCode.UnloadCommand:
                         _runner.Unload();
                         break;
-                    case "Explore":
-                        var filter = (TestFilter)command.Arguments[0];
+                    case MessageCode.ExploreCommand:
+                        var filter = new TestFilter(command.Data);
                         SendResult(_runner.Explore(filter));
                         break;
-                    case "CountTestCases":
-                        filter = (TestFilter)command.Arguments[0];
+                    case MessageCode.CountCasesCommand:
+                        filter = new TestFilter(command.Data);
                         SendResult(_runner.CountTestCases(filter));
                         break;
-                    case "Run":
-                        filter = (TestFilter)command.Arguments[0];
+                    case MessageCode.RunCommand:
+                        filter = new TestFilter(command.Data);
                         SendResult(_runner.Run(this, filter));
                         break;
 
-                    case "RunAsync":
-                        filter = (TestFilter)command.Arguments[0];
+                    case MessageCode.RunAsyncCommand:
+                        filter = new TestFilter(command.Data);
                         _runner.RunAsync(this, filter);
                         break;
 
-                    case "Stop":
+                    case MessageCode.StopAgent:
                         keepRunning = false;
                         break;
                 }

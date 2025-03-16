@@ -50,19 +50,19 @@ namespace NUnit.Engine.Communication.Messages
         //    Assert.That(decoded.Argument, Is.EqualTo(argument));
         //}
 
-        //[Test]
-        //public void ProgressMessageTest()
-        //{
-        //    const string REPORT = "Progress report";
-        //    var msg = new TestEngineMessage(MessageCode.ProgressReport, REPORT);
-        //    Assert.That(msg.Code, Is.EqualTo(MessageCode.ProgressReport));
-        //    Assert.That(msg.Data, Is.EqualTo(REPORT));
-        //    var bytes = _wireProtocol.Encode(msg);
-        //    var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
-        //    var decoded = messages[0];
-        //    Assert.That(decoded.Code, Is.EqualTo(MessageCode.ProgressReport));
-        //    Assert.That(decoded.Data, Is.EqualTo(REPORT));
-        //}
+        [Test]
+        public void ProgressMessageTest()
+        {
+            const string REPORT = "Progress report";
+            var msg = new TestEngineMessage(MessageCode.ProgressReport, REPORT);
+            Assert.That(msg.Code, Is.EqualTo(MessageCode.ProgressReport));
+            Assert.That(msg.Data, Is.EqualTo(REPORT));
+            var bytes = _wireProtocol.Encode(msg);
+            var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
+            var decoded = messages[0];
+            Assert.That(decoded.Code, Is.EqualTo(MessageCode.ProgressReport));
+            Assert.That(decoded.Data, Is.EqualTo(REPORT));
+        }
 
         //[Test]
         //public void CommandReturnMessageTest()
