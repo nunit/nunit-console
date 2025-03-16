@@ -28,27 +28,25 @@ namespace NUnit.Engine.Communication.Messages
             new TestCaseData(MessageCode.ForcedStopCommand, null)
         };
 
-        //[TestCaseSource(nameof(MessageTestData))]
-        //public void CommandMessageConstructionTests(string commandName, string argument)
-        //{
-        //    var cmd = new TestEngineMessage(commandName, argument);
-        //    Assert.That(cmd.Code, Is.EqualTo(commandName));
-        //    Assert.That(cmd.CommandName, Is.EqualTo(commandName));
-        //    Assert.That(cmd.Argument, Is.EqualTo(argument));
-        //}
+        [TestCaseSource(nameof(MessageTestData))]
+        public void CommandMessageConstructionTests(string code, string data)
+        {
+            var cmd = new TestEngineMessage(code, data);
+            Assert.That(cmd.Code, Is.EqualTo(code));
+            Assert.That(cmd.Data, Is.EqualTo(data));
+        }
 
-        //[TestCaseSource(nameof(MessageTestData))]
-        //public void CommandMessageEncodingTests(string commandName, string argument)
-        //{
-        //    var cmd = new TestEngineMessage(commandName, argument);
+        [TestCaseSource(nameof(MessageTestData))]
+        public void CommandMessageEncodingTests(string code, string data)
+        {
+            var cmd = new TestEngineMessage(code, data);
 
-        //    var bytes = _wireProtocol.Encode(cmd);
-        //    var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
-        //    var decoded = messages[0];
-        //    Assert.That(decoded.Code, Is.EqualTo(commandName));
-        //    Assert.That(decoded.CommandName, Is.EqualTo(commandName));
-        //    Assert.That(decoded.Argument, Is.EqualTo(argument));
-        //}
+            var bytes = _wireProtocol.Encode(cmd);
+            var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
+            var decoded = messages[0];
+            Assert.That(decoded.Code, Is.EqualTo(code));
+            Assert.That(decoded.Data, Is.EqualTo(data));
+        }
 
         [Test]
         public void ProgressMessageTest()
@@ -64,18 +62,18 @@ namespace NUnit.Engine.Communication.Messages
             Assert.That(decoded.Data, Is.EqualTo(REPORT));
         }
 
-        //[Test]
-        //public void CommandReturnMessageTest()
-        //{
-        //    const string RESULT = "Result text";
-        //    var msg = new TestEngineMessage(MessageCode.CommandResult, RESULT);
-        //    Assert.That(msg.Code, Is.EqualTo(MessageCode.CommandResult));
-        //    Assert.That(msg.Data, Is.EqualTo(RESULT));
-        //    var bytes = _wireProtocol.Encode(msg);
-        //    var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
-        //    var decoded = messages[0];
-        //    Assert.That(decoded.Code, Is.EqualTo(MessageCode.CommandResult));
-        //    Assert.That(decoded.Data, Is.EqualTo(RESULT));
-        //}
+        [Test]
+        public void CommandReturnMessageTest()
+        {
+            const string RESULT = "Result text";
+            var msg = new TestEngineMessage(MessageCode.CommandResult, RESULT);
+            Assert.That(msg.Code, Is.EqualTo(MessageCode.CommandResult));
+            Assert.That(msg.Data, Is.EqualTo(RESULT));
+            var bytes = _wireProtocol.Encode(msg);
+            var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
+            var decoded = messages[0];
+            Assert.That(decoded.Code, Is.EqualTo(MessageCode.CommandResult));
+            Assert.That(decoded.Data, Is.EqualTo(RESULT));
+        }
     }
 }

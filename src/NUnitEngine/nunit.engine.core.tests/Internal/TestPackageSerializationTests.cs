@@ -8,19 +8,25 @@ namespace NUnit.Engine.Internal
 {
     public class TestPackageSerializationTests
     {
-        private static readonly string ASSEMBLY_1 = Path.GetFullPath("mock-assembly.dll");
-        private static readonly string ASSEMBLY_2 = Path.GetFullPath("notest-assembly.dll");
-        private static readonly TestPackage TEST_PACKAGE = new TestPackage(new string[] { "mock-assembly.dll", "notest-assembly.dll" });
-        private static readonly string TEST_PACKAGE_XML =
-            "<TestPackage id=\"0\"><Settings foo=\"bar\" />" +
-            $"<TestPackage id=\"1\" fullname=\"{ASSEMBLY_1}\"><Settings foo=\"bar\" /></TestPackage>" +
-            $"<TestPackage id=\"2\" fullname=\"{ASSEMBLY_2}\"><Settings foo=\"bar\" /></TestPackage>" +
-            "</TestPackage>";
-        private static readonly string TEST_PACKAGE_XML_WITH_XML_DECLARATION = "<?xml version = \"1.0\" encoding=\"utf-16\"?>" + TEST_PACKAGE_XML;
+        private const string ASSEMBLY_1 = "mock-assembly.dll";
+        private const string ASSEMBLY_2 = "notest-assembly.dll";
+
+        private static readonly TestPackage TEST_PACKAGE;
+        private static readonly string TEST_PACKAGE_XML;
+        private static readonly string TEST_PACKAGE_XML_WITH_XML_DECLARATION;
 
         static TestPackageSerializationTests() 
         {
+            TEST_PACKAGE = new TestPackage(new string[] { "mock-assembly.dll", "notest-assembly.dll" });
             TEST_PACKAGE.AddSetting("foo", "bar");
+
+            TEST_PACKAGE_XML =
+                $"<TestPackage id=\"{TEST_PACKAGE.ID}\"><Settings foo=\"bar\" />" +
+                $"<TestPackage id=\"{TEST_PACKAGE.SubPackages[0].ID}\" fullname=\"{Path.GetFullPath(ASSEMBLY_1)}\"><Settings foo=\"bar\" /></TestPackage>" +
+                $"<TestPackage id=\"{TEST_PACKAGE.SubPackages[1].ID}\" fullname=\"{Path.GetFullPath(ASSEMBLY_2)}\"><Settings foo=\"bar\" /></TestPackage>" +
+                "</TestPackage>";
+
+            TEST_PACKAGE_XML_WITH_XML_DECLARATION = "<?xml version = \"1.0\" encoding=\"utf-16\"?>" + TEST_PACKAGE_XML;
         }
 
         [Test]
@@ -58,6 +64,7 @@ namespace NUnit.Engine.Internal
         {
             var xml = TEST_PACKAGE.ToXml();
             Console.WriteLine(xml);
+            Assert.That(xml, Is.EqualTo(TEST_PACKAGE_XML));
             var package = new TestPackage().FromXml(xml);
             ComparePackages(package, TEST_PACKAGE);
         }

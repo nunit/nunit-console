@@ -79,7 +79,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             while (keepRunning)
             {
-                var command = socketReader.GetNextMessage<TestEngineMessage>();
+                var command = socketReader.GetNextMessage();
 
                 switch (command.Code)
                 {
@@ -88,25 +88,25 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                         _runner = CreateRunner(package);
                         break;
                     case MessageCode.LoadCommand:
-                        SendResult(_runner.Load());
+                        SendResult(_runner.Load().Xml.OuterXml);
                         break;
                     case MessageCode.ReloadCommand:
-                        SendResult(_runner.Reload());
+                        SendResult(_runner.Reload().Xml.OuterXml);
                         break;
                     case MessageCode.UnloadCommand:
                         _runner.Unload();
                         break;
                     case MessageCode.ExploreCommand:
                         var filter = new TestFilter(command.Data);
-                        SendResult(_runner.Explore(filter));
+                        SendResult(_runner.Explore(filter).Xml.OuterXml);
                         break;
                     case MessageCode.CountCasesCommand:
                         filter = new TestFilter(command.Data);
-                        SendResult(_runner.CountTestCases(filter));
+                        SendResult(_runner.CountTestCases(filter).ToString());
                         break;
                     case MessageCode.RunCommand:
                         filter = new TestFilter(command.Data);
-                        SendResult(_runner.Run(this, filter));
+                        SendResult(_runner.Run(this, filter).Xml.OuterXml);
                         break;
 
                     case MessageCode.RunAsyncCommand:
@@ -123,16 +123,15 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             Stop();
         }
 
-        private void SendResult(object result)
+        private void SendResult(string result)
         {
-            var resultMessage = new CommandReturnMessage(result);
+            var resultMessage = new TestEngineMessage(MessageCode.CommandResult, result);
             var bytes = new BinarySerializationProtocol().Encode(resultMessage);
             _clientSocket.Send(bytes);
         }
 
         public void OnTestEvent(string report)
         {
-            //var progressMessage = new ProgressMessage(report);
             var progressMessage = new TestEngineMessage(MessageCode.ProgressReport, report);
             var bytes = new BinarySerializationProtocol().Encode(progressMessage);
             _clientSocket.Send(bytes);

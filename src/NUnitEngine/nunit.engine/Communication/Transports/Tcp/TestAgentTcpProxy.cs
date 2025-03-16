@@ -36,7 +36,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         public bool Start()
         {
             SendCommandMessage(MessageCode.StartAgent);
-            return CommandResult<bool>();
+            return bool.Parse(CommandResult());
         }
 
         public void Stop()
@@ -47,7 +47,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         public TestEngineResult Load()
         {
             SendCommandMessage(MessageCode.LoadCommand);
-            return CommandResult<TestEngineResult>();
+            return new TestEngineResult(CommandResult());
         }
 
         public void Unload()
@@ -58,13 +58,13 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         public TestEngineResult Reload()
         {
             SendCommandMessage(MessageCode.ReloadCommand);
-            return CommandResult<TestEngineResult>();
+            return new TestEngineResult(CommandResult());
         }
 
         public int CountTestCases(TestFilter filter)
         {
             SendCommandMessage(MessageCode.CountCasesCommand, filter.Text);
-            return CommandResult<int>();
+            return int.Parse(CommandResult());
         }
 
         public TestEngineResult Run(ITestEventListener listener, TestFilter filter)
@@ -78,8 +78,8 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         {
             SendCommandMessage(MessageCode.RunAsyncCommand, filter.Text);
             // TODO: Should we get the async result from the agent or just use our own?
-            return CommandResult<AsyncTestEngineResult>();
-            //return new AsyncTestEngineResult();
+            //return CommandResult<AsyncTestEngineResult>();
+            return new AsyncTestEngineResult();
         }
 
         public void RequestStop() => SendCommandMessage(MessageCode.RequestStopCommand);
@@ -89,7 +89,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         public TestEngineResult Explore(TestFilter filter)
         {
             SendCommandMessage(MessageCode.ExploreCommand, filter.Text);
-            return CommandResult<TestEngineResult>();
+            return new TestEngineResult(CommandResult());
         }
 
         public void Dispose()
@@ -101,9 +101,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             _socket.Send(_wireProtocol.Encode(new TestEngineMessage(command, data)));
         }
 
-        private T CommandResult<T>()
+        private string CommandResult()
         {
-            return (T)new SocketReader(_socket, _wireProtocol).GetNextMessage<CommandReturnMessage>().ReturnValue;
+            return new SocketReader(_socket, _wireProtocol).GetNextMessage().Data;
         }
 
         // Return the result of a test run as a TestEngineResult. ProgressMessages
@@ -114,16 +114,14 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             while (true)
             {
                 var receivedMessage = rdr.GetNextMessage();
-                var receivedType = receivedMessage.GetType();
 
-                var returnMessage = receivedMessage as CommandReturnMessage;
-                if (returnMessage != null)
-                    return (TestEngineResult)returnMessage.ReturnValue;
+                if (receivedMessage.Code == MessageCode.CommandResult)
+                    return new TestEngineResult(receivedMessage.Data);
 
                 if (receivedMessage.Code == MessageCode.ProgressReport)
                     listener.OnTestEvent(receivedMessage.Data);
                 else
-                    throw new InvalidOperationException($"Expected either a ProgressMessage or a CommandReturnMessage but received a {receivedType}");
+                    throw new InvalidOperationException($"Expected either a ProgressMessage or a CommandReturnMessage but received a {receivedMessage.Code}");
             }
         }
     }
