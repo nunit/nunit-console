@@ -5,21 +5,21 @@ using System;
 namespace NUnit.Engine.Communication.Messages
 {
     [Serializable]
-    public abstract class TestEngineMessage
+    public class TestEngineMessage
     {
-    //    public TestEngineMessage(string code, string data)
-    //    {
-    //        Code = code;
-    //        Data = data;
-    //    }
+        public TestEngineMessage(string code, string data)
+        {
+            Code = code;
+            Data = data;
+        }
 
-    //    protected TestEngineMessage() { }
+        protected TestEngineMessage() { }
 
-    //    public string Code { get; }
-    //    public string Data { get; }
+        public string Code { get; }
+        public string Data { get; }
 
-    //    // Alias properties for convenience
-    //    //public string CommandName => Code;
-    //    //public string Argument => Data;
+        // Alias properties for convenience
+        //public string CommandName => Code;
+        //public string Argument => Data;
     }
 }
