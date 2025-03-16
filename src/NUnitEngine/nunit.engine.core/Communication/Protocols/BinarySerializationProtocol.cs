@@ -5,20 +5,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 using NUnit.Engine.Communication.Messages;
 
 namespace NUnit.Engine.Communication.Protocols
 {
     /// <summary>
-    /// BinarySerializationProtocol serializes messages in the following format:
+    /// BinarySerializationProtocol serializes messages as an array of bytes in the following format:
     ///
-    ///     [Message Length (4 bytes)][Serialized Message Content]
-    ///     
-    /// The message content is in binary form as produced by the .NET BinaryFormatter.
-    /// Each message of length n is serialized as n + 4 bytes.
+    ///     <Message Length> <Message Code> [<Additional Message Data>]
+    ///
+    /// The length of the message is encoded as four bytes, from lowest to highest order.
+    /// 
+    /// The message code is always four bytes and indicates the type of message.
+    /// 
+    /// Messages taking an additional data argument encode it in the remaining bytes. The
+    /// argument length may therefore be calculated as overall length - 8 bytes. Messages
+    /// without an argument are serialized as 8 bytes.
     /// </summary>
     public class BinarySerializationProtocol : ISerializationProtocol
     {
+        private const int MSG_LENGTH_SIZE = 4;
+        private const int MSG_CODE_SIZE = 4;
+
         /// <summary>
         /// Maximum length of a message.
         /// </summary>
@@ -34,24 +43,30 @@ namespace NUnit.Engine.Communication.Protocols
         /// </summary>
         /// <param name="message">Message to be serialized</param>
         /// <returns>A byte[] containing the message, serialized as per the protocol.</returns>
-        public byte[] Encode(object message)
+        public byte[] Encode(TestEngineMessage message)
         {
-            //Serialize the message to a byte array
-            var serializedMessage = SerializeMessage(message);
+            string code = message.Code;
+            string data = message.Data;
+            Encoding utf8 = Encoding.UTF8;
 
-            //Check for message length
-            var messageLength = serializedMessage.Length;
+            // TODO: Compile time check
+            if (utf8.GetByteCount(code) != MSG_CODE_SIZE)
+                throw new ArgumentException($"Invalid message code {code}");
+
+            int dataLength = message.Data != null ? utf8.GetByteCount(message.Data) : 0;
+            int messageLength = dataLength + MSG_CODE_SIZE;
+
+            //Check message length
             if (messageLength > MAX_MESSAGE_LENGTH)
-            {
                 throw new Exception("Message is too big (" + messageLength + " bytes). Max allowed length is " + MAX_MESSAGE_LENGTH + " bytes.");
-            }
 
             //Create a byte array including the length of the message (4 bytes) and serialized message content
-            var bytes = new byte[messageLength + 4];
+            var bytes = new byte[messageLength + MSG_LENGTH_SIZE];
             WriteInt32(bytes, 0, messageLength);
-            Array.Copy(serializedMessage, 0, bytes, 4, messageLength);
+            utf8.GetBytes(code, 0, code.Length, bytes, MSG_LENGTH_SIZE);
+            if (dataLength > 0)
+                utf8.GetBytes(data, 0, data.Length, bytes, MSG_LENGTH_SIZE + MSG_CODE_SIZE);
 
-            //Return serialized message by this protocol
             return bytes;
         }
 
@@ -139,7 +154,7 @@ namespace NUnit.Engine.Communication.Protocols
 
             //If stream has less than 4 bytes, that means we can not even read length of the message
             //So, return false to wait more for bytes from remorte application.
-            if (_receiveMemoryStream.Length < 4)
+            if (_receiveMemoryStream.Length < MSG_LENGTH_SIZE)
             {
                 return false;
             }
@@ -147,15 +162,13 @@ namespace NUnit.Engine.Communication.Protocols
             //Read length of the message
             var messageLength = ReadInt32(_receiveMemoryStream);
             if (messageLength > MAX_MESSAGE_LENGTH)
-            {
                 throw new Exception("Message is too big (" + messageLength + " bytes). Max allowed length is " + MAX_MESSAGE_LENGTH + " bytes.");
-            }
 
             //If message is zero-length (It must not be but good approach to check it)
             if (messageLength == 0)
             {
                 //if no more bytes, return immediately
-                if (_receiveMemoryStream.Length == 4)
+                if (_receiveMemoryStream.Length == MSG_LENGTH_SIZE)
                 {
                     _receiveMemoryStream = new MemoryStream(); //Clear the stream
                     return false;
@@ -164,12 +177,12 @@ namespace NUnit.Engine.Communication.Protocols
                 //Create a new memory stream from current except first 4-bytes.
                 var bytes = _receiveMemoryStream.ToArray();
                 _receiveMemoryStream = new MemoryStream();
-                _receiveMemoryStream.Write(bytes, 4, bytes.Length - 4);
+                _receiveMemoryStream.Write(bytes, MSG_LENGTH_SIZE, bytes.Length - MSG_LENGTH_SIZE);
                 return true;
             }
 
             //If all bytes of the message is not received yet, return to wait more bytes
-            if (_receiveMemoryStream.Length < (4 + messageLength))
+            if (_receiveMemoryStream.Length < (MSG_LENGTH_SIZE + messageLength))
             {
                 _receiveMemoryStream.Position = _receiveMemoryStream.Length;
                 return false;
@@ -178,7 +191,15 @@ namespace NUnit.Engine.Communication.Protocols
             //Read bytes of serialized message and deserialize it
             var serializedMessageBytes = ReadByteArray(_receiveMemoryStream, messageLength);
 
-            messages.Add((TestEngineMessage)DeserializeMessage(serializedMessageBytes));
+            Encoding utf8 = Encoding.UTF8;
+
+            string code = utf8.GetString(serializedMessageBytes, 0, MSG_CODE_SIZE);
+
+            string data = messageLength > MSG_CODE_SIZE
+                ? utf8.GetString(serializedMessageBytes, MSG_CODE_SIZE, messageLength - MSG_CODE_SIZE)
+                : null;
+
+            messages.Add(new TestEngineMessage(code, data));
 
             //Read remaining bytes to an array
             var remainingBytes = ReadByteArray(_receiveMemoryStream, (int)(_receiveMemoryStream.Length - (4 + messageLength)));
@@ -188,7 +209,7 @@ namespace NUnit.Engine.Communication.Protocols
             _receiveMemoryStream.Write(remainingBytes, 0, remainingBytes.Length);
 
             //Return true to re-call this method to try to read next message
-            return (remainingBytes.Length > 4);
+            return (remainingBytes.Length > MSG_LENGTH_SIZE);
         }
 
         /// <summary>
@@ -212,10 +233,15 @@ namespace NUnit.Engine.Communication.Protocols
         private static int ReadInt32(Stream stream)
         {
             var buffer = ReadByteArray(stream, 4);
-            return ((buffer[0] << 24) |
-                    (buffer[1] << 16) |
-                    (buffer[2] << 8) |
-                    (buffer[3])
+            return ReadInt32(buffer, 0);
+        }
+
+        private static int ReadInt32(byte[] buffer, int index)
+        {
+            return ((buffer[index] << 24) |
+                    (buffer[index + 1] << 16) |
+                    (buffer[index + 2] << 8) |
+                    (buffer[index + 3])
                    );
         }
 

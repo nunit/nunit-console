@@ -50,8 +50,8 @@ namespace NUnit.Engine.Communication.Protocols
 
             Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
             Assert.That(message.Data, Is.EqualTo(originalPackage.ToXml()));
-            //var newPackage = DeserializePackage(message.Data);
-            //ComparePackages(newPackage, originalPackage);
+            var newPackage = new TestPackage().FromXml(message.Data);
+            ComparePackages(newPackage, originalPackage);
         }
 
         [TestCase(1)]
@@ -88,8 +88,8 @@ namespace NUnit.Engine.Communication.Protocols
             foreach (TestEngineMessage message in messages)
             {
                 Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
-                //var newPackage = DeserializePackage(message.Data);
-                //ComparePackages(newPackage, originalPackage);
+                var newPackage = new TestPackage().FromXml(message.Data);
+                ComparePackages(newPackage, originalPackage);
             }
         }
 
@@ -113,5 +113,24 @@ namespace NUnit.Engine.Communication.Protocols
                 Assert.That(received[i].Code, Is.EqualTo(commands[i]));
         }
 
+        private void ComparePackages(TestPackage newPackage, TestPackage oldPackage)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(newPackage.Name, Is.EqualTo(oldPackage.Name));
+                Assert.That(newPackage.FullName, Is.EqualTo(oldPackage.FullName));
+                Assert.That(newPackage.Settings.Count, Is.EqualTo(oldPackage.Settings.Count));
+                Assert.That(newPackage.SubPackages.Count, Is.EqualTo(oldPackage.SubPackages.Count));
+
+                foreach (var key in oldPackage.Settings.Keys)
+                {
+                    Assert.That(newPackage.Settings.ContainsKey(key));
+                    Assert.That(newPackage.Settings[key], Is.EqualTo(oldPackage.Settings[key]));
+                }
+
+                for (int i = 0; i < oldPackage.SubPackages.Count; i++)
+                    ComparePackages(newPackage.SubPackages[i], oldPackage.SubPackages[i]);
+            });
+        }
     }
 }
