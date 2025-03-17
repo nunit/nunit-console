@@ -46,12 +46,14 @@ namespace NUnit.Engine.Internal
         public static string ToXml(this TestPackage package)
         {
             var writer = new StringWriter();
-            var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings() { OmitXmlDeclaration = true });
-            var serializer = new XmlSerializer(typeof(TestPackage));
-            serializer.Serialize(xmlWriter, package);
-            xmlWriter.Flush();
-            xmlWriter.Close();
 
+            using (var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings() { OmitXmlDeclaration = true }))
+            {
+                xmlWriter.WriteStartElement(nameof(TestPackage));
+                package.WriteXml(xmlWriter);
+                xmlWriter.WriteEndElement();
+            }
+            
             return writer.ToString();
         }
 
@@ -80,7 +82,7 @@ namespace NUnit.Engine.Internal
             {
                 while (xmlReader.Read())
                     if (xmlReader.NodeType == XmlNodeType.Element)
-                        return xmlReader.Name == "TestPackage";
+                        return xmlReader.Name == nameof(TestPackage);
                 return false;
             }
         }

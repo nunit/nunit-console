@@ -99,44 +99,6 @@ namespace NUnit.Engine.Communication.Protocols
             }
         }
 
-        ///// <summary>
-        ///// Serializes a message to a byte array to send to remote application.
-        ///// </summary>
-        ///// <param name="message">Message to be serialized</param>
-        ///// <returns>
-        ///// A byte[] containing the message itself, without a prefixed
-        ///// length, serialized according to the protocol.
-        ///// </returns>
-        //internal byte[] SerializeMessage(object message)
-        //{
-        //    using (var memoryStream = new MemoryStream())
-        //    {
-        //        new BinaryFormatter().Serialize(memoryStream, message);
-        //        return memoryStream.ToArray();
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Deserializes a message contained in a byte array.
-        ///// </summary>
-        ///// <param name="bytes">A byte[] containing just the message, without a length prefix</param>
-        ///// <returns>An object representing the message encoded in the byte array</returns>
-        //internal object DeserializeMessage(byte[] bytes)
-        //{
-        //    using (var memoryStream = new MemoryStream(bytes))
-        //    {
-        //        try
-        //        {
-        //            return new BinaryFormatter().Deserialize(memoryStream);
-        //        }
-        //        catch (Exception exception)
-        //        {
-        //            Reset(); // reset the received memory stream before the exception is rethrown - otherwise the same erroneous message is received again and again
-        //            throw new SerializationException("error while deserializing message", exception);
-        //        }
-        //    }
-        //}
-
         /// <summary>
         /// This method tries to read a single message and add to the messages collection. 
         /// </summary>
