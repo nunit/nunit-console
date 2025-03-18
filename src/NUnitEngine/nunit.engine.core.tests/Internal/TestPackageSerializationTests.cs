@@ -17,12 +17,13 @@ namespace NUnit.Engine.Internal
 
         static TestPackageSerializationTests() 
         {
-            TEST_PACKAGE = new TestPackage(new string[] { "mock-assembly.dll", "notest-assembly.dll" });
+            TEST_PACKAGE = new TestPackage(new string[] { ASSEMBLY_1, ASSEMBLY_2 });
             TEST_PACKAGE.AddSetting("foo", "bar");
+            TEST_PACKAGE.SubPackages[0].AddSetting("cpu", "x86");
 
             TEST_PACKAGE_XML =
                 $"<TestPackage id=\"{TEST_PACKAGE.ID}\"><Settings foo=\"bar\" />" +
-                $"<TestPackage id=\"{TEST_PACKAGE.SubPackages[0].ID}\" fullname=\"{Path.GetFullPath(ASSEMBLY_1)}\"><Settings foo=\"bar\" /></TestPackage>" +
+                $"<TestPackage id=\"{TEST_PACKAGE.SubPackages[0].ID}\" fullname=\"{Path.GetFullPath(ASSEMBLY_1)}\"><Settings foo=\"bar\" cpu=\"x86\" /></TestPackage>" +
                 $"<TestPackage id=\"{TEST_PACKAGE.SubPackages[1].ID}\" fullname=\"{Path.GetFullPath(ASSEMBLY_2)}\"><Settings foo=\"bar\" /></TestPackage>" +
                 "</TestPackage>";
 

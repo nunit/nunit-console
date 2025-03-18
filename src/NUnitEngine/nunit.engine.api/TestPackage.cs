@@ -152,9 +152,8 @@ namespace NUnit.Engine
         /// <inheritdoc />
         public void ReadXml(XmlReader xmlReader)
         {
-            var currentPackage = this;
-            currentPackage.ID = xmlReader.GetAttribute("id");
-            currentPackage.FullName = xmlReader.GetAttribute("fullname");
+            ID = xmlReader.GetAttribute("id");
+            FullName = xmlReader.GetAttribute("fullname");
             if (!xmlReader.IsEmptyElement)
             {
                 while (xmlReader.Read())
@@ -168,14 +167,14 @@ namespace NUnit.Engine
                                     // We don't use AddSettings, which copies settings downward.
                                     // Instead, each package handles it's own settings.
                                     while (xmlReader.MoveToNextAttribute())
-                                        currentPackage.Settings.Add(xmlReader.Name, xmlReader.Value);
+                                        Settings.Add(xmlReader.Name, xmlReader.Value);
                                     xmlReader.MoveToElement();
                                     break;
 
                                 case "TestPackage":
                                     TestPackage subPackage = new TestPackage();
                                     subPackage.ReadXml(xmlReader);
-                                    currentPackage.SubPackages.Add(subPackage);
+                                    SubPackages.Add(subPackage);
                                     break;
                             }
                             break;
