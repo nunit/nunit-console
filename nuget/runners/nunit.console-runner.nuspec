@@ -78,7 +78,6 @@
     <file src="agents/net9.0/nunit.engine.core.pdb" target="tools/agents/net9.0" />
     <file src="agents/net9.0/testcentric.engine.metadata.dll" target="tools/agents/net9.0" />
     <file src="agents/net9.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net9.0" />
-    <file src="agents/net9.0/System.Runtime.Serialization.Formatters.dll" target="tools/agents/net9.0" />
 
     <file src="net462/nunit3-console.exe" target="tools" />
     <file src="net462/nunit3-console.pdb" target="tools" />

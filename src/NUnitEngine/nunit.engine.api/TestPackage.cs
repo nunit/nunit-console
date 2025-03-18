@@ -3,6 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Schema;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace NUnit.Engine
 {
@@ -23,7 +26,7 @@ namespace NUnit.Engine
     /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
     [Serializable]
-    public class TestPackage
+    public class TestPackage : IXmlSerializable
     {
         /// <summary>
         /// Construct a named TestPackage, specifying a file path for
@@ -37,8 +40,6 @@ namespace NUnit.Engine
             if (filePath != null)
             {
                 FullName = Path.GetFullPath(filePath);
-                Settings = new Dictionary<string,object>();
-                SubPackages = new List<TestPackage>();
             }
         }
 
@@ -49,16 +50,19 @@ namespace NUnit.Engine
         public TestPackage(IList<string> testFiles)
         {
             ID = GetNextID();
-            SubPackages = new List<TestPackage>();
-            Settings = new Dictionary<string,object>();
 
             foreach (string testFile in testFiles)
                 SubPackages.Add(new TestPackage(testFile));
         }
 
+        /// <summary>
+        ///  Construct an empty TestPackage.
+        /// </summary>
+        public TestPackage() { }
+
         private static int _nextID = 0;
 
-        private string GetNextID()
+        private static string GetNextID()
         {
             return (_nextID++).ToString();
         }
@@ -75,10 +79,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the name of the package
         /// </summary>
-        public string Name
-        {
-            get { return FullName == null ? null : Path.GetFileName(FullName); }
-        }
+        public string Name => FullName == null ? null : Path.GetFileName(FullName);
 
         /// <summary>
         /// Gets the path to the file containing tests. It may be
@@ -89,12 +90,12 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the list of SubPackages contained in this package
         /// </summary>
-        public IList<TestPackage> SubPackages { get; private set; }
+        public IList<TestPackage> SubPackages { get; } = new List<TestPackage>();
 
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string,object> Settings { get; private set; }
+        public IDictionary<string,object> Settings { get; } = new Dictionary<string,object>();
 
         /// <summary>
         /// Add a subproject to the package.
@@ -139,5 +140,87 @@ namespace NUnit.Engine
                 ? (T)Settings[name]
                 : defaultSetting;
         }
+
+        #region IXmlSerializable Implementation
+
+        /// <inheritdoc />
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        /// <inheritdoc />
+        public void ReadXml(XmlReader xmlReader)
+        {
+            ID = xmlReader.GetAttribute("id");
+            FullName = xmlReader.GetAttribute("fullname");
+            if (!xmlReader.IsEmptyElement)
+            {
+                while (xmlReader.Read())
+                {
+                    switch (xmlReader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            switch(xmlReader.Name)
+                            {
+                                case "Settings":
+                                    // We don't use AddSettings, which copies settings downward.
+                                    // Instead, each package handles it's own settings.
+                                    while (xmlReader.MoveToNextAttribute())
+                                        Settings.Add(xmlReader.Name, xmlReader.Value);
+                                    xmlReader.MoveToElement();
+                                    break;
+
+                                case "TestPackage":
+                                    TestPackage subPackage = new TestPackage();
+                                    subPackage.ReadXml(xmlReader);
+                                    SubPackages.Add(subPackage);
+                                    break;
+                            }
+                            break;
+
+                        case XmlNodeType.EndElement:
+                            if (xmlReader.Name == "TestPackage")
+                                return;
+                            break;
+
+                        default:
+                            throw new Exception("Unexpected EndElement: " + xmlReader.Name);
+                    }
+                }
+
+                throw new Exception("Invalid XML: TestPackage Element not terminated.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void WriteXml(XmlWriter xmlWriter)
+        {
+            // Write ID and FullName
+            xmlWriter.WriteAttributeString("id", ID);
+            if (FullName != null)
+                xmlWriter.WriteAttributeString("fullname", FullName);
+
+            // Write Settings
+            if (Settings.Count != 0)
+            {
+                xmlWriter.WriteStartElement("Settings");
+
+                foreach (KeyValuePair<string, object> setting in Settings)
+                    xmlWriter.WriteAttributeString(setting.Key, setting.Value.ToString());
+
+                xmlWriter.WriteEndElement();
+            }
+
+            // Write any SubPackages recursively
+            foreach (TestPackage subPackage in SubPackages)
+            {
+                xmlWriter.WriteStartElement("TestPackage");
+                subPackage.WriteXml(xmlWriter);
+                xmlWriter.WriteEndElement();
+            }
+        }
     }
+
+    #endregion
 }

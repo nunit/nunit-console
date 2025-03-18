@@ -12,7 +12,7 @@ namespace NUnit.Engine.Communication.Protocols
         /// </summary>
         /// <param name="message">Message to be serialized</param>
         /// <returns>A byte[] containing the message, serialized as per the protocol.</returns>
-        byte[] Encode(object message);
+        byte[] Encode(TestEngineMessage message);
 
         /// <summary>
         /// Accept an array of bytes and deserialize the messages that are found.

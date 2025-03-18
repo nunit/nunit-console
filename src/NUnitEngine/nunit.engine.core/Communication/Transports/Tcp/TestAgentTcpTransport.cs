@@ -8,6 +8,8 @@ using NUnit.Engine.Agents;
 using NUnit.Engine.Internal;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
@@ -23,6 +25,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         private string _agencyUrl;
         private Socket _clientSocket;
         private ITestEngineRunner _runner;
+        private XmlSerializer _testPackageSerializer = new XmlSerializer(typeof(TestPackage));
 
         public TestAgentTcpTransport(RemoteTestAgent agent, string serverUrl)
         {
@@ -76,42 +79,42 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             while (keepRunning)
             {
-                var command = socketReader.GetNextMessage<CommandMessage>();
+                var command = socketReader.GetNextMessage();
 
-                switch (command.CommandName)
+                switch (command.Code)
                 {
-                    case "CreateRunner":
-                        var package = (TestPackage)command.Arguments[0];
+                    case MessageCode.CreateRunner:
+                        var package = new TestPackage().FromXml(command.Data);
                         _runner = CreateRunner(package);
                         break;
-                    case "Load":
-                        SendResult(_runner.Load());
+                    case MessageCode.LoadCommand:
+                        SendResult(_runner.Load().Xml.OuterXml);
                         break;
-                    case "Reload":
-                        SendResult(_runner.Reload());
+                    case MessageCode.ReloadCommand:
+                        SendResult(_runner.Reload().Xml.OuterXml);
                         break;
-                    case "Unload":
+                    case MessageCode.UnloadCommand:
                         _runner.Unload();
                         break;
-                    case "Explore":
-                        var filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.Explore(filter));
+                    case MessageCode.ExploreCommand:
+                        var filter = new TestFilter(command.Data);
+                        SendResult(_runner.Explore(filter).Xml.OuterXml);
                         break;
-                    case "CountTestCases":
-                        filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.CountTestCases(filter));
+                    case MessageCode.CountCasesCommand:
+                        filter = new TestFilter(command.Data);
+                        SendResult(_runner.CountTestCases(filter).ToString());
                         break;
-                    case "Run":
-                        filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.Run(this, filter));
+                    case MessageCode.RunCommand:
+                        filter = new TestFilter(command.Data);
+                        SendResult(_runner.Run(this, filter).Xml.OuterXml);
                         break;
 
-                    case "RunAsync":
-                        filter = (TestFilter)command.Arguments[0];
+                    case MessageCode.RunAsyncCommand:
+                        filter = new TestFilter(command.Data);
                         _runner.RunAsync(this, filter);
                         break;
 
-                    case "Stop":
+                    case MessageCode.StopAgent:
                         keepRunning = false;
                         break;
                 }
@@ -120,16 +123,16 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             Stop();
         }
 
-        private void SendResult(object result)
+        private void SendResult(string result)
         {
-            var resultMessage = new CommandReturnMessage(result);
+            var resultMessage = new TestEngineMessage(MessageCode.CommandResult, result);
             var bytes = new BinarySerializationProtocol().Encode(resultMessage);
             _clientSocket.Send(bytes);
         }
 
         public void OnTestEvent(string report)
         {
-            var progressMessage = new ProgressMessage(report);
+            var progressMessage = new TestEngineMessage(MessageCode.ProgressReport, report);
             var bytes = new BinarySerializationProtocol().Encode(progressMessage);
             _clientSocket.Send(bytes);
         }

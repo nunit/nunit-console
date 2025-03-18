@@ -65,7 +65,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net462").WithFiles(AGENT_FILES),
             HasDirectory("tools/agents/net6.0").WithFiles(AGENT_FILES_NETCORE),
             HasDirectory("tools/agents/net8.0").WithFiles(AGENT_FILES_NETCORE),
-            HasDirectory("tools/agents/net9.0").WithFiles(AGENT_FILES_NETCORE).WithFile("System.Runtime.Serialization.Formatters.dll")
+            HasDirectory("tools/agents/net9.0").WithFiles(AGENT_FILES_NETCORE)
         },
         symbols: new PackageCheck[] {
             HasDirectory("tools").WithFiles(ENGINE_PDB_FILES).AndFile("nunit3-console.pdb"),
@@ -126,7 +126,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net8.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),
             HasDirectory("bin/agents/net9.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE)
-                .AndFile("System.Runtime.Serialization.Formatters.dll")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ZipTestDirectory
             + $"NUnit.Console.{BuildSettings.PackageVersion}/bin/net462/nunit3-console.exe"),

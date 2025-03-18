@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>NUnit.Engine.Core.Tests</RootNamespace>
+    <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0;net9.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>

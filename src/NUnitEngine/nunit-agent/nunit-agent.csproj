@@ -9,7 +9,6 @@
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
     <OutputPath>..\..\..\bin\$(Configuration)\agents\</OutputPath>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <PropertyGroup>
