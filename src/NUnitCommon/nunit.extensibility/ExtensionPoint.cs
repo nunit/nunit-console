@@ -19,7 +19,7 @@ namespace NUnit.Extensibility
         public ExtensionPoint(string path, Type type)
         {
             Path = path;
-            TypeName = type.FullName!;
+            Type = type;
             Extensions = new List<ExtensionNode>();
         }
 
@@ -34,9 +34,14 @@ namespace NUnit.Extensibility
         public string? Description { get; set; }
 
         /// <summary>
+        /// Gets the Type required for any extension to be installed at this extension point.
+        /// </summary>
+        public Type Type { get; private set; }
+
+        /// <summary>
         /// Gets the FullName of the Type required for any extension to be installed at this extension point.
         /// </summary>
-        public string TypeName { get; private set; }
+        public string TypeName => Type.FullName!;
 
         /// <summary>
         /// Gets an enumeration of IExtensionNodes for extensions installed on this extension point.
@@ -59,10 +64,7 @@ namespace NUnit.Extensibility
         public void Install(ExtensionNode node)
         {
             if (node.Path != Path)
-            {
-                string msg = $"Non-matching extension path. Expected {Path} but got {node.Path}.";
-                throw new NUnitExtensibilityException(msg);
-            }
+                throw new NUnitExtensibilityException($"Non-matching extension path. Expected {Path} but got {node.Path}.");
 
             // TODO: Verify that the type is correct using Cecil or Reflection
             // depending on whether the assembly is pre-loaded. For now, it's not

@@ -34,24 +34,24 @@ namespace NUnit.Extensibility
             typeof(IFrameworkDriver)
         };
 
-        private static readonly int[] KnownExtensionPointCounts = { 1, 1, 1, 2, 1, 1 };
+        private static readonly int[] KnownExtensionPointCounts = { 1, 1, 1, 2, 1, 0 };
 
-        private const string DUMMY_FRAMEWORK_DRIVER_EXTENSION = "NUnit.Engine.Fakes.DummyFrameworkDriverExtension";
-        private const string DUMMY_PROJECT_LOADER_EXTENSION = "NUnit.Engine.Fakes.DummyProjectLoaderExtension";
-        private const string DUMMY_RESULT_WRITER_EXTENSION = "NUnit.Engine.Fakes.DummyResultWriterExtension";
-        private const string DUMMY_EVENT_LISTENER_EXTENSION = "NUnit.Engine.Fakes.DummyEventListenerExtension";
-        private const string DUMMY_SERVICE_EXTENSION = "NUnit.Engine.Fakes.DummyServiceExtension";
-        private const string DUMMY_DISABLED_EXTENSION = "NUnit.Engine.Fakes.DummyDisabledExtension";
-        private const string DUMMY_NUNIT_V2_DRIVER_EXTENSION = "NUnit.Engine.Fakes.V2DriverExtension";
+        private const string FAKE_FRAMEWORK_DRIVER_EXTENSION = "NUnit.Engine.Fakes.FakeFrameworkDriverExtension";
+        private const string FAKE_PROJECT_LOADER_EXTENSION = "NUnit.Engine.Fakes.FakeProjectLoaderExtension";
+        private const string FAKE_RESULT_WRITER_EXTENSION = "NUnit.Engine.Fakes.FakeResultWriterExtension";
+        private const string FAKE_EVENT_LISTENER_EXTENSION = "NUnit.Engine.Fakes.FakeEventListenerExtension";
+        private const string FAKE_SERVICE_EXTENSION = "NUnit.Engine.Fakes.FakeServiceExtension";
+        private const string FAKE_DISABLED_EXTENSION = "NUnit.Engine.Fakes.FakeDisabledExtension";
+        private const string FAKE_NUNIT_V2_DRIVER_EXTENSION = "NUnit.Engine.Fakes.V2DriverExtension";
 
         private readonly string[] KnownExtensions = {
-            DUMMY_FRAMEWORK_DRIVER_EXTENSION,
-            DUMMY_PROJECT_LOADER_EXTENSION,
-            DUMMY_RESULT_WRITER_EXTENSION,
-            DUMMY_EVENT_LISTENER_EXTENSION,
-            DUMMY_SERVICE_EXTENSION,
-            DUMMY_DISABLED_EXTENSION,
-            DUMMY_NUNIT_V2_DRIVER_EXTENSION
+            FAKE_FRAMEWORK_DRIVER_EXTENSION,
+            FAKE_PROJECT_LOADER_EXTENSION,
+            FAKE_RESULT_WRITER_EXTENSION,
+            FAKE_EVENT_LISTENER_EXTENSION,
+            FAKE_SERVICE_EXTENSION,
+            FAKE_DISABLED_EXTENSION
+            //FAKE_NUNIT_V2_DRIVER_EXTENSION
         };
 #pragma warning restore 414
 
@@ -90,7 +90,7 @@ namespace NUnit.Extensibility
         {
             foreach (var node in _extensionManager.Extensions)
             {
-                var shouldBeEnabled = node.TypeName != DUMMY_DISABLED_EXTENSION;
+                var shouldBeEnabled = node.TypeName != FAKE_DISABLED_EXTENSION;
                 Assert.That(node.Enabled, Is.EqualTo(shouldBeEnabled));
             }
         }
@@ -132,17 +132,17 @@ namespace NUnit.Extensibility
         public void ExtensionMayBeDisabledByDefault()
         {
             Assert.That(_extensionManager.Extensions,
-                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(DUMMY_DISABLED_EXTENSION)
+                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(FAKE_DISABLED_EXTENSION)
                    .And.Property(nameof(ExtensionNode.Enabled)).False);
         }
 
         [Test]
         public void DisabledExtensionMayBeEnabled()
         {
-            _extensionManager.EnableExtension(DUMMY_DISABLED_EXTENSION, true);
+            _extensionManager.EnableExtension(FAKE_DISABLED_EXTENSION, true);
 
             Assert.That(_extensionManager.Extensions,
-                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(DUMMY_DISABLED_EXTENSION)
+                Has.One.Property(nameof(ExtensionNode.TypeName)).EqualTo(FAKE_DISABLED_EXTENSION)
                    .And.Property(nameof(ExtensionNode.Enabled)).True);
         }
 

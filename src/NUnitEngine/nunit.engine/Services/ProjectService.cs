@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
 
@@ -13,7 +14,11 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ProjectService : Service, IProjectService
     {
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
+
         Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
+        //IEnumerable<ExtensionNode>? _extensionNodes;
+        ExtensionService? _extensionService;
 
         public bool CanLoadFrom(string path)
         {
@@ -83,41 +88,39 @@ namespace NUnit.Engine.Services
             {
                 try
                 {
-                    if (ServiceContext == null)
-                        throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
+                    _extensionService = ServiceContext?.GetService<ExtensionService>();
 
-                    var extensionService = ServiceContext.GetService<ExtensionService>();
+                    //_extensionNodes = extensionService.GetExtensionNodes<IProjectLoader>();
 
-                    if (extensionService == null)
-                        Status = ServiceStatus.Started;
-                    else if (extensionService.Status != ServiceStatus.Started)
-                        Status = ServiceStatus.Error;
-                    else
-                    {
-                        Status = ServiceStatus.Started;
-
-                        foreach (var node in extensionService.GetExtensionNodes<IProjectLoader>())
-                        {
-                            foreach (string ext in node.GetValues("FileExtension"))
-                            {
-                                if (ext != null)
-                                {
-                                    if (_extensionIndex.ContainsKey(ext))
-                                        throw new NUnitEngineException(string.Format("ProjectLoader extension {0} is already handled by another extension.", ext));
-
-                                    _extensionIndex.Add(ext, node);
-                                }
-                            }
-                        }
-                    }
+                    Status = _extensionService == null || _extensionService.Status == ServiceStatus.Started
+                        ? ServiceStatus.Started : ServiceStatus.Error;
                 }
                 catch
                 {
-                    // TODO: Should we just ignore any addin that doesn't load?
                     Status = ServiceStatus.Error;
                     throw;
                 }
             }
+        }
+
+        private void InitializeExtensionIndex()
+        {
+            _extensionIndex = new Dictionary<string, ExtensionNode>();
+
+            if (_extensionService != null)
+                foreach (var node in _extensionService.GetExtensionNodes<IProjectLoader>())
+                {
+                    foreach (string ext in node.GetValues("FileExtension"))
+                    {
+                        if (ext != null)
+                        {
+                            if (_extensionIndex.ContainsKey(ext))
+                                throw new NUnitEngineException(string.Format("ProjectLoader extension {0} is already handled by another extension.", ext));
+
+                            _extensionIndex.Add(ext, node);
+                        }
+                    }
+                }
         }
 
         private IProject? LoadFrom(string path)
@@ -139,8 +142,11 @@ namespace NUnit.Engine.Services
         {
             var ext = Path.GetExtension(path);
 
-            if (string.IsNullOrEmpty(ext) || !_extensionIndex.TryGetValue(ext, out ExtensionNode? node))
+            if (!string.IsNullOrEmpty(ext) || _extensionIndex == null)
                 return null;
+            
+            if (_extensionIndex.TryGetValue(ext, out ExtensionNode? node))
+                return node;
 
             return node;
         }

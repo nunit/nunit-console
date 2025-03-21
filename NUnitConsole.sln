@@ -154,8 +154,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.extensibility.tests", "src\NUnitCommon\nunit.extensibility.tests\nunit.extensibility.tests.csproj", "{B22FEE5B-83D4-4021-B066-1B958332D391}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FakeExtensions", "src\NUnitCommon\FakeExtensions\FakeExtensions.csproj", "{E2A4C099-E35D-4E27-B89D-957140ED970F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.common", "src\NUnitCommon\nunit.common\nunit.common.csproj", "{9D9CAD66-8EDF-4ED0-A222-503BE9B21EC7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.common.tests", "src\NUnitCommon\nunit.common.tests\nunit.common.tests.csproj", "{6605DA54-EBF4-4ED1-B5BC-B607AD0CE308}"
@@ -163,6 +161,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.agent.core", "src\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj", "{4FCFAF1C-1579-4A1C-BAF9-9627E39D7CDA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.agent.core.tests", "src\NUnitCommon\nunit.agent.core.tests\nunit.agent.core.tests.csproj", "{89258A3E-5B62-487A-9AE7-D7672CBF61F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeExtensions", "src\TestData\FakeExtensions\FakeExtensions.csproj", "{608AA86D-4090-33CA-0031-BD324E5A766E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -270,10 +270,6 @@ Global
 		{B22FEE5B-83D4-4021-B066-1B958332D391}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B22FEE5B-83D4-4021-B066-1B958332D391}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B22FEE5B-83D4-4021-B066-1B958332D391}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2A4C099-E35D-4E27-B89D-957140ED970F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2A4C099-E35D-4E27-B89D-957140ED970F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2A4C099-E35D-4E27-B89D-957140ED970F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2A4C099-E35D-4E27-B89D-957140ED970F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D9CAD66-8EDF-4ED0-A222-503BE9B21EC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D9CAD66-8EDF-4ED0-A222-503BE9B21EC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D9CAD66-8EDF-4ED0-A222-503BE9B21EC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -290,6 +286,10 @@ Global
 		{89258A3E-5B62-487A-9AE7-D7672CBF61F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89258A3E-5B62-487A-9AE7-D7672CBF61F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89258A3E-5B62-487A-9AE7-D7672CBF61F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{608AA86D-4090-33CA-0031-BD324E5A766E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{608AA86D-4090-33CA-0031-BD324E5A766E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{608AA86D-4090-33CA-0031-BD324E5A766E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{608AA86D-4090-33CA-0031-BD324E5A766E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -331,11 +331,11 @@ Global
 		{71DE0F2C-C72B-4CBF-99BE-F2DC0FBEDA24} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{49E8B583-37C2-4166-8007-3DB780D01004} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{B22FEE5B-83D4-4021-B066-1B958332D391} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
-		{E2A4C099-E35D-4E27-B89D-957140ED970F} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{9D9CAD66-8EDF-4ED0-A222-503BE9B21EC7} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{6605DA54-EBF4-4ED1-B5BC-B607AD0CE308} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{4FCFAF1C-1579-4A1C-BAF9-9627E39D7CDA} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{89258A3E-5B62-487A-9AE7-D7672CBF61F1} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
+		{608AA86D-4090-33CA-0031-BD324E5A766E} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
