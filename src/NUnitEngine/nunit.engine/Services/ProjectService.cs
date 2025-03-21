@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
@@ -16,22 +17,64 @@ namespace NUnit.Engine.Services
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
 
-        Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
-        //IEnumerable<ExtensionNode>? _extensionNodes;
-        ExtensionService? _extensionService;
+        IEnumerable<ExtensionNode> _extensionNodes = new List<ExtensionNode>();
+
+        private string[]? _fileExtensions;
+        public string[] FileExtensions
+        {
+            get
+            {
+                if (_fileExtensions == null)
+                {
+                    var extensionList = new List<string>();
+
+                    foreach (var node in _extensionNodes)
+                        foreach (var ext in node.GetValues("FileExtensions"))
+                            extensionList.Add(ext);
+
+                    _fileExtensions = extensionList.ToArray();
+                }
+
+                return _fileExtensions;
+            }
+        }
 
         public bool CanLoadFrom(string path)
         {
             ExtensionNode? node = GetNodeForPath(path);
-            if (node != null)
-            {
-                if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
-                    return true;
-            }
-
-            return false;
+            return node != null
+                ? ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path)
+                : false;
         }
 
+        private IProject? LoadFrom(string path)
+        {
+            if (File.Exists(path))
+            {
+                ExtensionNode? node = GetNodeForPath(path);
+                if (node != null)
+                {
+                    if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
+                        return loader.LoadFrom(path);
+                }
+            }
+
+            return null;
+        }
+
+        private ExtensionNode? GetNodeForPath(string path)
+        {
+            var ext = Path.GetExtension(path);
+
+            if (string.IsNullOrEmpty(ext) || !FileExtensions.Contains(ext))
+                return null;
+
+            foreach (var node in _extensionNodes)
+                if (node.GetValues("FileExtensions").Contains(ext))
+                    return node;
+
+            return null;
+        }
         /// <summary>
         /// Expands a TestPackage based on a known project format, populating it
         /// with the project contents and any settings the project provides.
@@ -88,11 +131,15 @@ namespace NUnit.Engine.Services
             {
                 try
                 {
-                    _extensionService = ServiceContext?.GetService<ExtensionService>();
+                    if (ServiceContext == null)
+                        throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
-                    //_extensionNodes = extensionService.GetExtensionNodes<IProjectLoader>();
+                    // TODO: This throws if ExtensionService is not available. Should it be optional?
+                    var extensionService = ServiceContext.GetService<ExtensionService>();
 
-                    Status = _extensionService == null || _extensionService.Status == ServiceStatus.Started
+                    _extensionNodes = extensionService.GetExtensionNodes<IProjectLoader>();
+
+                    Status = extensionService == null || extensionService.Status == ServiceStatus.Started
                         ? ServiceStatus.Started : ServiceStatus.Error;
                 }
                 catch
@@ -101,54 +148,6 @@ namespace NUnit.Engine.Services
                     throw;
                 }
             }
-        }
-
-        private void InitializeExtensionIndex()
-        {
-            _extensionIndex = new Dictionary<string, ExtensionNode>();
-
-            if (_extensionService != null)
-                foreach (var node in _extensionService.GetExtensionNodes<IProjectLoader>())
-                {
-                    foreach (string ext in node.GetValues("FileExtension"))
-                    {
-                        if (ext != null)
-                        {
-                            if (_extensionIndex.ContainsKey(ext))
-                                throw new NUnitEngineException(string.Format("ProjectLoader extension {0} is already handled by another extension.", ext));
-
-                            _extensionIndex.Add(ext, node);
-                        }
-                    }
-                }
-        }
-
-        private IProject? LoadFrom(string path)
-        {
-            if (File.Exists(path))
-            {
-                ExtensionNode? node = GetNodeForPath(path);
-                if (node != null)
-                {
-                    if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
-                        return loader.LoadFrom(path);
-                }
-            }
-
-            return null;
-        }
-
-        private ExtensionNode? GetNodeForPath(string path)
-        {
-            var ext = Path.GetExtension(path);
-
-            if (!string.IsNullOrEmpty(ext) || _extensionIndex == null)
-                return null;
-            
-            if (_extensionIndex.TryGetValue(ext, out ExtensionNode? node))
-                return node;
-
-            return node;
         }
     }
 }
