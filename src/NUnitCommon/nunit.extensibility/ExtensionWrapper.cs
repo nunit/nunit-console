@@ -51,9 +51,19 @@ namespace NUnit.Extensibility
         protected T Invoke<T>(string methodName, params object[] args)
         {
             Console.WriteLine($"Wrapper called for {typeof(T)} {methodName}");
+            if (args == null) args = Array.Empty<object>();
             var result = WrapMethod(methodName, Type.GetTypeArray(args)).Invoke(_wrappedInstance, args);
             Console.WriteLine($"    Returning {(T)result.ShouldNotBeNull()}");
             return (T)result.ShouldNotBeNull();
+        }
+
+        protected T? GetProperty<T>(string propertyName) =>
+            (T?)WrapMethod($"get_{propertyName}").Invoke(_wrappedInstance, Array.Empty<object>());
+
+        protected void SetProperty<T>(string propertyName, T val)
+        {
+            if (val != null)
+                WrapMethod($"set_{propertyName}", new[] { typeof(T) }).Invoke(_wrappedInstance, new object[] { val });
         }
 
         private MethodInfo WrapMethod(string methodName, params Type[] argTypes)
@@ -67,6 +77,15 @@ namespace NUnit.Extensibility
                 throw new MissingMethodException(methodName);
 
             return _methods[sig] = method;
+        }
+
+        // TODO: Support indexed properties only if we need them
+        private PropertyInfo WrapProperty(string propertyName)
+        {
+            var prop = _wrappedType.GetProperty(propertyName);
+            if (prop == null)
+                throw new MissingMemberException(propertyName);
+            return prop;
         }
 
         private struct MethodSignature

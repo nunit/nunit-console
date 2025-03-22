@@ -329,11 +329,11 @@ AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 // TODO: Add back extension tests after latest changes to ExtensionManager
 // are ported. Most extensions will require an update to work under V4.
 
-// NUnit Project Loader Tests
+//NUnit Project Loader Tests
 //StandardRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
 //{
 //    Description = "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
-//    Arguments = "../../MixedTests.nunit --config=Release --trace:Debug",
+//    Arguments = "../../MixedTests.nunit --config=Release",
 //    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
 //    ExtensionsNeeded = new[] { Extensions.NUnitProjectLoader }
 //});

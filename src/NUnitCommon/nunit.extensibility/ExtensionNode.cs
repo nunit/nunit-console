@@ -15,6 +15,8 @@ namespace NUnit.Extensibility
     /// </summary>
     public class ExtensionNode : IExtensionNode
     {
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionNode));
+
         private object? _extensionObject;
         private readonly Dictionary<string, List<string>> _properties = new Dictionary<string, List<string>>();
 
@@ -107,9 +109,17 @@ namespace NUnit.Extensibility
                 if (_extensionObject == null)
                 {
                     object obj = CreateExtensionObject();
-                    _extensionObject = IsV3Extension
-                        ? ExtensionWrapper.Wrap(obj, Path)
-                        : obj;
+
+                    if (IsV3Extension)
+                    {
+                        log.Debug("Creating Wrapper for extension object");
+                        _extensionObject = ExtensionWrapper.Wrap(obj, Path);
+                    }
+                    else
+                    {
+                        log.Debug("No wrapper necessary for extension object");
+                        _extensionObject = obj;
+                    }
                 }
 
                 return _extensionObject;

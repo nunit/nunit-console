@@ -17,34 +17,22 @@ namespace NUnit.Engine.Services
     {
         static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
 
-        IEnumerable<ExtensionNode> _extensionNodes = new List<ExtensionNode>();
-
-        private string[]? _fileExtensions;
-        public string[] FileExtensions
-        {
-            get
-            {
-                if (_fileExtensions == null)
-                {
-                    var extensionList = new List<string>();
-
-                    foreach (var node in _extensionNodes)
-                        foreach (var ext in node.GetValues("FileExtensions"))
-                            extensionList.Add(ext);
-
-                    _fileExtensions = extensionList.ToArray();
-                }
-
-                return _fileExtensions;
-            }
-        }
+        IEnumerable<ExtensionNode>? _extensionNodes;
+        ExtensionService? _extensionService;
 
         public bool CanLoadFrom(string path)
         {
             ExtensionNode? node = GetNodeForPath(path);
-            return node != null
-                ? ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path)
-                : false;
+            if (node != null && ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
+            {
+                log.Debug($"{node.ExtensionObject.GetType()} can load {path}");
+                return true;
+            }
+
+            log.Debug($"Cannot load {path}");
+            if (node == null)
+                log.Debug("    No Extension was found");
+            return false;
         }
 
         private IProject? LoadFrom(string path)
@@ -52,10 +40,11 @@ namespace NUnit.Engine.Services
             if (File.Exists(path))
             {
                 ExtensionNode? node = GetNodeForPath(path);
-                if (node != null)
+                IProjectLoader loader;
+                if (node != null && (loader = (IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
                 {
-                    if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
-                        return loader.LoadFrom(path);
+                    log.Debug($"Using loader {loader.GetType()}");
+                    return loader.LoadFrom(path);
                 }
             }
 
@@ -66,15 +55,20 @@ namespace NUnit.Engine.Services
         {
             var ext = Path.GetExtension(path);
 
-            if (string.IsNullOrEmpty(ext) || !FileExtensions.Contains(ext))
+            if (string.IsNullOrEmpty(ext) || _extensionService == null)
                 return null;
 
+            if (_extensionNodes == null)
+                _extensionNodes = _extensionService.GetExtensionNodes<IProjectLoader>();
+
             foreach (var node in _extensionNodes)
-                if (node.GetValues("FileExtensions").Contains(ext))
-                    return node;
+                foreach (string extNode in node.GetValues("FileExtension"))
+                    if (extNode == ext)
+                        return node;
 
             return null;
         }
+
         /// <summary>
         /// Expands a TestPackage based on a known project format, populating it
         /// with the project contents and any settings the project provides.
@@ -84,6 +78,8 @@ namespace NUnit.Engine.Services
         /// <param name="package">The TestPackage to be expanded</param>
         public void ExpandProjectPackage(TestPackage package)
         {
+            log.Debug($"Expanding package {package.Name}");
+
             Guard.ArgumentNotNull(package, "package");
             Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", "package");
 
@@ -92,18 +88,19 @@ namespace NUnit.Engine.Services
                 return;
 
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
+            log.Debug("Got project");
 
             string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string?)null);
+            log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig == null)
                 activeConfig = project.ActiveConfigName;
             else
                 Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", "package");
 
             TestPackage tempPackage = project.GetTestPackage(activeConfig);
+            log.Debug("Got temp package");
 
-            // Add info about the configurations to the project package
-            tempPackage.Settings[EnginePackageSettings.ActiveConfig] = activeConfig;
-            tempPackage.Settings[EnginePackageSettings.ConfigNames] = project.ConfigNames;
+            package.Settings[EnginePackageSettings.ConfigNames] = project.ConfigNames;
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
@@ -117,7 +114,7 @@ namespace NUnit.Engine.Services
             // If no config file is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use its own config, if present.
-            if (!package.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
+            if (!tempPackage.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
                 if (File.Exists(packageConfig))
@@ -127,26 +124,20 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
-            if (Status == ServiceStatus.Stopped)
+            try
             {
-                try
-                {
-                    if (ServiceContext == null)
-                        throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
+                if (ServiceContext == null)
+                    throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
-                    // TODO: This throws if ExtensionService is not available. Should it be optional?
-                    var extensionService = ServiceContext.GetService<ExtensionService>();
+                _extensionService = ServiceContext.GetService<ExtensionService>();
 
-                    _extensionNodes = extensionService.GetExtensionNodes<IProjectLoader>();
-
-                    Status = extensionService == null || extensionService.Status == ServiceStatus.Started
-                        ? ServiceStatus.Started : ServiceStatus.Error;
-                }
-                catch
-                {
-                    Status = ServiceStatus.Error;
-                    throw;
-                }
+                Status = _extensionService == null || _extensionService.Status == ServiceStatus.Started
+                    ? ServiceStatus.Started : ServiceStatus.Error;
+            }
+            catch
+            {
+                Status = ServiceStatus.Error;
+                throw;
             }
         }
     }
