@@ -1,11 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace NUnit.Extensibility
@@ -96,6 +92,32 @@ namespace NUnit.Extensibility
             var val = _wrapper.StringProperty;
             Assert.That(_wrappedClass.LastCall, Is.EqualTo("StringProperty"));
             Assert.That(val, Is.EqualTo("The ANSWER"));
+        }
+
+        [Test]
+        public void CheckCachingWithoutParameters()
+        {
+            _wrapper.CallVoidMethod();
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("VoidMethod()"));
+            _wrapper.CallVoidMethod();
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("VoidMethod()"));
+
+            // There should only be one method as otherwise the cache is not working
+            var voidMethodSignatures = _wrapper.GetMethodSignatures().Where(sig => sig.Name == "VoidMethod" && sig.ArgTypes.Length == 0).ToArray();
+            Assert.That(voidMethodSignatures, Has.Length.EqualTo(1));
+        }
+
+        [Test]
+        public void CheckCachingWithParameters()
+        {
+            _wrapper.CallVoidMethod(5, "foo");
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("VoidMethod(5,foo)"));
+            _wrapper.CallVoidMethod(42, "galaxy");
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("VoidMethod(42,galaxy)"));
+
+            // There should only be one method as otherwise the cache is not working
+            var voidMethodSignatures = _wrapper.GetMethodSignatures().Where(sig => sig.Name == "VoidMethod" && sig.ArgTypes.Length == 2).ToArray();
+            Assert.That(voidMethodSignatures, Has.Length.EqualTo(1));
         }
     }
 

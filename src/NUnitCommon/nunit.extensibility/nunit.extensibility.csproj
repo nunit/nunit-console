@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="nunit.extensibility.tests, PublicKey=$(NUnitPublicKey)"/>
+  </ItemGroup>
+
 </Project>

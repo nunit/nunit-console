@@ -3,17 +3,16 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using NUnit.Extensibility.Wrappers;
 
 namespace NUnit.Extensibility
 {
-    using Wrappers;
-
     public abstract class ExtensionWrapper
     {
         static protected readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionWrapper));
 
-        private object _wrappedInstance;
-        private Type _wrappedType;
+        private readonly object _wrappedInstance;
+        private readonly Type _wrappedType;
 
         public static ExtensionWrapper Wrap(object extension, string path)
         {
@@ -69,10 +68,10 @@ namespace NUnit.Extensibility
         private MethodInfo WrapMethod(string methodName, params Type[] argTypes)
         {
             var sig = new MethodSignature(methodName, argTypes);
-            if (_methods.ContainsKey(sig))
-                return _methods[sig];
+            if (_methods.TryGetValue(sig, out MethodInfo? method))
+                return method;
 
-            var method = _wrappedType.GetMethod(methodName, argTypes);
+            method = _wrappedType.GetMethod(methodName, argTypes);
             if (method == null)
                 throw new MissingMethodException(methodName);
 
@@ -88,18 +87,42 @@ namespace NUnit.Extensibility
             return prop;
         }
 
-        private struct MethodSignature
+        internal IEnumerable<MethodSignature> GetMethodSignatures() => _methods.Keys;
+
+        internal class MethodSignature : IEquatable<MethodSignature>
         {
-            public string Name;
-            public object[] ArgTypes;
+            public readonly string Name;
+            public readonly object[] ArgTypes;
 
             public MethodSignature(string name, object[] argTypes)
             {  
                 Name = name; 
                 ArgTypes = argTypes;
             }
+
+            public bool Equals(MethodSignature? other)
+            {
+                if (other is null || Name != other.Name || ArgTypes.Length != other.ArgTypes.Length)
+                    return false;
+
+                for (int i = 0; i < ArgTypes.Length; i++)
+                    if (ArgTypes[i] != other.ArgTypes[i])
+                        return false;
+
+                return true;
+            }
+
+            public override bool Equals(object? obj) => Equals(obj as MethodSignature);
+
+            override public int GetHashCode()
+            {
+                var hash = Name.GetHashCode();
+                for (int i = 0; i < ArgTypes.Length; i++)
+                    hash ^= ArgTypes[i].GetHashCode();
+                return hash;
+            }
         }
 
-        private Dictionary<MethodSignature, MethodInfo> _methods = new Dictionary<MethodSignature, MethodInfo>();
+        private readonly Dictionary<MethodSignature, MethodInfo> _methods = new Dictionary<MethodSignature, MethodInfo>();
     }
 }
