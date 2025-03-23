@@ -35,6 +35,8 @@ namespace NUnit.ConsoleRunner
         private const string INDENT6 = "      ";
         private const string INDENT8 = "        ";
 
+        private const string NUNIT_EXTENSION_DIRECTORIES = "NUNIT_EXTENSION_DIRECTORIES";
+
         public static readonly int OK = 0;
         public static readonly int INVALID_ARG = -1;
         public static readonly int INVALID_ASSEMBLY = -2;
@@ -55,20 +57,35 @@ namespace NUnit.ConsoleRunner
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
-            _engine = engine;
-            _options = options;
-            _outWriter = writer;
+            Guard.ArgumentNotNull(_engine = engine, nameof(engine));
+            Guard.ArgumentNotNull(_options = options, nameof(options));
+            Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
+
+            // NOTE: Accessing Services triggers the engine to initialize all services
+            _resultService = _engine.Services.GetService<IResultService>();
+            Guard.OperationValid(_resultService != null, "Internal Error: ResultService was not found");
+
+            _filterService = _engine.Services.GetService<ITestFilterService>();
+            Guard.OperationValid(_filterService != null, "Internal Error: TestFilterService was not found");
+
+            _extensionService = _engine.Services.GetService<IExtensionService>();
+            Guard.OperationValid(_extensionService != null, "Internal Error: ExtensionService was not found");
+
+            _extensionService = _engine.Services.GetService<IExtensionService>();
+            Guard.OperationValid(_extensionService != null, "Internal Error: ExtensionService was not found");
+
+            var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
+            if (!string.IsNullOrEmpty(extensionPath))
+                foreach (string extensionDirectory in extensionPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries))
+                    _extensionService.FindExtensionAssemblies(extensionDirectory);
+
+            foreach (string extensionDirectory in _options.ExtensionDirectories)
+                _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
 
             if (!Directory.Exists(_workDirectory))
                 Directory.CreateDirectory(_workDirectory);
-
-            _resultService = _engine.Services.GetService<IResultService>();
-            _filterService = _engine.Services.GetService<ITestFilterService>();
-            _extensionService = _engine.Services.GetService<IExtensionService>();
-
-            // TODO: Exit with error if any of the services are not found
 
             // Attempt to enable extensions as requested by the user
             foreach (string typeName in options.EnableExtensions)
@@ -341,6 +358,14 @@ namespace NUnit.ConsoleRunner
 
         private void DisplayExtensionList()
         {
+            if (_options.ExtensionDirectories.Count > 0)
+            {
+                _outWriter.WriteLine(ColorStyle.SectionHeader, "User Extension Directories");
+                foreach (var dir in _options.ExtensionDirectories)
+                    _outWriter.WriteLine($"  {Path.GetFullPath(dir)}");
+                _outWriter.WriteLine();
+            }
+
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
             foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])

@@ -492,14 +492,14 @@ namespace NUnit.Extensibility
             //}
 #endif
 
-            foreach (var extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
+            foreach (TypeDefinition extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
             {
-                bool useV3Attribute = false;
+                bool isV3Extension = false;
                 CustomAttribute extensionAttr = extensionType.GetAttribute(EXTENSION_ATTRIBUTE);
                 if (extensionAttr == null) 
                 {
                     extensionAttr = extensionType.GetAttribute(V3_EXTENSION_ATTRIBUTE);
-                    useV3Attribute = true;
+                    isV3Extension = true;
                 }
 
                 if (extensionAttr == null)
@@ -519,8 +519,9 @@ namespace NUnit.Extensibility
                 }
 
                 string? extensionAttrPath = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Path));
-                var node = new ExtensionNode(extensionAssembly.FilePath, extensionAssembly.AssemblyVersion, extensionType.FullName)
+                var node = new ExtensionNode(extensionAssembly, extensionType)
                 {
+                    IsV3Extension = isV3Extension,
                     Description = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Description)),
                 };
 
@@ -529,7 +530,7 @@ namespace NUnit.Extensibility
 
                 log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
 
-                var propertyAttributes = useV3Attribute
+                var propertyAttributes = isV3Extension
                     ? extensionType.GetAttributes(V3_EXTENSION_PROPERTY_ATTRIBUTE)
                     : extensionType.GetAttributes(EXTENSION_PROPERTY_ATTRIBUTE);
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TestCentric.Metadata;
 
 namespace NUnit.Extensibility
 {
@@ -14,6 +15,8 @@ namespace NUnit.Extensibility
     /// </summary>
     public class ExtensionNode : IExtensionNode
     {
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionNode));
+
         private object? _extensionObject;
         private readonly Dictionary<string, List<string>> _properties = new Dictionary<string, List<string>>();
 
@@ -25,11 +28,11 @@ namespace NUnit.Extensibility
         /// <param name="assemblyVersion">The version of the extension assembly.</param>
         /// <param name="typeName">The full name of the Type of the extension object.</param>
         ///// <param name="targetFramework">The target framework of the extension assembly.</param>
-        public ExtensionNode(string assemblyPath, Version assemblyVersion, string typeName)
+        public ExtensionNode(ExtensionAssembly extensionAssembly, TypeDefinition extensionType)
         {
-            AssemblyPath = assemblyPath;
-            AssemblyVersion = assemblyVersion;
-            TypeName = typeName;
+            AssemblyPath = extensionAssembly.FilePath;
+            AssemblyVersion = extensionAssembly.AssemblyVersion;
+            TypeName = extensionType.FullName;
             Enabled = true; // By default
         }
 
@@ -37,6 +40,11 @@ namespace NUnit.Extensibility
         /// Gets the full name of the Type of the extension object.
         /// </summary>
         public string TypeName { get; private set; }
+
+        /// <summary>
+        /// True for V3 extensions, which require a wrapper
+        /// </summary>
+        public bool IsV3Extension { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="NUnit.Engine.Extensibility.ExtensionNode"/> is enabled.
@@ -99,7 +107,20 @@ namespace NUnit.Extensibility
             get
             {
                 if (_extensionObject == null)
-                    _extensionObject = CreateExtensionObject();
+                {
+                    object obj = CreateExtensionObject();
+
+                    if (IsV3Extension)
+                    {
+                        log.Debug("Creating Wrapper for extension object");
+                        _extensionObject = ExtensionWrapper.Wrap(obj, Path);
+                    }
+                    else
+                    {
+                        log.Debug("No wrapper necessary for extension object");
+                        _extensionObject = obj;
+                    }
+                }
 
                 return _extensionObject;
             }

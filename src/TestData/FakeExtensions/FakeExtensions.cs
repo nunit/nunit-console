@@ -11,7 +11,7 @@ using NUnit.Extensibility;
 namespace NUnit.Engine.Fakes
 {
     [Extension]
-    public class DummyFrameworkDriverExtension : IDriverFactory
+    public class FakeFrameworkDriverExtension : IDriverFactory
     {
 #if NETFRAMEWORK
         public IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference)
@@ -29,7 +29,7 @@ namespace NUnit.Engine.Fakes
     }
 
     [Extension]
-    public class DummyProjectLoaderExtension : IProjectLoader
+    public class FakeProjectLoaderExtension : IProjectLoader
     {
         public bool CanLoadFrom(string path)
         {
@@ -43,7 +43,7 @@ namespace NUnit.Engine.Fakes
     }
 
     [Extension]
-    public class DummyResultWriterExtension : IResultWriter
+    public class FakeResultWriterExtension : IResultWriter
     {
         public void CheckWritability(string outputPath)
         {
@@ -62,7 +62,7 @@ namespace NUnit.Engine.Fakes
     }
 
     [Extension]
-    public class DummyEventListenerExtension : ITestEventListener
+    public class FakeEventListenerExtension : ITestEventListener
     {
         public void OnTestEvent(string report)
         {
@@ -71,7 +71,7 @@ namespace NUnit.Engine.Fakes
     }
 
     [Extension]
-    public class DummyServiceExtension : IService
+    public class FakeServiceExtension : IService
     {
         public IServiceLocator ServiceContext
         {
@@ -105,50 +105,51 @@ namespace NUnit.Engine.Fakes
         }
     }
 
-    [Extension]
-    public class V2DriverExtension : IFrameworkDriver
-    {
-        public string ID
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
+    // TODO: Determine whether we support the V2 driver and, if so, how
+    //[Extension(Path= "/NUnit/Engine/NUnitV2Driver")]
+    //public class V2DriverExtension : IFrameworkDriver
+    //{
+    //    public string ID
+    //    {
+    //        get
+    //        {
+    //            throw new NotImplementedException();
+    //        }
 
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+    //        set
+    //        {
+    //            throw new NotImplementedException();
+    //        }
+    //    }
 
-        public int CountTestCases(string filter)
-        {
-            throw new NotImplementedException();
-        }
+    //    public int CountTestCases(string filter)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public string Explore(string filter)
-        {
-            throw new NotImplementedException();
-        }
+    //    public string Explore(string filter)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public string Load(string testAssemblyPath, IDictionary<string, object> settings)
-        {
-            throw new NotImplementedException();
-        }
+    //    public string Load(string testAssemblyPath, IDictionary<string, object> settings)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public string Run(ITestEventListener? listener, string filter)
-        {
-            throw new NotImplementedException();
-        }
+    //    public string Run(ITestEventListener? listener, string filter)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public void StopRun(bool force)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    //    public void StopRun(bool force)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
     [Extension(Enabled=false)]
-    public class DummyDisabledExtension : ITestEventListener
+    public class FakeDisabledExtension : ITestEventListener
     {
         public void OnTestEvent(string report)
         {

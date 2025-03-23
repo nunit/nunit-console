@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
 
@@ -13,18 +15,58 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ProjectService : Service, IProjectService
     {
-        Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
+        static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
+
+        IEnumerable<ExtensionNode>? _extensionNodes;
+        ExtensionService? _extensionService;
 
         public bool CanLoadFrom(string path)
         {
             ExtensionNode? node = GetNodeForPath(path);
-            if (node != null)
+            if (node != null && ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
             {
-                if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
-                    return true;
+                log.Debug($"{node.ExtensionObject.GetType()} can load {path}");
+                return true;
             }
 
+            log.Debug($"Cannot load {path}");
+            if (node == null)
+                log.Debug("    No Extension was found");
             return false;
+        }
+
+        private IProject? LoadFrom(string path)
+        {
+            if (File.Exists(path))
+            {
+                ExtensionNode? node = GetNodeForPath(path);
+                IProjectLoader loader;
+                if (node != null && (loader = (IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
+                {
+                    log.Debug($"Using loader {loader.GetType()}");
+                    return loader.LoadFrom(path);
+                }
+            }
+
+            return null;
+        }
+
+        private ExtensionNode? GetNodeForPath(string path)
+        {
+            var ext = Path.GetExtension(path);
+
+            if (string.IsNullOrEmpty(ext) || _extensionService == null)
+                return null;
+
+            if (_extensionNodes == null)
+                _extensionNodes = _extensionService.GetExtensionNodes<IProjectLoader>();
+
+            foreach (var node in _extensionNodes)
+                foreach (string extNode in node.GetValues("FileExtension"))
+                    if (extNode == ext)
+                        return node;
+
+            return null;
         }
 
         /// <summary>
@@ -36,6 +78,8 @@ namespace NUnit.Engine.Services
         /// <param name="package">The TestPackage to be expanded</param>
         public void ExpandProjectPackage(TestPackage package)
         {
+            log.Debug($"Expanding package {package.Name}");
+
             Guard.ArgumentNotNull(package, "package");
             Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", "package");
 
@@ -44,18 +88,19 @@ namespace NUnit.Engine.Services
                 return;
 
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
+            log.Debug("Got project");
 
             string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string?)null);
+            log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig == null)
                 activeConfig = project.ActiveConfigName;
             else
                 Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", "package");
 
             TestPackage tempPackage = project.GetTestPackage(activeConfig);
+            log.Debug("Got temp package");
 
-            // Add info about the configurations to the project package
-            tempPackage.Settings[EnginePackageSettings.ActiveConfig] = activeConfig;
-            tempPackage.Settings[EnginePackageSettings.ConfigNames] = project.ConfigNames;
+            package.Settings[EnginePackageSettings.ConfigNames] = project.ConfigNames;
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
@@ -69,7 +114,7 @@ namespace NUnit.Engine.Services
             // If no config file is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use its own config, if present.
-            if (!package.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
+            if (!tempPackage.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
                 if (File.Exists(packageConfig))
@@ -79,70 +124,21 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
-            if (Status == ServiceStatus.Stopped)
+            try
             {
-                try
-                {
-                    if (ServiceContext == null)
-                        throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
+                if (ServiceContext == null)
+                    throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
-                    var extensionService = ServiceContext.GetService<ExtensionService>();
+                _extensionService = ServiceContext.GetService<ExtensionService>();
 
-                    if (extensionService == null)
-                        Status = ServiceStatus.Started;
-                    else if (extensionService.Status != ServiceStatus.Started)
-                        Status = ServiceStatus.Error;
-                    else
-                    {
-                        Status = ServiceStatus.Started;
-
-                        foreach (var node in extensionService.GetExtensionNodes<IProjectLoader>())
-                        {
-                            foreach (string ext in node.GetValues("FileExtension"))
-                            {
-                                if (ext != null)
-                                {
-                                    if (_extensionIndex.ContainsKey(ext))
-                                        throw new NUnitEngineException(string.Format("ProjectLoader extension {0} is already handled by another extension.", ext));
-
-                                    _extensionIndex.Add(ext, node);
-                                }
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // TODO: Should we just ignore any addin that doesn't load?
-                    Status = ServiceStatus.Error;
-                    throw;
-                }
+                Status = _extensionService == null || _extensionService.Status == ServiceStatus.Started
+                    ? ServiceStatus.Started : ServiceStatus.Error;
             }
-        }
-
-        private IProject? LoadFrom(string path)
-        {
-            if (File.Exists(path))
+            catch
             {
-                ExtensionNode? node = GetNodeForPath(path);
-                if (node != null)
-                {
-                    if (node.ExtensionObject is IProjectLoader loader && loader.CanLoadFrom(path))
-                        return loader.LoadFrom(path);
-                }
+                Status = ServiceStatus.Error;
+                throw;
             }
-
-            return null;
-        }
-
-        private ExtensionNode? GetNodeForPath(string path)
-        {
-            var ext = Path.GetExtension(path);
-
-            if (string.IsNullOrEmpty(ext) || !_extensionIndex.TryGetValue(ext, out ExtensionNode? node))
-                return null;
-
-            return node;
         }
     }
 }
