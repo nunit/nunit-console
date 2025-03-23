@@ -9,6 +9,9 @@ namespace NUnit.Extensibility
 {
     public abstract class ExtensionWrapper
     {
+        public static readonly Type[] NoTypes = [];
+        public static readonly Type[] StringType = [typeof(string)];
+
         static protected readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionWrapper));
 
         private readonly object _wrappedInstance;
@@ -42,30 +45,38 @@ namespace NUnit.Extensibility
             _wrappedType = wrappedInstance.GetType();
         }
 
-        protected void Invoke(string methodName, params object[] args)
+        protected void Invoke(string methodName, Type[] argTypes, params object[] args)
         {
-            WrapMethod(methodName, Type.GetTypeArray(args)).Invoke(_wrappedInstance, args);
+            WrapMethod(methodName, argTypes).Invoke(_wrappedInstance, args);
         }
 
-        protected T Invoke<T>(string methodName, params object[] args)
+        protected void Invoke(string methodName, params object[] args)
+            => Invoke(methodName, Type.GetTypeArray(args), args);
+
+        protected void Invoke(string methodName, string arg)
+            => Invoke(methodName, StringType, arg);
+
+        protected T Invoke<T>(string methodName, Type[] argTypes, params object[] args)
         {
             Console.WriteLine($"Wrapper called for {typeof(T)} {methodName}");
-            if (args == null) args = Array.Empty<object>();
-            var result = WrapMethod(methodName, Type.GetTypeArray(args)).Invoke(_wrappedInstance, args);
+            var result = WrapMethod(methodName, argTypes).Invoke(_wrappedInstance, args);
             Console.WriteLine($"    Returning {(T)result.ShouldNotBeNull()}");
             return (T)result.ShouldNotBeNull();
         }
 
+        protected T Invoke<T>(string methodName, params object[] args)
+            => Invoke<T>(methodName, Type.GetTypeArray(args), args);
+
+        protected T Invoke<T>(string methodName, string arg)
+            => Invoke<T>(methodName, StringType, arg);
+
         protected T? GetProperty<T>(string propertyName) =>
-            (T?)WrapMethod($"get_{propertyName}").Invoke(_wrappedInstance, Array.Empty<object>());
+            (T?)WrapProperty(propertyName).GetValue(_wrappedInstance);
 
-        protected void SetProperty<T>(string propertyName, T val)
-        {
-            if (val != null)
-                WrapMethod($"set_{propertyName}", new[] { typeof(T) }).Invoke(_wrappedInstance, new object[] { val });
-        }
+        protected void SetProperty<T>(string propertyName, T val) =>
+            WrapProperty(propertyName).SetValue(_wrappedInstance, val);
 
-        private MethodInfo WrapMethod(string methodName, params Type[] argTypes)
+        private MethodInfo WrapMethod(string methodName, Type[] argTypes)
         {
             var sig = new MethodSignature(methodName, argTypes);
             if (_methods.TryGetValue(sig, out MethodInfo? method))
@@ -78,16 +89,18 @@ namespace NUnit.Extensibility
             return _methods[sig] = method;
         }
 
-        // TODO: Support indexed properties only if we need them
         private PropertyInfo WrapProperty(string propertyName)
         {
-            var prop = _wrappedType.GetProperty(propertyName);
-            if (prop == null)
+            if (_properties.TryGetValue(propertyName, out PropertyInfo? property))
+                return property;
+            property = _wrappedType.GetProperty(propertyName);
+            if (property == null)
                 throw new MissingMemberException(propertyName);
-            return prop;
+            return _properties[propertyName] = property;
         }
 
         internal IEnumerable<MethodSignature> GetMethodSignatures() => _methods.Keys;
+        internal IEnumerable<string> GetPropertyNames() => _properties.Keys;
 
         internal class MethodSignature : IEquatable<MethodSignature>
         {
@@ -102,7 +115,13 @@ namespace NUnit.Extensibility
 
             public bool Equals(MethodSignature? other)
             {
-                if (other is null || Name != other.Name || ArgTypes.Length != other.ArgTypes.Length)
+                if (other is null || Name != other.Name)
+                    return false;
+
+                if (ReferenceEquals(ArgTypes, other.ArgTypes))
+                    return true;
+
+                if (ArgTypes.Length != other.ArgTypes.Length)
                     return false;
 
                 for (int i = 0; i < ArgTypes.Length; i++)
@@ -123,6 +142,7 @@ namespace NUnit.Extensibility
             }
         }
 
-        private readonly Dictionary<MethodSignature, MethodInfo> _methods = new Dictionary<MethodSignature, MethodInfo>();
+        private readonly Dictionary<MethodSignature, MethodInfo> _methods = new();
+        private readonly Dictionary<string, PropertyInfo> _properties = new();
     }
 }

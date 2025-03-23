@@ -78,20 +78,30 @@ namespace NUnit.Extensibility
             Assert.That(thingy.Name, Is.EqualTo("THINGY"));
         }
 
-        [Test]
-        public void GetIntProperty()
+        [TestCase(42)]
+        [TestCase(99)]
+        public void IntProperty(int value)
         {
-            var val = _wrapper.IntProperty;
-            Assert.That(_wrappedClass.LastCall, Is.EqualTo("IntProperty"));
-            Assert.That(val, Is.EqualTo(42));
+            _wrapper.IntProperty = value;
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("SetIntProperty"));
+            var val = _wrappedClass.IntProperty;
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("GetIntProperty"));
+            Assert.That(val, Is.EqualTo(value));
+
+            Assert.That(_wrapper.GetPropertyNames(), Does.Contain("IntProperty"));
         }
 
-        [Test]
-        public void GetStringProperty()
+        [TestCase("THE ANSWER")]
+        [TestCase(null)]
+        public void StringProperty(string? value)
         {
+            _wrapper.StringProperty = value;
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("SetStringProperty"));
             var val = _wrapper.StringProperty;
-            Assert.That(_wrappedClass.LastCall, Is.EqualTo("StringProperty"));
-            Assert.That(val, Is.EqualTo("The ANSWER"));
+            Assert.That(_wrappedClass.LastCall, Is.EqualTo("GetStringProperty"));
+            Assert.That(val, Is.EqualTo(value));
+
+            Assert.That(_wrapper.GetPropertyNames(), Does.Contain("StringProperty"));
         }
 
         [Test]
@@ -125,27 +135,38 @@ namespace NUnit.Extensibility
 
     class DummyExtensionWrapper : ExtensionWrapper
     {
+        private static readonly Type[] IntStringTypes = [typeof(int), typeof(string)];
+        private static readonly Type[] IntType = [typeof(int)];
+
         public DummyExtensionWrapper(object wrappedInstance) : base(wrappedInstance) { }
 
-        public void CallVoidMethod() => Invoke("VoidMethod");
+        public void CallVoidMethod() => Invoke("VoidMethod", NoTypes);
 
-        public void CallVoidMethod(int n, string s) => Invoke("VoidMethod", n, s);
+        public void CallVoidMethod(int n, string s) => Invoke("VoidMethod", IntStringTypes, n, s);
 
-        public void CallVoidMethod(string s) => Invoke("VoidMethod", s);
+        public void CallVoidMethod(string s) => Invoke("VoidMethod", StringType, s);
 
-        public int CallIntMethod() => Invoke<int>("IntMethod");
+        public int CallIntMethod() => Invoke<int>("IntMethod", NoTypes);
 
-        public int CallIntMethod(int val) => Invoke<int>("IntMethod", val);
+        public int CallIntMethod(int val) => Invoke<int>("IntMethod", IntType, val);
 
-        public string CallStringMethod() => Invoke<string>("StringMethod");
+        public string CallStringMethod() => Invoke<string>("StringMethod", NoTypes);
 
-        public string CallStringMethod(string val) => Invoke<string>("StringMethod", val);
+        public string CallStringMethod(string val) => Invoke<string>("StringMethod", StringType, val);
 
-        public IThingy CallThingyMethod() => new ThingyWrapper(Invoke<object>("GetThingy"));
+        public IThingy CallThingyMethod() => new ThingyWrapper(Invoke<object>("GetThingy", NoTypes));
 
-        public int IntProperty => GetProperty<int>("IntProperty");
+        public int IntProperty
+        {
+            get => GetProperty<int>("IntProperty");
+            set => SetProperty("IntProperty", value);
+        }
 
-        public string? StringProperty => GetProperty<string>("StringProperty");
+        public string? StringProperty
+        {
+            get => GetProperty<string>("StringProperty");
+            set => SetProperty("StringProperty", value);
+        }
     }
 
     #endregion
@@ -155,6 +176,9 @@ namespace NUnit.Extensibility
     public class DummyExtensionClass
     {
         public string? LastCall;
+
+        public int IntValue;
+        public string? StringValue;
 
         public void VoidMethod() => LastCall = "VoidMethod()";
 
@@ -188,17 +212,27 @@ namespace NUnit.Extensibility
         {
             get
             {
-                LastCall = "IntProperty";
-                return 42;
+                LastCall = "GetIntProperty";
+                return IntValue;
+            }
+            set
+            {
+                LastCall = "SetIntProperty";
+                IntValue = value;
             }
         }
 
-        public string StringProperty
+        public string? StringProperty
         {
             get
             {
-                LastCall = "StringProperty";
-                return "The ANSWER";
+                LastCall = "GetStringProperty";
+                return StringValue;
+            }
+            set
+            {
+                LastCall = "SetStringProperty";
+                StringValue = value;
             }
         }
 
