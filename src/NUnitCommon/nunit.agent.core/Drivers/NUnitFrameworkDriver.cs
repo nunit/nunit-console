@@ -131,7 +131,10 @@ namespace NUnit.Engine.Drivers
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        public string Run(ITestEventListener? listener, string filter) => _api.Run(null, filter);
+        public string Run(ITestEventListener? listener, string filter)
+        {
+            return _api.Run(listener != null ? new EventInterceptor(listener) : null, filter);
+        }
 
         /// <summary>
         /// Executes the tests in an assembly asynchronously.
@@ -152,5 +155,73 @@ namespace NUnit.Engine.Drivers
         /// <param name="filter">A filter indicating which tests to include</param>
         /// <returns>An Xml string representing the tests</returns>
         public string Explore(string filter) => _api.Explore(filter);
+
+        /// <summary>
+        /// Nested class used to intercept progress reports received from the test
+        /// framework and resend them to the actual listener, normally located in
+        /// the runner that is using the engine.
+        /// </summary>
+        /// <remarks>
+        /// This class is absolutely needed when the 2018 NUnit API is used under
+        /// the .NET Framework using Windows Remoting as a communicatioion protocol.
+        /// In particular, the MarshalByRef object implementing the listener must 
+        /// be convertible to ITestEventListener via the IConvertible interface.
+        /// 
+        /// In other cases, the interceptor is not essential, but we use it anyway
+        /// for several reasons:
+        /// 
+        /// 1. We have no control over the implementation of runners using the engine.
+        ///    They may not implement IConvertible and may not even derive from 
+        ///    MarshaByRefObject.
+        /// 
+        /// 2. The interceptor provides a point of control for checking what events 
+        ///    are received from the framework and for possible future modifications to
+        ///    the events before they are forwarded.
+        /// </remarks>
+        public class EventInterceptor : MarshalByRefObject, ITestEventListener, IConvertible
+        {
+            private ITestEventListener _listener;
+
+            public EventInterceptor(ITestEventListener listener)
+            {
+                _listener = listener;
+            }
+
+            #region ITestEventListener and IConvertible Implementations
+
+            void ITestEventListener.OnTestEvent(string report)
+            {
+                _listener.OnTestEvent(report);
+            }
+
+
+            // Conversion to ITestEventListener is the only one that makes sense
+            object IConvertible.ToType(Type conversionType, IFormatProvider? provider) =>
+                conversionType == typeof(ITestEventListener) ? this : InvalidCast(conversionType);
+
+            TypeCode IConvertible.GetTypeCode() => TypeCode.Object;
+            bool IConvertible.ToBoolean(IFormatProvider? provider) => InvalidCast<bool>();
+            char IConvertible.ToChar(IFormatProvider? provider) => InvalidCast<char>();
+            sbyte IConvertible.ToSByte(IFormatProvider? provider) => InvalidCast<sbyte>();
+            byte IConvertible.ToByte(IFormatProvider? provider) => InvalidCast<byte>();
+            short IConvertible.ToInt16(IFormatProvider? provider) => InvalidCast<short>();
+            ushort IConvertible.ToUInt16(IFormatProvider? provider) => InvalidCast<ushort>();
+            int IConvertible.ToInt32(IFormatProvider? provider) => InvalidCast<int>();
+            uint IConvertible.ToUInt32(IFormatProvider? provider) => InvalidCast<uint>();
+            long IConvertible.ToInt64(IFormatProvider? provider) => InvalidCast<long>();
+            ulong IConvertible.ToUInt64(IFormatProvider? provider) => InvalidCast<ulong>();
+            float IConvertible.ToSingle(IFormatProvider? provider) => InvalidCast<float>();
+            double IConvertible.ToDouble(IFormatProvider? provider) => InvalidCast<double>();
+            decimal IConvertible.ToDecimal(IFormatProvider? provider) => InvalidCast<decimal>();
+            DateTime IConvertible.ToDateTime(IFormatProvider? provider) => InvalidCast<DateTime>();
+            string IConvertible.ToString(IFormatProvider? provider) => InvalidCast<string>();
+
+            static T InvalidCast<T>() => (T)InvalidCast(typeof(T));
+
+            static object InvalidCast(Type type) =>
+                throw new InvalidCastException($"{nameof(EventInterceptor)} is not convertible to {nameof(type)}");
+
+            #endregion
+        }
     }
 }

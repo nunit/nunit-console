@@ -121,7 +121,11 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
-            Action<string>? callback = null;
+#if NETFRAMEWORK
+            Action<string>? callback = listener != null ? listener.OnTestEvent : null;
+#else
+            Action<string>? callback = listener != null ? listener.OnTestEvent : null;
+#endif
             return (string)ExecuteMethod(RUN_METHOD, [typeof(Action<string>), typeof(string)], callback, filter);
         }
 

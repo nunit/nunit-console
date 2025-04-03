@@ -66,7 +66,9 @@ namespace NUnit.Engine.Fakes
     {
         public void OnTestEvent(string report)
         {
-            throw new NotImplementedException();
+            if (report.Length > 63)
+                report = report.Substring(0, 60) + "...";
+            Console.WriteLine($"EventListener: {report}");
         }
     }
 

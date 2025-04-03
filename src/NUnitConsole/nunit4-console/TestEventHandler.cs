@@ -12,7 +12,7 @@ namespace NUnit.ConsoleRunner
     /// test for the console runner.
     /// </summary>
 #if NETFRAMEWORK
-    public class TestEventHandler : MarshalByRefObject, ITestEventListener
+    public class TestEventHandler : ITestEventListener
 #else
     public class TestEventHandler : ITestEventListener
 #endif
@@ -205,12 +205,5 @@ namespace NUnit.ConsoleRunner
                     return ColorStyle.Output;
             }
         }
-
-#if NETFRAMEWORK
-        public override object InitializeLifetimeService()
-        {
-            return null!;
-        }
-#endif
     }
 }
