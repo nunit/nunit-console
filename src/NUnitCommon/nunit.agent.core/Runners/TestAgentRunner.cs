@@ -16,6 +16,8 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public abstract class TestAgentRunner : ITestEngineRunner
     {
+        private readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentRunner));
+
         private readonly ProvidedPathsAssemblyResolver? _assemblyResolver;
 
         private IFrameworkDriver? _driver;

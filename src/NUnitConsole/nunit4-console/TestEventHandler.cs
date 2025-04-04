@@ -11,11 +11,7 @@ namespace NUnit.ConsoleRunner
     /// TestEventHandler processes events from the running
     /// test for the console runner.
     /// </summary>
-#if NETFRAMEWORK
-    public class TestEventHandler : MarshalByRefObject, ITestEventListener
-#else
     public class TestEventHandler : ITestEventListener
-#endif
     {
         private readonly ExtendedTextWriter _outWriter;
 
@@ -205,12 +201,5 @@ namespace NUnit.ConsoleRunner
                     return ColorStyle.Output;
             }
         }
-
-#if NETFRAMEWORK
-        public override object InitializeLifetimeService()
-        {
-            return null!;
-        }
-#endif
     }
 }
