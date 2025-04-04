@@ -11,11 +11,7 @@ namespace NUnit.ConsoleRunner
     /// TestEventHandler processes events from the running
     /// test for the console runner.
     /// </summary>
-#if NETFRAMEWORK
     public class TestEventHandler : ITestEventListener
-#else
-    public class TestEventHandler : ITestEventListener
-#endif
     {
         private readonly ExtendedTextWriter _outWriter;
 

@@ -16,7 +16,7 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public abstract class TestAgentRunner : ITestEngineRunner
     {
-        Logger log = InternalTrace.GetLogger(typeof(TestAgentRunner));
+        private readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentRunner));
 
         private readonly ProvidedPathsAssemblyResolver? _assemblyResolver;
 

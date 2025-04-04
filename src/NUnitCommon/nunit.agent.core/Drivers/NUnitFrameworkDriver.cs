@@ -163,7 +163,7 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         /// <remarks>
         /// This class is absolutely needed when the 2018 NUnit API is used under
-        /// the .NET Framework using Windows Remoting as a communicatioion protocol.
+        /// the .NET Framework using Windows Remoting as a communication protocol.
         /// In particular, the MarshalByRef object implementing the listener must 
         /// be convertible to ITestEventListener via the IConvertible interface.
         /// 
@@ -193,7 +193,6 @@ namespace NUnit.Engine.Drivers
             {
                 _listener.OnTestEvent(report);
             }
-
 
             // Conversion to ITestEventListener is the only one that makes sense
             object IConvertible.ToType(Type conversionType, IFormatProvider? provider) =>
