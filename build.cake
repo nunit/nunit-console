@@ -82,7 +82,15 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitConsoleNuGetPackage = new NuGetPackage(
         id: "NUnit.Console",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
-        checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
+        checks: new PackageCheck[] {
+            HasFile("LICENSE.txt"),
+            // Check proper extension is in a sibling directory since we
+            // don't yet have the 'HasExtension' predicate.
+            HasDirectory("../NUnit.Extension.NUnitProjectLoader.3.8.0"),
+            HasDirectory("../NUnit.Extension.NUnitV2Driver.3.9.0"),
+            HasDirectory("../NUnit.Extension.NUnitV2ResultWriter.3.8.0"),
+            HasDirectory("../NUnit.Extension.TeamCityEventListener.1.0.10"),
+            HasDirectory("../NUnit.Extension.VSProjectLoader.3.9.0") }),
 
     NUnitConsoleRunnerNetCorePackage = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.NetCore",
@@ -120,7 +128,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("NUnit.Extension.NUnitProjectLoader.3.8.0"),
             HasDirectory("NUnit.Extension.NUnitV2Driver.3.9.0"),
             HasDirectory("NUnit.Extension.NUnitV2ResultWriter.3.8.0"),
-            HasDirectory("NUnit.Extension.TeamCityEventListener.1.0.9"),
+            HasDirectory("NUnit.Extension.TeamCityEventListener.1.0.10"),
             HasDirectory("NUnit.Extension.VSProjectLoader.3.9.0"),
             HasDirectory("bin/agents/net462").WithFiles(AGENT_FILES).AndFiles(AGENT_PDB_FILES),
             HasDirectory("bin/agents/net6.0").WithFiles(AGENT_FILES_NETCORE).AndFiles(AGENT_PDB_FILES_NETCORE),

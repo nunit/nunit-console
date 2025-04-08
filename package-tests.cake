@@ -1,6 +1,6 @@
 public static class Extensions
 {
-    // Extensions used in tests, with version specified.
+    // Define the latest version of every extension bundled and/or used in tests.
     public static ExtensionSpecifier NUnitV2Driver = new ExtensionSpecifier(
         "NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0");
     public static ExtensionSpecifier NUnitProjectLoader = new ExtensionSpecifier(
@@ -10,7 +10,7 @@ public static class Extensions
     public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
         "NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "3.8.0");
     public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
-        "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
+        "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.10");
 }
 
 public static class PackageTests
