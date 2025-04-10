@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.7
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.11
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -86,11 +86,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFile("LICENSE.txt"),
             // Check proper extension is in a sibling directory since we
             // don't yet have the 'HasExtension' predicate.
-            HasDirectory("../NUnit.Extension.NUnitProjectLoader.3.8.0"),
-            HasDirectory("../NUnit.Extension.NUnitV2Driver.3.9.0"),
-            HasDirectory("../NUnit.Extension.NUnitV2ResultWriter.3.8.0"),
-            HasDirectory("../NUnit.Extension.TeamCityEventListener.1.0.10"),
-            HasDirectory("../NUnit.Extension.VSProjectLoader.3.9.0") }),
+            HasDependency(Extensions.NUnitProjectLoader.NuGetPackage),
+            HasDependency(Extensions.NUnitV2Driver.NuGetPackage),
+            HasDependency(Extensions.NUnitV2ResultWriter.NuGetPackage),
+            HasDependency(Extensions.TeamCityEventListener.NuGetPackage),
+            HasDependency(Extensions.VSProjectLoader.NuGetPackage) }),
 
     NUnitConsoleRunnerNetCorePackage = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.NetCore",
