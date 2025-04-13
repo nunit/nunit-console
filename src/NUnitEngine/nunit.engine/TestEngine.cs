@@ -56,7 +56,12 @@ namespace NUnit.Engine
         {
             if (InternalTraceLevel != InternalTraceLevel.Off && !InternalTrace.Initialized)
             {
-                var logName = string.Format("InternalTrace.{0}.log", Process.GetCurrentProcess().Id);
+#if NET6_0_OR_GREATER
+                int id = Environment.ProcessId;
+#else
+                int id = Process.GetCurrentProcess().Id;
+#endif
+                var logName = string.Format("InternalTrace.{0}.log", id);
                 InternalTrace.Initialize(Path.Combine(WorkDirectory, logName), InternalTraceLevel);
             }
 
