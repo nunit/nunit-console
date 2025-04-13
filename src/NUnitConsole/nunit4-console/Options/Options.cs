@@ -395,8 +395,7 @@ namespace NUnit.ConsoleRunner.Options
         {
             if (c.Option is null)
                 throw new InvalidOperationException("OptionContext.Option is null.");
-            if (index >= c.Option.MaxValueCount)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            Guard.ArgumentInRange(index < c.Option.MaxValueCount, "Index must be less than MaxValueCount.", nameof(index));
             if (c.Option.OptionValueType == OptionValueType.Required &&
                     index >= values.Count)
                 throw new OptionException(string.Format(
@@ -508,10 +507,8 @@ namespace NUnit.ConsoleRunner.Options
         protected Option(string prototype, string? description, int maxValueCount, bool hidden)
         {
             Guard.ArgumentNotNull(prototype, nameof(prototype));
-            if (prototype.Length == 0)
-                throw new ArgumentException("Cannot be the empty string.", nameof(prototype));
-            if (maxValueCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(maxValueCount));
+            Guard.ArgumentValid(prototype.Length > 0, nameof(prototype), "Cannot be the empty string.");
+            Guard.ArgumentInRange(maxValueCount >= 0, "MaxValueCount must be greater or equal to zero", nameof(maxValueCount));
 
             this.prototype = prototype;
             this.description = description;
