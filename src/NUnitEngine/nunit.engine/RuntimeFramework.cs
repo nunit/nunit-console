@@ -52,7 +52,7 @@ namespace NUnit.Engine
             FrameworkName = new FrameworkName(runtime.FrameworkIdentifier, FrameworkVersion);
         }
 
-        private bool IsValidFrameworkVersion(Version v)
+        private static bool IsValidFrameworkVersion(Version v)
         {
             // All known framework versions have either two components or
             // three. If three, then the Build is currently less than 3.

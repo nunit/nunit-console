@@ -14,7 +14,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init()
         {
-            var path = this.GetTestFileLocation();
+            var path = GetTestFileLocation();
             var parent = SIO.Path.GetDirectoryName(path);
 
             var file = new File(path);
@@ -37,7 +37,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
                 Assert.Ignore("This test does not make sense on systems where System.IO.Path.GetInvalidPathChars() returns an empty array.");
             }
 
-            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length - 1] + this.GetTestFileLocation();
+            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length - 1] + GetTestFileLocation();
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -51,7 +51,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             }
 
             char invalidCharThatIsNotInInvalidPathChars = SIO.Path.GetInvalidFileNameChars().Except(SIO.Path.GetInvalidPathChars()).First();
-            var path = this.GetTestFileLocation() + invalidCharThatIsNotInInvalidPathChars;
+            var path = GetTestFileLocation() + invalidCharThatIsNotInInvalidPathChars;
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
@@ -65,7 +65,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
         [Test]
         public void Init_NonExistingFile()
         {
-            var path = this.GetTestFileLocation();
+            var path = GetTestFileLocation();
             while (SIO.File.Exists(path))
             {
                 path += "a";
@@ -87,7 +87,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
             Assert.That(() => new File(path), Throws.ArgumentException);
         }
 
-        private string GetTestFileLocation()
+        private static string GetTestFileLocation()
         {
             return Assembly.GetAssembly(typeof(FileTests))!.Location;
         }

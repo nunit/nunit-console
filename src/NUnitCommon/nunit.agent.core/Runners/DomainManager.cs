@@ -59,7 +59,7 @@ namespace NUnit.Engine.Runners
         }
 
         // Made separate and internal for testing
-        private AppDomainSetup CreateAppDomainSetup(TestPackage package)
+        private static AppDomainSetup CreateAppDomainSetup(TestPackage package)
         {
             AppDomainSetup setup = new AppDomainSetup();
 
@@ -99,7 +99,7 @@ namespace NUnit.Engine.Runners
             return setup;
         }
 
-        public void Unload(AppDomain domain)
+        public static void Unload(AppDomain domain)
         {
             new DomainUnloader(domain).Unload();
         }

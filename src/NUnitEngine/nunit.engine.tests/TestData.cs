@@ -23,7 +23,7 @@ namespace NUnit.Engine
             VerifyFilePath("testdata/" + CURRENT_RUNTIME + "/notest-assembly.dll");
         }
 
-        private void VerifyFilePath(string path)
+        private static void VerifyFilePath(string path)
         {
             path = Path.GetFullPath(path);
             Assert.That(File.Exists(path), $"File not found at {path}");

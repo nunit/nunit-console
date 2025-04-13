@@ -460,7 +460,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
         }
 
-        private void DumpErrors()
+        private static void DumpErrors()
         {
         }
 

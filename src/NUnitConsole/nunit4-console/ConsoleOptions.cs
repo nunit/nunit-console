@@ -408,16 +408,16 @@ namespace NUnit.ConsoleRunner
             this.Add(prototype, description, action, isHidden);
         }
 
+#if NETFRAMEWORK
+        private static Action<string> NetFxOnlyOption(string optionName, Action<string> action) => action;
+#else
         private Action<string> NetFxOnlyOption(string optionName, Action<string> action)
         {
-#if NETFRAMEWORK
-            return action;
-#else
             return s => ErrorMessages.Add($"The {optionName} option is not available on this platform.");
-#endif
         }
+#endif
 
-        private void CheckOptionCombinations()
+        private static void CheckOptionCombinations()
         {
             // Add any validation of option combinations here
         }
@@ -500,7 +500,7 @@ namespace NUnit.ConsoleRunner
             return GetArgs(sb.ToString());
         }
 
-        private string? ExpandToFullPath(string path)
+        private static string? ExpandToFullPath(string path)
         {
             if (path is null)
                 return null;

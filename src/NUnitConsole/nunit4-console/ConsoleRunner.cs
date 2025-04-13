@@ -109,7 +109,7 @@ namespace NUnit.ConsoleRunner
                     DisableExtension(typeName);
         }
 
-        private bool RunningUnderTeamCity =>
+        private static bool RunningUnderTeamCity =>
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
 
         private bool IsExtensionInstalled(string typeName)
@@ -316,7 +316,7 @@ namespace NUnit.ConsoleRunner
             return ConsoleRunner.UNEXPECTED_ERROR;
         }
 
-        private void DisplayRuntimeEnvironment(ExtendedTextWriter OutWriter)
+        private static void DisplayRuntimeEnvironment(ExtendedTextWriter OutWriter)
         {
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Runtime Environment");
             OutWriter.WriteLabelLine(INDENT4 + "OS Version: ", GetOSVersion());
