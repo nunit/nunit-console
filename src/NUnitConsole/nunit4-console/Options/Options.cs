@@ -1623,7 +1623,7 @@ namespace NUnit.ConsoleRunner.Options
                             if ((i + 1) == description.Length || description[i + 1] != '}')
                                 throw new InvalidOperationException("Invalid option description: " + description);
                             ++i;
-                            sb.Append("}");
+                            sb.Append('}');
                         }
                         else
                         {
