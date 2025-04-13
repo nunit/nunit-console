@@ -19,7 +19,11 @@ namespace NUnit.Agents
     {
         static Process? AgencyProcess;
         static RemoteTestAgent? Agent;
+#if NET6_0_OR_GREATER
+        static readonly int _pid = Environment.ProcessId;
+#else
         static readonly int _pid = Process.GetCurrentProcess().Id;
+#endif
         static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgent));
 
         /// <summary>
