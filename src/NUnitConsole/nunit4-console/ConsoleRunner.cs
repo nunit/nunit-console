@@ -368,7 +368,7 @@ namespace NUnit.ConsoleRunner
 
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
-            if (_extensionService?.ExtensionPoints != null)
+            if (_extensionService?.ExtensionPoints is not null)
                 foreach (var ep in _extensionService.ExtensionPoints)
                 {
                     _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
