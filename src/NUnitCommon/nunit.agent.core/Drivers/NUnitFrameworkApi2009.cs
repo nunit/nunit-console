@@ -48,7 +48,7 @@ namespace NUnit.Engine.Drivers
 
             public string Load(string testAssemblyPath, IDictionary<string, object> settings)
             {
-                Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", "testAssemblyPath");
+                Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", nameof(testAssemblyPath));
 
                 log.Info($"Loading {testAssemblyPath} - see separate log file");
 

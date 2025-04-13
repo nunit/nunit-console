@@ -18,7 +18,7 @@ namespace NUnit.Engine.Runners
 
         public ParallelTaskWorkerPool(int maxThreads)
         {
-            Guard.ArgumentValid(maxThreads >= 1, "Number of threads must be greater than zero.", "maxThreads");
+            Guard.ArgumentValid(maxThreads >= 1, "Number of threads must be greater than zero.", nameof(maxThreads));
 
             _maxThreads = maxThreads;
             _tasks = new Queue<ITestExecutionTask>();
