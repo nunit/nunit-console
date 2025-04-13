@@ -37,7 +37,7 @@ namespace NUnit
             // To get the location before the file has been shadow-copied, use the CodeBase property.
             string? codeBase = assembly.CodeBase;
 
-            if (codeBase != null && IsFileUri(codeBase))
+            if (codeBase is not null && IsFileUri(codeBase))
                 return GetAssemblyPathFromCodeBase(codeBase);
 #endif
 

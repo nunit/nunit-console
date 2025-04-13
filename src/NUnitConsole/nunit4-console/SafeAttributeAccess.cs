@@ -27,7 +27,7 @@ namespace NUnit.ConsoleRunner
         {
             XmlAttribute? attr = result.Attributes?[name];
 
-            return attr == null ? null : attr.Value;
+            return attr is null ? null : attr.Value;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace NUnit.ConsoleRunner
         {
             XmlAttribute? attr = result.Attributes?[name];
 
-            return attr == null
+            return attr is null
                 ? defaultValue
                 : double.Parse(attr.Value, System.Globalization.CultureInfo.InvariantCulture);
         }
@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner
         public static DateTime GetAttribute(this XmlNode result, string name, DateTime defaultValue)
         {
             string? dateStr = GetAttribute(result, name);
-            if (dateStr == null)
+            if (dateStr is null)
                 return defaultValue;
 
             DateTime date;

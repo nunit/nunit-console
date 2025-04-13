@@ -76,7 +76,7 @@ namespace NUnit.Engine
             get
             {
                 // xmlNodes might be null after deserialization
-                if (_xmlNodes == null)
+                if (_xmlNodes is null)
                     _xmlNodes = new List<XmlNode>();
 
                 for (int i = _xmlNodes.Count; i < _xmlText.Count; i++)
@@ -84,7 +84,7 @@ namespace NUnit.Engine
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(_xmlText[i]);
                     // TODO: Should we throw if first child is null?
-                    if (doc.FirstChild != null)
+                    if (doc.FirstChild is not null)
                         _xmlNodes.Add(doc.FirstChild);
                 }
 

@@ -170,7 +170,7 @@ namespace NUnit.Extensibility
 
             IDirectory? startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
 
-            while (startDir != null)
+            while (startDir is not null)
             {
                 foreach (var pattern in extensionPatterns)
                     foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
@@ -205,7 +205,7 @@ namespace NUnit.Extensibility
             EnsureExtensionsAreLoaded();
 
             var ep = GetExtensionPoint(path);
-            if (ep != null)
+            if (ep is not null)
                 foreach (var node in ep.Extensions)
                     yield return node;
         }
@@ -222,7 +222,7 @@ namespace NUnit.Extensibility
             // TODO: Remove need for the cast
             var ep = GetExtensionPoint(path) as ExtensionPoint;
 
-            return ep != null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
+            return ep is not null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace NUnit.Extensibility
             EnsureExtensionsAreLoaded();
 
             var ep = GetExtensionPoint(typeof(T));
-            if (ep != null)
+            if (ep is not null)
                 foreach (var node in ep.Extensions)
                     if (includeDisabled || node.Enabled)
                         yield return node;
@@ -286,7 +286,7 @@ namespace NUnit.Extensibility
         private ExtensionPoint? DeduceExtensionPointFromType(TypeReference typeRef)
         {
             var ep = GetExtensionPoint(typeRef);
-            if (ep != null)
+            if (ep is not null)
                 return ep;
 
             TypeDefinition typeDef = typeRef.Resolve();
@@ -294,12 +294,12 @@ namespace NUnit.Extensibility
             foreach (InterfaceImplementation iface in typeDef.Interfaces)
             {
                 ep = DeduceExtensionPointFromType(iface.InterfaceType);
-                if (ep != null)
+                if (ep is not null)
                     return ep;
             }
 
             TypeReference? baseType = typeDef.BaseType;
-            return baseType != null && baseType.FullName != "System.Object"
+            return baseType is not null && baseType.FullName != "System.Object"
                 ? DeduceExtensionPointFromType(baseType)
                 : null;
         }
@@ -496,20 +496,20 @@ namespace NUnit.Extensibility
             {
                 bool isV3Extension = false;
                 CustomAttribute extensionAttr = extensionType.GetAttribute(EXTENSION_ATTRIBUTE);
-                if (extensionAttr == null) 
+                if (extensionAttr is null) 
                 {
                     extensionAttr = extensionType.GetAttribute(V3_EXTENSION_ATTRIBUTE);
                     isV3Extension = true;
                 }
 
-                if (extensionAttr == null)
+                if (extensionAttr is null)
                     continue;
 
                 // TODO: This is a remnant of older code. In principle, this should be generalized
                 // to something like "HostVersion". However, this can safely remain until
                 // we separate ExtensionManager into its own assembly.
                 string? versionArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.EngineVersion)) as string;
-                if (versionArg != null)
+                if (versionArg is not null)
                 {
                     if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
                     {
@@ -526,7 +526,7 @@ namespace NUnit.Extensibility
                 };
 
                 object? enabledArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Enabled));
-                node.Enabled = enabledArg == null || (bool)enabledArg;
+                node.Enabled = enabledArg is null || (bool)enabledArg;
 
                 log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
 
@@ -539,7 +539,7 @@ namespace NUnit.Extensibility
                     string? name = attr.ConstructorArguments[0].Value as string;
                     string? value = attr.ConstructorArguments[1].Value as string;
 
-                    if (name != null && value != null)
+                    if (name is not null && value is not null)
                     {
                         node.AddProperty(name, value);
                         log.Info("        ExtensionProperty {0} = {1}", name, value);
@@ -549,10 +549,10 @@ namespace NUnit.Extensibility
                 _extensions.Add(node);
 
                 ExtensionPoint? ep;
-                if (extensionAttrPath == null)
+                if (extensionAttrPath is null)
                 {
                     ep = DeduceExtensionPointFromType(extensionType);
-                    if (ep == null)
+                    if (ep is null)
                         throw new NUnitExtensibilityException($"Unable to deduce ExtensionPoint for Type {extensionType.FullName}. Specify Path on ExtensionAttribute to resolve.");
 
                     node.Path = ep.Path;
@@ -563,7 +563,7 @@ namespace NUnit.Extensibility
 
                     // TODO: Remove need for the cast
                     ep = GetExtensionPoint(node.Path) as ExtensionPoint;
-                    if (ep == null)
+                    if (ep is null)
                         throw new NUnitExtensibilityException($"Unable to locate ExtensionPoint for Type {extensionType.FullName}. The Path {node.Path} cannot be found.");
                 }
 
@@ -583,7 +583,7 @@ namespace NUnit.Extensibility
         /// <param name="extensionAsm">The extension we are attempting to load</param>
         public bool CanLoadTargetFramework(Assembly? runnerAsm, ExtensionAssembly extensionAsm)
         {
-            if (runnerAsm == null)
+            if (runnerAsm is null)
                 return true;
 
             var runnerFrameworkName = GetTargetRuntime(runnerAsm.Location);

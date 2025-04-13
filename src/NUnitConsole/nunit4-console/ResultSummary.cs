@@ -158,7 +158,7 @@ namespace NUnit.ConsoleRunner
                         case "Failed":
                             if (failedInFixtureTearDown)
                                 ErrorCount++;
-                            else if (label == null)
+                            else if (label is null)
                                 FailureCount++;
                             else if (label == "Invalid")
                                 InvalidCount++;

@@ -72,7 +72,7 @@ namespace NUnit.Engine.Drivers
                         null,
                         null).ShouldNotBeNull();
                 }
-                catch (BadImageFormatException ex) when (requestedRuntime != null)
+                catch (BadImageFormatException ex) when (requestedRuntime is not null)
                 {
                     throw new NUnitEngineException($"Requested runtime {requestedRuntime} is not suitable for use with test assembly {_testAssemblyPath}", ex);
                 }
@@ -113,7 +113,7 @@ namespace NUnit.Engine.Drivers
 
             private void CheckLoadWasCalled()
             {
-                if (_frameworkController == null)
+                if (_frameworkController is null)
                     throw new InvalidOperationException(LOAD_MESSAGE);
             }
 

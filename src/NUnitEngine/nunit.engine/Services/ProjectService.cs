@@ -23,14 +23,14 @@ namespace NUnit.Engine.Services
         public bool CanLoadFrom(string path)
         {
             ExtensionNode? node = GetNodeForPath(path);
-            if (node != null && ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
+            if (node is not null && ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
             {
                 log.Debug($"{node.ExtensionObject.GetType()} can load {path}");
                 return true;
             }
 
             log.Debug($"Cannot load {path}");
-            if (node == null)
+            if (node is null)
                 log.Debug("    No Extension was found");
             return false;
         }
@@ -41,7 +41,7 @@ namespace NUnit.Engine.Services
             {
                 ExtensionNode? node = GetNodeForPath(path);
                 IProjectLoader loader;
-                if (node != null && (loader = (IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
+                if (node is not null && (loader = (IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
                 {
                     log.Debug($"Using loader {loader.GetType()}");
                     return loader.LoadFrom(path);
@@ -55,10 +55,10 @@ namespace NUnit.Engine.Services
         {
             var ext = Path.GetExtension(path);
 
-            if (string.IsNullOrEmpty(ext) || _extensionService == null)
+            if (string.IsNullOrEmpty(ext) || _extensionService is null)
                 return null;
 
-            if (_extensionNodes == null)
+            if (_extensionNodes is null)
                 _extensionNodes = _extensionService.GetExtensionNodes<IProjectLoader>();
 
             foreach (var node in _extensionNodes)
@@ -92,7 +92,7 @@ namespace NUnit.Engine.Services
 
             string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string?)null);
             log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
-            if (activeConfig == null)
+            if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;
             else
                 Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", "package");
@@ -126,12 +126,12 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                if (ServiceContext == null)
+                if (ServiceContext is null)
                     throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
                 _extensionService = ServiceContext.GetService<ExtensionService>();
 
-                Status = _extensionService == null || _extensionService.Status == ServiceStatus.Started
+                Status = _extensionService is null || _extensionService.Status == ServiceStatus.Started
                     ? ServiceStatus.Started : ServiceStatus.Error;
             }
             catch

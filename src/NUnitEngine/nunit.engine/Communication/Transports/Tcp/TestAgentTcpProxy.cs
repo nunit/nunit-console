@@ -117,11 +117,11 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                 var receivedType = receivedMessage.GetType();
 
                 var returnMessage = receivedMessage as CommandReturnMessage;
-                if (returnMessage != null)
+                if (returnMessage is not null)
                     return (TestEngineResult)returnMessage.ReturnValue;
 
                 var progressMessage = receivedMessage as ProgressMessage;
-                if (progressMessage == null)
+                if (progressMessage is null)
                     throw new InvalidOperationException($"Expected either a ProgressMessage or a CommandReturnMessage but received a {receivedType}");
 
                 listener.OnTestEvent(progressMessage.Report);

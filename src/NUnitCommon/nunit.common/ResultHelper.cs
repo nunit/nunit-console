@@ -113,12 +113,12 @@ namespace NUnit.Engine
         public static XmlNode Aggregate(string elementName, string? testType, string id, string? name, string? fullName, IList<XmlNode> resultNodes)
         {
             XmlNode combinedNode = XmlHelper.CreateTopLevelElement(elementName);
-            if (testType != null)
+            if (testType is not null)
                 combinedNode.AddAttribute("type", testType);
             combinedNode.AddAttribute("id", id);
-            if (name != null && name != string.Empty)
+            if (name is not null && name != string.Empty)
                 combinedNode.AddAttribute("name", name);
-            if (fullName != null && fullName != string.Empty)
+            if (fullName is not null && fullName != string.Empty)
                 combinedNode.AddAttribute("fullname", fullName);
             combinedNode.AddAttribute("runstate", "Runnable"); // If not, we would not have gotten this far
 
@@ -143,7 +143,7 @@ namespace NUnit.Engine
                 testcasecount += node.GetAttribute("testcasecount", 0);
 
                 XmlAttribute? resultAttribute = node.Attributes?["result"];
-                if (resultAttribute != null)
+                if (resultAttribute is not null)
                 {
                     isTestRunResult = true;
 
@@ -183,7 +183,7 @@ namespace NUnit.Engine
                     asserts += node.GetAttribute("asserts", 0);
                 }
 
-                if (combinedNode.OwnerDocument != null)
+                if (combinedNode.OwnerDocument is not null)
                 {
                     XmlNode import = combinedNode.OwnerDocument.ImportNode(node, true);
                     combinedNode.AppendChild(import);
@@ -195,9 +195,9 @@ namespace NUnit.Engine
             if (isTestRunResult)
             {
                 combinedNode.AddAttribute("result", aggregateResult);
-                if (aggregateLabel != null)
+                if (aggregateLabel is not null)
                     combinedNode.AddAttribute("label", aggregateLabel);
-                if (aggregateSite != null)
+                if (aggregateSite is not null)
                     combinedNode.AddAttribute("site", aggregateSite);
 
                 //combinedNode.AddAttribute("duration", totalDuration.ToString("0.000000", NumberFormatInfo.InvariantInfo));

@@ -52,7 +52,7 @@ namespace NUnit.Engine.Services
 
         public ITestAgent? GetAgent(TestPackage package)
         {
-            if (_runtimeService == null || _availableRuntimeService == null)
+            if (_runtimeService is null || _availableRuntimeService is null)
                 throw new InvalidOperationException("TestAgency needs to be Started first");
 
             // Target Runtime must be specified by this point
@@ -188,7 +188,7 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                if (ServiceContext == null)
+                if (ServiceContext is null)
                     throw new InvalidOperationException("ServiceContext is required for TestAgency");
 
                 _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();

@@ -23,7 +23,7 @@ namespace NUnit.ConsoleRunner.Options
             while (index < argument.Length)
             {
                 string name = GetTestName(argument, ref index);
-                if (name != null && name != string.Empty)
+                if (name is not null && name != string.Empty)
                     list.Add(name);
             }
 

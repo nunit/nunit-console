@@ -19,7 +19,7 @@ namespace NUnit.ConsoleRunner.Options
         /// <param name="transformFolder">The folder containing the transform.</param>
         public OutputSpecification(string spec, string? transformFolder)
         {
-            if (spec == null)
+            if (spec is null)
                 throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
 
             string[] parts = spec.Split(';');
@@ -37,7 +37,7 @@ namespace NUnit.ConsoleRunner.Options
                     case "format":
                         string fmt = opt[1].Trim();
 
-                        if (this.Format != null && this.Format != fmt)
+                        if (this.Format is not null && this.Format != fmt)
                             throw new ArgumentException(
                                 string.Format("Conflicting format options: {0}", spec));
 
@@ -47,11 +47,11 @@ namespace NUnit.ConsoleRunner.Options
                     case "transform":
                         string val = opt[1].Trim();
 
-                        if (this.Transform != null && this.Transform != val)
+                        if (this.Transform is not null && this.Transform != val)
                             throw new ArgumentException(
                                 string.Format("Conflicting transform options: {0}", spec));
 
-                        if (this.Format != null && this.Format != "user")
+                        if (this.Format is not null && this.Format != "user")
                             throw new ArgumentException(
                                 string.Format("Conflicting format options: {0}", spec));
 
@@ -61,7 +61,7 @@ namespace NUnit.ConsoleRunner.Options
                 }
             }
 
-            if (Format == null)
+            if (Format is null)
                 Format = "nunit3";
         }
 
@@ -83,8 +83,8 @@ namespace NUnit.ConsoleRunner.Options
         public override string ToString()
         {
             var sb = new StringBuilder($"OutputPath: {OutputPath}");
-            if (Format != null) sb.Append($", Format: {Format}");
-            if (Transform != null) sb.Append($", Transform: {Transform}");
+            if (Format is not null) sb.Append($", Format: {Format}");
+            if (Transform is not null) sb.Append($", Transform: {Transform}");
             return sb.ToString();
         }
     }

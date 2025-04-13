@@ -17,7 +17,7 @@ namespace NUnit.Engine
 
             public ObservableServerChannelSinkProvider(CurrentMessageCounter currentMessageCounter)
             {
-                if (currentMessageCounter == null) throw new ArgumentNullException(nameof(currentMessageCounter));
+                if (currentMessageCounter is null) throw new ArgumentNullException(nameof(currentMessageCounter));
                 _currentMessageCounter = currentMessageCounter;
             }
 
@@ -27,7 +27,7 @@ namespace NUnit.Engine
 
             public IServerChannelSink CreateSink(IChannelReceiver channel)
             {
-                if (Next == null)
+                if (Next is null)
                     throw new InvalidOperationException("Cannot create a sink without setting the next provider.");
                 return new ObservableServerChannelSink(_currentMessageCounter, Next.CreateSink(channel));
             }
@@ -42,7 +42,7 @@ namespace NUnit.Engine
 
                 public ObservableServerChannelSink(CurrentMessageCounter currentMessageCounter, IServerChannelSink next)
                 {
-                    if (next == null) throw new ArgumentNullException(nameof(next));
+                    if (next is null) throw new ArgumentNullException(nameof(next));
                     _currentMessageCounter = currentMessageCounter;
                     _next = next;
                 }

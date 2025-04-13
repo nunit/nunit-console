@@ -28,7 +28,7 @@ namespace NUnit.ConsoleRunner
         {
             get
             {
-                if (_outWriter == null) _outWriter = new ColorConsoleWriter(!Options.NoColor);
+                if (_outWriter is null) _outWriter = new ColorConsoleWriter(!Options.NoColor);
 
                 return _outWriter;
             }
@@ -100,7 +100,7 @@ namespace NUnit.ConsoleRunner
                     if (Options.RuntimeFrameworkSpecified)
                     {
                         var availableRuntimeService = engine.Services.GetService<IAvailableRuntimes>();
-                        if (availableRuntimeService == null)
+                        if (availableRuntimeService is null)
                         {
                             WriteErrorMessage("Unable to acquire AvailableRuntimeService from engine");
                             return ConsoleRunner.UNEXPECTED_ERROR;
@@ -118,10 +118,10 @@ namespace NUnit.ConsoleRunner
                             WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
                     }
 
-                    if (Options.WorkDirectory != null)
+                    if (Options.WorkDirectory is not null)
                         engine.WorkDirectory = Options.WorkDirectory;
 
-                    engine.InternalTraceLevel = Options.InternalTraceLevel != null
+                    engine.InternalTraceLevel = Options.InternalTraceLevel is not null
                         ? (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), Options.InternalTraceLevel)
                         : InternalTraceLevel.Off;
 

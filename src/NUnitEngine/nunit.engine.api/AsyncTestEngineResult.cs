@@ -23,7 +23,7 @@ namespace NUnit.Engine
         {
             get
             {
-                if (_result == null)
+                if (_result is null)
                     throw new InvalidOperationException("Cannot retrieve Result from an incomplete or cancelled TestRun.");
 
                 return _result;
@@ -44,9 +44,9 @@ namespace NUnit.Engine
         /// <param name="result"></param>
         public void SetResult(TestEngineResult result)
         {
-            if (result == null)
+            if (result is null)
                 throw new ArgumentNullException(nameof(result));
-            if (_result != null)
+            if (_result is not null)
                 throw new InvalidOperationException("Cannot set the Result of an TestRun more than once");
 
             _result = result;
@@ -67,7 +67,7 @@ namespace NUnit.Engine
         /// <summary>
         /// True if the test run has completed
         /// </summary>
-        public bool IsComplete { get { return _result != null; } }
+        public bool IsComplete { get { return _result is not null; } }
 
         XmlNode ITestRun.Result
         {

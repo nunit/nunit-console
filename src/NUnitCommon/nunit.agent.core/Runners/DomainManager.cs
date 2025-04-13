@@ -34,7 +34,7 @@ namespace NUnit.Engine.Runners
             AppDomainSetup setup = CreateAppDomainSetup(package);
 
             string hashCode = string.Empty;
-            if (package.Name != null)
+            if (package.Name is not null)
             {
                 hashCode = package.Name.GetHashCode().ToString("x") + "-";
             }
@@ -80,7 +80,7 @@ namespace NUnit.Engine.Runners
                 // .NET versions greater than v4.0 report as v4.0, so look at
                 // the TargetFrameworkAttribute on the assembly if it exists
                 // If property is null, .NET 4.5+ is not installed, so there is no need
-                if (TargetFrameworkNameProperty != null)
+                if (TargetFrameworkNameProperty is not null)
                 {
                     var frameworkName = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
                     if (frameworkName != "")
@@ -133,7 +133,7 @@ namespace NUnit.Engine.Runners
                     throw new NUnitEngineUnloadException(msg);
                 }
 
-                if (_unloadException != null)
+                if (_unloadException is not null)
                     throw new NUnitEngineUnloadException("Exception encountered unloading application domain", _unloadException);
             }
 
@@ -231,7 +231,7 @@ namespace NUnit.Engine.Runners
             var assemblies = new List<string>();
 
             // All subpackages have full names, but this is a public method in a public class so we have no control.
-            foreach (var package in packages.Where(p => p.FullName != null))
+            foreach (var package in packages.Where(p => p.FullName is not null))
                 assemblies.Add(package.FullName!); 
 
             return GetCommonAppBase(assemblies);
@@ -244,9 +244,9 @@ namespace NUnit.Engine.Runners
             foreach (string assembly in assemblies)
             {
                 string? dir = Path.GetDirectoryName(Path.GetFullPath(assembly))!;
-                if (commonBase == null)
+                if (commonBase is null)
                     commonBase = dir;
-                else while (commonBase != null && !PathUtils.SamePathOrUnder(commonBase, dir))
+                else while (commonBase is not null && !PathUtils.SamePathOrUnder(commonBase, dir))
                         commonBase = Path.GetDirectoryName(commonBase)!;
             }
 
@@ -265,7 +265,7 @@ namespace NUnit.Engine.Runners
             if (package.GetSetting(EnginePackageSettings.AutoBinPath, binPath == string.Empty))
                 binPath = package.SubPackages.Count > 0
                     ? GetPrivateBinPath(appBase, package.SubPackages)
-                    : package.FullName != null
+                    : package.FullName is not null
                         ? GetPrivateBinPath(appBase, package.FullName)
                         : null;
 
@@ -275,7 +275,7 @@ namespace NUnit.Engine.Runners
         public static string? GetPrivateBinPath(string basePath, IList<TestPackage> packages)
         {
             var assemblies = new List<string>();
-            foreach (var package in packages.Where(p => p.FullName != null))
+            foreach (var package in packages.Where(p => p.FullName is not null))
                 assemblies.Add(package.FullName!);
 
             return GetPrivateBinPath(basePath, assemblies);
@@ -291,7 +291,7 @@ namespace NUnit.Engine.Runners
                 string? dir = PathUtils.RelativePath(
                     Path.GetFullPath(basePath),
                     Path.GetDirectoryName( Path.GetFullPath(assembly) )! );
-                if ( dir != null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
+                if ( dir is not null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
                 {
                     dirList.Add( dir );
                     if ( sb.Length > 0 )

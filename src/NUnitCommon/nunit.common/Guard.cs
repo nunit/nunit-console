@@ -19,7 +19,7 @@ namespace NUnit
         /// <param name="name">The name of the argument</param>
         public static void ArgumentNotNull(object value, string name)
         {
-            if (value == null)
+            if (value is null)
                 throw new ArgumentNullException("Argument " + name + " must not be null", name);
         }
 
@@ -33,7 +33,7 @@ namespace NUnit
         /// <exception cref="InvalidOperationException"></exception>
         public static T ShouldNotBeNull<T>(this T? result, [CallerArgumentExpression(nameof(result))] string expression = "") where T : class
         {
-            if (result == null)
+            if (result is null)
                 throw new InvalidOperationException($"Result {expression} must not be null");
 
             return result;

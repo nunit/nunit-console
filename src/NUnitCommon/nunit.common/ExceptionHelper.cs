@@ -85,7 +85,7 @@ namespace NUnit
             var result = new List<Exception>();
 
             var unloadException = exception as NUnitEngineUnloadException;
-            if (unloadException?.AggregatedExceptions != null)
+            if (unloadException?.AggregatedExceptions is not null)
             {
                 result.AddRange(unloadException.AggregatedExceptions);
 
@@ -94,7 +94,7 @@ namespace NUnit
             }
 
             var reflectionException = exception as ReflectionTypeLoadException;
-            if (reflectionException != null && reflectionException.LoaderExceptions != null)
+            if (reflectionException is not null && reflectionException.LoaderExceptions is not null)
             {
                 result.AddRange(reflectionException.LoaderExceptions.WhereNotNull());
 
@@ -102,7 +102,7 @@ namespace NUnit
                     result.AddRange(FlattenExceptionHierarchy(innerException));
             }
 
-            if (exception.InnerException != null)
+            if (exception.InnerException is not null)
             {
                 result.Add(exception.InnerException);
                 result.AddRange(FlattenExceptionHierarchy(exception.InnerException));
@@ -117,7 +117,7 @@ namespace NUnit
             {
                 // Special handling for Mono 5.0, which returns an empty message
                 var fnfEx = ex as System.IO.FileNotFoundException;
-                return fnfEx != null
+                return fnfEx is not null
                     ? "Could not load assembly. File not found: " + fnfEx.FileName
                     : "No message provided";
             }

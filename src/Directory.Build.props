@@ -39,4 +39,9 @@
         <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
     </PropertyGroup>
 
+    <!-- Code Style Analyzers -->
+    <ItemGroup>
+        <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.593" PrivateAssets="all" />
+    </ItemGroup>
+
 </Project>

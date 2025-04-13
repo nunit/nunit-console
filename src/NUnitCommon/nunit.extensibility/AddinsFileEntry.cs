@@ -37,7 +37,7 @@ namespace NUnit.Extensibility
         public override bool Equals(object? obj)
         {
             var other = obj as AddinsFileEntry;
-            if (other == null) return false;
+            if (other is null) return false;
 
             return LineNumber == other.LineNumber && RawText == other.RawText;
         }

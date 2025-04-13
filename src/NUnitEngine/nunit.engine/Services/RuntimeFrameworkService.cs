@@ -31,7 +31,7 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// The path to the mono executable, if we are running on Mono.
         /// </summary>
-        public static string MonoExePath => MonoPrefix != null && Environment.OSVersion.Platform == PlatformID.Win32NT
+        public static string MonoExePath => MonoPrefix is not null && Environment.OSVersion.Platform == PlatformID.Win32NT
                     ? Path.Combine(MonoPrefix, "bin/mono.exe")
                     : "mono";
 
@@ -118,7 +118,7 @@ namespace NUnit.Engine.Services
 
         private RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
         {
-            if (CurrentFramework == null)
+            if (CurrentFramework is null)
                 throw new InvalidOperationException("Service not Started");
 
             foreach (var subPackage in package.SubPackages)
@@ -220,14 +220,14 @@ namespace NUnit.Engine.Services
         {
             Type? monoRuntimeType = Type.GetType("Mono.Runtime", throwOnError: false);
 
-            Runtime runtime = monoRuntimeType != null
+            Runtime runtime = monoRuntimeType is not null
                 ? Runtime.Mono
                 : Runtime.Net;
 
             int major = Environment.Version.Major;
             int minor = Environment.Version.Minor;
 
-            if (monoRuntimeType != null)
+            if (monoRuntimeType is not null)
             {
                 switch (major)
                 {
@@ -244,10 +244,10 @@ namespace NUnit.Engine.Services
                 if (major == 2)
             {
                 using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
-                if (key != null)
+                if (key is not null)
                 {
                     string? installRoot = key.GetValue("InstallRoot") as string;
-                    if (installRoot != null)
+                    if (installRoot is not null)
                     {
                         if (Directory.Exists(Path.Combine(installRoot, "v3.5")))
                         {
@@ -262,20 +262,20 @@ namespace NUnit.Engine.Services
                     }
                 }
             }
-            else if (major == 4 && Type.GetType("System.Reflection.AssemblyMetadataAttribute") != null)
+            else if (major == 4 && Type.GetType("System.Reflection.AssemblyMetadataAttribute") is not null)
             {
                 minor = 5;
             }
 
             var currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
 
-            if (monoRuntimeType != null)
+            if (monoRuntimeType is not null)
             {
                 MonoPrefix = GetMonoPrefixFromAssembly(monoRuntimeType.Assembly);
 
                 MethodInfo? getDisplayNameMethod = monoRuntimeType.GetMethod(
                     "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
-                if (getDisplayNameMethod != null)
+                if (getDisplayNameMethod is not null)
                 {
                     string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0])!;
 
@@ -365,7 +365,7 @@ namespace NUnit.Engine.Services
                     string fn = subPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
                     if (fn != "")
                     {
-                        if (frameworkName == null || fn.CompareTo(frameworkName) < 0)
+                        if (frameworkName is null || fn.CompareTo(frameworkName) < 0)
                             frameworkName = fn;
                     }
 

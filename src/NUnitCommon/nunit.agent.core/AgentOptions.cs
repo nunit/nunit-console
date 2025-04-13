@@ -55,10 +55,10 @@ namespace NUnit.Agents
 
                     if (optionTakesValue)
                     {
-                        if (val == null && index + 1 < args.Length)
+                        if (val is null && index + 1 < args.Length)
                             val = args[++index];
 
-                        if (val == null)
+                        if (val is null)
                             throw new Exception($"Option requires a value: {arg}");
                     }
                     else if (delim > 0)

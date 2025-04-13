@@ -57,7 +57,7 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         protected override TestEngineResult LoadPackage()
         {
-            Guard.OperationValid(TestPackage!=null, "Calling LoadPackage with null TestPackage");
+            Guard.OperationValid(TestPackage is not null, "Calling LoadPackage with null TestPackage");
 
             log.Info("Loading " + TestPackage.Name);
             Unload();
@@ -85,7 +85,7 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                if (_remoteRunner != null)
+                if (_remoteRunner is not null)
                 {
                     log.Info("Unloading " + TestPackage.Name);
                     _remoteRunner.Unload();
@@ -179,7 +179,7 @@ namespace NUnit.Engine.Runners
         /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
         public override void StopRun(bool force)
         {
-            if (_remoteRunner != null)
+            if (_remoteRunner is not null)
             {
                 try
                 {
@@ -216,14 +216,14 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent != null && _agency.IsAgentProcessActive(_agent.Id, out _))
+                if (_agent is not null && _agency.IsAgentProcessActive(_agent.Id, out _))
                 {
                     try
                     {
                         log.Debug("Stopping remote agent");
                         _agent.Stop();
                     }
-                    catch (NUnitEngineUnloadException ex) when (unloadException != null)
+                    catch (NUnitEngineUnloadException ex) when (unloadException is not null)
                     {
                         // Both kinds of errors, throw exception with combined message
                         throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + ex.Message);
@@ -234,7 +234,7 @@ namespace NUnit.Engine.Runners
                     }
                 }
 
-                if (unloadException != null) // Add message line indicating we managed to stop agent anyway
+                if (unloadException is not null) // Add message line indicating we managed to stop agent anyway
                     throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
             }
         }
@@ -242,7 +242,7 @@ namespace NUnit.Engine.Runners
         [MemberNotNull(nameof(_agent), nameof(_remoteRunner))]
         private void CreateAgentAndRunnerIfNeeded()
         {
-            if (_agent == null)
+            if (_agent is null)
             {
                 // Increase the timeout to give time to attach a debugger
                 bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
@@ -250,11 +250,11 @@ namespace NUnit.Engine.Runners
 
                 _agent = _agency.GetAgent(TestPackage);
 
-                if (_agent == null)
+                if (_agent is null)
                     throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
-            if (_remoteRunner == null)
+            if (_remoteRunner is null)
                 _remoteRunner = _agent.CreateRunner(TestPackage);
         }
 

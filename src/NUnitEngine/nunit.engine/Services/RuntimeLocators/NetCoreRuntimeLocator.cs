@@ -40,7 +40,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
         {
             string? installDir = DotNet.GetInstallDirectory(x86);
 
-            if (installDir != null && Directory.Exists(installDir) &&
+            if (installDir is not null && Directory.Exists(installDir) &&
                 File.Exists(Path.Combine(installDir, "dotnet.exe")))
             {
                 string runtimeDir = Path.Combine(installDir, Path.Combine("shared", "Microsoft.NETCore.App"));
@@ -78,7 +78,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
             const int VERSION_START = 22;
 
             string? line;
-            while ((line = process.StandardOutput.ReadLine()) != null)
+            while ((line = process.StandardOutput.ReadLine()) is not null)
             {
                 if (line.StartsWith(PREFIX))
                     yield return line.Substring(VERSION_START);

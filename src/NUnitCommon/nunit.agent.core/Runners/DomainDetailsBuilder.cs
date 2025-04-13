@@ -23,7 +23,7 @@ namespace NUnit.Engine
         public static string DetailsFor(AppDomain domain, string? errMsg = null)
         {
             var sb = new StringBuilder();
-            if (errMsg != null) sb.AppendLine(errMsg);
+            if (errMsg is not null) sb.AppendLine(errMsg);
 
             try
             {

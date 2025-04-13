@@ -106,7 +106,7 @@ namespace NUnit.Extensibility
         {
             get
             {
-                if (_extensionObject == null)
+                if (_extensionObject is null)
                 {
                     object obj = CreateExtensionObject();
 

@@ -30,13 +30,13 @@ namespace NUnit.Engine.Agents
 
         public override bool Start()
         {
-            Guard.OperationValid(Transport != null, "Transport must be set before calling Start().");
+            Guard.OperationValid(Transport is not null, "Transport must be set before calling Start().");
             return Transport.Start();
         }
 
         public override void Stop()
         {
-            Guard.OperationValid(Transport != null, "Transport must be set before calling Stop().");
+            Guard.OperationValid(Transport is not null, "Transport must be set before calling Stop().");
             Transport.Stop();
         }
 

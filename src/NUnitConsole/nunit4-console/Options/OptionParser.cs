@@ -25,7 +25,7 @@ namespace NUnit.ConsoleRunner.Options
 
             bool isValid = true;
 
-            if (validValues != null && validValues.Length > 0)
+            if (validValues is not null && validValues.Length > 0)
             {
                 isValid = false;
 
@@ -97,7 +97,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OutputSpecification? ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications, IFileSystem fileSystem, string currentDir)
         {
-            if (value == null)
+            if (value is null)
                 return null;
 
             OutputSpecification spec;
@@ -112,7 +112,7 @@ namespace NUnit.ConsoleRunner.Options
                 return null;
             }
 
-            if (spec.Transform != null)
+            if (spec.Transform is not null)
             {
                 if (!fileSystem.FileExists(spec.Transform))
                 {

@@ -24,7 +24,7 @@ namespace NUnit.Engine.TestHelpers
 
                 process.OutputDataReceived += (sender, e) =>
                 {
-                    if (e.Data == null) return;
+                    if (e.Data is null) return;
                     if (currentDataIsError)
                     {
                         if (currentData.Length != 0)
@@ -36,7 +36,7 @@ namespace NUnit.Engine.TestHelpers
                 };
                 process.ErrorDataReceived += (sender, e) =>
                 {
-                    if (e.Data == null) return;
+                    if (e.Data is null) return;
                     if (!currentDataIsError)
                     {
                         if (currentData.Length != 0)

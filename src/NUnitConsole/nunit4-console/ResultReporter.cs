@@ -20,7 +20,7 @@ namespace NUnit.ConsoleRunner
             string? overallResult = resultNode.GetAttribute("result");
             if (overallResult == "Skipped")
                 OverallResult = "Warning";
-            if (overallResult == null)
+            if (overallResult is null)
                 OverallResult = "Unknown";
             else
                 OverallResult = overallResult;
@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner
         internal void WriteRunSettingsReport()
         {
             var firstSuite = ResultNode.SelectSingleNode("test-suite");
-            if (firstSuite != null)
+            if (firstSuite is not null)
             {
                 var settings = firstSuite.SelectNodes("settings/setting");
 
@@ -190,7 +190,7 @@ namespace NUnit.ConsoleRunner
 
                             // Correct a problem in some framework versions, whereby warnings and some failures 
                             // are promulgated to the containing suite without setting the FailureSite.
-                            if (site == null)
+                            if (site is null)
                             {
                                 if (resultNode.SelectSingleNode("reason/message")?.InnerText == "One or more child tests had warnings" ||
                                     resultNode.SelectSingleNode("failure/message")?.InnerText == "One or more child tests had errors")

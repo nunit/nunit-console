@@ -71,7 +71,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
         public void Stop()
         {
-            Guard.OperationValid(_channel != null, "Channel is not open");
+            Guard.OperationValid(_channel is not null, "Channel is not open");
 
             log.Info("Stopping");
 

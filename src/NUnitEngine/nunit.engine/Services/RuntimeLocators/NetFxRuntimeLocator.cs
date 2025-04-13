@@ -19,14 +19,14 @@ namespace NUnit.Engine.Services.RuntimeLocators
                 yield return framework;
 
             using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\NET Framework Setup\NDP");
-            if (key != null)
+            if (key is not null)
             {
                 foreach (string name in key.GetSubKeyNames())
                 {
                     if (name.StartsWith("v") && name != "v4.0") // v4.0 is a duplicate, legacy key
                     {
                         var versionKey = key.OpenSubKey(name);
-                        if (versionKey == null) continue;
+                        if (versionKey is null) continue;
 
                         if (name.StartsWith("v4", StringComparison.Ordinal))
                         {
@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
         {
             using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\.NETFramework\policy\v1.0");
 
-            if (key == null)
+            if (key is null)
                 yield break;
 
             foreach (var build in key.GetValueNames())
@@ -88,7 +88,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
             foreach (string profile in new string[] { "Full", "Client" })
             {
                 var profileKey = versionKey.OpenSubKey(profile);
-                if (profileKey == null) continue;
+                if (profileKey is null) continue;
 
                 if (CheckInstallDword(profileKey))
                 {

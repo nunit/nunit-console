@@ -91,7 +91,7 @@ namespace NUnit.Engine.Internal
 
         private Assembly? OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            if (loadContext == null) throw new ArgumentNullException("context");
+            if (loadContext is null) throw new ArgumentNullException("context");
 
             Assembly? loadedAssembly;
             foreach (var strategy in ResolutionStrategies)
@@ -169,7 +169,7 @@ namespace NUnit.Engine.Internal
             public override bool TryToResolve(
                 AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
             {
-                if (_dependencyContext == null)
+                if (_dependencyContext is null)
                 {
                     // TODO: Is this the intended behavior?
                     loadedAssembly = null;
@@ -223,12 +223,12 @@ namespace NUnit.Engine.Internal
                 AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
             {
                 loadedAssembly = null;
-                if (assemblyName.Version == null)
+                if (assemblyName.Version is null)
                     return false;
 
                 var versionDir = FindBestVersionDir(_frameworkDirectory, assemblyName.Version);
 
-                if (versionDir != null)
+                if (versionDir is not null)
                 {
                     string candidate = Path.Combine(_frameworkDirectory, versionDir, assemblyName.Name + ".dll");
                     if (File.Exists(candidate))

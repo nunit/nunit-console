@@ -93,7 +93,7 @@ namespace NUnit.Engine.Runners
             expected = TestPath(expected);
 
             var package = new TestPackage(filePath);
-            if (appBase != null)
+            if (appBase is not null)
                 package.Settings["BasePath"] = appBase;
 
             Assert.That(DomainManager.GetApplicationBase(package), Is.SamePath(expected));
@@ -124,7 +124,7 @@ namespace NUnit.Engine.Runners
             expected = TestPath(expected);
 
             var package = new TestPackage(filePath);
-            if (configSetting != null)
+            if (configSetting is not null)
                 package.Settings["ConfigurationFile"] = configSetting;
 
             Assert.That(DomainManager.GetConfigFile(appBase, package), Is.EqualTo(expected));
@@ -138,7 +138,7 @@ namespace NUnit.Engine.Runners
         [return: NotNullIfNotNull(nameof(path))]
         private static string? TestPath(string? path)
         {
-            if (path != null && Path.DirectorySeparatorChar != '/')
+            if (path is not null && Path.DirectorySeparatorChar != '/')
             {
                 path = path.Replace('/', Path.DirectorySeparatorChar);
                 if (path[0] == Path.DirectorySeparatorChar)
