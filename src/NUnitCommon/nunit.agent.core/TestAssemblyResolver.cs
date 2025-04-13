@@ -304,7 +304,7 @@ namespace NUnit.Engine.Internal
             int len = 0;
             foreach (char c in text)
             {
-                if (VERSION_CHARS.IndexOf(c) >= 0)
+                if (VERSION_CHARS.Contains(c))
                     len++;
                 else
                     break;
