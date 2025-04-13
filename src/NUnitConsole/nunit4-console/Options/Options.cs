@@ -195,7 +195,7 @@ namespace NUnit.ConsoleRunner.Options
         public static IEnumerable<string> WrappedLines(string self, IEnumerable<int> widths)
         {
             if (widths is null)
-                throw new ArgumentNullException("widths");
+                throw new ArgumentNullException(nameof(widths));
             return CreateWrappedLinesIterator(self, widths);
         }
 
@@ -397,7 +397,7 @@ namespace NUnit.ConsoleRunner.Options
             if (c.Option is null)
                 throw new InvalidOperationException("OptionContext.Option is null.");
             if (index >= c.Option.MaxValueCount)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             if (c.Option.OptionValueType == OptionValueType.Required &&
                     index >= values.Count)
                 throw new OptionException(string.Format(
@@ -509,11 +509,11 @@ namespace NUnit.ConsoleRunner.Options
         protected Option(string prototype, string? description, int maxValueCount, bool hidden)
         {
             if (prototype is null)
-                throw new ArgumentNullException("prototype");
+                throw new ArgumentNullException(nameof(prototype));
             if (prototype.Length == 0)
-                throw new ArgumentException("Cannot be the empty string.", "prototype");
+                throw new ArgumentException("Cannot be the empty string.", nameof(prototype));
             if (maxValueCount < 0)
-                throw new ArgumentOutOfRangeException("maxValueCount");
+                throw new ArgumentOutOfRangeException(nameof(maxValueCount));
 
             this.prototype = prototype;
             this.description = description;
@@ -534,17 +534,17 @@ namespace NUnit.ConsoleRunner.Options
                 throw new ArgumentException(
                         "Cannot provide maxValueCount of 0 for OptionValueType.Required or " +
                             "OptionValueType.Optional.",
-                        "maxValueCount");
+                        nameof(maxValueCount));
             if (this.type == OptionValueType.None && maxValueCount > 1)
                 throw new ArgumentException(
                         string.Format("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
-                        "maxValueCount");
+                        nameof(maxValueCount));
             if (Array.IndexOf(names, "<>") >= 0 &&
                     ((names.Length == 1 && this.type != OptionValueType.None) ||
                      (names.Length > 1 && this.MaxValueCount > 1)))
                 throw new ArgumentException(
                         "The default option handler '<>' cannot require values.",
-                        "prototype");
+                        nameof(prototype));
         }
 
         public string Prototype
@@ -942,7 +942,7 @@ namespace NUnit.ConsoleRunner.Options
         protected Option? GetOptionForName(string option)
         {
             if (option is null)
-                throw new ArgumentNullException("option");
+                throw new ArgumentNullException(nameof(option));
             try
             {
                 return base[option];
@@ -979,7 +979,7 @@ namespace NUnit.ConsoleRunner.Options
         private void AddImpl(Option option)
         {
             if (option is null)
-                throw new ArgumentNullException("option");
+                throw new ArgumentNullException(nameof(option));
             List<string> added = new List<string>(option.Names.Length);
             try
             {
@@ -1001,7 +1001,7 @@ namespace NUnit.ConsoleRunner.Options
         public OptionSet Add(string header)
         {
             if (header is null)
-                throw new ArgumentNullException("header");
+                throw new ArgumentNullException(nameof(header));
             Add(new Category(header));
             return this;
         }
@@ -1041,7 +1041,7 @@ namespace NUnit.ConsoleRunner.Options
                 : base(prototype, description, count, hidden)
             {
                 if (action is null)
-                    throw new ArgumentNullException("action");
+                    throw new ArgumentNullException(nameof(action));
                 this.action = action;
             }
 
@@ -1064,7 +1064,7 @@ namespace NUnit.ConsoleRunner.Options
         public OptionSet Add(string prototype, string? description, Action<string> action, bool hidden)
         {
             if (action is null)
-                throw new ArgumentNullException("action");
+                throw new ArgumentNullException(nameof(action));
             Option p = new ActionOption(prototype, description, 1,
                     delegate(OptionValueCollection v) { action(v[0]); }, hidden);
             base.Add(p);
@@ -1084,7 +1084,7 @@ namespace NUnit.ConsoleRunner.Options
         public OptionSet Add(string prototype, string? description, OptionAction<string, string> action, bool hidden)
         {
             if (action is null)
-                throw new ArgumentNullException("action");
+                throw new ArgumentNullException(nameof(action));
             Option p = new ActionOption(prototype, description, 2,
                     delegate(OptionValueCollection v) { action(v[0], v[1]); }, hidden);
             base.Add(p);
@@ -1099,7 +1099,7 @@ namespace NUnit.ConsoleRunner.Options
                 : base(prototype, description, 1)
             {
                 if (action is null)
-                    throw new ArgumentNullException("action");
+                    throw new ArgumentNullException(nameof(action));
                 this.action = action;
             }
 
@@ -1117,7 +1117,7 @@ namespace NUnit.ConsoleRunner.Options
                 : base(prototype, description, 2)
             {
                 if (action is null)
-                    throw new ArgumentNullException("action");
+                    throw new ArgumentNullException(nameof(action));
                 this.action = action;
             }
 
@@ -1152,7 +1152,7 @@ namespace NUnit.ConsoleRunner.Options
         public OptionSet Add(ArgumentSource source)
         {
             if (source is null)
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             sources.Add(source);
             return this;
         }
@@ -1165,7 +1165,7 @@ namespace NUnit.ConsoleRunner.Options
         public List<string> Parse(IEnumerable<string> arguments)
         {
             if (arguments is null)
-                throw new ArgumentNullException("arguments");
+                throw new ArgumentNullException(nameof(arguments));
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
             bool process = true;
@@ -1263,7 +1263,7 @@ namespace NUnit.ConsoleRunner.Options
         protected bool GetOptionParts(string argument, [NotNullWhen(true)] out string? flag, [NotNullWhen(true)] out string? name, out string? sep, out string? value)
         {
             if (argument is null)
-                throw new ArgumentNullException("argument");
+                throw new ArgumentNullException(nameof(argument));
 
             flag = name = sep = value = null;
             Match m = ValueOption.Match(argument);

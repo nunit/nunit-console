@@ -11,7 +11,7 @@ namespace NUnit.ConsoleRunner
         public bool FileExists(string fileName)
         {
             if (fileName is null)
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
 
             return File.Exists(fileName);
         }
@@ -19,7 +19,7 @@ namespace NUnit.ConsoleRunner
         public IEnumerable<string> ReadLines(string fileName)
         {
             if (fileName is null)
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
 
             using (var file = File.OpenText(fileName))
             {

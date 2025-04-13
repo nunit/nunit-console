@@ -22,7 +22,7 @@ namespace NUnit.Engine.Services
             Guard.ArgumentValid(
                 !string.IsNullOrEmpty(_xsltFile),
                 "Argument to XmlTransformWriter must be a non-empty string",
-                "args");
+                nameof(args));
 
             try
             {
