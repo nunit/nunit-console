@@ -19,8 +19,7 @@ namespace NUnit.ConsoleRunner.Options
         /// <param name="transformFolder">The folder containing the transform.</param>
         public OutputSpecification(string spec, string? transformFolder)
         {
-            if (spec is null)
-                throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
+            Guard.ArgumentNotNull(spec, nameof(spec));
 
             string[] parts = spec.Split(';');
             this.OutputPath = parts[0];

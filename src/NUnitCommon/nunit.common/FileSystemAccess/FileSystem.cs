@@ -13,10 +13,7 @@ namespace NUnit.FileSystemAccess
         /// <inheritdoc/>
         public bool Exists(IDirectory directory)
         {
-            if (directory is null)
-            {
-                throw new ArgumentNullException(nameof(directory));
-            }
+            Guard.ArgumentNotNull(directory, nameof(directory));
 
             return SIO.Directory.Exists(directory.FullName);
         }
@@ -24,10 +21,7 @@ namespace NUnit.FileSystemAccess
         /// <inheritdoc/>
         public bool Exists(IFile file)
         {
-            if (file is null)
-            {
-                throw new ArgumentNullException(nameof(file));
-            }
+            Guard.ArgumentNotNull(file, nameof(file));
 
             return SIO.File.Exists(file.FullName);
         }

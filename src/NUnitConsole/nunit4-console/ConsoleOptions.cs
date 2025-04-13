@@ -27,7 +27,9 @@ namespace NUnit.ConsoleRunner
 
         internal ConsoleOptions(IFileSystem fileSystem, params string[] args)
         {
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            Guard.ArgumentNotNull(fileSystem, nameof(fileSystem));
+
+            _fileSystem = fileSystem;
 
             ConfigureOptions();
             if (args is not null)
@@ -423,8 +425,7 @@ namespace NUnit.ConsoleRunner
 
         public IEnumerable<string> PreParse(IEnumerable<string> args)
         {
-            if (args is null)
-                throw new ArgumentNullException(nameof(args));
+            Guard.ArgumentNotNull(args, nameof(args));
 
             if (++_nesting > 3)
             {

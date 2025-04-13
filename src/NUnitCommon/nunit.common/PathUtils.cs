@@ -40,10 +40,8 @@ namespace NUnit
         /// </summary>
         public static string? RelativePath(string from, string to)
         {
-            if (from is null)
-                throw new ArgumentNullException(from);
-            if (to is null)
-                throw new ArgumentNullException(to);
+            Guard.ArgumentNotNull(from, nameof(from));
+            Guard.ArgumentNotNull(to, nameof(to));
 
             string? toPathRoot = Path.GetPathRoot(to);
             if (toPathRoot is null || toPathRoot == string.Empty)
@@ -189,10 +187,7 @@ namespace NUnit
         /// <exception cref="ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         public static bool IsFullyQualifiedWindowsPath(string path)
         {
-            if (path is null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            Guard.ArgumentNotNull(path, nameof(path));
 
             if (path.Length > 2)
             {
@@ -213,10 +208,7 @@ namespace NUnit
         /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
         public static bool IsFullyQualifiedUnixPath(string path)
         {
-            if (path is null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            Guard.ArgumentNotNull(path, nameof(path));
 
             return path.Length > 0 && path[0] == '/';
         }

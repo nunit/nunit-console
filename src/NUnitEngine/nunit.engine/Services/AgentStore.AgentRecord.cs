@@ -29,16 +29,14 @@ namespace NUnit.Engine.Services
 
             public static AgentRecord Starting(Process process)
             {
-                if (process is null)
-                    throw new ArgumentNullException(nameof(process));
+                Guard.ArgumentNotNull(process, nameof(process));
 
                 return new AgentRecord(process, agent: null);
             }
 
             public AgentRecord Ready(ITestAgent agent)
             {
-                if (agent is null)
-                    throw new ArgumentNullException(nameof(agent));
+                Guard.ArgumentNotNull(agent, nameof(agent));
 
                 return new AgentRecord(Process, agent);
             }

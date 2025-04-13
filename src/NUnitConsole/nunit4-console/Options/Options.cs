@@ -194,8 +194,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public static IEnumerable<string> WrappedLines(string self, IEnumerable<int> widths)
         {
-            if (widths is null)
-                throw new ArgumentNullException(nameof(widths));
+            Guard.ArgumentNotNull(widths, nameof(widths));
             return CreateWrappedLinesIterator(self, widths);
         }
 
@@ -508,8 +507,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected Option(string prototype, string? description, int maxValueCount, bool hidden)
         {
-            if (prototype is null)
-                throw new ArgumentNullException(nameof(prototype));
+            Guard.ArgumentNotNull(prototype, nameof(prototype));
             if (prototype.Length == 0)
                 throw new ArgumentException("Cannot be the empty string.", nameof(prototype));
             if (maxValueCount < 0)
@@ -929,8 +927,8 @@ namespace NUnit.ConsoleRunner.Options
 
         protected override string GetKeyForItem(Option item)
         {
-            if (item is null)
-                throw new ArgumentNullException("option");
+            Guard.ArgumentNotNull(item, nameof(item));
+
             if (item.Names is not null && item.Names.Length > 0)
                 return item.Names[0];
             // This should never happen, as it's invalid for Option to be
@@ -941,8 +939,8 @@ namespace NUnit.ConsoleRunner.Options
         [Obsolete("Use KeyedCollection.this[string]")]
         protected Option? GetOptionForName(string option)
         {
-            if (option is null)
-                throw new ArgumentNullException(nameof(option));
+            Guard.ArgumentNotNull(option, nameof(option));
+
             try
             {
                 return base[option];
@@ -978,8 +976,8 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AddImpl(Option option)
         {
-            if (option is null)
-                throw new ArgumentNullException(nameof(option));
+            Guard.ArgumentNotNull(option, nameof(option));
+
             List<string> added = new List<string>(option.Names.Length);
             try
             {
@@ -1000,8 +998,8 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string header)
         {
-            if (header is null)
-                throw new ArgumentNullException(nameof(header));
+            Guard.ArgumentNotNull(header, nameof(header));
+
             Add(new Category(header));
             return this;
         }
@@ -1040,8 +1038,8 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, int count, Action<OptionValueCollection> action, bool hidden)
                 : base(prototype, description, count, hidden)
             {
-                if (action is null)
-                    throw new ArgumentNullException(nameof(action));
+                Guard.ArgumentNotNull(action, nameof(action));
+
                 this.action = action;
             }
 
@@ -1063,8 +1061,8 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string prototype, string? description, Action<string> action, bool hidden)
         {
-            if (action is null)
-                throw new ArgumentNullException(nameof(action));
+            Guard.ArgumentNotNull(action, nameof(action));
+
             Option p = new ActionOption(prototype, description, 1,
                     delegate(OptionValueCollection v) { action(v[0]); }, hidden);
             base.Add(p);
@@ -1083,8 +1081,8 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string prototype, string? description, OptionAction<string, string> action, bool hidden)
         {
-            if (action is null)
-                throw new ArgumentNullException(nameof(action));
+            Guard.ArgumentNotNull(action, nameof(action));
+
             Option p = new ActionOption(prototype, description, 2,
                     delegate(OptionValueCollection v) { action(v[0], v[1]); }, hidden);
             base.Add(p);
@@ -1098,8 +1096,8 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, Action<T> action)
                 : base(prototype, description, 1)
             {
-                if (action is null)
-                    throw new ArgumentNullException(nameof(action));
+                Guard.ArgumentNotNull(action, nameof(action));
+
                 this.action = action;
             }
 
@@ -1116,8 +1114,8 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, OptionAction<TKey, TValue> action)
                 : base(prototype, description, 2)
             {
-                if (action is null)
-                    throw new ArgumentNullException(nameof(action));
+                Guard.ArgumentNotNull(action, nameof(action));
+
                 this.action = action;
             }
 
@@ -1151,8 +1149,8 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(ArgumentSource source)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            Guard.ArgumentNotNull(source, nameof(source));
+
             sources.Add(source);
             return this;
         }
@@ -1164,8 +1162,8 @@ namespace NUnit.ConsoleRunner.Options
 
         public List<string> Parse(IEnumerable<string> arguments)
         {
-            if (arguments is null)
-                throw new ArgumentNullException(nameof(arguments));
+            Guard.ArgumentNotNull(arguments, nameof(arguments));
+
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
             bool process = true;
@@ -1262,8 +1260,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected bool GetOptionParts(string argument, [NotNullWhen(true)] out string? flag, [NotNullWhen(true)] out string? name, out string? sep, out string? value)
         {
-            if (argument is null)
-                throw new ArgumentNullException(nameof(argument));
+            Guard.ArgumentNotNull(argument, nameof(argument));
 
             flag = name = sep = value = null;
             Match m = ValueOption.Match(argument);
@@ -1667,8 +1664,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public Command(string name, string? help = null)
         {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(nameof(name));
+            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
 
             Name = NormalizeCommandName(name);
             Help = help;
@@ -1711,10 +1707,10 @@ namespace NUnit.ConsoleRunner.Options
         // (see Option.ParsePrototype(), and thus it'll prevent Category
         // instances from being accidentally used as normal options.
         public CommandOption(Command command, string? commandName = null, bool hidden = false)
-            : base("=:Command:= " + (commandName ?? command?.Name), (commandName ?? command?.Name), maxValueCount: 0, hidden: hidden)
+            : base("=:Command:= " + (commandName ?? command.Name), (commandName ?? command.Name), maxValueCount: 0, hidden: hidden)
         {
-            if (command is null)
-                throw new ArgumentNullException(nameof(command));
+            Guard.ArgumentNotNull(command, nameof(command));
+
             Command = command;
             CommandName = commandName ?? command.Name;
         }
@@ -1816,12 +1812,9 @@ namespace NUnit.ConsoleRunner.Options
 
         public CommandSet(string suite, TextWriter output, TextWriter error, MessageLocalizerConverter? localizer = null)
         {
-            if (suite is null)
-                throw new ArgumentNullException(nameof(suite));
-            if (output is null)
-                throw new ArgumentNullException(nameof(output));
-            if (error is null)
-                throw new ArgumentNullException(nameof(error));
+            Guard.ArgumentNotNull(suite, nameof(suite));
+            Guard.ArgumentNotNull(output, nameof(output));
+            Guard.ArgumentNotNull(error, nameof(error));
 
             this.suite = suite;
             options = new CommandOptionSet(this, localizer);
@@ -1841,8 +1834,8 @@ namespace NUnit.ConsoleRunner.Options
 
         public new CommandSet Add(Command value)
         {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
+            Guard.ArgumentNotNull(value, nameof(value));
+
             AddCommand(value);
             options.Add(new CommandOption(value));
             return this;
@@ -1945,8 +1938,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public CommandSet Add(CommandSet nestedCommands)
         {
-            if (nestedCommands is null)
-                throw new ArgumentNullException(nameof(nestedCommands));
+            Guard.ArgumentNotNull(nestedCommands, nameof(nestedCommands));
 
             if (NestedCommandSets is null)
             {
@@ -2047,8 +2039,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public int Run(IEnumerable<string> arguments)
         {
-            if (arguments is null)
-                throw new ArgumentNullException(nameof(arguments));
+            Guard.ArgumentNotNull(arguments, nameof(arguments));
 
             this.showHelp = false;
             if (help is null)

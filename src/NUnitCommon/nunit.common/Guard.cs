@@ -20,7 +20,7 @@ namespace NUnit
         public static void ArgumentNotNull(object value, string name)
         {
             if (value is null)
-                throw new ArgumentNullException("Argument " + name + " must not be null", name);
+                throw new ArgumentNullException(name);
         }
 
         /// <summary>

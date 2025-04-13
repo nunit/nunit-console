@@ -65,7 +65,8 @@ namespace NUnit.Extensibility.Wrappers
         {
             IDictionary<string, object> Settings { get; }
             IList<TestPackage> SubPackages { get; }
-            T GetSetting<T>(string name, T defaultValue);
+            T GetSetting<T>(string name, T defaultValue)
+                where T : notnull;
         }
 
         public class TestPackageWrapper : ExtensionWrapper, ITestPackage
@@ -79,9 +80,10 @@ namespace NUnit.Extensibility.Wrappers
             public IList<TestPackage> SubPackages => throw new NotImplementedException();
 
             public T GetSetting<T>(string name, T defaultValue)
+                where T : notnull
             {
-                if (defaultValue is null)
-                    throw new ArgumentNullException(nameof(defaultValue));
+                Guard.ArgumentNotNull(defaultValue, nameof(defaultValue));
+
                 return Invoke<T>(nameof(GetSetting), name, defaultValue);
             }
 
