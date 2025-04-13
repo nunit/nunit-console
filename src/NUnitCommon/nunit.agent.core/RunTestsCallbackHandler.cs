@@ -41,7 +41,7 @@ namespace NUnit.Engine
             _listener.OnTestEvent(state);
         }
 
-        private bool IsFinalResult(string eventArgument)
+        private static bool IsFinalResult(string eventArgument)
         {
             // TODO: If we add a prefix to the final result in the next framework
             // release, then we can immediately recognize the final result but we

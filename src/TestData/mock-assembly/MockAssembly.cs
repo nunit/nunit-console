@@ -158,7 +158,7 @@ namespace NUnit.TestData
                 MethodThrowsException();
             }
 
-            private void MethodThrowsException()
+            private static void MethodThrowsException()
             {
                 throw new Exception("Intentional Exception");
             }

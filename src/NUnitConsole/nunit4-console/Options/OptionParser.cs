@@ -82,7 +82,7 @@ namespace NUnit.ConsoleRunner.Options
             return null;
         }
 
-        private bool IsQuotedString(string value)
+        private static bool IsQuotedString(string value)
         {
             var length = value.Length;
             if (length > 2)

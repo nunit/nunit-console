@@ -30,7 +30,7 @@ namespace NUnit.Engine.Runners
         {
             if (this.TestDomain != null)
             {
-                _domainManager.Unload(this.TestDomain);
+                DomainManager.Unload(this.TestDomain);
                 this.TestDomain = null;
             }
         }

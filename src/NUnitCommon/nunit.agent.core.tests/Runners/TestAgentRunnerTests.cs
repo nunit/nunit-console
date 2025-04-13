@@ -91,26 +91,26 @@ namespace NUnit.Engine.Runners
                 Assert.That(_runner.IsPackageLoaded, Is.False, "Package should not be loaded automatically");
         }
 
-        private void CheckBasicResult(TestEngineResult result)
+        private static void CheckBasicResult(TestEngineResult result)
         {
             foreach (var node in result.XmlNodes)
                 CheckBasicResult(node);
         }
 
-        private void CheckBasicResult(XmlNode node)
+        private static void CheckBasicResult(XmlNode node)
         {
             Assert.That(node.Name, Is.EqualTo("test-suite"));
             Assert.That(node.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(node.GetAttribute("runstate"), Is.EqualTo("Runnable"));
         }
 
-        private void CheckRunResult(TestEngineResult result)
+        private static void CheckRunResult(TestEngineResult result)
         {
             foreach (var node in result.XmlNodes)
                 CheckRunResult(node);
         }
 
-        private void CheckRunResult(XmlNode result)
+        private static void CheckRunResult(XmlNode result)
         {
             CheckBasicResult(result);
             Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));

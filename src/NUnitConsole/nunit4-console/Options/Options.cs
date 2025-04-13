@@ -1680,7 +1680,7 @@ namespace NUnit.ConsoleRunner.Options
             base.SetItem(index, item);
         }
 
-        bool ShouldWrapOption(Option item)
+        static bool ShouldWrapOption(Option item)
         {
             if (item == null)
                 return false;
@@ -2128,7 +2128,7 @@ namespace NUnit.ConsoleRunner.Options
             return commands;
         }
 
-        void AddNestedCommands(List<KeyValuePair<string, Command>> commands, string outer, CommandSet value)
+        static void AddNestedCommands(List<KeyValuePair<string, Command>> commands, string outer, CommandSet value)
         {
             foreach (var v in value)
             {

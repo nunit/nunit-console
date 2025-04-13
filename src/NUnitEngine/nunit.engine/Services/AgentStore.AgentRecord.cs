@@ -41,7 +41,7 @@ namespace NUnit.Engine.Services
                 return new AgentRecord(Process, agent);
             }
 
-            public AgentRecord Terminated()
+            public static AgentRecord Terminated()
             {
                 return new AgentRecord(process: null, agent: null);
             }

@@ -644,7 +644,7 @@ namespace NUnit.Extensibility
             //return true;
         }
 
-        private System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
+        private static System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
         {
             var assemblyDef = AssemblyDefinition.ReadAssembly(filePath);
             var frameworkName = assemblyDef.GetFrameworkName();

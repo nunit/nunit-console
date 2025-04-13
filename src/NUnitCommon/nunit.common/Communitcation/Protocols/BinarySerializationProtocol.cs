@@ -94,7 +94,7 @@ namespace NUnit.Engine.Communication.Protocols
         /// A byte[] containing the message itself, without a prefixed
         /// length, serialized according to the protocol.
         /// </returns>
-        internal byte[] SerializeMessage(object message)
+        internal static byte[] SerializeMessage(object message)
         {
             using (var memoryStream = new MemoryStream())
             {

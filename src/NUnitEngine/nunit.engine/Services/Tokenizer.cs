@@ -154,7 +154,7 @@ namespace NUnit.Engine
             }
         }
 
-        private bool IsWordChar(char c)
+        private static bool IsWordChar(char c)
         {
             if (char.IsWhiteSpace(c) || c == EOF_CHAR)
                 return false;
