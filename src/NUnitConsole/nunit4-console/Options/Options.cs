@@ -242,7 +242,7 @@ namespace NUnit.ConsoleRunner.Options
                 // '.' is any character, - is for a continuation
                 const string minWidth = ".-";
                 if (curWidth < minWidth.Length)
-                    throw new ArgumentOutOfRangeException("widths",
+                    throw new ArgumentOutOfRangeException(nameof(curWidth),
                             string.Format("Element must be >= {0}, was {1}.", minWidth.Length, curWidth));
                 return curWidth;
             }
@@ -686,14 +686,14 @@ namespace NUnit.ConsoleRunner.Options
                         if (start != -1)
                             throw new ArgumentException(
                                     string.Format("Ill-formed name/value separator found in \"{0}\".", name),
-                                    "prototype");
+                                    nameof(name));
                         start = i + 1;
                         break;
                     case '}':
                         if (start == -1)
                             throw new ArgumentException(
                                     string.Format("Ill-formed name/value separator found in \"{0}\".", name),
-                                    "prototype");
+                                    nameof(name));
                         seps.Add(name.Substring(start, i - start));
                         start = -1;
                         break;
@@ -706,7 +706,7 @@ namespace NUnit.ConsoleRunner.Options
             if (start != -1)
                 throw new ArgumentException(
                         string.Format("Ill-formed name/value separator found in \"{0}\".", name),
-                        "prototype");
+                        nameof(name));
         }
 
         public void Invoke(OptionContext c)
