@@ -32,8 +32,8 @@ namespace NUnit.Engine.Runners
             }
         }
 
-#if NET8_0
-        [Obsolete]
+#if NET5_0_OR_GREATER
+        [Obsolete("This Remoting API is not supported and throws PlatformNotSupportedException. SYSLIB0010")]
 #endif
         public override object InitializeLifetimeService()
         {

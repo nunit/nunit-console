@@ -777,7 +777,7 @@ namespace NUnit.ConsoleRunner.Options
 
 #if !PCL
 #if NET8_0_OR_GREATER
-        [Obsolete]
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code. SYSLIB0051")]
 #endif
         protected OptionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -793,7 +793,7 @@ namespace NUnit.ConsoleRunner.Options
 
 #if !PCL
 #if NET8_0_OR_GREATER
-        [Obsolete]
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code. SYSLIB0051")]
 #endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
