@@ -17,6 +17,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     public class TestAgentTcpTransport : ITestAgentTransport, ITestEventListener
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentTcpTransport));
+        private static readonly char[] PortSeparator = [':'];
 
         private readonly string _agencyUrl;
         private Socket? _clientSocket;
@@ -30,7 +31,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             Guard.ArgumentNotNullOrEmpty(serverUrl, nameof(serverUrl));
             _agencyUrl = serverUrl;
 
-            var parts = serverUrl.Split(new char[] { ':' });
+            var parts = serverUrl.Split(PortSeparator);
             Guard.ArgumentValid(parts.Length == 2, "Invalid server address specified. Must be a valid endpoint including the port number", nameof(serverUrl));
             ServerEndPoint = new IPEndPoint(IPAddress.Parse(parts[0]), int.Parse(parts[1]));
         }

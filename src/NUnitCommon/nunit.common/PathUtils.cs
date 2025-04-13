@@ -22,6 +22,8 @@ namespace NUnit
         protected static char DirectorySeparatorChar = Path.DirectorySeparatorChar;
         protected static char AltDirectorySeparatorChar = Path.AltDirectorySeparatorChar;
 
+        private static readonly char[] DirectorySeparators = [DirectorySeparatorChar, AltDirectorySeparatorChar];
+
         /// <summary>
         /// Returns a boolean indicating whether the specified path
         /// is that of an assembly - that is a dll or exe file.
@@ -93,7 +95,7 @@ namespace NUnit
         public static string Canonicalize(string path)
         {
             List<string> parts = new List<string>(
-                path.Split(DirectorySeparatorChar, AltDirectorySeparatorChar));
+                path.Split(DirectorySeparators));
 
             for (int index = 0; index < parts.Count;)
             {
@@ -246,9 +248,7 @@ namespace NUnit
 
         private static string[] SplitPath(string path)
         {
-            char[] separators = new char[] { PathUtils.DirectorySeparatorChar, PathUtils.AltDirectorySeparatorChar };
-
-            string[] trialSplit = path.Split(separators);
+            string[] trialSplit = path.Split(DirectorySeparators);
 
             int emptyEntries = 0;
             foreach (string piece in trialSplit)

@@ -570,7 +570,8 @@ namespace NUnit.ConsoleRunner
             Assume.That(testListPath, Does.Exist);
             var options = ConsoleMocks.Options("--testlist=" + testListPath);
             Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.TestList, Is.EqualTo(new[] { "AmazingTest" }));
+            string[] expected = new[] { "AmazingTest" };
+            Assert.That(options.TestList, Is.EqualTo(expected));
         }
 
         [Test]

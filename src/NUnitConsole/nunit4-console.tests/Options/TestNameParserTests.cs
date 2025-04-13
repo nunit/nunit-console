@@ -20,7 +20,7 @@ namespace NUnit.ConsoleRunner.Options
         {
             string[] names = TestNameParser.Parse(name);
             Assert.That(names.Length, Is.EqualTo(1));
-            Assert.That(names[0], Is.EqualTo(name.Trim(new char[] { ' ', ',' })));
+            Assert.That(names[0], Is.EqualTo(name.Trim(' ', ',')));
         }
 
         [TestCase("Test.Namespace.Fixture.Method1", "Test.Namespace.Fixture.Method2")]
