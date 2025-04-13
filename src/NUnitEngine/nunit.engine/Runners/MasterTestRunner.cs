@@ -376,8 +376,8 @@ namespace NUnit.Engine.Runners
             {
                 var oldKey = entry.OldKey;
                 var newKey = entry.NewKey;
-                if (TestPackage.Settings.ContainsKey(oldKey) && !TestPackage.Settings.ContainsKey(newKey))
-                    TestPackage.Settings[newKey] = TestPackage.Settings[oldKey];
+                if (TestPackage.Settings.TryGetValue(oldKey, out object? value) && !TestPackage.Settings.ContainsKey(newKey))
+                    TestPackage.Settings[newKey] = value;
             }
         }
 #else
