@@ -123,6 +123,8 @@ ClientBin/
 *.pfx
 *.publishsettings
 
+!StyleCop.Analyzers.globalconfig
+
 # RIA/Silverlight projects
 Generated_Code/
 
@@ -166,10 +168,8 @@ $RECYCLE.BIN/
 
 .~
 *.userprefs
-*.StyleCop
 *.sdf
 GeneratedAssemblyInfo.cs
-StyleCop.Cache
 local.settings.include
 InternalTrace.txt
 TestResult.xml
