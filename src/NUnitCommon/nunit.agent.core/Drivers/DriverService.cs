@@ -19,7 +19,7 @@ namespace NUnit.Engine.Drivers
 
         private static readonly char[] CommaSeparator = [','];
 
-        readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
+        readonly List<IDriverFactory> _factories = new List<IDriverFactory>();
 
         public DriverService()
         {

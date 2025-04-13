@@ -17,9 +17,9 @@ namespace NUnit.Engine.Drivers
         static readonly Version MINIMUM_NUNIT_VERSION = new(3, 2, 0);
         static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
+#if NETFRAMEWORK
         readonly NUnitFrameworkApi _api;
 
-#if NETFRAMEWORK
         /// <summary>
         /// Construct an NUnitFrameworkDriver
         /// </summary>
@@ -82,6 +82,8 @@ namespace NUnit.Engine.Drivers
                 : new NUnitFrameworkApi2009(testDomain, ID, nunitRef);
         }
 #else
+        readonly NUnitFrameworkApi2018 _api;
+
         /// <summary>
         /// Construct an NUnitFrameworkDriver
         /// </summary>

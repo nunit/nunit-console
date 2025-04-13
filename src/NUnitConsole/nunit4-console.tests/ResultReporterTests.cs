@@ -187,7 +187,7 @@ namespace NUnit.ConsoleRunner
             return _report.ToString();
         }
 
-        private IList<string> GetReportLines(TestDelegate del)
+        private List<string> GetReportLines(TestDelegate del)
         {
             var rdr = new StringReader(GetReport(del));
 

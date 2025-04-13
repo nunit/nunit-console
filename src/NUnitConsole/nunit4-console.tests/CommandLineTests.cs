@@ -724,7 +724,7 @@ namespace NUnit.ConsoleRunner
             ConsoleOptions options = ConsoleMocks.Options("--disable=NUnit.Engine.Listeners.TeamCityEventListener");
             Assert.That(options.DisableExtensions.Contains("NUnit.Engine.Listeners.TeamCityEventListener"));
         }
-        private static IFileSystem GetFileSystemContainingFile(string fileName)
+        private static VirtualFileSystem GetFileSystemContainingFile(string fileName)
         {
             var fileSystem = new VirtualFileSystem();
             fileSystem.SetupFile(Path.Combine(Environment.CurrentDirectory, fileName), new List<string>());
