@@ -228,7 +228,11 @@ namespace NUnit.ConsoleRunner.Options
                         --end;
                         continuation = "-";
                     }
+#if NETFRAMEWORK
                     string line = self.Substring(start, end - start) + continuation;
+#else
+                    string line = string.Concat(self.AsSpan(start, end - start), continuation);
+#endif
                     yield return line;
                     start = end;
                     if (char.IsWhiteSpace(c))
@@ -1544,7 +1548,7 @@ namespace NUnit.ConsoleRunner.Options
                         }
                         else
                         {
-                            sb.Append(description.Substring(start, i - start));
+                            sb.Append(description, start, i - start);
                             start = -1;
                         }
                         break;
