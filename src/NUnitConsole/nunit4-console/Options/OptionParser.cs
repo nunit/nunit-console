@@ -61,7 +61,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public KeyValuePair<string, string>? RequiredKeyValue(string testParameterSpecification)
         {
-            var equalsIndex = testParameterSpecification.IndexOf("=");
+            var equalsIndex = testParameterSpecification.IndexOf('=');
 
             if (equalsIndex > 0 && equalsIndex < testParameterSpecification.Length - 1)
             {

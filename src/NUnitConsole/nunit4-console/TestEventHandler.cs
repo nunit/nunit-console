@@ -2,6 +2,7 @@
 
 using System;
 using System.Xml;
+using NUnit.Common;
 using NUnit.Engine;
 using NUnit.TextDisplay;
 
@@ -167,7 +168,7 @@ namespace NUnit.ConsoleRunner
             _outWriter.Write(color, text);
 
             // If the text we just wrote did not have a new line, flag that we should eventually emit one.
-            if (!text.EndsWith("\n"))
+            if (!text.EndsWith('\n'))
             {
                 _wantNewLine = true;
             }
