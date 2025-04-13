@@ -46,7 +46,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        private static XmlNode GetStubResult()
+        private static XmlDocument GetStubResult()
         {
             var doc = new XmlDocument();
             var test = doc.CreateElement("test-run");

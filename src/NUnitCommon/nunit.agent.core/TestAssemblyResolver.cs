@@ -152,7 +152,7 @@ namespace NUnit.Engine.Internal
         public class RuntimeLibrariesStrategy : ResolutionStrategy
         {
             private DependencyContext? _dependencyContext;
-            private readonly ICompilationAssemblyResolver _assemblyResolver;
+            private readonly CompositeCompilationAssemblyResolver _assemblyResolver;
 
             public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
             {
