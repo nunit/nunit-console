@@ -277,7 +277,7 @@ namespace NUnit.Engine.Services
                     "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
                 if (getDisplayNameMethod is not null)
                 {
-                    string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0])!;
+                    string displayName = (string)getDisplayNameMethod.Invoke(null, Array.Empty<object>())!;
 
                     int space = displayName.IndexOf(' ');
                     if (space >= 3) // Minimum length of a version

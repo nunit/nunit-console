@@ -368,30 +368,31 @@ namespace NUnit.ConsoleRunner
 
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
-            foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])
-            {
-                _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
-                foreach (var node in ep.Extensions)
+            if (_extensionService?.ExtensionPoints != null)
+                foreach (var ep in _extensionService.ExtensionPoints)
                 {
-                    _outWriter.Write(INDENT6 + "Extension: ");
-                    _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-                    _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
-
-                    _outWriter.Write(INDENT8 + "Version: ");
-                    _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
-
-                    _outWriter.Write(INDENT8 + "Path: ");
-                    _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
-
-                    foreach (var prop in node.PropertyNames)
+                    _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
+                    foreach (var node in ep.Extensions)
                     {
-                        _outWriter.Write(INDENT8 + prop + ":");
-                        foreach (var val in node.GetValues(prop))
-                            _outWriter.Write(ColorStyle.Value, " " + val);
-                        _outWriter.WriteLine();
+                        _outWriter.Write(INDENT6 + "Extension: ");
+                        _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
+                        _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
+
+                        _outWriter.Write(INDENT8 + "Version: ");
+                        _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
+
+                        _outWriter.Write(INDENT8 + "Path: ");
+                        _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
+
+                        foreach (var prop in node.PropertyNames)
+                        {
+                            _outWriter.Write(INDENT8 + prop + ":");
+                            foreach (var val in node.GetValues(prop))
+                                _outWriter.Write(ColorStyle.Value, " " + val);
+                            _outWriter.WriteLine();
+                        }
                     }
                 }
-            }
 
             _outWriter.WriteLine();
         }

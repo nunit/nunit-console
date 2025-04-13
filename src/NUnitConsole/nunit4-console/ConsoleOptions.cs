@@ -134,7 +134,7 @@ namespace NUnit.ConsoleRunner
             get
             {
                 if (NoResultSpecified)
-                    return new OutputSpecification[0];
+                    return Array.Empty<OutputSpecification>();
 
                 if (resultOutputSpecifications.Count == 0)
                     resultOutputSpecifications.Add(
