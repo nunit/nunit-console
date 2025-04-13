@@ -63,6 +63,8 @@ namespace NUnit.Engine
 
         #region IRuntimeFramework Implementation
 
+        private static readonly char[] RuntimeFrameworkSeparator = ['-'];
+
         /// <summary>
         /// Gets the unique Id for this runtime, such as "net-4.5"
         /// </summary>
@@ -106,7 +108,7 @@ namespace NUnit.Engine
         {
             Guard.ArgumentNotNullOrEmpty(s, nameof(s));
 
-            string[] parts = s.Split(new char[] { '-' });
+            string[] parts = s.Split(RuntimeFrameworkSeparator);
             Guard.ArgumentValid(parts.Length == 2 && parts[0].Length > 0 && parts[1].Length > 0, "RuntimeFramework id not in correct format", nameof(s));
 
             var runtime = Runtime.Parse(parts[0]);

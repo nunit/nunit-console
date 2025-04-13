@@ -12,6 +12,9 @@ namespace NUnit.ConsoleRunner.Options
     /// </summary>
     public class OutputSpecification
     {
+        private static readonly char[] SemicolonSeparator = [';'];
+        private static readonly char[] EqualsSeparator = ['='];
+
         /// <summary>
         /// Construct an OutputSpecification from an option value.
         /// </summary>
@@ -22,12 +25,12 @@ namespace NUnit.ConsoleRunner.Options
             if (spec == null)
                 throw new ArgumentNullException(nameof(spec), "Output spec may not be null");
 
-            string[] parts = spec.Split(';');
+            string[] parts = spec.Split(SemicolonSeparator);
             this.OutputPath = parts[0];
 
             for (int i = 1; i < parts.Length; i++)
             {
-                string[] opt = parts[i].Split('=');
+                string[] opt = parts[i].Split(EqualsSeparator);
 
                 if (opt.Length != 2)
                     throw new ArgumentException($"Invalid output specification: {spec}");

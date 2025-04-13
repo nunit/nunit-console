@@ -23,6 +23,8 @@ namespace NUnit.ConsoleRunner
     {
         static Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
 
+        private static readonly char[] PathSeparator = [Path.PathSeparator];
+
         // Some operating systems truncate the return code to 8 bits, which
         // only allows us a maximum of 127 in the positive range. We limit
         // ourselves so as to stay in that range.
@@ -76,7 +78,7 @@ namespace NUnit.ConsoleRunner
 
             var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
             if (!string.IsNullOrEmpty(extensionPath))
-                foreach (string extensionDirectory in extensionPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (string extensionDirectory in extensionPath.Split(PathSeparator, StringSplitOptions.RemoveEmptyEntries))
                     _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             foreach (string extensionDirectory in _options.ExtensionDirectories)

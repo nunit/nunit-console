@@ -31,12 +31,16 @@ namespace NUnit.ConsoleRunner
             files[path] = new List<string>(lines);
         }
 
+        private static readonly char[] CommaSeparator = [','];
+        private static readonly char[] ColonSeparator = [':'];
+        private static readonly char[] NewLineSeparator = ['\n'];
+
         internal void SetupFiles(string files)
         {
-            foreach (var file in files.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var file in files.Split(CommaSeparator, StringSplitOptions.RemoveEmptyEntries))
             {
-                var fileParts = file.Split(':');
-                var lines = fileParts[1].Replace("\r\n", "\n").Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var fileParts = file.Split(ColonSeparator);
+                var lines = fileParts[1].Replace("\r\n", "\n").Split(NewLineSeparator, StringSplitOptions.RemoveEmptyEntries);
                 SetupFile(fileParts[0], lines);
             }
         }

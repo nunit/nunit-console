@@ -419,6 +419,8 @@ namespace NUnit.ConsoleRunner.Options
 
     public abstract class Option
     {
+        private static readonly char[] PipeSeparator = ['|'];
+
         readonly string prototype;
         readonly string? description;
         readonly string[] names;
@@ -450,7 +452,7 @@ namespace NUnit.ConsoleRunner.Options
                 // append GetHashCode() so that "duplicate" categories have distinct
                 // names, e.g. adding multiple "" categories should be valid.
                 ? new[] { prototype + this.GetHashCode() }
-                : prototype.Split('|');
+                : prototype.Split(PipeSeparator);
 
             if (this is OptionSet.Category || this is CommandOption)
                 return;
@@ -1482,13 +1484,15 @@ namespace NUnit.ConsoleRunner.Options
             o.Write(s);
         }
 
+        private static readonly char[] ColonSeparator = [':'];
+
         static string GetArgumentName(int index, int maxIndex, string? description)
         {
             var matches = Regex.Matches(description ?? "", @"(?<=(?<!\{)\{)[^{}]*(?=\}(?!\}))"); // ignore double braces 
             string argName = "";
             foreach (Match match in matches)
             {
-                var parts = match.Value.Split(':');
+                var parts = match.Value.Split(ColonSeparator);
                 // for maxIndex=1 it can be {foo} or {0:foo}
                 if (maxIndex == 1)
                 {
@@ -2049,6 +2053,8 @@ namespace NUnit.ConsoleRunner.Options
 
     public class HelpCommand : Command
     {
+        private static readonly string[] helpArgument = ["--help"];
+
         public HelpCommand()
             : base("help", help: "Show this message and exit")
         {
@@ -2095,7 +2101,7 @@ namespace NUnit.ConsoleRunner.Options
                 command.Options.WriteOptionDescriptions(CommandSet.Out);
                 return 0;
             }
-            return command.Invoke(new[] { "--help" });
+            return command.Invoke(helpArgument);
         }
 
         List<KeyValuePair<string, Command>> GetCommands()

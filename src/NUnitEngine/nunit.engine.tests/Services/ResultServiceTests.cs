@@ -37,7 +37,8 @@ namespace NUnit.Engine.Services
         [Test]
         public void AvailableFormats()
         {
-            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
+            string[] expected = new string[] { "nunit3", "cases", "user" };
+            Assert.That(_resultService.Formats, Is.EquivalentTo(expected));
         }
 
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]

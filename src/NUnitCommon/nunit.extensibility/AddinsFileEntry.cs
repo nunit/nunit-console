@@ -25,8 +25,21 @@ namespace NUnit.Extensibility
         {
             LineNumber = lineNumber;
             RawText = rawText;
-            Text = rawText.Split(new char[] { '#' })[0].Trim()
-                .Replace(Path.DirectorySeparatorChar, '/');
+
+            // Remove comments and trim whitespace
+            int commentIndex = rawText.IndexOf('#');
+            if (commentIndex >= 0)
+            {
+                Text = rawText.Substring(0, commentIndex).Trim();
+            }
+            else
+            {
+                Text = rawText.Trim();
+            }
+
+            // Replace backslashes with slashes for consistency and
+            // to avoid issues with path separators on different platforms
+            Text = Text.Replace(Path.DirectorySeparatorChar, '/');
         }
 
         public override string ToString()

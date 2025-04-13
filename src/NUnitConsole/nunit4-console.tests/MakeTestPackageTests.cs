@@ -72,7 +72,8 @@ namespace NUnit.ConsoleRunner
             Assert.That(settings.ContainsKey("TestParametersDictionary"), "TestParametersDictionary setting not included.");
             var paramDictionary = settings["TestParametersDictionary"] as IDictionary<string, string>;
             Assert.That(paramDictionary, Is.Not.Null);
-            Assert.That(paramDictionary.Keys, Is.EqualTo(new[] { "X", "Y" }));
+            string[] expectedKeys = new[] { "X", "Y" };
+            Assert.That(paramDictionary.Keys, Is.EqualTo(expectedKeys));
             Assert.That(paramDictionary["X"], Is.EqualTo("5"));
             Assert.That(paramDictionary["Y"], Is.EqualTo("7"));
 
@@ -109,7 +110,8 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.Settings.Keys, Is.EquivalentTo(new string[] { "WorkDirectory", "DisposeRunners" }));
+            string[] expected = new string[] { "WorkDirectory", "DisposeRunners" };
+            Assert.That(package.Settings.Keys, Is.EquivalentTo(expected));
         }
 
     }
