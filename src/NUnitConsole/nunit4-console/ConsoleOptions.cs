@@ -391,7 +391,7 @@ namespace NUnit.ConsoleRunner
 
         public IEnumerable<string> PreParse(IEnumerable<string> args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
+            Guard.ArgumentNotNull(args, nameof(args));
 
             if (++_nesting > 3)
             {

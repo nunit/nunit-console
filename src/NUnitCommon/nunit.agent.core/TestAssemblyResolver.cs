@@ -91,7 +91,7 @@ namespace NUnit.Engine.Internal
 
         private Assembly? OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            if (loadContext == null) throw new ArgumentNullException("context");
+            Guard.ArgumentNotNull(loadContext, nameof(loadContext));
 
             Assembly? loadedAssembly;
             foreach (var strategy in ResolutionStrategies)
