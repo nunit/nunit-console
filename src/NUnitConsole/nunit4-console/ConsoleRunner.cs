@@ -21,7 +21,7 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ConsoleRunner
     {
-        static Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
+        private static Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
 
         // Some operating systems truncate the return code to 8 bits, which
         // only allows us a maximum of 127 in the positive range. We limit
@@ -113,7 +113,8 @@ namespace NUnit.ConsoleRunner
         private bool IsExtensionInstalled(string typeName)
         {
             foreach (var node in _extensionService.Extensions)
-                if (node.TypeName == typeName) return true;
+                if (node.TypeName == typeName)
+                    return true;
 
             return false;
         }
@@ -193,15 +194,14 @@ namespace NUnit.ConsoleRunner
 
         private int RunTests(TestPackage package, TestFilter filter)
         {
-
             var writer = new ColorConsoleWriter(!_options.NoColor);
 
             foreach (var spec in _options.ResultOutputSpecifications)
             {
                 var outputPath = Path.Combine(_workDirectory, spec.OutputPath);
-                
+
                 IResultWriter resultWriter;
-                
+
                 try
                 {
                     resultWriter = GetResultWriter(spec);
@@ -237,7 +237,6 @@ namespace NUnit.ConsoleRunner
                             "The path specified in --result {0} could not be written to",
                             spec.OutputPath), ex);
                 }
-
             }
 
             var labels = _options.DisplayTestLabels != null
@@ -325,7 +324,6 @@ namespace NUnit.ConsoleRunner
             OutWriter.WriteLabelLine(INDENT4 + "Runtime: ", RuntimeInformation.FrameworkDescription);
 #endif
 
-
             OutWriter.WriteLine();
         }
 
@@ -354,7 +352,7 @@ namespace NUnit.ConsoleRunner
         }
 
         [DllImport("libc")]
-        static extern int uname(IntPtr buf);
+        private static extern int uname(IntPtr buf);
 
         private void DisplayExtensionList()
         {
@@ -375,7 +373,7 @@ namespace NUnit.ConsoleRunner
                 {
                     _outWriter.Write(INDENT6 + "Extension: ");
                     _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-                    _outWriter.WriteLine(node.Enabled ? "" : " (Disabled)");
+                    _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
 
                     _outWriter.Write(INDENT8 + "Version: ");
                     _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
@@ -444,7 +442,7 @@ namespace NUnit.ConsoleRunner
 
             // Console runner always sets DisposeRunners
             //if (options.DisposeRunners)
-                package.AddSetting(EnginePackageSettings.DisposeRunners, true);
+            package.AddSetting(EnginePackageSettings.DisposeRunners, true);
 
             if (options.ShadowCopyFiles)
                 package.AddSetting(EnginePackageSettings.ShadowCopyFiles, true);
@@ -574,4 +572,3 @@ namespace NUnit.ConsoleRunner
         }
     }
 }
-

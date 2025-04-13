@@ -19,7 +19,7 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="path">The path of the project file</param>
         /// <returns>True if the loader knows how to load this file, otherwise false</returns>
-        bool CanLoadFrom( string path );
+        bool CanLoadFrom(string path);
 
         /// <summary>
         /// Loads a project of a known format.

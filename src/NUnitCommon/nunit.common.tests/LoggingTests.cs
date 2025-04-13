@@ -7,7 +7,7 @@ namespace NUnit.Engine
 {
     public class LoggingTests
     {
-        static readonly InternalTraceLevel[] LEVELS = new [] { InternalTraceLevel.Error, InternalTraceLevel.Warning, InternalTraceLevel.Info, InternalTraceLevel.Debug };
+        private static readonly InternalTraceLevel[] LEVELS = [InternalTraceLevel.Error, InternalTraceLevel.Warning, InternalTraceLevel.Info, InternalTraceLevel.Debug];
 
         [Test, Combinatorial]
         public void LoggerSelectsMessagesToWrite(

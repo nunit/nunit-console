@@ -126,7 +126,7 @@ namespace NUnit.Engine.Internal
 
             var firstEngineResult = new TestEngineResult(firstResultText);
             var secondEngineResult = new TestEngineResult(secondResultText);
-            var data = new XmlNode[]{ firstEngineResult.Xml, secondEngineResult.Xml };
+            var data = new XmlNode[] { firstEngineResult.Xml, secondEngineResult.Xml };
             XmlNode combined = ResultHelper.Aggregate("test-run", "ID", "NAME", "FULLNAME", data);
             Assert.That(combined.Attributes?["result"]?.Value, Is.EqualTo(aggregateResult));
         }

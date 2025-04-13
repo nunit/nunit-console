@@ -26,7 +26,8 @@ namespace NUnit.Engine.Services.RuntimeLocators
                     if (name.StartsWith("v") && name != "v4.0") // v4.0 is a duplicate, legacy key
                     {
                         var versionKey = key.OpenSubKey(name);
-                        if (versionKey == null) continue;
+                        if (versionKey == null)
+                            continue;
 
                         if (name.StartsWith("v4", StringComparison.Ordinal))
                         {
@@ -88,7 +89,8 @@ namespace NUnit.Engine.Services.RuntimeLocators
             foreach (string profile in new string[] { "Full", "Client" })
             {
                 var profileKey = versionKey.OpenSubKey(profile);
-                if (profileKey == null) continue;
+                if (profileKey == null)
+                    continue;
 
                 if (CheckInstallDword(profileKey))
                 {
@@ -98,7 +100,6 @@ namespace NUnit.Engine.Services.RuntimeLocators
                     foreach (var entry in ReleaseTable)
                         if (release >= entry.Release)
                             yield return new RuntimeFramework(Runtime.Net, entry.Version);
-
 
                     yield break;     //If full profile found don't check for client profile
                 }

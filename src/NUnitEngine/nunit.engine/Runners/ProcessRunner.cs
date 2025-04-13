@@ -57,7 +57,7 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         protected override TestEngineResult LoadPackage()
         {
-            Guard.OperationValid(TestPackage!=null, "Calling LoadPackage with null TestPackage");
+            Guard.OperationValid(TestPackage != null, "Calling LoadPackage with null TestPackage");
 
             log.Info("Loading " + TestPackage.Name);
             Unload();
@@ -258,7 +258,7 @@ namespace NUnit.Engine.Runners
                 _remoteRunner = _agent.CreateRunner(TestPackage);
         }
 
-        TestEngineResult CreateFailedResult(Exception e)
+        private TestEngineResult CreateFailedResult(Exception e)
         {
             var suite = XmlHelper.CreateTopLevelElement("test-suite");
             XmlHelper.AddAttribute(suite, "type", "Assembly");

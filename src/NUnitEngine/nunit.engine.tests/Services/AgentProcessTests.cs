@@ -28,9 +28,9 @@ namespace NUnit.Engine.Services
         }
 
 #if DEBUG
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
+        private const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
 #else
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
+        private const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
 #endif
 
         [TestCase("net-4.8", false, "net462/nunit-agent-net462.exe")]
@@ -124,7 +124,6 @@ namespace NUnit.Engine.Services
             var agentProcess = GetAgentProcess();
             Assert.That(agentProcess.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS + " --debug-agent"));
         }
-
 
         [Test]
         public void LoadUserProfile()

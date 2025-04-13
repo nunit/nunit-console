@@ -207,7 +207,8 @@ namespace NUnit.Engine.Services
             foreach (var thread in threads)
                 thread.Join();
 
-            if (exceptions.Count != 0) throw exceptions[0];
+            if (exceptions.Count != 0)
+                throw exceptions[0];
         }
     }
 }

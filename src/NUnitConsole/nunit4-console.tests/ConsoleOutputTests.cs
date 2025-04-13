@@ -14,7 +14,6 @@ namespace NUnit.ConsoleRunner
             Console.WriteLine("OneTimeSetUp: Console.WriteLine()");
             Console.Error.WriteLine("OneTimeSetUp: Console.Error.WriteLine()");
             TestContext.Out.WriteLine("OneTimeSetUp: TestContext.WriteLine()");
-
         }
 
         [SetUp]

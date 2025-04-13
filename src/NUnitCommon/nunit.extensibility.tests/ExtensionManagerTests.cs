@@ -16,7 +16,8 @@ namespace NUnit.Extensibility
         private ExtensionManager _extensionManager;
 
 #pragma warning disable 414
-        private static readonly string[] KnownExtensionPointPaths = {
+        private static readonly string[] KnownExtensionPointPaths =
+        {
             "/NUnit/Engine/TypeExtensions/IDriverFactory",
             "/NUnit/Engine/TypeExtensions/IProjectLoader",
             "/NUnit/Engine/TypeExtensions/IResultWriter",
@@ -25,7 +26,8 @@ namespace NUnit.Extensibility
             "/NUnit/Engine/NUnitV2Driver"
         };
 
-        private static readonly Type[] KnownExtensionPointTypes = {
+        private static readonly Type[] KnownExtensionPointTypes =
+        {
             typeof(IDriverFactory),
             typeof(IProjectLoader),
             typeof(IResultWriter),
@@ -44,7 +46,8 @@ namespace NUnit.Extensibility
         private const string FAKE_DISABLED_EXTENSION = "NUnit.Engine.Fakes.FakeDisabledExtension";
         private const string FAKE_NUNIT_V2_DRIVER_EXTENSION = "NUnit.Engine.Fakes.V2DriverExtension";
 
-        private readonly string[] KnownExtensions = {
+        private readonly string[] KnownExtensions =
+        {
             FAKE_FRAMEWORK_DRIVER_EXTENSION,
             FAKE_PROJECT_LOADER_EXTENSION,
             FAKE_RESULT_WRITER_EXTENSION,

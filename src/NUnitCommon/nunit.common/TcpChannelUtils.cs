@@ -61,7 +61,7 @@ namespace NUnit.Engine
         /// <returns>The specified <see cref="TcpChannel"/> or <see langword="null"/> if it cannot be found and created.</returns>
         public static TcpChannel? GetTcpChannel(CurrentMessageCounter? currentMessageCounter = null)
         {
-            return GetTcpChannel("", 0, 2, currentMessageCounter);
+            return GetTcpChannel(string.Empty, 0, 2, currentMessageCounter);
         }
 
         /// <summary>
@@ -91,7 +91,8 @@ namespace NUnit.Engine
         public static TcpChannel? GetTcpChannel(string name, int port, int limit, CurrentMessageCounter? currentMessageCounter = null)
         {
             var existingChannel = ChannelServices.GetChannel(name) as TcpChannel;
-            if (existingChannel != null) return existingChannel;
+            if (existingChannel != null)
+                return existingChannel;
 
             // NOTE: Retries are normally only needed when rapidly creating
             // and destroying channels, as in running the NUnit tests.

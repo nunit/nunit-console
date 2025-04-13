@@ -10,9 +10,9 @@ namespace NUnit.Engine.Drivers
 {
     public class ProvidedPathsAssemblyResolver
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ProvidedPathsAssemblyResolver));
 
-        static readonly string THIS_ASSEMBLY_LOCATION = Assembly.GetExecutingAssembly().Location;
+        private static readonly string THIS_ASSEMBLY_LOCATION = Assembly.GetExecutingAssembly().Location;
 
         public ProvidedPathsAssemblyResolver()
         {
@@ -53,7 +53,7 @@ namespace NUnit.Engine.Drivers
             RemovePath(dirPath);
         }
 
-        Assembly? AssemblyResolve(object? sender, ResolveEventArgs args)
+        private Assembly? AssemblyResolve(object? sender, ResolveEventArgs args)
         {
             foreach (string path in _resolutionPaths)
             {
@@ -75,6 +75,6 @@ namespace NUnit.Engine.Drivers
             return null;
         }
 
-        readonly List<string> _resolutionPaths;
+        private readonly List<string> _resolutionPaths;
     }
 }

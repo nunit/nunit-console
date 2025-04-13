@@ -9,7 +9,7 @@ namespace NUnit.Engine.Drivers
     public class NUnit3DriverFactory : IDriverFactory
     {
         internal const string NUNIT_FRAMEWORK = "nunit.framework";
-        static readonly Logger log = InternalTrace.GetLogger(typeof(NUnit3DriverFactory));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(NUnit3DriverFactory));
 
         /// <summary>
         /// Gets a flag indicating whether a given assembly name and version

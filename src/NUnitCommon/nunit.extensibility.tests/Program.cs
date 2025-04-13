@@ -5,9 +5,9 @@ using NUnitLite;
 
 namespace NUnit.Engine.Tests
 {
-    class Program
+    internal class Program
     {
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             return new TextRunner(typeof(Program).Assembly).Execute(args);
         }

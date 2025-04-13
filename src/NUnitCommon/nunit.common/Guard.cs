@@ -31,7 +31,8 @@ namespace NUnit
         /// <param name="expression">Compiler supplied parameter for the <paramref name="result"/> expression.</param>
         /// <returns>Value of <paramref name="result"/> if not null, throws otherwise.</returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static T ShouldNotBeNull<T>(this T? result, [CallerArgumentExpression(nameof(result))] string expression = "") where T : class
+        public static T ShouldNotBeNull<T>(this T? result, [CallerArgumentExpression(nameof(result))] string expression = "")
+            where T : class
         {
             if (result == null)
                 throw new InvalidOperationException($"Result {expression} must not be null");
@@ -49,7 +50,7 @@ namespace NUnit
             ArgumentNotNull(value, name);
 
             if (value == string.Empty)
-                throw new ArgumentException("Argument " + name +" must not be the empty string", name);
+                throw new ArgumentException("Argument " + name + " must not be the empty string", name);
         }
 
         /// <summary>

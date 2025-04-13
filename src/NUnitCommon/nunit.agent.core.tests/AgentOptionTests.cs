@@ -8,7 +8,7 @@ namespace NUnit.Agents
 {
     public class AgentOptionTests
     {
-        static TestCaseData[] DefaultSettings = new[]
+        private static TestCaseData[] DefaultSettings = new[]
         {
             new TestCaseData("AgentId", Guid.Empty),
             new TestCaseData("AgencyUrl", string.Empty),
@@ -28,8 +28,8 @@ namespace NUnit.Agents
             Assert.That(prop.GetValue(options, new object[0]), Is.EqualTo(defaultValue));
         }
 
-        static readonly Guid AGENT_GUID = Guid.NewGuid();
-        static readonly TestCaseData[] ValidSettings = new[]
+        private static readonly Guid AGENT_GUID = Guid.NewGuid();
+        private static readonly TestCaseData[] ValidSettings = new[]
         {
             // Boolean options - no values provided
             new TestCaseData("--debug-agent", "DebugAgent", true),

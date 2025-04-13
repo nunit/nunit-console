@@ -42,7 +42,7 @@ namespace NUnit.Extensibility
                 while ((line = reader.ReadLine()) != null)
                 {
                     var entry = new AddinsFileEntry(++lineNumber, line);
-                    if (entry.Text != "" && !entry.IsValid)
+                    if (entry.Text != string.Empty && !entry.IsValid)
                     {
                         string msg = $"Invalid Entry in {fullName}:\r\n  {entry}";
                         throw new InvalidOperationException(msg);
@@ -55,7 +55,9 @@ namespace NUnit.Extensibility
             }
         }
 
-        private AddinsFile() { }
+        private AddinsFile()
+        {
+        }
 
         public override string ToString()
         {
@@ -68,12 +70,15 @@ namespace NUnit.Extensibility
         public override bool Equals(object? obj)
         {
             var other = obj as AddinsFile;
-            if (other == null) return false;
+            if (other == null)
+                return false;
 
-            if (Count != other.Count) return false;
+            if (Count != other.Count)
+                return false;
 
             for (int i = 0; i < Count; i++)
-                if (this[i] != other[i]) return false;
+                if (this[i] != other[i])
+                    return false;
 
             return true;
         }

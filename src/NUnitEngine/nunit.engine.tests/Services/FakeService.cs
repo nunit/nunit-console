@@ -4,8 +4,9 @@ using System;
 
 namespace NUnit.Engine.Services
 {
-    interface IFakeService
-    { }
+    internal interface IFakeService
+    {
+    }
 
     public class FakeService : IFakeService, IService
     {

@@ -56,7 +56,8 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         /// <typeparam name="TMessage">The expected message type</typeparam>
         /// <returns>A message of type TMessage</returns>
         /// <exception cref="InvalidOperationException">A message of a different type was received</exception>
-        public TMessage GetNextMessage<TMessage>() where TMessage : TestEngineMessage
+        public TMessage GetNextMessage<TMessage>()
+            where TMessage : TestEngineMessage
         {
             var receivedMessage = GetNextMessage();
             var expectedMessage = receivedMessage as TMessage;

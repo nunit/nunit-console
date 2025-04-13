@@ -14,13 +14,13 @@ namespace NUnit.Extensibility
 {
     public class ExtensionManager
     {
-        static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
-        static readonly string EXTENSION_ATTRIBUTE = typeof(ExtensionAttribute).FullName.ShouldNotBeNull();
-        static readonly string EXTENSION_PROPERTY_ATTRIBUTE = typeof(ExtensionPropertyAttribute).FullName.ShouldNotBeNull();
-        static readonly string V3_EXTENSION_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionAttribute";
-        static readonly string V3_EXTENSION_PROPERTY_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionPropertyAttribute";
+        private static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
+        private static readonly string EXTENSION_ATTRIBUTE = typeof(ExtensionAttribute).FullName.ShouldNotBeNull();
+        private static readonly string EXTENSION_PROPERTY_ATTRIBUTE = typeof(ExtensionPropertyAttribute).FullName.ShouldNotBeNull();
+        private static readonly string V3_EXTENSION_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionAttribute";
+        private static readonly string V3_EXTENSION_PROPERTY_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionPropertyAttribute";
 
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
         private readonly IFileSystem _fileSystem;
         //private readonly IAddinsFileReader _addinsReader;
@@ -166,7 +166,6 @@ namespace NUnit.Extensibility
             string[] extensionPatterns = isChocolateyPackage
                 ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
                 : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
-
 
             IDirectory? startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
 
@@ -382,7 +381,7 @@ namespace NUnit.Extensibility
                     if (entry.IsFullyQualified)
                     {
                         baseDir = _fileSystem.GetDirectory(entry.Text);
-                        foreach (var dir in _directoryFinder.GetDirectories(_fileSystem.GetDirectory(entryDir), ""))
+                        foreach (var dir in _directoryFinder.GetDirectories(_fileSystem.GetDirectory(entryDir), string.Empty))
                             ProcessDirectory(dir, isWild);
                     }
                     else
@@ -438,7 +437,7 @@ namespace NUnit.Extensibility
                 log.Debug("  Adding this assembly");
                 _assemblies.Add(candidateAssembly);
             }
-            catch (Exception) when(fromWildCard)
+            catch (Exception) when (fromWildCard)
             {
                 // When we are using wildcards, we may reach assemblies built for some other
                 // runtime, which we cannot load. We ignore those assemblies.
@@ -496,7 +495,7 @@ namespace NUnit.Extensibility
             {
                 bool isV3Extension = false;
                 CustomAttribute extensionAttr = extensionType.GetAttribute(EXTENSION_ATTRIBUTE);
-                if (extensionAttr == null) 
+                if (extensionAttr == null)
                 {
                     extensionAttr = extensionType.GetAttribute(V3_EXTENSION_ATTRIBUTE);
                     isV3Extension = true;
@@ -658,7 +657,7 @@ namespace NUnit.Extensibility
 
         public void Dispose()
         {
-            // Make sure all assemblies release the underlying file streams. 
+            // Make sure all assemblies release the underlying file streams.
             foreach (var candidate in _assemblies)
             {
                 candidate.Dispose();

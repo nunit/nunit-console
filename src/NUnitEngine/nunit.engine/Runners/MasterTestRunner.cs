@@ -24,9 +24,9 @@ namespace NUnit.Engine.Runners
         // implement ITestEngineRunner.
         //
         // Explore and execution results from MasterTestRunner are
-        // returned as XmlNodes, created from the internal 
+        // returned as XmlNodes, created from the internal
         // TestEngineResult representation.
-        // 
+        //
         // MasterTestRunner is responsible for creating the test-run
         // element, which wraps all the individual assembly and project
         // results.
@@ -48,8 +48,10 @@ namespace NUnit.Engine.Runners
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
-            if (services == null) throw new ArgumentNullException("services");
-            if (package == null) throw new ArgumentNullException("package");
+            if (services == null)
+                throw new ArgumentNullException("services");
+            if (package == null)
+                throw new ArgumentNullException("package");
 
             _services = services;
             TestPackage = package;
@@ -149,7 +151,6 @@ namespace NUnit.Engine.Runners
             return RunTests(listener, filter).Xml;
         }
 
-
         /// <summary>
         /// Start a run of the tests in the loaded TestPackage. The tests are run
         /// asynchronously and the listener interface is notified as it progresses.
@@ -181,7 +182,7 @@ namespace NUnit.Engine.Runners
                 // notifications needed by some runners. In fact, such a bug is present in the
                 // NUnit framework through release 3.12 and motivated the following code.
                 //
-                // We try to make up for the potential problem here by notifying the listeners 
+                // We try to make up for the potential problem here by notifying the listeners
                 // of the completion of every pending WorkItem, that is, one that started but
                 // never sent a completion event.
 
@@ -269,14 +270,15 @@ namespace NUnit.Engine.Runners
         // allows the lower-level runners to be completely ignorant of projects
         private TestEngineResult PrepareResult(TestEngineResult result)
         {
-            if (result == null) throw new ArgumentNullException("result");
+            if (result == null)
+                throw new ArgumentNullException("result");
 
             // See if we have any projects to deal with. At this point,
             // any subpackage, which itself has subpackages, is a project
             // we expanded.
             bool hasProjects = false;
-                foreach (var p in TestPackage.SubPackages)
-                    hasProjects |= p.HasSubPackages();
+            foreach (var p in TestPackage.SubPackages)
+                hasProjects |= p.HasSubPackages();
 
             // If no Projects, there's nothing to do
             if (!hasProjects)
@@ -306,7 +308,7 @@ namespace NUnit.Engine.Runners
                 {
                     // This is a project, create an intermediate result
                     var projectResult = new TestEngineResult();
-                    
+
                     // Now move any children of this project under it. As noted
                     // above, we must rely on ordering here because (1) the
                     // fullname attribute is not reliable on all nunit framework
@@ -315,7 +317,7 @@ namespace NUnit.Engine.Runners
                     int numChildren = subPackage.SubPackages.Count;
                     while (numChildren-- > 0)
                         projectResult.Add(result.XmlNodes[nextTest++]);
-                    
+
                     topLevelResult.Add(projectResult.MakeProjectResult(subPackage).Xml);
                 }
                 else
@@ -324,13 +326,14 @@ namespace NUnit.Engine.Runners
                     topLevelResult.Add(result.XmlNodes[nextTest++]);
                 }
             }
-            
+
             return topLevelResult;
         }
 
         private void EnsurePackagesAreExpanded(TestPackage package)
         {
-            if (package == null) throw new ArgumentNullException("package");
+            if (package == null)
+                throw new ArgumentNullException("package");
 
             foreach (var subPackage in package.SubPackages)
             {
@@ -345,7 +348,8 @@ namespace NUnit.Engine.Runners
 
         private bool IsProjectPackage(TestPackage package)
         {
-            if (package == null) throw new ArgumentNullException("package");
+            if (package == null)
+                throw new ArgumentNullException("package");
 
             return
                 _projectService != null
@@ -361,7 +365,7 @@ namespace NUnit.Engine.Runners
 
         private static ObsoletePackageSetting[] ObsoleteSettings = new ObsoletePackageSetting[]
         {
-            new ObsoletePackageSetting() { OldKey = "RuntimeFramework", NewKey = "RequestedRuntimeFramework"}
+            new ObsoletePackageSetting() { OldKey = "RuntimeFramework", NewKey = "RequestedRuntimeFramework" }
         };
 
         // Any Errors thrown from this method indicate that the client
@@ -369,7 +373,7 @@ namespace NUnit.Engine.Runners
         private void ValidatePackageSettings()
         {
 #if NETFRAMEWORK  // TODO: How do we validate runtime framework for .NET Standard 2.0?
-            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
+            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, string.Empty);
             var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             foreach (var entry in ObsoleteSettings)
@@ -400,7 +404,8 @@ namespace NUnit.Engine.Runners
         /// <returns>The count of test cases</returns>
         private int CountTests(TestFilter filter)
         {
-            if (!IsPackageLoaded) return 0;
+            if (!IsPackageLoaded)
+                return 0;
 
             return GetEngineRunner().CountTestCases(filter);
         }
@@ -425,7 +430,7 @@ namespace NUnit.Engine.Runners
                 _eventDispatcher.Listeners.Add(extension);
 
             IsTestRunning = true;
-            
+
             string clrVersion;
             string engineVersion;
 

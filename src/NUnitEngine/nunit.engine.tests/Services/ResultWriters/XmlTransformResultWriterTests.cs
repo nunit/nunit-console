@@ -38,7 +38,6 @@ namespace NUnit.Engine.Services.ResultWriters
             }
         }
 
-
         [Test]
         public void SummaryTransformTest()
         {

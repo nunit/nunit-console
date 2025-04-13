@@ -18,9 +18,13 @@ namespace NUnit.Engine
 
     public class Token
     {
-        public Token(TokenKind kind) : this(kind, string.Empty) { }
+        public Token(TokenKind kind) : this(kind, string.Empty)
+        {
+        }
 
-        public Token(TokenKind kind, char ch) : this(kind, ch.ToString()) { }
+        public Token(TokenKind kind, char ch) : this(kind, ch.ToString())
+        {
+        }
 
         public Token(TokenKind kind, string text)
         {
@@ -136,7 +140,7 @@ namespace NUnit.Engine
                 case '=':
                 case '!':
                     GetChar();
-                    foreach(string dbl in DOUBLE_CHAR_SYMBOLS)
+                    foreach (string dbl in DOUBLE_CHAR_SYMBOLS)
                         if (ch == dbl[0] && NextChar == dbl[1])
                         {
                             GetChar();

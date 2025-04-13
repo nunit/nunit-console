@@ -15,7 +15,7 @@ namespace NUnit.Engine.Services
         public AgentProcess(TestAgency agency, TestPackage package, Guid agentId)
         {
             // Get target runtime
-            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
+            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, string.Empty);
             log.Debug($"TargetRuntime = {runtimeSetting}");
             TargetRuntime = RuntimeFramework.Parse(runtimeSetting);
 

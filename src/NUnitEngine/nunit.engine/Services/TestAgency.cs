@@ -56,7 +56,7 @@ namespace NUnit.Engine.Services
                 throw new InvalidOperationException("TestAgency needs to be Started first");
 
             // Target Runtime must be specified by this point
-            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, "");
+            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, string.Empty);
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
             bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
 
@@ -74,7 +74,7 @@ namespace NUnit.Engine.Services
 
             var agentId = Guid.NewGuid();
             var agentProcess = new AgentProcess(this, package, agentId);
-            var agentName = targetRuntime.Id + (runAsX86 ? "-x86" : "") + "-agent";
+            var agentName = targetRuntime.Id + (runAsX86 ? "-x86" : string.Empty) + "-agent";
             package.AddSetting("SelectedAgentName", agentName);
 
             agentProcess.Exited += (sender, e) => OnAgentExit((Process)sender!, agentId);

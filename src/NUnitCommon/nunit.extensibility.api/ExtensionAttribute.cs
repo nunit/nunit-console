@@ -20,7 +20,7 @@ namespace NUnit.Extensibility
         }
 
         /// <summary>
-        /// A unique string identifying the ExtensionPoint for which this Extension is 
+        /// A unique string identifying the ExtensionPoint for which this Extension is
         /// intended. This is an optional field provided NUnit is able to deduce the
         /// ExtensionPoint from the Type of the extension class.
         /// </summary>

@@ -40,7 +40,6 @@ namespace NUnit.Engine.Internal
                 return loadedAssembly;
             }
 
-
             var runtimeResolverPath = _runtimeResolver.ResolveAssemblyToPath(name);
             if (string.IsNullOrEmpty(runtimeResolverPath) == false &&
                 File.Exists(runtimeResolverPath))

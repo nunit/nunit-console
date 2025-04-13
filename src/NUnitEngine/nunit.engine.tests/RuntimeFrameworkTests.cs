@@ -47,67 +47,69 @@ namespace NUnit.Engine
         }
 
 #pragma warning disable 414
-        static TestCaseData[] matchData = new TestCaseData[] {
+        private static TestCaseData[] matchData = new TestCaseData[]
+        {
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(3,5)),
-                new RuntimeFramework(Runtime.Net, new Version(2,0)))
+                new RuntimeFramework(Runtime.Net, new Version(3, 5)),
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(2,0)),
-                new RuntimeFramework(Runtime.Net, new Version(3,5)))
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(3, 5)))
                 .Returns(false),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(3,5)),
-                new RuntimeFramework(Runtime.Net, new Version(3,5)))
+                new RuntimeFramework(Runtime.Net, new Version(3, 5)),
+                new RuntimeFramework(Runtime.Net, new Version(3, 5)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(2,0)),
-                new RuntimeFramework(Runtime.Net, new Version(2,0)))
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(2,0)),
-                new RuntimeFramework(Runtime.Mono, new Version(2,0)))
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)),
+                new RuntimeFramework(Runtime.Mono, new Version(2, 0)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Mono, new Version(2,0)),
-                new RuntimeFramework(Runtime.Net, new Version(2,0)))
+                new RuntimeFramework(Runtime.Mono, new Version(2, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(4,0)),
-                new RuntimeFramework(Runtime.Mono, new Version(4,0)))
+                new RuntimeFramework(Runtime.Net, new Version(4, 0)),
+                new RuntimeFramework(Runtime.Mono, new Version(4, 0)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Mono, new Version(4,0)),
-                new RuntimeFramework(Runtime.Net, new Version(4,0)))
+                new RuntimeFramework(Runtime.Mono, new Version(4, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(4, 0)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Mono, new Version(4,0)),
-                new RuntimeFramework(Runtime.Net, new Version(4,6,2)))
+                new RuntimeFramework(Runtime.Mono, new Version(4, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(4, 6, 2)))
                 .Returns(true),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(2,0)),
-                new RuntimeFramework(Runtime.Net, new Version(1,1)))
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(1, 1)))
                 .Returns(false),
             new TestCaseData(
-                new RuntimeFramework(Runtime.Mono, new Version(1,1)), // non-existent version but it works
-                new RuntimeFramework(Runtime.Mono, new Version(1,0)))
+                new RuntimeFramework(Runtime.Mono, new Version(1, 1)), // non-existent version but it works
+                new RuntimeFramework(Runtime.Mono, new Version(1, 0)))
                 .Returns(true),
-            };
+        };
 
-        private static readonly TestCaseData[] CanLoadData = {
+        private static readonly TestCaseData[] CanLoadData =
+        {
             new TestCaseData(
-                new RuntimeFramework(Runtime.Net, new Version(2,0)),
-                new RuntimeFramework(Runtime.Net, new Version(2,0)))
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)),
+                new RuntimeFramework(Runtime.Net, new Version(2, 0)))
                 .Returns(true),
             new TestCaseData(
-                    new RuntimeFramework(Runtime.Net, new Version(2,0)),
-                    new RuntimeFramework(Runtime.Net, new Version(4,0)))
+                    new RuntimeFramework(Runtime.Net, new Version(2, 0)),
+                    new RuntimeFramework(Runtime.Net, new Version(4, 0)))
                 .Returns(false),
             new TestCaseData(
-                    new RuntimeFramework(Runtime.Net, new Version(4,0)),
-                    new RuntimeFramework(Runtime.Net, new Version(2,0)))
+                    new RuntimeFramework(Runtime.Net, new Version(4, 0)),
+                    new RuntimeFramework(Runtime.Net, new Version(2, 0)))
                 .Returns(true)
-            };
+        };
 #pragma warning restore 414
 
         public struct FrameworkData
@@ -132,32 +134,33 @@ namespace NUnit.Engine
             }
         }
 
-        static readonly FrameworkData[] frameworkData = new FrameworkData[] {
-            new FrameworkData(Runtime.Net, new Version(1,0), "net-1.0", ".NET 1.0"),
-            new FrameworkData(Runtime.Net, new Version(1,1), "net-1.1", ".NET 1.1"),
-            new FrameworkData(Runtime.Net, new Version(2,0), "net-2.0", ".NET 2.0"),
-            new FrameworkData(Runtime.Net, new Version(3,0), "net-3.0", ".NET 3.0"),
-            new FrameworkData(Runtime.Net, new Version(3,5), "net-3.5", ".NET 3.5"),
-            new FrameworkData(Runtime.Net, new Version(4,0), "net-4.0", ".NET 4.0"),
-            new FrameworkData(Runtime.Net, new Version(4,5), "net-4.5", ".NET 4.5"),
-            new FrameworkData(Runtime.Net, new Version(4,5,1), "net-4.5.1", ".NET 4.5.1"),
-            new FrameworkData(Runtime.Net, new Version(4,5,2), "net-4.5.2", ".NET 4.5.2"),
-            new FrameworkData(Runtime.Net, new Version(4,6), "net-4.6", ".NET 4.6"),
-            new FrameworkData(Runtime.Net, new Version(4,6,1), "net-4.6.1", ".NET 4.6.1"),
-            new FrameworkData(Runtime.Net, new Version(4,6,2), "net-4.6.2", ".NET 4.6.2"),
-            new FrameworkData(Runtime.Net, new Version(4,7), "net-4.7", ".NET 4.7"),
-            new FrameworkData(Runtime.Net, new Version(4,7,1), "net-4.7.1", ".NET 4.7.1"),
-            new FrameworkData(Runtime.Net, new Version(4,7,2), "net-4.7.2", ".NET 4.7.2"),
-            new FrameworkData(Runtime.Net, new Version(4,8), "net-4.8", ".NET 4.8"),
-            new FrameworkData(Runtime.Mono, new Version(1,0), "mono-1.0", "Mono 1.0"),
-            new FrameworkData(Runtime.Mono, new Version(2,0), "mono-2.0", "Mono 2.0"),
-            new FrameworkData(Runtime.Mono, new Version(3,5), "mono-3.5", "Mono 3.5"),
-            new FrameworkData(Runtime.Mono, new Version(4,0), "mono-4.0", "Mono 4.0"),
-            new FrameworkData(Runtime.NetCore, new Version(2,1), "netcore-2.1", ".NETCore 2.1"),
-            new FrameworkData(Runtime.NetCore, new Version(3,1), "netcore-3.1", ".NETCore 3.1"),
-            new FrameworkData(Runtime.NetCore, new Version(5,0), "netcore-5.0", ".NETCore 5.0"),
-            new FrameworkData(Runtime.NetCore, new Version(6,0), "netcore-6.0", ".NETCore 6.0"),
-            new FrameworkData(Runtime.NetCore, new Version(7,0), "netcore-7.0", ".NETCore 7.0"),
+        private static readonly FrameworkData[] frameworkData = new FrameworkData[]
+        {
+            new FrameworkData(Runtime.Net, new Version(1, 0), "net-1.0", ".NET 1.0"),
+            new FrameworkData(Runtime.Net, new Version(1, 1), "net-1.1", ".NET 1.1"),
+            new FrameworkData(Runtime.Net, new Version(2, 0), "net-2.0", ".NET 2.0"),
+            new FrameworkData(Runtime.Net, new Version(3, 0), "net-3.0", ".NET 3.0"),
+            new FrameworkData(Runtime.Net, new Version(3, 5), "net-3.5", ".NET 3.5"),
+            new FrameworkData(Runtime.Net, new Version(4, 0), "net-4.0", ".NET 4.0"),
+            new FrameworkData(Runtime.Net, new Version(4, 5), "net-4.5", ".NET 4.5"),
+            new FrameworkData(Runtime.Net, new Version(4, 5, 1), "net-4.5.1", ".NET 4.5.1"),
+            new FrameworkData(Runtime.Net, new Version(4, 5, 2), "net-4.5.2", ".NET 4.5.2"),
+            new FrameworkData(Runtime.Net, new Version(4, 6), "net-4.6", ".NET 4.6"),
+            new FrameworkData(Runtime.Net, new Version(4, 6, 1), "net-4.6.1", ".NET 4.6.1"),
+            new FrameworkData(Runtime.Net, new Version(4, 6, 2), "net-4.6.2", ".NET 4.6.2"),
+            new FrameworkData(Runtime.Net, new Version(4, 7), "net-4.7", ".NET 4.7"),
+            new FrameworkData(Runtime.Net, new Version(4, 7, 1), "net-4.7.1", ".NET 4.7.1"),
+            new FrameworkData(Runtime.Net, new Version(4, 7, 2), "net-4.7.2", ".NET 4.7.2"),
+            new FrameworkData(Runtime.Net, new Version(4, 8), "net-4.8", ".NET 4.8"),
+            new FrameworkData(Runtime.Mono, new Version(1, 0), "mono-1.0", "Mono 1.0"),
+            new FrameworkData(Runtime.Mono, new Version(2, 0), "mono-2.0", "Mono 2.0"),
+            new FrameworkData(Runtime.Mono, new Version(3, 5), "mono-3.5", "Mono 3.5"),
+            new FrameworkData(Runtime.Mono, new Version(4, 0), "mono-4.0", "Mono 4.0"),
+            new FrameworkData(Runtime.NetCore, new Version(2, 1), "netcore-2.1", ".NETCore 2.1"),
+            new FrameworkData(Runtime.NetCore, new Version(3, 1), "netcore-3.1", ".NETCore 3.1"),
+            new FrameworkData(Runtime.NetCore, new Version(5, 0), "netcore-5.0", ".NETCore 5.0"),
+            new FrameworkData(Runtime.NetCore, new Version(6, 0), "netcore-6.0", ".NETCore 6.0"),
+            new FrameworkData(Runtime.NetCore, new Version(7, 0), "netcore-7.0", ".NETCore 7.0"),
         };
     }
 }

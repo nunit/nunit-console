@@ -15,11 +15,10 @@ namespace NUnit.Extensibility
     /// </summary>
     public class ExtensionNode : IExtensionNode
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionNode));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionNode));
 
         private object? _extensionObject;
         private readonly Dictionary<string, List<string>> _properties = new Dictionary<string, List<string>>();
-
 
         /// <summary>
         /// Construct an ExtensionNode supplying the assembly path and type name.
@@ -50,7 +49,7 @@ namespace NUnit.Extensibility
         /// Gets or sets a value indicating whether this <see cref="NUnit.Engine.Extensibility.ExtensionNode"/> is enabled.
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        public bool Enabled	{ get; set; }
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// Gets and sets the unique string identifying the ExtensionPoint for which

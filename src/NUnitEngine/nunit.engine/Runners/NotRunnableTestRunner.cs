@@ -128,6 +128,7 @@ namespace NUnit.Engine.Runners
     {
         public UnmanagedExecutableTestRunner(string assemblyPath)
             : base(assemblyPath, "Unmanaged libraries or applications are not supported")
-        { }
+        {
+        }
     }
 }

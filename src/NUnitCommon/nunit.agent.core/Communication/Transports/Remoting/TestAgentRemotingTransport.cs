@@ -9,7 +9,6 @@ using NUnit.Engine.Agents;
 
 namespace NUnit.Engine.Communication.Transports.Remoting
 {
-
     /// <summary>
     /// TestAgentRemotingTransport uses remoting to support
     /// a TestAgent in communicating with a TestAgency and

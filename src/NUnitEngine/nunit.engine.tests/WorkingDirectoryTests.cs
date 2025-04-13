@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace NUnit.Engine
 {
     [NonParallelizable]
-    class WorkingDirectoryTests
+    internal class WorkingDirectoryTests
     {
         private string _origWorkingDir;
 

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-
 using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner.Options
 {
 #if NETCOREAPP
-    class NetCoreConsoleOptionsTest
+    internal class NetCoreConsoleOptionsTest
     {
         [TestCaseSource(nameof(TestCases))]
         public void InvalidOptionsShowError(string arg, bool isValidOnNetCore)

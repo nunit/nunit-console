@@ -47,6 +47,8 @@ namespace NUnit.Engine.Services
 
         protected bool _disposed = false;
 
-        protected virtual void Dispose(bool disposing) { }
+        protected virtual void Dispose(bool disposing)
+        {
+        }
     }
 }

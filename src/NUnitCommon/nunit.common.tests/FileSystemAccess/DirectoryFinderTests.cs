@@ -13,7 +13,7 @@ namespace NUnit.Engine.Internal
     {
         private Dictionary<string, IDirectory> fakedDirectories;
         private Dictionary<string, IFile> fakedFiles;
-        
+
         private IFileSystem fileSystem;
 
         [SetUp]
@@ -59,7 +59,7 @@ namespace NUnit.Engine.Internal
                 var parts = path.Split('/');
                 for (var i = 0; i < parts.Length; i++)
                 {
-                    var absolutePath = CreateAbsolutePath(parts.Take(i+1));
+                    var absolutePath = CreateAbsolutePath(parts.Take(i + 1));
                     if (!fakedDirectories.ContainsKey(absolutePath))
                     {
                         var fake = Substitute.For<IDirectory>();

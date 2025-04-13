@@ -20,7 +20,7 @@ namespace NUnit.ConsoleRunner
     public class Program
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
-        static readonly ConsoleOptions Options = new ConsoleOptions(new FileSystem());
+        private static readonly ConsoleOptions Options = new ConsoleOptions(new FileSystem());
         private static ExtendedTextWriter? _outWriter;
 
         // This has to be lazy otherwise NoColor command line option is not applied correctly
@@ -28,7 +28,8 @@ namespace NUnit.ConsoleRunner
         {
             get
             {
-                if (_outWriter == null) _outWriter = new ColorConsoleWriter(!Options.NoColor);
+                if (_outWriter == null)
+                    _outWriter = new ColorConsoleWriter(!Options.NoColor);
 
                 return _outWriter;
             }
@@ -182,7 +183,8 @@ namespace NUnit.ConsoleRunner
             if (configurationAttributes.Length > 0)
             {
                 string configuration = ((AssemblyConfigurationAttribute)configurationAttributes[0]).Configuration;
-                if (!string.IsNullOrEmpty(configuration)) header += $" ({configuration})";
+                if (!string.IsNullOrEmpty(configuration))
+                    header += $" ({configuration})";
             }
 
             OutWriter.WriteLine(ColorStyle.Header, header);

@@ -14,16 +14,16 @@ namespace NUnit.Engine.Drivers
     /// As far as I can discover, it first appeared in pre-release 2.9.1,
     /// on launchpad in 2009, hence the name.
     /// </summary>
-    class NUnitFrameworkApi2009 : NUnitFrameworkApi
+    internal class NUnitFrameworkApi2009 : NUnitFrameworkApi
         {
-            static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkApi2009));
+            private static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkApi2009));
 
-            const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
-            const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
-            const string FAILED_TO_LOAD_ASSEMBLY = "Failed to load assembly ";
-            const string FAILED_TO_LOAD_NUNIT = "Failed to load the NUnit Framework in the test assembly";
+            private const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
+            private const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
+            private const string FAILED_TO_LOAD_ASSEMBLY = "Failed to load assembly ";
+            private const string FAILED_TO_LOAD_NUNIT = "Failed to load the NUnit Framework in the test assembly";
 
-            const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
+            private const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
 
             private readonly string _driverId;
 
@@ -31,7 +31,7 @@ namespace NUnit.Engine.Drivers
             private readonly AssemblyName _nunitRef;
 
             private string? _testAssemblyPath;
-            
+
             private object? _frameworkController;
             private Type? _frameworkControllerType;
 
@@ -118,7 +118,7 @@ namespace NUnit.Engine.Drivers
             }
 
             // Actions with no extra arguments beyond controller and handler
-            const string LOAD_ACTION = CONTROLLER_TYPE + "+LoadTestsAction";
+            private const string LOAD_ACTION = CONTROLLER_TYPE + "+LoadTestsAction";
             private string ExecuteAction(string action)
             {
                 CallbackHandler handler = new CallbackHandler();
@@ -127,9 +127,9 @@ namespace NUnit.Engine.Drivers
             }
 
             // Actions with one extra argument
-            const string EXPLORE_ACTION = CONTROLLER_TYPE + "+ExploreTestsAction";
-            const string COUNT_ACTION = CONTROLLER_TYPE + "+CountTestsAction";
-            const string STOP_RUN_ACTION = CONTROLLER_TYPE + "+StopRunAction";
+            private const string EXPLORE_ACTION = CONTROLLER_TYPE + "+ExploreTestsAction";
+            private const string COUNT_ACTION = CONTROLLER_TYPE + "+CountTestsAction";
+            private const string STOP_RUN_ACTION = CONTROLLER_TYPE + "+StopRunAction";
             private string ExecuteAction(string action, object arg1)
             {
                 CallbackHandler handler = new CallbackHandler();
@@ -138,7 +138,7 @@ namespace NUnit.Engine.Drivers
             }
 
             // Run action has two extra arguments and uses a special handler
-            const string RUN_ACTION = CONTROLLER_TYPE + "+RunTestsAction";
+            private const string RUN_ACTION = CONTROLLER_TYPE + "+RunTestsAction";
             private string ExecuteAction(string action, ITestEventListener? listener, string filter)
             {
                 RunTestsCallbackHandler handler = new RunTestsCallbackHandler(listener);

@@ -15,22 +15,25 @@ namespace NUnit.Engine.Services
         private List<IService> _services = new List<IService>();
         private Dictionary<Type, IService> _serviceIndex = new Dictionary<Type, IService>();
 
-        static Logger log = InternalTrace.GetLogger(typeof(ServiceManager));
+        private static Logger log = InternalTrace.GetLogger(typeof(ServiceManager));
 
         public bool ServicesInitialized { get; private set; }
 
-        public int ServiceCount { get { return _services.Count; } }
+        public int ServiceCount
+        {
+            get { return _services.Count; }
+        }
 
-        public IService GetService( Type serviceType )
+        public IService GetService(Type serviceType)
         {
             IService? theService = null;
 
             if (_serviceIndex.ContainsKey(serviceType))
                 theService = _serviceIndex[serviceType];
             else
-                foreach( IService service in _services )
+                foreach (IService service in _services)
                 {
-                    if( serviceType.IsInstanceOfType( service ) )
+                    if (serviceType.IsInstanceOfType(service))
                     {
                         _serviceIndex[serviceType] = service;
                         theService = service;
@@ -58,7 +61,7 @@ namespace NUnit.Engine.Services
 
         public void StartServices()
         {
-            foreach( IService service in _services )
+            foreach (IService service in _services)
             {
                 if (service.Status == ServiceStatus.Stopped)
                 {
@@ -73,7 +76,7 @@ namespace NUnit.Engine.Services
                     catch (Exception ex)
                     {
                         // TODO: Should we pass this exception through?
-                        log.Error("Failed to initialize " + name );
+                        log.Error("Failed to initialize " + name);
                         log.Error(ex.ToString());
                         throw;
                     }

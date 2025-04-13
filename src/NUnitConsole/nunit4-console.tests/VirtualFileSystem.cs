@@ -6,7 +6,7 @@ using System.IO;
 
 namespace NUnit.ConsoleRunner
 {
-    internal class VirtualFileSystem: IFileSystem
+    internal class VirtualFileSystem : IFileSystem
     {
         private readonly Dictionary<string, IEnumerable<string>> files = new Dictionary<string, IEnumerable<string>>();
 

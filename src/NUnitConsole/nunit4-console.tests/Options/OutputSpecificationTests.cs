@@ -15,7 +15,6 @@ namespace NUnit.ConsoleRunner.Options
                 Throws.TypeOf<ArgumentNullException>());
         }
 
-
         [Test]
         public void SpecOptionMustContainEqualSign()
         {
@@ -113,7 +112,7 @@ namespace NUnit.ConsoleRunner.Options
         {
             const string fileName = "transform.xslt";
             var spec = new OutputSpecification($"MyFile.xml;transform=transform.xslt", transformFolder);
-            var expectedTransform = Path.Combine(transformFolder ?? "", fileName);
+            var expectedTransform = Path.Combine(transformFolder ?? string.Empty, fileName);
             Assert.That(spec.Transform, Is.EqualTo(expectedTransform));
         }
     }

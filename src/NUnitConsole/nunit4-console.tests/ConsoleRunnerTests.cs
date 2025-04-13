@@ -13,7 +13,7 @@ using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {
-    class ConsoleRunnerTests
+    internal class ConsoleRunnerTests
     {
         private ITestEngine _testEngine;
         private IResultService _resultService;
@@ -61,7 +61,6 @@ namespace NUnit.ConsoleRunner
 
         public string[] Formats
         {
-
             get
             {
                 return new[] { "nunit3" };
@@ -79,7 +78,7 @@ namespace NUnit.ConsoleRunner
         private FakeResultService _service;
 
         public FakeResultWriter(FakeResultService service)
-        { 
+        {
             _service = service;
         }
 

@@ -14,10 +14,10 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnitFrameworkDriver : IFrameworkDriver
     {
-        static readonly Version MINIMUM_NUNIT_VERSION = new(3, 2, 0);
-        static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
+        private static readonly Version MINIMUM_NUNIT_VERSION = new(3, 2, 0);
+        private static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
-        readonly NUnitFrameworkApi _api;
+        private readonly NUnitFrameworkApi _api;
 
 #if NETFRAMEWORK
         /// <summary>
@@ -164,17 +164,17 @@ namespace NUnit.Engine.Drivers
         /// <remarks>
         /// This class is absolutely needed when the 2018 NUnit API is used under
         /// the .NET Framework using Windows Remoting as a communication protocol.
-        /// In particular, the MarshalByRef object implementing the listener must 
+        /// In particular, the MarshalByRef object implementing the listener must
         /// be convertible to ITestEventListener via the IConvertible interface.
-        /// 
+        ///
         /// In other cases, the interceptor is not essential, but we use it anyway
         /// for several reasons:
-        /// 
+        ///
         /// 1. We have no control over the implementation of runners using the engine.
-        ///    They may not implement IConvertible and may not even derive from 
+        ///    They may not implement IConvertible and may not even derive from
         ///    MarshaByRefObject.
-        /// 
-        /// 2. The interceptor provides a point of control for checking what events 
+        ///
+        /// 2. The interceptor provides a point of control for checking what events
         ///    are received from the framework and for possible future modifications to
         ///    the events before they are forwarded.
         /// </remarks>
@@ -215,9 +215,9 @@ namespace NUnit.Engine.Drivers
             DateTime IConvertible.ToDateTime(IFormatProvider? provider) => InvalidCast<DateTime>();
             string IConvertible.ToString(IFormatProvider? provider) => InvalidCast<string>();
 
-            static T InvalidCast<T>() => (T)InvalidCast(typeof(T));
+            private static T InvalidCast<T>() => (T)InvalidCast(typeof(T));
 
-            static object InvalidCast(Type type) =>
+            private static object InvalidCast(Type type) =>
                 throw new InvalidCastException($"{nameof(EventInterceptor)} is not convertible to {nameof(type)}");
 
             #endregion

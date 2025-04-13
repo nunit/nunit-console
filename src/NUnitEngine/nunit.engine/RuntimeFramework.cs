@@ -148,7 +148,7 @@ namespace NUnit.Engine
         /// Returns true if the current framework matches the
         /// one supplied as an argument. Both the RuntimeType
         /// and the version must match.
-        /// 
+        ///
         /// Two RuntimeTypes match if they are equal, if either one
         /// is RuntimeType.Any or if one is RuntimeType.Net and
         /// the other is RuntimeType.Mono.
@@ -188,7 +188,8 @@ namespace NUnit.Engine
             for (int i = 0; i < 4; i++)
             {
                 string? dir = Path.GetDirectoryName(prefix);
-                if (string.IsNullOrEmpty(dir)) break;
+                if (string.IsNullOrEmpty(dir))
+                    break;
 
                 prefix = dir;
             }

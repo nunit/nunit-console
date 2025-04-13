@@ -15,10 +15,10 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ProjectService : Service, IProjectService
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
 
-        IEnumerable<ExtensionNode>? _extensionNodes;
-        ExtensionService? _extensionService;
+        private IEnumerable<ExtensionNode>? _extensionNodes;
+        private ExtensionService? _extensionService;
 
         public bool CanLoadFrom(string path)
         {

@@ -7,7 +7,9 @@ using System.Xml;
 namespace System.Runtime.CompilerServices
 {
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
-    sealed class ExtensionAttribute : Attribute { }
+    internal sealed class ExtensionAttribute : Attribute
+    {
+    }
 }
 
 namespace NUnit
@@ -25,7 +27,7 @@ namespace NUnit
         public static XmlNode CreateTopLevelElement(string name)
         {
             XmlDocument doc = new XmlDocument();
-            doc.LoadXml( "<" + name + "/>" );
+            doc.LoadXml("<" + name + "/>");
             return doc.FirstChild.ShouldNotBeNull();
         }
 

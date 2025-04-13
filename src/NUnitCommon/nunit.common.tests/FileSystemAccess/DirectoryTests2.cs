@@ -47,7 +47,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
 
             this._subDirectories = subDirectories;
             SIO.Directory.CreateDirectory(this._testDirectory);
-            foreach(var directory in this._subDirectories)
+            foreach (var directory in this._subDirectories)
             {
                 SIO.Directory.CreateDirectory(directory);
             }

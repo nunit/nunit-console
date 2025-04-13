@@ -57,7 +57,7 @@ namespace NUnit.Engine
 
             // Eliminate suites that do not represent an assembly
             if (!eventArgument.Contains("type=\"Assembly\""))
-                return false; 
+                return false;
             // Return for all except the assembly result. Remaining code is only
             // executed twice per assembly.
 
@@ -75,7 +75,7 @@ namespace NUnit.Engine
             return eventArgument.IndexOf("<test-suite", 12, StringComparison.Ordinal) > 0;
         }
 
-        class NullListener : ITestEventListener
+        private class NullListener : ITestEventListener
         {
             public void OnTestEvent(string report)
             {

@@ -56,7 +56,7 @@ namespace NUnit.ConsoleRunner.Options
                                 string.Format("Conflicting format options: {0}", spec));
 
                         this.Format = "user";
-                        this.Transform = Path.Combine(transformFolder ?? "", val);
+                        this.Transform = Path.Combine(transformFolder ?? string.Empty, val);
                         break;
                 }
             }
@@ -83,8 +83,10 @@ namespace NUnit.ConsoleRunner.Options
         public override string ToString()
         {
             var sb = new StringBuilder($"OutputPath: {OutputPath}");
-            if (Format != null) sb.Append($", Format: {Format}");
-            if (Transform != null) sb.Append($", Transform: {Transform}");
+            if (Format != null)
+                sb.Append($", Format: {Format}");
+            if (Transform != null)
+                sb.Append($", Transform: {Transform}");
             return sb.ToString();
         }
     }

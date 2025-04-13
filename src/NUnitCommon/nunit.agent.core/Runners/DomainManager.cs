@@ -20,7 +20,7 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class DomainManager
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(DomainManager));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(DomainManager));
 
         private static readonly PropertyInfo TargetFrameworkNameProperty =
             typeof(AppDomainSetup).GetProperty("TargetFrameworkName", BindingFlags.Public | BindingFlags.Instance)!;
@@ -29,7 +29,7 @@ namespace NUnit.Engine.Runners
         /// Construct an application domain for running a test package
         /// </summary>
         /// <param name="package">The TestPackage to be run</param>
-        public AppDomain CreateDomain( TestPackage package )
+        public AppDomain CreateDomain(TestPackage package)
         {
             AppDomainSetup setup = CreateAppDomainSetup(package);
 
@@ -59,7 +59,7 @@ namespace NUnit.Engine.Runners
         }
 
         // Made separate and internal for testing
-        AppDomainSetup CreateAppDomainSetup(TestPackage package)
+        private AppDomainSetup CreateAppDomainSetup(TestPackage package)
         {
             AppDomainSetup setup = new AppDomainSetup();
 
@@ -82,8 +82,8 @@ namespace NUnit.Engine.Runners
                 // If property is null, .NET 4.5+ is not installed, so there is no need
                 if (TargetFrameworkNameProperty != null)
                 {
-                    var frameworkName = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
-                    if (frameworkName != "")
+                    var frameworkName = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
+                    if (frameworkName != string.Empty)
                         TargetFrameworkNameProperty.SetValue(setup, frameworkName, null);
                 }
             }
@@ -104,7 +104,7 @@ namespace NUnit.Engine.Runners
             new DomainUnloader(domain).Unload();
         }
 
-        class DomainUnloader
+        private class DomainUnloader
         {
             private readonly AppDomain _domain;
             private Thread? _unloadThread;
@@ -232,7 +232,7 @@ namespace NUnit.Engine.Runners
 
             // All subpackages have full names, but this is a public method in a public class so we have no control.
             foreach (var package in packages.Where(p => p.FullName != null))
-                assemblies.Add(package.FullName!); 
+                assemblies.Add(package.FullName!);
 
             return GetCommonAppBase(assemblies);
         }
@@ -246,7 +246,8 @@ namespace NUnit.Engine.Runners
                 string? dir = Path.GetDirectoryName(Path.GetFullPath(assembly))!;
                 if (commonBase == null)
                     commonBase = dir;
-                else while (commonBase != null && !PathUtils.SamePathOrUnder(commonBase, dir))
+                else
+                    while (commonBase != null && !PathUtils.SamePathOrUnder(commonBase, dir))
                         commonBase = Path.GetDirectoryName(commonBase)!;
             }
 
@@ -286,17 +287,17 @@ namespace NUnit.Engine.Runners
             List<string> dirList = new List<string>();
             StringBuilder sb = new StringBuilder(200);
 
-            foreach( string assembly in assemblies )
+            foreach (string assembly in assemblies)
             {
                 string? dir = PathUtils.RelativePath(
                     Path.GetFullPath(basePath),
-                    Path.GetDirectoryName( Path.GetFullPath(assembly) )! );
-                if ( dir != null && dir != string.Empty && dir != "." && !dirList.Contains( dir ) )
+                    Path.GetDirectoryName(Path.GetFullPath(assembly))!);
+                if (dir != null && dir != string.Empty && dir != "." && !dirList.Contains(dir))
                 {
-                    dirList.Add( dir );
-                    if ( sb.Length > 0 )
-                        sb.Append( Path.PathSeparator );
-                    sb.Append( dir );
+                    dirList.Add(dir);
+                    if (sb.Length > 0)
+                        sb.Append(Path.PathSeparator);
+                    sb.Append(dir);
                 }
             }
 

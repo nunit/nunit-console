@@ -30,6 +30,8 @@ namespace NUnit.Extensibility
         /// <summary>
         /// Serialization constructor
         /// </summary>
-        public NUnitExtensibilityException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        public NUnitExtensibilityException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

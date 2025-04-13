@@ -49,7 +49,7 @@ namespace NUnit.Engine.Services
         /// <param name="outputPath"></param>
         public void CheckWritability(string outputPath)
         {
-            using ( new StreamWriter( outputPath, false ) )
+            using (new StreamWriter(outputPath, false))
             {
                 // We don't need to check if the XSLT file exists,
                 // that would have thrown in the constructor
@@ -58,7 +58,7 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode result, TextWriter writer)
         {
-            using (var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings {Indent = true, ConformanceLevel = ConformanceLevel.Auto}))
+            using (var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings { Indent = true, ConformanceLevel = ConformanceLevel.Auto }))
             {
                 _transform.Transform(result, xmlWriter);
             }
@@ -66,7 +66,7 @@ namespace NUnit.Engine.Services
 
         public void WriteResultFile(XmlNode result, string outputPath)
         {
-            using (var xmlWriter = XmlWriter.Create(outputPath, new XmlWriterSettings {Indent = true, ConformanceLevel = ConformanceLevel.Auto}))
+            using (var xmlWriter = XmlWriter.Create(outputPath, new XmlWriterSettings { Indent = true, ConformanceLevel = ConformanceLevel.Auto }))
             {
                 _transform.Transform(result, xmlWriter);
             }

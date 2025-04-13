@@ -19,7 +19,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         private object _theLock = new object();
 
-        public TestAgencyTcpTransport(ITestAgency agency, int port=0)
+        public TestAgencyTcpTransport(ITestAgency agency, int port = 0)
         {
             Guard.ArgumentNotNull(agency, nameof(agency));
             Guard.ArgumentValid(port >= IPEndPoint.MinPort && port <= IPEndPoint.MaxPort,
@@ -51,9 +51,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public void WaitForStop()
         {
-            lock( _theLock )
+            lock (_theLock)
             {
-                Monitor.Wait( _theLock );
+                Monitor.Wait(_theLock);
             }
         }
 

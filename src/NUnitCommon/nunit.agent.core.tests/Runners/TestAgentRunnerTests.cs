@@ -16,7 +16,8 @@ namespace NUnit.Engine.Runners
 #if NETFRAMEWORK
     [TestFixture(typeof(TestDomainRunner))]
 #endif
-    public class TestAgentRunnerTests<TRunner> where TRunner : TestAgentRunner
+    public class TestAgentRunnerTests<TRunner>
+        where TRunner : TestAgentRunner
     {
         protected TestPackage _package;
         protected TRunner _runner;
@@ -37,7 +38,7 @@ namespace NUnit.Engine.Runners
             if (_runner != null)
                 _runner.Dispose();
         }
-         
+
         [Test]
         public void Load()
         {

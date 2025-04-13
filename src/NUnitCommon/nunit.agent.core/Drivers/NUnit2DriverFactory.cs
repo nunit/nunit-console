@@ -16,7 +16,7 @@ namespace NUnit.Engine.Drivers
 
         // TODO: This should be a central service but for now it's local
         private readonly ProvidedPathsAssemblyResolver _resolver;
-        bool _resolverInstalled;
+        private bool _resolverInstalled;
 
         public NUnit2DriverFactory(IExtensionNode driverNode)
         {
@@ -55,13 +55,13 @@ namespace NUnit.Engine.Drivers
             }
 
             return (IFrameworkDriver)AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(
-                _driverNode.AssemblyPath, 
+                _driverNode.AssemblyPath,
                 _driverNode.TypeName,
-                false, 
-                0, 
-                null, 
-                new object[] { domain, id, reference }, 
-                null, 
+                false,
+                0,
+                null,
+                new object[] { domain, id, reference },
+                null,
                 null).ShouldNotBeNull();
         }
     }

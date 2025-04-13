@@ -62,7 +62,8 @@ namespace NUnit.Engine
             while (true)
             {
                 var nextEscapeChar = literalValue.IndexOfAny(CharsThatRequireEscaping, nextPosition);
-                if (nextEscapeChar == -1) break;
+                if (nextEscapeChar == -1)
+                    break;
 
                 builder.Append(literalValue, nextPosition, nextEscapeChar - nextPosition);
                 nextPosition = nextEscapeChar + 1;

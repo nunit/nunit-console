@@ -10,14 +10,16 @@ namespace NUnit.ConsoleRunner
     {
         public bool FileExists(string fileName)
         {
-            if (fileName == null) throw new ArgumentNullException("fileName");
+            if (fileName == null)
+                throw new ArgumentNullException("fileName");
 
             return File.Exists(fileName);
         }
 
         public IEnumerable<string> ReadLines(string fileName)
         {
-            if (fileName == null) throw new ArgumentNullException("fileName");
+            if (fileName == null)
+                throw new ArgumentNullException("fileName");
 
             using (var file = File.OpenText(fileName))
             {

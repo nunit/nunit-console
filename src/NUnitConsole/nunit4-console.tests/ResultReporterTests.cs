@@ -14,7 +14,6 @@ using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {
-
     public class ResultReporterTests
     {
         private XmlNode _result;
@@ -28,11 +27,13 @@ namespace NUnit.ConsoleRunner
             var frameworkSettings = new Dictionary<string, object>
             {
                 { "TestParameters", "1=d;2=c" },
-                { "TestParametersDictionary", new Dictionary<string, string>
+                {
+                    "TestParametersDictionary", new Dictionary<string, string>
                 {
                     { "1", "d" },
                     { "2", "c" }
-                }}
+                }
+                }
             };
 
             var controller = new FrameworkController(mockAssembly, "id", frameworkSettings);
@@ -79,7 +80,9 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void SummaryReportTest()
         {
-            var expected = new[] {
+#pragma warning disable SA1137 // Elements should have the same indentation
+            var expected = new[]
+            {
                 "Test Run Summary",
                 "    Overall result: Failed",
                $"    Test Count: {MockAssembly.Tests}, Pass: {MockAssembly.Passed}, Fail: 11, Warn: 1, Inconclusive: 1, Skip: 7",
@@ -88,8 +91,9 @@ namespace NUnit.ConsoleRunner
                 "    Start time: 2015-10-19 02:12:28Z",
                 "    End time: 2015-10-19 02:12:29Z",
                 "    Duration: 0.349 seconds",
-                ""
+                string.Empty
             };
+#pragma warning restore SA1137 // Elements should have the same indentation
 
             var actualSummary = GetReportLines(_reporter.WriteSummaryReport);
             Assert.That(actualSummary, Is.EqualTo(expected));
@@ -100,7 +104,8 @@ namespace NUnit.ConsoleRunner
         {
             var nl = Environment.NewLine;
 
-            var expected = new[] {
+            var expected = new[]
+            {
                 "Errors, Failures and Warnings",
                 "1) Failed : NUnit.TestData.Assemblies.MockTestFixture.FailingTest" + nl +
                 "Intentional failure",
@@ -127,29 +132,30 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void TestsNotRunTest()
         {
-            var expected = new[] {
+            var expected = new[]
+            {
                 "Tests Not Run",
-                "",
+                string.Empty,
                 "1) Explicit : NUnit.TestData.Assemblies.MockTestFixture.ExplicitTest",
-                "",
+                string.Empty,
                 "2) Ignored : NUnit.TestData.Assemblies.MockTestFixture.IgnoreTest",
                 "Ignore Message",
-                "",
+                string.Empty,
                 "3) Explicit : NUnit.TestData.ExplicitFixture.Test1",
                 "OneTimeSetUp: ",
-                "",
+                string.Empty,
                 "4) Explicit : NUnit.TestData.ExplicitFixture.Test2",
                 "OneTimeSetUp: ",
-                "",
+                string.Empty,
                 "5) Ignored : NUnit.TestData.IgnoredFixture.Test1",
                 "OneTimeSetUp: BECAUSE",
-                "",
+                string.Empty,
                 "6) Ignored : NUnit.TestData.IgnoredFixture.Test2",
                 "OneTimeSetUp: BECAUSE",
-                "",
+                string.Empty,
                 "7) Ignored : NUnit.TestData.IgnoredFixture.Test3",
                 "OneTimeSetUp: BECAUSE",
-                ""
+                string.Empty
             };
 
             var report = GetReportLines(_reporter.WriteNotRunReport);
@@ -165,7 +171,8 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void TestParameterSettingsWrittenCorrectly()
         {
-            var expected = new[] {
+            var expected = new[]
+            {
                 "    TestParameters: |1=d;2=c|",
                 "    TestParametersDictionary:",
                 "        1 -> |d|",

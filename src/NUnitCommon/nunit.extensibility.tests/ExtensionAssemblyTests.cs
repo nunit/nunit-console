@@ -47,7 +47,7 @@ namespace NUnit.Extensibility
             Assert.Multiple(() =>
             {
                 Assert.That(_ea.FrameworkName.Identifier, Is.EqualTo(".NETFramework"));
-                Assert.That(_ea.FrameworkName.Version, Is.EqualTo(new Version(4,6,2)));
+                Assert.That(_ea.FrameworkName.Version, Is.EqualTo(new Version(4, 6, 2)));
             });
         }
 #endif

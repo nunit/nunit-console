@@ -21,7 +21,7 @@ namespace NUnit.Engine.Services
 
         /// <summary>
         /// Expands a TestPackage based on a known project format, populating it
-        /// with the project contents and any settings the project provides. 
+        /// with the project contents and any settings the project provides.
         /// Note that the package file path must be checked to ensure that it is
         /// a known project format before calling this method.
         /// </summary>

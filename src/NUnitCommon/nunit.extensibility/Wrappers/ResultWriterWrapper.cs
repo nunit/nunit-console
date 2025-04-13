@@ -15,7 +15,9 @@ namespace NUnit.Extensibility.Wrappers
         private static readonly Type[] XmlNodeStringTypes = [typeof(XmlNode), typeof(string)];
         private static readonly Type[] XmlNodeTextWriterTypes = [typeof(XmlNode), typeof(TextWriter)];
 
-        public ResultWriterWrapper(object writer) : base(writer) { }
+        public ResultWriterWrapper(object writer) : base(writer)
+        {
+        }
 
         public void CheckWritability(string outputPath)
         {

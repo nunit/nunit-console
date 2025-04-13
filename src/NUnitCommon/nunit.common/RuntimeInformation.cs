@@ -80,7 +80,6 @@ namespace NUnit.Engine.Internal.Backports
         public static Version FrameworkVersion { get; }
         public static string FrameworkDescription => $"{FrameworkName} {FrameworkVersion}";
 
-
         private struct MinimumRelease
         {
             public readonly int Release;

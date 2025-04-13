@@ -37,7 +37,7 @@ namespace NUnit.Engine
         {
             get { return _waitHandle; }
         }
-        
+
         /// <summary>
         /// Used by tests
         /// </summary>
@@ -67,7 +67,10 @@ namespace NUnit.Engine
         /// <summary>
         /// True if the test run has completed
         /// </summary>
-        public bool IsComplete { get { return _result != null; } }
+        public bool IsComplete
+        {
+            get { return _result != null; }
+        }
 
         XmlNode ITestRun.Result
         {

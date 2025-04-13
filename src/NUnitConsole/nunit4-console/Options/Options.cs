@@ -18,10 +18,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -42,16 +42,16 @@
 // A Getopt::Long-inspired option parsing library for C#.
 //
 // Mono.Options.OptionSet is built upon a key/value table, where the
-// key is a option format string and the value is a delegate that is 
+// key is a option format string and the value is a delegate that is
 // invoked when the format string is matched.
 //
 // Option format strings:
-//  Regex-like BNF Grammar: 
+//  Regex-like BNF Grammar:
 //    name: .+
 //    type: [=:]
 //    sep: ( [^{}]+ | '{' .+ '}' )?
 //    aliases: ( name type sep ) ( '|' name type sep )*
-// 
+//
 // Each '|'-delimited name is an alias for the associated action.  If the
 // format string ends in a '=', it has a required value.  If the format
 // string ends in a ':', it has an optional value.  If neither '=' or ':'
@@ -97,7 +97,7 @@
 //  p.Parse (new string[]{"-v", "--v", "/v", "-name=A", "/name", "B", "extra"});
 //
 // The above would parse the argument string array, and would invoke the
-// lambda expression three times, setting `verbose' to 3 when complete.  
+// lambda expression three times, setting `verbose' to 3 when complete.
 // It would also print out "A" and "B" to standard output.
 // The returned array would contain the string "extra".
 //
@@ -172,11 +172,9 @@ using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
 
-
 #if LINQ
 using System.Linq;
 #endif
-
 
 #if PCL
 using MessageLocalizerConverter = System.Func<string, string>;
@@ -186,9 +184,8 @@ using MessageLocalizerConverter = System.Converter<string, string>;
 
 namespace NUnit.ConsoleRunner.Options
 {
-    static class StringCoda
+    internal static class StringCoda
     {
-
         public static IEnumerable<string> WrappedLines(string self, params int[] widths)
         {
             IEnumerable<int> w = widths;
@@ -221,7 +218,7 @@ namespace NUnit.ConsoleRunner.Options
                     if (char.IsWhiteSpace(c))
                         --end;
                     bool needContinuation = end != self.Length && !IsEolChar(c);
-                    string continuation = "";
+                    string continuation = string.Empty;
                     if (needContinuation)
                     {
                         --end;
@@ -233,7 +230,8 @@ namespace NUnit.ConsoleRunner.Options
                     if (char.IsWhiteSpace(c))
                         ++start;
                     width = GetNextWidth(ewidths, width, ref hw);
-                } while (start < self.Length);
+                }
+                while (start < self.Length);
             }
         }
 
@@ -277,8 +275,8 @@ namespace NUnit.ConsoleRunner.Options
 
     public class OptionValueCollection : IList, IList<string>
     {
-        readonly List<string> values = new List<string>();
-        readonly OptionContext c;
+        private readonly List<string> values = new List<string>();
+        private readonly OptionContext c;
 
         internal OptionValueCollection(OptionContext c)
         {
@@ -286,44 +284,113 @@ namespace NUnit.ConsoleRunner.Options
         }
 
         #region ICollection
-        void ICollection.CopyTo(Array array, int index) { (values as ICollection).CopyTo(array, index); }
-        bool ICollection.IsSynchronized { get { return (values as ICollection).IsSynchronized; } }
-        object ICollection.SyncRoot { get { return (values as ICollection).SyncRoot; } }
+        void ICollection.CopyTo(Array array, int index)
+        {
+            (values as ICollection).CopyTo(array, index);
+        }
+        bool ICollection.IsSynchronized
+        {
+            get { return (values as ICollection).IsSynchronized; }
+        }
+        object ICollection.SyncRoot
+        {
+            get { return (values as ICollection).SyncRoot; }
+        }
         #endregion
 
         #region ICollection<T>
-        public void Add(string item) { values.Add(item); }
-        public void Clear() { values.Clear(); }
-        public bool Contains(string item) { return values.Contains(item); }
-        public void CopyTo(string[] array, int arrayIndex) { values.CopyTo(array, arrayIndex); }
-        public bool Remove(string item) { return values.Remove(item); }
-        public int Count { get { return values.Count; } }
-        public bool IsReadOnly { get { return false; } }
+        public void Add(string item)
+        {
+            values.Add(item);
+        }
+        public void Clear()
+        {
+            values.Clear();
+        }
+        public bool Contains(string item)
+        {
+            return values.Contains(item);
+        }
+        public void CopyTo(string[] array, int arrayIndex)
+        {
+            values.CopyTo(array, arrayIndex);
+        }
+        public bool Remove(string item)
+        {
+            return values.Remove(item);
+        }
+        public int Count
+        {
+            get { return values.Count; }
+        }
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
         #endregion
 
         #region IEnumerable
-        IEnumerator IEnumerable.GetEnumerator() { return values.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return values.GetEnumerator();
+        }
         #endregion
 
         #region IEnumerable<T>
-        public IEnumerator<string> GetEnumerator() { return values.GetEnumerator(); }
+        public IEnumerator<string> GetEnumerator()
+        {
+            return values.GetEnumerator();
+        }
         #endregion
 
         #region IList
-        int IList.Add(object? value) { return (values as IList).Add(value); }
-        bool IList.Contains(object? value) { return (values as IList).Contains(value); }
-        int IList.IndexOf(object? value) { return (values as IList).IndexOf(value); }
-        void IList.Insert(int index, object? value) { (values as IList).Insert(index, value); }
-        void IList.Remove(object? value) { (values as IList).Remove(value); }
-        void IList.RemoveAt(int index) { (values as IList).RemoveAt(index); }
-        bool IList.IsFixedSize { get { return false; } }
-        object? IList.this[int index] { get { return this[index]; } set { (values as IList)[index] = value; } }
+        int IList.Add(object? value)
+        {
+            return (values as IList).Add(value);
+        }
+        bool IList.Contains(object? value)
+        {
+            return (values as IList).Contains(value);
+        }
+        int IList.IndexOf(object? value)
+        {
+            return (values as IList).IndexOf(value);
+        }
+        void IList.Insert(int index, object? value)
+        {
+            (values as IList).Insert(index, value);
+        }
+        void IList.Remove(object? value)
+        {
+            (values as IList).Remove(value);
+        }
+        void IList.RemoveAt(int index)
+        {
+            (values as IList).RemoveAt(index);
+        }
+        bool IList.IsFixedSize
+        {
+            get { return false; }
+        }
+        object? IList.this[int index]
+        {
+            get { return this[index]; } set { (values as IList)[index] = value; }
+        }
         #endregion
 
         #region IList<T>
-        public int IndexOf(string item) { return values.IndexOf(item); }
-        public void Insert(int index, string item) { values.Insert(index, item); }
-        public void RemoveAt(int index) { values.RemoveAt(index); }
+        public int IndexOf(string item)
+        {
+            return values.IndexOf(item);
+        }
+        public void Insert(int index, string item)
+        {
+            values.Insert(index, item);
+        }
+        public void RemoveAt(int index)
+        {
+            values.RemoveAt(index);
+        }
 
         private void AssertValid(int index)
         {
@@ -421,13 +488,13 @@ namespace NUnit.ConsoleRunner.Options
 
     public abstract class Option
     {
-        readonly string prototype;
-        readonly string? description;
-        readonly string[] names;
-        readonly OptionValueType type;
-        readonly int count;
-        string[]? separators;
-        readonly bool hidden;
+        private readonly string prototype;
+        private readonly string? description;
+        private readonly string[] names;
+        private readonly OptionValueType type;
+        private readonly int count;
+        private string[]? separators;
+        private readonly bool hidden;
 
         protected Option(string prototype, string? description)
             : this(prototype, description, 1, false)
@@ -480,11 +547,26 @@ namespace NUnit.ConsoleRunner.Options
                         "prototype");
         }
 
-        public string Prototype { get { return prototype; } }
-        public string? Description { get { return description; } }
-        public OptionValueType OptionValueType { get { return type; } }
-        public int MaxValueCount { get { return count; } }
-        public bool Hidden { get { return hidden; } }
+        public string Prototype
+        {
+            get { return prototype; }
+        }
+        public string? Description
+        {
+            get { return description; }
+        }
+        public OptionValueType OptionValueType
+        {
+            get { return type; }
+        }
+        public int MaxValueCount
+        {
+            get { return count; }
+        }
+        public bool Hidden
+        {
+            get { return hidden; }
+        }
 
         public string[] GetNames()
         {
@@ -544,10 +626,16 @@ namespace NUnit.ConsoleRunner.Options
             return t;
         }
 
-        internal string[] Names { get { return names; } }
-        internal string[]? ValueSeparators { get { return separators; } }
+        internal string[] Names
+        {
+            get { return names; }
+        }
+        internal string[]? ValueSeparators
+        {
+            get { return separators; }
+        }
 
-        static readonly char[] NameTerminator = new char[] { '=', ':' };
+        private static readonly char[] NameTerminator = new char[] { '=', ':' };
 
         private OptionValueType ParsePrototype()
         {
@@ -649,7 +737,6 @@ namespace NUnit.ConsoleRunner.Options
 
     public abstract class ArgumentSource
     {
-
         protected ArgumentSource()
         {
         }
@@ -671,7 +758,7 @@ namespace NUnit.ConsoleRunner.Options
         }
 
         // Cribbed from mcs/driver.cs:LoadArgs(string)
-        static IEnumerable<string> GetArguments(TextReader reader, bool close)
+        private static IEnumerable<string> GetArguments(TextReader reader, bool close)
         {
             try
             {
@@ -728,7 +815,6 @@ namespace NUnit.ConsoleRunner.Options
 #if !PCL || NETSTANDARD1_3
     public class ResponseFileSource : ArgumentSource
     {
-
         public override string[] GetNames()
         {
             return new string[] { "@file" };
@@ -817,12 +903,13 @@ namespace NUnit.ConsoleRunner.Options
         {
             this.roSources = new ReadOnlyCollection<ArgumentSource>(sources);
             this.localizer = localizer ??
-                delegate (string f) {
+                delegate(string f)
+                {
                     return f;
                 };
         }
 
-        MessageLocalizerConverter localizer;
+        private MessageLocalizerConverter localizer;
 
         private new IDictionary<string, Option> Dictionary => base.Dictionary!;
 
@@ -832,14 +919,13 @@ namespace NUnit.ConsoleRunner.Options
             internal set { localizer = value; }
         }
 
-        readonly List<ArgumentSource> sources = new List<ArgumentSource>();
-        readonly ReadOnlyCollection<ArgumentSource> roSources;
+        private readonly List<ArgumentSource> sources = new List<ArgumentSource>();
+        private readonly ReadOnlyCollection<ArgumentSource> roSources;
 
         public ReadOnlyCollection<ArgumentSource> ArgumentSources
         {
             get { return roSources; }
         }
-
 
         protected override string GetKeyForItem(Option item)
         {
@@ -922,7 +1008,6 @@ namespace NUnit.ConsoleRunner.Options
 
         internal sealed class Category : Option
         {
-
             // Prototype starts with '=' because this is an invalid prototype
             // (see Option.ParsePrototype(), and thus it'll prevent Category
             // instances from being accidentally used as normal options.
@@ -937,16 +1022,15 @@ namespace NUnit.ConsoleRunner.Options
             }
         }
 
-
         public new OptionSet Add(Option option)
         {
             base.Add(option);
             return this;
         }
 
-        sealed class ActionOption : Option
+        private sealed class ActionOption : Option
         {
-            readonly Action<OptionValueCollection> action;
+            private readonly Action<OptionValueCollection> action;
 
             public ActionOption(string prototype, string? description, int count, Action<OptionValueCollection> action)
                 : this(prototype, description, count, action, false)
@@ -982,7 +1066,7 @@ namespace NUnit.ConsoleRunner.Options
             if (action == null)
                 throw new ArgumentNullException("action");
             Option p = new ActionOption(prototype, description, 1,
-                    delegate (OptionValueCollection v) { action(v[0]); }, hidden);
+                    delegate(OptionValueCollection v) { action(v[0]); }, hidden);
             base.Add(p);
             return this;
         }
@@ -1002,14 +1086,14 @@ namespace NUnit.ConsoleRunner.Options
             if (action == null)
                 throw new ArgumentNullException("action");
             Option p = new ActionOption(prototype, description, 2,
-                    delegate (OptionValueCollection v) { action(v[0], v[1]); }, hidden);
+                    delegate(OptionValueCollection v) { action(v[0], v[1]); }, hidden);
             base.Add(p);
             return this;
         }
 
-        sealed class ActionOption<T> : Option
+        private sealed class ActionOption<T> : Option
         {
-            readonly Action<T> action;
+            private readonly Action<T> action;
 
             public ActionOption(string prototype, string? description, Action<T> action)
                 : base(prototype, description, 1)
@@ -1025,9 +1109,9 @@ namespace NUnit.ConsoleRunner.Options
             }
         }
 
-        sealed class ActionOption<TKey, TValue> : Option
+        private sealed class ActionOption<TKey, TValue> : Option
         {
-            readonly OptionAction<TKey, TValue> action;
+            private readonly OptionAction<TKey, TValue> action;
 
             public ActionOption(string prototype, string? description, OptionAction<TKey, TValue> action)
                 : base(prototype, description, 2)
@@ -1111,9 +1195,9 @@ namespace NUnit.ConsoleRunner.Options
             return unprocessed;
         }
 
-        class ArgumentEnumerator : IEnumerable<string>
+        private class ArgumentEnumerator : IEnumerable<string>
         {
-            readonly List<IEnumerator<string>> sources = new List<IEnumerator<string>>();
+            private readonly List<IEnumerator<string>> sources = new List<IEnumerator<string>>();
 
             public ArgumentEnumerator(IEnumerable<string> arguments)
             {
@@ -1137,7 +1221,8 @@ namespace NUnit.ConsoleRunner.Options
                         c.Dispose();
                         sources.RemoveAt(sources.Count - 1);
                     }
-                } while (sources.Count > 0);
+                }
+                while (sources.Count > 0);
             }
 
             IEnumerator IEnumerable.GetEnumerator()
@@ -1146,7 +1231,7 @@ namespace NUnit.ConsoleRunner.Options
             }
         }
 
-        bool AddSource(ArgumentEnumerator ae, string argument)
+        private bool AddSource(ArgumentEnumerator ae, string argument)
         {
             foreach (ArgumentSource source in sources)
             {
@@ -1328,8 +1413,8 @@ namespace NUnit.ConsoleRunner.Options
         private const int Description_FirstWidth = 80 - OptionWidth;
         private const int Description_RemWidth = 80 - OptionWidth - 2;
 
-        static readonly string CommandHelpIndentStart = new string(' ', OptionWidth);
-        static readonly string CommandHelpIndentRemaining = new string(' ', OptionWidth + 2);
+        private static readonly string CommandHelpIndentStart = new string(' ', OptionWidth);
+        private static readonly string CommandHelpIndentRemaining = new string(' ', OptionWidth + 2);
 
         public void WriteOptionDescriptions(TextWriter o)
         {
@@ -1343,7 +1428,7 @@ namespace NUnit.ConsoleRunner.Options
                 Category? c = p as Category;
                 if (c != null)
                 {
-                    WriteDescription(o, p.Description, "", 80, 80);
+                    WriteDescription(o, p.Description, string.Empty, 80, 80);
                     continue;
                 }
                 CommandOption? co = p as CommandOption;
@@ -1406,12 +1491,12 @@ namespace NUnit.ConsoleRunner.Options
             }
             else
             {
-                WriteDescription(o, name, "", 80, 80);
+                WriteDescription(o, name, string.Empty, 80, 80);
                 WriteDescription(o, CommandHelpIndentStart + c.Help, CommandHelpIndentRemaining, 80, Description_RemWidth);
             }
         }
 
-        void WriteDescription(TextWriter o, string? value, string prefix, int firstWidth, int remWidth)
+        private void WriteDescription(TextWriter o, string? value, string prefix, int firstWidth, int remWidth)
         {
             bool indent = false;
             foreach (string line in GetLines(localizer(GetDescription(value)), firstWidth, remWidth))
@@ -1423,7 +1508,7 @@ namespace NUnit.ConsoleRunner.Options
             }
         }
 
-        bool WriteOptionPrototype(TextWriter o, Option p, ref int written)
+        private bool WriteOptionPrototype(TextWriter o, Option p, ref int written)
         {
             string[] names = p.Names;
 
@@ -1473,7 +1558,7 @@ namespace NUnit.ConsoleRunner.Options
             return true;
         }
 
-        static int GetNextOptionIndex(string[] names, int i)
+        private static int GetNextOptionIndex(string[] names, int i)
         {
             while (i < names.Length && names[i] == "<>")
             {
@@ -1482,16 +1567,16 @@ namespace NUnit.ConsoleRunner.Options
             return i;
         }
 
-        static void Write(TextWriter o, ref int n, string s)
+        private static void Write(TextWriter o, ref int n, string s)
         {
             n += s.Length;
             o.Write(s);
         }
 
-        static string GetArgumentName(int index, int maxIndex, string? description)
+        private static string GetArgumentName(int index, int maxIndex, string? description)
         {
-            var matches = Regex.Matches(description ?? "", @"(?<=(?<!\{)\{)[^{}]*(?=\}(?!\}))"); // ignore double braces 
-            string argName = "";
+            var matches = Regex.Matches(description ?? string.Empty, @"(?<=(?<!\{)\{)[^{}]*(?=\}(?!\}))"); // ignore double braces
+            string argName = string.Empty;
             foreach (Match match in matches)
             {
                 var parts = match.Value.Split(':');
@@ -1589,7 +1674,7 @@ namespace NUnit.ConsoleRunner.Options
             Help = help;
         }
 
-        static string NormalizeCommandName(string name)
+        private static string NormalizeCommandName(string name)
         {
             var value = new StringBuilder(name.Length);
             var space = false;
@@ -1617,7 +1702,7 @@ namespace NUnit.ConsoleRunner.Options
         }
     }
 
-    class CommandOption : Option
+    internal class CommandOption : Option
     {
         public Command Command { get; }
         public string CommandName { get; }
@@ -1640,10 +1725,10 @@ namespace NUnit.ConsoleRunner.Options
         }
     }
 
-    class HelpOption : Option
+    internal class HelpOption : Option
     {
-        readonly Option option;
-        readonly CommandSet commands;
+        private readonly Option option;
+        private readonly CommandSet commands;
 
         public HelpOption(CommandSet commands, Option d)
             : base(d.Prototype, d.Description, d.MaxValueCount, d.Hidden)
@@ -1660,9 +1745,9 @@ namespace NUnit.ConsoleRunner.Options
         }
     }
 
-    class CommandOptionSet : OptionSet
+    internal class CommandOptionSet : OptionSet
     {
-        readonly CommandSet commands;
+        private readonly CommandSet commands;
 
         public CommandOptionSet(CommandSet commands, MessageLocalizerConverter? localizer)
             : base(localizer)
@@ -1680,7 +1765,7 @@ namespace NUnit.ConsoleRunner.Options
             base.SetItem(index, item);
         }
 
-        bool ShouldWrapOption(Option item)
+        private bool ShouldWrapOption(Option item)
         {
             if (item == null)
                 return false;
@@ -1708,11 +1793,11 @@ namespace NUnit.ConsoleRunner.Options
 
     public class CommandSet : KeyedCollection<string, Command>
     {
-        readonly string suite;
+        private readonly string suite;
 
-        OptionSet options;
-        TextWriter outWriter;
-        TextWriter errorWriter;
+        private OptionSet options;
+        private TextWriter outWriter;
+        private TextWriter errorWriter;
 
         internal List<CommandSet>? NestedCommandSets;
 
@@ -1763,7 +1848,7 @@ namespace NUnit.ConsoleRunner.Options
             return this;
         }
 
-        void AddCommand(Command value)
+        private void AddCommand(Command value)
         {
             if (value.CommandSet != null && value.CommandSet != this)
             {
@@ -1891,7 +1976,7 @@ namespace NUnit.ConsoleRunner.Options
             return this;
         }
 
-        bool AlreadyAdded(CommandSet value)
+        private bool AlreadyAdded(CommandSet value)
         {
             if (value == this)
                 return true;
@@ -1933,10 +2018,10 @@ namespace NUnit.ConsoleRunner.Options
             }
         }
 
-        static void ExtractToken([NotNull] ref string? input, out string rest)
+        private static void ExtractToken([NotNull] ref string? input, out string rest)
         {
-            rest = "";
-            input = input ?? "";
+            rest = string.Empty;
+            input = input ?? string.Empty;
 
             int top = input.Length;
             for (int i = 0; i < top; i++)
@@ -1953,7 +2038,7 @@ namespace NUnit.ConsoleRunner.Options
                         return;
                     }
                 }
-                rest = "";
+                rest = string.Empty;
                 if (i != 0)
                     input = input.Substring(i).Trim();
                 return;
@@ -1974,11 +2059,11 @@ namespace NUnit.ConsoleRunner.Options
             Action<string> setHelp = v => showHelp = v != null;
             if (!options.Contains("help"))
             {
-                options.Add("help", "", setHelp, hidden: true);
+                options.Add("help", string.Empty, setHelp, hidden: true);
             }
             if (!options.Contains("?"))
             {
-                options.Add("?", "", setHelp, hidden: true);
+                options.Add("?", string.Empty, setHelp, hidden: true);
             }
             var extra = options.Parse(arguments);
             if (extra.Count == 0)
@@ -2014,7 +2099,7 @@ namespace NUnit.ConsoleRunner.Options
             return TryGetLocalCommand(extra) ?? TryGetNestedCommand(extra);
         }
 
-        Command? TryGetLocalCommand(List<string> extra)
+        private Command? TryGetLocalCommand(List<string> extra)
         {
             var name = extra[0];
             if (Contains(name))
@@ -2033,7 +2118,7 @@ namespace NUnit.ConsoleRunner.Options
             return null;
         }
 
-        Command? TryGetNestedCommand(List<string> extra)
+        private Command? TryGetNestedCommand(List<string> extra)
         {
             if (NestedCommandSets == null)
                 return null;
@@ -2109,7 +2194,7 @@ namespace NUnit.ConsoleRunner.Options
             return command.Invoke(new[] { "--help" });
         }
 
-        List<KeyValuePair<string, Command>> GetCommands()
+        private List<KeyValuePair<string, Command>> GetCommands()
         {
             var commands = new List<KeyValuePair<string, Command>>();
 
@@ -2125,13 +2210,13 @@ namespace NUnit.ConsoleRunner.Options
 
             foreach (var nc in commandSet.NestedCommandSets)
             {
-                AddNestedCommands(commands, "", nc);
+                AddNestedCommands(commands, string.Empty, nc);
             }
 
             return commands;
         }
 
-        void AddNestedCommands(List<KeyValuePair<string, Command>> commands, string outer, CommandSet value)
+        private void AddNestedCommands(List<KeyValuePair<string, Command>> commands, string outer, CommandSet value)
         {
             foreach (var v in value)
             {
@@ -2154,4 +2239,3 @@ namespace NUnit.ConsoleRunner.Options
         }
     }
 }
-

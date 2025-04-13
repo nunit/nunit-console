@@ -46,9 +46,9 @@ namespace NUnit.Engine.Services
         }
 
 #if DEBUG
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
+        private const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
 #else
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
+        private const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
 #endif
 
         [TestCase("net35", false)]
@@ -63,7 +63,7 @@ namespace NUnit.Engine.Services
 
             var returnValue = _runtimeService.SelectRuntimeFramework(package);
 
-            Assert.That(package.GetSetting("TargetRuntimeFramework", ""), Is.EqualTo(returnValue));
+            Assert.That(package.GetSetting("TargetRuntimeFramework", string.Empty), Is.EqualTo(returnValue));
             Assert.That(package.GetSetting("RunAsX86", false), Is.EqualTo(runAsX86));
         }
 
@@ -143,7 +143,7 @@ namespace NUnit.Engine.Services
             Assume.That(_runtimeService.IsAvailable("net-4.0", false));
             Assume.That(_runtimeService.IsAvailable("net-4.0", true));
 
-            var topLevelPackage = new TestPackage(new [] {"a.dll", "b.dll"});
+            var topLevelPackage = new TestPackage(new string[] { "a.dll", "b.dll" });
 
             var net20Package = topLevelPackage.SubPackages[0];
             net20Package.Settings.Add(EnginePackageSettings.ImageRuntimeVersion, new Version("2.0"));
