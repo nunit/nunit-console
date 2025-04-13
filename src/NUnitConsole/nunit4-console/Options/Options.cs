@@ -184,6 +184,8 @@ using MessageLocalizerConverter = System.Func<string, string>;
 using MessageLocalizerConverter = System.Converter<string, string>;
 #endif
 
+using NUnit.Common;
+
 namespace NUnit.ConsoleRunner.Options
 {
     static class StringCoda
@@ -738,7 +740,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public override bool GetArguments(string value, [NotNullWhen(true)] out IEnumerable<string>? replacement)
         {
-            if (string.IsNullOrEmpty(value) || !value.StartsWith("@"))
+            if (string.IsNullOrEmpty(value) || !value.StartsWith('@'))
             {
                 replacement = null;
                 return false;

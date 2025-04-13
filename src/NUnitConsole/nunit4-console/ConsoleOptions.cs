@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using NUnit.Common;
 
 namespace NUnit.ConsoleRunner
 {
@@ -311,7 +312,7 @@ namespace NUnit.ConsoleRunner
             // Default
             this.Add("<>", v =>
             {
-                if (v.StartsWith("-") || v.StartsWith("/") && Path.DirectorySeparatorChar != '/')
+                if (v.StartsWith('-') || v.StartsWith('/') && Path.DirectorySeparatorChar != '/')
                     ErrorMessages.Add("Invalid argument: " + v);
                 else
                     InputFiles.Add(v);
