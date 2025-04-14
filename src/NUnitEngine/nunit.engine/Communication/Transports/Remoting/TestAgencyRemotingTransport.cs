@@ -68,15 +68,15 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         [System.Runtime.Remoting.Messaging.OneWay]
         public void Stop()
         {
-            lock( _theLock )
+            lock (_theLock)
             {
-                if ( this._isMarshalled )
+                if (this._isMarshalled)
                 {
-                    RemotingServices.Disconnect( this );
+                    RemotingServices.Disconnect(this);
                     this._isMarshalled = false;
                 }
 
-                if ( this._channel != null )
+                if (this._channel != null)
                 {
                     try
                     {
@@ -90,7 +90,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
                     }
                 }
 
-                Monitor.PulseAll( _theLock );
+                Monitor.PulseAll(_theLock);
             }
         }
 
@@ -101,9 +101,9 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
         public void WaitForStop()
         {
-            lock( _theLock )
+            lock (_theLock)
             {
-                Monitor.Wait( _theLock );
+                Monitor.Wait(_theLock);
             }
         }
 

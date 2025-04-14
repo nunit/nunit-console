@@ -5,7 +5,7 @@ using System;
 namespace NUnit.Engine
 {
     /// <summary>
-    /// The ITestAgency interface is implemented by a TestAgency in 
+    /// The ITestAgency interface is implemented by a TestAgency in
     /// order to allow TestAgents to register with it.
     /// </summary>
     public interface ITestAgency

@@ -68,7 +68,7 @@ namespace NUnit.Engine
         public void Wait_AllowsMultipleWaits()
         {
             _asyncResult.SetResult(new TestEngineResult());
-            
+
             Assert.That(_asyncResult.Wait(0), Is.True, "Expected wait to be true because the test is complete");
 
             Assert.That(_asyncResult.Wait(0), Is.True, "Expected the second wait to be non blocking");

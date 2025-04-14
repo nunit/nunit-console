@@ -9,7 +9,9 @@ namespace NUnit.Extensibility.Wrappers
     /// </summary>
     public class TestEventListenerWrapper : ExtensionWrapper, ITestEventListener
     {
-        public TestEventListenerWrapper(object listener) : base(listener) { }
+        public TestEventListenerWrapper(object listener) : base(listener)
+        {
+        }
 
         public void OnTestEvent(string report)
         {

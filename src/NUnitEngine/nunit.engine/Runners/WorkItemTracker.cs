@@ -11,16 +11,16 @@ namespace NUnit.Engine.Runners
 {
     /// <summary>
     /// Test Frameworks, don't always handle cancellation. Those that do may
-    /// not always handle it correctly. In fact, even NUnit itself, through 
+    /// not always handle it correctly. In fact, even NUnit itself, through
     /// at least release 3.12, fails to cancel a test that's in an infinite
     /// loop. In addition, it's possible for user code to defeat cancellation,
     /// even forced cancellation or kill.
-    /// 
+    ///
     /// The engine needs to protect itself from such problems by assuring that
     /// any test for which cancellation is requested is fully cancelled, with
     /// nothing left behind. Further, it needs to generate notifications to
     /// tell the runner what happened.
-    /// 
+    ///
     /// WorkItemTracker examines test events and keeps track of those tests
     /// that have started but not yet finished. It implements ITestEventListener
     /// in order to capture events. It allows waiting for all items to complete.
@@ -59,7 +59,7 @@ namespace NUnit.Engine.Runners
                 if (other == null)
                     return -1;
 
-                return  _order.CompareTo(other._order) * -1;
+                return _order.CompareTo(other._order) * -1;
             }
         }
 

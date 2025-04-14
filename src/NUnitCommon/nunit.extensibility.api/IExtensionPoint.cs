@@ -15,7 +15,7 @@ namespace NUnit.Extensibility
         /// Gets the unique path identifying this extension point.
         /// </summary>
         string Path { get; }
-    
+
         /// <summary>
         /// Gets the description of this extension point. May be null.
         /// </summary>
@@ -32,4 +32,3 @@ namespace NUnit.Extensibility
         IEnumerable<IExtensionNode> Extensions { get; }
     }
 }
-

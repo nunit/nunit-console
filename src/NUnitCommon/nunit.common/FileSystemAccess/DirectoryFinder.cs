@@ -48,10 +48,10 @@ namespace NUnit.FileSystemAccess
                 else
                 {
                     range = pattern;
-                    pattern = "";
+                    pattern = string.Empty;
                 }
 
-                if (range == "." || range == "")
+                if (range == "." || range == string.Empty)
                     continue;
 
                 dirList = ExpandOneStep(dirList, range);
@@ -89,7 +89,7 @@ namespace NUnit.FileSystemAccess
 
             foreach (var dir in dirList)
             {
-                if (pattern == "." || pattern == "")
+                if (pattern == "." || pattern == string.Empty)
                     newList.Add(dir);
                 else if (pattern == "..")
                 {
@@ -102,12 +102,14 @@ namespace NUnit.FileSystemAccess
                     // add the directory itself to start out.
                     newList.Add(dir);
                     var subDirs = dir.GetDirectories("*", SearchOption.AllDirectories);
-                    if (subDirs.Any()) newList.AddRange(subDirs);
+                    if (subDirs.Any())
+                        newList.AddRange(subDirs);
                 }
                 else
                 {
                     var subDirs = dir.GetDirectories(pattern, SearchOption.TopDirectoryOnly);
-                    if (subDirs.Any()) newList.AddRange(subDirs);
+                    if (subDirs.Any())
+                        newList.AddRange(subDirs);
                 }
             }
 

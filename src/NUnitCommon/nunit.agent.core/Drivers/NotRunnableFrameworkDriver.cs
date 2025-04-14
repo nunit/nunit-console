@@ -48,7 +48,6 @@ namespace NUnit.Engine.Drivers
 
         public string ID { get; }
 
-        
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
             return GetLoadResult();
@@ -61,7 +60,7 @@ namespace NUnit.Engine.Drivers
 
         public string Run(ITestEventListener? listener, string filter)
         {
-            return string.Format(RUN_RESULT_FORMAT, 
+            return string.Format(RUN_RESULT_FORMAT,
                 _type, TestID, _name, _fullname, _runstate, _result, _label, _message);
         }
 
@@ -94,7 +93,7 @@ namespace NUnit.Engine.Drivers
         private string TestID => ID + "-1";
     }
 
-    public class InvalidAssemblyFrameworkDriver :NotRunnableFrameworkDriver
+    public class InvalidAssemblyFrameworkDriver : NotRunnableFrameworkDriver
     {
         public InvalidAssemblyFrameworkDriver(string assemblyPath, string id, string message)
             : base(assemblyPath, id, message)

@@ -5,9 +5,8 @@ using NUnit.Framework;
 
 namespace NUnit.Engine
 {
-    class InstantiateEngineInsideTest
+    internal class InstantiateEngineInsideTest
     {
-
         /// <summary>
         /// Historically it wasn't possible to instantiate a full engine inside
         /// a running NUnit test due to issues with URI collisions for
@@ -40,6 +39,5 @@ namespace NUnit.Engine
                 // No action
             }
         }
-
     }
 }

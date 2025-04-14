@@ -119,10 +119,14 @@ namespace NUnit.TestData
             [Test(Description="Mock Test #1")]
             [Category("MockCategory")]
             [Property("Severity", "Critical")]
-            public void TestWithDescription() { }
+            public void TestWithDescription()
+            {
+            }
 
             [Test]
-            protected static void NonPublicTest() { }
+            protected static void NonPublicTest()
+            {
+            }
 
             [Test]
             public void FailingTest()
@@ -138,13 +142,19 @@ namespace NUnit.TestData
             }
 
             [Test, Ignore("Ignore Message")]
-            public void IgnoreTest() { }
+            public void IgnoreTest()
+            {
+            }
 
             [Test, Explicit]
-            public void ExplicitTest() { }
+            public void ExplicitTest()
+            {
+            }
 
             [Test]
-            public void NotRunnableTest( int a, int b) { }
+            public void NotRunnableTest(int a, int b)
+            {
+            }
 
             [Test]
             public void InconclusiveTest()
@@ -175,7 +185,8 @@ namespace NUnit.TestData
 
             [Test]
             public virtual void TestCase()
-            {}
+            {
+            }
         }
     }
 
@@ -201,16 +212,22 @@ namespace NUnit.TestData
         public const int Suites = 1;
 
         [Test]
-        public void Test1() { }
+        public void Test1()
+        {
+        }
 
         [Test]
-        public void Test2() { }
+        public void Test2()
+        {
+        }
 
         [Test]
-        public void Test3() { }
+        public void Test3()
+        {
+        }
     }
 
-    [TestFixture,Explicit]
+    [TestFixture, Explicit]
     public class ExplicitFixture
     {
         public const int Tests = 2;
@@ -218,10 +235,14 @@ namespace NUnit.TestData
         public const int Nodes = Tests + Suites;
 
         [Test]
-        public void Test1() { }
+        public void Test1()
+        {
+        }
 
         [Test]
-        public void Test2() { }
+        public void Test2()
+        {
+        }
     }
 
     [TestFixture]
@@ -230,10 +251,14 @@ namespace NUnit.TestData
         public const int Tests = 1;
         public const int Suites = 1;
 
-        public BadFixture(int val) { }
+        public BadFixture(int val)
+        {
+        }
 
         [Test]
-        public void SomeTest() { }
+        public void SomeTest()
+        {
+        }
     }
 
     [TestFixture]
@@ -246,7 +271,7 @@ namespace NUnit.TestData
         [TestCase(9, 11, ExpectedResult=20)]
         public int MethodWithParameters(int x, int y)
         {
-            return x+y;
+            return x + y;
         }
 
         [TestCase(2, 4)]
@@ -263,13 +288,19 @@ namespace NUnit.TestData
         public const int Tests = 4;
         public const int Suites = 3;
 
-        public ParameterizedFixture(int num) { }
+        public ParameterizedFixture(int num)
+        {
+        }
 
         [Test]
-        public void Test1() { }
+        public void Test1()
+        {
+        }
 
         [Test]
-        public void Test2() { }
+        public void Test2()
+        {
+        }
     }
 
     public class GenericFixtureConstants
@@ -282,13 +313,19 @@ namespace NUnit.TestData
     [TestFixture(11.5)]
     public class GenericFixture<T>
     {
-        public GenericFixture(T num){ }
+        public GenericFixture(T num)
+        {
+        }
 
         [Test]
-        public void Test1() { }
+        public void Test1()
+        {
+        }
 
         [Test]
-        public void Test2() { }
+        public void Test2()
+        {
+        }
     }
 
     [TestFixture]
@@ -298,10 +335,14 @@ namespace NUnit.TestData
         public const int Tests = 2;
 
         [Test]
-        public void Test1() { }
+        public void Test1()
+        {
+        }
 
         [Test]
-        public void Test2() { }
+        public void Test2()
+        {
+        }
 
         public void Dispose()
         {
@@ -316,10 +357,14 @@ namespace NUnit.TestData
         public const int Tests = 2;
 
         [Test]
-        public void Test1() { }
+        public void Test1()
+        {
+        }
 
         [Test]
-        public void Test2() { }
+        public void Test2()
+        {
+        }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
@@ -347,14 +392,18 @@ namespace NUnit.TestData
         public class Fixture1
         {
             [Test]
-            public void Test1() { }
+            public void Test1()
+            {
+            }
         }
 
         [TestFixture]
         public class Fixture2
         {
             [Test]
-            public void Test1() { }
+            public void Test1()
+            {
+            }
         }
     }
 }

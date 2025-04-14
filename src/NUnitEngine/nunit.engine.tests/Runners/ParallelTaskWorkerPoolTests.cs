@@ -101,7 +101,9 @@ namespace NUnit.Engine.Runners
 
         private class NoOpTask : ITestExecutionTask
         {
-            public void Execute() { }
+            public void Execute()
+            {
+            }
         }
 
         private enum BusyTaskState

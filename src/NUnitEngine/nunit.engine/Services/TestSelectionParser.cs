@@ -198,7 +198,8 @@ namespace NUnit.Engine
         {
             Token op = Expect(LPAREN, NOT_OP);
 
-            if (op == NOT_OP) Expect(LPAREN);
+            if (op == NOT_OP)
+                Expect(LPAREN);
 
             string result = ParseFilterExpression();
 

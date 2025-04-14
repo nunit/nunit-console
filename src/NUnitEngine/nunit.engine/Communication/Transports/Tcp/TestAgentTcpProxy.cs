@@ -19,7 +19,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         public TestAgentTcpProxy(Socket socket, Guid id)
         {
            _socket = socket;
-            Id = id;
+           Id = id;
         }
 
         public Guid Id { get; }

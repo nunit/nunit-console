@@ -24,16 +24,17 @@ namespace NUnit.Engine.Integration
 
         public void Dispose()
         {
-            for (;;) try
-            {
-                File.Delete(AgentExe);
-                File.Delete(AgentX86Exe);
-                break;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                Thread.Sleep(100);
-            }
+            for (; ;)
+                try
+                {
+                    File.Delete(AgentExe);
+                    File.Delete(AgentX86Exe);
+                    break;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    Thread.Sleep(100);
+                }
 
             directory.Dispose();
         }

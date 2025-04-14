@@ -23,7 +23,7 @@ namespace NUnit.Engine.Runners
         // AggregatingTestRunners.
         //
         // AggregatingTestRunner is used in the engine/runner process as well as in agent
-        // processes. It may be called with a TestPackage that specifies a single 
+        // processes. It may be called with a TestPackage that specifies a single
         // assembly, multiple assemblies, a single project, multiple projects or
         // a mix of projects and assemblies. Each file passed is handled by
         // a single runner.
@@ -154,7 +154,8 @@ namespace NUnit.Engine.Runners
                 RunTestsInParallel(listener, filter, results, disposeRunners);
             }
 
-            if (disposeRunners) Runners.Clear();
+            if (disposeRunners)
+                Runners.Clear();
 
             return ResultHelper.Merge(results);
         }

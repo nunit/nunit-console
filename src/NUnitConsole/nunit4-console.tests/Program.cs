@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace NUnit.Engine.Tests
 {
-    class Program
+    internal class Program
     {
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             return new NUnitLite.TextRunner(typeof(Program).Assembly).Execute(args);
         }

@@ -8,7 +8,6 @@ using NUnit.Engine.Drivers;
 
 namespace NUnit.Engine.Services
 {
-
     public class TestFilteringTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
@@ -55,7 +54,6 @@ namespace NUnit.Engine.Services
             builder.AddTest(testName);
 
             Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(count));
-
         }
 
         [TestCase("test==NUnit.TestData.Assemblies.MockTestFixture", MockTestFixture.Tests, TestName = "{m}_MockTestFixture")]
@@ -71,7 +69,6 @@ namespace NUnit.Engine.Services
             builder.SelectWhere(expression);
 
             Assert.That(_driver.CountTestCases(builder.GetFilter().Text), Is.EqualTo(count));
-
         }
     }
 }

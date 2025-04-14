@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 namespace NUnit.ConsoleRunner
 {
-    class ExceptionHelperTests
+    internal class ExceptionHelperTests
     {
         [TestCaseSource(nameof(TestCases))]
         public void TestMessageContainsAllInnerExceptions(Exception ex, params Type[] expectedExceptions)
@@ -58,6 +58,5 @@ namespace NUnit.ConsoleRunner
                     .SetName("{m}(LoaderException)");
             }
         }
-
     }
 }

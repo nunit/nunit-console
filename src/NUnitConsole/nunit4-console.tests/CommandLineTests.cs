@@ -199,7 +199,7 @@ namespace NUnit.ConsoleRunner
        // We can't predict which runtimes are available on the test machine, so we don't
         // test for any good or bad values. TODO: Create a fake list of availble runtimes.
         [TestCase("RuntimeFramework", "framework", new string[0], new string[0])]
-        [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0] )]
+        [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0])]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
 #endif
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)
@@ -570,7 +570,7 @@ namespace NUnit.ConsoleRunner
             Assume.That(testListPath, Does.Exist);
             var options = ConsoleMocks.Options("--testlist=" + testListPath);
             Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.TestList, Is.EqualTo(new[] {"AmazingTest"}));
+            Assert.That(options.TestList, Is.EqualTo(new[] { "AmazingTest" }));
         }
 
         [Test]

@@ -8,16 +8,16 @@ using System.IO;
 namespace NUnit.Agents
 {
     /// <summary>
-    /// All agents, either built-in or pluggable, must be able to 
+    /// All agents, either built-in or pluggable, must be able to
     /// handle the options defined in this class. In some cases,
     /// it may be permissible to ignore them but they should never
     /// give rise to an error.
     /// </summary>
     public class AgentOptions
     {
-        static readonly char[] DELIMS = new[] { '=', ':' };
+        private static readonly char[] DELIMS = new[] { '=', ':' };
         // Dictionary containing valid options with bool value true if a value is required.
-        static readonly Dictionary<string, bool> VALID_OPTIONS = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, bool> VALID_OPTIONS = new Dictionary<string, bool>();
 
         static AgentOptions()
         {

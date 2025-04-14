@@ -11,12 +11,12 @@ namespace NUnit.Engine
     /// be loaded by a TestRunner. Each TestPackage represents
     /// tests for one or more test files. TestPackages may be named
     /// or anonymous, depending on the constructor used.
-    /// 
+    ///
     /// Upon construction, a package is given an ID (string), which
     /// remains unchanged for the lifetime of the TestPackage instance.
     /// The package ID is passed to the test framework for use in generating
     /// test IDs.
-    /// 
+    ///
     /// A runner that reloads test assemblies and wants the ids to remain stable
     /// should avoid creating a new package but should instead use the original
     /// package, changing settings as needed. This gives the best chance for the
@@ -95,7 +95,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string,object> Settings { get; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Settings { get; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Add a subpackage to the package.

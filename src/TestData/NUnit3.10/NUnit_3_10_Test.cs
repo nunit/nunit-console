@@ -8,6 +8,9 @@ namespace NUnit.Engine.TestData
     public class NUnit_3_10_Test
     {
         [Test]
-        public void Test() { Assert.Pass("test passes"); }
+        public void Test()
+        {
+            Assert.Pass("test passes");
+        }
     }
 }

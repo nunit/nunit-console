@@ -12,18 +12,18 @@ namespace NUnit.Engine
     /// by the test engine for most operations. The XML is
     /// stored as a string in order to allow serialization
     /// and actual XmlNodes are created on demand.
-    /// 
+    ///
     /// In principal, there should only be one XmlNode in
     /// a result. However, as work progresses, there may
     /// temporarily be multiple nodes, which have not yet
     /// been aggregated under a higher level suite. For
     /// that reason, TestEngineResult maintains a list
     /// of XmlNodes and another of the corresponding text.
-    /// 
+    ///
     /// Static methods are provided for aggregating the
     /// internal XmlNodes into a single node as well as
     /// for combining multiple TestEngineResults into one.
-    /// 
+    ///
     /// </summary>
     [Serializable]
     public class TestEngineResult
@@ -63,7 +63,7 @@ namespace NUnit.Engine
         /// Gets a flag indicating whether this is a single result
         /// having only one XmlNode associated with it.
         /// </summary>
-        public bool IsSingle 
+        public bool IsSingle
         {
             get { return _xmlText.Count == 1; }
         }
@@ -100,13 +100,13 @@ namespace NUnit.Engine
         /// </exception>
         public XmlNode Xml
         {
-            get 
+            get
             {
                 // TODO: Fix this in some way and also allow for a count of zero
                 if (!IsSingle)
                     throw new InvalidOperationException("May not use 'Xml' property on a result with multiple XmlNodes");
-                    
-                return XmlNodes[0]; 
+
+                return XmlNodes[0];
             }
         }
 

@@ -15,7 +15,10 @@ namespace NUnit.Extensibility.Wrappers
     /// </summary>
     public class ProjectLoaderWrapper : ExtensionWrapper, IProjectLoader
     {
-        public ProjectLoaderWrapper(object projectLoader) : base(projectLoader) { log.Debug("Creating ProjectLoaderWrapper"); }
+        public ProjectLoaderWrapper(object projectLoader) : base(projectLoader)
+        {
+            log.Debug("Creating ProjectLoaderWrapper");
+        }
 
         public bool CanLoadFrom(string path)
         {
@@ -31,7 +34,9 @@ namespace NUnit.Extensibility.Wrappers
 
         public class ProjectWrapper : ExtensionWrapper, IProject
         {
-            public ProjectWrapper(object wrappedInstance) : base(wrappedInstance) { }
+            public ProjectWrapper(object wrappedInstance) : base(wrappedInstance)
+            {
+            }
 
             public string ProjectPath => GetProperty<string>(nameof(ProjectPath)).ShouldNotBeNull();
 
@@ -65,7 +70,9 @@ namespace NUnit.Extensibility.Wrappers
 
         public class TestPackageWrapper : ExtensionWrapper, ITestPackage
         {
-            public TestPackageWrapper(object wrappedInstance) : base(wrappedInstance) { }
+            public TestPackageWrapper(object wrappedInstance) : base(wrappedInstance)
+            {
+            }
 
             public IDictionary<string, object> Settings => throw new NotImplementedException();
 

@@ -22,7 +22,7 @@ namespace NUnit.ConsoleRunner
         [Test]
         public void MultipleAssemblies()
         {
-            var names = new [] { "test1.dll", "test2.dll", "test3.dll" };
+            var names = new string[] { "test1.dll", "test2.dll", "test3.dll" };
             var options = ConsoleMocks.Options(names);
             var package = ConsoleRunner.MakeTestPackage(options);
 
@@ -111,6 +111,5 @@ namespace NUnit.ConsoleRunner
 
             Assert.That(package.Settings.Keys, Is.EquivalentTo(new string[] { "WorkDirectory", "DisposeRunners" }));
         }
-
     }
 }

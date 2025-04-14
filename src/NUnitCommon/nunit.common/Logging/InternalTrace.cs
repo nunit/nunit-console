@@ -8,14 +8,14 @@ namespace NUnit
 {
     /// <summary>
     /// InternalTrace provides facilities for tracing the execution
-    /// of the NUnit framework. Tests and classes under test may make use 
+    /// of the NUnit framework. Tests and classes under test may make use
     /// of Console writes, System.Diagnostics.Trace or various loggers and
     /// NUnit itself traps and processes each of them. For that reason, a
     /// separate internal trace is needed.
-    /// 
+    ///
     /// Note:
     /// InternalTrace uses a global lock to allow multiple threads to write
-    /// trace messages. This can easily make it a bottleneck so it must be 
+    /// trace messages. This can easily make it a bottleneck so it must be
     /// used sparingly. Keep the trace Level as low as possible and only
     /// insert InternalTrace writes where they are needed.
     /// TODO: add some buffering and a separate writer thread as an option.

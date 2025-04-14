@@ -25,9 +25,8 @@ namespace NUnit.Engine.Runners
             _processorCount = processorCount <= 0
                 ? Environment.ProcessorCount
                 : processorCount;
-
         }
-        
+
         public override int LevelOfParallelism
         {
             get

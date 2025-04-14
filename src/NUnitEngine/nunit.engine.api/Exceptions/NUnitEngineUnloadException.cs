@@ -6,18 +6,16 @@ using System.Runtime.Serialization;
 
 namespace NUnit.Engine
 {
-
     /// <summary>
     /// NUnitEngineUnloadException is thrown when a test run has completed successfully
     /// but one or more errors were encountered when attempting to unload
     /// and shut down the test run cleanly.
     /// </summary>
     [Serializable]
-    public class NUnitEngineUnloadException : NUnitEngineException  //Inherits from NUnitEngineException for backwards compatibility of calling runners
+    public class NUnitEngineUnloadException : NUnitEngineException // Inherits from NUnitEngineException for backwards compatibility of calling runners
     {
         private const string AggregatedExceptionsMsg =
             "Multiple exceptions encountered. Retrieve AggregatedExceptions property for more information";
-
 
         /// <summary>
         /// Construct with a message
@@ -44,7 +42,9 @@ namespace NUnit.Engine
         /// <summary>
         /// Serialization constructor.
         /// </summary>
-        public NUnitEngineUnloadException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        public NUnitEngineUnloadException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
         /// <summary>
         /// Gets the collection of exceptions .

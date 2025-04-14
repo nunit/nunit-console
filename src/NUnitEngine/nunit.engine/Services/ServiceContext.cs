@@ -19,7 +19,10 @@ namespace NUnit.Engine
 
         public ServiceManager ServiceManager { get; }
 
-        public int ServiceCount { get { return ServiceManager.ServiceCount; } }
+        public int ServiceCount
+        {
+            get { return ServiceManager.ServiceCount; }
+        }
 
         public void Add(IService service)
         {
@@ -27,7 +30,8 @@ namespace NUnit.Engine
             service.ServiceContext = this;
         }
 
-        public T GetService<T>() where T : class
+        public T GetService<T>()
+            where T : class
         {
             return (T)ServiceManager.GetService(typeof(T));
         }

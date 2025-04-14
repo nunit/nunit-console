@@ -9,7 +9,7 @@ namespace NUnit.Engine.Services
 {
     public class TestFilterBuilderTests
     {
-        TestFilterBuilder builder;
+        private TestFilterBuilder builder;
 
         [SetUp]
         public void CreateBuilder()

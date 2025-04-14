@@ -6,11 +6,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using NUnit.ConsoleRunner.Options;
 
 namespace NUnit.ConsoleRunner
 {
-    using Options;
-
     /// <summary>
     /// <c>ConsoleOptions</c> encapsulates the option settings for
     /// the nunit4-console program. The class inherits from the Mono
@@ -62,17 +61,29 @@ namespace NUnit.ConsoleRunner
         public string? WhereClause { get; private set; }
 
         [MemberNotNullWhen(true, nameof(WhereClause))]
-        public bool WhereClauseSpecified { get { return WhereClause != null; } }
+        public bool WhereClauseSpecified
+        {
+            get { return WhereClause != null; }
+        }
 
         public int DefaultTestCaseTimeout { get; private set; } = -1;
-        public bool DefaultTestCaseTimeoutSpecified { get { return DefaultTestCaseTimeout >= 0; } }
+        public bool DefaultTestCaseTimeoutSpecified
+        {
+            get { return DefaultTestCaseTimeout >= 0; }
+        }
 
         public int RandomSeed { get; private set; } = -1;
-        public bool RandomSeedSpecified { get { return RandomSeed >= 0; } }
+        public bool RandomSeedSpecified
+        {
+            get { return RandomSeed >= 0; }
+        }
 
         public string? DefaultTestNamePattern { get; private set; }
         public int NumberOfTestWorkers { get; private set; } = -1;
-        public bool NumberOfTestWorkersSpecified { get { return NumberOfTestWorkers >= 0; } }
+        public bool NumberOfTestWorkersSpecified
+        {
+            get { return NumberOfTestWorkers >= 0; }
+        }
 
         public bool StopOnError { get; private set; }
 
@@ -89,7 +100,10 @@ namespace NUnit.ConsoleRunner
         public string? OutFile { get; private set; }
 
         [MemberNotNullWhen(true, nameof(OutFile))]
-        public bool OutFileSpecified { get { return OutFile != null; } }
+        public bool OutFileSpecified
+        {
+            get { return OutFile != null; }
+        }
 
         public string? DisplayTestLabels { get; private set; }
 
@@ -98,12 +112,18 @@ namespace NUnit.ConsoleRunner
         {
             get { return workDirectory ?? CURRENT_DIRECTORY_ON_ENTRY; }
         }
-        public bool WorkDirectorySpecified { get { return workDirectory != null; } }
+        public bool WorkDirectorySpecified
+        {
+            get { return workDirectory != null; }
+        }
 
         public string? InternalTraceLevel { get; private set; }
 
         [MemberNotNullWhen(true, nameof(InternalTraceLevel))]
-        public bool InternalTraceLevelSpecified { get { return InternalTraceLevel != null; } }
+        public bool InternalTraceLevelSpecified
+        {
+            get { return InternalTraceLevel != null; }
+        }
 
         private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
         public IList<OutputSpecification> ResultOutputSpecifications
@@ -128,14 +148,20 @@ namespace NUnit.ConsoleRunner
         public string? ActiveConfig { get; private set; }
 
         [MemberNotNullWhen(true, nameof(ActiveConfig))]
-        public bool ActiveConfigSpecified { get { return ActiveConfig != null; } }
+        public bool ActiveConfigSpecified
+        {
+            get { return ActiveConfig != null; }
+        }
 
         // How to Run Tests
 
         public string? RuntimeFramework { get; private set; }
 
         [MemberNotNullWhen(true, nameof(RuntimeFramework))]
-        public bool RuntimeFrameworkSpecified { get { return RuntimeFramework != null; } }
+        public bool RuntimeFrameworkSpecified
+        {
+            get { return RuntimeFramework != null; }
+        }
 
         public string? ConfigurationFile { get; private set; }
 
@@ -150,8 +176,14 @@ namespace NUnit.ConsoleRunner
         public bool SkipNonTestAssemblies { get; private set; }
 
         private int _maxAgents = -1;
-        public int MaxAgents { get { return _maxAgents; } }
-        public bool MaxAgentsSpecified { get { return _maxAgents >= 0; } }
+        public int MaxAgents
+        {
+            get { return _maxAgents; }
+        }
+        public bool MaxAgentsSpecified
+        {
+            get { return _maxAgents >= 0; }
+        }
 
         public bool DebugTests { get; private set; }
 
@@ -245,23 +277,23 @@ namespace NUnit.ConsoleRunner
                 v =>
                 {
                     var spec = parser.ResolveOutputSpecification(parser.RequiredValue(v, "--resultxml"), resultOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
-                    if (spec != null) resultOutputSpecifications.Add(spec);
+                    if (spec != null)
+                        resultOutputSpecifications.Add(spec);
                 });
 
             this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
             {
                 Explore = true;
                 var spec = parser.ResolveOutputSpecification(v, ExploreOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
-                if (spec != null) ExploreOutputSpecifications.Add(spec);
+                if (spec != null)
+                    ExploreOutputSpecifications.Add(spec);
             });
 
             this.Add("noresult", "Don't save any test results.",
                 v => NoResultSpecified = !string.IsNullOrEmpty(v));
 
             this.Add("labels=", "Specify whether to write test case names to the output. Values: Off (Default), On, OnOutput, Before, After, BeforeAndAfter. On is currently an alias for OnOutput, but is subject to change.",
-                v => {
-                        DisplayTestLabels = parser.RequiredValue(v, "--labels", "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter");
-                });
+                v => DisplayTestLabels = parser.RequiredValue(v, "--labels", "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter"));
 
             this.Add("extensionDirectory=", "Specifies an additional directory to be examined for extensions. May be repeated.", v =>
             {
@@ -391,7 +423,8 @@ namespace NUnit.ConsoleRunner
 
         public IEnumerable<string> PreParse(IEnumerable<string> args)
         {
-            if (args == null) throw new ArgumentNullException("args");
+            if (args == null)
+                throw new ArgumentNullException("args");
 
             if (++_nesting > 3)
             {
@@ -467,10 +500,10 @@ namespace NUnit.ConsoleRunner
 
         private string? ExpandToFullPath(string path)
         {
-            if (path == null) return null;
+            if (path == null)
+                return null;
 
             return Path.GetFullPath(path);
         }
-
     }
 }

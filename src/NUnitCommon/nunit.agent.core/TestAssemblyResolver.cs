@@ -28,7 +28,7 @@ namespace NUnit.Engine.Internal
         private static readonly string ASP_NET_CORE_DIR;
 
         // Our Strategies for resolving references
-        List<ResolutionStrategy> ResolutionStrategies;
+        private List<ResolutionStrategy> ResolutionStrategies;
 
         static TestAssemblyResolver()
         {
@@ -91,7 +91,8 @@ namespace NUnit.Engine.Internal
 
         private Assembly? OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            if (loadContext == null) throw new ArgumentNullException("context");
+            if (loadContext == null)
+                throw new ArgumentNullException("context");
 
             Assembly? loadedAssembly;
             foreach (var strategy in ResolutionStrategies)

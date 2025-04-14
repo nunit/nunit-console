@@ -13,7 +13,7 @@ namespace NUnit.Engine.Communication.Protocols
     /// BinarySerializationProtocol serializes messages in the following format:
     ///
     ///     [Message Length (4 bytes)][Serialized Message Content]
-    ///     
+    ///
     /// The message content is in binary form as produced by the .NET BinaryFormatter.
     /// Each message of length n is serialized as n + 4 bytes.
     /// </summary>
@@ -73,7 +73,9 @@ namespace NUnit.Engine.Communication.Protocols
             var messages = new List<TestEngineMessage>();
 
             //Read all available messages and add to messages collection
-            while (ReadSingleMessage(messages)) { }
+            while (ReadSingleMessage(messages))
+            {
+            }
 
             return messages;
         }
@@ -125,7 +127,7 @@ namespace NUnit.Engine.Communication.Protocols
         }
 
         /// <summary>
-        /// This method tries to read a single message and add to the messages collection. 
+        /// This method tries to read a single message and add to the messages collection.
         /// </summary>
         /// <param name="messages">Messages collection to collect messages</param>
         /// <returns>
@@ -215,8 +217,7 @@ namespace NUnit.Engine.Communication.Protocols
             return ((buffer[0] << 24) |
                     (buffer[1] << 16) |
                     (buffer[2] << 8) |
-                    (buffer[3])
-                   );
+                    (buffer[3]));
         }
 
         /// <summary>

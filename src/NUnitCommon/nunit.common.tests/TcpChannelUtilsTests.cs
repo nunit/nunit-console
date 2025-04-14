@@ -71,7 +71,6 @@ namespace NUnit.Engine.Internal
             }
         }
 
-
         private static ConstraintExpression HasChannelName() =>
             Has.Property(nameof(TcpChannel.ChannelName));
 

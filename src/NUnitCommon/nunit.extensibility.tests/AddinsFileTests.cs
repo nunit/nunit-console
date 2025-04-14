@@ -26,7 +26,7 @@ namespace NUnit.Extensibility
             var content = new[]
             {
                 "# This line is a comment and is ignored. The next (blank) line is ignored as well.",
-                "",
+                string.Empty,
                 "*.dll                   # include all dlls in the same directory",
                 "addins/*.dll            # include all dlls in the addins directory too",
                 "special/myassembly.dll  # include a specific dll in a special directory",

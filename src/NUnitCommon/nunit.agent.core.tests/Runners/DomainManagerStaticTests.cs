@@ -12,16 +12,16 @@ namespace NUnit.Engine.Runners
 {
     public static class DomainManagerStaticTests
     {
-        static string path1 = TestPath("/test/bin/debug/test1.dll");
-        static string path2 = TestPath("/test/bin/debug/test2.dll");
-        static string path3 = TestPath("/test/utils/test3.dll");
+        private static string path1 = TestPath("/test/bin/debug/test1.dll");
+        private static string path2 = TestPath("/test/bin/debug/test2.dll");
+        private static string path3 = TestPath("/test/utils/test3.dll");
 
 #if NETFRAMEWORK
-        const string STANDARD_CONFIG_FILE = "nunit.engine.core.tests.exe.config";
+        private const string STANDARD_CONFIG_FILE = "nunit.engine.core.tests.exe.config";
 #else
         const string STANDARD_CONFIG_FILE = "nunit.engine.core.tests.dll.config";
 #endif
-        const string ALTERNATE_CONFIG_FILE = "alt.config";
+        private const string ALTERNATE_CONFIG_FILE = "alt.config";
 
         [Test]
         public static void GetPrivateBinPath()

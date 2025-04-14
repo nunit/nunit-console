@@ -24,7 +24,8 @@ namespace NUnit.Engine.TestHelpers
             while (!current.MoveNext())
             {
                 current.Dispose();
-                if (stack.Count == 0) return false;
+                if (stack.Count == 0)
+                    return false;
                 current = stack.Pop();
             }
 
@@ -35,13 +36,15 @@ namespace NUnit.Engine.TestHelpers
 
         public void Recurse(IEnumerator<T> newCurrent)
         {
-            if (newCurrent == null) return;
+            if (newCurrent == null)
+                return;
             stack.Push(current);
             current = newCurrent;
         }
         public void Recurse(IEnumerable<T> newCurrent)
         {
-            if (newCurrent == null) return;
+            if (newCurrent == null)
+                return;
             Recurse(newCurrent.GetEnumerator());
         }
         public void Recurse(params T[] newCurrent)

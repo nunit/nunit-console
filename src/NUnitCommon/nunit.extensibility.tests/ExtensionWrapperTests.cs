@@ -133,12 +133,14 @@ namespace NUnit.Extensibility
 
     #region DummyExtensionWrapper
 
-    class DummyExtensionWrapper : ExtensionWrapper
+    internal class DummyExtensionWrapper : ExtensionWrapper
     {
         private static readonly Type[] IntStringTypes = [typeof(int), typeof(string)];
         private static readonly Type[] IntType = [typeof(int)];
 
-        public DummyExtensionWrapper(object wrappedInstance) : base(wrappedInstance) { }
+        public DummyExtensionWrapper(object wrappedInstance) : base(wrappedInstance)
+        {
+        }
 
         public void CallVoidMethod() => Invoke("VoidMethod", NoTypes);
 
@@ -260,7 +262,9 @@ namespace NUnit.Extensibility
 
     public class ThingyWrapper : ExtensionWrapper, IThingy
     {
-        public ThingyWrapper(object wrappedInstance) : base(wrappedInstance) { }
+        public ThingyWrapper(object wrappedInstance) : base(wrappedInstance)
+        {
+        }
 
         public string Name => "THINGY";
     }

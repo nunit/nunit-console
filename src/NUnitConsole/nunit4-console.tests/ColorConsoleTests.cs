@@ -14,9 +14,9 @@ namespace NUnit.TextDisplay
         public void SetUp()
         {
             // Find a test color that is different than the console color
-            if (Console.ForegroundColor != ColorConsole.GetColor( ColorStyle.Error ))
+            if (Console.ForegroundColor != ColorConsole.GetColor(ColorStyle.Error))
                 _testStyle = ColorStyle.Error;
-            else if (Console.ForegroundColor != ColorConsole.GetColor( ColorStyle.Pass ))
+            else if (Console.ForegroundColor != ColorConsole.GetColor(ColorStyle.Pass))
                 _testStyle = ColorStyle.Pass;
             else
                 Assert.Inconclusive("Could not find a color to test with");
@@ -37,11 +37,11 @@ namespace NUnit.TextDisplay
         public void TestConstructor()
         {
             ConsoleColor expected = ColorConsole.GetColor(_testStyle);
-            using(new ColorConsole(_testStyle))
+            using (new ColorConsole(_testStyle))
             {
                 Assert.That(Console.ForegroundColor, Is.EqualTo(expected));
             }
-            Assert.That( Console.ForegroundColor, Is.Not.EqualTo(expected) );
+            Assert.That(Console.ForegroundColor, Is.Not.EqualTo(expected));
         }
     }
 }

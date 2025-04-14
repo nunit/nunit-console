@@ -23,14 +23,14 @@ namespace NUnit.Engine.Drivers
     public class NUnitFrameworkApi2018 : NUnitFrameworkApi
 #endif
     {
-        static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkApi2018));
+        private static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkApi2018));
 
-        const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
-        const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
-        const string FAILED_TO_LOAD_ASSEMBLY = "Failed to load assembly ";
-        const string FAILED_TO_LOAD_NUNIT = "Failed to load the NUnit Framework in the test assembly";
+        private const string LOAD_MESSAGE = "Method called without calling Load first. Possible error in runner.";
+        private const string INVALID_FRAMEWORK_MESSAGE = "Running tests against this version of the framework using this driver is not supported. Please update NUnit.Framework to the latest version.";
+        private const string FAILED_TO_LOAD_ASSEMBLY = "Failed to load assembly ";
+        private const string FAILED_TO_LOAD_NUNIT = "Failed to load the NUnit Framework in the test assembly";
 
-        const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
+        private const string CONTROLLER_TYPE = "NUnit.Framework.Api.FrameworkController";
 
         private readonly string _driverId;
 

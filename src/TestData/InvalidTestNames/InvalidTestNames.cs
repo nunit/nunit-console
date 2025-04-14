@@ -15,7 +15,7 @@ namespace InvalidTestNames
         // Generates test name TestContainsInvalidCharacter("\uffff");
         [TestCase(char.MaxValue)]
         public void TestNameContainsInvalidChar(char c)
-        { 
+        {
             Console.WriteLine($"Test for char {c}");
         }
     }

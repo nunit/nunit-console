@@ -29,7 +29,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Selects a target runtime framework for a TestPackage based on
         /// the settings in the package and the assemblies themselves.
-        /// The package RuntimeFramework setting may be updated as a 
+        /// The package RuntimeFramework setting may be updated as a
         /// result and the selected runtime is returned.
         ///
         /// Note that if a package has subpackages, the subpackages may run on a different

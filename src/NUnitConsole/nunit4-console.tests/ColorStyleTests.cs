@@ -13,7 +13,7 @@ namespace NUnit.TextDisplay
         [TestCase(ColorStyle.Failure, ConsoleColor.Red)]
         //[TestCase(ColorStyle.Warning, ConsoleColor.Yellow)]
         [TestCase(ColorStyle.Error, ConsoleColor.Red)]
-        public void TestGetColor( ColorStyle style, ConsoleColor expected )
+        public void TestGetColor(ColorStyle style, ConsoleColor expected)
         {
             Assert.That(ColorConsole.GetColor(style), Is.EqualTo(expected));
         }

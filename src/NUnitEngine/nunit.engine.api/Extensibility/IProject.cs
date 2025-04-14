@@ -28,7 +28,7 @@ namespace NUnit.Engine.Extensibility
 
         /// <summary>
         /// Gets a test package for the primary or active
-        /// configuration within the project. The package 
+        /// configuration within the project. The package
         /// includes all the assemblies and any settings
         /// specified in the project format.
         /// </summary>
@@ -38,7 +38,7 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Gets a TestPackage for a specific configuration
         /// within the project. The package includes all the
-        /// assemblies and any settings specified in the 
+        /// assemblies and any settings specified in the
         /// project format.
         /// </summary>
         /// <param name="configName">The name of the config to use</param>

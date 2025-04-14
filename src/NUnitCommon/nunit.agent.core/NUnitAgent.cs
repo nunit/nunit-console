@@ -17,10 +17,10 @@ namespace NUnit.Agents
 {
     public class NUnitAgent<TAgent>
     {
-        static Process? AgencyProcess;
-        static RemoteTestAgent? Agent;
-        static readonly int _pid = Process.GetCurrentProcess().Id;
-        static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgent));
+        private static Process? AgencyProcess;
+        private static RemoteTestAgent? Agent;
+        private static readonly int _pid = Process.GetCurrentProcess().Id;
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgent));
 
         /// <summary>
         /// The main entry point for the application.

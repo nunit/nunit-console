@@ -37,7 +37,7 @@ namespace NUnit.Engine.Tests.Internal.FileSystemAccess.Default
                 Assert.Ignore("This test does not make sense on systems where System.IO.Path.GetInvalidPathChars() returns an empty array.");
             }
 
-            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length-1] + this.GetTestFileLocation();
+            var path = SIO.Path.GetInvalidPathChars()[SIO.Path.GetInvalidPathChars().Length - 1] + this.GetTestFileLocation();
 
             Assert.That(() => new File(path), Throws.ArgumentException);
         }

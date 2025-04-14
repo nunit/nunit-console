@@ -26,7 +26,7 @@ namespace NUnit.Engine.Services
             Assert.That(driver, Is.InstanceOf(expectedType));
         }
 
-        static TestCaseData[] DriverSelectionTestCases = new[]
+        private static TestCaseData[] DriverSelectionTestCases = new[]
         {
             new TestCaseData("mock-assembly.dll", false, typeof(NUnitFrameworkDriver)),
             new TestCaseData("mock-assembly.dll", true, typeof(NUnitFrameworkDriver)),

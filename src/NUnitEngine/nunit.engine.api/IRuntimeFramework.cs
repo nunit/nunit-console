@@ -27,7 +27,7 @@ namespace NUnit.Engine
 
         /// <summary>
         /// Gets a string representing the particular profile installed,
-        /// or null if there is no profile. Currently. the only defined 
+        /// or null if there is no profile. Currently. the only defined
         /// values are Full and Client.
         /// </summary>
         string? Profile { get; }

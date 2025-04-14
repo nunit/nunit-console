@@ -17,7 +17,7 @@ namespace NUnit.Engine.Runners
             Listeners = new List<ITestEventListener>();
         }
 
-        public IList<ITestEventListener>Listeners { get; private set; }
+        public IList<ITestEventListener> Listeners { get; private set; }
 
         public void OnTestEvent(string report)
         {

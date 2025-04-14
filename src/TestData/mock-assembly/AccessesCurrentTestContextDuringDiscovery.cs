@@ -16,9 +16,13 @@ namespace NUnit.TestData
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public void Access_by_TestCaseSource(int arg) { }
+        public void Access_by_TestCaseSource(int arg)
+        {
+        }
 
         [Test]
-        public void Access_by_ValueSource([ValueSource(nameof(TestCases))] int arg) { }
+        public void Access_by_ValueSource([ValueSource(nameof(TestCases))] int arg)
+        {
+        }
     }
 }

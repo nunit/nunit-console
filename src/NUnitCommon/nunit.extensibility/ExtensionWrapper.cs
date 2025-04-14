@@ -108,8 +108,8 @@ namespace NUnit.Extensibility
             public readonly object[] ArgTypes;
 
             public MethodSignature(string name, object[] argTypes)
-            {  
-                Name = name; 
+            {
+                Name = name;
                 ArgTypes = argTypes;
             }
 

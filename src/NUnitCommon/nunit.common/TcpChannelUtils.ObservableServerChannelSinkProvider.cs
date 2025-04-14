@@ -17,7 +17,8 @@ namespace NUnit.Engine
 
             public ObservableServerChannelSinkProvider(CurrentMessageCounter currentMessageCounter)
             {
-                if (currentMessageCounter == null) throw new ArgumentNullException(nameof(currentMessageCounter));
+                if (currentMessageCounter == null)
+                    throw new ArgumentNullException(nameof(currentMessageCounter));
                 _currentMessageCounter = currentMessageCounter;
             }
 
@@ -34,7 +35,6 @@ namespace NUnit.Engine
 
             public IServerChannelSinkProvider? Next { get; set; }
 
-
             private sealed class ObservableServerChannelSink : IServerChannelSink
             {
                 private readonly IServerChannelSink _next;
@@ -42,7 +42,8 @@ namespace NUnit.Engine
 
                 public ObservableServerChannelSink(CurrentMessageCounter currentMessageCounter, IServerChannelSink next)
                 {
-                    if (next == null) throw new ArgumentNullException(nameof(next));
+                    if (next == null)
+                        throw new ArgumentNullException(nameof(next));
                     _currentMessageCounter = currentMessageCounter;
                     _next = next;
                 }
@@ -64,7 +65,8 @@ namespace NUnit.Engine
                     }
                     finally
                     {
-                        if (!isAsync) _currentMessageCounter.OnMessageEnd();
+                        if (!isAsync)
+                            _currentMessageCounter.OnMessageEnd();
                     }
                 }
 

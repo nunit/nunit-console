@@ -10,7 +10,7 @@ namespace NUnit.Engine.Services
 {
     public class ResultService : Service, IResultService
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(ResultService));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ResultService));
 
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases", "user" };
         private IEnumerable<ExtensionNode>? _extensionNodes;

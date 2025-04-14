@@ -32,7 +32,7 @@ namespace NUnit.ConsoleRunner
         /// <summary>
         /// Returns the number of test cases actually run.
         /// </summary>
-        public int RunCount 
+        public int RunCount
         {
             get { return PassCount + FailureCount + ErrorCount + InconclusiveCount;  }
         }
@@ -194,8 +194,10 @@ namespace NUnit.ConsoleRunner
                 case "test-suite":
                     if (status == "Failed" && label == "Invalid")
                     {
-                        if (type == "Assembly") InvalidAssemblies++;
-                        else InvalidTestFixtures++;
+                        if (type == "Assembly")
+                            InvalidAssemblies++;
+                        else
+                            InvalidTestFixtures++;
                     }
                     if (type == "Assembly" && status == "Failed" && label == "Error")
                     {

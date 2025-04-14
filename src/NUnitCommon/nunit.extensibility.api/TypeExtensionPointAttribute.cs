@@ -27,12 +27,11 @@ namespace NUnit.Extensibility
         /// </summary>
         public TypeExtensionPointAttribute()
         {
-
         }
 
         /// <summary>
         /// The unique string identifying this ExtensionPoint. This identifier
-        /// is typically formatted as a path using '/' and the set of extension 
+        /// is typically formatted as a path using '/' and the set of extension
         /// points is sometimes viewed as forming a tree.
         /// </summary>
         public string? Path { get; }

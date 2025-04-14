@@ -100,12 +100,12 @@ namespace NUnit.ConsoleRunner
 
             ColorStyle overall = OverallResult == "Passed"
                 ? ColorStyle.Pass
-                : OverallResult == "Failed"  || OverallResult == "Unknown"
+                : OverallResult == "Failed" || OverallResult == "Unknown"
                     ? ColorStyle.Failure
                     : OverallResult == "Warning"
                         ? ColorStyle.Warning
                         : ColorStyle.Output;
-            
+
             Writer.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
             Writer.WriteLabelLine(INDENT4 + "Overall result: ", OverallResult, overall);
 
@@ -188,7 +188,7 @@ namespace NUnit.ConsoleRunner
                             // Where did this happen? Default is in the current test.
                             var site = resultNode.GetAttribute("site");
 
-                            // Correct a problem in some framework versions, whereby warnings and some failures 
+                            // Correct a problem in some framework versions, whereby warnings and some failures
                             // are promulgated to the containing suite without setting the FailureSite.
                             if (site == null)
                             {
@@ -206,10 +206,11 @@ namespace NUnit.ConsoleRunner
                                 new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
 
                             // Do not list individual "failed" tests after a one-time setup failure
-                            if (site == "SetUp") return;
+                            if (site == "SetUp")
+                                return;
                         }
                     }
-                    
+
                     foreach (XmlNode childResult in resultNode.ChildNodes)
                         WriteErrorsFailuresAndWarnings(childResult);
 

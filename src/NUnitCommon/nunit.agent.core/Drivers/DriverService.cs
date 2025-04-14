@@ -15,9 +15,9 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class DriverService : IDriverService
     {
-        static readonly Logger log = InternalTrace.GetLogger("DriverService");
+        private static readonly Logger log = InternalTrace.GetLogger("DriverService");
 
-        readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
+        private readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
 
         public DriverService()
         {
@@ -69,7 +69,7 @@ namespace NUnit.Engine.Drivers
                     if (skipNonTestAssemblies)
                         return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
                     else
-                        return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, platform + 
+                        return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, platform +
                             " test assemblies are not supported by this version of the engine");
             }
 
@@ -111,7 +111,7 @@ namespace NUnit.Engine.Drivers
             if (skipNonTestAssemblies)
                 return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
             else
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, 
+                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID,
                     $"No suitable tests found in '{assemblyPath}'.\r\nEither assembly contains no tests or proper test driver has not been found.");
         }
     }

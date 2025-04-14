@@ -12,6 +12,8 @@ namespace WpfApp
 {
     internal class Program
     {
-        static void Main() { }
+        private static void Main()
+        {
+        }
     }
 }

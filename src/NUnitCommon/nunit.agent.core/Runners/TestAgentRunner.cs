@@ -11,7 +11,7 @@ namespace NUnit.Engine.Runners
 {
     /// <summary>
     /// TestAgentRunner is the abstract base for runners used by agents, which
-    /// deal directly with a framework driver. It loads and runs tests in a single 
+    /// deal directly with a framework driver. It loads and runs tests in a single
     /// assembly, creating an <see cref="IFrameworkDriver"/> to do so.
     /// </summary>
     public abstract class TestAgentRunner : ITestEngineRunner
@@ -125,7 +125,9 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        public virtual void Unload() { }
+        public virtual void Unload()
+        {
+        }
         public TestEngineResult Reload() => Load();
 
         /// <summary>
@@ -146,7 +148,6 @@ namespace NUnit.Engine.Runners
             }
         }
 
-
         /// <summary>
         /// Run the tests in the loaded TestPackage.
         /// </summary>
@@ -165,7 +166,6 @@ namespace NUnit.Engine.Runners
             {
                 throw new NUnitEngineException("An exception occurred in the driver while running tests.", ex);
             }
-
         }
 
         public AsyncTestEngineResult RunAsync(ITestEventListener? listener, TestFilter filter)

@@ -15,7 +15,7 @@ namespace NUnit.Engine.Services
 {
     public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
     {
-        static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 
         private List<RuntimeFramework> _availableRuntimes = new List<RuntimeFramework>();
         private List<RuntimeFramework> _availableX86Runtimes = new List<RuntimeFramework>();
@@ -130,7 +130,7 @@ namespace NUnit.Engine.Services
             IRuntimeFramework currentFramework = CurrentFramework;
             log.Debug("Current framework is " + currentFramework);
 
-            string frameworkSetting = package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, "");
+            string frameworkSetting = package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, string.Empty);
             bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
 
             if (frameworkSetting.Length > 0)
@@ -150,7 +150,7 @@ namespace NUnit.Engine.Services
 
             log.Debug($"No specific framework requested for {package.Name}");
 
-            string imageTargetFrameworkNameSetting = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
+            string imageTargetFrameworkNameSetting = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
             Runtime targetRuntime;
             Version targetVersion;
 
@@ -305,7 +305,8 @@ namespace NUnit.Engine.Services
             for (int i = 0; i < 4; i++)
             {
                 string? dir = Path.GetDirectoryName(prefix);
-                if (string.IsNullOrEmpty(dir)) break;
+                if (string.IsNullOrEmpty(dir))
+                    break;
 
                 prefix = dir;
             }
@@ -358,12 +359,13 @@ namespace NUnit.Engine.Services
 
                     // Collect the highest version required
                     Version v = subPackage.GetSetting(EnginePackageSettings.ImageRuntimeVersion, new Version(0, 0));
-                    if (v > targetVersion) targetVersion = v;
+                    if (v > targetVersion)
+                        targetVersion = v;
 
                     // Collect highest framework name
                     // TODO: This assumes lexical ordering is valid - check it
-                    string fn = subPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, "");
-                    if (fn != "")
+                    string fn = subPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
+                    if (fn != string.Empty)
                     {
                         if (frameworkName == null || fn.CompareTo(frameworkName) < 0)
                             frameworkName = fn;

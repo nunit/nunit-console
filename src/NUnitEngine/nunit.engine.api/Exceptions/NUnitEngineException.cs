@@ -30,6 +30,8 @@ namespace NUnit.Engine
         /// <summary>
         /// Serialization constructor
         /// </summary>
-        public NUnitEngineException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        public NUnitEngineException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

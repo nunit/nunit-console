@@ -39,4 +39,10 @@
         <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
     </PropertyGroup>
 
+    <!-- Code Style Analyzers -->
+    <ItemGroup>
+        <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" PrivateAssets="all" />
+        <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)/StyleCop.Analyzers.globalconfig" />
+    </ItemGroup>
+
 </Project>

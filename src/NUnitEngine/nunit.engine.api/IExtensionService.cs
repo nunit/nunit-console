@@ -42,7 +42,5 @@ namespace NUnit.Engine
         /// Enable or disable an extension
         /// </summary>
         void EnableExtension(string typeName, bool enabled);
-
     }
 }
-

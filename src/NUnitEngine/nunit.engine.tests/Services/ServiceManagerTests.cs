@@ -42,7 +42,7 @@ namespace NUnit.Engine.Services
         public void InitializationFailure()
         {
             ((FakeService)_fakeService).FailToStart = true;
-            Assert.That(() => _serviceManager.StartServices(), 
+            Assert.That(() => _serviceManager.StartServices(),
                 Throws.InstanceOf<InvalidOperationException>().And.Message.Contains("FakeService"));
         }
 

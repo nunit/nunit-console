@@ -24,7 +24,8 @@ namespace NUnit.Engine.TestHelpers
 
                 process.OutputDataReceived += (sender, e) =>
                 {
-                    if (e.Data == null) return;
+                    if (e.Data == null)
+                        return;
                     if (currentDataIsError)
                     {
                         if (currentData.Length != 0)
@@ -36,7 +37,8 @@ namespace NUnit.Engine.TestHelpers
                 };
                 process.ErrorDataReceived += (sender, e) =>
                 {
-                    if (e.Data == null) return;
+                    if (e.Data == null)
+                        return;
                     if (!currentDataIsError)
                     {
                         if (currentData.Length != 0)
@@ -78,7 +80,8 @@ namespace NUnit.Engine.TestHelpers
             {
                 var r = new StringBuilder("Exit code ").Append(ExitCode);
 
-                if (StandardStreamData.Length != 0) r.AppendLine();
+                if (StandardStreamData.Length != 0)
+                    r.AppendLine();
 
                 foreach (var data in StandardStreamData)
                 {

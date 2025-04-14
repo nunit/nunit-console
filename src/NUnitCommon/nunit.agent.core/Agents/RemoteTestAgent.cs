@@ -22,7 +22,9 @@ namespace NUnit.Engine.Agents
         /// The first argument is a temporary measure and will be removed
         /// once services are all moved from nunit.engine.core to nunit.engine.
         /// </remarks>
-        public RemoteTestAgent(Guid agentId) : base(agentId) { }
+        public RemoteTestAgent(Guid agentId) : base(agentId)
+        {
+        }
 
         public ITestAgentTransport? Transport;
 

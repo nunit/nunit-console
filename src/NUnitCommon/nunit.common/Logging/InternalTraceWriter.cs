@@ -9,8 +9,8 @@ namespace NUnit
     /// </summary>
     internal class InternalTraceWriter : TextWriter
     {
-        TextWriter _writer;
-        readonly object _myLock = new object();
+        private TextWriter _writer;
+        private readonly object _myLock = new object();
 
         /// <summary>
         /// Construct an InternalTraceWriter that writes to a file.
@@ -24,7 +24,7 @@ namespace NUnit
         }
 
         /// <summary>
-        /// Construct an InternalTraceWriter that writes to a 
+        /// Construct an InternalTraceWriter that writes to a
         /// TextWriter provided by the caller.
         /// </summary>
         /// <param name="writer"></param>

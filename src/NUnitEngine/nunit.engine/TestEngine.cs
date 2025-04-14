@@ -34,7 +34,7 @@ namespace NUnit.Engine
         {
             get
             {
-                if(!Services.ServiceManager.ServicesInitialized)
+                if (!Services.ServiceManager.ServicesInitialized)
                     Initialize();
 
                 return Services;
@@ -54,7 +54,7 @@ namespace NUnit.Engine
         /// </summary>
         public void Initialize()
         {
-            if(InternalTraceLevel != InternalTraceLevel.Off && !InternalTrace.Initialized)
+            if (InternalTraceLevel != InternalTraceLevel.Off && !InternalTrace.Initialized)
             {
                 var logName = string.Format("InternalTrace.{0}.log", Process.GetCurrentProcess().Id);
                 InternalTrace.Initialize(Path.Combine(WorkDirectory, logName), InternalTraceLevel);
@@ -88,7 +88,7 @@ namespace NUnit.Engine
         /// <returns>An ITestRunner.</returns>
         public ITestRunner GetRunner(TestPackage package)
         {
-            if(!Services.ServiceManager.ServicesInitialized)
+            if (!Services.ServiceManager.ServicesInitialized)
                 Initialize();
 
             return new Runners.MasterTestRunner(Services, package);
