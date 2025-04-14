@@ -196,7 +196,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public static IEnumerable<string> WrappedLines(string self, IEnumerable<int> widths)
         {
-            Guard.ArgumentNotNull(widths, nameof(widths));
+            Guard.ArgumentNotNull(widths);
             return CreateWrappedLinesIterator(self, widths);
         }
 
@@ -399,8 +399,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AssertValid(int index)
         {
-            if (c.Option is null)
-                throw new InvalidOperationException("OptionContext.Option is null.");
+            Guard.OperationValid(c.Option is not null, "OptionContext.Option is null.");
             Guard.ArgumentInRange(index < c.Option.MaxValueCount, "Index must be less than MaxValueCount.", nameof(index));
             if (c.Option.OptionValueType == OptionValueType.Required &&
                     index >= values.Count)
@@ -514,7 +513,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected Option(string prototype, string? description, int maxValueCount, bool hidden)
         {
-            Guard.ArgumentNotNull(prototype, nameof(prototype));
+            Guard.ArgumentNotNull(prototype);
             Guard.ArgumentValid(prototype.Length > 0, nameof(prototype), "Cannot be the empty string.");
             Guard.ArgumentInRange(maxValueCount >= 0, "MaxValueCount must be greater or equal to zero", nameof(maxValueCount));
 
@@ -932,7 +931,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected override string GetKeyForItem(Option item)
         {
-            Guard.ArgumentNotNull(item, nameof(item));
+            Guard.ArgumentNotNull(item);
 
             if (item.Names is not null && item.Names.Length > 0)
                 return item.Names[0];
@@ -944,7 +943,7 @@ namespace NUnit.ConsoleRunner.Options
         [Obsolete("Use KeyedCollection.this[string]")]
         protected Option? GetOptionForName(string option)
         {
-            Guard.ArgumentNotNull(option, nameof(option));
+            Guard.ArgumentNotNull(option);
 
             try
             {
@@ -981,7 +980,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AddImpl(Option option)
         {
-            Guard.ArgumentNotNull(option, nameof(option));
+            Guard.ArgumentNotNull(option);
 
             List<string> added = new List<string>(option.Names.Length);
             try
@@ -1003,7 +1002,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string header)
         {
-            Guard.ArgumentNotNull(header, nameof(header));
+            Guard.ArgumentNotNull(header);
 
             Add(new Category(header));
             return this;
@@ -1043,7 +1042,7 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, int count, Action<OptionValueCollection> action, bool hidden)
                 : base(prototype, description, count, hidden)
             {
-                Guard.ArgumentNotNull(action, nameof(action));
+                Guard.ArgumentNotNull(action);
 
                 this.action = action;
             }
@@ -1066,7 +1065,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string prototype, string? description, Action<string> action, bool hidden)
         {
-            Guard.ArgumentNotNull(action, nameof(action));
+            Guard.ArgumentNotNull(action);
 
             Option p = new ActionOption(prototype, description, 1,
                     delegate(OptionValueCollection v) { action(v[0]); }, hidden);
@@ -1086,7 +1085,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string prototype, string? description, OptionAction<string, string> action, bool hidden)
         {
-            Guard.ArgumentNotNull(action, nameof(action));
+            Guard.ArgumentNotNull(action);
 
             Option p = new ActionOption(prototype, description, 2,
                     delegate(OptionValueCollection v) { action(v[0], v[1]); }, hidden);
@@ -1101,7 +1100,7 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, Action<T> action)
                 : base(prototype, description, 1)
             {
-                Guard.ArgumentNotNull(action, nameof(action));
+                Guard.ArgumentNotNull(action);
 
                 this.action = action;
             }
@@ -1119,7 +1118,7 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, OptionAction<TKey, TValue> action)
                 : base(prototype, description, 2)
             {
-                Guard.ArgumentNotNull(action, nameof(action));
+                Guard.ArgumentNotNull(action);
 
                 this.action = action;
             }
@@ -1154,7 +1153,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(ArgumentSource source)
         {
-            Guard.ArgumentNotNull(source, nameof(source));
+            Guard.ArgumentNotNull(source);
 
             sources.Add(source);
             return this;
@@ -1167,7 +1166,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public List<string> Parse(IEnumerable<string> arguments)
         {
-            Guard.ArgumentNotNull(arguments, nameof(arguments));
+            Guard.ArgumentNotNull(arguments);
 
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
@@ -1265,7 +1264,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected bool GetOptionParts(string argument, [NotNullWhen(true)] out string? flag, [NotNullWhen(true)] out string? name, out string? sep, out string? value)
         {
-            Guard.ArgumentNotNull(argument, nameof(argument));
+            Guard.ArgumentNotNull(argument);
 
             flag = name = sep = value = null;
             Match m = ValueOption.Match(argument);
@@ -1671,7 +1670,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public Command(string name, string? help = null)
         {
-            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
+            Guard.ArgumentNotNullOrEmpty(name);
 
             Name = NormalizeCommandName(name);
             Help = help;
@@ -1716,7 +1715,7 @@ namespace NUnit.ConsoleRunner.Options
         public CommandOption(Command command, string? commandName = null, bool hidden = false)
             : base("=:Command:= " + (commandName ?? command.Name), (commandName ?? command.Name), maxValueCount: 0, hidden: hidden)
         {
-            Guard.ArgumentNotNull(command, nameof(command));
+            Guard.ArgumentNotNull(command);
 
             Command = command;
             CommandName = commandName ?? command.Name;
@@ -1819,9 +1818,9 @@ namespace NUnit.ConsoleRunner.Options
 
         public CommandSet(string suite, TextWriter output, TextWriter error, MessageLocalizerConverter? localizer = null)
         {
-            Guard.ArgumentNotNull(suite, nameof(suite));
-            Guard.ArgumentNotNull(output, nameof(output));
-            Guard.ArgumentNotNull(error, nameof(error));
+            Guard.ArgumentNotNull(suite);
+            Guard.ArgumentNotNull(output);
+            Guard.ArgumentNotNull(error);
 
             this.suite = suite;
             options = new CommandOptionSet(this, localizer);
@@ -1841,7 +1840,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public new CommandSet Add(Command value)
         {
-            Guard.ArgumentNotNull(value, nameof(value));
+            Guard.ArgumentNotNull(value);
 
             AddCommand(value);
             options.Add(new CommandOption(value));
@@ -1945,7 +1944,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public CommandSet Add(CommandSet nestedCommands)
         {
-            Guard.ArgumentNotNull(nestedCommands, nameof(nestedCommands));
+            Guard.ArgumentNotNull(nestedCommands);
 
             if (NestedCommandSets is null)
             {
@@ -2046,7 +2045,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public int Run(IEnumerable<string> arguments)
         {
-            Guard.ArgumentNotNull(arguments, nameof(arguments));
+            Guard.ArgumentNotNull(arguments);
 
             this.showHelp = false;
             if (help is null)

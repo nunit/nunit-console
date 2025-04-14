@@ -15,7 +15,7 @@ namespace NUnit.Extensibility
     {
         public static AddinsFile Read(IFile file)
         {
-            Guard.ArgumentNotNull(file, nameof(file));
+            Guard.ArgumentNotNull(file);
 
             using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {

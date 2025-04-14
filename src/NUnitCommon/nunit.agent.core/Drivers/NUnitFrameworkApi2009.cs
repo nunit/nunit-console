@@ -37,9 +37,9 @@ namespace NUnit.Engine.Drivers
 
             public NUnitFrameworkApi2009(AppDomain testDomain, string driverId, AssemblyName nunitRef)
             {
-                Guard.ArgumentNotNull(testDomain, nameof(testDomain));
-                Guard.ArgumentNotNull(driverId, nameof(driverId));
-                Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+                Guard.ArgumentNotNull(testDomain);
+                Guard.ArgumentNotNull(driverId);
+                Guard.ArgumentNotNull(nunitRef);
 
                 _testDomain = testDomain;
                 _driverId = driverId;

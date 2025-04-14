@@ -82,7 +82,7 @@ namespace NUnit.Extensibility.Wrappers
             public T GetSetting<T>(string name, T defaultValue)
                 where T : notnull
             {
-                Guard.ArgumentNotNull(defaultValue, nameof(defaultValue));
+                Guard.ArgumentNotNull(defaultValue);
 
                 return Invoke<T>(nameof(GetSetting), name, defaultValue);
             }

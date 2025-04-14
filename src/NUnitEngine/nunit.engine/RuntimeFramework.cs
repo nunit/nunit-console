@@ -39,7 +39,7 @@ namespace NUnit.Engine
         /// <param name="profile">A string representing the profile of the framework. Null if unspecified.</param>
         public RuntimeFramework(Runtime runtime, Version version, string? profile)
         {
-            Guard.ArgumentNotNull(runtime, nameof(runtime));
+            Guard.ArgumentNotNull(runtime);
             Guard.ArgumentValid(IsValidFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
 
             Runtime = runtime;
@@ -106,7 +106,7 @@ namespace NUnit.Engine
         /// <returns></returns>
         public static RuntimeFramework Parse(string s)
         {
-            Guard.ArgumentNotNullOrEmpty(s, nameof(s));
+            Guard.ArgumentNotNullOrEmpty(s);
 
             string[] parts = s.Split(RuntimeFrameworkSeparator);
             Guard.ArgumentValid(parts.Length == 2 && parts[0].Length > 0 && parts[1].Length > 0, "RuntimeFramework id not in correct format", nameof(s));

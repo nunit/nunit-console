@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services
         /// <returns>True if the framework is available, false if unavailable or nonexistent</returns>
         public bool IsAvailable(string name, bool needX86)
         {
-            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
+            Guard.ArgumentNotNullOrEmpty(name);
 
             if (!RuntimeFramework.TryParse(name, out RuntimeFramework? requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);

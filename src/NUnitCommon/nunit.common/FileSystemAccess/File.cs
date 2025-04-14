@@ -21,7 +21,7 @@ namespace NUnit.FileSystemAccess
         /// <exception cref="System.IO.PathTooLongException">The specified path exceeds the system-defined maximum length.</exception>
         public File(string path)
         {
-            Guard.ArgumentNotNull(path, nameof(path));
+            Guard.ArgumentNotNull(path);
 
             if (string.IsNullOrEmpty(path))
             {

@@ -48,8 +48,8 @@ namespace NUnit.Engine.Runners
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
-            Guard.ArgumentNotNull(services, nameof(services));
-            Guard.ArgumentNotNull(package, nameof(package));
+            Guard.ArgumentNotNull(services);
+            Guard.ArgumentNotNull(package);
 
             _services = services;
             TestPackage = package;
@@ -268,7 +268,7 @@ namespace NUnit.Engine.Runners
         // allows the lower-level runners to be completely ignorant of projects
         private TestEngineResult PrepareResult(TestEngineResult result)
         {
-            Guard.ArgumentNotNull(result, nameof(result));
+            Guard.ArgumentNotNull(result);
 
             // See if we have any projects to deal with. At this point,
             // any subpackage, which itself has subpackages, is a project
@@ -329,7 +329,7 @@ namespace NUnit.Engine.Runners
 
         private void EnsurePackagesAreExpanded(TestPackage package)
         {
-            Guard.ArgumentNotNull(package, nameof(package));
+            Guard.ArgumentNotNull(package);
 
             foreach (var subPackage in package.SubPackages)
             {
@@ -344,7 +344,7 @@ namespace NUnit.Engine.Runners
 
         private bool IsProjectPackage(TestPackage package)
         {
-            Guard.ArgumentNotNull(package, nameof(package));
+            Guard.ArgumentNotNull(package);
 
             return
                 _projectService is not null

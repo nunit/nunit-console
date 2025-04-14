@@ -16,7 +16,7 @@ namespace NUnit.Engine.Services
 
         public XmlTransformResultWriter(object?[] args)
         {
-            Guard.ArgumentNotNull(args, "args");
+            Guard.ArgumentNotNull(args);
             _xsltFile = (string?)args[0];
 
             Guard.ArgumentValid(

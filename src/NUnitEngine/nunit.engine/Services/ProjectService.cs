@@ -80,7 +80,7 @@ namespace NUnit.Engine.Services
         {
             log.Debug($"Expanding package {package.Name}");
 
-            Guard.ArgumentNotNull(package, "package");
+            Guard.ArgumentNotNull(package);
             Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", nameof(package));
 
             string path = package.FullName!;

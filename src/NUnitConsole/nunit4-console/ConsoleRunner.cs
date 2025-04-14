@@ -59,9 +59,9 @@ namespace NUnit.ConsoleRunner
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
-            Guard.ArgumentNotNull(_engine = engine, nameof(engine));
-            Guard.ArgumentNotNull(_options = options, nameof(options));
-            Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
+            Guard.ArgumentNotNull(_engine = engine);
+            Guard.ArgumentNotNull(_options = options);
+            Guard.ArgumentNotNull(_outWriter = writer);
 
             // NOTE: Accessing Services triggers the engine to initialize all services
             _resultService = _engine.Services.GetService<IResultService>();

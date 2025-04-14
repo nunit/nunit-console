@@ -25,10 +25,10 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public TestAgentTcpTransport(RemoteTestAgent agent, string serverUrl)
         {
-            Guard.ArgumentNotNull(agent, nameof(agent));
+            Guard.ArgumentNotNull(agent);
             Agent = agent;
 
-            Guard.ArgumentNotNullOrEmpty(serverUrl, nameof(serverUrl));
+            Guard.ArgumentNotNullOrEmpty(serverUrl);
             _agencyUrl = serverUrl;
 
             var parts = serverUrl.Split(PortSeparator);

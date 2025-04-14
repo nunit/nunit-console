@@ -91,7 +91,7 @@ namespace NUnit.Engine
 
         public Tokenizer(string input)
         {
-            Guard.ArgumentNotNull(input, nameof(input));
+            Guard.ArgumentNotNull(input);
 
             _input = input;
             _index = 0;

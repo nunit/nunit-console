@@ -22,7 +22,7 @@ namespace NUnit.ConsoleRunner.Options
         /// <param name="transformFolder">The folder containing the transform.</param>
         public OutputSpecification(string spec, string? transformFolder)
         {
-            Guard.ArgumentNotNull(spec, nameof(spec));
+            Guard.ArgumentNotNull(spec);
 
             string[] parts = spec.Split(SemicolonSeparator);
             this.OutputPath = parts[0];

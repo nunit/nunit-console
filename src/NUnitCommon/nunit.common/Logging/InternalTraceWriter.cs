@@ -30,7 +30,7 @@ namespace NUnit
         /// <param name="writer"></param>
         public InternalTraceWriter(TextWriter writer)
         {
-            Guard.ArgumentNotNull(writer, nameof(writer));
+            Guard.ArgumentNotNull(writer);
 
             _writer = writer;
         }

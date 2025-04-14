@@ -17,7 +17,7 @@ namespace NUnit.Engine
 
             public ObservableServerChannelSinkProvider(CurrentMessageCounter currentMessageCounter)
             {
-                Guard.ArgumentNotNull(currentMessageCounter, nameof(currentMessageCounter));
+                Guard.ArgumentNotNull(currentMessageCounter);
                 _currentMessageCounter = currentMessageCounter;
             }
 
@@ -41,7 +41,7 @@ namespace NUnit.Engine
 
                 public ObservableServerChannelSink(CurrentMessageCounter currentMessageCounter, IServerChannelSink next)
                 {
-                    Guard.ArgumentNotNull(next, nameof(next));
+                    Guard.ArgumentNotNull(next);
                     _currentMessageCounter = currentMessageCounter;
                     _next = next;
                 }

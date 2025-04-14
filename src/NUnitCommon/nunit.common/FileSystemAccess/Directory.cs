@@ -23,7 +23,7 @@ namespace NUnit.FileSystemAccess
         /// <exception cref="SIO.PathTooLongException"><paramref name="path"/> exceeds the system-defined maximum length.</exception>
         public Directory(string path)
         {
-            Guard.ArgumentNotNull(path, nameof(path));
+            Guard.ArgumentNotNull(path);
 
             if (path.IndexOfAny(SIO.Path.GetInvalidPathChars()) > -1)
             {
