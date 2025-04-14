@@ -22,11 +22,11 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                if (_formats == null)
+                if (_formats is null)
                 {
                     var formatList = new List<string>(BUILT_IN_FORMATS);
 
-                    if (_extensionNodes != null)
+                    if (_extensionNodes is not null)
                         foreach (var node in _extensionNodes)
                             foreach (var format in node.GetValues("Format"))
                                 formatList.Add(format);
@@ -61,7 +61,7 @@ namespace NUnit.Engine.Services
                     return new XmlTransformResultWriter(args!);
 
                 default:
-                    if (_extensionNodes != null)
+                    if (_extensionNodes is not null)
                         foreach (var node in _extensionNodes)
                             foreach (var supported in node.GetValues("Format"))
                                 if (supported == format)
@@ -77,7 +77,7 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                if (ServiceContext == null)
+                if (ServiceContext is null)
                     throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
                 var extensionService = ServiceContext.GetService<ExtensionService>();

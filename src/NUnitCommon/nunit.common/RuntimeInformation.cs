@@ -15,7 +15,7 @@ namespace NUnit.Engine.Internal.Backports
     {
         static RuntimeInformation()
         {
-            bool isMono = Type.GetType("Mono.Runtime", false) != null;
+            bool isMono = Type.GetType("Mono.Runtime", false) is not null;
 
             Version version = new Version(Environment.Version.Major, Environment.Version.Minor);
             if (isMono)
@@ -41,10 +41,10 @@ namespace NUnit.Engine.Internal.Backports
                 {
                     case 2:
                         key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
-                        if (key != null)
+                        if (key is not null)
                         {
                             string? installRoot = key.GetValue("InstallRoot") as string;
-                            if (installRoot != null)
+                            if (installRoot is not null)
                             {
                                 if (Directory.Exists(System.IO.Path.Combine(installRoot, "v3.5")))
                                 {
@@ -59,7 +59,7 @@ namespace NUnit.Engine.Internal.Backports
                         break;
                     case 4:
                         key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full");
-                        if (key != null)
+                        if (key is not null)
                         {
                             version = new Version(4, 5);
                             int release = (int)key.GetValue("Release", 0);

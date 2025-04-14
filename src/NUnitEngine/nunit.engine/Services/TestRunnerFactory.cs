@@ -19,7 +19,7 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                if (ServiceContext == null)
+                if (ServiceContext is null)
                     throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
 
                 // TestRunnerFactory requires the ProjectService
@@ -47,7 +47,7 @@ namespace NUnit.Engine.Services
         /// <returns>A TestRunner</returns>
         public ITestEngineRunner MakeTestRunner(TestPackage package)
         {
-            if (ServiceContext == null)
+            if (ServiceContext is null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
             if (package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty).StartsWith("Unmanaged,"))

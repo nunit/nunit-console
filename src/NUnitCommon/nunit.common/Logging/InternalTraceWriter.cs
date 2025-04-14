@@ -88,7 +88,7 @@ namespace NUnit
         {
             lock (_myLock)
             {
-                if (disposing && _writer != null)
+                if (disposing && _writer is not null)
                 {
                     _writer.Flush();
                     _writer.Dispose();

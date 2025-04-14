@@ -55,7 +55,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
             if (_port == 0)
             {
                 ChannelDataStore? store = _channel!.ChannelData as ChannelDataStore;
-                if (store != null)
+                if (store is not null)
                 {
                     string channelUri = store.ChannelUris[0];
                     _port = int.Parse(channelUri.Substring(channelUri.LastIndexOf(':') + 1));
@@ -76,7 +76,7 @@ namespace NUnit.Engine.Communication.Transports.Remoting
                     this._isMarshalled = false;
                 }
 
-                if (this._channel != null)
+                if (this._channel is not null)
                 {
                     try
                     {

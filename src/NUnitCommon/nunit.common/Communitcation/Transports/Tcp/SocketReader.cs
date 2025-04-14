@@ -62,7 +62,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             var receivedMessage = GetNextMessage();
             var expectedMessage = receivedMessage as TMessage;
 
-            if (expectedMessage == null)
+            if (expectedMessage is null)
                 throw new InvalidOperationException($"Expected a {typeof(TMessage)} but received a {receivedMessage.GetType()}");
 
             return expectedMessage;

@@ -28,7 +28,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         public override void Unload()
         {
-            if (this.TestDomain != null)
+            if (this.TestDomain is not null)
             {
                 _domainManager.Unload(this.TestDomain);
                 this.TestDomain = null;

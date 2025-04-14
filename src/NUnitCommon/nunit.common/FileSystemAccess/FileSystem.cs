@@ -13,7 +13,7 @@ namespace NUnit.FileSystemAccess
         /// <inheritdoc/>
         public bool Exists(IDirectory directory)
         {
-            if (directory == null)
+            if (directory is null)
             {
                 throw new ArgumentNullException(nameof(directory));
             }
@@ -24,7 +24,7 @@ namespace NUnit.FileSystemAccess
         /// <inheritdoc/>
         public bool Exists(IFile file)
         {
-            if (file == null)
+            if (file is null)
             {
                 throw new ArgumentNullException(nameof(file));
             }

@@ -49,7 +49,7 @@ namespace NUnit.Engine
             return new TcpChannel(
                 props,
                 clientProvider,
-                currentMessageCounter != null
+                currentMessageCounter is not null
                     ? new ObservableServerChannelSinkProvider(currentMessageCounter) { Next = serverProvider }
                     : (IServerChannelSinkProvider)serverProvider);
         }
@@ -91,7 +91,7 @@ namespace NUnit.Engine
         public static TcpChannel? GetTcpChannel(string name, int port, int limit, CurrentMessageCounter? currentMessageCounter = null)
         {
             var existingChannel = ChannelServices.GetChannel(name) as TcpChannel;
-            if (existingChannel != null)
+            if (existingChannel is not null)
                 return existingChannel;
 
             // NOTE: Retries are normally only needed when rapidly creating

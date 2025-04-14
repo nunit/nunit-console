@@ -15,7 +15,7 @@ namespace NUnit.Extensibility
     {
         public static AddinsFile Read(IFile file)
         {
-            if (file == null)
+            if (file is null)
                 throw new ArgumentNullException(nameof(file));
 
             using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -39,7 +39,7 @@ namespace NUnit.Extensibility
 
                 int lineNumber = 0;
                 string? line;
-                while ((line = reader.ReadLine()) != null)
+                while ((line = reader.ReadLine()) is not null)
                 {
                     var entry = new AddinsFileEntry(++lineNumber, line);
                     if (entry.Text != string.Empty && !entry.IsValid)
@@ -70,7 +70,7 @@ namespace NUnit.Extensibility
         public override bool Equals(object? obj)
         {
             var other = obj as AddinsFile;
-            if (other == null)
+            if (other is null)
                 return false;
 
             if (Count != other.Count)

@@ -36,14 +36,14 @@ namespace NUnit.Engine.TestHelpers
 
         public void Recurse(IEnumerator<T> newCurrent)
         {
-            if (newCurrent == null)
+            if (newCurrent is null)
                 return;
             stack.Push(current);
             current = newCurrent;
         }
         public void Recurse(IEnumerable<T> newCurrent)
         {
-            if (newCurrent == null)
+            if (newCurrent is null)
                 return;
             Recurse(newCurrent.GetEnumerator());
         }

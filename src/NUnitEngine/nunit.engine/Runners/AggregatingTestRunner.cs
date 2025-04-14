@@ -49,7 +49,7 @@ namespace NUnit.Engine.Runners
         {
             get
             {
-                if (_runners == null)
+                if (_runners is null)
                 {
                     _runners = new List<ITestEngineRunner>();
                     foreach (var subPackage in TestPackage.Select(p => !p.HasSubPackages()))
@@ -64,7 +64,7 @@ namespace NUnit.Engine.Runners
 
         public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-            Guard.ArgumentValid(TestRunnerFactory != null, "TestRunnerFactory service not available", nameof(services));
+            Guard.ArgumentValid(TestRunnerFactory is not null, "TestRunnerFactory service not available", nameof(services));
         }
 
         /// <summary>
@@ -229,12 +229,12 @@ namespace NUnit.Engine.Runners
         private static void LogResultsFromTask(TestExecutionTask task, List<TestEngineResult> results, List<Exception> unloadExceptions)
         {
             var result = task.Result;
-            if (result != null)
+            if (result is not null)
             {
                 results.Add(result);
             }
 
-            if (task.UnloadException != null)
+            if (task.UnloadException is not null)
             {
                 unloadExceptions.Add(task.UnloadException);
             }

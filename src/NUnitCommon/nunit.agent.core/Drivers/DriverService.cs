@@ -56,7 +56,7 @@ namespace NUnit.Engine.Drivers
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
                 return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, "File type is not supported");
 
-            if (targetFramework != null)
+            if (targetFramework is not null)
             {
                 // This takes care of an issue with Roslyn. It may get fixed, but we still
                 // have to deal with assemblies having this setting. I'm assuming that

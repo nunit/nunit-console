@@ -24,7 +24,7 @@ namespace NUnit.Engine.Services
 
         void IProjectService.ExpandProjectPackage(TestPackage package)
         {
-            if (package.Name == null)
+            if (package.Name is null)
             {
                 throw new ArgumentException("Package must have a name", nameof(package));
             }

@@ -14,7 +14,7 @@ namespace NUnit.Engine
     {
         public static bool IsAssemblyPackage(this TestPackage package)
         {
-            return package.FullName != null && PathUtils.IsAssemblyFileType(package.FullName);
+            return package.FullName is not null && PathUtils.IsAssemblyFileType(package.FullName);
         }
 
         public static bool HasSubPackages(this TestPackage package)

@@ -42,7 +42,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         public bool IsPackageLoaded
         {
-            get { return LoadResult != null; }
+            get { return LoadResult is not null; }
         }
 
         public TestAgentRunner(TestPackage package)
@@ -89,7 +89,7 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult.</returns>
         public virtual TestEngineResult Load()
         {
-            Guard.OperationValid(TestDomain != null, "TestDomain is not set");
+            Guard.OperationValid(TestDomain is not null, "TestDomain is not set");
 
             var result = new TestEngineResult();
 
@@ -97,7 +97,7 @@ namespace NUnit.Engine.Runners
             // only a single assembly.
             var assemblyPackage = TestPackage.Select(p => !p.HasSubPackages()).First();
 
-            if (DriverService == null)
+            if (DriverService is null)
                 DriverService = new DriverService();
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
@@ -105,7 +105,7 @@ namespace NUnit.Engine.Runners
             string? targetFramework = assemblyPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, (string?)null);
             bool skipNonTestAssemblies = assemblyPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
-            if (_assemblyResolver != null && !TestDomain.IsDefaultAppDomain()
+            if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
                 && assemblyPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
             {
                 // It's OK to do this in the loop because the Add method

@@ -43,6 +43,7 @@
     <ItemGroup>
         <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" PrivateAssets="all" />
         <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)/StyleCop.Analyzers.globalconfig" />
+        <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.593" PrivateAssets="all" />
     </ItemGroup>
 
 </Project>

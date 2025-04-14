@@ -41,7 +41,7 @@ namespace NUnit.Engine.Services
                     }
                 }
 
-            if (theService == null)
+            if (theService is null)
             {
                 string message = $"Requested service {serviceType.FullName} was not found";
                 log.Error(message);

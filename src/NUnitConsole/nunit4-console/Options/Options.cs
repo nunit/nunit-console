@@ -194,7 +194,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public static IEnumerable<string> WrappedLines(string self, IEnumerable<int> widths)
         {
-            if (widths == null)
+            if (widths is null)
                 throw new ArgumentNullException("widths");
             return CreateWrappedLinesIterator(self, widths);
         }
@@ -394,7 +394,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AssertValid(int index)
         {
-            if (c.Option == null)
+            if (c.Option is null)
                 throw new InvalidOperationException("OptionContext.Option is null.");
             if (index >= c.Option.MaxValueCount)
                 throw new ArgumentOutOfRangeException("index");
@@ -508,7 +508,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected Option(string prototype, string? description, int maxValueCount, bool hidden)
         {
-            if (prototype == null)
+            if (prototype is null)
                 throw new ArgumentNullException("prototype");
             if (prototype.Length == 0)
                 throw new ArgumentException("Cannot be the empty string.", "prototype");
@@ -575,7 +575,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public string[] GetValueSeparators()
         {
-            if (separators == null)
+            if (separators is null)
                 return Array.Empty<string>();
             return (string[])separators.Clone();
         }
@@ -601,7 +601,7 @@ namespace NUnit.ConsoleRunner.Options
             T t = default(T)!;
             try
             {
-                if (value != null)
+                if (value is not null)
                 {
 #if PCL
                     if (targetType.GetTypeInfo ().IsEnum)
@@ -765,7 +765,7 @@ namespace NUnit.ConsoleRunner.Options
                 StringBuilder arg = new StringBuilder();
 
                 string? line;
-                while ((line = reader.ReadLine()) != null)
+                while ((line = reader.ReadLine()) is not null)
                 {
                     int t = line.Length;
 
@@ -929,9 +929,9 @@ namespace NUnit.ConsoleRunner.Options
 
         protected override string GetKeyForItem(Option item)
         {
-            if (item == null)
+            if (item is null)
                 throw new ArgumentNullException("option");
-            if (item.Names != null && item.Names.Length > 0)
+            if (item.Names is not null && item.Names.Length > 0)
                 return item.Names[0];
             // This should never happen, as it's invalid for Option to be
             // constructed w/o any names.
@@ -941,7 +941,7 @@ namespace NUnit.ConsoleRunner.Options
         [Obsolete("Use KeyedCollection.this[string]")]
         protected Option? GetOptionForName(string option)
         {
-            if (option == null)
+            if (option is null)
                 throw new ArgumentNullException("option");
             try
             {
@@ -978,7 +978,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AddImpl(Option option)
         {
-            if (option == null)
+            if (option is null)
                 throw new ArgumentNullException("option");
             List<string> added = new List<string>(option.Names.Length);
             try
@@ -1000,7 +1000,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string header)
         {
-            if (header == null)
+            if (header is null)
                 throw new ArgumentNullException("header");
             Add(new Category(header));
             return this;
@@ -1040,7 +1040,7 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, int count, Action<OptionValueCollection> action, bool hidden)
                 : base(prototype, description, count, hidden)
             {
-                if (action == null)
+                if (action is null)
                     throw new ArgumentNullException("action");
                 this.action = action;
             }
@@ -1063,7 +1063,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string prototype, string? description, Action<string> action, bool hidden)
         {
-            if (action == null)
+            if (action is null)
                 throw new ArgumentNullException("action");
             Option p = new ActionOption(prototype, description, 1,
                     delegate(OptionValueCollection v) { action(v[0]); }, hidden);
@@ -1083,7 +1083,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(string prototype, string? description, OptionAction<string, string> action, bool hidden)
         {
-            if (action == null)
+            if (action is null)
                 throw new ArgumentNullException("action");
             Option p = new ActionOption(prototype, description, 2,
                     delegate(OptionValueCollection v) { action(v[0], v[1]); }, hidden);
@@ -1098,7 +1098,7 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, Action<T> action)
                 : base(prototype, description, 1)
             {
-                if (action == null)
+                if (action is null)
                     throw new ArgumentNullException("action");
                 this.action = action;
             }
@@ -1116,7 +1116,7 @@ namespace NUnit.ConsoleRunner.Options
             public ActionOption(string prototype, string? description, OptionAction<TKey, TValue> action)
                 : base(prototype, description, 2)
             {
-                if (action == null)
+                if (action is null)
                     throw new ArgumentNullException("action");
                 this.action = action;
             }
@@ -1151,7 +1151,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OptionSet Add(ArgumentSource source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException("source");
             sources.Add(source);
             return this;
@@ -1164,7 +1164,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public List<string> Parse(IEnumerable<string> arguments)
         {
-            if (arguments == null)
+            if (arguments is null)
                 throw new ArgumentNullException("arguments");
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
@@ -1190,7 +1190,7 @@ namespace NUnit.ConsoleRunner.Options
                 if (!Parse(argument, c))
                     Unprocessed(unprocessed, def, c, argument);
             }
-            if (c.Option != null)
+            if (c.Option is not null)
                 c.Option.Invoke(c);
             return unprocessed;
         }
@@ -1246,7 +1246,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private static bool Unprocessed(ICollection<string> extra, Option? def, OptionContext c, string argument)
         {
-            if (def == null)
+            if (def is null)
             {
                 extra.Add(argument);
                 return false;
@@ -1262,7 +1262,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected bool GetOptionParts(string argument, [NotNullWhen(true)] out string? flag, [NotNullWhen(true)] out string? name, out string? sep, out string? value)
         {
-            if (argument == null)
+            if (argument is null)
                 throw new ArgumentNullException("argument");
 
             flag = name = sep = value = null;
@@ -1283,7 +1283,7 @@ namespace NUnit.ConsoleRunner.Options
 
         protected virtual bool Parse(string argument, OptionContext c)
         {
-            if (c.Option != null)
+            if (c.Option is not null)
             {
                 ParseValue(argument, c);
                 return true;
@@ -1324,10 +1324,10 @@ namespace NUnit.ConsoleRunner.Options
 
         private void ParseValue(string? option, OptionContext c)
         {
-            Guard.OperationValid(c.Option != null, "OptionContext.Option != null");
+            Guard.OperationValid(c.Option is not null, "OptionContext.Option != null");
 
-            if (option != null)
-                foreach (string o in c.Option.ValueSeparators != null
+            if (option is not null)
+                foreach (string o in c.Option.ValueSeparators is not null
                         ? option.Split(c.Option.ValueSeparators, c.Option.MaxValueCount - c.OptionValues.Count, StringSplitOptions.None)
                         : new string[] { option })
                 {
@@ -1426,13 +1426,13 @@ namespace NUnit.ConsoleRunner.Options
                     continue;
 
                 Category? c = p as Category;
-                if (c != null)
+                if (c is not null)
                 {
                     WriteDescription(o, p.Description, string.Empty, 80, 80);
                     continue;
                 }
                 CommandOption? co = p as CommandOption;
-                if (co != null)
+                if (co is not null)
                 {
                     WriteCommandDescription(o, co.Command, co.CommandName);
                     continue;
@@ -1456,7 +1456,7 @@ namespace NUnit.ConsoleRunner.Options
             foreach (ArgumentSource s in sources)
             {
                 string[] names = s.GetNames();
-                if (names == null || names.Length == 0)
+                if (names is null || names.Length == 0)
                     continue;
 
                 int written = 0;
@@ -1543,7 +1543,7 @@ namespace NUnit.ConsoleRunner.Options
                     Write(o, ref written, localizer("["));
                 }
                 Write(o, ref written, localizer("=" + GetArgumentName(0, p.MaxValueCount, p.Description)));
-                string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
+                string sep = p.ValueSeparators is not null && p.ValueSeparators.Length > 0
                     ? p.ValueSeparators[0]
                     : " ";
                 for (int c = 1; c < p.MaxValueCount; ++c)
@@ -1602,7 +1602,7 @@ namespace NUnit.ConsoleRunner.Options
 
         private static string GetDescription(string? description)
         {
-            if (description == null)
+            if (description is null)
                 return string.Empty;
             StringBuilder sb = new StringBuilder(description.Length);
             int start = -1;
@@ -1713,7 +1713,7 @@ namespace NUnit.ConsoleRunner.Options
         public CommandOption(Command command, string? commandName = null, bool hidden = false)
             : base("=:Command:= " + (commandName ?? command?.Name), (commandName ?? command?.Name), maxValueCount: 0, hidden: hidden)
         {
-            if (command == null)
+            if (command is null)
                 throw new ArgumentNullException(nameof(command));
             Command = command;
             CommandName = commandName ?? command.Name;
@@ -1767,10 +1767,10 @@ namespace NUnit.ConsoleRunner.Options
 
         private bool ShouldWrapOption(Option item)
         {
-            if (item == null)
+            if (item is null)
                 return false;
             var help = item as HelpOption;
-            if (help != null)
+            if (help is not null)
                 return false;
             foreach (var n in item.Names)
             {
@@ -1816,11 +1816,11 @@ namespace NUnit.ConsoleRunner.Options
 
         public CommandSet(string suite, TextWriter output, TextWriter error, MessageLocalizerConverter? localizer = null)
         {
-            if (suite == null)
+            if (suite is null)
                 throw new ArgumentNullException(nameof(suite));
-            if (output == null)
+            if (output is null)
                 throw new ArgumentNullException(nameof(output));
-            if (error == null)
+            if (error is null)
                 throw new ArgumentNullException(nameof(error));
 
             this.suite = suite;
@@ -1841,7 +1841,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public new CommandSet Add(Command value)
         {
-            if (value == null)
+            if (value is null)
                 throw new ArgumentNullException(nameof(value));
             AddCommand(value);
             options.Add(new CommandOption(value));
@@ -1850,12 +1850,12 @@ namespace NUnit.ConsoleRunner.Options
 
         private void AddCommand(Command value)
         {
-            if (value.CommandSet != null && value.CommandSet != this)
+            if (value.CommandSet is not null && value.CommandSet != this)
             {
                 throw new ArgumentException("Command instances can only be added to a single CommandSet.", nameof(value));
             }
             value.CommandSet = this;
-            if (value.Options != null)
+            if (value.Options is not null)
             {
                 value.Options.MessageLocalizer = options.MessageLocalizer;
             }
@@ -1945,10 +1945,10 @@ namespace NUnit.ConsoleRunner.Options
 
         public CommandSet Add(CommandSet nestedCommands)
         {
-            if (nestedCommands == null)
+            if (nestedCommands is null)
                 throw new ArgumentNullException(nameof(nestedCommands));
 
-            if (NestedCommandSets == null)
+            if (NestedCommandSets is null)
             {
                 NestedCommandSets = new List<CommandSet>();
             }
@@ -1980,7 +1980,7 @@ namespace NUnit.ConsoleRunner.Options
         {
             if (value == this)
                 return true;
-            if (NestedCommandSets == null)
+            if (NestedCommandSets is null)
                 return false;
             foreach (var nc in NestedCommandSets)
             {
@@ -2003,7 +2003,7 @@ namespace NUnit.ConsoleRunner.Options
                 }
             }
 
-            if (NestedCommandSets == null)
+            if (NestedCommandSets is null)
                 yield break;
 
             foreach (var subset in NestedCommandSets)
@@ -2047,16 +2047,16 @@ namespace NUnit.ConsoleRunner.Options
 
         public int Run(IEnumerable<string> arguments)
         {
-            if (arguments == null)
+            if (arguments is null)
                 throw new ArgumentNullException(nameof(arguments));
 
             this.showHelp = false;
-            if (help == null)
+            if (help is null)
             {
                 help = new HelpCommand();
                 AddCommand(help);
             }
-            Action<string> setHelp = v => showHelp = v != null;
+            Action<string> setHelp = v => showHelp = v is not null;
             if (!options.Contains("help"))
             {
                 options.Add("help", string.Empty, setHelp, hidden: true);
@@ -2076,7 +2076,7 @@ namespace NUnit.ConsoleRunner.Options
                 return 1;
             }
             var command = GetCommand(extra);
-            if (command == null)
+            if (command is null)
             {
                 help.WriteUnknownCommand(extra[0]);
                 return 1;
@@ -2120,11 +2120,11 @@ namespace NUnit.ConsoleRunner.Options
 
         private Command? TryGetNestedCommand(List<string> extra)
         {
-            if (NestedCommandSets == null)
+            if (NestedCommandSets is null)
                 return null;
 
             var nestedCommands = NestedCommandSets.Find(c => c.Suite == extra[0]);
-            if (nestedCommands == null)
+            if (nestedCommands is null)
                 return null;
 
             var extraCopy = new List<string>(extra);
@@ -2133,7 +2133,7 @@ namespace NUnit.ConsoleRunner.Options
                 return null;
 
             var command = nestedCommands.GetCommand(extraCopy);
-            if (command != null)
+            if (command is not null)
             {
                 extra.Clear();
                 extra.AddRange(extraCopy);
@@ -2177,16 +2177,16 @@ namespace NUnit.ConsoleRunner.Options
                     }
                     CommandSet.Options.WriteCommandDescription(CommandSet.Out, c.Value, c.Key);
                 }
-                if (CommandSet.help != null)
+                if (CommandSet.help is not null)
                     CommandSet.Options.WriteCommandDescription(CommandSet.Out, CommandSet.help, "help");
                 return 0;
             }
-            if (command == null)
+            if (command is null)
             {
                 WriteUnknownCommand(extra[0]);
                 return 1;
             }
-            if (command.Options != null)
+            if (command.Options is not null)
             {
                 command.Options.WriteOptionDescriptions(CommandSet.Out);
                 return 0;
@@ -2205,7 +2205,7 @@ namespace NUnit.ConsoleRunner.Options
                 commands.Add(new KeyValuePair<string, Command>(c.Name, c));
             }
 
-            if (commandSet.NestedCommandSets == null)
+            if (commandSet.NestedCommandSets is null)
                 return commands;
 
             foreach (var nc in commandSet.NestedCommandSets)
@@ -2222,7 +2222,7 @@ namespace NUnit.ConsoleRunner.Options
             {
                 commands.Add(new KeyValuePair<string, Command>($"{outer}{value.Suite} {v.Name}", v));
             }
-            if (value.NestedCommandSets == null)
+            if (value.NestedCommandSets is null)
                 return;
             foreach (var nc in value.NestedCommandSets)
             {
