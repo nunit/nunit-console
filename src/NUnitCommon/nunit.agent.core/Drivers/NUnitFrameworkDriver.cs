@@ -133,7 +133,7 @@ namespace NUnit.Engine.Drivers
         /// <returns>An Xml string representing the result</returns>
         public string Run(ITestEventListener? listener, string filter)
         {
-            return _api.Run(listener != null ? new EventInterceptor(listener) : null, filter);
+            return _api.Run(listener is not null ? new EventInterceptor(listener) : null, filter);
         }
 
         /// <summary>

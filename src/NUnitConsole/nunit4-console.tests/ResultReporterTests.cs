@@ -200,7 +200,7 @@ namespace NUnit.ConsoleRunner
 
             string? line;
             var lines = new List<string>();
-            while ((line = rdr.ReadLine()) != null)
+            while ((line = rdr.ReadLine()) is not null)
                 lines.Add(line);
 
             return lines;

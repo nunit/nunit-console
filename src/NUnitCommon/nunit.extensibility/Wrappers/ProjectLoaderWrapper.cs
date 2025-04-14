@@ -80,7 +80,7 @@ namespace NUnit.Extensibility.Wrappers
 
             public T GetSetting<T>(string name, T defaultValue)
             {
-                if (defaultValue == null)
+                if (defaultValue is null)
                     throw new ArgumentNullException(nameof(defaultValue));
                 return Invoke<T>(nameof(GetSetting), name, defaultValue);
             }

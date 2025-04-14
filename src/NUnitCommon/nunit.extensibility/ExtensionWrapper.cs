@@ -83,7 +83,7 @@ namespace NUnit.Extensibility
                 return method;
 
             method = _wrappedType.GetMethod(methodName, argTypes);
-            if (method == null)
+            if (method is null)
                 throw new MissingMethodException(methodName);
 
             return _methods[sig] = method;
@@ -94,7 +94,7 @@ namespace NUnit.Extensibility
             if (_properties.TryGetValue(propertyName, out PropertyInfo? property))
                 return property;
             property = _wrappedType.GetProperty(propertyName);
-            if (property == null)
+            if (property is null)
                 throw new MissingMemberException(propertyName);
             return _properties[propertyName] = property;
         }

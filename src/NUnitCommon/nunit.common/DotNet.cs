@@ -18,10 +18,10 @@ namespace NUnit.Engine
         private static string? _x64InstallDirectory;
         public static string? GetX64InstallDirectory()
         {
-            if (_x64InstallDirectory == null)
+            if (_x64InstallDirectory is null)
                 _x64InstallDirectory = Environment.GetEnvironmentVariable("DOTNET_ROOT");
 
-            if (_x64InstallDirectory == null)
+            if (_x64InstallDirectory is null)
             {
 #if NETFRAMEWORK
                 if (Path.DirectorySeparatorChar == '\\')
@@ -42,10 +42,10 @@ namespace NUnit.Engine
         private static string? _x86InstallDirectory;
         public static string? GetX86InstallDirectory()
         {
-            if (_x86InstallDirectory == null)
+            if (_x86InstallDirectory is null)
                 _x86InstallDirectory = Environment.GetEnvironmentVariable("DOTNET_ROOT_X86");
 
-            if (_x86InstallDirectory == null)
+            if (_x86InstallDirectory is null)
             {
 #if NETFRAMEWORK
                 if (Path.DirectorySeparatorChar == '\\')

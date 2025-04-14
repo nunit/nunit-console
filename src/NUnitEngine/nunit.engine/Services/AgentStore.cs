@@ -64,7 +64,7 @@ namespace NUnit.Engine.Services
                     && record.Status != AgentStatus.Terminated)
                 {
                     process = record.Process;
-                    return process != null;
+                    return process is not null;
                 }
 
                 process = null;

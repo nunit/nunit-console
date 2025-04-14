@@ -96,7 +96,7 @@ namespace NUnit.Engine.Drivers
             _frameworkAssembly = LoadAssembly(_nunitRef);
 
             _frameworkController = CreateInstance(CONTROLLER_TYPE, testAssembly, idPrefix, settings);
-            if (_frameworkController == null)
+            if (_frameworkController is null)
             {
                 log.Error(INVALID_FRAMEWORK_MESSAGE);
                 throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
@@ -114,14 +114,14 @@ namespace NUnit.Engine.Drivers
         {
             CheckLoadWasCalled();
             object? count = ExecuteMethod(COUNT_METHOD, filter);
-            return count != null ? (int)count : 0;
+            return count is not null ? (int)count : 0;
         }
 
         public string Run(ITestEventListener? listener, string filter)
         {
             CheckLoadWasCalled();
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
-            Action<string>? callback = listener != null ? listener.OnTestEvent : null;
+            Action<string>? callback = listener is not null ? listener.OnTestEvent : null;
             return (string)ExecuteMethod(RUN_METHOD, [typeof(Action<string>), typeof(string)], callback, filter);
         }
 
@@ -146,7 +146,7 @@ namespace NUnit.Engine.Drivers
 
         private void CheckLoadWasCalled()
         {
-            if (_frameworkController == null)
+            if (_frameworkController is null)
                 throw new InvalidOperationException(LOAD_MESSAGE);
         }
 
@@ -164,7 +164,7 @@ namespace NUnit.Engine.Drivers
             try
             {
                 assembly = _assemblyLoadContext?.LoadFromAssemblyPath(assemblyPath)!;
-                if (assembly == null)
+                if (assembly is null)
                     throw new Exception("LoadFromAssemblyPath returned null");
             }
             catch (Exception e)
@@ -185,7 +185,7 @@ namespace NUnit.Engine.Drivers
             try
             {
                 assembly = _assemblyLoadContext?.LoadFromAssemblyName(assemblyName)!;
-                if (assembly == null)
+                if (assembly is null)
                     throw new Exception("LoadFromAssemblyName returned null");
             }
             catch (Exception e)
@@ -227,7 +227,7 @@ namespace NUnit.Engine.Drivers
 
         private object ExecuteMethod(MethodInfo? method, params object?[] args)
         {
-            if (method == null)
+            if (method is null)
                 throw new NUnitEngineException(INVALID_FRAMEWORK_MESSAGE);
 
             log.Debug($"Executing {method.DeclaringType}.{method.Name}");

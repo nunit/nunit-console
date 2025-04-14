@@ -100,7 +100,7 @@ namespace NUnit.Engine.Drivers
         private static string? GetSkipReason(XmlNode result)
         {
             var propNode = result.SelectSingleNode(string.Format("properties/property[@name='{0}']", PropertyNames.SkipReason));
-            return propNode == null ? null : propNode.GetAttribute("value");
+            return propNode is null ? null : propNode.GetAttribute("value");
         }
 
         private class NullListener : ITestEventListener

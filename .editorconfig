@@ -14,3 +14,17 @@ indent_size = 4
 [*.{proj,csproj,vcxproj,xproj,json,config,nuspec,xml,yml}]
 indent_style = space
 indent_size = 2
+
+##########################################################################################
+# Analysis settings
+
+[*.cs]
+# CSharpIsNull Analyzers
+
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
+
+# CSIsNull001: Use `is null` for null checks
+dotnet_diagnostic.CSIsNull001.severity = warning
+
+# CSIsNull002: Use `is object` for non-null checks
+dotnet_diagnostic.CSIsNull002.severity = warning

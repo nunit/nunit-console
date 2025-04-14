@@ -38,7 +38,7 @@ namespace NUnit.ConsoleRunner
             doc.LoadXml(report);
 
             var testEvent = doc.FirstChild;
-            if (testEvent == null)
+            if (testEvent is null)
                 return;
 
             switch (testEvent.Name)
@@ -65,7 +65,7 @@ namespace NUnit.ConsoleRunner
         {
             var testName = testResult.Attributes?["fullname"]?.Value;
 
-            if (_displayBeforeTest && testName != null)
+            if (_displayBeforeTest && testName is not null)
                 WriteLabelLine(testName);
         }
 
@@ -73,13 +73,13 @@ namespace NUnit.ConsoleRunner
         {
             var testName = testResult.Attributes?["fullname"]?.Value;
 
-            if (testName == null)
+            if (testName is null)
                 return;
 
             var status = testResult.GetAttribute("label") ?? testResult.GetAttribute("result") ?? "Unknown";
             var outputNode = testResult.SelectSingleNode("output");
 
-            if (outputNode != null)
+            if (outputNode is not null)
             {
                 if (_displayBeforeOutput)
                     WriteLabelLine(testName);
@@ -97,7 +97,7 @@ namespace NUnit.ConsoleRunner
             var suiteName = testResult.Attributes?["fullname"]?.Value;
             var outputNode = testResult.SelectSingleNode("output");
 
-            if (suiteName != null && outputNode != null)
+            if (suiteName is not null && outputNode is not null)
             {
                 if (_displayBeforeOutput)
                     WriteLabelLine(suiteName);
@@ -111,7 +111,7 @@ namespace NUnit.ConsoleRunner
         {
             var testName = outputNode.GetAttribute("testname");
 
-            if (testName != null)
+            if (testName is not null)
             {
                 if (_displayBeforeOutput)
                     WriteLabelLine(testName);
@@ -141,7 +141,7 @@ namespace NUnit.ConsoleRunner
             FlushNewLineIfNeeded();
             _lastTestOutput = label;
 
-            if (status != null)
+            if (status is not null)
             {
                 _outWriter.Write(GetColorForResultStatus(status), $"{status} ");
             }

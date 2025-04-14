@@ -78,7 +78,7 @@ namespace NUnit.Engine
         /// </summary>
         public string? Name
         {
-            get { return FullName == null ? null : Path.GetFileName(FullName); }
+            get { return FullName is null ? null : Path.GetFileName(FullName); }
         }
 
         /// <summary>

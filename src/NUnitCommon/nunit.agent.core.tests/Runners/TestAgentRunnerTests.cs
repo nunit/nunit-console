@@ -35,7 +35,7 @@ namespace NUnit.Engine.Runners
         [TearDown]
         public void Cleanup()
         {
-            if (_runner != null)
+            if (_runner is not null)
                 _runner.Dispose();
         }
 

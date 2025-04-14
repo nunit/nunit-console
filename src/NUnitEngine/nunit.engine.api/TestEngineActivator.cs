@@ -22,7 +22,7 @@ namespace NUnit.Engine
         {
             var apiLocation = typeof(TestEngineActivator).Assembly.Location;
             var directoryName = Path.GetDirectoryName(apiLocation);
-            var enginePath = directoryName == null ? DEFAULT_ENGINE_ASSEMBLY : Path.Combine(directoryName, DEFAULT_ENGINE_ASSEMBLY);
+            var enginePath = directoryName is null ? DEFAULT_ENGINE_ASSEMBLY : Path.Combine(directoryName, DEFAULT_ENGINE_ASSEMBLY);
             var assembly = Assembly.LoadFrom(enginePath);
             var engineType = assembly.GetType(DEFAULT_ENGINE_TYPE, throwOnError: true)!;
             return (ITestEngine)Activator.CreateInstance(engineType)!;

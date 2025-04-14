@@ -48,9 +48,9 @@ namespace NUnit.Engine.Runners
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
-            if (services == null)
+            if (services is null)
                 throw new ArgumentNullException("services");
-            if (package == null)
+            if (package is null)
                 throw new ArgumentNullException("package");
 
             _services = services;
@@ -85,7 +85,7 @@ namespace NUnit.Engine.Runners
         /// </summary>
         protected bool IsPackageLoaded
         {
-            get { return LoadResult != null; }
+            get { return LoadResult is not null; }
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace NUnit.Engine.Runners
         {
             if (!_disposed)
             {
-                if (disposing && _engineRunner != null)
+                if (disposing && _engineRunner is not null)
                     _engineRunner.Dispose();
 
                 _disposed = true;
@@ -243,7 +243,7 @@ namespace NUnit.Engine.Runners
         //Exposed for testing
         internal ITestEngineRunner GetEngineRunner()
         {
-            if (_engineRunner == null)
+            if (_engineRunner is null)
             {
                 // Some files in the top level package may be projects.
                 // Expand them so that they contain subprojects for
@@ -270,7 +270,7 @@ namespace NUnit.Engine.Runners
         // allows the lower-level runners to be completely ignorant of projects
         private TestEngineResult PrepareResult(TestEngineResult result)
         {
-            if (result == null)
+            if (result is null)
                 throw new ArgumentNullException("result");
 
             // See if we have any projects to deal with. At this point,
@@ -332,7 +332,7 @@ namespace NUnit.Engine.Runners
 
         private void EnsurePackagesAreExpanded(TestPackage package)
         {
-            if (package == null)
+            if (package is null)
                 throw new ArgumentNullException("package");
 
             foreach (var subPackage in package.SubPackages)
@@ -348,11 +348,11 @@ namespace NUnit.Engine.Runners
 
         private bool IsProjectPackage(TestPackage package)
         {
-            if (package == null)
+            if (package is null)
                 throw new ArgumentNullException("package");
 
             return
-                _projectService != null
+                _projectService is not null
                 && !string.IsNullOrEmpty(package.FullName)
                 && _projectService.CanLoadFrom(package.FullName);
         }
@@ -423,7 +423,7 @@ namespace NUnit.Engine.Runners
             _eventDispatcher.Listeners.Clear();
             _eventDispatcher.Listeners.Add(_workItemTracker);
 
-            if (listener != null)
+            if (listener is not null)
                 _eventDispatcher.Listeners.Add(listener);
 
             foreach (var extension in _extensionService.GetExtensions<ITestEventListener>())
@@ -493,7 +493,7 @@ namespace NUnit.Engine.Runners
         {
             var doc = resultNode.OwnerDocument;
 
-            if (doc == null)
+            if (doc is null)
             {
                 return;
             }
@@ -517,7 +517,7 @@ namespace NUnit.Engine.Runners
             }
 
             var doc = resultNode.OwnerDocument;
-            if (doc == null)
+            if (doc is null)
             {
                 return;
             }

@@ -27,7 +27,7 @@ namespace NUnit.ConsoleRunner
         {
             get
             {
-                if (_outWriter == null)
+                if (_outWriter is null)
                     _outWriter = new ColorConsoleWriter(!Options.NoColor);
 
                 return _outWriter;
@@ -97,10 +97,10 @@ namespace NUnit.ConsoleRunner
                         return ConsoleRunner.INVALID_ARG;
                     }
 
-                    if (Options.WorkDirectory != null)
+                    if (Options.WorkDirectory is not null)
                         engine.WorkDirectory = Options.WorkDirectory;
 
-                    engine.InternalTraceLevel = Options.InternalTraceLevel != null
+                    engine.InternalTraceLevel = Options.InternalTraceLevel is not null
                         ? (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), Options.InternalTraceLevel)
                         : InternalTraceLevel.Off;
 

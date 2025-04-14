@@ -42,14 +42,14 @@ namespace NUnit.Engine.Runners
         [TestCase(20, 8, 8)]
         public void CheckLevelOfParallelism_ListOfAssemblies(int assemblyCount, int? maxAgents, int expected)
         {
-            if (maxAgents == null)
+            if (maxAgents is null)
                 expected = Math.Min(assemblyCount, _processorCount);
 
             var assemblies = new List<string>();
             for (int i = 1; i <= assemblyCount; i++)
                 assemblies.Add($"test{i}.dll");
             var package = new TestPackage(assemblies);
-            if (maxAgents != null)
+            if (maxAgents is not null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
             var runner = new MultipleTestProcessRunner(_serviceContext, package, _processorCount);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
@@ -76,7 +76,7 @@ namespace NUnit.Engine.Runners
             var package = new TestPackage(new string[] { "proj.nunit" });
             for (int i = 1; i <= assemblyCount; i++)
                 package.SubPackages[0].AddSubPackage(new TestPackage($"test{i}.dll"));
-            if (maxAgents != null)
+            if (maxAgents is not null)
                 package.Settings[EnginePackageSettings.MaxAgents] = maxAgents;
             var runner = new MultipleTestProcessRunner(_serviceContext, package);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));

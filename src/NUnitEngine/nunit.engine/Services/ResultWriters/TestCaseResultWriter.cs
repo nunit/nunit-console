@@ -29,7 +29,7 @@ namespace NUnit.Engine.Services
         public void WriteResultFile(XmlNode resultNode, TextWriter writer)
         {
             XmlNodeList? testCases = resultNode.SelectNodes("//test-case");
-            if (testCases != null)
+            if (testCases is not null)
                 foreach (XmlNode node in testCases)
                     writer.WriteLine(node.Attributes?["fullname"]?.Value);
         }

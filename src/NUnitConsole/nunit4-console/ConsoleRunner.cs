@@ -63,16 +63,16 @@ namespace NUnit.ConsoleRunner
 
             // NOTE: Accessing Services triggers the engine to initialize all services
             _resultService = _engine.Services.GetService<IResultService>();
-            Guard.OperationValid(_resultService != null, "Internal Error: ResultService was not found");
+            Guard.OperationValid(_resultService is not null, "Internal Error: ResultService was not found");
 
             _filterService = _engine.Services.GetService<ITestFilterService>();
-            Guard.OperationValid(_filterService != null, "Internal Error: TestFilterService was not found");
+            Guard.OperationValid(_filterService is not null, "Internal Error: TestFilterService was not found");
 
             _extensionService = _engine.Services.GetService<IExtensionService>();
-            Guard.OperationValid(_extensionService != null, "Internal Error: ExtensionService was not found");
+            Guard.OperationValid(_extensionService is not null, "Internal Error: ExtensionService was not found");
 
             _extensionService = _engine.Services.GetService<IExtensionService>();
-            Guard.OperationValid(_extensionService != null, "Internal Error: ExtensionService was not found");
+            Guard.OperationValid(_extensionService is not null, "Internal Error: ExtensionService was not found");
 
             var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
             if (!string.IsNullOrEmpty(extensionPath))
@@ -239,7 +239,7 @@ namespace NUnit.ConsoleRunner
                 }
             }
 
-            var labels = _options.DisplayTestLabels != null
+            var labels = _options.DisplayTestLabels is not null
                 ? _options.DisplayTestLabels.ToUpperInvariant()
                 : "ON";
 
@@ -267,7 +267,7 @@ namespace NUnit.ConsoleRunner
                 engineException = ex;
             }
 
-            if (result != null)
+            if (result is not null)
             {
                 var reporter = new ResultReporter(result, writer, _options);
                 reporter.ReportResults();
@@ -279,13 +279,13 @@ namespace NUnit.ConsoleRunner
                     writer.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
 
-                if (engineException != null)
+                if (engineException is not null)
                 {
                     writer.WriteLine(ColorStyle.Error, Environment.NewLine + ExceptionHelper.BuildMessage(engineException));
                     return ConsoleRunner.UNEXPECTED_ERROR;
                 }
 
-                if (unloadException != null)
+                if (unloadException is not null)
                 {
                     writer.WriteLine(ColorStyle.Warning, Environment.NewLine + ExceptionHelper.BuildMessage(unloadException));
                 }
@@ -304,7 +304,7 @@ namespace NUnit.ConsoleRunner
             }
 
             // If we got here, it's because we had an exception, but check anyway
-            if (engineException != null)
+            if (engineException is not null)
             {
                 writer.WriteLine(ColorStyle.Error, ExceptionHelper.BuildMessage(engineException));
                 writer.WriteLine();
@@ -489,7 +489,7 @@ namespace NUnit.ConsoleRunner
             if (options.PauseBeforeRun)
                 package.AddSetting(FrameworkPackageSettings.PauseBeforeRun, true);
 
-            if (options.PrincipalPolicy != null)
+            if (options.PrincipalPolicy is not null)
                 package.AddSetting(EnginePackageSettings.PrincipalPolicy, options.PrincipalPolicy);
 
 #if DEBUG
@@ -501,13 +501,13 @@ namespace NUnit.ConsoleRunner
             //        throw new Exception(string.Format("Package setting {0} is not a valid type", entry.Key));
 #endif
 
-            if (options.DefaultTestNamePattern != null)
+            if (options.DefaultTestNamePattern is not null)
                 package.AddSetting(FrameworkPackageSettings.DefaultTestNamePattern, options.DefaultTestNamePattern);
 
             if (options.TestParameters.Count != 0)
                 AddTestParametersSetting(package, options.TestParameters);
 
-            if (options.ConfigurationFile != null)
+            if (options.ConfigurationFile is not null)
                 package.AddSetting(EnginePackageSettings.ConfigurationFile, options.ConfigurationFile);
 
             return package;

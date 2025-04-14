@@ -34,7 +34,7 @@ namespace NUnit.Engine.Internal
             log.Debug("Loading {0} assembly", name);
 
             var loadedAssembly = base.Load(name);
-            if (loadedAssembly != null)
+            if (loadedAssembly is not null)
             {
                 log.Info("Assembly {0} ({1}) is loaded using default base.Load()", name, GetAssemblyLocationInfo(loadedAssembly));
                 return loadedAssembly;
@@ -47,14 +47,14 @@ namespace NUnit.Engine.Internal
                 loadedAssembly = LoadFromAssemblyPath(runtimeResolverPath);
             }
 
-            if (loadedAssembly != null)
+            if (loadedAssembly is not null)
             {
                 log.Info("Assembly {0} ({1}) is loaded using the deps.json info", name, GetAssemblyLocationInfo(loadedAssembly));
                 return loadedAssembly;
             }
 
             loadedAssembly = _resolver.Resolve(this, name);
-            if (loadedAssembly != null)
+            if (loadedAssembly is not null)
             {
                 log.Info("Assembly {0} ({1}) is loaded using the TestAssembliesResolver", name, GetAssemblyLocationInfo(loadedAssembly));
 
@@ -71,7 +71,7 @@ namespace NUnit.Engine.Internal
                 loadedAssembly = LoadFromAssemblyPath(assemblyPath);
             }
 
-            if (loadedAssembly != null)
+            if (loadedAssembly is not null)
             {
                 log.Info("Assembly {0} ({1}) is loaded using base path", name, GetAssemblyLocationInfo(loadedAssembly));
                 return loadedAssembly;

@@ -23,7 +23,7 @@ namespace NUnit.FileSystemAccess
         /// <exception cref="SIO.PathTooLongException"><paramref name="path"/> exceeds the system-defined maximum length.</exception>
         public Directory(string path)
         {
-            if (path == null)
+            if (path is null)
             {
                 throw new ArgumentNullException(nameof(path));
             }
@@ -35,7 +35,7 @@ namespace NUnit.FileSystemAccess
 
             this.directory = new SIO.DirectoryInfo(path);
 
-            this.Parent = this.directory.Parent == null ? null : new Directory(directory.Parent.FullName);
+            this.Parent = this.directory.Parent is null ? null : new Directory(directory.Parent.FullName);
         }
 
         /// <inheritdoc/>

@@ -30,7 +30,7 @@ namespace NUnit.ConsoleRunner
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
             ConfigureOptions();
-            if (args != null)
+            if (args is not null)
                 Parse(args);
         }
 
@@ -63,7 +63,7 @@ namespace NUnit.ConsoleRunner
         [MemberNotNullWhen(true, nameof(WhereClause))]
         public bool WhereClauseSpecified
         {
-            get { return WhereClause != null; }
+            get { return WhereClause is not null; }
         }
 
         public int DefaultTestCaseTimeout { get; private set; } = -1;
@@ -102,7 +102,7 @@ namespace NUnit.ConsoleRunner
         [MemberNotNullWhen(true, nameof(OutFile))]
         public bool OutFileSpecified
         {
-            get { return OutFile != null; }
+            get { return OutFile is not null; }
         }
 
         public string? DisplayTestLabels { get; private set; }
@@ -114,7 +114,7 @@ namespace NUnit.ConsoleRunner
         }
         public bool WorkDirectorySpecified
         {
-            get { return workDirectory != null; }
+            get { return workDirectory is not null; }
         }
 
         public string? InternalTraceLevel { get; private set; }
@@ -122,7 +122,7 @@ namespace NUnit.ConsoleRunner
         [MemberNotNullWhen(true, nameof(InternalTraceLevel))]
         public bool InternalTraceLevelSpecified
         {
-            get { return InternalTraceLevel != null; }
+            get { return InternalTraceLevel is not null; }
         }
 
         private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
@@ -150,7 +150,7 @@ namespace NUnit.ConsoleRunner
         [MemberNotNullWhen(true, nameof(ActiveConfig))]
         public bool ActiveConfigSpecified
         {
-            get { return ActiveConfig != null; }
+            get { return ActiveConfig is not null; }
         }
 
         // How to Run Tests
@@ -160,7 +160,7 @@ namespace NUnit.ConsoleRunner
         [MemberNotNullWhen(true, nameof(RuntimeFramework))]
         public bool RuntimeFrameworkSpecified
         {
-            get { return RuntimeFramework != null; }
+            get { return RuntimeFramework is not null; }
         }
 
         public string? ConfigurationFile { get; private set; }
@@ -277,7 +277,7 @@ namespace NUnit.ConsoleRunner
                 v =>
                 {
                     var spec = parser.ResolveOutputSpecification(parser.RequiredValue(v, "--resultxml"), resultOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
-                    if (spec != null)
+                    if (spec is not null)
                         resultOutputSpecifications.Add(spec);
                 });
 
@@ -285,7 +285,7 @@ namespace NUnit.ConsoleRunner
             {
                 Explore = true;
                 var spec = parser.ResolveOutputSpecification(v, ExploreOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
-                if (spec != null)
+                if (spec is not null)
                     ExploreOutputSpecifications.Add(spec);
             });
 
@@ -423,7 +423,7 @@ namespace NUnit.ConsoleRunner
 
         public IEnumerable<string> PreParse(IEnumerable<string> args)
         {
-            if (args == null)
+            if (args is null)
                 throw new ArgumentNullException("args");
 
             if (++_nesting > 3)
@@ -500,7 +500,7 @@ namespace NUnit.ConsoleRunner
 
         private string? ExpandToFullPath(string path)
         {
-            if (path == null)
+            if (path is null)
                 return null;
 
             return Path.GetFullPath(path);

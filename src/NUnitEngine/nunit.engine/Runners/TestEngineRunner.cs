@@ -41,7 +41,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// Gets an indicator of whether the package has been loaded.
         /// </summary>
-        public bool IsPackageLoaded => LoadResult != null;
+        public bool IsPackageLoaded => LoadResult is not null;
 
         /// <summary>
         /// Loads the TestPackage for exploration or execution.
@@ -130,7 +130,7 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public TestEngineResult Reload()
         {
-            if (this.TestPackage == null)
+            if (this.TestPackage is null)
                 throw new InvalidOperationException("MasterTestRunner: Reload called before Load");
 
             return LoadResult = ReloadPackage();

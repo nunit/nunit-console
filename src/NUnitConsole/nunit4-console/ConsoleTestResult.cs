@@ -67,7 +67,7 @@ namespace NUnit.ConsoleRunner
         {
             get
             {
-                if (_assertions == null)
+                if (_assertions is null)
                 {
                     _assertions = new List<AssertionResult>();
                     XmlNodeList? assertions = _resultNode.SelectNodes("assertions/assertion");
@@ -131,7 +131,7 @@ namespace NUnit.ConsoleRunner
             // In order to control the format, we trim any line-end chars
             // from end of the strings we write and supply them via calls
             // to WriteLine(). Newlines within the strings are retained.
-            return node != null
+            return node is not null
                 ? node.InnerText.TrimEnd(EOL_CHARS)
                 : null;
         }

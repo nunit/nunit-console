@@ -15,7 +15,7 @@ namespace NUnit.Engine.Services
 
         // We can do this because we currently only build under NETFRAMEWORK
         private static Runtime _currentRuntime =
-            Type.GetType("Mono.Runtime", false) != null
+            Type.GetType("Mono.Runtime", false) is not null
                 ? Runtime.Mono
                 : Runtime.Net;
 

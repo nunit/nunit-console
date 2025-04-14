@@ -49,7 +49,7 @@ namespace NUnit.Engine
                     filter.Append("</or>");
             }
 
-            if (_whereClause != null)
+            if (_whereClause is not null)
                 filter.Append(TestSelectionParser.Parse(_whereClause));
 
             filter.Append("</filter>");

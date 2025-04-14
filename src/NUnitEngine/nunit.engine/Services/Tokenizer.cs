@@ -50,7 +50,7 @@ namespace NUnit.Engine
 
         public override string ToString()
         {
-            return Text != null
+            return Text is not null
                 ? Kind.ToString() + ":" + Text
                 : Kind.ToString();
         }
@@ -91,7 +91,7 @@ namespace NUnit.Engine
 
         public Tokenizer(string input)
         {
-            if (input == null)
+            if (input is null)
                 throw new ArgumentNullException("input");
 
             _input = input;
@@ -102,7 +102,7 @@ namespace NUnit.Engine
         {
             get
             {
-                if (_lookahead == null)
+                if (_lookahead is null)
                     _lookahead = GetNextToken();
 
                 return _lookahead;

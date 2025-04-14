@@ -93,7 +93,7 @@ namespace NUnit.FileSystemAccess
                     newList.Add(dir);
                 else if (pattern == "..")
                 {
-                    if (dir.Parent != null)
+                    if (dir.Parent is not null)
                         newList.Add(dir.Parent);
                 }
                 else if (pattern == "**")
