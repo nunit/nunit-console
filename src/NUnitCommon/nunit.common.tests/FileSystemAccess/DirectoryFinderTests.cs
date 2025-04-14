@@ -441,7 +441,7 @@ namespace NUnit.Engine.Internal
         {
             var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
 
-            Assert.That(() => finder.GetDirectories((IDirectory)null!, "notused"), Throws.ArgumentNullException.With.Message.Contains(" startDirectory "));
+            Assert.That(() => finder.GetDirectories((IDirectory)null!, "notused"), Throws.ArgumentNullException.With.Message.Contains("startDirectory"));
         }
 
         [Test]
@@ -449,7 +449,7 @@ namespace NUnit.Engine.Internal
         {
             var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
 
-            Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), null!), Throws.ArgumentNullException.With.Message.Contains(" pattern "));
+            Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), null!), Throws.ArgumentNullException.With.Message.Contains("pattern"));
         }
 
         [Test]
@@ -594,7 +594,7 @@ namespace NUnit.Engine.Internal
         {
             var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
 
-            Assert.That(() => finder.GetFiles((IDirectory)null!, "notused"), Throws.ArgumentNullException.With.Message.Contains(" startDirectory "));
+            Assert.That(() => finder.GetFiles((IDirectory)null!, "notused"), Throws.ArgumentNullException.With.Message.Contains("startDirectory"));
         }
 
         [Test]
@@ -602,7 +602,7 @@ namespace NUnit.Engine.Internal
         {
             var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
 
-            Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), null!), Throws.ArgumentNullException.With.Message.Contains(" pattern "));
+            Assert.That(() => finder.GetDirectories(Substitute.For<IDirectory>(), null!), Throws.ArgumentNullException.With.Message.Contains("pattern"));
         }
 
         [Test]
@@ -610,7 +610,7 @@ namespace NUnit.Engine.Internal
         {
             var finder = new DirectoryFinder(Substitute.For<IFileSystem>());
 
-            Assert.That(() => finder.GetFiles(Substitute.For<IDirectory>(), string.Empty), Throws.ArgumentException.With.Message.Contains(" pattern "));
+            Assert.That(() => finder.GetFiles(Substitute.For<IDirectory>(), string.Empty), Throws.ArgumentException.With.Message.Contains("pattern"));
         }
 
         private static string CreateAbsolutePath(IEnumerable<string> parts)

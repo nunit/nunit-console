@@ -59,7 +59,7 @@ namespace NUnit.Engine.Runners
         }
 
         // Made separate and internal for testing
-        private AppDomainSetup CreateAppDomainSetup(TestPackage package)
+        private static AppDomainSetup CreateAppDomainSetup(TestPackage package)
         {
             AppDomainSetup setup = new AppDomainSetup();
 
@@ -99,7 +99,7 @@ namespace NUnit.Engine.Runners
             return setup;
         }
 
-        public void Unload(AppDomain domain)
+        public static void Unload(AppDomain domain)
         {
             new DomainUnloader(domain).Unload();
         }
@@ -169,7 +169,7 @@ namespace NUnit.Engine.Runners
         /// <returns>The ApplicationBase</returns>
         public static string? GetApplicationBase(TestPackage package)
         {
-            Guard.ArgumentNotNull(package, "package");
+            Guard.ArgumentNotNull(package);
 
             var appBase = package.GetSetting(EnginePackageSettings.BasePath, string.Empty);
 
@@ -190,8 +190,8 @@ namespace NUnit.Engine.Runners
 
         public static string? GetConfigFile(string appBase, TestPackage package)
         {
-            Guard.ArgumentNotNullOrEmpty(appBase, "appBase");
-            Guard.ArgumentNotNull(package, "package");
+            Guard.ArgumentNotNullOrEmpty(appBase);
+            Guard.ArgumentNotNull(package);
 
             // Use provided setting if available
             string configFile = package.GetSetting(EnginePackageSettings.ConfigurationFile, string.Empty);

@@ -160,14 +160,14 @@ namespace NUnit.Extensibility
 
         public int IntProperty
         {
-            get => GetProperty<int>("IntProperty");
-            set => SetProperty("IntProperty", value);
+            get => GetProperty<int>(nameof(IntProperty));
+            set => SetProperty(nameof(IntProperty), value);
         }
 
         public string? StringProperty
         {
-            get => GetProperty<string>("StringProperty");
-            set => SetProperty("StringProperty", value);
+            get => GetProperty<string>(nameof(StringProperty));
+            set => SetProperty(nameof(StringProperty), value);
         }
     }
 

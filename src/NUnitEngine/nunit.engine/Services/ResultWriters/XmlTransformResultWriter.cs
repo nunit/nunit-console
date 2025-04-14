@@ -16,13 +16,13 @@ namespace NUnit.Engine.Services
 
         public XmlTransformResultWriter(object?[] args)
         {
-            Guard.ArgumentNotNull(args, "args");
+            Guard.ArgumentNotNull(args);
             _xsltFile = (string?)args[0];
 
             Guard.ArgumentValid(
                 !string.IsNullOrEmpty(_xsltFile),
                 "Argument to XmlTransformWriter must be a non-empty string",
-                "args");
+                nameof(args));
 
             try
             {

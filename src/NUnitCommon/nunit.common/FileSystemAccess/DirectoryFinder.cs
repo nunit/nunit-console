@@ -27,8 +27,8 @@ namespace NUnit.FileSystemAccess
         /// <inheritdoc/>
         public IEnumerable<IDirectory> GetDirectories(IDirectory startDirectory, string pattern)
         {
-            Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
-            Guard.ArgumentNotNull(pattern, nameof(pattern));
+            Guard.ArgumentNotNull(startDirectory);
+            Guard.ArgumentNotNull(pattern);
 
             if (Path.DirectorySeparatorChar == '\\')
                 pattern = pattern.Replace(Path.DirectorySeparatorChar, '/');
@@ -63,8 +63,8 @@ namespace NUnit.FileSystemAccess
         /// <inheritdoc/>
         public IEnumerable<IFile> GetFiles(IDirectory startDirectory, string pattern)
         {
-            Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
-            Guard.ArgumentNotNullOrEmpty(pattern, nameof(pattern));
+            Guard.ArgumentNotNull(startDirectory);
+            Guard.ArgumentNotNullOrEmpty(pattern);
 
             // If there is no directory path in pattern, delegate to DirectoryInfo
             int lastSep = pattern.LastIndexOf('/');

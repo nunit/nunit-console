@@ -71,7 +71,7 @@ namespace NUnit.Engine.Runners
         public void CanUnloadDomain()
         {
             var domain = _domainManager.CreateDomain(_package);
-            _domainManager.Unload(domain);
+            DomainManager.Unload(domain);
 
             CheckDomainIsUnloaded(domain);
         }
@@ -80,14 +80,14 @@ namespace NUnit.Engine.Runners
         public void UnloadingTwiceThrowsNUnitEngineUnloadException()
         {
             var domain = _domainManager.CreateDomain(_package);
-            _domainManager.Unload(domain);
+            DomainManager.Unload(domain);
 
-            Assert.That(() => _domainManager.Unload(domain), Throws.TypeOf<NUnitEngineUnloadException>());
+            Assert.That(() => DomainManager.Unload(domain), Throws.TypeOf<NUnitEngineUnloadException>());
 
             CheckDomainIsUnloaded(domain);
         }
 
-        private void CheckDomainIsUnloaded(AppDomain domain)
+        private static void CheckDomainIsUnloaded(AppDomain domain)
         {
             // HACK: Either the Assert will succeed or the
             // exception should be thrown.

@@ -16,11 +16,12 @@ namespace NUnit
         /// Throws an exception if an argument is null
         /// </summary>
         /// <param name="value">The value to be tested</param>
-        /// <param name="name">The name of the argument</param>
-        public static void ArgumentNotNull(object value, string name)
+        /// <param name="name">Compiler supplied parameter for the <paramref name="value"/> expression.</param>
+        public static void ArgumentNotNull<T>(T value, [CallerArgumentExpression(nameof(value))] string name = "")
+            where T : notnull
         {
             if (value is null)
-                throw new ArgumentNullException("Argument " + name + " must not be null", name);
+                throw new ArgumentNullException(name);
         }
 
         /// <summary>
@@ -44,8 +45,8 @@ namespace NUnit
         /// Throws an exception if a string argument is null or empty
         /// </summary>
         /// <param name="value">The value to be tested</param>
-        /// <param name="name">The name of the argument</param>
-        public static void ArgumentNotNullOrEmpty(string value, string name)
+        /// <param name="name">Compiler supplied parameter for the <paramref name="value"/> expression.</param>
+        public static void ArgumentNotNullOrEmpty(string value, [CallerArgumentExpression(nameof(value))] string name = "")
         {
             ArgumentNotNull(value, name);
 

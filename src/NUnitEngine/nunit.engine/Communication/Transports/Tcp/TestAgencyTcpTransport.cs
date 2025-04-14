@@ -21,7 +21,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public TestAgencyTcpTransport(ITestAgency agency, int port = 0)
         {
-            Guard.ArgumentNotNull(agency, nameof(agency));
+            Guard.ArgumentNotNull(agency);
             Guard.ArgumentValid(port >= IPEndPoint.MinPort && port <= IPEndPoint.MaxPort,
                 $"Port number {port} is invalid. Must be a positive integer less than or equal to {IPEndPoint.MaxPort}", nameof(port));
 

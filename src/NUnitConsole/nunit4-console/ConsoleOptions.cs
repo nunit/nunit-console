@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using NUnit.Common;
 using NUnit.ConsoleRunner.Options;
 
 namespace NUnit.ConsoleRunner
@@ -27,7 +28,9 @@ namespace NUnit.ConsoleRunner
 
         internal ConsoleOptions(IFileSystem fileSystem, params string[] args)
         {
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            Guard.ArgumentNotNull(fileSystem);
+
+            _fileSystem = fileSystem;
 
             ConfigureOptions();
             if (args is not null)
@@ -131,7 +134,7 @@ namespace NUnit.ConsoleRunner
             get
             {
                 if (NoResultSpecified)
-                    return new OutputSpecification[0];
+                    return Array.Empty<OutputSpecification>();
 
                 if (resultOutputSpecifications.Count == 0)
                     resultOutputSpecifications.Add(
@@ -343,7 +346,7 @@ namespace NUnit.ConsoleRunner
             // Default
             this.Add("<>", v =>
             {
-                if (v.StartsWith("-") || v.StartsWith("/") && Path.DirectorySeparatorChar != '/')
+                if (v.StartsWith('-') || v.StartsWith('/') && Path.DirectorySeparatorChar != '/')
                     ErrorMessages.Add("Invalid argument: " + v);
                 else
                     InputFiles.Add(v);
@@ -405,16 +408,16 @@ namespace NUnit.ConsoleRunner
             this.Add(prototype, description, action, isHidden);
         }
 
+#if NETFRAMEWORK
+        private static Action<string> NetFxOnlyOption(string optionName, Action<string> action) => action;
+#else
         private Action<string> NetFxOnlyOption(string optionName, Action<string> action)
         {
-#if NETFRAMEWORK
-            return action;
-#else
             return s => ErrorMessages.Add($"The {optionName} option is not available on this platform.");
-#endif
         }
+#endif
 
-        private void CheckOptionCombinations()
+        private static void CheckOptionCombinations()
         {
             // Add any validation of option combinations here
         }
@@ -423,8 +426,7 @@ namespace NUnit.ConsoleRunner
 
         public IEnumerable<string> PreParse(IEnumerable<string> args)
         {
-            if (args is null)
-                throw new ArgumentNullException("args");
+            Guard.ArgumentNotNull(args);
 
             if (++_nesting > 3)
             {
@@ -498,7 +500,7 @@ namespace NUnit.ConsoleRunner
             return GetArgs(sb.ToString());
         }
 
-        private string? ExpandToFullPath(string path)
+        private static string? ExpandToFullPath(string path)
         {
             if (path is null)
                 return null;

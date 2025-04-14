@@ -15,8 +15,7 @@ namespace NUnit.Extensibility
     {
         public static AddinsFile Read(IFile file)
         {
-            if (file is null)
-                throw new ArgumentNullException(nameof(file));
+            Guard.ArgumentNotNull(file);
 
             using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {

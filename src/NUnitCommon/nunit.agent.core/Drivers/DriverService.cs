@@ -17,7 +17,9 @@ namespace NUnit.Engine.Drivers
     {
         private static readonly Logger log = InternalTrace.GetLogger("DriverService");
 
-        private readonly IList<IDriverFactory> _factories = new List<IDriverFactory>();
+        private static readonly char[] CommaSeparator = [','];
+
+        private readonly List<IDriverFactory> _factories = new List<IDriverFactory>();
 
         public DriverService()
         {
@@ -63,7 +65,7 @@ namespace NUnit.Engine.Drivers
                 // any true Portable assembly would have a Profile as part of its name.
                 var platform = targetFramework == ".NETPortable,Version=v5.0"
                     ? ".NETStandard"
-                    : targetFramework.Split(new char[] { ',' })[0];
+                    : targetFramework.Split(CommaSeparator)[0];
 
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
                     if (skipNonTestAssemblies)

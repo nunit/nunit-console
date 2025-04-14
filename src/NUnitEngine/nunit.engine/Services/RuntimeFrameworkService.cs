@@ -53,7 +53,7 @@ namespace NUnit.Engine.Services
         /// <returns>True if the framework is available, false if unavailable or nonexistent</returns>
         public bool IsAvailable(string name, bool needX86)
         {
-            Guard.ArgumentNotNullOrEmpty(name, nameof(name));
+            Guard.ArgumentNotNullOrEmpty(name);
 
             if (!RuntimeFramework.TryParse(name, out RuntimeFramework? requestedFramework))
                 throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
@@ -277,7 +277,7 @@ namespace NUnit.Engine.Services
                     "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
                 if (getDisplayNameMethod is not null)
                 {
-                    string displayName = (string)getDisplayNameMethod.Invoke(null, new object[0])!;
+                    string displayName = (string)getDisplayNameMethod.Invoke(null, Array.Empty<object>())!;
 
                     int space = displayName.IndexOf(' ');
                     if (space >= 3) // Minimum length of a version

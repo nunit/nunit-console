@@ -25,7 +25,7 @@ namespace NUnit.Agents
             var options = new AgentOptions();
             var prop = typeof(AgentOptions).GetProperty(propertyName);
             Assert.That(prop, Is.Not.Null, $"Property {propertyName} does not exist");
-            Assert.That(prop.GetValue(options, new object[0]), Is.EqualTo(defaultValue));
+            Assert.That(prop.GetValue(options, Array.Empty<object>()), Is.EqualTo(defaultValue));
         }
 
         private static readonly Guid AGENT_GUID = Guid.NewGuid();
@@ -53,7 +53,7 @@ namespace NUnit.Agents
             var options = new AgentOptions(option);
             var prop = typeof(AgentOptions).GetProperty(propertyName);
             Assert.That(prop, Is.Not.Null, $"Property {propertyName} does not exist");
-            Assert.That(prop.GetValue(options, new object[0]), Is.EqualTo(expectedValue));
+            Assert.That(prop.GetValue(options, Array.Empty<object>()), Is.EqualTo(expectedValue));
         }
 
         [Test]

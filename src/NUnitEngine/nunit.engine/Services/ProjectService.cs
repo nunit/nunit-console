@@ -80,8 +80,8 @@ namespace NUnit.Engine.Services
         {
             log.Debug($"Expanding package {package.Name}");
 
-            Guard.ArgumentNotNull(package, "package");
-            Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", "package");
+            Guard.ArgumentNotNull(package);
+            Guard.ArgumentValid(package.SubPackages.Count == 0, "Package is already expanded", nameof(package));
 
             string path = package.FullName!;
             if (!File.Exists(path))
@@ -95,7 +95,7 @@ namespace NUnit.Engine.Services
             if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;
             else
-                Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", "package");
+                Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", nameof(package));
 
             TestPackage tempPackage = project.GetTestPackage(activeConfig);
             log.Debug("Got temp package");

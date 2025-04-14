@@ -235,7 +235,7 @@ namespace NUnit.Engine
             throw InvalidTokenError(token);
         }
 
-        private Exception InvalidTokenError(Token token)
+        private static TestSelectionParserException InvalidTokenError(Token token)
         {
             return new TestSelectionParserException(string.Format(
                 "Unexpected token '{0}' at position {1} in selection expression.", token.Text, token.Pos));

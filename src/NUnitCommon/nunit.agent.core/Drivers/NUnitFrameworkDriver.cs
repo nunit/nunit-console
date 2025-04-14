@@ -17,9 +17,9 @@ namespace NUnit.Engine.Drivers
         private static readonly Version MINIMUM_NUNIT_VERSION = new(3, 2, 0);
         private static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
+#if NETFRAMEWORK
         private readonly NUnitFrameworkApi _api;
 
-#if NETFRAMEWORK
         /// <summary>
         /// Construct an NUnitFrameworkDriver
         /// </summary>
@@ -27,9 +27,9 @@ namespace NUnit.Engine.Drivers
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
         public NUnitFrameworkDriver(AppDomain testDomain, string id, AssemblyName nunitRef)
         {
-            Guard.ArgumentNotNull(testDomain, nameof(testDomain));
-            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
-            Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+            Guard.ArgumentNotNull(testDomain);
+            Guard.ArgumentNotNullOrEmpty(id);
+            Guard.ArgumentNotNull(nunitRef);
 
             ID = id;
 
@@ -60,11 +60,11 @@ namespace NUnit.Engine.Drivers
         /// <param name="nunitRef">An AssemblyName referring to the test framework.</param>
         internal NUnitFrameworkDriver(AppDomain testDomain, string api, string id, AssemblyName nunitRef)
         {
-            Guard.ArgumentNotNull(testDomain, nameof(testDomain));
-            Guard.ArgumentNotNull(api, nameof(api));
+            Guard.ArgumentNotNull(testDomain);
+            Guard.ArgumentNotNull(api);
             Guard.ArgumentValid(api == "2009" || api == "2018", $"Invalid API specified: {api}", nameof(api));
-            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
-            Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+            Guard.ArgumentNotNullOrEmpty(id);
+            Guard.ArgumentNotNull(nunitRef);
 
             ID = id;
             API = api;
@@ -82,14 +82,16 @@ namespace NUnit.Engine.Drivers
                 : new NUnitFrameworkApi2009(testDomain, ID, nunitRef);
         }
 #else
+        private readonly NUnitFrameworkApi2018 _api;
+
         /// <summary>
         /// Construct an NUnitFrameworkDriver
         /// </summary>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
         public NUnitFrameworkDriver(string id, AssemblyName nunitRef)
         {
-            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
-            Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+            Guard.ArgumentNotNullOrEmpty(id);
+            Guard.ArgumentNotNull(nunitRef);
 
             ID = id;
             API = "2018";

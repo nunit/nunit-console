@@ -32,8 +32,8 @@ namespace NUnit.Engine.Communication.Transports.Remoting
 
         public TestAgencyRemotingTransport(ITestAgency agency, string uri, int port)
         {
-            Guard.ArgumentNotNull(agency, nameof(agency));
-            Guard.ArgumentNotNullOrEmpty(uri, nameof(uri));
+            Guard.ArgumentNotNull(agency);
+            Guard.ArgumentNotNullOrEmpty(uri);
 
             _agency = agency;
             _uri = uri;

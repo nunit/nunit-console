@@ -47,7 +47,7 @@ namespace NUnit.Engine.Runners
 
         public TestAgentRunner(TestPackage package)
         {
-            Guard.ArgumentNotNull(package, nameof(package));
+            Guard.ArgumentNotNull(package);
             //Guard.ArgumentValid(package.IsAssemblyPackage(), "TestAgentRunner requires a package with a single assembly", nameof(package));
             var assemblyPackages = package.Select(p => !p.HasSubPackages());
             Guard.ArgumentValid(assemblyPackages.Count == 1, "TestAgentRunner requires a package with a single assembly", nameof(package));

@@ -91,8 +91,7 @@ namespace NUnit.Engine.Internal
 
         private Assembly? OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            if (loadContext is null)
-                throw new ArgumentNullException("context");
+            Guard.ArgumentNotNull(loadContext);
 
             Assembly? loadedAssembly;
             foreach (var strategy in ResolutionStrategies)
@@ -153,7 +152,7 @@ namespace NUnit.Engine.Internal
         public class RuntimeLibrariesStrategy : ResolutionStrategy
         {
             private DependencyContext? _dependencyContext;
-            private readonly ICompilationAssemblyResolver _assemblyResolver;
+            private readonly CompositeCompilationAssemblyResolver _assemblyResolver;
 
             public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
             {
@@ -305,7 +304,7 @@ namespace NUnit.Engine.Internal
             int len = 0;
             foreach (char c in text)
             {
-                if (VERSION_CHARS.IndexOf(c) >= 0)
+                if (VERSION_CHARS.Contains(c))
                     len++;
                 else
                     break;

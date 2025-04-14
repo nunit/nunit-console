@@ -48,8 +48,8 @@ namespace NUnit.Engine.Drivers
 
         public NUnitFrameworkApi2018(string driverId, AssemblyName nunitRef)
         {
-            Guard.ArgumentNotNull(driverId, nameof(driverId));
-            Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+            Guard.ArgumentNotNull(driverId);
+            Guard.ArgumentNotNull(nunitRef);
 
             _driverId = driverId;
             _nunitRef = nunitRef;
@@ -57,8 +57,8 @@ namespace NUnit.Engine.Drivers
 
         public string Load(string testAssemblyPath, IDictionary<string, object> settings)
         {
-            Guard.ArgumentNotNull(testAssemblyPath, nameof(testAssemblyPath));
-            Guard.ArgumentNotNull(settings, nameof(settings));
+            Guard.ArgumentNotNull(testAssemblyPath);
+            Guard.ArgumentNotNull(settings);
             Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", nameof(testAssemblyPath));
             log.Info($"Loading {testAssemblyPath} - see separate log file");
 

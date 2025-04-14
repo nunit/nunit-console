@@ -22,6 +22,8 @@ namespace NUnit
         protected static char DirectorySeparatorChar = Path.DirectorySeparatorChar;
         protected static char AltDirectorySeparatorChar = Path.AltDirectorySeparatorChar;
 
+        private static readonly char[] DirectorySeparators = [DirectorySeparatorChar, AltDirectorySeparatorChar];
+
         /// <summary>
         /// Returns a boolean indicating whether the specified path
         /// is that of an assembly - that is a dll or exe file.
@@ -40,10 +42,8 @@ namespace NUnit
         /// </summary>
         public static string? RelativePath(string from, string to)
         {
-            if (from is null)
-                throw new ArgumentNullException(from);
-            if (to is null)
-                throw new ArgumentNullException(to);
+            Guard.ArgumentNotNull(from);
+            Guard.ArgumentNotNull(to);
 
             string? toPathRoot = Path.GetPathRoot(to);
             if (toPathRoot is null || toPathRoot == string.Empty)
@@ -95,7 +95,7 @@ namespace NUnit
         public static string Canonicalize(string path)
         {
             List<string> parts = new List<string>(
-                path.Split(DirectorySeparatorChar, AltDirectorySeparatorChar));
+                path.Split(DirectorySeparators));
 
             for (int index = 0; index < parts.Count;)
             {
@@ -189,10 +189,7 @@ namespace NUnit
         /// <exception cref="ArgumentNullException"><paramref name="path"/> is <see langword="null"/>.</exception>
         public static bool IsFullyQualifiedWindowsPath(string path)
         {
-            if (path is null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            Guard.ArgumentNotNull(path);
 
             if (path.Length > 2)
             {
@@ -213,10 +210,7 @@ namespace NUnit
         /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
         public static bool IsFullyQualifiedUnixPath(string path)
         {
-            if (path is null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            Guard.ArgumentNotNull(path);
 
             return path.Length > 0 && path[0] == '/';
         }
@@ -254,9 +248,7 @@ namespace NUnit
 
         private static string[] SplitPath(string path)
         {
-            char[] separators = new char[] { PathUtils.DirectorySeparatorChar, PathUtils.AltDirectorySeparatorChar };
-
-            string[] trialSplit = path.Split(separators);
+            string[] trialSplit = path.Split(DirectorySeparators);
 
             int emptyEntries = 0;
             foreach (string piece in trialSplit)

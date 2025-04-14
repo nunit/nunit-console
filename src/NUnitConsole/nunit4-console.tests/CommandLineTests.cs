@@ -460,7 +460,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(options.ResultOutputSpecifications.Count, Is.EqualTo(0));
         }
 
-        private void DumpErrors()
+        private static void DumpErrors()
         {
         }
 
@@ -570,7 +570,8 @@ namespace NUnit.ConsoleRunner
             Assume.That(testListPath, Does.Exist);
             var options = ConsoleMocks.Options("--testlist=" + testListPath);
             Assert.That(options.ErrorMessages, Is.Empty);
-            Assert.That(options.TestList, Is.EqualTo(new[] { "AmazingTest" }));
+            string[] expected = new[] { "AmazingTest" };
+            Assert.That(options.TestList, Is.EqualTo(expected));
         }
 
         [Test]
@@ -723,7 +724,7 @@ namespace NUnit.ConsoleRunner
             ConsoleOptions options = ConsoleMocks.Options("--disable=NUnit.Engine.Listeners.TeamCityEventListener");
             Assert.That(options.DisableExtensions.Contains("NUnit.Engine.Listeners.TeamCityEventListener"));
         }
-        private static IFileSystem GetFileSystemContainingFile(string fileName)
+        private static VirtualFileSystem GetFileSystemContainingFile(string fileName)
         {
             var fileSystem = new VirtualFileSystem();
             fileSystem.SetupFile(Path.Combine(Environment.CurrentDirectory, fileName), new List<string>());

@@ -76,12 +76,12 @@ namespace NUnit.Engine.Services
         {
             lock (_agentsById)
             {
-                if (!_agentsById.TryGetValue(agentId, out var record))
+                if (!_agentsById.ContainsKey(agentId))
                 {
                     throw new ArgumentException($"An entry for agent {agentId} must exist in order to mark it as terminated.", nameof(agentId));
                 }
 
-                _agentsById[agentId] = record.Terminated();
+                _agentsById[agentId] = AgentRecord.Terminated();
             }
         }
     }

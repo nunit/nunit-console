@@ -30,8 +30,8 @@ namespace NUnit.Engine.Drivers
         /// <returns>An IFrameworkDriver</returns>
         public IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference)
         {
-            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
-            Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", "reference");
+            Guard.ArgumentNotNullOrEmpty(id);
+            Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", nameof(reference));
 
             log.Info("Using NUnitFrameworkDriver");
             return new NUnitFrameworkDriver(domain, id, reference);
@@ -44,7 +44,7 @@ namespace NUnit.Engine.Drivers
         /// <returns></returns>
         public IFrameworkDriver GetDriver(string id, AssemblyName reference)
         {
-            Guard.ArgumentNotNullOrEmpty(id, nameof(id));
+            Guard.ArgumentNotNullOrEmpty(id);
             Guard.ArgumentValid(IsSupportedTestFramework(reference), "Invalid framework", nameof(reference));
             log.Info("Using NUnitFrameworkDriver");
             return new NUnitFrameworkDriver(id, reference);

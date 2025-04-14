@@ -26,11 +26,7 @@ namespace NUnit.Engine.Services
 
         public IService GetService(Type serviceType)
         {
-            IService? theService = null;
-
-            if (_serviceIndex.ContainsKey(serviceType))
-                theService = _serviceIndex[serviceType];
-            else
+            if (!_serviceIndex.TryGetValue(serviceType, out IService? theService))
                 foreach (IService service in _services)
                 {
                     if (serviceType.IsInstanceOfType(service))

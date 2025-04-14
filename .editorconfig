@@ -28,3 +28,9 @@ dotnet_diagnostic.CSIsNull001.severity = warning
 
 # CSIsNull002: Use `is object` for non-null checks
 dotnet_diagnostic.CSIsNull002.severity = warning
+
+# Microsoft NetAnalyzer
+
+# This relates to classes that have finalizers, but we should not have any finalizer
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = none

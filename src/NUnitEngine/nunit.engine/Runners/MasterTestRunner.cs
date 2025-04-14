@@ -48,10 +48,8 @@ namespace NUnit.Engine.Runners
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
         {
-            if (services is null)
-                throw new ArgumentNullException("services");
-            if (package is null)
-                throw new ArgumentNullException("package");
+            Guard.ArgumentNotNull(services);
+            Guard.ArgumentNotNull(package);
 
             _services = services;
             TestPackage = package;
@@ -270,8 +268,7 @@ namespace NUnit.Engine.Runners
         // allows the lower-level runners to be completely ignorant of projects
         private TestEngineResult PrepareResult(TestEngineResult result)
         {
-            if (result is null)
-                throw new ArgumentNullException("result");
+            Guard.ArgumentNotNull(result);
 
             // See if we have any projects to deal with. At this point,
             // any subpackage, which itself has subpackages, is a project
@@ -332,8 +329,7 @@ namespace NUnit.Engine.Runners
 
         private void EnsurePackagesAreExpanded(TestPackage package)
         {
-            if (package is null)
-                throw new ArgumentNullException("package");
+            Guard.ArgumentNotNull(package);
 
             foreach (var subPackage in package.SubPackages)
             {
@@ -348,8 +344,7 @@ namespace NUnit.Engine.Runners
 
         private bool IsProjectPackage(TestPackage package)
         {
-            if (package is null)
-                throw new ArgumentNullException("package");
+            Guard.ArgumentNotNull(package);
 
             return
                 _projectService is not null
@@ -368,11 +363,12 @@ namespace NUnit.Engine.Runners
             new ObsoletePackageSetting() { OldKey = "RuntimeFramework", NewKey = "RequestedRuntimeFramework" }
         };
 
+#if NETFRAMEWORK
         // Any Errors thrown from this method indicate that the client
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings()
         {
-#if NETFRAMEWORK  // TODO: How do we validate runtime framework for .NET Standard 2.0?
+            // TODO: How do we validate runtime framework for .NET Standard 2.0?
             var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, string.Empty);
             var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
 
@@ -380,11 +376,16 @@ namespace NUnit.Engine.Runners
             {
                 var oldKey = entry.OldKey;
                 var newKey = entry.NewKey;
-                if (TestPackage.Settings.ContainsKey(oldKey) && !TestPackage.Settings.ContainsKey(newKey))
-                    TestPackage.Settings[newKey] = TestPackage.Settings[oldKey];
+                if (TestPackage.Settings.TryGetValue(oldKey, out object? value) && !TestPackage.Settings.ContainsKey(newKey))
+                    TestPackage.Settings[newKey] = value;
             }
-#endif
         }
+#else
+        private static void ValidatePackageSettings()
+        {
+            // No settings to validate in .NET Core
+        }
+#endif
 
         /// <summary>
         /// Unload any loaded TestPackage.

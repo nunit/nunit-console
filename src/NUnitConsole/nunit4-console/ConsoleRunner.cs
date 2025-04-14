@@ -23,6 +23,8 @@ namespace NUnit.ConsoleRunner
     {
         private static Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
 
+        private static readonly char[] PathSeparator = [Path.PathSeparator];
+
         // Some operating systems truncate the return code to 8 bits, which
         // only allows us a maximum of 127 in the positive range. We limit
         // ourselves so as to stay in that range.
@@ -57,9 +59,9 @@ namespace NUnit.ConsoleRunner
 
         public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
-            Guard.ArgumentNotNull(_engine = engine, nameof(engine));
-            Guard.ArgumentNotNull(_options = options, nameof(options));
-            Guard.ArgumentNotNull(_outWriter = writer, nameof(writer));
+            Guard.ArgumentNotNull(_engine = engine);
+            Guard.ArgumentNotNull(_options = options);
+            Guard.ArgumentNotNull(_outWriter = writer);
 
             // NOTE: Accessing Services triggers the engine to initialize all services
             _resultService = _engine.Services.GetService<IResultService>();
@@ -76,7 +78,7 @@ namespace NUnit.ConsoleRunner
 
             var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
             if (!string.IsNullOrEmpty(extensionPath))
-                foreach (string extensionDirectory in extensionPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (string extensionDirectory in extensionPath.Split(PathSeparator, StringSplitOptions.RemoveEmptyEntries))
                     _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             foreach (string extensionDirectory in _options.ExtensionDirectories)
@@ -107,7 +109,7 @@ namespace NUnit.ConsoleRunner
                     DisableExtension(typeName);
         }
 
-        private bool RunningUnderTeamCity =>
+        private static bool RunningUnderTeamCity =>
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
 
         private bool IsExtensionInstalled(string typeName)
@@ -314,7 +316,7 @@ namespace NUnit.ConsoleRunner
             return ConsoleRunner.UNEXPECTED_ERROR;
         }
 
-        private void DisplayRuntimeEnvironment(ExtendedTextWriter OutWriter)
+        private static void DisplayRuntimeEnvironment(ExtendedTextWriter OutWriter)
         {
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Runtime Environment");
             OutWriter.WriteLabelLine(INDENT4 + "OS Version: ", GetOSVersion());
@@ -366,30 +368,31 @@ namespace NUnit.ConsoleRunner
 
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
-            foreach (var ep in _extensionService?.ExtensionPoints ?? new IExtensionPoint[0])
-            {
-                _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
-                foreach (var node in ep.Extensions)
+            if (_extensionService?.ExtensionPoints is not null)
+                foreach (var ep in _extensionService.ExtensionPoints)
                 {
-                    _outWriter.Write(INDENT6 + "Extension: ");
-                    _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-                    _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
-
-                    _outWriter.Write(INDENT8 + "Version: ");
-                    _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
-
-                    _outWriter.Write(INDENT8 + "Path: ");
-                    _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
-
-                    foreach (var prop in node.PropertyNames)
+                    _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
+                    foreach (var node in ep.Extensions)
                     {
-                        _outWriter.Write(INDENT8 + prop + ":");
-                        foreach (var val in node.GetValues(prop))
-                            _outWriter.Write(ColorStyle.Value, " " + val);
-                        _outWriter.WriteLine();
+                        _outWriter.Write(INDENT6 + "Extension: ");
+                        _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
+                        _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
+
+                        _outWriter.Write(INDENT8 + "Version: ");
+                        _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
+
+                        _outWriter.Write(INDENT8 + "Path: ");
+                        _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
+
+                        foreach (var prop in node.PropertyNames)
+                        {
+                            _outWriter.Write(INDENT8 + prop + ":");
+                            foreach (var val in node.GetValues(prop))
+                                _outWriter.Write(ColorStyle.Value, " " + val);
+                            _outWriter.WriteLine();
+                        }
                     }
                 }
-            }
 
             _outWriter.WriteLine();
         }

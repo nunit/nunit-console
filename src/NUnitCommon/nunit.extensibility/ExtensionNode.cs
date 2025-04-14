@@ -79,8 +79,8 @@ namespace NUnit.Extensibility
         /// <returns>A collection of values</returns>
         public IEnumerable<string> GetValues(string name)
         {
-            if (_properties.ContainsKey(name))
-                return _properties[name];
+            if (_properties.TryGetValue(name, out List<string>? value))
+                return value;
             else
                 return Enumerable.Empty<string>();
         }

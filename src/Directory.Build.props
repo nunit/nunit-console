@@ -6,6 +6,9 @@
         <LangVersion>12</LangVersion>
         <Features>strict</Features>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisMode>Minimum</AnalysisMode>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <Version Condition="'$(Version)'==''">4.0.0.0</Version>
         <OutputPath>$(MSBuildThisFileDirectory)\..\bin\$(Configuration)\</OutputPath>
         <CheckEolTargetFramework>false</CheckEolTargetFramework>

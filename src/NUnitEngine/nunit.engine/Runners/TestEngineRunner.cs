@@ -13,8 +13,8 @@ namespace NUnit.Engine.Runners
     {
         public TestEngineRunner(IServiceLocator services, TestPackage package)
         {
-            Guard.ArgumentNotNull(services, nameof(services));
-            Guard.ArgumentNotNull(package, nameof(package));
+            Guard.ArgumentNotNull(services);
+            Guard.ArgumentNotNull(package);
 
             TestPackage = package;
             Services = services;

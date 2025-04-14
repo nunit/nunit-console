@@ -37,9 +37,9 @@ namespace NUnit.Engine.Drivers
 
             public NUnitFrameworkApi2009(AppDomain testDomain, string driverId, AssemblyName nunitRef)
             {
-                Guard.ArgumentNotNull(testDomain, nameof(testDomain));
-                Guard.ArgumentNotNull(driverId, nameof(driverId));
-                Guard.ArgumentNotNull(nunitRef, nameof(nunitRef));
+                Guard.ArgumentNotNull(testDomain);
+                Guard.ArgumentNotNull(driverId);
+                Guard.ArgumentNotNull(nunitRef);
 
                 _testDomain = testDomain;
                 _driverId = driverId;
@@ -48,15 +48,14 @@ namespace NUnit.Engine.Drivers
 
             public string Load(string testAssemblyPath, IDictionary<string, object> settings)
             {
-                Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", "testAssemblyPath");
+                Guard.ArgumentValid(File.Exists(testAssemblyPath), "Framework driver called with a file name that doesn't exist.", nameof(testAssemblyPath));
 
                 log.Info($"Loading {testAssemblyPath} - see separate log file");
 
                 _testAssemblyPath = testAssemblyPath;
 
                 // Normally, the caller should check for an invalid requested runtime, but we make sure here
-                var requestedRuntime = settings.ContainsKey(EnginePackageSettings.RequestedRuntimeFramework)
-                    ? settings[EnginePackageSettings.RequestedRuntimeFramework] : null;
+                settings.TryGetValue(EnginePackageSettings.RequestedRuntimeFramework, out object? requestedRuntime);
 
                 var idPrefix = _driverId + "-";
 

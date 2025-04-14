@@ -28,8 +28,6 @@ namespace NUnit.Engine.Agents
 
         public ITestAgentTransport? Transport;
 
-        public int ProcessId => System.Diagnostics.Process.GetCurrentProcess().Id;
-
         public override bool Start()
         {
             Guard.OperationValid(Transport is not null, "Transport must be set before calling Start().");

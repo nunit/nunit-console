@@ -14,7 +14,7 @@ namespace NUnit.Engine.Api
 
         public TestPackageTests(string fileNames)
         {
-            _fileNames = fileNames.Split(new char[] { ',' });
+            _fileNames = fileNames.Split(',');
             _package = new TestPackage(_fileNames);
         }
 
