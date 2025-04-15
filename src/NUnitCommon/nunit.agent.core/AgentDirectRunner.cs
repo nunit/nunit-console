@@ -72,6 +72,7 @@ namespace NUnit.Agents
             if (ea != null)
             {
                 var title = GetAttribute<AssemblyTitleAttribute>(ea)?.Title;
+                //var title = GetAttribute<AssemblyTitleAttribute>(ea)?.Title;
                 var version = GetAttribute<AssemblyFileVersionAttribute>(ea)?.Version;
                 var copyright = GetAttribute<AssemblyCopyrightAttribute>(ea)?.Copyright;
 
@@ -83,16 +84,9 @@ namespace NUnit.Agents
             }
         }
 
-        private TAttr? GetAttribute<TAttr>(Assembly assembly) where TAttr : Attribute
+        private static TAttr? GetAttribute<TAttr>(Assembly assembly) where TAttr : Attribute
         {
-#if (NETCOREAPP || NET462_OR_GREATER)
             return assembly?.GetCustomAttribute<TAttr>();
-#else
-            var attrs = assembly?.GetCustomAttributes(typeof(TAttr), false);
-            return attrs.Length > 0
-                ? attrs[0] as TAttr
-                : null;
-#endif
         }
 
         internal void WriteRunSettingsReport(XmlNode resultNode)
@@ -128,35 +122,20 @@ namespace NUnit.Agents
 
         public void WriteSummaryReport(XmlNode resultNode)
         {
-            var OverallResult = resultNode.GetAttribute("result") ?? "Unknown";
-            if (OverallResult == "Skipped")
-                OverallResult = "Warning";
+            var overallResult = resultNode.GetAttribute("result") ?? "Unknown";
+            if (overallResult == "Skipped")
+                overallResult = "Warning";
 
-            ColorStyle overall = OverallResult == "Passed"
+            ColorStyle resultColor = overallResult == "Passed"
                 ? ColorStyle.Pass
-                : OverallResult == "Failed" || OverallResult == "Unknown"
+                : overallResult == "Failed" || overallResult == "Unknown"
                     ? ColorStyle.Failure
-                    : OverallResult == "Warning"
+                    : overallResult == "Warning"
                         ? ColorStyle.Warning
                         : ColorStyle.Output;
 
             OutWriter.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
-            switch(OverallResult)
-            {
-                case "Passed":
-                    OutWriter.WriteLabelLine("  Overall result: ", OverallResult, ColorStyle.Pass);
-                    break;
-                case "Failed":
-                case "Unknown":
-                    OutWriter.WriteLabelLine("  Overall result: ", OverallResult, ColorStyle.Failure);
-                    break;
-                case "Warning":
-                    OutWriter.WriteLabelLine("  Overall result: ", OverallResult, ColorStyle.Warning);
-                    break;
-                default:
-                    OutWriter.WriteLabelLine("  Overall result: ", OverallResult, ColorStyle.Output);
-                    break;
-            }
+            OutWriter.WriteLabelLine(overallResult, resultColor);
 
             int cases = resultNode.GetAttribute("testcasecount", 0);
             int passed = resultNode.GetAttribute("passed", 0);
@@ -194,6 +173,9 @@ namespace NUnit.Agents
 
         private void WriteErrorsFailuresAndWarnings(XmlNode resultNode)
         {
+            const string OLD_NUNIT_CHILD_HAD_ERRORS_MESSAGE = "One or more child tests had errors";
+            const string OLD_NUNIT_CHILD_HAD_WARNINGS_MESSAGE = "One or more child tests had errors";
+
             string resultState = resultNode.GetAttribute("result") ?? "";
 
             switch (resultNode.Name)
@@ -227,8 +209,8 @@ namespace NUnit.Agents
                             // are promulgated to the containing suite without setting the FailureSite.
                             if (site == null)
                             {
-                                if (resultNode.SelectSingleNode("reason/message")?.InnerText == "One or more child tests had warnings" ||
-                                    resultNode.SelectSingleNode("failure/message")?.InnerText == "One or more child tests had errors")
+                                if (resultNode.SelectSingleNode("reason/message")?.InnerText == OLD_NUNIT_CHILD_HAD_WARNINGS_MESSAGE ||
+                                    resultNode.SelectSingleNode("failure/message")?.InnerText == OLD_NUNIT_CHILD_HAD_ERRORS_MESSAGE)
                                 {
                                     site = "Child";
                                 }
