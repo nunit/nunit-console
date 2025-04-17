@@ -65,35 +65,35 @@ namespace NUnit.Agents
 
             Environment.Exit(AgentExitCodes.OK);
         }
-        
+
         private void WriteHeader()
         {
             var ea = Assembly.GetEntryAssembly();
-            if (ea != null)
+            if (ea is not null)
             {
                 var title = GetAttribute<AssemblyTitleAttribute>(ea)?.Title;
-                //var title = GetAttribute<AssemblyTitleAttribute>(ea)?.Title;
                 var version = GetAttribute<AssemblyFileVersionAttribute>(ea)?.Version;
                 var copyright = GetAttribute<AssemblyCopyrightAttribute>(ea)?.Copyright;
 
                 OutWriter.WriteLine(ColorStyle.Header, $"{title} {version}");
-                if (copyright != null)
+                if (copyright is not null)
                     OutWriter.WriteLine(ColorStyle.SubHeader, copyright);
                 OutWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
                 OutWriter.WriteLine();
             }
         }
 
-        private static TAttr? GetAttribute<TAttr>(Assembly assembly) where TAttr : Attribute
+        private static TAttr? GetAttribute<TAttr>(Assembly assembly)
+            where TAttr : Attribute
         {
             return assembly?.GetCustomAttribute<TAttr>();
         }
 
         internal void WriteRunSettingsReport(XmlNode resultNode)
         {
-            var settings =  resultNode.SelectNodes("settings/setting");
+            var settings = resultNode.SelectNodes("settings/setting");
 
-            if (settings != null && settings.Count > 0)
+            if (settings is not null && settings.Count > 0)
             {
                 OutWriter.WriteLine(ColorStyle.SectionHeader, "Run Settings");
                 settings.ForEachNode(WriteSettingsNode);
@@ -107,7 +107,7 @@ namespace NUnit.Agents
             var name = node.GetAttribute("name");
             var val = node.GetAttribute("value") ?? string.Empty;
 
-            if (items != null)
+            if (items is not null)
             {
                 OutWriter.WriteLabelLine($"    {name}:", items.Count > 0 ? string.Empty : $" {val}");
 
@@ -176,7 +176,7 @@ namespace NUnit.Agents
             const string OLD_NUNIT_CHILD_HAD_ERRORS_MESSAGE = "One or more child tests had errors";
             const string OLD_NUNIT_CHILD_HAD_WARNINGS_MESSAGE = "One or more child tests had errors";
 
-            string resultState = resultNode.GetAttribute("result") ?? "";
+            string resultState = resultNode.GetAttribute("result") ?? string.Empty;
 
             switch (resultNode.Name)
             {
@@ -205,9 +205,9 @@ namespace NUnit.Agents
                             // Where did this happen? Default is in the current test.
                             var site = resultNode.GetAttribute("site");
 
-                            // Correct a problem in some framework versions, whereby warnings and some failures 
+                            // Correct a problem in some framework versions, whereby warnings and some failures
                             // are promulgated to the containing suite without setting the FailureSite.
-                            if (site == null)
+                            if (site is null)
                             {
                                 if (resultNode.SelectSingleNode("reason/message")?.InnerText == OLD_NUNIT_CHILD_HAD_WARNINGS_MESSAGE ||
                                     resultNode.SelectSingleNode("failure/message")?.InnerText == OLD_NUNIT_CHILD_HAD_ERRORS_MESSAGE)
@@ -225,7 +225,8 @@ namespace NUnit.Agents
                             }
 
                             // Do not list individual "failed" tests after a one-time setup failure
-                            if (site == "SetUp") return;
+                            if (site == "SetUp")
+                                return;
                         }
                     }
 
@@ -298,11 +299,6 @@ namespace NUnit.Agents
         private void WriteSummaryCount(string label, int count, ColorStyle color)
         {
             OutWriter.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture), count > 0 ? color : ColorStyle.Value);
-        }
-
-        private void WriteSummaryCount(string label, string attributeName, ColorStyle color)
-        {
-            
         }
 
         public static void WriteResultFile(XmlNode resultNode, string outputPath)

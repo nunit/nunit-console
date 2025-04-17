@@ -153,13 +153,15 @@ namespace NUnit
         public static IEnumerable<XmlNode> NonNullChildNodes(this XmlNode node)
         {
             foreach (XmlNode childNode in node.ChildNodes)
-                if (childNode != null) yield return childNode;
+                if (childNode is not null)
+                    yield return childNode;
         }
 
         public static void ForEachChildNode(this XmlNode node, Action<XmlNode> action)
         {
             foreach (XmlNode childNode in node.ChildNodes)
-                if (childNode != null) action.Invoke(childNode);
+                if (childNode is not null)
+                    action.Invoke(childNode);
         }
 
         #endregion
@@ -169,7 +171,8 @@ namespace NUnit
         public static void ForEachNode(this XmlNodeList nodeList, Action<XmlNode> action)
         {
             foreach (XmlNode childNode in nodeList)
-                if (childNode != null) action.Invoke(childNode);
+                if (childNode is not null)
+                    action.Invoke(childNode);
         }
 
         #endregion

@@ -19,7 +19,7 @@ namespace NUnit.Agents
             RunTestUnderTestBed(typeof(MockAssembly).Assembly.Location);
         }
 
-        private void RunTestUnderTestBed(string testAssembly)
+        private static void RunTestUnderTestBed(string testAssembly)
         {
             string agentAssembly = typeof(DirectTestAgent).Assembly.Location;
 
@@ -36,7 +36,7 @@ namespace NUnit.Agents
 
             Process? process = Process.Start(startInfo);
 
-            if (process != null)
+            if (process is not null)
             {
                 process.WaitForExit();
 
