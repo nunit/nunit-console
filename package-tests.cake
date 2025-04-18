@@ -4,6 +4,29 @@ var StandardRunnerTests = new List<PackageTest>();
 // Tests run for the NETCORE runner package
 var NetCoreRunnerTests = new List<PackageTest>();
 
+// Tests run directly against the agents themselves
+var AgentTests = new List<PackageTest>()
+{
+    new PackageTest(1, "Net462AgentTest")
+    {
+        Description = "Run mock-assembly.dll under .NET 4.6.2",
+        Arguments = "testdata/net462/mock-assembly.dll",
+        ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
+    },
+    new PackageTest(1, "Net462X86AgentTest")
+    {
+        Description = "Run mock-assembly-x86.dll under .NET 4.6.2",
+        Arguments = "testdata/net462/mock-assembly-x86.dll --x86",
+        ExpectedResult = new MockAssemblyX86ExpectedResult("net-4.6.2")
+    },
+    new PackageTest(1, "Net80AgentTest")
+    {
+        Description = "Run mock-assembly.dll under .NET 8.0",
+        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+        ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
+    }
+};
+
 // Method for adding to both lists
 void AddToBothLists(PackageTest test)
 {
@@ -50,7 +73,7 @@ class MockAssemblyExpectedResult : ExpectedResult
 StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
-    Arguments = "testdata/net462/mock-assembly.dll --trace:Debug",
+    Arguments = "testdata/net462/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
 });
 
