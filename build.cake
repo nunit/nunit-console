@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.11
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.12
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -137,7 +137,10 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("agents/net8.0").WithFiles(
                 "nunit-agent-net80.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb")
-        }),
+        },
+        testRunner: new AgentRunner(
+            BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
+        tests: AgentTests),
 
     NUnitEngineApiPackage = new NuGetPackage(
         id: "NUnit.Engine.Api",
