@@ -165,7 +165,7 @@ namespace NUnit.ConsoleRunner
             {
                 case "test-case":
                     if (resultState == "Failed" || resultState == "Warning")
-                        new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                        new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                     return;
 
                 case "test-run":
@@ -181,7 +181,7 @@ namespace NUnit.ConsoleRunner
                         {
                             // Report failure of the entire theory and then go on
                             // to list the individual cases that failed
-                            new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                            new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
                         }
                         else
                         {
@@ -203,7 +203,7 @@ namespace NUnit.ConsoleRunner
 
                             // Only report errors in the current test method, setup or teardown
                             if (site == "SetUp" || site == "TearDown" || site == "Test")
-                                new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                                new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
 
                             // Do not list individual "failed" tests after a one-time setup failure
                             if (site == "SetUp")
@@ -234,7 +234,7 @@ namespace NUnit.ConsoleRunner
                     string? status = resultNode.GetAttribute("result");
 
                     if (status == "Skipped")
-                        new ConsoleTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                        new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
 
                     break;
 

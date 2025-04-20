@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="..\nunit4-console\ConsoleOptions.cs" Link="ConsoleOptions.cs" />
     <Compile Include="..\nunit4-console\ConsoleRunner.cs" Link="ConsoleRunner.cs" />
-    <Compile Include="..\nunit4-console\ConsoleTestResult.cs" Link="ConsoleTestResult.cs" />
     <Compile Include="..\nunit4-console\FileSystem.cs" Link="FileSystem.cs" />
     <Compile Include="..\nunit4-console\FrameworkPackageSettings.cs" Link="FrameworkPackageSettings.cs" />
     <Compile Include="..\nunit4-console\Options\OptionParser.cs" Link="Options\OptionParser.cs" />

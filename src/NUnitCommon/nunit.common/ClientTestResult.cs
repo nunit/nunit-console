@@ -6,13 +6,13 @@ using System.Text;
 using System.Xml;
 using NUnit.TextDisplay;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit
 {
     /// <summary>
     /// ConsoleTestResult represents the result of one test being
     /// displayed in the console report.
     /// </summary>
-    public class ConsoleTestResult
+    public class ClientTestResult
     {
         private static readonly char[] EOL_CHARS = new char[] { '\r', '\n' };
 
@@ -23,7 +23,7 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         /// <param name="resultNode">An XmlNode representing the result</param>
         /// <param name="reportIndex">Integer index used in the report listing</param>
-        public ConsoleTestResult(XmlNode resultNode, int reportIndex)
+        public ClientTestResult(XmlNode resultNode, int reportIndex)
         {
             _resultNode = resultNode;
             ReportID = reportIndex.ToString();
@@ -32,7 +32,7 @@ namespace NUnit.ConsoleRunner
             Label = resultNode.GetAttribute("label");
             Site = resultNode.GetAttribute("site");
 
-            Status = Label ?? Result ?? "Unkown";
+            Status = Label ?? Result ?? "Unknown";
             if (Status == "Failed" || Status == "Error")
                 if (Site == "SetUp" || Site == "TearDown")
                     Status = Site + " " + Status;
@@ -73,7 +73,7 @@ namespace NUnit.ConsoleRunner
                     XmlNodeList? assertions = _resultNode.SelectNodes("assertions/assertion");
                     if (assertions is not null)
                         foreach (XmlNode assertion in assertions)
-                            Assertions.Add(new ConsoleTestResult.AssertionResult(assertion));
+                            Assertions.Add(new ClientTestResult.AssertionResult(assertion));
                 }
 
                 return _assertions;
