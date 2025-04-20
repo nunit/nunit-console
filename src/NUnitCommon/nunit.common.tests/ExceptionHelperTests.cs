@@ -4,11 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Framework;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit
 {
     internal class ExceptionHelperTests
     {
@@ -53,8 +52,8 @@ namespace NUnit.ConsoleRunner
                 yield return new TestCaseData(exception3, new[] { typeof(InvalidOperationException), typeof(FileNotFoundException), typeof(AccessViolationException) })
                     .SetName("{m}(Multiple InnerExceptions)");
 
-                var relfectionException = new ReflectionTypeLoadException(new[] { typeof(ExceptionHelperTests) }, new[] { new FileNotFoundException() });
-                yield return new TestCaseData(relfectionException, new[] { typeof(ReflectionTypeLoadException), typeof(FileNotFoundException) })
+                var reflectionException = new ReflectionTypeLoadException(new[] { typeof(ExceptionHelperTests) }, new[] { new FileNotFoundException() });
+                yield return new TestCaseData(reflectionException, new[] { typeof(ReflectionTypeLoadException), typeof(FileNotFoundException) })
                     .SetName("{m}(LoaderException)");
             }
         }
