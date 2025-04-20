@@ -52,7 +52,6 @@
     <Compile Include="..\nunit4-console\Options\TestNameParser.cs" Link="Options\TestNameParser.cs" />
     <Compile Include="..\nunit4-console\RequiredExtensionException.cs" Link="RequiredExtensionException.cs" />
     <Compile Include="..\nunit4-console\ResultReporter.cs" Link="ResultReporter.cs" />
-    <Compile Include="..\nunit4-console\ResultSummary.cs" Link="ResultSummary.cs" />
     <Compile Include="..\nunit4-console\TestEventHandler.cs" Link="TestEventHandler.cs" />
     <Compile Include="..\nunit4-console\Utilities\SaveConsoleOutput.cs" Link="Utilities\SaveConsoleOutput.cs" />
     <Content Include="..\..\..\LICENSE.txt" Link="LICENSE.txt" />
