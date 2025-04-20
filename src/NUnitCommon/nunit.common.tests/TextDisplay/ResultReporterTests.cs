@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
 using NUnit.TestData.Assemblies;
-using NUnit.TextDisplay;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     public class ResultReporterTests
     {
@@ -51,7 +49,7 @@ namespace NUnit.ConsoleRunner
         {
             _report = new StringBuilder();
             var writer = new ExtendedTextWrapper(new StringWriter(_report));
-            _reporter = new ResultReporter(_result, writer, ConsoleMocks.Options());
+            _reporter = new ResultReporter(_result, writer);
         }
 
         [Test]

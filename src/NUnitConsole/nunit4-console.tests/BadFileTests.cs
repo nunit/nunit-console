@@ -36,7 +36,7 @@ namespace NUnit.ConsoleRunner
             var result = runner.Run(this, TestFilter.Empty);
             var sb = new StringBuilder();
             var writer = new ExtendedTextWrapper(new StringWriter(sb));
-            var reporter = new ResultReporter(result, writer, ConsoleMocks.Options());
+            var reporter = new ResultReporter(result, writer);
 
             reporter.WriteErrorsFailuresAndWarningsReport();
             var report = sb.ToString();

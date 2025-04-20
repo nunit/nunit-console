@@ -271,7 +271,7 @@ namespace NUnit.ConsoleRunner
 
             if (result is not null)
             {
-                var reporter = new ResultReporter(result, writer, _options);
+                var reporter = new ResultReporter(result, writer, _options.StopOnError);
                 reporter.ReportResults();
 
                 foreach (var spec in _options.ResultOutputSpecifications)

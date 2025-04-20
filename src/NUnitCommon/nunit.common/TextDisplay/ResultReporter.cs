@@ -1,21 +1,18 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
-using NUnit.ConsoleRunner.Options;
-using NUnit.TextDisplay;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.TextDisplay
 {
     public class ResultReporter
     {
-        public ResultReporter(XmlNode resultNode, ExtendedTextWriter writer, ConsoleOptions options)
+        public ResultReporter(XmlNode resultNode, ExtendedTextWriter writer, bool stopOnError = false)
         {
             ResultNode = resultNode;
             Writer = writer;
-            Options = options;
+            StopOnError = stopOnError;
 
             string? overallResult = resultNode.GetAttribute("result");
             if (overallResult == "Skipped")
@@ -32,8 +29,8 @@ namespace NUnit.ConsoleRunner
         private int ReportIndex { get; set; }
         private XmlNode ResultNode { get; set; }
         private ExtendedTextWriter Writer { get; set; }
-        private ConsoleOptions Options { get; set; }
         private string OverallResult { get; set; }
+        private bool StopOnError { get; set; }
 
         /// <summary>
         /// Reports the results to the console
@@ -53,7 +50,7 @@ namespace NUnit.ConsoleRunner
             WriteSummaryReport();
         }
 
-        internal void WriteRunSettingsReport()
+        public void WriteRunSettingsReport()
         {
             var firstSuite = ResultNode.SelectSingleNode("test-suite");
             if (firstSuite is not null)
@@ -150,11 +147,11 @@ namespace NUnit.ConsoleRunner
 
             WriteErrorsFailuresAndWarnings(ResultNode);
 
-            if (Options.StopOnError)
-            {
-                Writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
-                Writer.WriteLine();
-            }
+            //if (Options.StopOnError)
+            //{
+            //    Writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
+            //    Writer.WriteLine();
+            //}
         }
 
         private void WriteErrorsFailuresAndWarnings(XmlNode resultNode)
