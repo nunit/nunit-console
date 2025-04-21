@@ -15,7 +15,26 @@ namespace NUnit.TextDisplay
     public class ResultReporterTests
     {
         private XmlNode _result;
-        private StringBuilder _report;
+
+        private StringBuilder _reportBuilder;
+        private ExtendedTextWrapper _writer;
+
+        private string ReportOutput => _reportBuilder.ToString();
+
+        private List<string> ReportLines
+        {
+            get
+            {
+                var rdr = new StringReader(ReportOutput);
+
+                string? line;
+                var lines = new List<string>();
+                while ((line = rdr.ReadLine()) is not null)
+                    lines.Add(line);
+
+                return lines;
+            }
+        }
 
         [OneTimeSetUp]
         public void CreateResult()
@@ -44,19 +63,19 @@ namespace NUnit.TextDisplay
         }
 
         [SetUp]
-        public void CreateReporter()
+        public void SetUp()
         {
-            _report = new StringBuilder();
-            var writer = new ExtendedTextWrapper(new StringWriter(_report));
+            _reportBuilder = new StringBuilder();
+            _writer = new ExtendedTextWrapper(new StringWriter(_reportBuilder));
         }
+
+        [TearDown]
+        public void TearDown() => _writer.Dispose();
 
         [Test]
         public void ReportSequenceTest()
         {
-            var sb = new StringBuilder();
-            var writer = new ExtendedTextWrapper(new StringWriter(sb));
-            ResultReporter.ReportResults(new ResultSummary(_result), writer);
-            var report = sb.ToString();
+            ResultReporter.ReportResults(new ResultSummary(_result), _writer);
 
             var reportSequence = new[]
             {
@@ -69,7 +88,7 @@ namespace NUnit.TextDisplay
 
             foreach (string title in reportSequence)
             {
-                var index = report.IndexOf(title);
+                var index = ReportOutput.IndexOf(title);
                 Assert.That(index > 0, "Report not found: " + title);
                 Assert.That(index > last, "Report out of sequence: " + title);
                 last = index;
@@ -94,11 +113,8 @@ namespace NUnit.TextDisplay
             };
 #pragma warning restore SA1137 // Elements should have the same indentation
 
-            var report = new StringBuilder();
-            var writer = new ExtendedTextWrapper(new StringWriter(report));
-            ResultReporter.WriteSummaryReport(_result, new ResultSummary(_result), writer);
-            var lines = GetReportLines(report.ToString());
-            Assert.That(lines, Is.EqualTo(expected));
+            ResultReporter.WriteSummaryReport(new ResultSummary(_result), _writer);
+            Assert.That(ReportLines, Is.EqualTo(expected));
         }
 
         [Test]
@@ -123,14 +139,10 @@ namespace NUnit.TextDisplay
                 "No suitable constructor was found"
             };
 
-            var sb = new StringBuilder();
-            var writer = new ExtendedTextWrapper(new StringWriter(sb));
-            ResultReporter.WriteErrorsFailuresAndWarningsReport(_result, writer);
-
-            var report = sb.ToString();
+            ResultReporter.WriteErrorsFailuresAndWarningsReport(_result, _writer);
 
             foreach (var item in expected)
-                Assert.That(report.Contains(item));
+                Assert.That(ReportOutput.Contains(item));
         }
 
         [Test]
@@ -162,11 +174,8 @@ namespace NUnit.TextDisplay
                 string.Empty
             };
 
-            var report = new StringBuilder();
-            var writer = new ExtendedTextWrapper(new StringWriter(report));
-            ResultReporter.WriteNotRunReport(_result, writer);
-            var lines = GetReportLines(report.ToString());
-            Assert.That(lines, Is.EqualTo(expected));
+            ResultReporter.WriteNotRunReport(_result, _writer);
+            Assert.That(ReportLines, Is.EqualTo(expected));
         }
 
         [Test, Explicit("Displays failure behavior")]
@@ -186,28 +195,13 @@ namespace NUnit.TextDisplay
                 "        2 -> |c|"
             };
 
-            var report = new StringBuilder();
-            var writer = new ExtendedTextWrapper(new StringWriter(report));
-            ResultReporter.WriteRunSettingsReport(_result, writer);
-            var lines = GetReportLines(report.ToString());
-            Assert.That(lines, Is.SupersetOf(expected));
+            ResultReporter.WriteRunSettingsReport(_result, _writer);
+            Assert.That(ReportLines, Is.SupersetOf(expected));
         }
 
         private static TestEngineResult AddMetadata(TestEngineResult input)
         {
             return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty, string.Empty);
-        }
-
-        private static List<string> GetReportLines(string report)
-        {
-            var rdr = new StringReader(report.ToString());
-
-            string? line;
-            var lines = new List<string>();
-            while ((line = rdr.ReadLine()) is not null)
-                lines.Add(line);
-
-            return lines;
         }
     }
 }

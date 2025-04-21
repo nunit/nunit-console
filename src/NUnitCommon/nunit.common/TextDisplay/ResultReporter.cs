@@ -1,13 +1,30 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Xml;
 
 namespace NUnit.TextDisplay
 {
     public static class ResultReporter
     {
+        public static void WriteHeader(ExtendedTextWriter writer)
+        {
+            Assembly entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+            var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
+
+            var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
+
+            var configurationAttributes = entryAssembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+
+            writer.WriteLine(ColorStyle.Header, header);
+            writer.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright ?? "No Copyright statement found");
+            writer.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
+            writer.WriteLine();
+        }
+
         /// <summary>
         /// Reports the results to the console
         /// </summary>
@@ -25,7 +42,7 @@ namespace NUnit.TextDisplay
 
             WriteRunSettingsReport(topLevelResult, writer);
 
-            WriteSummaryReport(topLevelResult, summary, writer);
+            WriteSummaryReport(summary, writer);
         }
 
         public static void WriteRunSettingsReport(XmlNode topLevelResult, ExtendedTextWriter writer)
@@ -68,10 +85,12 @@ namespace NUnit.TextDisplay
             }
         }
 
-        public static void WriteSummaryReport(XmlNode topLevelResult, ResultSummary summary, ExtendedTextWriter writer)
+        public static void WriteSummaryReport(ResultSummary summary, ExtendedTextWriter writer)
         {
             const string INDENT4 = "    ";
             const string INDENT8 = "        ";
+
+            var topLevelResult = summary.ResultNode;
 
             ColorStyle resultColor = summary.OverallResult == "Passed"
                 ? ColorStyle.Pass
