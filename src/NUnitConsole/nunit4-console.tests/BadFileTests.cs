@@ -36,9 +36,8 @@ namespace NUnit.ConsoleRunner
             var result = runner.Run(this, TestFilter.Empty);
             var sb = new StringBuilder();
             var writer = new ExtendedTextWrapper(new StringWriter(sb));
-            var reporter = new ResultReporter(result, writer);
 
-            reporter.WriteErrorsFailuresAndWarningsReport();
+            ResultReporter.WriteErrorsFailuresAndWarningsReport(result, writer);
             var report = sb.ToString();
 
             Assert.That(report, Contains.Substring($"1) Invalid : {fullname}"));

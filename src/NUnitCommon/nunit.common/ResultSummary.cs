@@ -10,15 +10,29 @@ namespace NUnit
     /// </summary>
     public class ResultSummary
     {
-        public ResultSummary(XmlNode result)
+        public ResultSummary(XmlNode resultNode)
         {
-            if (result.Name != "test-run")
-                throw new InvalidOperationException("Expected <test-run> as top-level element but was <" + result.Name + ">");
+            if (resultNode.Name != "test-run")
+                throw new InvalidOperationException("Expected <test-run> as top-level element but was <" + resultNode.Name + ">");
 
             InitializeCounters();
 
-            Summarize(result, false);
+            Summarize(resultNode, false);
+
+            string? overallResult = resultNode.GetAttribute("result");
+            if (overallResult == "Skipped")
+                OverallResult = "Warning";
+            if (overallResult is null)
+                OverallResult = "Unknown";
+            else
+                OverallResult = overallResult;
+
+            ResultNode = resultNode;
         }
+
+        public XmlNode ResultNode { get; }
+
+        public string OverallResult { get; }
 
         /// <summary>
         /// Gets the number of test cases for which results

@@ -15,7 +15,6 @@ namespace NUnit.TextDisplay
     public class ResultReporterTests
     {
         private XmlNode _result;
-        private ResultReporter _reporter;
         private StringBuilder _report;
 
         [OneTimeSetUp]
@@ -49,13 +48,15 @@ namespace NUnit.TextDisplay
         {
             _report = new StringBuilder();
             var writer = new ExtendedTextWrapper(new StringWriter(_report));
-            _reporter = new ResultReporter(_result, writer);
         }
 
         [Test]
         public void ReportSequenceTest()
         {
-            var report = GetReport(_reporter.ReportResults);
+            var sb = new StringBuilder();
+            var writer = new ExtendedTextWrapper(new StringWriter(sb));
+            ResultReporter.ReportResults(new ResultSummary(_result), writer);
+            var report = sb.ToString();
 
             var reportSequence = new[]
             {
@@ -93,12 +94,15 @@ namespace NUnit.TextDisplay
             };
 #pragma warning restore SA1137 // Elements should have the same indentation
 
-            var actualSummary = GetReportLines(_reporter.WriteSummaryReport);
-            Assert.That(actualSummary, Is.EqualTo(expected));
+            var report = new StringBuilder();
+            var writer = new ExtendedTextWrapper(new StringWriter(report));
+            ResultReporter.WriteSummaryReport(_result, new ResultSummary(_result), writer);
+            var lines = GetReportLines(report.ToString());
+            Assert.That(lines, Is.EqualTo(expected));
         }
 
         [Test]
-        public void ErrorsAndFailuresReportTest()
+        public void ErrorsFailuresAndWarningsReportTest()
         {
             var nl = Environment.NewLine;
 
@@ -119,12 +123,14 @@ namespace NUnit.TextDisplay
                 "No suitable constructor was found"
             };
 
-            var actualErrorFailuresReport = GetReport(_reporter.WriteErrorsFailuresAndWarningsReport);
+            var sb = new StringBuilder();
+            var writer = new ExtendedTextWrapper(new StringWriter(sb));
+            ResultReporter.WriteErrorsFailuresAndWarningsReport(_result, writer);
 
-            foreach (var ex in expected)
-            {
-                Assert.That(actualErrorFailuresReport, Does.Contain(ex));
-            }
+            var report = sb.ToString();
+
+            foreach (var item in expected)
+                Assert.That(report.Contains(item));
         }
 
         [Test]
@@ -156,8 +162,11 @@ namespace NUnit.TextDisplay
                 string.Empty
             };
 
-            var report = GetReportLines(_reporter.WriteNotRunReport);
-            Assert.That(report, Is.EqualTo(expected));
+            var report = new StringBuilder();
+            var writer = new ExtendedTextWrapper(new StringWriter(report));
+            ResultReporter.WriteNotRunReport(_result, writer);
+            var lines = GetReportLines(report.ToString());
+            Assert.That(lines, Is.EqualTo(expected));
         }
 
         [Test, Explicit("Displays failure behavior")]
@@ -177,8 +186,11 @@ namespace NUnit.TextDisplay
                 "        2 -> |c|"
             };
 
-            var report = GetReportLines(_reporter.WriteRunSettingsReport);
-            Assert.That(report, Is.SupersetOf(expected));
+            var report = new StringBuilder();
+            var writer = new ExtendedTextWrapper(new StringWriter(report));
+            ResultReporter.WriteRunSettingsReport(_result, writer);
+            var lines = GetReportLines(report.ToString());
+            Assert.That(lines, Is.SupersetOf(expected));
         }
 
         private static TestEngineResult AddMetadata(TestEngineResult input)
@@ -186,15 +198,9 @@ namespace NUnit.TextDisplay
             return input.Aggregate("test-run start-time=\"2015-10-19 02:12:28Z\" end-time=\"2015-10-19 02:12:29Z\" duration=\"0.348616\"", string.Empty, string.Empty, string.Empty);
         }
 
-        private string GetReport(TestDelegate del)
+        private static List<string> GetReportLines(string report)
         {
-            del();
-            return _report.ToString();
-        }
-
-        private List<string> GetReportLines(TestDelegate del)
-        {
-            var rdr = new StringReader(GetReport(del));
+            var rdr = new StringReader(report.ToString());
 
             string? line;
             var lines = new List<string>();

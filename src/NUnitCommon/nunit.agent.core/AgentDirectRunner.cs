@@ -30,7 +30,7 @@ namespace NUnit.Agents
             {
                 var testFile = _options.Files[0];
 
-                WriteHeader();
+                WriteHeader(OutWriter);
 
                 TestPackage package = new TestPackage(testFile).SubPackages[0];
 
@@ -66,7 +66,7 @@ namespace NUnit.Agents
             Environment.Exit(AgentExitCodes.OK);
         }
 
-        private void WriteHeader()
+        private static void WriteHeader(ExtendedTextWriter outWriter)
         {
             var ea = Assembly.GetEntryAssembly();
             if (ea is not null)
@@ -75,11 +75,11 @@ namespace NUnit.Agents
                 var version = GetAttribute<AssemblyFileVersionAttribute>(ea)?.Version;
                 var copyright = GetAttribute<AssemblyCopyrightAttribute>(ea)?.Copyright;
 
-                OutWriter.WriteLine(ColorStyle.Header, $"{title} {version}");
+                outWriter.WriteLine(ColorStyle.Header, $"{title} {version}");
                 if (copyright is not null)
-                    OutWriter.WriteLine(ColorStyle.SubHeader, copyright);
-                OutWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
-                OutWriter.WriteLine();
+                    outWriter.WriteLine(ColorStyle.SubHeader, copyright);
+                outWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
+                outWriter.WriteLine();
             }
         }
 

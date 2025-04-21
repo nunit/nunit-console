@@ -6,155 +6,133 @@ using System.Xml;
 
 namespace NUnit.TextDisplay
 {
-    public class ResultReporter
+    public static class ResultReporter
     {
-        public ResultReporter(XmlNode resultNode, ExtendedTextWriter writer, bool stopOnError = false)
-        {
-            ResultNode = resultNode;
-            Writer = writer;
-            StopOnError = stopOnError;
-
-            string? overallResult = resultNode.GetAttribute("result");
-            if (overallResult == "Skipped")
-                OverallResult = "Warning";
-            if (overallResult is null)
-                OverallResult = "Unknown";
-            else
-                OverallResult = overallResult;
-            Summary = new ResultSummary(resultNode);
-        }
-
-        public ResultSummary Summary { get; private set; }
-
-        private int ReportIndex { get; set; }
-        private XmlNode ResultNode { get; set; }
-        private ExtendedTextWriter Writer { get; set; }
-        private string OverallResult { get; set; }
-        private bool StopOnError { get; set; }
-
         /// <summary>
         /// Reports the results to the console
         /// </summary>
-        public void ReportResults()
+        public static void ReportResults(ResultSummary summary, ExtendedTextWriter writer, bool stopOnError = false)
         {
-            Writer.WriteLine();
+            writer.WriteLine();
 
-            if (Summary.ExplicitCount + Summary.SkipCount + Summary.IgnoreCount > 0)
-                WriteNotRunReport();
+            var topLevelResult = summary.ResultNode;
 
-            if (OverallResult == "Failed" || Summary.WarningCount > 0)
-                WriteErrorsFailuresAndWarningsReport();
+            if (summary.ExplicitCount + summary.SkipCount + summary.IgnoreCount > 0)
+                WriteNotRunReport(topLevelResult, writer);
 
-            WriteRunSettingsReport();
+            if (summary.OverallResult == "Failed" || summary.WarningCount > 0)
+                WriteErrorsFailuresAndWarningsReport(topLevelResult, writer, stopOnError);
 
-            WriteSummaryReport();
+            WriteRunSettingsReport(topLevelResult, writer);
+
+            WriteSummaryReport(topLevelResult, summary, writer);
         }
 
-        public void WriteRunSettingsReport()
+        public static void WriteRunSettingsReport(XmlNode topLevelResult, ExtendedTextWriter writer)
         {
-            var firstSuite = ResultNode.SelectSingleNode("test-suite");
+            var firstSuite = topLevelResult.SelectSingleNode("test-suite");
             if (firstSuite is not null)
             {
                 var settings = firstSuite.SelectNodes("settings/setting");
 
                 if (settings is not null && settings.Count > 0)
                 {
-                    Writer.WriteLine(ColorStyle.SectionHeader, "Run Settings");
+                    writer.WriteLine(ColorStyle.SectionHeader, "Run Settings");
 
                     foreach (XmlNode node in settings)
-                        WriteSettingsNode(node);
+                        WriteSettingsNode(node, writer);
 
-                    Writer.WriteLine();
+                    writer.WriteLine();
                 }
             }
         }
 
-        private void WriteSettingsNode(XmlNode node)
+        private static void WriteSettingsNode(XmlNode node, ExtendedTextWriter writer)
         {
             var items = node.SelectNodes("item");
             var name = node.GetAttribute("name");
             var val = node.GetAttribute("value") ?? string.Empty;
 
             if (items is null || items.Count == 0)
-                Writer.WriteLabelLine($"    {name}:", $" |{val}|");
+                writer.WriteLabelLine($"    {name}:", $" |{val}|");
             else
             {
-                Writer.WriteLabelLine($"    {name}:", string.Empty);
+                writer.WriteLabelLine($"    {name}:", string.Empty);
 
                 foreach (XmlNode item in items)
                 {
                     var key = item.GetAttribute("key");
                     var value = item.GetAttribute("value");
-                    Writer.WriteLine(ColorStyle.Value, $"        {key} -> |{value}|");
+                    writer.WriteLine(ColorStyle.Value, $"        {key} -> |{value}|");
                 }
             }
         }
 
-        public void WriteSummaryReport()
+        public static void WriteSummaryReport(XmlNode topLevelResult, ResultSummary summary, ExtendedTextWriter writer)
         {
             const string INDENT4 = "    ";
             const string INDENT8 = "        ";
 
-            ColorStyle overall = OverallResult == "Passed"
+            ColorStyle resultColor = summary.OverallResult == "Passed"
                 ? ColorStyle.Pass
-                : OverallResult == "Failed" || OverallResult == "Unknown"
+                : summary.OverallResult == "Failed" || summary.OverallResult == "Unknown"
                     ? ColorStyle.Failure
-                    : OverallResult == "Warning"
+                    : summary.OverallResult == "Warning"
                         ? ColorStyle.Warning
                         : ColorStyle.Output;
 
-            Writer.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
-            Writer.WriteLabelLine(INDENT4 + "Overall result: ", OverallResult, overall);
+            writer.WriteLine(ColorStyle.SectionHeader, "Test Run Summary");
+            writer.WriteLabelLine(INDENT4 + "Overall result: ", summary.OverallResult, resultColor);
 
-            WriteSummaryCount(INDENT4 + "Test Count: ", Summary.TestCount);
-            WriteSummaryCount(", Pass: ", Summary.PassCount);
-            WriteSummaryCount(", Fail: ", Summary.FailedCount, ColorStyle.Failure);
-            WriteSummaryCount(", Warn: ", Summary.WarningCount, ColorStyle.Warning);
-            WriteSummaryCount(", Inconclusive: ", Summary.InconclusiveCount);
-            WriteSummaryCount(", Skip: ", Summary.TotalSkipCount);
-            Writer.WriteLine();
+            WriteSummaryCount(writer, INDENT4 + "Test Count: ", summary.TestCount);
+            WriteSummaryCount(writer, ", Pass: ", summary.PassCount);
+            WriteSummaryCount(writer, ", Fail: ", summary.FailedCount, ColorStyle.Failure);
+            WriteSummaryCount(writer, ", Warn: ", summary.WarningCount, ColorStyle.Warning);
+            WriteSummaryCount(writer, ", Inconclusive: ", summary.InconclusiveCount);
+            WriteSummaryCount(writer, ", Skip: ", summary.TotalSkipCount);
+            writer.WriteLine();
 
-            if (Summary.FailedCount > 0)
+            if (summary.FailedCount > 0)
             {
-                WriteSummaryCount(INDENT8 + "Failed Tests - Failures: ", Summary.FailureCount);
-                WriteSummaryCount(", Errors: ", Summary.ErrorCount, ColorStyle.Error);
-                WriteSummaryCount(", Invalid: ", Summary.InvalidCount);
-                Writer.WriteLine();
+                WriteSummaryCount(writer, INDENT8 + "Failed Tests - Failures: ", summary.FailureCount);
+                WriteSummaryCount(writer, ", Errors: ", summary.ErrorCount, ColorStyle.Error);
+                WriteSummaryCount(writer, ", Invalid: ", summary.InvalidCount);
+                writer.WriteLine();
             }
-            if (Summary.TotalSkipCount > 0)
+            if (summary.TotalSkipCount > 0)
             {
-                WriteSummaryCount(INDENT8 + "Skipped Tests - Ignored: ", Summary.IgnoreCount);
-                WriteSummaryCount(", Explicit: ", Summary.ExplicitCount);
-                WriteSummaryCount(", Other: ", Summary.SkipCount);
-                Writer.WriteLine();
+                WriteSummaryCount(writer, INDENT8 + "Skipped Tests - Ignored: ", summary.IgnoreCount);
+                WriteSummaryCount(writer, ", Explicit: ", summary.ExplicitCount);
+                WriteSummaryCount(writer, ", Other: ", summary.SkipCount);
+                writer.WriteLine();
             }
 
-            var duration = ResultNode.GetAttribute("duration", 0.0);
-            var startTime = ResultNode.GetAttribute("start-time", DateTime.MinValue);
-            var endTime = ResultNode.GetAttribute("end-time", DateTime.MaxValue);
+            var duration = topLevelResult.GetAttribute("duration", 0.0);
+            var startTime = topLevelResult.GetAttribute("start-time", DateTime.MinValue);
+            var endTime = topLevelResult.GetAttribute("end-time", DateTime.MaxValue);
 
-            Writer.WriteLabelLine(INDENT4 + "Start time: ", startTime.ToString("u"));
-            Writer.WriteLabelLine(INDENT4 + "End time: ", endTime.ToString("u"));
-            Writer.WriteLabelLine(INDENT4 + "Duration: ", string.Format(NumberFormatInfo.InvariantInfo, "{0:0.000} seconds", duration));
-            Writer.WriteLine();
+            writer.WriteLabelLine(INDENT4 + "Start time: ", startTime.ToString("u"));
+            writer.WriteLabelLine(INDENT4 + "End time: ", endTime.ToString("u"));
+            writer.WriteLabelLine(INDENT4 + "Duration: ", string.Format(NumberFormatInfo.InvariantInfo, "{0:0.000} seconds", duration));
+            writer.WriteLine();
         }
 
-        public void WriteErrorsFailuresAndWarningsReport()
+        public static void WriteErrorsFailuresAndWarningsReport(XmlNode resultNode, ExtendedTextWriter writer, bool stopOnError = false)
         {
-            ReportIndex = 0;
-            Writer.WriteLine(ColorStyle.SectionHeader, "Errors, Failures and Warnings");
-            Writer.WriteLine();
+            int reportIndex = 0;
+            writer.WriteLine(ColorStyle.SectionHeader, "Errors, Failures and Warnings");
+            writer.WriteLine();
 
-            WriteErrorsFailuresAndWarnings(ResultNode);
+            WriteErrorsFailuresAndWarnings(resultNode, writer, ref reportIndex);
 
-            //if (Options.StopOnError)
-            //{
-            //    Writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
-            //    Writer.WriteLine();
-            //}
+            if (stopOnError)
+            {
+                writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
+                writer.WriteLine();
+            }
         }
 
-        private void WriteErrorsFailuresAndWarnings(XmlNode resultNode)
+        private static void WriteErrorsFailuresAndWarnings(XmlNode resultNode, ExtendedTextWriter writer, ref int reportIndex)
         {
             string? resultState = resultNode.GetAttribute("result");
 
@@ -162,12 +140,12 @@ namespace NUnit.TextDisplay
             {
                 case "test-case":
                     if (resultState == "Failed" || resultState == "Warning")
-                        new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                        new ClientTestResult(resultNode, ++reportIndex).WriteResult(writer);
                     return;
 
                 case "test-run":
                     foreach (XmlNode childResult in resultNode.ChildNodes)
-                        WriteErrorsFailuresAndWarnings(childResult);
+                        WriteErrorsFailuresAndWarnings(childResult, writer, ref reportIndex);
                     break;
 
                 case "test-suite":
@@ -178,7 +156,7 @@ namespace NUnit.TextDisplay
                         {
                             // Report failure of the entire theory and then go on
                             // to list the individual cases that failed
-                            new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                            new ClientTestResult(resultNode, ++reportIndex).WriteResult(writer);
                         }
                         else
                         {
@@ -200,7 +178,7 @@ namespace NUnit.TextDisplay
 
                             // Only report errors in the current test method, setup or teardown
                             if (site == "SetUp" || site == "TearDown" || site == "Test")
-                                new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                                new ClientTestResult(resultNode, ++reportIndex).WriteResult(writer);
 
                             // Do not list individual "failed" tests after a one-time setup failure
                             if (site == "SetUp")
@@ -209,21 +187,21 @@ namespace NUnit.TextDisplay
                     }
 
                     foreach (XmlNode childResult in resultNode.ChildNodes)
-                        WriteErrorsFailuresAndWarnings(childResult);
+                        WriteErrorsFailuresAndWarnings(childResult, writer, ref reportIndex);
 
                     break;
             }
         }
 
-        public void WriteNotRunReport()
+        public static void WriteNotRunReport(XmlNode resultNode, ExtendedTextWriter writer)
         {
-            ReportIndex = 0;
-            Writer.WriteLine(ColorStyle.SectionHeader, "Tests Not Run");
-            Writer.WriteLine();
-            WriteNotRunResults(ResultNode);
+            int reportIndex = 0;
+            writer.WriteLine(ColorStyle.SectionHeader, "Tests Not Run");
+            writer.WriteLine();
+            WriteNotRunResults(resultNode, writer, ref reportIndex);
         }
 
-        private void WriteNotRunResults(XmlNode resultNode)
+        private static void WriteNotRunResults(XmlNode resultNode, ExtendedTextWriter writer, ref int reportIndex)
         {
             switch (resultNode.Name)
             {
@@ -231,27 +209,27 @@ namespace NUnit.TextDisplay
                     string? status = resultNode.GetAttribute("result");
 
                     if (status == "Skipped")
-                        new ClientTestResult(resultNode, ++ReportIndex).WriteResult(Writer);
+                        new ClientTestResult(resultNode, ++reportIndex).WriteResult(writer);
 
                     break;
 
                 case "test-suite":
                 case "test-run":
                     foreach (XmlNode childResult in resultNode.ChildNodes)
-                        WriteNotRunResults(childResult);
+                        WriteNotRunResults(childResult, writer, ref reportIndex);
 
                     break;
             }
         }
 
-        private void WriteSummaryCount(string label, int count)
+        private static void WriteSummaryCount(ExtendedTextWriter writer, string label, int count)
         {
-            Writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture));
+            writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture));
         }
 
-        private void WriteSummaryCount(string label, int count, ColorStyle color)
+        private static void WriteSummaryCount(ExtendedTextWriter writer, string label, int count, ColorStyle color)
         {
-            Writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture), count > 0 ? color : ColorStyle.Value);
+            writer.WriteLabel(label, count.ToString(CultureInfo.CurrentUICulture), count > 0 ? color : ColorStyle.Value);
         }
     }
 }
