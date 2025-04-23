@@ -2,7 +2,7 @@
 
 #if !NETSTANDARD2_1 && !NETCOREAPP2_0_OR_GREATER
 
-namespace NUnit.Common
+namespace NUnit
 {
     public static class StringExtensions
     {

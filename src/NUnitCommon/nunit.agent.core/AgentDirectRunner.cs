@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Xml;
 using NUnit.TextDisplay;
+using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Engine.Runners;
 

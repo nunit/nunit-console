@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Xml;
+using NUnit.Common;
 
 namespace NUnit.TextDisplay
 {
@@ -16,8 +17,6 @@ namespace NUnit.TextDisplay
             var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
 
             var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
-
-            var configurationAttributes = entryAssembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
 
             writer.WriteLine(ColorStyle.Header, header);
             writer.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright ?? "No Copyright statement found");

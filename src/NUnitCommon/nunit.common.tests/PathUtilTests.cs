@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 
-namespace NUnit.Engine.Internal
+namespace NUnit.Common
 {
     [TestFixture]
     public class PathUtilsTests

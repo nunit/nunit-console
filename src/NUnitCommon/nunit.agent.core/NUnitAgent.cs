@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Reflection;
+using NUnit.Common;
 using NUnit.Engine.Agents;
 
 #if NETFRAMEWORK

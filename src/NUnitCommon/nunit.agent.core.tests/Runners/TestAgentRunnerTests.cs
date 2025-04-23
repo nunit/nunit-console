@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using NUnit.Engine.Internal;
 using NUnit.Framework;
 using NUnit.TestData;
 using NUnit.TestData.Assemblies;

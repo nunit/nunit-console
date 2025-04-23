@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace NUnit
+namespace NUnit.Common
 {
     /// <summary>
     /// Static methods for manipulating project paths, including both directories

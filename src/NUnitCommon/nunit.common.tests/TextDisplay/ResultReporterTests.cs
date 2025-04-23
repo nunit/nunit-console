@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using NUnit.Common;
 using NUnit.Engine;
 using NUnit.Framework;
 using NUnit.Framework.Api;
@@ -19,13 +20,11 @@ namespace NUnit.TextDisplay
         private StringBuilder _reportBuilder;
         private ExtendedTextWrapper _writer;
 
-        private string ReportOutput => _reportBuilder.ToString();
-
         private List<string> ReportLines
         {
             get
             {
-                var rdr = new StringReader(ReportOutput);
+                var rdr = new StringReader(_reportBuilder.ToString());
 
                 string? line;
                 var lines = new List<string>();
@@ -86,9 +85,10 @@ namespace NUnit.TextDisplay
 
             int last = -1;
 
+            string reportOutput = _reportBuilder.ToString();
             foreach (string title in reportSequence)
             {
-                var index = ReportOutput.IndexOf(title);
+                var index = reportOutput.IndexOf(title);
                 Assert.That(index > 0, "Report not found: " + title);
                 Assert.That(index > last, "Report out of sequence: " + title);
                 last = index;
@@ -141,8 +141,9 @@ namespace NUnit.TextDisplay
 
             ResultReporter.WriteErrorsFailuresAndWarningsReport(_result, _writer);
 
+            string reportOutput = _reportBuilder.ToString();
             foreach (var item in expected)
-                Assert.That(ReportOutput.Contains(item));
+                Assert.That(reportOutput.Contains(item));
         }
 
         [Test]
@@ -177,12 +178,6 @@ namespace NUnit.TextDisplay
             ResultReporter.WriteNotRunReport(_result, _writer);
             Assert.That(ReportLines, Is.EqualTo(expected));
         }
-
-        //[Test, Explicit("Displays failure behavior")]
-        //public void WarningsOnlyDisplayOnce()
-        //{
-        //    Assert.Warn("Just a warning");
-        //}
 
         [Test]
         public void TestParameterSettingsWrittenCorrectly()

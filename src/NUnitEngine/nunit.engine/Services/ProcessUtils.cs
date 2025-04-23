@@ -23,7 +23,7 @@
 
 using System.Text;
 
-namespace NUnit.Engine
+namespace NUnit.Engine.Services
 {
     public static class ProcessUtils
     {

@@ -1,12 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
-using NUnit.TextDisplay;
 
-namespace NUnit
+namespace NUnit.TextDisplay
 {
     /// <summary>
     /// ConsoleTestResult represents the result of one test being
@@ -73,7 +70,7 @@ namespace NUnit
                     XmlNodeList? assertions = _resultNode.SelectNodes("assertions/assertion");
                     if (assertions is not null)
                         foreach (XmlNode assertion in assertions)
-                            Assertions.Add(new ClientTestResult.AssertionResult(assertion));
+                            Assertions.Add(new AssertionResult(assertion));
                 }
 
                 return _assertions;

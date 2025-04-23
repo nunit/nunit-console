@@ -3,7 +3,7 @@
 using System;
 using System.Xml;
 
-namespace NUnit
+namespace NUnit.Common
 {
     /// <summary>
     /// Summary description for ResultSummary.

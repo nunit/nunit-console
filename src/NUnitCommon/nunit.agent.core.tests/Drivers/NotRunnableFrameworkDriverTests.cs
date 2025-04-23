@@ -6,7 +6,6 @@ using System.Xml;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using NUnit.Engine.Extensibility;
-using NUnit.Engine.Internal;
 using System;
 
 namespace NUnit.Engine.Drivers
