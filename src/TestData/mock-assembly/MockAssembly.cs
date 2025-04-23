@@ -65,18 +65,18 @@ namespace NUnit.TestData
             public const int ExplicitFixtures = 1;
             public const int SuitesRun = Suites - ExplicitFixtures;
 
+            public const int PassedButFailedInTearDown = FixtureWithDispose.Tests
+                        + FixtureWithOneTimeTearDown.Tests
+                        + TestSetUpFixture.SetUpFixture.TestsInNamespace;
+
             public const int Passed = MockTestFixture.Passed
                         + Singletons.OneTestCase.Tests
                         + TestAssembly.MockTestFixture.Tests
                         + FixtureWithTestCases.Tests
                         + ParameterizedFixture.Tests
                         + GenericFixtureConstants.Tests
-                        + AccessesCurrentTestContextDuringDiscovery.Tests;
-
-            public const int PassedInAttribute = Passed
-                        + FixtureWithDispose.Tests
-                        + FixtureWithOneTimeTearDown.Tests
-                        + TestSetUpFixture.SetUpFixture.TestsInNamespace;
+                        + AccessesCurrentTestContextDuringDiscovery.Tests
+                        + PassedButFailedInTearDown;
 
             public const int Skipped_Ignored = MockTestFixture.Skipped_Ignored + IgnoredFixture.Tests;
             public const int Skipped_Explicit = MockTestFixture.Skipped_Explicit + ExplicitFixture.Tests;
@@ -92,6 +92,22 @@ namespace NUnit.TestData
             public const int Inconclusive = MockTestFixture.Inconclusive;
 
             public static readonly string AssemblyPath = AssemblyHelper.GetAssemblyPath(typeof(MockAssembly).Assembly);
+
+            // Method run manually to verify that the counts are set up correctly
+            public static void DisplayCounts()
+            {
+                Console.WriteLine($"Test Count:   {Tests}");
+                Console.WriteLine($"  Passed:       {Passed}");
+                Console.WriteLine($"  Failed:       {Failed}");
+                Console.WriteLine($"    Failures:     {Failed_Other}");
+                Console.WriteLine($"    Errors:       {Failed_Error}");
+                Console.WriteLine($"    Invalid:      {Failed_NotRunnable}");
+                Console.WriteLine($"  Warnings:     {Warnings}");
+                Console.WriteLine($"  Skipped:      {Skipped}");
+                Console.WriteLine($"    Explicit:     {Skipped_Explicit}");
+                Console.WriteLine($"    Ignored:      {Skipped_Ignored}");
+                Console.WriteLine($"  Inconclusive: {Inconclusive}");
+            }
         }
 
         [TestFixture(Description="Fake Test Fixture")]

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NUnit.Common;
 using NUnit.Framework;
 using NUnit.TestData.Assemblies;
 
@@ -28,6 +29,7 @@ namespace NUnit.Agents
 #else
             string agentExe = Path.ChangeExtension(agentAssembly, ".exe");
 #endif
+            MockAssembly.DisplayCounts();
 
             var startInfo = new ProcessStartInfo(agentExe);
             startInfo.Arguments = testAssembly;
@@ -39,16 +41,10 @@ namespace NUnit.Agents
             if (process is not null)
             {
                 process.WaitForExit();
-
-                string output = process.StandardOutput.ReadToEnd();
-                int index = output.IndexOf("Test Run Summary");
-                if (index > 0)
-                    output = output.Substring(index);
-
-                Console.WriteLine(output);
                 Console.WriteLine($"Agent process exited with rc={process.ExitCode}");
 
-                if (index < 0)
+                string output = process.StandardOutput.ReadToEnd();
+                if (!output.Contains("Test Run Summary"))
                     Assert.Fail("No Summary Report found");
             }
         }

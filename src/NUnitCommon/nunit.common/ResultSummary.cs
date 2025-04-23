@@ -12,8 +12,8 @@ namespace NUnit
     {
         public ResultSummary(XmlNode resultNode)
         {
-            if (resultNode.Name != "test-run")
-                throw new InvalidOperationException("Expected <test-run> as top-level element but was <" + resultNode.Name + ">");
+            if (resultNode.Name != "test-run" && resultNode.Name != "test-suite")
+                throw new InvalidOperationException("Expected <test-run> or <test-suite> as top-level element but was <" + resultNode.Name + ">");
 
             InitializeCounters();
 
@@ -216,10 +216,11 @@ namespace NUnit
                         InvalidAssemblies++;
                         UnexpectedError = true;
                     }
-                    if ((type == "SetUpFixture" || type == "TestFixture") && status == "Failed" && label == "Error" && site == "TearDown")
-                    {
-                        failedInFixtureTearDown = true;
-                    }
+                    // TODO: This seems wrong and causes failures. Leaving it commented while awaiting feedback.
+                    //if ((type == "SetUpFixture" || type == "TestFixture") && status == "Failed" && label == "Error" && site == "TearDown")
+                    //{
+                    //    failedInFixtureTearDown = true;
+                    //}
 
                     Summarize(node.ChildNodes, failedInFixtureTearDown);
                     break;

@@ -103,9 +103,9 @@ namespace NUnit.TextDisplay
             {
                 "Test Run Summary",
                 "    Overall result: Failed",
-               $"    Test Count: {MockAssembly.Tests}, Pass: {MockAssembly.Passed}, Fail: 11, Warn: 1, Inconclusive: 1, Skip: 7",
-                "        Failed Tests - Failures: 1, Errors: 7, Invalid: 3",
-                "        Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
+               $"    Test Count: {MockAssembly.Tests}, Pass: {MockAssembly.Passed}, Fail: {MockAssembly.Failed}, Warn: {MockAssembly.Warnings}, Inconclusive: {MockAssembly.Inconclusive}, Skip: {MockAssembly.Skipped}",
+               $"        Failed Tests - Failures: {MockAssembly.Failed_Other}, Errors: {MockAssembly.Failed_Error}, Invalid: {MockAssembly.Failed_NotRunnable}",
+               $"        Skipped Tests - Ignored: 4, Explicit: 3, Other: 0",
                 "    Start time: 2015-10-19 02:12:28Z",
                 "    End time: 2015-10-19 02:12:29Z",
                 "    Duration: 0.349 seconds",
@@ -178,11 +178,11 @@ namespace NUnit.TextDisplay
             Assert.That(ReportLines, Is.EqualTo(expected));
         }
 
-        [Test, Explicit("Displays failure behavior")]
-        public void WarningsOnlyDisplayOnce()
-        {
-            Assert.Warn("Just a warning");
-        }
+        //[Test, Explicit("Displays failure behavior")]
+        //public void WarningsOnlyDisplayOnce()
+        //{
+        //    Assert.Warn("Just a warning");
+        //}
 
         [Test]
         public void TestParameterSettingsWrittenCorrectly()
