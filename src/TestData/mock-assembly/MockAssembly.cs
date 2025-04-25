@@ -18,12 +18,6 @@ namespace NUnit.TestData
         /// </summary>
         public class MockAssembly
         {
-            /// <summary>
-            /// Constant definitions used by tests that both reference the
-            /// mock-assembly and load it in order to verify counts.
-            /// </summary>
-            public const string FileName = "mock.nunit.assembly.exe";
-
             public const int Classes = 9;
             public const int NamespaceSuites = 6; // assembly, NUnit, Tests, Assemblies, Singletons, TestAssembly
 
@@ -65,27 +59,30 @@ namespace NUnit.TestData
             public const int ExplicitFixtures = 1;
             public const int SuitesRun = Suites - ExplicitFixtures;
 
-            public const int PassedButFailedInTearDown = FixtureWithDispose.Tests
-                        + FixtureWithOneTimeTearDown.Tests
-                        + TestSetUpFixture.SetUpFixture.TestsInNamespace;
-
             public const int Passed = MockTestFixture.Passed
                         + Singletons.OneTestCase.Tests
                         + TestAssembly.MockTestFixture.Tests
                         + FixtureWithTestCases.Tests
                         + ParameterizedFixture.Tests
                         + GenericFixtureConstants.Tests
-                        + AccessesCurrentTestContextDuringDiscovery.Tests
-                        + PassedButFailedInTearDown;
+                        + AccessesCurrentTestContextDuringDiscovery.Tests;
 
-            public const int Skipped_Ignored = MockTestFixture.Skipped_Ignored + IgnoredFixture.Tests;
-            public const int Skipped_Explicit = MockTestFixture.Skipped_Explicit + ExplicitFixture.Tests;
-            public const int Skipped = Skipped_Ignored + Skipped_Explicit;
+            public const int PassedButFailedInTearDown = FixtureWithDispose.Tests
+                        + FixtureWithOneTimeTearDown.Tests
+                        + TestSetUpFixture.SetUpFixture.TestsInNamespace;
 
-            public const int Failed_Error = MockTestFixture.Failed_Error;
-            public const int Failed_Other = MockTestFixture.Failed_Other;
-            public const int Failed_NotRunnable = MockTestFixture.Failed_NotRunnable + BadFixture.Tests;
-            public const int Failed = Failed_Error + Failed_Other + Failed_NotRunnable;
+            public const int Passed_Raw = Passed + PassedButFailedInTearDown;
+
+            public const int Ignored = MockTestFixture.Ignored + IgnoredFixture.Tests;
+            public const int Explicit = MockTestFixture.Explicit + ExplicitFixture.Tests;
+            public const int Skipped = Ignored + Explicit;
+
+            public const int Failures = MockTestFixture.Failures;
+            public const int Errors_Raw = MockTestFixture.Errors;
+            public const int Errors = MockTestFixture.Errors + PassedButFailedInTearDown;
+            public const int NotRunnable = MockTestFixture.NotRunnable + BadFixture.Tests;
+            public const int Failed = Failures + Errors + NotRunnable;
+            public const int Failed_Raw = Failures + Errors_Raw + NotRunnable;
 
             public const int Warnings = MockTestFixture.Warnings;
 
@@ -99,13 +96,13 @@ namespace NUnit.TestData
                 Console.WriteLine($"Test Count:   {Tests}");
                 Console.WriteLine($"  Passed:       {Passed}");
                 Console.WriteLine($"  Failed:       {Failed}");
-                Console.WriteLine($"    Failures:     {Failed_Other}");
-                Console.WriteLine($"    Errors:       {Failed_Error}");
-                Console.WriteLine($"    Invalid:      {Failed_NotRunnable}");
+                Console.WriteLine($"    Failures:     {Failures}");
+                Console.WriteLine($"    Errors:       {Errors}");
+                Console.WriteLine($"    Invalid:      {NotRunnable}");
                 Console.WriteLine($"  Warnings:     {Warnings}");
                 Console.WriteLine($"  Skipped:      {Skipped}");
-                Console.WriteLine($"    Explicit:     {Skipped_Explicit}");
-                Console.WriteLine($"    Ignored:      {Skipped_Ignored}");
+                Console.WriteLine($"    Explicit:     {Explicit}");
+                Console.WriteLine($"    Ignored:      {Ignored}");
                 Console.WriteLine($"  Inconclusive: {Inconclusive}");
             }
         }
@@ -119,14 +116,14 @@ namespace NUnit.TestData
 
             public const int Passed = 1;
 
-            public const int Skipped_Ignored = 1;
-            public const int Skipped_Explicit = 1;
-            public const int Skipped = Skipped_Ignored + Skipped_Explicit;
+            public const int Ignored = 1;
+            public const int Explicit = 1;
+            public const int Skipped = Ignored + Explicit;
 
-            public const int Failed_Other = 1;
-            public const int Failed_Error = 1;
-            public const int Failed_NotRunnable = 2;
-            public const int Failed = Failed_Error + Failed_Other + Failed_NotRunnable;
+            public const int Failures = 1;
+            public const int Errors = 1;
+            public const int NotRunnable = 2;
+            public const int Failed = Errors + Failures + NotRunnable;
 
             public const int Warnings = 1;
 

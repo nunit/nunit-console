@@ -105,12 +105,12 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
             Assert.That(result.GetAttribute("runstate"), Is.EqualTo("Runnable"));
-            Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo(MockAssembly.Tests.ToString()));
+            Assert.That(result.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(result.GetAttribute("result"), Is.EqualTo("Failed"));
-            Assert.That(result.GetAttribute("passed"), Is.EqualTo(MockAssembly.Passed.ToString()));
-            Assert.That(result.GetAttribute("failed"), Is.EqualTo(MockAssembly.Failed.ToString()));
-            Assert.That(result.GetAttribute("skipped"), Is.EqualTo(MockAssembly.Skipped.ToString()));
-            Assert.That(result.GetAttribute("inconclusive"), Is.EqualTo(MockAssembly.Inconclusive.ToString()));
+            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed_Raw));
+            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed_Raw));
+            Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
+            Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
             Assert.That(result.SelectNodes("test-suite")?.Count, Is.GreaterThan(0), "Explore result should have child tests");
         }
 

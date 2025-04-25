@@ -216,11 +216,10 @@ namespace NUnit.Common
                         InvalidAssemblies++;
                         UnexpectedError = true;
                     }
-                    // TODO: This seems wrong and causes failures. Leaving it commented while awaiting feedback.
-                    //if ((type == "SetUpFixture" || type == "TestFixture") && status == "Failed" && label == "Error" && site == "TearDown")
-                    //{
-                    //    failedInFixtureTearDown = true;
-                    //}
+                    if ((type == "SetUpFixture" || type == "TestFixture") && status == "Failed" && label == "Error" && site == "TearDown")
+                    {
+                        failedInFixtureTearDown = true;
+                    }
 
                     Summarize(node.ChildNodes, failedInFixtureTearDown);
                     break;
