@@ -46,7 +46,7 @@ namespace NUnit.ConsoleRunner
             }
             catch (OptionException ex)
             {
-                WriteHeader();
+                ResultReporter.WriteHeader(OutWriter);
                 WriteErrorMessage(string.Format(ex.Message, ex.OptionName));
                 return ConsoleRunner.INVALID_ARG;
             }
@@ -59,7 +59,7 @@ namespace NUnit.ConsoleRunner
                 }
                 catch (Exception error)
                 {
-                    WriteHeader();
+                    ResultReporter.WriteHeader(OutWriter);
                     WriteErrorMessage(string.Format("Unsupported Encoding, {0}", error.Message));
                     return ConsoleRunner.INVALID_ARG;
                 }
@@ -68,7 +68,7 @@ namespace NUnit.ConsoleRunner
             try
             {
                 if (Options.ShowVersion || !Options.NoHeader)
-                    WriteHeader();
+                    ResultReporter.WriteHeader(OutWriter);
 
                 if (Options.ShowHelp || args.Length == 0)
                 {
@@ -169,28 +169,6 @@ namespace NUnit.ConsoleRunner
             {
                 Console.ResetColor();
             }
-        }
-
-        private static void WriteHeader()
-        {
-            Assembly entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-            var versionBlock = FileVersionInfo.GetVersionInfo(entryAssembly.ManifestModule.FullyQualifiedName);
-
-            var header = $"{versionBlock.ProductName} {versionBlock.ProductVersion}";
-
-            var configurationAttributes = entryAssembly.GetCustomAttributes<AssemblyConfigurationAttribute>().ToArray();
-
-            if (configurationAttributes.Length > 0)
-            {
-                string configuration = ((AssemblyConfigurationAttribute)configurationAttributes[0]).Configuration;
-                if (!string.IsNullOrEmpty(configuration))
-                    header += $" ({configuration})";
-            }
-
-            OutWriter.WriteLine(ColorStyle.Header, header);
-            OutWriter.WriteLine(ColorStyle.SubHeader, versionBlock.LegalCopyright ?? "No Copyright statement found");
-            OutWriter.WriteLine(ColorStyle.SubHeader, DateTime.Now.ToString(CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern));
-            OutWriter.WriteLine();
         }
 
         private static void WriteHelpText()

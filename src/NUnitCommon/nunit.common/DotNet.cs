@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace NUnit.Engine
+namespace NUnit.Common
 {
     public static class DotNet
     {

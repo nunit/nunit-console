@@ -11,6 +11,7 @@ using System.Security;
 using System.Security.Policy;
 using System.Security.Principal;
 using System.Linq;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {

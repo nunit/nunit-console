@@ -4,7 +4,7 @@
 using System;
 using System.Runtime.Versioning;
 using NSubstitute;
-using NUnit.Extensibility;
+using NUnit.Common;
 using NUnit.Framework;
 
 namespace NUnit.Extensibility

@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using NUnit.Common;
 using NUnit.ConsoleRunner.Utilities;
 using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
-using NUnit.Extensibility;
 using NUnit.TextDisplay;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -271,8 +271,8 @@ namespace NUnit.ConsoleRunner
 
             if (result is not null)
             {
-                var reporter = new ResultReporter(result, writer, _options);
-                reporter.ReportResults();
+                var summary = new ResultSummary(result);
+                ResultReporter.ReportResults(summary, writer, _options.StopOnError);
 
                 foreach (var spec in _options.ResultOutputSpecifications)
                 {
@@ -292,16 +292,16 @@ namespace NUnit.ConsoleRunner
                     writer.WriteLine(ColorStyle.Warning, Environment.NewLine + ExceptionHelper.BuildMessage(unloadException));
                 }
 
-                if (reporter.Summary.UnexpectedError)
+                if (summary.UnexpectedError)
                     return ConsoleRunner.UNEXPECTED_ERROR;
 
-                if (reporter.Summary.InvalidAssemblies > 0)
+                if (summary.InvalidAssemblies > 0)
                     return ConsoleRunner.INVALID_ASSEMBLY;
 
-                if (reporter.Summary.InvalidTestFixtures > 0)
+                if (summary.InvalidTestFixtures > 0)
                     return ConsoleRunner.INVALID_TEST_FIXTURE;
 
-                var failureCount = reporter.Summary.FailureCount + reporter.Summary.ErrorCount + reporter.Summary.InvalidCount;
+                var failureCount = summary.FailureCount + summary.ErrorCount + summary.InvalidCount;
                 return Math.Min(failureCount, MAXIMUM_RETURN_CODE_ALLOWED);
             }
 

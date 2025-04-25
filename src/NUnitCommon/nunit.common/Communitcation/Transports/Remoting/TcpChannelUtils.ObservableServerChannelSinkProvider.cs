@@ -7,7 +7,7 @@ using System.IO;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 
-namespace NUnit.Engine
+namespace NUnit.Engine.Communication.Transports.Remoting
 {
     partial class TcpChannelUtils
     {

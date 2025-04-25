@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Diagnostics;
+using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
 using System.Diagnostics.CodeAnalysis;

@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using NUnit.Common;
 using NUnit.ConsoleRunner.Options;
 
 namespace NUnit.ConsoleRunner

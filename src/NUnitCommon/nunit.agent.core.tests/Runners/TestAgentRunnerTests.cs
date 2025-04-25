@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using NUnit.Engine.Internal;
 using NUnit.Framework;
 using NUnit.TestData;
 using NUnit.TestData.Assemblies;
@@ -114,8 +113,8 @@ namespace NUnit.Engine.Runners
         private static void CheckRunResult(XmlNode result)
         {
             CheckBasicResult(result);
-            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.PassedInAttribute));
-            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed));
+            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed_Raw));
+            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed_Raw));
             Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
             Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
         }

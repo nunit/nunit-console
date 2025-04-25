@@ -1,26 +1,38 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Globalization;
 using System.Xml;
-using NUnit.ConsoleRunner.Utilities;
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.Common
 {
     /// <summary>
     /// Summary description for ResultSummary.
     /// </summary>
     public class ResultSummary
     {
-        public ResultSummary(XmlNode result)
+        public ResultSummary(XmlNode resultNode)
         {
-            if (result.Name != "test-run")
-                throw new InvalidOperationException("Expected <test-run> as top-level element but was <" + result.Name + ">");
+            if (resultNode.Name != "test-run" && resultNode.Name != "test-suite")
+                throw new InvalidOperationException("Expected <test-run> or <test-suite> as top-level element but was <" + resultNode.Name + ">");
 
             InitializeCounters();
 
-            Summarize(result, false);
+            Summarize(resultNode, false);
+
+            string? overallResult = resultNode.GetAttribute("result");
+            if (overallResult == "Skipped")
+                OverallResult = "Warning";
+            if (overallResult is null)
+                OverallResult = "Unknown";
+            else
+                OverallResult = overallResult;
+
+            ResultNode = resultNode;
         }
+
+        public XmlNode ResultNode { get; }
+
+        public string OverallResult { get; }
 
         /// <summary>
         /// Gets the number of test cases for which results

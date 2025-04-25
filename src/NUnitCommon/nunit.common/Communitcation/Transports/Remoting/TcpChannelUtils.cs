@@ -3,13 +3,12 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Serialization.Formatters;
 using System.Threading;
 
-namespace NUnit.Engine
+namespace NUnit.Engine.Communication.Transports.Remoting
 {
     /// <summary>
     /// A collection of utility methods used to create, retrieve

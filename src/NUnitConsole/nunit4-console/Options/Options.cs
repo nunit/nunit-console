@@ -182,8 +182,6 @@ using MessageLocalizerConverter = System.Func<string, string>;
 using MessageLocalizerConverter = System.Converter<string, string>;
 #endif
 
-using NUnit.Common;
-
 namespace NUnit.ConsoleRunner.Options
 {
     internal static class StringCoda

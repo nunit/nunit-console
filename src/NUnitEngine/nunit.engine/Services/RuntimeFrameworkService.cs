@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using NUnit.Common;
 using NUnit.Engine.Services.RuntimeLocators;
 using TestCentric.Metadata;
 
