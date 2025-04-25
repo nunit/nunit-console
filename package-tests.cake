@@ -4,29 +4,6 @@ var StandardRunnerTests = new List<PackageTest>();
 // Tests run for the NETCORE runner package
 var NetCoreRunnerTests = new List<PackageTest>();
 
-// Tests run directly against the agents themselves
-var AgentTests = new List<PackageTest>()
-{
-    new PackageTest(1, "Net462AgentTest")
-    {
-        Description = "Run mock-assembly.dll under .NET 4.6.2",
-        Arguments = "testdata/net462/mock-assembly.dll",
-        ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
-    },
-    new PackageTest(1, "Net462X86AgentTest")
-    {
-        Description = "Run mock-assembly-x86.dll under .NET 4.6.2",
-        Arguments = "testdata/net462/mock-assembly-x86.dll --x86",
-        ExpectedResult = new MockAssemblyX86ExpectedResult("net-4.6.2")
-    },
-    new PackageTest(1, "Net80AgentTest")
-    {
-        Description = "Run mock-assembly.dll under .NET 8.0",
-        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
-        ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
-    }
-};
-
 // Method for adding to both lists
 void AddToBothLists(PackageTest test)
 {
@@ -526,3 +503,53 @@ AddToBothLists(new PackageTest(1, "AppContextBaseDirectory_NET80")
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
     }
 });
+
+// NOTE: Tests for NUnit.Engine and NUnit.Agent.Core here are quite limited. At this
+// point, the main purpose they serve is to demonstrate that we are ABLE to  run
+// the tests without using the console runner.
+//
+// That's because multiple packages are created by this build script and these tests
+// really just repetitions of tests we perform for the console runner package.
+// When either of these packages is moved to a separate repository, the tests will
+// become more meaningful and will then be expanded.
+
+// Tests for NUnit.Engine package
+var EngineTests = new List<PackageTest>()
+{
+    new PackageTest(1, "Net462AgentTest")
+    {
+        Description = "Run mock-assembly.dll under .NET 4.6.2",
+        Arguments = "testdata/net462/mock-assembly.dll",
+        ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
+    },
+    new PackageTest(1, "Net462X86AgentTest")
+    {
+        Description = "Run mock-assembly-x86.dll under .NET 4.6.2",
+        Arguments = "testdata/net462/mock-assembly-x86.dll --x86",
+        ExpectedResult = new MockAssemblyX86ExpectedResult("net-4.6.2")
+    },
+    new PackageTest(1, "Net80AgentTest")
+    {
+        Description = "Run mock-assembly.dll under .NET 8.0",
+        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+        ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
+    }
+};
+
+// Tests for NUnit.Agent.Core package
+var AgentCoreTests = new List<PackageTest>()
+{
+    new PackageTest(1, "Net462AgentTest")
+    {
+        Description = "Run mock-assembly.dll under .NET 4.6.2",
+        Arguments = "testdata/net462/mock-assembly.dll",
+        ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
+    },
+    new PackageTest(1, "Net80AgentTest")
+    {
+        Description = "Run mock-assembly.dll under .NET 8.0",
+        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+        ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
+    }
+};
+
