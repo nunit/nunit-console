@@ -29,8 +29,6 @@ namespace NUnit.Agents
 #else
             string agentExe = Path.ChangeExtension(agentAssembly, ".exe");
 #endif
-            MockAssembly.DisplayCounts();
-
             var startInfo = new ProcessStartInfo(agentExe);
             startInfo.Arguments = testAssembly;
             startInfo.RedirectStandardOutput = true;

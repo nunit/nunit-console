@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.12
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -20,8 +20,9 @@ BuildSettings.Initialize(
 
 PackageDefinition NUnitConsoleNuGetPackage;
 PackageDefinition NUnitConsoleRunnerNuGetPackage;
-PackageDefinition NUnitConsoleRunnerNetCorePackage;
+PackageDefinition NUnitConsoleRunnerDotNetToolPackage;
 PackageDefinition NUnitConsoleRunnerNet80Package;
+PackageDefinition NUnitAgentCorePackage;
 PackageDefinition NUnitEnginePackage;
 PackageDefinition NUnitEngineApiPackage;
 PackageDefinition NUnitExtensibilityApiPackage;
@@ -36,11 +37,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("LICENSE.txt", "NOTICES.txt"),
             HasDirectory("tools").WithFiles(
                 "nunit-console.exe", "nunit-console.exe.config", "nunit.engine.dll",
-                "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll", 
+                "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll",
                 "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net462").WithFiles(
                 "nunit-agent-net462.exe", "nunit-agent-net462.exe.config", "nunit-agent-net462-x86.exe", "nunit-agent-net462-x86.exe.config",
-                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
                 "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent-net80.dll", "nunit-agent-net80.dll.config",
@@ -52,7 +53,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
                 "nunit.engine.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
                 "nunit.common.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
             HasDirectory("tools/agents/net462").WithFiles(
-                "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb", "nunit.agent.core.pdb", 
+                "nunit-agent-net462.pdb", "nunit-agent-net462-x86.pdb", "nunit.agent.core.pdb",
                 "nunit.extensibility.pdb", "nunit.extensibility.api.pdb", "nunit.common.pdb", "nunit.engine.api.pdb"),
             HasDirectory("tools/agents/net8.0").WithFiles(
                 "nunit-agent-net80.pdb", "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
@@ -68,7 +69,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
         checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
 
-    NUnitConsoleRunnerNetCorePackage = new DotNetToolPackage(
+    NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.NetCore",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
         checks: new PackageCheck[]
@@ -76,7 +77,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasFiles("nunit.exe"),
             HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
                 "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-                "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll", 
+                "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll",
                 "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
                 "Microsoft.Extensions.DependencyModel.dll")
         },
@@ -103,6 +104,32 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
             + $"nunit-console-runner-v4.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
         tests: StandardRunnerTests),
+
+    NUnitAgentCorePackage = new NuGetPackage(
+        id: "NUnit.Agent.Core",
+        source: BuildSettings.NuGetDirectory + "nunit.agent.core/nunit.agent.core.nuspec",
+        checks: new PackageCheck[]
+        {
+            HasFiles("LICENSE.txt", "NOTICES.txt"),
+            HasDirectory("lib/net462").WithFiles(
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
+                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
+            HasDirectory("lib/net8.0").WithFiles(
+                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
+                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
+                "Microsoft.Extensions.DependencyModel.dll")
+        },
+        symbols: new PackageCheck[]
+        {
+            HasDirectory("lib/net462").WithFiles(
+                "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+                "nunit.common.pdb", "nunit.engine.api.pdb"),
+            HasDirectory("lib/net8.0").WithFiles(
+                "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+                "nunit.common.pdb", "nunit.engine.api.pdb")
+        },
+        testRunner: new DirectTestAgentRunner(),
+        tests: AgentCoreTests),
 
     NUnitEnginePackage = new NuGetPackage(
         id: "NUnit.Engine",
@@ -140,7 +167,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         },
         testRunner: new AgentRunner(
             BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
-        tests: AgentTests),
+        tests: EngineTests),
 
     NUnitEngineApiPackage = new NuGetPackage(
         id: "NUnit.Engine.Api",
@@ -169,8 +196,9 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         })
 });
 
+
 //////////////////////////////////////////////////////////////////////
-// PACKAGE TEST RUNNER
+// CONSOLE PACKAGE TEST RUNNER
 //////////////////////////////////////////////////////////////////////
 
 // Use the console runner we just built to run package tests
@@ -187,6 +215,51 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
     {
         Console.WriteLine("Running package test");
         return base.RunPackageTest(_executablePath, new ProcessSettings() { Arguments = arguments, RedirectStandardOutput = redirectOutput });
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
+// AGENT CORE PACKAGE TEST RUNNER
+//////////////////////////////////////////////////////////////////////
+
+public class DirectTestAgentRunner : TestRunner, IPackageTestRunner
+{
+    public int RunPackageTest(string arguments, bool redirectOutput)
+    {
+        // First argument must be relative path to a test assembly.
+        // It's immediate directory name is the name of the runtime.
+        string testAssembly = arguments.Trim();
+        testAssembly = BuildSettings.OutputDirectory + (testAssembly[0] == '"'
+            ? testAssembly.Substring(1, testAssembly.IndexOf('"', 1) - 1)
+            : testAssembly.Substring(0, testAssembly.IndexOf(' ')));
+
+        if (!System.IO.File.Exists(testAssembly))
+            throw new FileNotFoundException($"File not found: {testAssembly}");
+
+        string testRuntime = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(testAssembly));
+        string agentRuntime = testRuntime;
+
+        if (agentRuntime.EndsWith("-windows"))
+            agentRuntime = agentRuntime.Substring(0, 6);
+
+        // Avoid builds we don't have
+        if (agentRuntime == "net35")
+            agentRuntime = "net20";
+        else if (agentRuntime == "net5.0")
+            agentRuntime = "net6.0";
+
+        var executablePath = BuildSettings.OutputDirectory + $"{agentRuntime}/DirectTestAgent.exe";
+
+        if (!System.IO.File.Exists(executablePath))
+            throw new FileNotFoundException($"File not found: {executablePath}");
+
+        Console.WriteLine($"Trying to run {executablePath} with arguments {arguments}");
+
+        return BuildSettings.Context.StartProcess(executablePath, new ProcessSettings()
+        {
+            Arguments = arguments,
+            WorkingDirectory = BuildSettings.OutputDirectory
+        });
     }
 }
 

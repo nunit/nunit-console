@@ -167,6 +167,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeExtensions", "src\TestD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectTestAgent", "src\NUnitCommon\DirectTestAgent\DirectTestAgent.csproj", "{0E415863-1621-41DB-9DB0-36B5664DFF35}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nunit.agent.core", "nunit.agent.core", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\nunit.agent.core\nunit.agent.core.nuspec = nuget\nunit.agent.core\nunit.agent.core.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -344,6 +349,7 @@ Global
 		{89258A3E-5B62-487A-9AE7-D7672CBF61F1} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{608AA86D-4090-33CA-0031-BD324E5A766E} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
 		{0E415863-1621-41DB-9DB0-36B5664DFF35} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
