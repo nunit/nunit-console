@@ -18,9 +18,5 @@ namespace NUnit.Engine.Communication.Messages
 
         public string Code { get; }
         public string? Data { get; }
-
-        // Alias properties for convenience
-        //public string CommandName => Code;
-        //public string Argument => Data;    }
     }
 }

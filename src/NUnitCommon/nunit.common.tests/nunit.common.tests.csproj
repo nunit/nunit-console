@@ -4,6 +4,7 @@
     <RootNamespace>NUnit</RootNamespace>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
   <ItemGroup>
