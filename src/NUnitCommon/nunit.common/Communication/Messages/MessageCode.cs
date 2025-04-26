@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
+
 namespace NUnit.Engine.Communication.Messages
 {
     // All messages must be four characters in length
@@ -21,5 +23,32 @@ namespace NUnit.Engine.Communication.Messages
 
         public const string ProgressReport = "PROG";
         public const string CommandResult = "RSLT";
+
+        public static string FromCommand(string command)
+        {
+            switch (command)
+            {
+                case "CreateRunner":
+                    return CreateRunner;
+                case "Load":
+                    return LoadCommand;
+                case "Reload":
+                    return ReloadCommand;
+                case "Unload":
+                    return UnloadCommand;
+                case "Explore":
+                    return ExploreCommand;
+                case "CountTestCases":
+                    return CountCasesCommand;
+                case "Run":
+                    return RunCommand;
+                case "RunAsync":
+                    return RunAsyncCommand;
+                case "Stop":
+                    return RequestStopCommand;
+                default:
+                    throw new ArgumentException("Invalid command", nameof(command));
+            }
+        }
     }
 }

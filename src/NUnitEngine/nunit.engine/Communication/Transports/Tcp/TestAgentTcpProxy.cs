@@ -119,11 +119,10 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                 if (returnMessage is not null)
                     return (TestEngineResult)returnMessage.ReturnValue;
 
-                var progressMessage = receivedMessage as ProgressMessage;
-                if (progressMessage is null)
+                if (receivedMessage.Code == MessageCode.ProgressReport)
+                    listener.OnTestEvent(receivedMessage.Data!);
+                else
                     throw new InvalidOperationException($"Expected either a ProgressMessage or a CommandReturnMessage but received a {receivedType}");
-
-                listener.OnTestEvent(progressMessage.Report);
             }
         }
     }

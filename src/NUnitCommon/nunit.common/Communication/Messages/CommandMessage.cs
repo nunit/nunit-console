@@ -8,6 +8,7 @@ namespace NUnit.Engine.Communication.Messages
     public class CommandMessage : TestEngineMessage
     {
         public CommandMessage(string commandName, params object[] arguments)
+            : base(MessageCode.FromCommand(commandName), null)
         {
             CommandName = commandName;
             Arguments = arguments;

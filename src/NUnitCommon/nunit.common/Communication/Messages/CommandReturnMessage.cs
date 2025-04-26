@@ -8,6 +8,7 @@ namespace NUnit.Engine.Communication.Messages
     public class CommandReturnMessage : TestEngineMessage
     {
         public CommandReturnMessage(object returnValue)
+            : base(MessageCode.CommandResult)
         {
             ReturnValue = returnValue;
         }

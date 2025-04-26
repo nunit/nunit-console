@@ -129,7 +129,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public void OnTestEvent(string report)
         {
-            var progressMessage = new ProgressMessage(report);
+            var progressMessage = new TestEngineMessage(MessageCode.ProgressReport, report);
             var bytes = new BinarySerializationProtocol().Encode(progressMessage);
             _clientSocket.ShouldNotBeNull().Send(bytes);
         }
