@@ -2,6 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
 using NUnit.Common;
 
 namespace NUnit.Engine
@@ -39,6 +42,48 @@ namespace NUnit.Engine
 
             foreach (var subPackage in package.SubPackages)
                 AccumulatePackages(subPackage, selection, selector);
+        }
+
+        public static string ToXml(this TestPackage package)
+        {
+            var writer = new StringWriter();
+            var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings() { OmitXmlDeclaration = true });
+            var serializer = new XmlSerializer(typeof(TestPackage));
+            serializer.Serialize(xmlWriter, package);
+            xmlWriter.Flush();
+            xmlWriter.Close();
+
+            return writer.ToString();
+        }
+
+        /// <summary>
+        /// Populate an empty TestPackage using its XML representation
+        /// </summary>
+        /// <param name="xml">String holding the XML representation of the package</param>
+        /// <returns>A TestPackage</returns>
+        public static TestPackage FromXml(this TestPackage package, string xml)
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(xml);
+
+            var reader = new StringReader(doc.OuterXml);
+            var xmlReader = XmlReader.Create(reader);
+
+            if (!ReadTestPackageElement())
+                throw new InvalidOperationException("Invalid TestPackage XML");
+
+            package.ReadXml(xmlReader);
+            return package;
+
+            // The reader must be positioned on the top-level TestPackage element
+            // before calling ReadXml.
+            bool ReadTestPackageElement()
+            {
+                while (xmlReader.Read())
+                    if (xmlReader.NodeType == XmlNodeType.Element)
+                        return xmlReader.Name == "TestPackage";
+                return false;
+            }
         }
     }
 }

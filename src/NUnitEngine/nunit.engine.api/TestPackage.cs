@@ -3,6 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace NUnit.Engine
 {
@@ -23,7 +26,7 @@ namespace NUnit.Engine
     /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
     [Serializable]
-    public class TestPackage
+    public class TestPackage : IXmlSerializable
     {
         /// <summary>
         /// Construct a top-level TestPackage that wraps one or more
@@ -57,6 +60,13 @@ namespace NUnit.Engine
                 AddSubPackage(testFile);
         }
 
+        /// <summary>
+        ///  Construct an empty TestPackage
+        /// </summary>()
+        public TestPackage()
+        {
+        }
+
         private static int _nextID = 0;
 
         private static string GetNextID()
@@ -71,7 +81,7 @@ namespace NUnit.Engine
         /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
-        public string ID { get; } = GetNextID();
+        public string ID { get; private set; } = GetNextID();
 
         /// <summary>
         /// Gets the name of the package
@@ -85,7 +95,7 @@ namespace NUnit.Engine
         /// Gets the path to the file containing tests. It may be
         /// an assembly or a recognized project type.
         /// </summary>
-        public string? FullName { get; private init; }
+        public string? FullName { get; private set; }
 
         /// <summary>
         /// Gets the list of SubPackages contained in this package
@@ -153,5 +163,87 @@ namespace NUnit.Engine
                 ? (T)setting
                 : defaultSetting;
         }
+
+        #region IXmlSerializable Implementation
+
+        /// <inheritdoc />
+        public XmlSchema GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public void ReadXml(XmlReader xmlReader)
+        {
+            ID = xmlReader.GetAttribute("id") ?? GetNextID();
+            FullName = xmlReader.GetAttribute("fullname");
+            if (!xmlReader.IsEmptyElement)
+            {
+                while (xmlReader.Read())
+                {
+                    switch (xmlReader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            switch (xmlReader.Name)
+                            {
+                                case "Settings":
+                                    // We don't use AddSettings, which copies settings downward.
+                                    // Instead, each package handles it's own settings.
+                                    while (xmlReader.MoveToNextAttribute())
+                                        Settings.Add(xmlReader.Name, xmlReader.Value);
+                                    xmlReader.MoveToElement();
+                                    break;
+
+                                case "TestPackage":
+                                    TestPackage subPackage = new TestPackage();
+                                    subPackage.ReadXml(xmlReader);
+                                    SubPackages.Add(subPackage);
+                                    break;
+                            }
+                            break;
+
+                        case XmlNodeType.EndElement:
+                            if (xmlReader.Name == "TestPackage")
+                                return;
+                            break;
+
+                        default:
+                            throw new Exception("Unexpected EndElement: " + xmlReader.Name);
+                    }
+                }
+
+                throw new Exception("Invalid XML: TestPackage Element not terminated.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void WriteXml(XmlWriter xmlWriter)
+        {
+            // Write ID and FullName
+            xmlWriter.WriteAttributeString("id", ID);
+            if (FullName is not null)
+                xmlWriter.WriteAttributeString("fullname", FullName);
+
+            // Write Settings
+            if (Settings.Count != 0)
+            {
+                xmlWriter.WriteStartElement("Settings");
+
+                foreach (KeyValuePair<string, object> setting in Settings)
+                    xmlWriter.WriteAttributeString(setting.Key, setting.Value.ToString());
+
+                xmlWriter.WriteEndElement();
+            }
+
+            // Write any SubPackages recursively
+            foreach (TestPackage subPackage in SubPackages)
+            {
+                xmlWriter.WriteStartElement("TestPackage");
+                subPackage.WriteXml(xmlWriter);
+                xmlWriter.WriteEndElement();
+            }
+        }
     }
+
+    #endregion
 }
