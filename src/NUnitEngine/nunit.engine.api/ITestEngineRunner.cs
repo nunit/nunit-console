@@ -57,11 +57,16 @@ namespace NUnit.Engine
         AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter);
 
         /// <summary>
-        /// Cancel the current test run. If no test is running,
+        /// Request the current test run to stop. If no tests are running,
         /// the call is ignored.
         /// </summary>
-        /// <param name="force">If true, force a stop by cancelling threads if necessary.</param>
-        void StopRun(bool force);
+        void RequestStop();
+
+        /// <summary>
+        /// Force the current test run to stop, killing threads or processes if necessary.
+        /// If no tests are running, the call is ignored.
+        /// </summary>
+        void ForcedStop();
 
         /// <summary>
         /// Explore a loaded TestPackage and return information about

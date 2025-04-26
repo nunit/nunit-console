@@ -81,10 +81,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             //return new AsyncTestEngineResult();
         }
 
-        public void StopRun(bool force)
-        {
-            SendCommandMessage("StopRun", force);
-        }
+        public void RequestStop() => SendCommandMessage(MessageCode.RequestStopCommand);
+
+        public void ForcedStop() => SendCommandMessage(MessageCode.ForcedStopCommand);
 
         public TestEngineResult Explore(TestFilter filter)
         {
