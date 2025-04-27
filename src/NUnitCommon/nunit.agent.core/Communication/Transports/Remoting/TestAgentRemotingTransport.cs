@@ -172,14 +172,16 @@ namespace NUnit.Engine.Communication.Transports.Remoting
         }
 
         /// <summary>
-        /// Cancel the ongoing test run. If no  test is running, the call is ignored.
+        /// Request the current test run to stop. If no tests are running,
+        /// the call is ignored.
         /// </summary>
-        /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
-        public void StopRun(bool force)
-        {
-            _runner?.StopRun(force);
-        }
+        public void RequestStop() => _runner?.RequestStop();
 
+        /// <summary>
+        /// Force the current test run to stop, killing threads or processes if necessary.
+        /// If no tests are running, the call is ignored.
+        /// </summary>
+        public void ForcedStop() => _runner?.ForcedStop();
         #endregion
 
         /// <summary>

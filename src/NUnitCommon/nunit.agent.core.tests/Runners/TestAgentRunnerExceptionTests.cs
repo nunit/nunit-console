@@ -114,7 +114,7 @@ namespace NUnit.Engine.Runners
             _driver.When(x => x.StopRun(Arg.Any<bool>()))
                 .Do(x => { throw new NUnitEngineException("Message"); });
 
-            var ex = Assert.Throws<NUnitEngineException>(() => _runner.StopRun(true));
+            var ex = Assert.Throws<NUnitEngineException>(() => _runner.ForcedStop());
             Assert.That(ex.Message, Is.EqualTo("Message"));
         }
 
@@ -124,7 +124,7 @@ namespace NUnit.Engine.Runners
             _driver.When(x => x.StopRun(Arg.Any<bool>()))
                 .Do(x => { throw new ArgumentException("Message"); });
 
-            var ex = Assert.Throws<NUnitEngineException>(() => _runner.StopRun(true));
+            var ex = Assert.Throws<NUnitEngineException>(() => _runner.ForcedStop());
             Assert.That(ex.InnerException, Is.Not.Null);
             Assert.That(ex.InnerException, Is.InstanceOf<ArgumentException>());
             Assert.That(ex.InnerException.Message, Is.EqualTo("Message"));

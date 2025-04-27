@@ -170,10 +170,12 @@ namespace NUnit.Engine.Runners
             if (_engineRunner is null)
                 return; // No test is was even started.
 
-            _engineRunner.StopRun(force);
-
-            if (force)
+            if (!force)
+                _engineRunner.RequestStop();
+            else
             {
+                _engineRunner.ForcedStop();
+
                 // Frameworks should handle StopRun(true) by cancelling all tests and notifying
                 // us of the completion of any tests that were running. However, this feature
                 // may be absent in some frameworks or may be broken and we may not pass on the

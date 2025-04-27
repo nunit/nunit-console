@@ -1,8 +1,10 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Xml.Serialization;
 using NUnit.Engine.Agents;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
@@ -22,6 +24,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
         private readonly string _agencyUrl;
         private Socket? _clientSocket;
         private ITestEngineRunner? _runner;
+        private XmlSerializer _testPackageSerializer = new XmlSerializer(typeof(TestPackage));
 
         public TestAgentTcpTransport(RemoteTestAgent agent, string serverUrl)
         {
@@ -75,43 +78,42 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             while (keepRunning)
             {
-                var command = socketReader.GetNextMessage<CommandMessage>();
+                var command = socketReader.GetNextMessage();
 
-                switch (command.CommandName)
+                switch (command.Code)
                 {
-                    case "CreateRunner":
-                        var package = (TestPackage)command.Arguments[0];
-                        _runner?.Unload();
+                    case MessageCode.CreateRunner:
+                        var package = new TestPackage().FromXml(command.Data!);
                         _runner = CreateRunner(package);
                         break;
-                    case "Load":
-                        SendResult(_runner.ShouldNotBeNull().Load());
+                    case MessageCode.LoadCommand:
+                        SendResult(_runner.ShouldNotBeNull().Load().Xml.OuterXml);
                         break;
-                    case "Reload":
-                        SendResult(_runner.ShouldNotBeNull().Reload());
+                    case MessageCode.ReloadCommand:
+                        SendResult(_runner.ShouldNotBeNull().Reload().Xml.OuterXml);
                         break;
-                    case "Unload":
+                    case MessageCode.UnloadCommand:
                         _runner.ShouldNotBeNull().Unload();
                         break;
-                    case "Explore":
-                        var filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.ShouldNotBeNull().Explore(filter));
+                    case MessageCode.ExploreCommand:
+                        var filter = new TestFilter(command.Data!);
+                        SendResult(_runner.ShouldNotBeNull().Explore(filter).Xml.OuterXml);
                         break;
-                    case "CountTestCases":
-                        filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.ShouldNotBeNull().CountTestCases(filter));
+                    case MessageCode.CountCasesCommand:
+                        filter = new TestFilter(command.Data!);
+                        SendResult(_runner.ShouldNotBeNull().CountTestCases(filter).ToString());
                         break;
-                    case "Run":
-                        filter = (TestFilter)command.Arguments[0];
-                        SendResult(_runner.ShouldNotBeNull().Run(this, filter));
+                    case MessageCode.RunCommand:
+                        filter = new TestFilter(command.Data!);
+                        SendResult(_runner.ShouldNotBeNull().Run(this, filter).Xml.OuterXml);
                         break;
 
-                    case "RunAsync":
-                        filter = (TestFilter)command.Arguments[0];
+                    case MessageCode.RunAsyncCommand:
+                        filter = new TestFilter(command.Data!);
                         _runner.ShouldNotBeNull().RunAsync(this, filter);
                         break;
 
-                    case "Stop":
+                    case MessageCode.StopAgent:
                         keepRunning = false;
                         break;
                 }
@@ -120,16 +122,16 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             Stop();
         }
 
-        private void SendResult(object result)
+        private void SendResult(string result)
         {
-            var resultMessage = new CommandReturnMessage(result);
+            var resultMessage = new TestEngineMessage(MessageCode.CommandResult, result);
             var bytes = new BinarySerializationProtocol().Encode(resultMessage);
             _clientSocket.ShouldNotBeNull().Send(bytes);
         }
 
         public void OnTestEvent(string report)
         {
-            var progressMessage = new ProgressMessage(report);
+            var progressMessage = new TestEngineMessage(MessageCode.ProgressReport, report);
             var bytes = new BinarySerializationProtocol().Encode(progressMessage);
             _clientSocket.ShouldNotBeNull().Send(bytes);
         }
