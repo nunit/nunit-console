@@ -8,11 +8,14 @@ using NUnit.Framework;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Internal;
 using System.Xml;
+using NUnit.TestData.Assemblies;
 
 namespace NUnit.Engine.Communication.Protocols
 {
     public class BinarySerializationProtocolTests
     {
+        private static readonly string[] TWO_ASSEMBLIES = new[] { "mock-assembly.dll", "notest-assembly.dll" };
+
         private BinarySerializationProtocol _wireProtocol = new BinarySerializationProtocol();
 
         [Test]
@@ -35,83 +38,83 @@ namespace NUnit.Engine.Communication.Protocols
             Assert.That(copy, Is.EqualTo(bytes));
         }
 
-        //[Test]
-        //public void DecodeSingleMessage()
-        //{
-        //    var originalPackage = new TestPackage(new[] { "mock-assembly.dll", "notest-assembly.dll" });
-        //    var originalMessage = new TestEngineMessage(MessageCode.CommandResult, originalPackage.ToXml());
+        [Test]
+        public void DecodeSingleMessage()
+        {
+            var originalPackage = new TestPackage(TWO_ASSEMBLIES);
+            var originalMessage = new TestEngineMessage(MessageCode.CommandResult, originalPackage.ToXml());
 
-        //    var bytes = _wireProtocol.Encode(originalMessage);
-        //    Console.WriteLine($"Serialized {bytes.Length} bytes.");
+            var bytes = _wireProtocol.Encode(originalMessage);
+            Console.WriteLine($"Serialized {bytes.Length} bytes.");
 
-        //    var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
-        //    Assert.That(messages.Count, Is.EqualTo(1));
-        //    var message = messages[0];
+            var messages = new List<TestEngineMessage>(_wireProtocol.Decode(bytes));
+            Assert.That(messages.Count, Is.EqualTo(1));
+            var message = messages[0];
 
-        //    Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
-        //    Assert.That(message.Data, Is.EqualTo(originalPackage.ToXml()));
-        //    var newPackage = new TestPackage().FromXml(message.Data);
-        //    ComparePackages(newPackage, originalPackage);
-        //}
+            Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
+            Assert.That(message.Data, Is.EqualTo(originalPackage.ToXml()));
+            var newPackage = new TestPackage().FromXml(message.Data);
+            ComparePackages(newPackage, originalPackage);
+        }
 
-        //[TestCase(1)]
-        //[TestCase(2)]
-        //[TestCase(5)]
-        //public void DecodeSplitMessages(int numMessages)
-        //{
-        //    const int SPLIT_SIZE = 1000;
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(5)]
+        public void DecodeSplitMessages(int numMessages)
+        {
+            const int SPLIT_SIZE = 1000;
 
-        //    var originalPackage = new TestPackage(new[] { "mock-assembly.dll", "notest-assembly.dll" });
-        //    var originalMessage = new TestEngineMessage(MessageCode.CommandResult, originalPackage.ToXml());
+            var originalPackage = new TestPackage(TWO_ASSEMBLIES);
+            var originalMessage = new TestEngineMessage(MessageCode.CommandResult, originalPackage.ToXml());
 
-        //    var msgBytes = _wireProtocol.Encode(originalMessage);
-        //    var msgLength = msgBytes.Length;
-        //    var allBytes = new byte[msgLength * numMessages];
-        //    for (int i = 0; i < numMessages; i++)
-        //        Array.Copy(msgBytes, 0, allBytes, i * msgLength, msgLength);
+            var msgBytes = _wireProtocol.Encode(originalMessage);
+            var msgLength = msgBytes.Length;
+            var allBytes = new byte[msgLength * numMessages];
+            for (int i = 0; i < numMessages; i++)
+                Array.Copy(msgBytes, 0, allBytes, i * msgLength, msgLength);
 
-        //    Console.WriteLine($"Serialized {numMessages} messages in {allBytes.Length} bytes.");
+            Console.WriteLine($"Serialized {numMessages} messages in {allBytes.Length} bytes.");
 
-        //    var messages = new List<TestEngineMessage>();
+            var messages = new List<TestEngineMessage>();
 
-        //    for (int index = 0; index < allBytes.Length; index += SPLIT_SIZE)
-        //    {
-        //        var bytesToSend = Math.Min(allBytes.Length - index, SPLIT_SIZE);
-        //        var buffer = new byte[bytesToSend];
-        //        Array.Copy(allBytes, index, buffer, 0, bytesToSend);
-        //        messages.AddRange(_wireProtocol.Decode(buffer));
-        //        Console.WriteLine($"Decoded {bytesToSend} bytes, message count is now {messages.Count}");
-        //        var expectedCount = (index + bytesToSend) / msgLength;
-        //        Assert.That(messages.Count, Is.EqualTo(expectedCount));
-        //    }
+            for (int index = 0; index < allBytes.Length; index += SPLIT_SIZE)
+            {
+                var bytesToSend = Math.Min(allBytes.Length - index, SPLIT_SIZE);
+                var buffer = new byte[bytesToSend];
+                Array.Copy(allBytes, index, buffer, 0, bytesToSend);
+                messages.AddRange(_wireProtocol.Decode(buffer));
+                Console.WriteLine($"Decoded {bytesToSend} bytes, message count is now {messages.Count}");
+                var expectedCount = (index + bytesToSend) / msgLength;
+                Assert.That(messages.Count, Is.EqualTo(expectedCount));
+            }
 
-        //    foreach (TestEngineMessage message in messages)
-        //    {
-        //        Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
-        //        var newPackage = new TestPackage().FromXml(message.Data);
-        //        ComparePackages(newPackage, originalPackage);
-        //    }
-        //}
+            foreach (TestEngineMessage message in messages)
+            {
+                Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
+                var newPackage = new TestPackage().FromXml(message.Data!);
+                ComparePackages(newPackage, originalPackage);
+            }
+        }
 
-        //[Test]
-        //public void DecodeMultipleMessages()
-        //{
-        //    var commands = new string[] { "CMD1", "CMD2", "CMD3", "CMD4", "CMD5", "CMD6" };
+        [Test]
+        public void DecodeMultipleMessages()
+        {
+            var commands = new string[] { "CMD1", "CMD2", "CMD3", "CMD4", "CMD5", "CMD6" };
 
-        //    var stream = new MemoryStream();
+            var stream = new MemoryStream();
 
-        //    foreach (var command in commands)
-        //    {
-        //        var buffer = _wireProtocol.Encode(new TestEngineMessage(command, null));
-        //        stream.Write(buffer, 0, buffer.Length);
-        //    }
+            foreach (var command in commands)
+            {
+                var buffer = _wireProtocol.Encode(new TestEngineMessage(command, null));
+                stream.Write(buffer, 0, buffer.Length);
+            }
 
-        //    var received = new List<TestEngineMessage>(_wireProtocol.Decode(stream.ToArray()));
-        //    Assert.That(received.Count, Is.EqualTo(commands.Length));
+            var received = new List<TestEngineMessage>(_wireProtocol.Decode(stream.ToArray()));
+            Assert.That(received.Count, Is.EqualTo(commands.Length));
 
-        //    for (int i = 0; i < commands.Length; i++)
-        //        Assert.That(received[i].Code, Is.EqualTo(commands[i]));
-        //}
+            for (int i = 0; i < commands.Length; i++)
+                Assert.That(received[i].Code, Is.EqualTo(commands[i]));
+        }
 
         private static void ComparePackages(TestPackage newPackage, TestPackage oldPackage)
         {

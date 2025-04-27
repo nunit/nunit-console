@@ -78,7 +78,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             while (keepRunning)
             {
-                var command = socketReader.GetNextMessage<TestEngineMessage>();
+                var command = socketReader.GetNextMessage();
 
                 switch (command.Code)
                 {
@@ -87,25 +87,25 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                         _runner = CreateRunner(package);
                         break;
                     case MessageCode.LoadCommand:
-                        SendResult(_runner.ShouldNotBeNull().Load());
+                        SendResult(_runner.ShouldNotBeNull().Load().Xml.OuterXml);
                         break;
                     case MessageCode.ReloadCommand:
-                        SendResult(_runner.ShouldNotBeNull().Reload());
+                        SendResult(_runner.ShouldNotBeNull().Reload().Xml.OuterXml);
                         break;
                     case MessageCode.UnloadCommand:
                         _runner.ShouldNotBeNull().Unload();
                         break;
                     case MessageCode.ExploreCommand:
                         var filter = new TestFilter(command.Data!);
-                        SendResult(_runner.ShouldNotBeNull().Explore(filter));
+                        SendResult(_runner.ShouldNotBeNull().Explore(filter).Xml.OuterXml);
                         break;
                     case MessageCode.CountCasesCommand:
                         filter = new TestFilter(command.Data!);
-                        SendResult(_runner.ShouldNotBeNull().CountTestCases(filter));
+                        SendResult(_runner.ShouldNotBeNull().CountTestCases(filter).ToString());
                         break;
                     case MessageCode.RunCommand:
                         filter = new TestFilter(command.Data!);
-                        SendResult(_runner.ShouldNotBeNull().Run(this, filter));
+                        SendResult(_runner.ShouldNotBeNull().Run(this, filter).Xml.OuterXml);
                         break;
 
                     case MessageCode.RunAsyncCommand:
@@ -122,9 +122,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             Stop();
         }
 
-        private void SendResult(object result)
+        private void SendResult(string result)
         {
-            var resultMessage = new CommandReturnMessage(result);
+            var resultMessage = new TestEngineMessage(MessageCode.CommandResult, result);
             var bytes = new BinarySerializationProtocol().Encode(resultMessage);
             _clientSocket.ShouldNotBeNull().Send(bytes);
         }

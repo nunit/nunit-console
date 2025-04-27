@@ -48,24 +48,5 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             return _msgQueue.Dequeue();
         }
-
-        /// <summary>
-        /// Get the next message to arrive, which must be of the
-        /// specified message type.
-        /// </summary>
-        /// <typeparam name="TMessage">The expected message type</typeparam>
-        /// <returns>A message of type TMessage</returns>
-        /// <exception cref="InvalidOperationException">A message of a different type was received</exception>
-        public TMessage GetNextMessage<TMessage>()
-            where TMessage : TestEngineMessage
-        {
-            var receivedMessage = GetNextMessage();
-            var expectedMessage = receivedMessage as TMessage;
-
-            if (expectedMessage is null)
-                throw new InvalidOperationException($"Expected a {typeof(TMessage)} but received a {receivedMessage.GetType()}");
-
-            return expectedMessage;
-        }
     }
 }
