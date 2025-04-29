@@ -261,9 +261,6 @@ namespace NUnit.Engine.Runners
                              TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
 
                 _agent = _agency.GetAgent(TestPackage);
-
-                if (_agent is null)
-                    throw new NUnitEngineException("Unable to acquire remote process agent");
             }
 
             if (_remoteRunner is null)

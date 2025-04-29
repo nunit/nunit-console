@@ -57,7 +57,7 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
 AddToBothLists(new PackageTest(1, "Net80Test")
 {
     Description = "Run mock-assembly.dll under .NET 8.0",
-    Arguments = "testdata/net8.0/mock-assembly.dll",
+    Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
     ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
 });
 

@@ -89,6 +89,16 @@ namespace NUnit
         public const string TargetRuntimeFramework = "TargetRuntimeFramework";
 
         /// <summary>
+        /// Indicates the name of the agent requested by the user.
+        /// </summary>
+        public const string RequestedAgentName = "RequestedAgentName";
+
+        /// <summary>
+        /// Indicates the name of the agent that was actually used.
+        /// </summary>
+        public const string SelectedAgentName = "SelectedAgentName";
+
+        /// <summary>
         /// Bool flag indicating that the test should be run in a 32-bit process
         /// on a 64-bit system. By default, NUNit runs in a 64-bit process on
         /// a 64-bit system. Ignored if set on a 32-bit system.

@@ -32,7 +32,7 @@ namespace NUnit.Engine.Services
             database.Register(DummyAgent);
             Assert.That(() => database.AddAgent(DummyAgentId, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
 
-            database.MarkTerminated(DummyAgentId);
+            database.MarkProcessTerminated(DummyProcess);
             Assert.That(() => database.AddAgent(DummyAgentId, DummyProcess), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
         }
 
@@ -60,7 +60,7 @@ namespace NUnit.Engine.Services
             var database = new AgentStore();
 
             database.AddAgent(DummyAgentId, DummyProcess);
-            database.MarkTerminated(DummyAgentId);
+            database.MarkProcessTerminated(DummyProcess);
             Assert.That(() => database.Register(DummyAgent), Throws.ArgumentException.With.Property("ParamName").EqualTo("agent"));
         }
 
@@ -69,7 +69,8 @@ namespace NUnit.Engine.Services
         {
             var database = new AgentStore();
 
-            Assert.That(() => database.MarkTerminated(DummyAgentId), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
+            Assert.That(() => database.MarkProcessTerminated(DummyProcess),
+                Throws.Exception.TypeOf<NUnitEngineException>().With.Message.EqualTo("Process terminated without registering an agent."));
         }
 
         [Test]
@@ -107,7 +108,7 @@ namespace NUnit.Engine.Services
 
             database.AddAgent(DummyAgentId, DummyProcess);
             database.Register(DummyAgent);
-            database.MarkTerminated(DummyAgentId);
+            database.MarkProcessTerminated(DummyProcess);
             Assert.That(database.IsReady(DummyAgentId, out _), Is.False);
         }
 
@@ -147,7 +148,7 @@ namespace NUnit.Engine.Services
 
             database.AddAgent(DummyAgentId, DummyProcess);
             database.Register(DummyAgent);
-            database.MarkTerminated(DummyAgentId);
+            database.MarkProcessTerminated(DummyProcess);
             Assert.That(database.IsAgentProcessActive(DummyAgentId, out _), Is.False);
         }
 
@@ -169,11 +170,13 @@ namespace NUnit.Engine.Services
                     Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.False);
 
+                    // Pretend that the agent process started and  registered
                     database.Register(new DummyTestAgent(id));
                     Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.True);
 
-                    database.MarkTerminated(id);
+                    //database.MarkProcessTerminated(DummyProcess);
+                    database.MarkAgentTerminated(id);
                     Assert.That(database.IsAgentProcessActive(id, out _), Is.False);
                     Assert.That(database.IsReady(id, out _), Is.False);
                 }
@@ -210,6 +213,35 @@ namespace NUnit.Engine.Services
             if (exceptions.Count != 0)
                 throw exceptions[0];
         }
+
+        #region Nested DummyTestAgent Class
+
+        private sealed class DummyTestAgent : ITestAgent
+        {
+            public DummyTestAgent(Guid id)
+            {
+                Id = id;
+            }
+
+            public Guid Id { get; }
+
+            public ITestEngineRunner CreateRunner(TestPackage package)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Start()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Stop()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
     }
 }
 #endif

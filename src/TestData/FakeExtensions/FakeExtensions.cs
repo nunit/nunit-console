@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Xml;
@@ -154,6 +154,22 @@ namespace NUnit.Engine.Fakes
     public class FakeDisabledExtension : ITestEventListener
     {
         public void OnTestEvent(string report)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [Extension]
+    public class FakeAgentLauncherExtension : IAgentLauncher
+    {
+        public TestAgentInfo AgentInfo => throw new NotImplementedException();
+
+        public bool CanCreateAgent(TestPackage package)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Process CreateAgent(Guid agentId, string agencyUrl, TestPackage package)
         {
             throw new NotImplementedException();
         }
