@@ -8,11 +8,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Versioning;
 using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Services.AgentLaunchers;
+using System.Diagnostics.Eventing.Reader;
 
 namespace NUnit.Engine.Services
 {
@@ -33,6 +35,9 @@ namespace NUnit.Engine.Services
         private IAvailableRuntimes? _availableRuntimeService;
 
         private readonly List<IAgentLauncher> _launchers = new List<IAgentLauncher>();
+
+        // Index used to retrieve the agentId of a terminated process
+        private readonly Dictionary<Process, Guid> _agentProcessIndex = new Dictionary<Process, Guid>();
 
         // Transports used for various target runtimes
         private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
@@ -66,10 +71,6 @@ namespace NUnit.Engine.Services
             return agents;
         }
 
-        #endregion
-
-        #region ITestAgentProvider Implementation
-
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for any available agents,
         /// which are able to handle the specified package.
@@ -83,40 +84,33 @@ namespace NUnit.Engine.Services
         {
             Guard.ArgumentNotNull(targetPackage, nameof(targetPackage));
 
+            // This method is primarily intended for use in implementing a command-line
+            // option to allow selection of the agent to be used for a test run. Because
+            // the option would apply to all assemblies being run, any agents returned
+            // must be able to run all assemblies.
+
             // Initialize lists with ALL available agents
             var availableAgents = new List<TestAgentInfo>(GetAvailableAgents());
-            var validAgentNames = new List<string>(availableAgents.Select(info => info.AgentName));
+            var validAgentNames = new HashSet<string>(availableAgents.Select(info => info.AgentName));
 
             // Look at each included assembly package to see if any names should be removed
             foreach (var assemblyPackage in targetPackage.Select(p => p.IsAssemblyPackage()))
             {
                 // Collect names of agents that work for each assembly
-                var agentsForAssembly = new List<string>();
-                foreach (var launcher in _launchers)
+                var agentsForAssembly = new HashSet<string>();
+                foreach (var launcher in _launchers.Where(l => validAgentNames.Contains(l.AgentInfo.AgentName)))
                     if (launcher.CanCreateAgent(assemblyPackage))
                         agentsForAssembly.Add(launcher.AgentInfo.AgentName);
 
                 // Remove agents from final result if they don't work for this assembly
-                for (int index = validAgentNames.Count - 1; index >= 0; index--)
-                {
-                    var agentName = validAgentNames[index];
-                    if (!agentsForAssembly.Contains(agentName))
-                        validAgentNames.RemoveAt(index);
-                }
+                validAgentNames.IntersectWith(agentsForAssembly);
             }
 
-            // Finish up by deleting all unsuitable entries form the List of TestAgentInfo
-            for (int index = availableAgents.Count - 1; index >= 0; index--)
-            {
-                var agentName = availableAgents[index].AgentName;
-                if (!validAgentNames.Contains(agentName))
-                    availableAgents.RemoveAt(index);
-            }
-
-            return availableAgents;
+            // Finish up by excluding all unsuitable entries from the List of available agents.
+            return availableAgents.Where(info => validAgentNames.Contains(info.AgentName)).ToList();
         }
 
-        #endregion
+#endregion
 
         #region ITestAgentProvider Implementation
 
@@ -144,22 +138,22 @@ namespace NUnit.Engine.Services
         public ITestAgent GetAgent(TestPackage package)
         {
             // Target Runtime must be specified by this point
-            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetRuntimeFramework, string.Empty);
-            Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no runtime specified");
-            bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
+            string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetFrameworkName, string.Empty);
+            Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no target runtime specified");
 
-            var targetRuntime = RuntimeFramework.Parse(runtimeSetting);
+            var targetRuntime = new FrameworkName(runtimeSetting);
             var agentId = Guid.NewGuid();
-            string agencyUrl = targetRuntime.FrameworkName.Identifier == ".NETFramework" ? RemotingUrl : TcpEndPoint;
+            string agencyUrl = targetRuntime.Identifier == FrameworkIdentifiers.NetFramework ? RemotingUrl : TcpEndPoint;
             var agentProcess = CreateAgentProcess(agentId, agencyUrl, package);
 
             agentProcess.Exited += (sender, e) => OnAgentExit(agentProcess);
 
             agentProcess.Start();
-            log.Debug("Launched Agent process {0} - see testcentric-agent_{0}.log", agentProcess.Id);
+            log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", agentProcess.Id);
             log.Debug("Command line: \"{0}\" {1}", agentProcess.StartInfo.FileName, agentProcess.StartInfo.Arguments);
 
             _agentStore.AddAgent(agentId, agentProcess);
+            _agentProcessIndex.Add(agentProcess, agentId);
 
             log.Debug($"Waiting for agent {agentId:B} to register");
 
@@ -181,7 +175,7 @@ namespace NUnit.Engine.Services
                 {
                     log.Debug($"Returning new agent {agentId:B}");
 
-                    switch (targetRuntime.Runtime.FrameworkIdentifier)
+                    switch (targetRuntime.Identifier)
                     {
                         case FrameworkIdentifiers.NetFramework:
                             return new TestAgentRemotingProxy(agent, agentId);
@@ -190,7 +184,7 @@ namespace NUnit.Engine.Services
                             return agent;
 
                         default:
-                            throw new InvalidOperationException($"Invalid runtime: {targetRuntime.Runtime.FrameworkIdentifier}");
+                            throw new InvalidOperationException($"Invalid runtime: {targetRuntime.Identifier}");
                     }
                 }
             }
@@ -214,7 +208,7 @@ namespace NUnit.Engine.Services
         {
             Process? process;
 
-            if (_agentStore.IsAgentProcessActive(agent.Id, out process))
+            if (_agentStore.IsAgentActive(agent.Id, out process))
                 try
                 {
                     log.Debug("Stopping remote agent");
@@ -312,46 +306,49 @@ namespace NUnit.Engine.Services
 
         #endregion
 
-        internal bool IsAgentProcessActive(Guid agentId, [NotNullWhen(true)] out Process? process)
+        internal bool IsAgentActive(Guid agentId, [NotNullWhen(true)] out Process? process)
         {
-            return _agentStore.IsAgentProcessActive(agentId, out process);
+            return _agentStore.IsAgentActive(agentId, out process);
         }
 
         private void OnAgentExit(Process process)
         {
-            _agentStore.MarkProcessTerminated(process);
-
-            string errorMsg;
-
-            switch (process.ExitCode)
+            if (_agentProcessIndex.TryGetValue(process, out var agentId))
             {
-                case AgentExitCodes.OK:
-                    return;
-                case AgentExitCodes.PARENT_PROCESS_TERMINATED:
-                    errorMsg = "Remote test agent believes agency process has exited.";
-                    break;
-                case AgentExitCodes.UNEXPECTED_EXCEPTION:
-                    errorMsg = "Unhandled exception on remote test agent. " +
-                               "To debug, try using --trace=debug to output logs.";
-                    break;
-                case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
-                    errorMsg = "Failed to start remote test agent.";
-                    break;
-                case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
-                    errorMsg = "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
-                    break;
-                case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
-                    errorMsg = "Debugger could not be started on remote agent as not available on platform.";
-                    break;
-                case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
-                    errorMsg = "Remote test agent unable to locate agency process.";
-                    break;
-                default:
-                    errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
-                    break;
-            }
+                _agentStore.MarkTerminated(agentId);
 
-            throw new NUnitEngineException(errorMsg);
+                string errorMsg;
+
+                switch (process.ExitCode)
+                {
+                    case AgentExitCodes.OK:
+                        return;
+                    case AgentExitCodes.PARENT_PROCESS_TERMINATED:
+                        errorMsg = "Remote test agent believes agency process has exited.";
+                        break;
+                    case AgentExitCodes.UNEXPECTED_EXCEPTION:
+                        errorMsg = "Unhandled exception on remote test agent. " +
+                                   "To debug, try using --trace=debug to output logs.";
+                        break;
+                    case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
+                        errorMsg = "Failed to start remote test agent.";
+                        break;
+                    case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
+                        errorMsg = "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
+                        break;
+                    case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
+                        errorMsg = "Debugger could not be started on remote agent as not available on platform.";
+                        break;
+                    case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
+                        errorMsg = "Remote test agent unable to locate agency process.";
+                        break;
+                    default:
+                        errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
+                        break;
+                }
+
+                throw new NUnitEngineException(errorMsg);
+            }
         }
 
         private Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)

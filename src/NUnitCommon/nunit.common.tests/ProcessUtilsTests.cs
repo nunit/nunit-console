@@ -24,7 +24,7 @@
 using NUnit.Framework;
 using System.Text;
 
-namespace NUnit.Engine.Services
+namespace NUnit.Common
 {
     public static class ProcessUtilsTests
     {

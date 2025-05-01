@@ -8,22 +8,22 @@ namespace NUnit.Engine
     /// The TestAgentInfo struct provides information about an
     /// available agent for use by a runner.
     /// </summary>
-    public struct TestAgentInfo
+    public readonly struct TestAgentInfo
     {
         /// <summary>
         /// The name of this agent
         /// </summary>
-        public string AgentName;
+        public readonly string AgentName;
 
         /// <summary>
         /// The agent type: InProcess, LocalProcess or RemoteProcess
         /// </summary>
-        public TestAgentType AgentType;
+        public readonly TestAgentType AgentType;
 
         /// <summary>
         /// The target runtime used by this agent
         /// </summary>
-        public FrameworkName TargetRuntime;
+        public readonly FrameworkName TargetRuntime;
 
         /// <summary>
         /// Construct a TestAgent Info

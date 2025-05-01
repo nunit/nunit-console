@@ -54,7 +54,8 @@ namespace NUnit.Engine.Drivers
 
                 _testAssemblyPath = testAssemblyPath;
 
-                // Normally, the caller should check for an invalid requested runtime, but we make sure here
+                // Normally, the caller should check for an invalid requested runtime, but to be sure,
+                // we check it. The setting value is only used for an error message.
                 settings.TryGetValue(EnginePackageSettings.RequestedRuntimeFramework, out object? requestedRuntime);
 
                 var idPrefix = _driverId + "-";

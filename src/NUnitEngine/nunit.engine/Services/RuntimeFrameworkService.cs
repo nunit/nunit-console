@@ -144,7 +144,9 @@ namespace NUnit.Engine.Services
                 if (!IsAvailable(frameworkSetting, runAsX86))
                     throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
 
-                package.Settings[EnginePackageSettings.TargetRuntimeFramework] = frameworkSetting;
+                var frameworkName = requestedFramework.FrameworkName.ToString();
+                package.Settings[EnginePackageSettings.RequestedFrameworkName] = frameworkName;
+                package.Settings[EnginePackageSettings.TargetFrameworkName] = frameworkName;
 
                 return requestedFramework;
             }
@@ -194,7 +196,7 @@ namespace NUnit.Engine.Services
             }
 
             RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);
-            package.Settings[EnginePackageSettings.TargetRuntimeFramework] = targetFramework.ToString();
+            package.Settings[EnginePackageSettings.TargetFrameworkName] = targetFramework.FrameworkName.ToString();
 
             log.Debug($"Test will use {targetFramework} for {package.Name}");
             return targetFramework;

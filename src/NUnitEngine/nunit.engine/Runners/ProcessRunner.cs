@@ -228,7 +228,7 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent is not null && _agency.IsAgentProcessActive(_agent.Id, out _))
+                if (_agent is not null && _agency.IsAgentActive(_agent.Id, out _))
                 {
                     try
                     {

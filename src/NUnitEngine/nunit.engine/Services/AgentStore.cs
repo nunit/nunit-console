@@ -17,7 +17,6 @@ namespace NUnit.Engine.Services
         private readonly object LOCK = new object();
 
         private readonly Dictionary<Guid, AgentRecord> _agentIndex = new Dictionary<Guid, AgentRecord>();
-        private readonly Dictionary<Process, AgentRecord> _processIndex = new Dictionary<Process, AgentRecord>();
 
         public void AddAgent(Guid agentId, Process process)
         {
@@ -30,7 +29,7 @@ namespace NUnit.Engine.Services
                     throw new ArgumentException($"An agent has already been started with the ID '{agentId}'.", nameof(agentId));
                 }
 
-                _agentIndex[agentId] = _processIndex[process] = new AgentRecord(agentId, process);
+                _agentIndex[agentId] = new AgentRecord(agentId, process);
             }
         }
 
@@ -60,7 +59,7 @@ namespace NUnit.Engine.Services
                     && record.Status == AgentStatus.Ready)
                 {
                     agent = record.Agent;
-                    return agent is object;
+                    return agent is not null;
                 }
 
                 agent = null;
@@ -68,7 +67,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public bool IsAgentProcessActive(Guid agentId, [NotNullWhen(true)] out Process? process)
+        public bool IsAgentActive(Guid agentId, [NotNullWhen(true)] out Process? process)
         {
             lock (LOCK)
             {
@@ -84,27 +83,15 @@ namespace NUnit.Engine.Services
             }
         }
 
-        public void MarkProcessTerminated(Process process)
-        {
-            lock (LOCK)
-            {
-                if (!_processIndex.TryGetValue(process, out var record))
-                    throw new NUnitEngineException("Process terminated without registering an agent.");
-
-                if (record.Status == AgentStatus.Terminated)
-                    throw new NUnitEngineException("Attempt to mark process as terminated, which is already terminated.");
-
-                record.MarkAsTerminated();
-            }
-        }
-
         // Internal for use by our tests, which may not actually create a process
-        internal void MarkAgentTerminated(Guid agentId)
+        internal void MarkTerminated(Guid agentId)
         {
             lock (LOCK)
             {
                 if (_agentIndex.TryGetValue(agentId, out var record))
                     record.MarkAsTerminated();
+                else
+                    throw new NUnitEngineException("Process terminated without registering an agent.");
             }
         }
 
