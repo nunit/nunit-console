@@ -44,7 +44,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void GetAvailableAgents()
         {
-            Assert.That(_testAgency.GetAvailableAgents().Select(a => a.AgentName), Is.EquivalentTo(AVAILABLE_AGENTS));
+            Assert.That(_testAgency.AvailableAgents.Select(a => a.AgentName), Is.EquivalentTo(AVAILABLE_AGENTS));
         }
 
         [Test]

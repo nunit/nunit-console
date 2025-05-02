@@ -9,7 +9,7 @@ namespace NUnit.Engine.Services
     /// test agents, which satisfy the criteria specified in a TestPackage.
     /// The interface is used by the engine itself to locate agents.
     /// </summary>
-    internal interface ITestAgentProvider : ITestAgentInfo
+    internal interface ITestAgentProvider : IAgentInfoProvider
     {
         /// <summary>
         /// Returns true if an agent can be found, which is suitable

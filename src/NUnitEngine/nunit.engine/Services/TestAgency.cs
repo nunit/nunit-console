@@ -10,11 +10,10 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Versioning;
 using NUnit.Common;
+using NUnit.Engine.Agents;
 using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
-using NUnit.Engine.Services.AgentLaunchers;
-using System.Diagnostics.Eventing.Reader;
 
 namespace NUnit.Engine.Services
 {
@@ -22,7 +21,7 @@ namespace NUnit.Engine.Services
     /// The TestAgency class provides RemoteTestAgents
     /// on request and tracks their status.
     /// </summary>
-    public class TestAgency : ITestAgentProvider, ITestAgency, ITestAgentInfo, IService
+    public class TestAgency : ITestAgentProvider, ITestAgency, IAgentInfoProvider, IService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
@@ -56,26 +55,18 @@ namespace NUnit.Engine.Services
             _tcpTransport = new TestAgencyTcpTransport(this, port);
         }
 
-        #region ITestAgentInfo Implementation
+        #region IAgentInfoProvider Implementation
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.
         /// </summary>
-        public IList<TestAgentInfo> GetAvailableAgents()
-        {
-            var agents = new List<TestAgentInfo>();
-
-            foreach (var launcher in _launchers)
-                agents.Add(launcher.AgentInfo);
-
-            return agents;
-        }
+        public IList<TestAgentInfo> AvailableAgents { get; private set; } = new List<TestAgentInfo>();
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for any available agents,
         /// which are able to handle the specified package.
         /// </summary>
-        /// <param name="package">A Testpackage</param>
+        /// <param name="package">A TestPackage</param>
         /// <returns>
         /// A list of suitable agents for running the package or an empty
         /// list if no agent is available for the package.
@@ -90,8 +81,7 @@ namespace NUnit.Engine.Services
             // must be able to run all assemblies.
 
             // Initialize lists with ALL available agents
-            var availableAgents = new List<TestAgentInfo>(GetAvailableAgents());
-            var validAgentNames = new HashSet<string>(availableAgents.Select(info => info.AgentName));
+            var validAgentNames = new HashSet<string>(AvailableAgents.Select(info => info.AgentName));
 
             // Look at each included assembly package to see if any names should be removed
             foreach (var assemblyPackage in targetPackage.Select(p => p.IsAssemblyPackage()))
@@ -107,7 +97,7 @@ namespace NUnit.Engine.Services
             }
 
             // Finish up by excluding all unsuitable entries from the List of available agents.
-            return availableAgents.Where(info => validAgentNames.Contains(info.AgentName)).ToList();
+            return AvailableAgents.Where(info => validAgentNames.Contains(info.AgentName)).ToList();
         }
 
 #endregion
@@ -292,6 +282,9 @@ namespace NUnit.Engine.Services
 
                 _launchers.Add(new Net462AgentLauncher());
                 _launchers.Add(new Net80AgentLauncher());
+
+                foreach (var launcher in _launchers)
+                    AvailableAgents.Add(launcher.AgentInfo);
 
                 _remotingTransport.Start();
                 _tcpTransport.Start();

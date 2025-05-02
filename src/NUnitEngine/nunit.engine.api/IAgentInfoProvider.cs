@@ -5,16 +5,16 @@ using System.Collections.Generic;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// Objects implementing ITestAgentInfo by classes that can return information about
-    /// available agents. The interface is used by runners in order to provide information
+    /// Objects implementing IAgentInfoProvider can return information about
+    /// available agents. The interface is used by runners in order to provide
     /// to the user or to allow selecting agents.
     /// </summary>
-    public interface ITestAgentInfo
+    public interface IAgentInfoProvider
     {
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.
         /// </summary>
-        IList<TestAgentInfo> GetAvailableAgents();
+        IList<TestAgentInfo> AvailableAgents { get; }
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for any available agents,

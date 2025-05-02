@@ -82,5 +82,13 @@
     <file src="net462/testcentric.metadata.dll" target="tools" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
     <file src="../../nunit_256.png" target="images"/>
+
+    <!-- Temporarily added until agents are dependencies -->
+    <file src="agents/net462/agent-launcher-net462.dll" target="tools" />
+    <file src="agents/net462/agent-launcher-net462.pdb" target="tools" />
+    <file src="agents/net462/agent-launcher-net80.dll" target="tools" />
+    <file src="agents/net462/agent-launcher-net80.pdb" target="tools" />
+    <file src="agents/net462/nunit.agent.core.dll" target="tools" />
+    <file src="agents/net462/nunit.agent.core.pdb" target="tools" />
   </files>
 </package>

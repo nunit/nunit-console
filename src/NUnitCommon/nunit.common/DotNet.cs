@@ -62,5 +62,22 @@ namespace NUnit.Common
 
             return _x86InstallDirectory;
         }
+
+        public static string GetDotNetExe(bool runAsX86)
+        {
+            string? installDirectory = DotNet.GetInstallDirectory(runAsX86);
+            if (installDirectory is not null)
+            {
+                var dotnet_exe = Path.Combine(installDirectory, "dotnet.exe");
+                if (File.Exists(dotnet_exe))
+                    return dotnet_exe;
+            }
+
+            var msg = runAsX86
+                ? "The X86 version of dotnet.exe is not installed."
+                : "Unable to locate dotnet.exe.";
+
+            throw new Exception(msg);
+        }
     }
 }

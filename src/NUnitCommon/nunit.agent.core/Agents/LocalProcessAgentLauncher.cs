@@ -3,36 +3,39 @@
 #if NETFRAMEWORK
 using NUnit.Engine.Extensibility;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.Versioning;
 using System.Text;
-using System.Threading.Tasks;
 using NUnit.Common;
-using TestCentric.Metadata;
 using System.IO;
 
-namespace NUnit.Engine.Services.AgentLaunchers
+namespace NUnit.Engine.Agents
 {
-    public abstract class AgentLauncherBase : IAgentLauncher
+    public abstract class LocalProcessAgentLauncher : IAgentLauncher
     {
         protected abstract string AgentName { get; }
         protected abstract TestAgentType AgentType { get; }
-        protected abstract FrameworkName TargetRuntime { get; }
+        protected abstract FrameworkName AgentRuntime { get; }
 
         protected abstract string AgentPath { get; }
-        protected virtual string X86AgentPath => throw new NotImplementedException(".NET Framework agents must override X86AgentPath");
 
-        public TestAgentInfo AgentInfo => new TestAgentInfo(AgentName, TestAgentType.LocalProcess, TargetRuntime);
+        // Override if the agent path for X86 is different
+        protected virtual string X86AgentPath => AgentPath;
+
+        public TestAgentInfo AgentInfo => new TestAgentInfo(AgentName, TestAgentType.LocalProcess, AgentRuntime);
 
         public bool CanCreateAgent(TestPackage package)
         {
             // Get target runtime from package
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetFrameworkName, string.Empty);
             var targetRuntime = new FrameworkName(runtimeSetting);
+            bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
 
-            return targetRuntime.Identifier == TargetRuntime.Identifier && targetRuntime.Version.Major <= TargetRuntime.Version.Major;
+            // Running under X86 under .NET Core is currently only supported on Windows
+            if (runAsX86 && targetRuntime.Identifier == FrameworkIdentifiers.NetCoreApp && Path.DirectorySeparatorChar != '\\')
+                return false;
+
+            return targetRuntime.Identifier == AgentRuntime.Identifier && targetRuntime.Version.Major <= AgentRuntime.Version.Major;
         }
 
         public Process CreateAgent(Guid agentId, string agencyUrl, TestPackage package)
@@ -74,47 +77,13 @@ namespace NUnit.Engine.Services.AgentLaunchers
             startInfo.WorkingDirectory = Environment.CurrentDirectory;
             startInfo.LoadUserProfile = loadUserProfile;
 
-            switch (TargetRuntime.Identifier)
+            startInfo.FileName = runAsX86 ? X86AgentPath : AgentPath;
+            startInfo.Arguments = arguments;
+
+            if (AgentRuntime.Identifier == FrameworkIdentifiers.NetCoreApp)
             {
-                case FrameworkIdentifiers.NetFramework:
-                    startInfo.FileName = runAsX86 ? X86AgentPath : AgentPath;
-                    startInfo.Arguments = arguments;
-                    startInfo.LoadUserProfile = loadUserProfile;
-                    // TODO: Re-integrate mono
-                    //if (TargetRuntime.Runtime == Runtime.Mono)
-                    //{
-                    //    StartInfo.FileName = RuntimeFrameworkService.MonoExePath;
-                    //    string monoOptions = "--runtime=v" + TargetRuntime.FrameworkVersion.ToString(2);
-                    //    monoOptions += " --debug";
-                    //    StartInfo.Arguments = $"{monoOptions} \"{agentPath}\" {AgentArgs}";
-                    //}
-                    break;
-                case FrameworkIdentifiers.NetCoreApp:
-                    startInfo.FileName = "dotnet";
-                    startInfo.Arguments = $"\"{AgentPath}\" {arguments}";
-                    startInfo.LoadUserProfile = loadUserProfile;
-
-                    // TODO: Remove the windows limitation and the use of a hard-coded path.
-                    if (runAsX86)
-                    {
-                        if (Path.DirectorySeparatorChar != '\\')
-                            throw new Exception("Running .NET Core as X86 is currently only supported on Windows");
-
-                        string? installDirectory = DotNet.GetX86InstallDirectory();
-                        if (installDirectory is null)
-                            throw new Exception("The X86 version of dotnet.exe is not installed");
-
-                        var x86_dotnet_exe = Path.Combine(installDirectory, "dotnet.exe");
-                        if (!File.Exists(x86_dotnet_exe))
-                            throw new Exception("The X86 version of dotnet.exe is not installed");
-
-                        startInfo.FileName = x86_dotnet_exe;
-                    }
-                    break;
-                default:
-                    startInfo.FileName = AgentPath;
-                    startInfo.Arguments = arguments;
-                    break;
+                startInfo.FileName = DotNet.GetDotNetExe(runAsX86);
+                startInfo.Arguments = $"\"{AgentPath}\" {arguments}";
             }
 
             return process;
