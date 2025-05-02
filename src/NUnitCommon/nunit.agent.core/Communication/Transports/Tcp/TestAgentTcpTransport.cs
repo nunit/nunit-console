@@ -1,11 +1,12 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using NUnit.Engine.Agents;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
+using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
@@ -14,28 +15,26 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     /// a TestAgent in communicating with a TestAgency and
     /// with the runners that make use of it.
     /// </summary>
-    public class TestAgentTcpTransport : ITestAgentTransport, ITestEventListener
+    public class TestAgentTcpTransport : ITestEventListener
     {
-        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentTcpTransport));
+        internal readonly ManualResetEvent StopSignal = new ManualResetEvent(false);
 
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentTcpTransport));
+        private readonly Guid id;
         private readonly string _agencyUrl;
         private Socket? _clientSocket;
         private ITestEngineRunner? _runner;
 
-        public TestAgentTcpTransport(RemoteTestAgent agent, string serverUrl)
+        public TestAgentTcpTransport(Guid id, string serverUrl)
         {
-            Guard.ArgumentNotNull(agent, nameof(agent));
-            Agent = agent;
-
             Guard.ArgumentNotNullOrEmpty(serverUrl, nameof(serverUrl));
+            this.id = id;
             _agencyUrl = serverUrl;
 
             var parts = serverUrl.Split(new char[] { ':' });
             Guard.ArgumentValid(parts.Length == 2, "Invalid server address specified. Must be a valid endpoint including the port number", nameof(serverUrl));
             ServerEndPoint = new IPEndPoint(IPAddress.Parse(parts[0]), int.Parse(parts[1]));
         }
-
-        public TestAgent Agent { get; }
 
         public IPEndPoint ServerEndPoint { get; }
 
@@ -48,7 +47,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             _clientSocket.Connect(ServerEndPoint);
 
             // Immediately upon connection send the agent Id as a raw byte array
-            _clientSocket.Send(Agent.Id.ToByteArray());
+            _clientSocket.Send(id.ToByteArray());
 
             // Start the loop that reads and executes commands
             Thread commandLoop = new Thread(CommandLoop);
@@ -59,12 +58,21 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public void Stop()
         {
-            Agent.StopSignal.Set();
+            StopSignal.Set();
         }
 
-        public ITestEngineRunner CreateRunner(TestPackage package)
+        public bool WaitForStop(int timeout)
         {
-            return Agent.CreateRunner(package);
+            return StopSignal.WaitOne(timeout);
+        }
+
+        ITestEngineRunner CreateRunner(TestPackage package)
+        {
+#if NETFRAMEWORK
+            return new TestDomainRunner(package);
+#else
+            return new LocalTestRunner(package);
+#endif
         }
 
         private void CommandLoop()

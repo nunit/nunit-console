@@ -15,12 +15,6 @@ namespace NUnit.Engine
         Guid Id { get; }
 
         /// <summary>
-        /// Starts the agent, performing any required initialization
-        /// </summary>
-        /// <returns>True if successful, otherwise false</returns>
-        bool Start();
-
-        /// <summary>
         /// Stops the agent, releasing any resources
         /// </summary>
         void Stop();

@@ -4,7 +4,6 @@
 using System;
 using System.Threading;
 using System.Diagnostics;
-using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
 using System.Diagnostics.CodeAnalysis;
 
@@ -30,19 +29,13 @@ namespace NUnit.Engine.Services
         private IRuntimeFrameworkService? _runtimeService;
         private IAvailableRuntimes? _availableRuntimeService;
 
-        // Transports used for various target runtimes
-        private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
-        private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
+        private TestAgencyTcpTransport _tcpTransport;
 
-        internal virtual string RemotingUrl => _remotingTransport.ServerUrl;
         internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
 
         public TestAgency()
         {
-            var uri = "TestAgency-" + Guid.NewGuid();
-            var port = 0;
-            _remotingTransport = new TestAgencyRemotingTransport(this, uri, port);
-            _tcpTransport = new TestAgencyTcpTransport(this, port);
+            _tcpTransport = new TestAgencyTcpTransport(this, port: 0);
         }
 
         public void Register(ITestAgent agent)
@@ -101,11 +94,11 @@ namespace NUnit.Engine.Services
             {
                 Thread.Sleep(pollTime);
 
-                if (_agentStore.IsReady(agentId, out var agent))
+                if (_agentStore.IsReady(agentId, out ITestAgent? agent))
                 {
                     log.Debug($"Returning new agent {agentId:B}");
 
-                    return new TestAgentRemotingProxy(agent, agentId);
+                    return agent;
                 }
             }
 
@@ -174,7 +167,6 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                _remotingTransport.Stop();
                 _tcpTransport.Stop();
             }
             finally
@@ -194,7 +186,6 @@ namespace NUnit.Engine.Services
                 _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();
                 _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>();
 
-                _remotingTransport.Start();
                 _tcpTransport.Start();
                 Status = ServiceStatus.Started;
             }
