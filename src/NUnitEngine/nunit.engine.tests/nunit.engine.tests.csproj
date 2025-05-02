@@ -22,6 +22,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">

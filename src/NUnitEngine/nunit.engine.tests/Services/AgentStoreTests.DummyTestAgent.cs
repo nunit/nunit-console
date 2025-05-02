@@ -20,11 +20,6 @@ namespace NUnit.Engine.Services
                 throw new NotImplementedException();
             }
 
-            public bool Start()
-            {
-                throw new NotImplementedException();
-            }
-
             public void Stop()
             {
                 throw new NotImplementedException();

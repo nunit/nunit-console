@@ -46,9 +46,9 @@ namespace NUnit.Engine.Services
         }
 
 #if DEBUG
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
+        const string AGENTS_DIR = "../../../bin/Debug/agents/";
 #else
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
+        const string AGENTS_DIR = "../../../bin/Release/agents/";
 #endif
 
         [TestCase("net35", false)]

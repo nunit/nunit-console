@@ -13,7 +13,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     /// </summary>
     internal class TestAgentTcpProxy : ITestAgent, ITestEngineRunner
     {
-        private Socket _socket;
+        private readonly Socket _socket;
         private BinarySerializationProtocol _wireProtocol = new BinarySerializationProtocol();
 
         public TestAgentTcpProxy(Socket socket, Guid id)
@@ -24,18 +24,14 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public Guid Id { get; }
 
+        public bool IsPackageLoaded => throw new NotImplementedException();
+
         public ITestEngineRunner CreateRunner(TestPackage package)
         {
             SendCommandMessage("CreateRunner", package);
 
             // Agent also functions as the runner
             return this;
-        }
-
-        public bool Start()
-        {
-            SendCommandMessage("Start");
-            return CommandResult<bool>();
         }
 
         public void Stop()

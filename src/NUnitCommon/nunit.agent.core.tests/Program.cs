@@ -7,9 +7,9 @@ namespace NUnit.Engine.Tests
 {
     class Program
     {
-        static int Main(string[] args)
-        {
-            return new TextRunner(typeof(Program).Assembly).Execute(args);
-        }
+        //static int Main(string[] args)
+        //{
+        //    return new TextRunner(typeof(Program).Assembly).Execute(args);
+        //}
     }
 }

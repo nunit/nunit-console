@@ -26,6 +26,12 @@ namespace NUnit.Engine
     public class TestPackage
     {
         /// <summary>
+        /// Construct a top-level TestPackage that wraps a single test file,
+        /// </summary>
+        /// <param name="testFile">Name of the test file</param>
+        public TestPackage(string testFile) : this([testFile]) { }
+
+        /// <summary>
         /// Construct a top-level TestPackage that wraps one or more
         /// test files, contained as subpackages.
         /// </summary>

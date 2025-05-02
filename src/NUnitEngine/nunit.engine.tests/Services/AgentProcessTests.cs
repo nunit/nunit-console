@@ -21,16 +21,16 @@ namespace NUnit.Engine.Services
         public void SetUp()
         {
             _agency = Substitute.For<TestAgency>();
-            _agency.RemotingUrl.ReturnsForAnyArgs(REMOTING_URL);
+            _agency.TcpEndPoint.ReturnsForAnyArgs(REMOTING_URL);
             _package = new TestPackage("junk.dll");
             // Only required setting, some tests may change this
             _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = "net-4.5";
         }
 
 #if DEBUG
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Debug/agents/";
+        const string AGENTS_DIR = "../../../bin/Debug/agents/";
 #else
-        const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
+        const string AGENTS_DIR = "../../../bin/Release/agents/";
 #endif
 
         [TestCase("net-4.8", false, "net462/nunit-agent-net462.exe")]

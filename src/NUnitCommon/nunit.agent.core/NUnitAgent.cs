@@ -5,22 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Security;
 using System.Reflection;
-using NUnit.Engine.Agents;
-
-#if NETFRAMEWORK
-using NUnit.Engine.Communication.Transports.Remoting;
-#else
 using NUnit.Engine.Communication.Transports.Tcp;
-#endif
 
 namespace NUnit.Agents
 {
     public class NUnitAgent<TAgent>
     {
-        static Process? AgencyProcess;
-        static RemoteTestAgent? Agent;
         static readonly int _pid = Process.GetCurrentProcess().Id;
-        static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgent));
+        static readonly Logger log = InternalTrace.GetLogger(typeof(NUnitAgent<TAgent>));
 
         /// <summary>
         /// The main entry point for the application.
@@ -52,21 +44,15 @@ namespace NUnit.Agents
             log.Info($"  AgencyUrl: {options.AgencyUrl}");
             log.Info($"  AgencyPid: {options.AgencyPid}");
 
-            if (!string.IsNullOrEmpty(options.AgencyPid))
-                LocateAgencyProcess(options.AgencyPid);
-
             log.Info("Starting RemoteTestAgent");
-            Agent = new RemoteTestAgent(options.AgentId);
-#if NETFRAMEWORK
-            Agent.Transport = new TestAgentRemotingTransport(Agent, options.AgencyUrl);
-#else
-            Agent.Transport = new TestAgentTcpTransport(Agent, options.AgencyUrl);
-#endif
+            TestAgentTcpTransport transport = new(options.AgentId, options.AgencyUrl);
 
             try
             {
-                if (Agent.Start())
-                    WaitForStop(Agent, AgencyProcess.ShouldNotBeNull());
+                if (transport.Start())
+                {
+                    WaitForStop(transport, options.AgencyPid);
+                }
                 else
                 {
                     log.Error("Failed to start RemoteTestAgent");
@@ -83,30 +69,35 @@ namespace NUnit.Agents
             Environment.Exit(AgentExitCodes.OK);
         }
 
-        private static void LocateAgencyProcess(string agencyPid)
+        private static Process LocateAgencyProcess(string agencyPid)
         {
-            var agencyProcessId = int.Parse(agencyPid);
             try
             {
-                AgencyProcess = Process.GetProcessById(agencyProcessId);
+                var agencyProcessId = int.Parse(agencyPid);
+                return Process.GetProcessById(agencyProcessId);
             }
             catch (Exception e)
             {
-                log.Error($"Unable to connect to agency process with PID: {agencyProcessId}");
-                log.Error($"Failed with exception: {e.Message} {e.StackTrace}");
+                log.Error($"Unable to connect to agency process with PID: {agencyPid}");
+                log.Error($"Failed with exception: {e}");
                 Environment.Exit(AgentExitCodes.UNABLE_TO_LOCATE_AGENCY);
+
+                throw;
             }
         }
 
-        private static void WaitForStop(RemoteTestAgent agent, Process agencyProcess)
+        private static void WaitForStop(TestAgentTcpTransport transport, string agencyPid)
         {
+            Process agencyProcess = LocateAgencyProcess(agencyPid);
+
             log.Debug("Waiting for stopSignal");
 
-            while (!agent.WaitForStop(500))
+            while (!transport.WaitForStop(500))
             {
                 if (agencyProcess.HasExited)
                 {
                     log.Error("Parent process has been terminated.");
+                    transport.Stop();
                     Environment.Exit(AgentExitCodes.PARENT_PROCESS_TERMINATED);
                 }
             }

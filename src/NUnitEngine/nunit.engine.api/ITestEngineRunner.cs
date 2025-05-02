@@ -12,6 +12,11 @@ namespace NUnit.Engine
     public interface ITestEngineRunner : IDisposable
     {
         /// <summary>
+        /// TODO
+        /// </summary>
+        bool IsPackageLoaded { get; }
+
+        /// <summary>
         /// Load a TestPackage for possible execution
         /// </summary>
         /// <returns>A TestEngineResult.</returns>

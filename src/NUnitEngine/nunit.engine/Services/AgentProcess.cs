@@ -26,8 +26,7 @@ namespace NUnit.Engine.Services
             bool loadUserProfile = package.GetSetting(EnginePackageSettings.LoadUserProfile, false);
             string workDirectory = package.GetSetting(EnginePackageSettings.WorkDirectory, string.Empty);
 
-            string agencyUrl = TargetRuntime.Runtime == Runtime.NetCore ? agency.TcpEndPoint : agency.RemotingUrl;
-            AgentArgs = new StringBuilder($"--agentId={agentId} --agencyUrl={agencyUrl} --pid={Process.GetCurrentProcess().Id}");
+            AgentArgs = new StringBuilder($"--agentId={agentId} --agencyUrl={agency.TcpEndPoint} --pid={Process.GetCurrentProcess().Id}");
 
             // Set options that need to be in effect before the package
             // is loaded by using the command line.
@@ -110,7 +109,7 @@ namespace NUnit.Engine.Services
                 // copied to the directory without the agents. In that cae, we locate the
                 // agents in the nunit.engine project binaries.
 #if DEBUG
-                agentsDir = Path.GetFullPath("../../../../nunit.engine/bin/Debug/agents/");
+                agentsDir = Path.GetFullPath("../agents/");
 #else
                 agentsDir = Path.GetFullPath("../../../../nunit.engine/bin/Release/agents/");
 #endif

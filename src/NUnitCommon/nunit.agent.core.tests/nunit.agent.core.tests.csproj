@@ -2,24 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net8.0</TargetFrameworks>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <ExposedInternals>true</ExposedInternals>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net6.0' OR '$(TargetFramework)'=='net8.0'">
+  <ItemGroup>
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnitLite" Version="4.2.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="NUnit" Version="3.14.0" />
-    <PackageReference Include="NUnitLite" Version="3.14.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="NUnit.Analyzers" Version="4.5.0" />
     <PackageReference Include="NSubstitute" Version="4.3.0" />
-  </ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.SDK" Version="17.13.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+  </ItemGroup> 
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <Reference Include="System.Configuration" />

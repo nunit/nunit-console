@@ -122,6 +122,8 @@ namespace NUnit.Engine.Runners
                     : ID + "-1";
             }
         }
+
+        public bool IsPackageLoaded => throw new NotImplementedException();
     }
 
     public class UnmanagedExecutableTestRunner : NotRunnableTestRunner

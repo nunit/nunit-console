@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
+using NUnit.Engine.Services;
 using NUnit.Framework;
 using NUnit.TestData;
 using NUnit.TestData.Assemblies;
 
-#if WIP
 namespace NUnit.Engine.Runners.Tests
 {
     // TODO: This class now only tests those runners used by agents,
@@ -22,12 +23,12 @@ namespace NUnit.Engine.Runners.Tests
     [TestFixture(typeof(LocalTestRunner))]
 #if NETFRAMEWORK
     [TestFixture(typeof(TestDomainRunner))]
-    //[TestFixture(typeof(ProcessRunner))]
+    [TestFixture(typeof(ProcessRunner))]
 #endif
     //[TestFixture(typeof(MultipleTestProcessRunner), 1)]
     //[TestFixture(typeof(MultipleTestProcessRunner), 3)]
     //[Platform(Exclude = "Mono", Reason = "Currently causing long delays or hangs under Mono")]
-    public class TestEngineRunnerTests<TRunner> where TRunner : AbstractTestRunner
+    public class TestEngineRunnerTests<TRunner> where TRunner : ITestEngineRunner
     {
         protected TestPackage _package;
         protected TRunner _runner;
@@ -45,6 +46,16 @@ namespace NUnit.Engine.Runners.Tests
         [SetUp]
         public void Initialize()
         {
+            var _serviceContext = new ServiceContext();
+            _serviceContext.Add(new Services.TestRunnerFactory());
+            _serviceContext.Add(new ExtensionService());
+            _serviceContext.Add(new FakeRuntimeService());
+#if NETFRAMEWORK
+            var testAgency = new TestAgency();
+            _serviceContext.Add(testAgency);
+            ((IService)testAgency).StartService();
+#endif
+
             var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
 
             var assemblies = new List<string>();
@@ -54,9 +65,10 @@ namespace NUnit.Engine.Runners.Tests
             }
 
             _package = new TestPackage(assemblies);
+            _package.AddSetting(EnginePackageSettings.TargetRuntimeFramework, "net-4.5");
 
             // HACK: Depends on the fact that all the runners we are testing here support this constructor
-            _runner = (TRunner)Activator.CreateInstance(typeof(TRunner), _package);
+            _runner = (TRunner)Activator.CreateInstance(typeof(TRunner), _serviceContext, _package)!;
         }
 
         [TearDown]
@@ -92,7 +104,7 @@ namespace NUnit.Engine.Runners.Tests
         [Test]
         public void Run()
         {
-            var result = _runner.Run(null, TestFilter.Empty);
+            var result = _runner.Run(new NullListener(), TestFilter.Empty);
             CheckRunResult(result);
             CheckPackageLoading();
         }
@@ -100,17 +112,17 @@ namespace NUnit.Engine.Runners.Tests
         [Test]
         public void RunAsync()
         {
-// TODO            
-//#if NETFRAMEWORK
-//            if (_runner is ProcessRunner || _runner is MultipleTestProcessRunner)
-//                Assert.Ignore("RunAsync is not working for ProcessRunner");
-//#endif
+            // TODO            
+            //#if NETFRAMEWORK
+            //            if (_runner is ProcessRunner || _runner is MultipleTestProcessRunner)
+            //                Assert.Ignore("RunAsync is not working for ProcessRunner");
+            //#endif
 
-            var asyncResult = _runner.RunAsync(null, TestFilter.Empty);
-            asyncResult.Wait(-1);
-            Assert.That(asyncResult.IsComplete, "Async result is not complete");
+            ITestRun asyncResult = _runner.RunAsync(new NullListener(), TestFilter.Empty);
+            bool complete = asyncResult.Wait(-1);
+            Assert.That(complete, "Async result is not complete");
 
-            CheckRunResult(asyncResult.EngineResult);
+            CheckRunResult(asyncResult.Result);
             CheckPackageLoading();
         }
 
@@ -154,4 +166,3 @@ namespace NUnit.Engine.Runners.Tests
         }
     }
 }
-#endif

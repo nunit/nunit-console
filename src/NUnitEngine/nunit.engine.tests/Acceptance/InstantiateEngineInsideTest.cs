@@ -7,7 +7,6 @@ namespace NUnit.Engine
 {
     class InstantiateEngineInsideTest
     {
-
         /// <summary>
         /// Historically it wasn't possible to instantiate a full engine inside
         /// a running NUnit test due to issues with URI collisions for
@@ -32,14 +31,5 @@ namespace NUnit.Engine
                 }
             });
         }
-
-        private class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string testEvent)
-            {
-                // No action
-            }
-        }
-
     }
 }
