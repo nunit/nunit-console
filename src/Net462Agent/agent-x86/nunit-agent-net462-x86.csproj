@@ -4,9 +4,9 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
     <TargetFrameworks>net462</TargetFrameworks>
-    <OutputPath>..\..\..\..\bin\$(Configuration)\agents</OutputPath>
+    <OutputPath>..\..\..\bin\$(Configuration)\agents</OutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <PlatformTarget>x86</PlatformTarget>
     <GenerateSupportedRuntime>False</GenerateSupportedRuntime>
   </PropertyGroup>
@@ -21,15 +21,15 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\..\..\..\nunit.ico">
+    <Content Include="..\..\..\nunit.ico">
       <Link>nunit.ico</Link>
     </Content>
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
-    <ProjectReference Include="..\..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
-    <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
 
   <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">

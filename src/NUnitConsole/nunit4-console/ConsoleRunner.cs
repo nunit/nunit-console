@@ -12,6 +12,7 @@ using NUnit.Engine.Extensibility;
 using NUnit.TextDisplay;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Data;
 
 namespace NUnit.ConsoleRunner
 {
@@ -438,7 +439,11 @@ namespace NUnit.ConsoleRunner
             TestPackage package = new TestPackage(options.InputFiles);
 
             if (options.RuntimeFrameworkSpecified)
+            {
+                // Temporarily use both settings until RuntimeFramework is retired
                 package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, options.RuntimeFramework);
+                package.AddSetting(EnginePackageSettings.RequestedFrameworkName, MakeFrameworkName(options.RuntimeFramework));
+            }
 
             if (options.RunAsX86)
                 package.AddSetting(EnginePackageSettings.RunAsX86, true);
@@ -514,6 +519,33 @@ namespace NUnit.ConsoleRunner
                 package.AddSetting(EnginePackageSettings.ConfigurationFile, options.ConfigurationFile);
 
             return package;
+        }
+
+        private static string MakeFrameworkName(string runtimeFramework)
+        {
+            var parts = runtimeFramework.Split('-');
+
+            if (parts.Length == 2)
+            {
+                string runtime = parts[0];
+                Version version = new Version(parts[1]);
+                string? identifier = null;
+
+                switch (runtime)
+                {
+                    case "netcore":
+                        identifier = FrameworkIdentifiers.NetCoreApp;
+                        break;
+                    case "net":
+                        identifier = version.Major > 4 ? FrameworkIdentifiers.NetCoreApp : FrameworkIdentifiers.NetFramework;
+                        break;
+                }
+
+                if (identifier is not null)
+                    return $"{identifier},Version=v{version}";
+            }
+
+            throw new ArgumentException($"Invalid RuntimeFramework: {runtimeFramework}", nameof(runtimeFramework));
         }
 
         /// <summary>

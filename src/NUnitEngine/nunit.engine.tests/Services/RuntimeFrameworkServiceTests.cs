@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using NUnit.Common;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services
@@ -61,10 +61,10 @@ namespace NUnit.Engine.Services
             Assert.That(File.Exists(assemblyPath), $"File does not exist: {assemblyPath}");
             var package = new TestPackage(assemblyPath);
 
-            var returnValue = _runtimeService.SelectRuntimeFramework(package);
+            var expectedFrameworkName = RuntimeFramework.Parse(_runtimeService.SelectRuntimeFramework(package)).FrameworkName.ToString();
 
-            Assert.That(package.GetSetting("TargetRuntimeFramework", string.Empty), Is.EqualTo(returnValue));
-            Assert.That(package.GetSetting("RunAsX86", false), Is.EqualTo(runAsX86));
+            Assert.That(package.GetSetting(EnginePackageSettings.TargetFrameworkName, string.Empty), Is.EqualTo(expectedFrameworkName));
+            Assert.That(package.GetSetting(EnginePackageSettings.RunAsX86, false), Is.EqualTo(runAsX86));
         }
 
         [Test]
@@ -154,9 +154,12 @@ namespace NUnit.Engine.Services
 
             Assert.Multiple(() =>
             {
-                Assert.That(net20Package.Settings[EnginePackageSettings.TargetRuntimeFramework], Is.EqualTo("net-2.0"));
-                Assert.That(net40Package.Settings[EnginePackageSettings.TargetRuntimeFramework], Is.EqualTo("net-4.0"));
-                Assert.That(topLevelPackage.Settings[EnginePackageSettings.TargetRuntimeFramework], Is.EqualTo("net-4.0"));
+#pragma warning disable 612, 618
+                var NF = FrameworkIdentifiers.NetFramework;
+                Assert.That(net20Package.Settings[EnginePackageSettings.TargetFrameworkName], Is.EqualTo($"{NF},Version=v2.0"));
+                Assert.That(net40Package.Settings[EnginePackageSettings.TargetFrameworkName], Is.EqualTo($"{NF},Version=v4.0"));
+                Assert.That(topLevelPackage.Settings[EnginePackageSettings.TargetFrameworkName], Is.EqualTo($"{NF},Version=v4.0"));
+#pragma warning restore 612, 618
             });
         }
     }

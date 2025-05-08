@@ -50,14 +50,14 @@ class MockAssemblyExpectedResult : ExpectedResult
 StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
-    Arguments = "testdata/net462/mock-assembly.dll",
+    Arguments = "testdata/net462/mock-assembly.dll --trace:Debug",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
 });
 
 AddToBothLists(new PackageTest(1, "Net80Test")
 {
     Description = "Run mock-assembly.dll under .NET 8.0",
-    Arguments = "testdata/net8.0/mock-assembly.dll",
+    Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
     ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
 });
 
@@ -293,14 +293,14 @@ StandardRunnerTests.Add(new PackageTest(1, "Net80WindowsFormsTest")
 AddToBothLists(new PackageTest(1, "Net60WPFTest")
 {
     Description = "Run test using WPF under .NET 6.0",
-    Arguments = "testdata/net6.0-windows/WpfTest.dll --trace=Debug",
+    Arguments = "testdata/net6.0-windows/WpfTest.dll",
     ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }
 });
 
 AddToBothLists(new PackageTest(1, "Net80WPFTest")
 {
     Description = "Run test using WPF under .NET 8.0",
-    Arguments = "testdata/net8.0-windows/WpfTest.dll --trace=Debug",
+    Arguments = "testdata/net8.0-windows/WpfTest.dll",
     ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }
 });
 
@@ -382,7 +382,7 @@ StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
 //StandardRunnerTests.Add(new PackageTest(1, "VSProjectLoaderTest_Solution")
 //{
 //    Description = "Run mock-assembly using the .sln file",
-//    Arguments = "../../src/TestData/TestData.sln --config=Release --trace=Debug",
+//    Arguments = "../../src/TestData/TestData.sln --config=Release",
 //    ExpectedResult = new ExpectedResult("Failed")
 //    {
 //        Total = 37 * 5,

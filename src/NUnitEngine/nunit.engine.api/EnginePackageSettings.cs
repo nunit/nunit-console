@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Runtime.Versioning;
 
 namespace NUnit
 {
@@ -72,21 +73,30 @@ namespace NUnit
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
-        [Obsolete("Use 'RequestedRuntimeFramework' instead.")]
-        public const string RuntimeFramework = "RequestedRuntimeFramework";
+        public const string RequestedRuntimeFramework = "RequestedRuntimeFramework";
 
         /// <summary>
         /// Indicates the desired runtime to use for the tests. Values
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
-        public const string RequestedRuntimeFramework = "RequestedRuntimeFramework";
+        public const string RequestedFrameworkName = "RequestedFrameworkName";
 
         /// <summary>
         /// Indicates the Target runtime selected for use by the engine,
         /// based on the requested runtime and assembly metadata.
         /// </summary>
-        public const string TargetRuntimeFramework = "TargetRuntimeFramework";
+        public const string TargetFrameworkName = "TargetFrameworkName";
+
+        /// <summary>
+        /// Indicates the name of the agent requested by the user.
+        /// </summary>
+        public const string RequestedAgentName = "RequestedAgentName";
+
+        /// <summary>
+        /// Indicates the name of the agent that was actually used.
+        /// </summary>
+        public const string SelectedAgentName = "SelectedAgentName";
 
         /// <summary>
         /// Bool flag indicating that the test should be run in a 32-bit process

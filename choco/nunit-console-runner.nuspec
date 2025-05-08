@@ -67,5 +67,11 @@
     <file src = "$BIN_DIR$agents/net8.0/nunit.common.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/testcentric.metadata.dll" target="tools/agents/net8.0" />
     <file src = "$BIN_DIR$agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
+
+    <!-- Temporarily added until agents are dependencies -->
+    <file src="$BIN_DIR$agents/net462/agent-launcher-net462.dll" target="tools" />
+    <file src="$BIN_DIR$agents/net462/agent-launcher-net80.dll" target="tools" />
+    <file src="$BIN_DIR$agents/net462/nunit.agent.core.dll" target="tools" />
+    <file src="$BIN_DIR$agents/net462/nunit.agent.core.pdb" target="tools" />
   </files>
 </package>

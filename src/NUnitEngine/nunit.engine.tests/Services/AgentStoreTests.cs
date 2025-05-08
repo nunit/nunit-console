@@ -69,7 +69,8 @@ namespace NUnit.Engine.Services
         {
             var database = new AgentStore();
 
-            Assert.That(() => database.MarkTerminated(DummyAgentId), Throws.ArgumentException.With.Property("ParamName").EqualTo("agentId"));
+            Assert.That(() => database.MarkTerminated(DummyAgentId),
+                Throws.Exception.TypeOf<NUnitEngineException>().With.Message.EqualTo("Process terminated without registering an agent."));
         }
 
         [Test]
@@ -116,7 +117,7 @@ namespace NUnit.Engine.Services
         {
             var database = new AgentStore();
 
-            Assert.That(database.IsAgentProcessActive(DummyAgentId, out _), Is.False);
+            Assert.That(database.IsAgentActive(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -125,7 +126,7 @@ namespace NUnit.Engine.Services
             var database = new AgentStore();
 
             database.AddAgent(DummyAgentId, DummyProcess);
-            Assert.That(database.IsAgentProcessActive(DummyAgentId, out var process), Is.True);
+            Assert.That(database.IsAgentActive(DummyAgentId, out var process), Is.True);
             Assert.That(process, Is.SameAs(DummyProcess));
         }
 
@@ -136,7 +137,7 @@ namespace NUnit.Engine.Services
 
             database.AddAgent(DummyAgentId, DummyProcess);
             database.Register(DummyAgent);
-            Assert.That(database.IsAgentProcessActive(DummyAgentId, out var process), Is.True);
+            Assert.That(database.IsAgentActive(DummyAgentId, out var process), Is.True);
             Assert.That(process, Is.SameAs(DummyProcess));
         }
 
@@ -148,7 +149,7 @@ namespace NUnit.Engine.Services
             database.AddAgent(DummyAgentId, DummyProcess);
             database.Register(DummyAgent);
             database.MarkTerminated(DummyAgentId);
-            Assert.That(database.IsAgentProcessActive(DummyAgentId, out _), Is.False);
+            Assert.That(database.IsAgentActive(DummyAgentId, out _), Is.False);
         }
 
         [Test]
@@ -162,19 +163,20 @@ namespace NUnit.Engine.Services
                 {
                     var id = Guid.NewGuid();
 
-                    Assert.That(database.IsAgentProcessActive(id, out _), Is.False);
+                    Assert.That(database.IsAgentActive(id, out _), Is.False);
                     Assert.That(database.IsReady(id, out _), Is.False);
 
                     database.AddAgent(id, DummyProcess);
-                    Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
+                    Assert.That(database.IsAgentActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.False);
 
+                    // Pretend that the agent process started and  registered
                     database.Register(new DummyTestAgent(id));
-                    Assert.That(database.IsAgentProcessActive(id, out _), Is.True);
+                    Assert.That(database.IsAgentActive(id, out _), Is.True);
                     Assert.That(database.IsReady(id, out _), Is.True);
 
                     database.MarkTerminated(id);
-                    Assert.That(database.IsAgentProcessActive(id, out _), Is.False);
+                    Assert.That(database.IsAgentActive(id, out _), Is.False);
                     Assert.That(database.IsReady(id, out _), Is.False);
                 }
             }, threadCount: Environment.ProcessorCount);
@@ -210,6 +212,38 @@ namespace NUnit.Engine.Services
             if (exceptions.Count != 0)
                 throw exceptions[0];
         }
+
+        #region Nested DummyTestAgent Class
+
+        private sealed class DummyTestAgent : ITestAgent
+        {
+            public DummyTestAgent(Guid id)
+            {
+                Id = id;
+                AgentType = TestAgentType.LocalProcess;
+            }
+
+            public Guid Id { get; }
+
+            public TestAgentType AgentType { get; }
+
+            public ITestEngineRunner CreateRunner(TestPackage package)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Start()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Stop()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
     }
 }
 #endif

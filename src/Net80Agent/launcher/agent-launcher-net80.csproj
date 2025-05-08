@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <OutputPath>..\..\..\bin\$(Configuration)\agents</OutputPath>
+    <RootNamespace>nunit_agent_launcher_net80</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
+  </ItemGroup>
+
+</Project>

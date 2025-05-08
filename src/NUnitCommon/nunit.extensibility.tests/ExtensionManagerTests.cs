@@ -18,6 +18,7 @@ namespace NUnit.Extensibility
 #pragma warning disable 414
         private static readonly string[] KnownExtensionPointPaths =
         {
+            "/NUnit/Engine/TypeExtensions/IAgentLauncher",
             "/NUnit/Engine/TypeExtensions/IDriverFactory",
             "/NUnit/Engine/TypeExtensions/IProjectLoader",
             "/NUnit/Engine/TypeExtensions/IResultWriter",
@@ -28,6 +29,7 @@ namespace NUnit.Extensibility
 
         private static readonly Type[] KnownExtensionPointTypes =
         {
+            typeof(IAgentLauncher),
             typeof(IDriverFactory),
             typeof(IProjectLoader),
             typeof(IResultWriter),
@@ -36,8 +38,9 @@ namespace NUnit.Extensibility
             typeof(IFrameworkDriver)
         };
 
-        private static readonly int[] KnownExtensionPointCounts = { 1, 1, 1, 2, 1, 0 };
+        private static readonly int[] KnownExtensionPointCounts = { 1, 1, 1, 1, 2, 1, 0 };
 
+        private const string FAKE_AGENT_LAUNCHER_EXTENSION = "NUnit.Engine.Fakes.FakeAgentLauncherExtension";
         private const string FAKE_FRAMEWORK_DRIVER_EXTENSION = "NUnit.Engine.Fakes.FakeFrameworkDriverExtension";
         private const string FAKE_PROJECT_LOADER_EXTENSION = "NUnit.Engine.Fakes.FakeProjectLoaderExtension";
         private const string FAKE_RESULT_WRITER_EXTENSION = "NUnit.Engine.Fakes.FakeResultWriterExtension";
@@ -48,6 +51,7 @@ namespace NUnit.Extensibility
 
         private readonly string[] KnownExtensions =
         {
+            FAKE_AGENT_LAUNCHER_EXTENSION,
             FAKE_FRAMEWORK_DRIVER_EXTENSION,
             FAKE_PROJECT_LOADER_EXTENSION,
             FAKE_RESULT_WRITER_EXTENSION,

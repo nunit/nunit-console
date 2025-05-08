@@ -3,10 +3,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>nunit.agent</RootNamespace>
-    <TargetFrameworks>net462</TargetFrameworks>
-    <OutputPath>..\..\..\..\bin\$(Configuration)\agents</OutputPath>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <OutputPath>..\..\..\bin\$(Configuration)\agents</OutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>..\..\..\..\nunit.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\..\nunit.ico</ApplicationIcon>
     <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
   </PropertyGroup>
 
@@ -15,26 +15,22 @@
     <Description>Agent used to run tests out of process</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
-    <Reference Include="System.Runtime.Remoting" />
-  </ItemGroup>
-  
   <ItemGroup>
-    <Content Include="..\..\..\..\nunit.ico">
+    <Content Include="..\..\..\nunit.ico">
       <Link>nunit.ico</Link>
     </Content>
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
-    <ProjectReference Include="..\..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
-    <ProjectReference Include="..\..\nunit.engine.api\nunit.engine.api.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
+    <ProjectReference Include="..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
+    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
   </ItemGroup>
 
   <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net462/"))</ConsoleDestination>
-      <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net462/"))</EngineDestination>
+      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net80/"))</ConsoleDestination>
+      <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net80/"))</EngineDestination>
     </PropertyGroup>
 
     <ItemGroup>
