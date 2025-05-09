@@ -11,7 +11,6 @@ using System.Net.Sockets;
 using System.Runtime.Versioning;
 using NUnit.Common;
 using NUnit.Engine.Agents;
-using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
 

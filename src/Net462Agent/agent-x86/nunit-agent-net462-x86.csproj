@@ -16,10 +16,6 @@
     <Description>Agent used to run X86 tests out of process under .NET framework</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
-    <Reference Include="System.Runtime.Remoting" />
-  </ItemGroup>
-  
   <ItemGroup>
     <Content Include="..\..\..\nunit.ico">
       <Link>nunit.ico</Link>
