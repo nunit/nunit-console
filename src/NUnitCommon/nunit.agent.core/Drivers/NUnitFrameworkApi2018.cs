@@ -68,6 +68,7 @@ namespace NUnit.Engine.Drivers
 #if NETFRAMEWORK
             try
             {
+                log.Debug("Creating FrameworkController");
                 _frameworkController = AppDomain.CurrentDomain.CreateInstanceAndUnwrap(
                     _nunitRef.FullName,
                     CONTROLLER_TYPE,
@@ -77,9 +78,11 @@ namespace NUnit.Engine.Drivers
                     new object[] { _testAssemblyPath, idPrefix, settings },
                     null,
                     null).ShouldNotBeNull();
+                log.Debug("Created FrameworkController");
             }
             catch (Exception ex)
             {
+                log.Debug($"Got Exception {ex}");
                 string msg = $"Failed to load {_nunitRef.FullName}\r\n  Codebase: {_nunitRef.CodeBase}";
                 throw new Exception(msg, ex);
             }

@@ -7,12 +7,7 @@ using System.Security;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Engine.Agents;
-
-#if NETFRAMEWORK
-using NUnit.Engine.Communication.Transports.Remoting;
-#else
 using NUnit.Engine.Communication.Transports.Tcp;
-#endif
 
 namespace NUnit.Agents
 {
@@ -62,11 +57,7 @@ namespace NUnit.Agents
 
             log.Info("Starting RemoteTestAgent");
             Agent = new RemoteTestAgent(options.AgentId);
-#if NETFRAMEWORK
-            Agent.Transport = new TestAgentRemotingTransport(Agent, options.AgencyUrl);
-#else
             Agent.Transport = new TestAgentTcpTransport(Agent, options.AgencyUrl);
-#endif
 
             try
             {
