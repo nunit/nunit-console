@@ -50,14 +50,14 @@ class MockAssemblyExpectedResult : ExpectedResult
 StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
-    Arguments = "testdata/net462/mock-assembly.dll --trace:Debug",
+    Arguments = "testdata/net462/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
 });
 
 AddToBothLists(new PackageTest(1, "Net80Test")
 {
     Description = "Run mock-assembly.dll under .NET 8.0",
-    Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+    Arguments = "testdata/net8.0/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
 });
 
@@ -329,7 +329,7 @@ AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 StandardRunnerTests.Add(new PackageTest(1, "FakeEventListenerTest")
 {
     Description = "Test that event listener gets all reports",
-    Arguments = "testdata/net462/mock-assembly.dll --extensionDirectory ../../src/TestData/FakeExtensions --trace:Debug",
+    Arguments = "testdata/net462/mock-assembly.dll --extensionDirectory ../../src/TestData/FakeExtensions",
     ExpectedResult = new MockAssemblyExpectedResult("netcore-4.6.2")
 });
 
@@ -348,7 +348,7 @@ StandardRunnerTests.Add(new PackageTest(1, "FakeEventListenerTest")
 //NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
 //{
 //    Description = "Run NUnit project with mock-assembly.dll built for .NET 6.0 and 8.0",
-//    Arguments = "../../NetCoreTests.nunit --config=Release --trace:Debug",
+//    Arguments = "../../NetCoreTests.nunit --config=Release",
 //    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
 //    ExtensionsNeeded = new[] { Extensions.NUnitProjectLoader }
 //});
@@ -357,7 +357,7 @@ StandardRunnerTests.Add(new PackageTest(1, "FakeEventListenerTest")
 StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
 {
     Description = "Run mock-assembly under .NET 4.6.2 and produce V2 output",
-    Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2 --trace:Debug",
+    Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
     ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
 });
@@ -365,7 +365,7 @@ StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
 //StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net60")
 //{
 //    Description = "Run mock-assembly under .NET 6.0 and produce V2 output",
-//    Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2 --trace:Debug",
+//    Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
 //    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0"),
 //    ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
 //});
@@ -411,7 +411,7 @@ StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
 StandardRunnerTests.Add(new PackageTest(1, "TeamCityListenerTest")
 {
     Description = "Run mock-assembly with --teamcity enabled",
-    Arguments = "testdata/net462/mock-assembly.dll --teamcity --trace:Debug",
+    Arguments = "testdata/net462/mock-assembly.dll --teamcity",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
     ExtensionsNeeded = new[] { Extensions.TeamCityEventListener }
 });
@@ -458,7 +458,7 @@ StandardRunnerTests.Add(new PackageTest(1, "TeamCityListenerTest")
 StandardRunnerTests.Add(new PackageTest(1, "InvalidTestNameTest_Net462")
 {
     Description = "Ensure we handle invalid test names correctly under .NET 4.6.2",
-    Arguments = "testdata/net462/InvalidTestNames.dll --trace:Debug",
+    Arguments = "testdata/net462/InvalidTestNames.dll",
     ExpectedResult = new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -471,7 +471,7 @@ StandardRunnerTests.Add(new PackageTest(1, "InvalidTestNameTest_Net462")
 AddToBothLists(new PackageTest(1, "InvalidTestNameTest_Net60")
 {
     Description = "Ensure we handle invalid test names correctly under .NET 6.0",
-    Arguments = "testdata/net6.0/InvalidTestNames.dll --trace:Debug",
+    Arguments = "testdata/net6.0/InvalidTestNames.dll",
     ExpectedResult = new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -484,7 +484,7 @@ AddToBothLists(new PackageTest(1, "InvalidTestNameTest_Net60")
 AddToBothLists(new PackageTest(1, "InvalidTestNameTest_Net80")
 {
     Description = "Ensure we handle invalid test names correctly under .NET 8.0",
-    Arguments = "testdata/net8.0/InvalidTestNames.dll --trace:Debug",
+    Arguments = "testdata/net8.0/InvalidTestNames.dll",
     ExpectedResult = new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[]
@@ -531,7 +531,7 @@ var EngineTests = new List<PackageTest>()
     new PackageTest(1, "Net80AgentTest")
     {
         Description = "Run mock-assembly.dll under .NET 8.0",
-        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+        Arguments = "testdata/net8.0/mock-assembly.dll",
         ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
     }
 };
@@ -548,7 +548,7 @@ var AgentCoreTests = new List<PackageTest>()
     new PackageTest(1, "Net80AgentTest")
     {
         Description = "Run mock-assembly.dll under .NET 8.0",
-        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+        Arguments = "testdata/net8.0/mock-assembly.dll",
         ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
     }
 };
