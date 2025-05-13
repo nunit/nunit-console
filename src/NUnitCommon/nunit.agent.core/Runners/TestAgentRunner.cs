@@ -100,7 +100,7 @@ namespace NUnit.Engine.Runners
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
 
-            string? targetFramework = assemblyPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, (string?)null);
+            string? targetFramework = assemblyPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
             bool skipNonTestAssemblies = assemblyPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
             // TODO: Restore this code after changes to PackageSettings implementation

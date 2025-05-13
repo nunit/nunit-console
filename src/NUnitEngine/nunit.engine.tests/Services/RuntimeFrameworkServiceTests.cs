@@ -127,11 +127,11 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("test");
             package.AddSetting(EnginePackageSettings.ImageTargetFrameworkName, framework);
-            package.AddSetting(EnginePackageSettings.ImageRuntimeVersion, new Version(majorVersion, minorVersion));
+            package.AddSetting(EnginePackageSettings.ImageRuntimeVersion, $"{majorVersion}.{minorVersion}");
             package.AddSetting(EnginePackageSettings.RequestedRuntimeFramework, requested);
 
             _runtimeService.SelectRuntimeFramework(package);
-            Assert.That(package.GetSetting<string>(EnginePackageSettings.RequestedRuntimeFramework, string.Empty), Is.EqualTo(requested));
+            Assert.That(package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, string.Empty), Is.EqualTo(requested));
         }
 
         [Test]
@@ -146,9 +146,9 @@ namespace NUnit.Engine.Services
             var topLevelPackage = new TestPackage(new string[] { "a.dll", "b.dll" });
 
             var net20Package = topLevelPackage.SubPackages[0];
-            net20Package.Settings.Add(EnginePackageSettings.ImageRuntimeVersion, new Version("2.0"));
+            net20Package.Settings.Add(EnginePackageSettings.ImageRuntimeVersion, "2.0");
             var net40Package = topLevelPackage.SubPackages[1];
-            net40Package.Settings.Add(EnginePackageSettings.ImageRuntimeVersion, new Version("4.0"));
+            net40Package.Settings.Add(EnginePackageSettings.ImageRuntimeVersion, "4.0");
 
             _runtimeService.SelectRuntimeFramework(topLevelPackage);
 

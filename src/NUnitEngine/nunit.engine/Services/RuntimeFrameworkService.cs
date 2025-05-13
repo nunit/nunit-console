@@ -161,7 +161,7 @@ namespace NUnit.Engine.Services
             {
                 // Assume .NET Framework
                 targetRuntime = Runtime.Net;
-                var trialVersion = package.GetSetting(EnginePackageSettings.ImageRuntimeVersion, new Version(2, 0));
+                var trialVersion = new Version(package.GetSetting(EnginePackageSettings.ImageRuntimeVersion, "2.0"));
                 targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
             else
@@ -361,7 +361,7 @@ namespace NUnit.Engine.Services
                     ApplyImageData(subPackage);
 
                     // Collect the highest version required
-                    Version v = subPackage.GetSetting(EnginePackageSettings.ImageRuntimeVersion, new Version(0, 0));
+                    Version v = new Version(subPackage.GetSetting(EnginePackageSettings.ImageRuntimeVersion, "0.0"));
                     if (v > targetVersion)
                         targetVersion = v;
 
@@ -419,7 +419,7 @@ namespace NUnit.Engine.Services
             }
 
             if (targetVersion.Major > 0)
-                package.Settings[EnginePackageSettings.ImageRuntimeVersion] = targetVersion;
+                package.Settings[EnginePackageSettings.ImageRuntimeVersion] = targetVersion.ToString();
 
             if (!string.IsNullOrEmpty(frameworkName))
                 package.Settings[EnginePackageSettings.ImageTargetFrameworkName] = frameworkName;
