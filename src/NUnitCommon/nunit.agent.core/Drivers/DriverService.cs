@@ -75,7 +75,7 @@ namespace NUnit.Engine.Drivers
                         return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, platform +
                             " test assemblies are not supported by this version of the engine");
             }
-
+            log.Debug("Looking for a driver");
             try
             {
                 using (var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath))

@@ -15,11 +15,6 @@
     <Description>Provides for loading, exploring and running NUnit tests</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Web" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Net462Agent\launcher\agent-launcher-net462.csproj" />
     <ProjectReference Include="..\..\Net80Agent\launcher\agent-launcher-net80.csproj" />

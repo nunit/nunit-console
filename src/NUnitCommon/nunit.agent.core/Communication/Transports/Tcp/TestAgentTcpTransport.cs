@@ -12,7 +12,7 @@ using NUnit.Engine.Communication.Protocols;
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
     /// <summary>
-    /// TestAgentRemotingTransport uses TCP to support
+    /// TestAgentTcpTransport uses TCP to support
     /// a TestAgent in communicating with a TestAgency and
     /// with the runners that make use of it.
     /// </summary>

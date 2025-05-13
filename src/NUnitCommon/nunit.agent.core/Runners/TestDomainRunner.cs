@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
+
 namespace NUnit.Engine.Runners
 {
     /// <summary>
@@ -9,6 +10,8 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public class TestDomainRunner : TestAgentRunner
     {
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TestDomainRunner));
+
         private readonly DomainManager _domainManager;
 
         public TestDomainRunner(TestPackage package) : base(package)
@@ -19,7 +22,6 @@ namespace NUnit.Engine.Runners
         public override TestEngineResult Load()
         {
             TestDomain = _domainManager.CreateDomain(TestPackage);
-
             return base.Load();
         }
 

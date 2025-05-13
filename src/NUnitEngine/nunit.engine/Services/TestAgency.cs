@@ -11,7 +11,6 @@ using System.Net.Sockets;
 using System.Runtime.Versioning;
 using NUnit.Common;
 using NUnit.Engine.Agents;
-using NUnit.Engine.Communication.Transports.Remoting;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
 
@@ -39,10 +38,8 @@ namespace NUnit.Engine.Services
         private readonly Dictionary<Process, Guid> _agentProcessIndex = new Dictionary<Process, Guid>();
 
         // Transports used for various target runtimes
-        private TestAgencyRemotingTransport _remotingTransport; // .NET Framework
         private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
 
-        internal virtual string RemotingUrl => _remotingTransport.ServerUrl;
         internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
 
         public TestAgency() : this("TestAgency", 0)
@@ -51,7 +48,6 @@ namespace NUnit.Engine.Services
 
         public TestAgency(string uri, int port)
         {
-            _remotingTransport = new TestAgencyRemotingTransport(this, uri, port);
             _tcpTransport = new TestAgencyTcpTransport(this, port);
         }
 
@@ -133,8 +129,7 @@ namespace NUnit.Engine.Services
 
             var targetRuntime = new FrameworkName(runtimeSetting);
             var agentId = Guid.NewGuid();
-            string agencyUrl = targetRuntime.Identifier == FrameworkIdentifiers.NetFramework ? RemotingUrl : TcpEndPoint;
-            var agentProcess = CreateAgentProcess(agentId, agencyUrl, package);
+            var agentProcess = CreateAgentProcess(agentId, TcpEndPoint, package);
 
             agentProcess.Exited += (sender, e) => OnAgentExit(agentProcess);
 
@@ -165,17 +160,7 @@ namespace NUnit.Engine.Services
                 {
                     log.Debug($"Returning new agent {agentId:B}");
 
-                    switch (targetRuntime.Identifier)
-                    {
-                        case FrameworkIdentifiers.NetFramework:
-                            return new TestAgentRemotingProxy(agent, agentId);
-
-                        case FrameworkIdentifiers.NetCoreApp:
-                            return agent;
-
-                        default:
-                            throw new InvalidOperationException($"Invalid runtime: {targetRuntime.Identifier}");
-                    }
+                    return agent;
                 }
             }
 
@@ -260,7 +245,6 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                _remotingTransport.Stop();
                 _tcpTransport.Stop();
             }
             finally
@@ -286,8 +270,8 @@ namespace NUnit.Engine.Services
                 foreach (var launcher in _launchers)
                     AvailableAgents.Add(launcher.AgentInfo);
 
-                _remotingTransport.Start();
                 _tcpTransport.Start();
+
                 Status = ServiceStatus.Started;
             }
             catch

@@ -6,28 +6,21 @@ using System.Collections.Generic;
 namespace NUnit.Engine.Runners
 {
     /// <summary>
-    /// AggregatingTestRunner runs tests using multiple
-    /// subordinate runners and combines the results.
-    /// The individual runners may be run in parallel
+    /// AggregatingTestRunner runs tests using multiple subordinate runners
+    /// and combines the results. The individual runners may be run in parallel
     /// if a derived class sets the LevelOfParallelism
     /// property in its constructor.
     /// </summary>
+    /// <remarks>
+    /// AggregatingTestRunner may be called with a TestPackage that specifies a single
+    /// assembly, multiple assemblies, a single project, multiple projects or any
+    /// combination of projects and asemblies. In all cases, it extracts a list of the
+    /// actual assemblies to be run and creates a separate runner for each of them.
+    /// </remarks>
     public class AggregatingTestRunner : TestEngineRunner
     {
-        // AggregatingTestRunner combines the results from tests run by different
-        // runners. It may be used as a base class or through one of it's derived
-        // classes, MultipleTestDomainRunner and MultipleTestProcessRunner.
-        //
-        // The runners created by the derived class will (at least at the time
-        // of writing this comment) be either DirectTestRunners, ProcessRunners or
-        // AggregatingTestRunners.
-        //
-        // AggregatingTestRunner is used in the engine/runner process as well as in agent
-        // processes. It may be called with a TestPackage that specifies a single
-        // assembly, multiple assemblies, a single project, multiple projects or
-        // a mix of projects and assemblies. Each file passed is handled by
-        // a single runner.
-        //
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(AggregatingTestRunner));
+
         // TODO: Determine whether AggregatingTestRunner needs to create an XML result
         // node for a project or if that responsibility can be delegated to the individual
         // runners it creates.
@@ -54,6 +47,8 @@ namespace NUnit.Engine.Runners
                     _runners = new List<ITestEngineRunner>();
                     foreach (var subPackage in TestPackage.Select(p => !p.HasSubPackages()))
                     {
+                        var runner = CreateRunner(subPackage);
+                        log.Debug($"Using {runner.GetType()} for {subPackage.Name}");
                         _runners.Add(CreateRunner(subPackage));
                     }
                 }
@@ -162,6 +157,8 @@ namespace NUnit.Engine.Runners
 
         private void RunTestsSequentially(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
         {
+            log.Debug("Running test assemblies sequentially.");
+
             foreach (ITestEngineRunner runner in Runners)
             {
                 var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
@@ -172,6 +169,8 @@ namespace NUnit.Engine.Runners
 
         private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
         {
+            log.Debug("Running test assemblies in parallel.");
+
             var workerPool = new ParallelTaskWorkerPool(LevelOfParallelism);
             var tasks = new List<TestExecutionTask>();
 
@@ -230,6 +229,8 @@ namespace NUnit.Engine.Runners
                 throw new NUnitEngineUnloadException(_unloadExceptions);
         }
 
+        // Use TestRunnerFactory to decide the type of runner to be used for
+        // each individual assembly. This may be overridden by a derived class.
         protected virtual ITestEngineRunner CreateRunner(TestPackage package)
         {
             return TestRunnerFactory.MakeTestRunner(package);

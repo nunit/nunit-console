@@ -15,10 +15,6 @@
     <Description>Agent used to run tests out of process</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net20' or '$(TargetFramework)'=='net40'">
-    <Reference Include="System.Runtime.Remoting" />
-  </ItemGroup>
-  
   <ItemGroup>
     <Content Include="..\..\..\nunit.ico">
       <Link>nunit.ico</Link>

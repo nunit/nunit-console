@@ -23,7 +23,6 @@
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
   </ItemGroup>
 

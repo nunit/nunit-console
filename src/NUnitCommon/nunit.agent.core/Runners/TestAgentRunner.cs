@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using NUnit.Engine.Drivers;
@@ -48,7 +47,6 @@ namespace NUnit.Engine.Runners
         public TestAgentRunner(TestPackage package)
         {
             Guard.ArgumentNotNull(package);
-            //Guard.ArgumentValid(package.IsAssemblyPackage(), "TestAgentRunner requires a package with a single assembly", nameof(package));
             var assemblyPackages = package.Select(p => !p.HasSubPackages());
             Guard.ArgumentValid(assemblyPackages.Count == 1, "TestAgentRunner requires a package with a single assembly", nameof(package));
 
@@ -105,13 +103,14 @@ namespace NUnit.Engine.Runners
             string? targetFramework = assemblyPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, (string?)null);
             bool skipNonTestAssemblies = assemblyPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
 
-            if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
-                && assemblyPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
-            {
-                // It's OK to do this in the loop because the Add method
-                // checks to see if the path is already present.
-                _assemblyResolver.AddPathFromFile(testFile);
-            }
+            // TODO: Restore this code after changes to PackageSettings implementation
+            //if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
+            //    && assemblyPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
+            //{
+            //    // It's OK to do this in the loop because the Add method
+            //    // checks to see if the path is already present.
+            //    _assemblyResolver.AddPathFromFile(testFile);
+            //}
 
             _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
 
@@ -160,11 +159,14 @@ namespace NUnit.Engine.Runners
         {
             try
             {
+                log.Debug($"Running");
                 return new TestEngineResult(GetLoadedDriver().Run(listener, filter.Text));
             }
             catch (Exception ex) when (!(ex is NUnitEngineException))
             {
-                throw new NUnitEngineException("An exception occurred in the driver while running tests.", ex);
+                string msg = "An exception occurred in the driver while running tests.";
+                log.Error(msg, ex);
+                throw new NUnitEngineException(msg, ex);
             }
         }
 
