@@ -90,7 +90,7 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
             log.Debug("Got project");
 
-            string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, (string?)null);
+            string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, string.Empty);
             log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;
@@ -99,8 +99,6 @@ namespace NUnit.Engine.Services
 
             TestPackage tempPackage = project.GetTestPackage(activeConfig);
             log.Debug("Got temp package");
-
-            package.Settings[EnginePackageSettings.ConfigNames] = project.ConfigNames;
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
