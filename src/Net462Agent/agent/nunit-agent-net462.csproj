@@ -29,8 +29,8 @@
 
   <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net462/"))</ConsoleDestination>
-      <EngineDestination>$([System.IO.Path]::GetFullPath("../../NUnitEngine/nunit.engine/bin/$(Configuration)/agents/nunit-agent-net462/"))</EngineDestination>
+      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../bin/$(Configuration)/net462/agents/net462/"))</ConsoleDestination>
+      <EngineDestination>$([System.IO.Path]::GetFullPath("../../../bin/$(Configuration)/agents/nunit-agent-net462/"))</EngineDestination>
     </PropertyGroup>
 
     <ItemGroup>

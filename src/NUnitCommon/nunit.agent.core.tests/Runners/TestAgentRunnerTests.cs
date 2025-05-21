@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using NUnit.TestData;
 using NUnit.TestData.Assemblies;
 
@@ -15,7 +16,7 @@ namespace NUnit.Engine.Runners
 #if NETFRAMEWORK
     [TestFixture(typeof(TestDomainRunner))]
 #endif
-    public class TestAgentRunnerTests<TRunner>
+    public class TestAgentRunnerTests<TRunner> : ITestEventListener
         where TRunner : TestAgentRunner
     {
         protected TestPackage _package;
@@ -42,23 +43,22 @@ namespace NUnit.Engine.Runners
         public void Load()
         {
             var result = _runner.Load();
-            CheckBasicResult(result);
+            CheckLoadResult(result);
         }
 
         [Test]
         public void CountTestCases()
         {
             int count = _runner.CountTestCases(TestFilter.Empty);
+            Assert.That(_runner.IsPackageLoaded, "Package was not loaded automatically");
             Assert.That(count, Is.EqualTo(MockAssembly.Tests));
-            CheckPackageLoading();
         }
 
         [Test]
         public void Explore()
         {
             var result = _runner.Explore(TestFilter.Empty);
-            CheckBasicResult(result);
-            CheckPackageLoading();
+            CheckLoadResult(result);
         }
 
         [Test]
@@ -66,57 +66,41 @@ namespace NUnit.Engine.Runners
         {
             var result = _runner.Run(null, TestFilter.Empty);
             CheckRunResult(result);
-            CheckPackageLoading();
         }
 
         [Test]
         public void RunAsync()
         {
-            var asyncResult = _runner.RunAsync(null, TestFilter.Empty);
+            var asyncResult = _runner.RunAsync(this, TestFilter.Empty);
             asyncResult.Wait(-1);
             Assert.That(asyncResult.IsComplete, "Async result is not complete");
 
             CheckRunResult(asyncResult.EngineResult);
-            CheckPackageLoading();
         }
 
-        private void CheckPackageLoading()
+        private void CheckLoadResult(TestEngineResult result)
         {
-            // Runners that derive from DirectTestRunner should automatically load the package
-            // on calls to CountTestCases, Explore, Run and RunAsync. Other runners should
-            // defer the loading to subpackages.
-            if (_runner is TestAgentRunner)
-                Assert.That(_runner.IsPackageLoaded, "Package was not loaded automatically");
-            else
-                Assert.That(_runner.IsPackageLoaded, Is.False, "Package should not be loaded automatically");
-        }
-
-        private static void CheckBasicResult(TestEngineResult result)
-        {
-            foreach (var node in result.XmlNodes)
-                CheckBasicResult(node);
-        }
-
-        private static void CheckBasicResult(XmlNode node)
-        {
+            Assert.That(_runner.IsPackageLoaded, "Package was not loaded automatically");
+            Assert.That(result.IsSingle);
+            var node = result.XmlNodes[0];
             Assert.That(node.Name, Is.EqualTo("test-suite"));
             Assert.That(node.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(node.GetAttribute("runstate"), Is.EqualTo("Runnable"));
         }
 
-        private static void CheckRunResult(TestEngineResult result)
+        private void CheckRunResult(TestEngineResult result)
         {
-            foreach (var node in result.XmlNodes)
-                CheckRunResult(node);
+            CheckLoadResult(result);
+            var node = result.XmlNodes[0];
+            Assert.That(node.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed_Raw));
+            Assert.That(node.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed_Raw));
+            Assert.That(node.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
+            Assert.That(node.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
         }
 
-        private static void CheckRunResult(XmlNode result)
+        public void OnTestEvent(string report)
         {
-            CheckBasicResult(result);
-            Assert.That(result.GetAttribute("passed", 0), Is.EqualTo(MockAssembly.Passed_Raw));
-            Assert.That(result.GetAttribute("failed", 0), Is.EqualTo(MockAssembly.Failed_Raw));
-            Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
-            Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
+            // Do nothing
         }
     }
 }

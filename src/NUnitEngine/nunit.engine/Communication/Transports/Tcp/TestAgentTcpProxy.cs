@@ -1,6 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.ComponentModel;
 using System.Net.Sockets;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
@@ -75,10 +76,27 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         public AsyncTestEngineResult RunAsync(ITestEventListener listener, TestFilter filter)
         {
-            SendCommandMessage(MessageCode.RunAsyncCommand, filter.Text);
-            // TODO: Should we get the async result from the agent or just use our own?
-            //return CommandResult<AsyncTestEngineResult>();
-            return new AsyncTestEngineResult();
+            // TODO: It's a long-standing problem that the engine doesn't
+            // handle RunAsync all the way up and down the runner stack.
+            // This change adds to the problem but makes the tests pass.
+            // We need to go through all our runners and ensure that calls
+            // to RunAsync remain async all the way from MasterTestRunner
+            // through the NUnit drivers and to framework itself.
+            SendCommandMessage(MessageCode.RunCommand, filter.Text);
+
+            var asyncResult = new AsyncTestEngineResult();
+
+            using (var worker = new BackgroundWorker())
+            {
+                worker.DoWork += (s, ea) =>
+                {
+                    var result = TestRunResult(listener);
+                    asyncResult.SetResult(result);
+                };
+                worker.RunWorkerAsync();
+            }
+
+            return asyncResult;
         }
 
         public void RequestStop() => SendCommandMessage(MessageCode.RequestStopCommand);
