@@ -121,7 +121,8 @@ namespace NUnit.Engine.Services
         /// <param name="package">The test package to be run</param>
         /// <returns>An ITestAgent</returns>
         /// <exception cref="ArgumentException">If no agent is available.</exception>
-        public ITestAgent GetAgent(TestPackage package)
+        /// <remarks>Virtual to allow substitution of agents in testing.</remarks>
+        public virtual ITestAgent GetAgent(TestPackage package)
         {
             // Target Runtime must be specified by this point
             string runtimeSetting = package.GetSetting(EnginePackageSettings.TargetFrameworkName, string.Empty);

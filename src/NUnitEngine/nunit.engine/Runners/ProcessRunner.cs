@@ -135,9 +135,7 @@ namespace NUnit.Engine.Runners
             {
                 CreateAgentAndRunnerIfNeeded();
 
-                var result = _remoteRunner.Run(listener, filter);
-                log.Info("Done running " + TestPackage.Name);
-                return result;
+                return _remoteRunner.Run(listener, filter);
             }
             catch (Exception e)
             {

@@ -156,7 +156,7 @@ namespace NUnit.Engine.Runners
         /// <param name="listener">The listener that is notified as the run progresses</param>
         /// <param name="filter">A TestFilter used to select tests</param>
         /// <returns></returns>
-        public ITestRun RunAsync(ITestEventListener? listener, TestFilter filter)
+        public ITestRun RunAsync(ITestEventListener listener, TestFilter filter)
         {
             return RunTestsAsync(listener, filter);
         }
@@ -474,7 +474,7 @@ namespace NUnit.Engine.Runners
             return result;
         }
 
-        private AsyncTestEngineResult RunTestsAsync(ITestEventListener? listener, TestFilter filter)
+        private AsyncTestEngineResult RunTestsAsync(ITestEventListener listener, TestFilter filter)
         {
             var testRun = new AsyncTestEngineResult();
 

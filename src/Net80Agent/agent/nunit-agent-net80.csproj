@@ -29,7 +29,7 @@
 
   <Target Name="CopyAgentFiles" AfterTargets="PostBuildEvent">
     <PropertyGroup>
-      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../NUnitConsole/nunit4-console/bin/$(Configuration)/net462/agents/nunit-agent-net80/"))</ConsoleDestination>
+      <ConsoleDestination>$([System.IO.Path]::GetFullPath("../../../bin/$(Configuration)/net462/agents/net8.0/"))</ConsoleDestination>
       <EngineDestination>$([System.IO.Path]::GetFullPath("../../nunit.engine/bin/$(Configuration)/agents/nunit-agent-net80/"))</EngineDestination>
     </PropertyGroup>
 

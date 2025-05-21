@@ -116,7 +116,7 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                return new TestEngineResult(_driver.Load(testFile, assemblyPackage.Settings));
+                return LoadResult = new TestEngineResult(_driver.Load(testFile, assemblyPackage.Settings));
             }
             catch (Exception ex) when (ex is not NUnitEngineException)
             {
