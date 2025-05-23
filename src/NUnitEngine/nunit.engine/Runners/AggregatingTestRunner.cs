@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 
@@ -49,7 +50,7 @@ namespace NUnit.Engine.Runners
                     {
                         var runner = CreateRunner(subPackage);
                         log.Debug($"Using {runner.GetType()} for {subPackage.Name}");
-                        _runners.Add(CreateRunner(subPackage));
+                        _runners.Add(runner);
                     }
                 }
 
@@ -251,3 +252,4 @@ namespace NUnit.Engine.Runners
         }
     }
 }
+#endif

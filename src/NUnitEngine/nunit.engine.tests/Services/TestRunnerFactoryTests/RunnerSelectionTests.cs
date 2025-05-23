@@ -67,8 +67,10 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
         {
             var runnerType = runner.GetType();
 
+#if NETFRAMEWORK
             if (runner is AggregatingTestRunner aggRunner)
                 return new RunnerResult(runnerType, aggRunner.Runners.Select(GetRunnerResult).ToArray());
+#endif
 
             return new RunnerResult(runnerType);
         }

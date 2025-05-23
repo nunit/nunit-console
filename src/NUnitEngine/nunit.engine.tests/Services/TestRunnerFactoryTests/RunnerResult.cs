@@ -18,11 +18,6 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
                 GetSubRunners(RunnerResult.ProcessRunner, numProcesses));
         public static RunnerResult AggregatingTestRunner(int numSubRunners) =>
             RunnerResult.AggregatingTestRunner(RunnerResult.ProcessRunner, numSubRunners);
-#else
-        public static RunnerResult AggregatingTestRunner(int numSubRunners) =>
-            RunnerResult.AggregatingTestRunner(RunnerResult.LocalTestRunner, numSubRunners);
-#endif
-        public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
         public static RunnerResult AggregatingTestRunner(RunnerResult subRunnerType, int numSubRunners)
         {
@@ -33,6 +28,8 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
         {
             return new RunnerResult(typeof(AggregatingTestRunner), subRunners);
         }
+#endif
+        public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
         public RunnerResult(Type testRunner)
         {

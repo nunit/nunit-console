@@ -24,7 +24,7 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// The TestPackage for which this is the runner
         /// </summary>
-        protected TestPackage TestPackage { get; }
+        protected TestPackage TestPackage { get; set; }
 
         /// <summary>
         /// Our Service Context

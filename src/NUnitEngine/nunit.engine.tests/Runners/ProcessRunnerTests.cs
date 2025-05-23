@@ -4,7 +4,7 @@
 // but we verify that the proper calls are made. When making changes to the code,
 // it may be convenient to actually use TestAgency and launch agent processes,
 // running the tests. To do so, uncomment the following #define.
-#define TESTAGENCY_INTEGRATION
+//#define TESTAGENCY_INTEGRATION
 
 #if NETFRAMEWORK
 using System.IO;
@@ -16,18 +16,36 @@ using NSubstitute;
 
 namespace NUnit.Engine.Runners
 {
+    [TestFixture("net462")]
+#if TESTAGENCY_INTEGRATION
+    [TestFixture("net35")]
+    [TestFixture("net8.0")]
+    [TestFixture("net7.0")]
+    [TestFixture("net6.0")]
+    [TestFixture("netcoreapp3.1")]
+#endif
     public class ProcessRunnerTests : ITestEventListener
     {
         private TestPackage _package;
         private ProcessRunner _runner;
 
+        private string _runtimeDir;
+
+        public ProcessRunnerTests(string runtimeDir)
+        {
+            _runtimeDir = runtimeDir;
+        }
+
         [SetUp]
         public void Initialize()
         {
-            var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
-            _package = new TestPackage(mockAssemblyPath);
-            _package.Settings.Add(EnginePackageSettings.TargetFrameworkName, ".NETFramework,Version=v4.6.2");
-            _package.Settings.Add(FrameworkPackageSettings.InternalTraceLevel, "Debug");
+            var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, $"../testdata/{_runtimeDir}/mock-assembly.dll");
+            Assert.That(File.Exists(assemblyPath), Is.True);
+            _package = new TestPackage(assemblyPath).SubPackages[0];
+            _package.Settings.Add(EnginePackageSettings.TargetFrameworkName,
+                _runtimeDir.StartsWith("net4") || _runtimeDir.StartsWith("net3")
+                    ? ".NETFramework,Version=v4.6.2"
+                    : ".NETCoreApp,Version=v8.0.0");
 
             var context = Substitute.For<IServiceLocator>();
 
