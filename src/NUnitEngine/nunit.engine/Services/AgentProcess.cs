@@ -64,7 +64,7 @@ namespace NUnit.Engine.Services
             else if (TargetRuntime.Runtime == RuntimeType.NetCore)
             {
                 StartInfo.FileName = "dotnet";
-                StartInfo.Arguments = $"{AgentExePath} {AgentArgs}";
+                StartInfo.Arguments = $"\"{AgentExePath}\" {AgentArgs}";
                 StartInfo.LoadUserProfile = loadUserProfile;
 
                 // TODO: Remove the windows limitation and the use of a hard-coded path.
