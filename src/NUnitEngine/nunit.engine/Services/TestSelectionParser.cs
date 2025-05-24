@@ -125,7 +125,9 @@ namespace NUnit.Engine
             {
                 case "test":
                     op = Expect(REL_OPS);
-                    rhs = GetTestName();
+                    rhs = op == MATCH_OP || op == NOMATCH_OP
+                        ? Expect(TokenKind.String, TokenKind.Word)
+                        : GetTestName();
                     return EmitFilterElement(lhs, op, rhs);
 
                 case "cat":
@@ -163,35 +165,15 @@ namespace NUnit.Engine
 
             if (result.Kind == TokenKind.String)
             {
-                int index = result.Text.IndexOf('(');
-
-                if (index < 0)
-                    return result;
-
-                // Remove white space around arguments
-                string testName = result.Text;
-                sb = new StringBuilder(testName.Substring(0, index).Trim());
-                sb.Append('(');
-                bool done = false;
-
-                while (++index < testName.Length && !done)
+                var inQuotes = false;
+                var inEscape = false;
+                foreach (var ch in result.Text)
                 {
-                    char ch = testName[index];
-                    switch (ch)
-                    {
-                        case '"':
-                            sb.Append(ch);
-                            while (++index < testName.Length && testName[index] != '"')
-                                sb.Append(testName[index]);
-                            sb.Append('"');
-                            break;
-                        case ' ':
-                            break;
-                        default:
-                            sb.Append(ch);
-                            done = ch == ')';
-                            break;
-                    }
+                    if (ch == ' ' && !inQuotes)
+                        continue;
+                    sb.Append(ch);
+                    inQuotes = (!inQuotes && ch == '"') || (inQuotes && ch != '"') || (inQuotes  && ch == '"' && inEscape);
+                    inEscape = inQuotes && !inEscape && ch == '\\';
                 }
             }
             else
