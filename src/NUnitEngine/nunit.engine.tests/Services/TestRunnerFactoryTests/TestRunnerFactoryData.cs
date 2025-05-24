@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
                 // NOTE: Some unsupported test cases are commented out in case
                 // we want to reinstate the feature that allows running multiple
                 // compatible assemblies under the .NET Core runner. Major
-                // decisions need to be made abotu the features of this runner!
+                // decisions need to be made about the features of this runner!
                 yield return new TestRunnerFactoryData(
                     "SingleAssembly",
                     new TestPackage("a.dll"),
