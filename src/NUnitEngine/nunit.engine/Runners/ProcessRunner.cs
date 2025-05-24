@@ -2,7 +2,6 @@
 
 #if NETFRAMEWORK
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Engine.Services;
 
@@ -27,6 +26,7 @@ namespace NUnit.Engine.Runners
         {
             _agency = Services.GetService<TestAgency>();
 
+            // Ensure that the package arg contains only one assembly package, and save it.
             var assemblyPackages = package.Select(p => !p.HasSubPackages());
             Guard.ArgumentValid(assemblyPackages.Count == 1, $"{GetType().Name} requires a package with a single assembly", nameof(package));
         }

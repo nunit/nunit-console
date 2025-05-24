@@ -63,6 +63,16 @@ namespace NUnit.Engine.Services
                     break;
                 }
             }
+
+            // TODO: A package is "nested" if any subpackages also have subpackages.
+            // In some cases, the maxagents setting could vary in different subpackages.
+            // In that case, we are currently running the individual subpackages
+            // sequentially but running agents in parallel across each subpackage.
+            // We should decide whether we really need to support maxagents on
+            // subpackages and exactly how we want it to work if we do support it.
+            // An "ideal" solution may be to require subordinate maxagents to
+            // add up to the top level maxagents and to enforce the value at all levels
+            // simultaneously. But this is rather complicated and may not be worth it.
             if (isNested)
                 return new AggregatingTestRunner(ServiceContext, package);
             else if (package.SubPackages.Count > 1)
@@ -70,20 +80,20 @@ namespace NUnit.Engine.Services
             else
                 return new ProcessRunner(ServiceContext, package);
 #else
-            if (package.SubPackages.Count > 1)
-                return new AggregatingTestRunner(ServiceContext, package);
-            else
+            // TODO: Currently, the .NET Core runner doesn't support multiple assemblies.
+            // We therefore only properly deal with the situation where a single assembly
+            // package is provided. This could change. :-)
+            // Zero case included but should never occur
+            var assemblyPackages = package.Select(p => p.IsAssemblyPackage());
+
+            switch (assemblyPackages.Count)
             {
-                var assemblyPackages = package.Select(p => p.IsAssemblyPackage());
-                switch (assemblyPackages.Count)
-                {
-                    default:
-                        return new AggregatingTestRunner(ServiceContext, package);
-                    case 1:
-                        return new LocalTestRunner(assemblyPackages[0]);
-                    case 0:
-                        return new LocalTestRunner(package);
-                }
+                case 1:
+                    return new LocalTestRunner(assemblyPackages[0]);
+                case 0:
+                    return new LocalTestRunner(package);
+                default:
+                    throw new InvalidOperationException("Multi-assembly packages are not supported under .NET Core");
             }
 #endif
         }
