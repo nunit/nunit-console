@@ -1,18 +1,11 @@
 <Project>
 
   <PropertyGroup>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>  
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>11</LangVersion>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <Company>NUnit Software</Company>
     <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Version)'==''">
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.99.0.0</FileVersion>
-    <InformationalVersion>3.99.0.0-VSIDE</InformationalVersion>
   </PropertyGroup>
 
 </Project>

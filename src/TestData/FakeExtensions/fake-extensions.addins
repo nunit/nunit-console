@@ -1,3 +1,4 @@
 # This file isn't copied anywhere but is used by one of our 
 # package tests to exercise the --extensionDirectory option
-../../../bin/Release/fakes/**/FakeExtensions.dll
+../../../bin/Release/fakesV1/**/FakeExtensions.dll
+../../../bin/Release/fakesV2/**/FakeExtensions.dll

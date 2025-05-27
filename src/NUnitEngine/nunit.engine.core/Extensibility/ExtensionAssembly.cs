@@ -14,7 +14,7 @@ namespace NUnit.Engine.Extensibility
         {
             FilePath = filePath;
             FromWildCard = fromWildCard;
-            Assembly = GetAssemblyDefinition();
+            Assembly = AssemblyDefinition.ReadAssembly(filePath); //GetAssemblyDefinition();
             AssemblyName = Assembly.Name.Name;
             AssemblyVersion = Assembly.Name.Version;
         }

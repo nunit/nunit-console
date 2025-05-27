@@ -15,7 +15,6 @@
     <AssemblyTitle>NUnit Engine API ($(TargetFramework))</AssemblyTitle>
     <Description>Defines the interfaces used to access the NUnit Engine</Description>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.99.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">
