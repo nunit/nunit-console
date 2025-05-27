@@ -1,24 +1,49 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace NUnit.Extensibility
 {
     /// <summary>
     /// This is a simple utility class used by the ExtensionManager to keep track of ExtensionAssemblies.
-    /// It is a List of ExtensionAssemblies and also provides indices by file path and assembly name.
+    /// It maps assemblies by there name nad keeps track of evealuated assembly paths.
     /// It allows writing tests to show that no duplicate extension assemblies are loaded.
     /// </summary>
-    internal class ExtensionAssemblyTracker : List<ExtensionAssembly>
+    internal class ExtensionAssemblyTracker : IEnumerable<ExtensionAssembly>
     {
-        public Dictionary<string, ExtensionAssembly> ByPath = new Dictionary<string, ExtensionAssembly>();
-        public Dictionary<string, ExtensionAssembly> ByName = new Dictionary<string, ExtensionAssembly>();
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionAssemblyTracker));
 
-        public new void Add(ExtensionAssembly assembly)
+        private readonly HashSet<string> _evaluatedPaths = new HashSet<string>();
+        private readonly Dictionary<string, ExtensionAssembly> _byName = new Dictionary<string, ExtensionAssembly>();
+
+        public int Count => +_byName.Count;
+
+        public IEnumerator<ExtensionAssembly> GetEnumerator() => _byName.Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public bool ContainsPath(string path) => _evaluatedPaths.Contains(path);
+
+        public void AddOrUpdate(ExtensionAssembly candidateAssembly)
         {
-            base.Add(assembly);
-            ByPath.Add(assembly.FilePath, assembly);
-            ByName.Add(assembly.AssemblyName, assembly);
+            string assemblyName = candidateAssembly.AssemblyName;
+            _evaluatedPaths.Add(candidateAssembly.FilePath);
+
+            // Do we already have a copy of the same assembly at a different path?
+            if (_byName.TryGetValue(assemblyName, out var existing))
+            {
+                if (candidateAssembly.IsBetterVersionOf(existing))
+                {
+                    _byName[assemblyName] = candidateAssembly;
+                    log.Debug($"Newer version added for assembly: {assemblyName}");
+                }
+            }
+            else
+            {
+                _byName[assemblyName] = candidateAssembly;
+                log.Debug($"Assembly added: {assemblyName}");
+            }
         }
     }
 }

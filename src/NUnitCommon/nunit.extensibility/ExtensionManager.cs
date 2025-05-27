@@ -23,7 +23,6 @@ namespace NUnit.Extensibility
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
         private readonly IFileSystem _fileSystem;
-        //private readonly IAddinsFileReader _addinsReader;
         private readonly IDirectoryFinder _directoryFinder;
 
         // List of all ExtensionPoints discovered
@@ -61,7 +60,7 @@ namespace NUnit.Extensibility
             _directoryFinder = directoryFinder;
         }
 
-        #region IExtensionManager Implementation
+        #region Public Properties and Methods
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -78,7 +77,7 @@ namespace NUnit.Extensibility
         {
             get
             {
-                EnsureExtensionsAreLoaded();
+                LoadExtensions();
 
                 return _extensions.ToArray();
             }
@@ -201,7 +200,7 @@ namespace NUnit.Extensibility
         /// </summary>
         public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             var ep = GetExtensionPoint(path);
             if (ep is not null)
@@ -216,7 +215,7 @@ namespace NUnit.Extensibility
         /// <returns></returns>
         public IExtensionNode? GetExtensionNode(string path)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             // TODO: Remove need for the cast
             var ep = GetExtensionPoint(path) as ExtensionPoint;
@@ -230,7 +229,7 @@ namespace NUnit.Extensibility
         /// <param name="includeDisabled">If true, disabled nodes are included</param>
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             var ep = GetExtensionPoint(typeof(T));
             if (ep is not null)
@@ -244,14 +243,30 @@ namespace NUnit.Extensibility
         /// </summary>
         public void EnableExtension(string typeName, bool enabled)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             foreach (var node in _extensions)
                 if (node.TypeName == typeName)
                     node.Enabled = enabled;
         }
 
-        #endregion
+        /// <summary>
+        /// We can only load extensions after all candidate assemblies are identified.
+        /// This method may be called by the user after all "Find" calls are complete.
+        /// If the user fails to call it and subsequently tries to examine extensions
+        /// using other ExtensionManager properties or methods, it will be called
+        /// but calls not going through ExtensionManager may fail.
+        /// </summary>
+        public void LoadExtensions()
+        {
+            if (!_extensionsAreLoaded)
+            {
+                _extensionsAreLoaded = true;
+
+                foreach (var candidate in _assemblies)
+                    FindExtensionsInAssembly(candidate);
+            }
+        }
 
         /// <summary>
         /// Get an ExtensionPoint based on the required Type for extensions.
@@ -277,6 +292,8 @@ namespace NUnit.Extensibility
             return null;
         }
 
+        #endregion
+
         /// <summary>
         /// Deduce the extension point based on the Type of an extension.
         /// Returns null if no extension point can be found that would
@@ -301,22 +318,6 @@ namespace NUnit.Extensibility
             return baseType is not null && baseType.FullName != "System.Object"
                 ? DeduceExtensionPointFromType(baseType)
                 : null;
-        }
-
-        /// <summary>
-        /// We can only load extensions after all candidate assemblies are identified.
-        /// This method is called internally to ensure the load happens before any
-        /// extensions are used.
-        /// </summary>
-        private void EnsureExtensionsAreLoaded()
-        {
-            if (!_extensionsAreLoaded)
-            {
-                _extensionsAreLoaded = true;
-
-                foreach (var candidate in _assemblies)
-                    FindExtensionsInAssembly(candidate);
-            }
         }
 
         /// <summary>
@@ -406,7 +407,7 @@ namespace NUnit.Extensibility
         {
             log.Debug($"Processing candidate assembly {filePath}");
             // Did we already process this file?
-            if (_assemblies.ByPath.ContainsKey(filePath))
+            if (_assemblies.ContainsPath(filePath))
             {
                 log.Debug("  Skipping assembly already processed");
                 return;
@@ -424,23 +425,17 @@ namespace NUnit.Extensibility
                     return;
                 }
 
-                // Do we already have a copy of the same assembly at a different path?
-                //if (_assemblies.ByName.ContainsKey(assemblyName))
-                if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly? existing))
-                {
-                    if (candidateAssembly.IsBetterVersionOf(existing))
-                        _assemblies.ByName[assemblyName] = candidateAssembly;
-
-                    return;
-                }
-
-                log.Debug("  Adding this assembly");
-                _assemblies.Add(candidateAssembly);
+                _assemblies.AddOrUpdate(candidateAssembly);
             }
-            catch (Exception) when (fromWildCard)
+            catch (BadImageFormatException e)
             {
-                // When we are using wildcards, we may reach assemblies built for some other
-                // runtime, which we cannot load. We ignore those assemblies.
+                if (!fromWildCard)
+                    throw new NUnitEngineException($"Specified extension {filePath} could not be read", e);
+            }
+            catch (NUnitEngineException)
+            {
+                if (!fromWildCard)
+                    throw;
             }
         }
 
