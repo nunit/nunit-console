@@ -1,5 +1,5 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.11
+#load nuget:?package=NUnit.Cake.Recipe&version=1.5.0-alpha.4
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -193,7 +193,6 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
 
     public int RunPackageTest(string arguments, bool redirectOutput = false)
     {
-        Console.WriteLine("Running package test");
         return base.RunPackageTest(_executablePath, new ProcessSettings { Arguments = arguments, RedirectStandardOutput = redirectOutput });
     }
 }

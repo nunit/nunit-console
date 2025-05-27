@@ -256,21 +256,23 @@ public static class PackageTests
         {
             Description = "List Extensions shows none installed",
             Arguments = "--list-extensions",
-            OutputCheck = new OutputDoesNotContain("Extension:"),
+            ExpectedOutput = new OutputCheck[] { DoesNotContain("Extension:") }
         });
 
         StandardAndNetCoreLists.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
         {
             Description = "List Extensions shows extension from added directory",
             Arguments = "--extensionDirectory ../../src/TestData/FakeExtensions --list-extensions",
-            OutputCheck = new OutputContains("Extension:", exactly: 5)
+            ExpectedOutput = new OutputCheck[] {
+                Contains("Extension:", exactly: 5),
+                Contains("fakesv2", exactly: 5) }
         });
 
         ZipRunnerTests.Add(new PackageTest(1, "BundledExtensionsInstalled")
         {
             Description = "List Extensions shows bundled extensions",
             Arguments = "--list-extensions",
-            OutputCheck = new OutputContains("Extension:", exactly: 5)
+            ExpectedOutput = new OutputCheck[] { Contains("Extension:", exactly: 5) }
         });
 
         //////////////////////////////////////////////////////////////////////
@@ -349,7 +351,7 @@ public static class PackageTests
             Arguments = "testdata/net462/mock-assembly.dll --teamcity",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
-            OutputCheck = new OutputContains("##teamcity")
+            ExpectedOutput = new OutputCheck[] { Contains("##teamcity") }
         });
 
         // TeamCity Event Listener Test
@@ -359,7 +361,7 @@ public static class PackageTests
             Arguments = "testdata/net462/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
-            OutputCheck = new OutputContains("##teamcity")
+            ExpectedOutput = new[] { Contains("##teamcity") }
         });
 
         AllLists.Add(new PackageTest(1, "Net60TeamCityListenerTest1")
@@ -368,7 +370,7 @@ public static class PackageTests
             Arguments = "testdata/net6.0/mock-assembly.dll --teamcity",
             ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
-            OutputCheck = new OutputContains("##teamcity")
+            ExpectedOutput = new[] { Contains("##teamcity") }
         });
 
         // TeamCity Event Listener Test
@@ -378,7 +380,7 @@ public static class PackageTests
             Arguments = "testdata/net6.0/mock-assembly.dll --enable:NUnit.Engine.Listeners.TeamCityEventListener",
             ExpectedResult = new MockAssemblyExpectedResult("net-6.0"),
             ExtensionsNeeded = new[] { Extensions.TeamCityEventListener },
-            OutputCheck = new OutputContains("##teamcity")
+            ExpectedOutput = new[] { Contains("##teamcity") }
         });
 
         // V2 Framework Driver Tests

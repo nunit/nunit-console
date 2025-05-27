@@ -57,7 +57,7 @@ namespace NUnit.Engine.Services
             _directoryFinder = directoryFinder;
         }
 
-        #region IExtensionManager Implementation
+        #region Public Properties and Methods
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -74,7 +74,7 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                EnsureExtensionsAreLoaded();
+                LoadExtensions();
 
                 return _extensions.ToArray();
             }
@@ -205,7 +205,7 @@ namespace NUnit.Engine.Services
         /// </summary>
         public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             var ep = GetExtensionPoint(path);
             if (ep != null)
@@ -220,7 +220,7 @@ namespace NUnit.Engine.Services
         /// <returns></returns>
         public IExtensionNode GetExtensionNode(string path)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             // TODO: Remove need for the cast
             var ep = GetExtensionPoint(path) as ExtensionPoint;
@@ -234,7 +234,7 @@ namespace NUnit.Engine.Services
         /// <param name="includeDisabled">If true, disabled nodes are included</param>
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             var ep = GetExtensionPoint(typeof(T));
             if (ep == null)
@@ -250,14 +250,30 @@ namespace NUnit.Engine.Services
         /// </summary>
         public void EnableExtension(string typeName, bool enabled)
         {
-            EnsureExtensionsAreLoaded();
+            LoadExtensions();
 
             foreach (var node in _extensions)
                 if (node.TypeName == typeName)
                     node.Enabled = enabled;
         }
 
-        #endregion
+        /// <summary>
+        /// We can only load extensions after all candidate assemblies are identified.
+        /// This method may be called by the user after all "Find" calls are complete.
+        /// If the user fails to call it and subsequently tries to examine extensions
+        /// using other ExtensionManager properties or methods, it will be called 
+        /// but calls not going through ExtensionManager may fail.
+        /// </summary>
+        public void LoadExtensions()
+        {
+            if (!_extensionsAreLoaded)
+            {
+                _extensionsAreLoaded = true;
+
+                foreach (var candidate in _assemblies)
+                    FindExtensionsInAssembly(candidate);
+            }
+        }
 
         /// <summary>
         /// Get an ExtensionPoint based on the required Type for extensions.
@@ -283,6 +299,8 @@ namespace NUnit.Engine.Services
             return null;
         }
 
+        #endregion
+
         /// <summary>
         /// Deduce the extension point based on the Type of an extension.
         /// Returns null if no extension point can be found that would
@@ -307,22 +325,6 @@ namespace NUnit.Engine.Services
             return baseType != null && baseType.FullName != "System.Object"
                 ? DeduceExtensionPointFromType(baseType)
                 : null;
-        }
-
-        /// <summary>
-        /// We can only load extensions after all candidate assemblies are identified.
-        /// This method is called internally to ensure the load happens before any
-        /// extensions are used.
-        /// </summary>
-        private void EnsureExtensionsAreLoaded()
-        {
-            if (!_extensionsAreLoaded)
-            {
-                _extensionsAreLoaded = true;
-
-                foreach (var candidate in _assemblies)
-                    FindExtensionsInAssembly(candidate);
-            }
         }
 
         /// <summary>
@@ -413,7 +415,7 @@ namespace NUnit.Engine.Services
             log.Debug($"Processing candidate assembly {filePath}");
 
             // Did we already process this file?
-            if (_assemblies.ByPath.ContainsKey(filePath))
+            if (_assemblies.ContainsPath(filePath))
             {
                 log.Debug("  Skipping assembly already processed");
                 return;
@@ -422,7 +424,6 @@ namespace NUnit.Engine.Services
             try
             {
                 var candidateAssembly = new ExtensionAssembly(filePath, fromWildCard);
-                string assemblyName = candidateAssembly.AssemblyName;
 
                 // We never add assemblies unless the host can load them
                 if (!CanLoadTargetFramework(Assembly.GetEntryAssembly(), candidateAssembly))
@@ -430,18 +431,8 @@ namespace NUnit.Engine.Services
                     log.Debug("  Unable to load this assembly");
                     return;
                 }
-                
-                // Do we already have a copy of the same assembly at a different path?
-                if (_assemblies.ByName.TryGetValue(assemblyName, out ExtensionAssembly existing))
-                {
-                    if (candidateAssembly.IsBetterVersionOf(existing))
-                        _assemblies.ByName[assemblyName] = candidateAssembly;
 
-                    return;
-                }
-
-                log.Debug("  Adding this assembly");
-                _assemblies.Add(candidateAssembly);
+                _assemblies.AddOrUpdate(candidateAssembly);
             }
             catch (BadImageFormatException e)
             {

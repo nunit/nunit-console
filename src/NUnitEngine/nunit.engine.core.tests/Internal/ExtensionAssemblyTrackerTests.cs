@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
 using NUnit.Framework;
@@ -14,7 +16,8 @@ namespace NUnit.Engine.Internal.Tests
         private static readonly string THIS_ASSEMBLY_PATH = THIS_ASSEMBLY.Location;
         private static readonly string THIS_ASSEMBLY_NAME = THIS_ASSEMBLY.GetName().Name;
         private static readonly Version THIS_ASSEMBLY_VERSION = THIS_ASSEMBLY.GetName().Version;
-        private static readonly ExtensionAssembly TEST_EXTENSION_ASSEMBLY = 
+
+        private static readonly ExtensionAssembly TEST_EXTENSION_ASSEMBLY =
             new ExtensionAssembly(THIS_ASSEMBLY_PATH, false, THIS_ASSEMBLY_NAME, THIS_ASSEMBLY_VERSION);
 
         private ExtensionAssemblyTracker _tracker;
@@ -28,52 +31,74 @@ namespace NUnit.Engine.Internal.Tests
         [Test]
         public void AddToList()
         {
-            _tracker.Add(TEST_EXTENSION_ASSEMBLY);
+            _tracker.AddOrUpdate(TEST_EXTENSION_ASSEMBLY);
 
             Assert.That(_tracker.Count, Is.EqualTo(1));
-            Assert.That(_tracker[0].FilePath, Is.EqualTo(THIS_ASSEMBLY_PATH));
-            Assert.That(_tracker[0].AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
-            Assert.That(_tracker[0].AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
+            var assembly = _tracker.Single();
+
+            Assert.That(assembly.FilePath, Is.EqualTo(THIS_ASSEMBLY_PATH));
+            Assert.That(assembly.AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
+            Assert.That(assembly.AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
         }
 
-        [Test]
-        public void AddUpdatesNameIndex()
-        {
-            _tracker.Add(TEST_EXTENSION_ASSEMBLY);
-
-            Assert.That(_tracker.ByName.ContainsKey(THIS_ASSEMBLY_NAME));
-            Assert.That(_tracker.ByName[THIS_ASSEMBLY_NAME].AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
-            Assert.That(_tracker.ByName[THIS_ASSEMBLY_NAME].FilePath, Is.EqualTo(THIS_ASSEMBLY_PATH));
-            Assert.That(_tracker.ByName[THIS_ASSEMBLY_NAME].AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
-        }
         [Test]
         public void AddUpdatesPathIndex()
         {
-            _tracker.Add(TEST_EXTENSION_ASSEMBLY);
+            _tracker.AddOrUpdate(TEST_EXTENSION_ASSEMBLY);
 
-            Assert.That(_tracker.ByPath.ContainsKey(THIS_ASSEMBLY_PATH));
-            Assert.That(_tracker.ByPath[THIS_ASSEMBLY_PATH].AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
-            Assert.That(_tracker.ByPath[THIS_ASSEMBLY_PATH].FilePath, Is.EqualTo(THIS_ASSEMBLY_PATH));
-            Assert.That(_tracker.ByPath[THIS_ASSEMBLY_PATH].AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
+            Assert.That(_tracker.ContainsPath(THIS_ASSEMBLY_PATH));
         }
 
-        [Test]
-        public void AddDuplicatePathThrowsArgumentException()
+        private static IEnumerable<TestCaseData> TestCasesAddNewerAssemblyUpdatesExistingInformation()
         {
-            _tracker.Add(TEST_EXTENSION_ASSEMBLY);
-
-            Assert.That(() => 
-                _tracker.Add(TEST_EXTENSION_ASSEMBLY), 
-                Throws.TypeOf<System.ArgumentException>());
+            yield return new TestCaseData(new Version(THIS_ASSEMBLY_VERSION.Major + 1, THIS_ASSEMBLY_VERSION.Minor, THIS_ASSEMBLY_VERSION.Build));
+            yield return new TestCaseData(new Version(THIS_ASSEMBLY_VERSION.Major, THIS_ASSEMBLY_VERSION.Minor + 1, THIS_ASSEMBLY_VERSION.Build));
+            yield return new TestCaseData(new Version(THIS_ASSEMBLY_VERSION.Major, THIS_ASSEMBLY_VERSION.Minor, THIS_ASSEMBLY_VERSION.Build + 1));
         }
 
-        [Test]
-        public void AddDuplicateAssemblyNameThrowsArgumentException()
+        [TestCaseSource(nameof(TestCasesAddNewerAssemblyUpdatesExistingInformation))]
+        public void AddNewerAssemblyUpdatesExistingInformation(Version newVersion)
         {
-            _tracker.Add(TEST_EXTENSION_ASSEMBLY);
+            _tracker.AddOrUpdate(TEST_EXTENSION_ASSEMBLY);
 
-            Assert.That(() => _tracker.Add(new ExtensionAssembly("Some/Other/Path", false, THIS_ASSEMBLY_NAME, THIS_ASSEMBLY_VERSION)),
-                Throws.TypeOf<System.ArgumentException>());
+            string newAssemblyPath = "/path/to/new/assembly";
+            var newerAssembly = new ExtensionAssembly(newAssemblyPath, false, THIS_ASSEMBLY_NAME, newVersion);
+
+            _tracker.AddOrUpdate(newerAssembly);
+
+            Assert.That(_tracker.Count, Is.EqualTo(1));
+            Assert.That(_tracker.ContainsPath(newAssemblyPath));
+
+            var assembly = _tracker.Single();
+            Assert.That(assembly.FilePath, Is.EqualTo(newAssemblyPath));
+            Assert.That(assembly.AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
+            Assert.That(assembly.AssemblyVersion, Is.EqualTo(newVersion));
+        }
+
+        private static IEnumerable<TestCaseData> AddNewerAssemblyUpdatesExistingInformationTestCases()
+        {
+            yield return new TestCaseData(new Version(THIS_ASSEMBLY_VERSION.Major - 1, THIS_ASSEMBLY_VERSION.Minor, THIS_ASSEMBLY_VERSION.Build));
+            yield return new TestCaseData(new Version(THIS_ASSEMBLY_VERSION.Major, THIS_ASSEMBLY_VERSION.Minor - 1, THIS_ASSEMBLY_VERSION.Build));
+            yield return new TestCaseData(new Version(THIS_ASSEMBLY_VERSION.Major, THIS_ASSEMBLY_VERSION.Minor, THIS_ASSEMBLY_VERSION.Build));
+        }
+
+        [TestCaseSource(nameof(AddNewerAssemblyUpdatesExistingInformationTestCases))]
+        public void AddOlderOrSameAssemblyDoesNotUpdateExistingInformation(Version newVersion)
+        {
+            _tracker.AddOrUpdate(TEST_EXTENSION_ASSEMBLY);
+
+            string newAssemblyPath = "/path/to/new/assembly";
+            var newerAssembly = new ExtensionAssembly(newAssemblyPath, false, THIS_ASSEMBLY_NAME, newVersion);
+
+            _tracker.AddOrUpdate(newerAssembly);
+
+            Assert.That(_tracker.Count, Is.EqualTo(1));
+            Assert.That(_tracker.ContainsPath(newAssemblyPath));
+
+            var assembly = _tracker.Single();
+            Assert.That(assembly.FilePath, Is.EqualTo(THIS_ASSEMBLY_PATH));
+            Assert.That(assembly.AssemblyName, Is.EqualTo(THIS_ASSEMBLY_NAME));
+            Assert.That(assembly.AssemblyVersion, Is.EqualTo(THIS_ASSEMBLY_VERSION));
         }
     }
 }
