@@ -314,14 +314,14 @@ AddToBothLists(new PackageTest(1, "NoExtensionsInstalled")
 {
     Description = "List Extensions shows none installed",
     Arguments = "--list-extensions",
-    OutputCheck = new OutputDoesNotContain("Extension:"),
+    ExpectedOutput = new[] { DoesNotContain("Extension:") }
 });
 
 AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
     Arguments = "--extensionDirectory ../../src/TestData/FakeExtensions --list-extensions",
-    OutputCheck = new OutputContains("Extension:", exactly: 5)
+    ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
 });
 
 //////////////////////////////////////////////////////////////////////

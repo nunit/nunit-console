@@ -13,9 +13,14 @@ namespace NUnit.Extensibility
 {
     public class ExtensionManagerTests
     {
-        private ExtensionManager _extensionManager;
+        private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionManagerTests).Assembly;
+        private static readonly string THIS_ASSEMBLY_DIRECTORY = Path.GetDirectoryName(THIS_ASSEMBLY.Location)!;
+        private const string FAKE_EXTENSIONS_FILENAME = "FakeExtensions.dll";
+        private static readonly string FAKE_EXTENSIONS_PARENT_DIRECTORY =
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2");
+        private static readonly string FAKE_EXTENSIONS_SOURCE_DIRECTORY =
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.Parent!.Parent!.FullName, "src/TestData/FakeExtensions");
 
-#pragma warning disable 414
         private static readonly string[] KnownExtensionPointPaths =
         {
             "/NUnit/Engine/TypeExtensions/IAgentLauncher",
@@ -60,7 +65,8 @@ namespace NUnit.Extensibility
             FAKE_DISABLED_EXTENSION
             //FAKE_NUNIT_V2_DRIVER_EXTENSION
         };
-#pragma warning restore 414
+
+        private ExtensionManager _extensionManager;
 
         [SetUp]
         public void CreateExtensionManager()
@@ -70,12 +76,10 @@ namespace NUnit.Extensibility
             // Find actual extension points.
             _extensionManager.FindExtensionPoints(typeof(ExtensionManager).Assembly);
             _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
-            // Find extensions directly in the their assemblies
-#if NETCOREAPP
-            _extensionManager.FindExtensionsInAssembly(FakeExtensions("netstandard2.0"));
-#else
-            _extensionManager.FindExtensionsInAssembly(FakeExtensions("net462"));
-#endif
+
+            // Find Fake Extensions using alternate start directory
+            _extensionManager.FindExtensionAssemblies(FAKE_EXTENSIONS_SOURCE_DIRECTORY);
+            _extensionManager.LoadExtensions();
         }
 
         [Test]
@@ -90,6 +94,15 @@ namespace NUnit.Extensibility
         {
             Assert.That(_extensionManager.Extensions.Select(ext => ext.TypeName),
                 Is.EquivalentTo(KnownExtensions));
+        }
+
+        [Test]
+        public void AllExtensionsUseTheLatestVersion()
+        {
+            // We have two builds of FakeExtensions. Version 2
+            // should be used rather than 1 for all extensions.
+            foreach (var node in _extensionManager.Extensions)
+                Assert.That(node.AssemblyVersion.ToString(), Is.EqualTo("2.0.0.0"));
         }
 
         [Test]
@@ -309,12 +322,6 @@ namespace NUnit.Extensibility
             var file = new FileInfo(typeof(ExtensionManagerTests).Assembly.Location);
             return Path.Combine(file.Directory!.Parent!.FullName, dir);
         }
-
-        private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionManagerTests).Assembly;
-        private static readonly string THIS_ASSEMBLY_DIRECTORY = Path.GetDirectoryName(THIS_ASSEMBLY.Location)!;
-        private const string FAKE_EXTENSIONS_FILENAME = "FakeExtensions.dll";
-        private static readonly string FAKE_EXTENSIONS_PARENT_DIRECTORY =
-            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakes");
 
         /// <summary>
         /// Returns an ExtensionAssembly referring to a particular build of the fake test extensions
