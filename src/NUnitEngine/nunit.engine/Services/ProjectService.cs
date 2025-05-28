@@ -3,8 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
 
@@ -90,7 +88,7 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
             log.Debug("Got project");
 
-            string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, string.Empty);
+            string? activeConfig = package.GetSetting(PackageSetting.ActiveConfig.Name, string.Empty);
             log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;
@@ -112,11 +110,11 @@ namespace NUnit.Engine.Services
             // If no config file is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use its own config, if present.
-            if (!tempPackage.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
+            if (!tempPackage.Settings.ContainsKey(PackageSetting.ConfigurationFile.Name))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
                 if (File.Exists(packageConfig))
-                    package.Settings[EnginePackageSettings.ConfigurationFile] = packageConfig;
+                    package.AddSetting(PackageSetting.ConfigurationFile.WithValue(packageConfig));
             }
         }
 

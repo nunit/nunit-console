@@ -60,7 +60,7 @@ namespace NUnit.ConsoleRunner
             var package = ConsoleRunner.MakeTestPackage(options);
 
             Assert.That(package.Settings.ContainsKey(key), $"Setting not included for {options}", option);
-            Assert.That(package.Settings[key], Is.EqualTo(val), $"NumberOfTestWorkers not set correctly for {option}");
+            Assert.That(package.Settings[key].Value, Is.EqualTo(val), $"{key} not set correctly for {option}");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace NUnit.ConsoleRunner
             var settings = ConsoleRunner.MakeTestPackage(options).Settings;
 
             Assert.That(settings.ContainsKey("TestParametersDictionary"), "TestParametersDictionary setting not included.");
-            var paramDictionary = settings["TestParametersDictionary"] as IDictionary<string, string>;
+            var paramDictionary = settings["TestParametersDictionary"].Value as IDictionary<string, string>;
             Assert.That(paramDictionary, Is.Not.Null);
             string[] expectedKeys = new[] { "X", "Y" };
             Assert.That(paramDictionary.Keys, Is.EqualTo(expectedKeys));
@@ -78,7 +78,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(paramDictionary["Y"], Is.EqualTo("7"));
 
             Assert.That(settings.ContainsKey("TestParameters"), "TestParameters setting not included.");
-            var paramString = settings["TestParameters"] as string;
+            string? paramString = settings["TestParameters"].Value as string;
             Assert.That(paramString, Is.EqualTo("X=5;Y=7"));
         }
 
@@ -89,8 +89,8 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", "--debug");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
-            Assert.That(package.Settings["NumberOfTestWorkers"], Is.EqualTo(0));
+            Assert.That(package.Settings["DebugTests"].Value, Is.EqualTo(true));
+            Assert.That(package.Settings["NumberOfTestWorkers"].Value, Is.EqualTo(0));
         }
 
         [Test]
@@ -99,8 +99,8 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", "--debug", "--workers=3");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.Settings["DebugTests"], Is.EqualTo(true));
-            Assert.That(package.Settings["NumberOfTestWorkers"], Is.EqualTo(3));
+            Assert.That(package.Settings["DebugTests"].Value, Is.EqualTo(true));
+            Assert.That(package.Settings["NumberOfTestWorkers"].Value, Is.EqualTo(3));
         }
 #endif
 

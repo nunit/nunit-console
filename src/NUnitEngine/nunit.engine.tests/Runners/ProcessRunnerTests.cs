@@ -42,10 +42,13 @@ namespace NUnit.Engine.Runners
             var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, $"../testdata/{_runtimeDir}/mock-assembly.dll");
             Assert.That(File.Exists(assemblyPath), Is.True);
             _package = new TestPackage(assemblyPath).SubPackages[0];
-            _package.Settings.Add(EnginePackageSettings.TargetFrameworkName,
-                _runtimeDir.StartsWith("net4") || _runtimeDir.StartsWith("net3")
-                    ? ".NETFramework,Version=v4.6.2"
-                    : ".NETCoreApp,Version=v8.0.0");
+            _package.Settings.Add(
+                // TODO: Simplify
+                PackageSetting.TargetFrameworkName.Name,
+                PackageSetting.TargetFrameworkName.WithValue(
+                    _runtimeDir.StartsWith("net4") || _runtimeDir.StartsWith("net3")
+                        ? ".NETFramework,Version=v4.6.2"
+                        : ".NETCoreApp,Version=v8.0.0"));
 
             var context = Substitute.For<IServiceLocator>();
 

@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services
             if (ServiceContext is null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
-            if (package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty).StartsWith("Unmanaged,"))
+            if (package.GetSetting(PackageSetting.ImageTargetFrameworkName.Name, string.Empty).StartsWith("Unmanaged,"))
                 return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
 
 #if NETFRAMEWORK

@@ -105,7 +105,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string, object> Settings { get; } = new Dictionary<string, object>();
+        public IDictionary<string, PackageSetting> Settings { get; } = new Dictionary<string, PackageSetting>();
 
         /// <summary>
         /// Add a subpackage to the package.
@@ -144,12 +144,18 @@ namespace NUnit.Engine
         /// used when the settings are intended to be reflected to all the
         /// subpackages under the package.
         /// </remarks>
-        public void AddSetting(string name, object value)
+        public void AddSetting(string name, PackageSetting value)
         {
             Settings[name] = value;
             foreach (var subPackage in SubPackages)
                 subPackage.AddSetting(name, value);
         }
+
+        /// <summary>
+        /// Add a setting directly
+        /// </summary>
+        /// <param name="setting"></param>
+        public void AddSetting(PackageSetting setting) => AddSetting(setting.Name, setting);
 
         /// <summary>
         /// Return the value of a setting or a default.
@@ -159,8 +165,8 @@ namespace NUnit.Engine
         /// <returns></returns>
         public T GetSetting<T>(string name, T defaultSetting)
         {
-            return (Settings.TryGetValue(name, out object? setting) && setting is not null)
-                ? (T)setting
+            return (Settings.TryGetValue(name, out PackageSetting? setting) && setting is not null)
+                ? (T)setting.Value
                 : defaultSetting;
         }
 
@@ -190,7 +196,7 @@ namespace NUnit.Engine
                                     // We don't use AddSettings, which copies settings downward.
                                     // Instead, each package handles it's own settings.
                                     while (xmlReader.MoveToNextAttribute())
-                                        Settings.Add(xmlReader.Name, xmlReader.Value);
+                                        Settings.Add(xmlReader.Name, new PackageSetting<string>(xmlReader.Name, xmlReader.Value));
                                     xmlReader.MoveToElement();
                                     break;
 
@@ -229,8 +235,8 @@ namespace NUnit.Engine
             {
                 xmlWriter.WriteStartElement("Settings");
 
-                foreach (KeyValuePair<string, object> setting in Settings)
-                    xmlWriter.WriteAttributeString(setting.Key, setting.Value.ToString());
+                foreach (PackageSetting setting in Settings.Values)
+                    xmlWriter.WriteAttributeString(setting.Name, setting.Value.ToString());
 
                 xmlWriter.WriteEndElement();
             }

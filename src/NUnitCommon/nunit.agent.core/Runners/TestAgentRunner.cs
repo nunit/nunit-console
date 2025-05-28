@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using NUnit.Engine.Drivers;
@@ -100,12 +101,12 @@ namespace NUnit.Engine.Runners
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
 
-            string? targetFramework = assemblyPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
-            bool skipNonTestAssemblies = assemblyPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
+            string? targetFramework = assemblyPackage.GetSetting(PackageSetting.ImageTargetFrameworkName.Name, string.Empty);
+            bool skipNonTestAssemblies = assemblyPackage.GetSetting(PackageSetting.SkipNonTestAssemblies.Name, false);
 
             // TODO: Restore this code after changes to PackageSettings implementation
             //if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
-            //    && assemblyPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
+            //    && assemblyPackage.GetSetting(PackageSetting.ImageRequiresDefaultAppDomainAssemblyResolver, false))
             //{
             //    // It's OK to do this in the loop because the Add method
             //    // checks to see if the path is already present.
@@ -113,10 +114,13 @@ namespace NUnit.Engine.Runners
             //}
 
             _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
+            var frameworkSettings = new Dictionary<string, object>();
+
+            // TODO: Add Values to settings
 
             try
             {
-                return LoadResult = new TestEngineResult(_driver.Load(testFile, assemblyPackage.Settings));
+                return LoadResult = new TestEngineResult(_driver.Load(testFile, frameworkSettings));
             }
             catch (Exception ex) when (ex is not NUnitEngineException)
             {

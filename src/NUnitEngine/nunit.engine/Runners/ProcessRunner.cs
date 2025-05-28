@@ -255,8 +255,8 @@ namespace NUnit.Engine.Runners
             if (_agent is null)
             {
                 // Increase the timeout to give time to attach a debugger
-                bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
-                             TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
+                bool debug = TestPackage.GetSetting(PackageSetting.DebugAgent.Name, false) ||
+                             TestPackage.GetSetting(PackageSetting.PauseBeforeRun.Name, false);
 
                 _agent = _agency.GetAgent(TestPackage);
             }
