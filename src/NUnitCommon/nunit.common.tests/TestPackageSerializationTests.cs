@@ -31,7 +31,7 @@ namespace NUnit.Engine.Internal
             TEST_PACKAGE.AddSetting(new PackageSetting<bool>("critical", true));
 
             // Add a setting to the first subpackage only
-            SUBPACKAGE1.AddSetting(new PackageSetting<string>("cpu", "x86"));
+            SUBPACKAGE1.Settings.Add(new PackageSetting<string>("cpu", "x86"));
 
             // Multi-line for ease of editing only
             EXPECTED_XML = $"""
@@ -96,9 +96,10 @@ namespace NUnit.Engine.Internal
                 Assert.That(newPackage.Settings.Count, Is.EqualTo(oldPackage.Settings.Count));
                 Assert.That(newPackage.SubPackages.Count, Is.EqualTo(oldPackage.SubPackages.Count));
 
-                foreach (var key in oldPackage.Settings.Keys)
+                foreach (var setting in oldPackage.Settings)
                 {
-                    Assert.That(newPackage.Settings.ContainsKey(key));
+                    var key = setting.Name;
+                    Assert.That(newPackage.Settings.HasSetting(key));
                     var oldValue = oldPackage.Settings[key].Value;
                     var newValue = newPackage.Settings[key].Value;
 

@@ -139,7 +139,7 @@ namespace NUnit.Engine.Runners
         {
             var results = new List<TestEngineResult>();
 
-            bool disposeRunners = TestPackage.GetSetting(PackageSetting.DisposeRunners.Name, false);
+            bool disposeRunners = TestPackage.GetSetting(PackageSettings.DisposeRunners.Name, false);
 
             if (LevelOfParallelism <= 1)
             {

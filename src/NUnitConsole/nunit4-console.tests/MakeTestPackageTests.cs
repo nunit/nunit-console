@@ -4,6 +4,8 @@ using System.IO;
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.ConsoleRunner.Options;
+using System.Linq;
+using NUnit.Engine;
 
 namespace NUnit.ConsoleRunner
 {
@@ -59,7 +61,7 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", option);
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.Settings.ContainsKey(key), $"Setting not included for {options}", option);
+            Assert.That(package.Settings.HasSetting(key), $"Setting not included for {options}", option);
             Assert.That(package.Settings[key].Value, Is.EqualTo(val), $"{key} not set correctly for {option}");
         }
 
@@ -69,7 +71,7 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", "--param:X=5", "--param:Y=7");
             var settings = ConsoleRunner.MakeTestPackage(options).Settings;
 
-            Assert.That(settings.ContainsKey("TestParametersDictionary"), "TestParametersDictionary setting not included.");
+            Assert.That(settings.HasSetting("TestParametersDictionary"), "TestParametersDictionary setting not included.");
             var paramDictionary = settings["TestParametersDictionary"].Value as IDictionary<string, string>;
             Assert.That(paramDictionary, Is.Not.Null);
             string[] expectedKeys = new[] { "X", "Y" };
@@ -77,7 +79,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(paramDictionary["X"], Is.EqualTo("5"));
             Assert.That(paramDictionary["Y"], Is.EqualTo("7"));
 
-            Assert.That(settings.ContainsKey("TestParameters"), "TestParameters setting not included.");
+            Assert.That(settings.HasSetting("TestParameters"), "TestParameters setting not included.");
             string? paramString = settings["TestParameters"].Value as string;
             Assert.That(paramString, Is.EqualTo("X=5;Y=7"));
         }
@@ -111,7 +113,7 @@ namespace NUnit.ConsoleRunner
             var package = ConsoleRunner.MakeTestPackage(options);
 
             string[] expected = new string[] { "WorkDirectory", "DisposeRunners" };
-            Assert.That(package.Settings.Keys, Is.EquivalentTo(expected));
+            Assert.That(package.Settings.Select(s => s.Name), Is.EquivalentTo(expected));
         }
     }
 }

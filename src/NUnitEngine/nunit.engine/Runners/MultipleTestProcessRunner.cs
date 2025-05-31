@@ -31,7 +31,7 @@ namespace NUnit.Engine.Runners
         {
             get
             {
-                var maxAgents = TestPackage.GetSetting(PackageSetting.MaxAgents.Name, _processorCount);
+                var maxAgents = TestPackage.GetSetting(PackageSettings.MaxAgents.Name, _processorCount);
                 return Math.Min(maxAgents, TestPackage.Select(p => !p.HasSubPackages()).Count);
             }
         }

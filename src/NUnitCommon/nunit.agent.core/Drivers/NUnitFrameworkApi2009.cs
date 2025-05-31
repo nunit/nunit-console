@@ -56,7 +56,7 @@ namespace NUnit.Engine.Drivers
 
                 // Normally, the caller should check for an invalid requested runtime, but to be sure,
                 // we check it. The setting value is only used for an error message.
-                settings.TryGetValue(PackageSetting.RequestedRuntimeFramework.Name, out object? requestedRuntime);
+                settings.TryGetValue(PackageSettings.RequestedRuntimeFramework.Name, out object? requestedRuntime);
 
                 var idPrefix = _driverId + "-";
 

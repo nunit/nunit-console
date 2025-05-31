@@ -441,68 +441,68 @@ namespace NUnit.ConsoleRunner
             if (options.RuntimeFrameworkSpecified)
             {
                 // Temporarily use both settings until RuntimeFramework is retired
-                package.AddSetting(PackageSetting.RequestedRuntimeFramework.WithValue(options.RuntimeFramework));
-                package.AddSetting(PackageSetting.RequestedFrameworkName.WithValue(options.RuntimeFramework));
+                package.AddSetting(PackageSettings.RequestedRuntimeFramework.WithValue(options.RuntimeFramework));
+                package.AddSetting(PackageSettings.RequestedFrameworkName.WithValue(options.RuntimeFramework));
             }
 
             if (options.RunAsX86)
-                package.AddSetting(PackageSetting.RunAsX86.WithValue(true));
+                package.AddSetting(PackageSettings.RunAsX86.WithValue(true));
 
             // Console runner always sets DisposeRunners
             //if (options.DisposeRunners)
-            package.AddSetting(PackageSetting.DisposeRunners.WithValue(true));
+            package.AddSetting(PackageSettings.DisposeRunners.WithValue(true));
 
             if (options.ShadowCopyFiles)
-                package.AddSetting(PackageSetting.ShadowCopyFiles.WithValue(true));
+                package.AddSetting(PackageSettings.ShadowCopyFiles.WithValue(true));
 
             if (options.LoadUserProfile)
-                package.AddSetting(PackageSetting.LoadUserProfile.WithValue(true));
+                package.AddSetting(PackageSettings.LoadUserProfile.WithValue(true));
 
             if (options.SkipNonTestAssemblies)
-                package.AddSetting(PackageSetting.SkipNonTestAssemblies.WithValue(true));
+                package.AddSetting(PackageSettings.SkipNonTestAssemblies.WithValue(true));
 
             if (options.DefaultTestCaseTimeout >= 0)
-                package.AddSetting(FrameworkPackageSettings.DefaultTimeout.WithValue(options.DefaultTestCaseTimeout));
+                package.AddSetting(FrameworkSettings.DefaultTimeout.WithValue(options.DefaultTestCaseTimeout));
 
             if (options.InternalTraceLevelSpecified)
-                package.AddSetting(FrameworkPackageSettings.InternalTraceLevel.WithValue(options.InternalTraceLevel));
+                package.AddSetting(FrameworkSettings.InternalTraceLevel.WithValue(options.InternalTraceLevel));
 
             if (options.ActiveConfigSpecified)
-                package.AddSetting(PackageSetting.ActiveConfig.WithValue(options.ActiveConfig));
+                package.AddSetting(PackageSettings.ActiveConfig.WithValue(options.ActiveConfig));
 
             // Always add work directory, in case current directory is changed
             var workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
-            package.AddSetting(FrameworkPackageSettings.WorkDirectory.WithValue(workDirectory));
+            package.AddSetting(FrameworkSettings.WorkDirectory.WithValue(workDirectory));
 
             if (options.StopOnError)
-                package.AddSetting(FrameworkPackageSettings.StopOnError.WithValue(true));
+                package.AddSetting(FrameworkSettings.StopOnError.WithValue(true));
 
             if (options.MaxAgentsSpecified)
-                package.AddSetting(PackageSetting.MaxAgents.WithValue(options.MaxAgents));
+                package.AddSetting(PackageSettings.MaxAgents.WithValue(options.MaxAgents));
 
             if (options.NumberOfTestWorkersSpecified)
-                package.AddSetting(FrameworkPackageSettings.NumberOfTestWorkers.WithValue(options.NumberOfTestWorkers));
+                package.AddSetting(FrameworkSettings.NumberOfTestWorkers.WithValue(options.NumberOfTestWorkers));
 
             if (options.RandomSeedSpecified)
-                package.AddSetting(FrameworkPackageSettings.RandomSeed.WithValue(options.RandomSeed));
+                package.AddSetting(FrameworkSettings.RandomSeed.WithValue(options.RandomSeed));
 
             if (options.DebugTests)
             {
-                package.AddSetting(FrameworkPackageSettings.DebugTests.WithValue(true));
+                package.AddSetting(FrameworkSettings.DebugTests.WithValue(true));
 
                 if (!options.NumberOfTestWorkersSpecified)
-                    package.AddSetting(FrameworkPackageSettings.NumberOfTestWorkers.WithValue(0));
+                    package.AddSetting(FrameworkSettings.NumberOfTestWorkers.WithValue(0));
             }
 
             if (options.PauseBeforeRun)
-                package.AddSetting(FrameworkPackageSettings.PauseBeforeRun.WithValue(true));
+                package.AddSetting(FrameworkSettings.PauseBeforeRun.WithValue(true));
 
             if (options.PrincipalPolicy is not null)
-                package.AddSetting(PackageSetting.PrincipalPolicy.WithValue(options.PrincipalPolicy));
+                package.AddSetting(PackageSettings.PrincipalPolicy.WithValue(options.PrincipalPolicy));
 
 #if DEBUG
             if (options.DebugAgent)
-                package.AddSetting(PackageSetting.DebugAgent.WithValue(true));
+                package.AddSetting(PackageSettings.DebugAgent.WithValue(true));
 
             //foreach (KeyValuePair<string, object> entry in package.Settings)
             //    if (!(entry.Value is string || entry.Value is int || entry.Value is bool))
@@ -510,13 +510,13 @@ namespace NUnit.ConsoleRunner
 #endif
 
             if (options.DefaultTestNamePattern is not null)
-                package.AddSetting(FrameworkPackageSettings.DefaultTestNamePattern.WithValue(options.DefaultTestNamePattern));
+                package.AddSetting(FrameworkSettings.DefaultTestNamePattern.WithValue(options.DefaultTestNamePattern));
 
             if (options.TestParameters.Count != 0)
                 AddTestParametersSetting(package, options.TestParameters);
 
             if (options.ConfigurationFile is not null)
-                package.AddSetting(PackageSetting.ConfigurationFile.WithValue(options.ConfigurationFile));
+                package.AddSetting(PackageSettings.ConfigurationFile.WithValue(options.ConfigurationFile));
 
             return package;
         }
@@ -553,7 +553,7 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         private static void AddTestParametersSetting(TestPackage testPackage, IDictionary<string, string> testParameters)
         {
-            testPackage.AddSetting(FrameworkPackageSettings.TestParametersDictionary.WithValue(testParameters));
+            testPackage.AddSetting(FrameworkSettings.TestParametersDictionary.WithValue(testParameters));
 
             if (testParameters.Count != 0)
             {
@@ -564,7 +564,7 @@ namespace NUnit.ConsoleRunner
                 foreach (var parameter in testParameters)
                     oldFrameworkSerializedParameters.Append(parameter.Key).Append('=').Append(parameter.Value).Append(';');
 
-                testPackage.AddSetting(FrameworkPackageSettings.TestParameters.WithValue(oldFrameworkSerializedParameters.ToString(0, oldFrameworkSerializedParameters.Length - 1)));
+                testPackage.AddSetting(FrameworkSettings.TestParameters.WithValue(oldFrameworkSerializedParameters.ToString(0, oldFrameworkSerializedParameters.Length - 1)));
             }
         }
 

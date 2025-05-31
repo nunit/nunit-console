@@ -88,7 +88,7 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
             log.Debug("Got project");
 
-            string? activeConfig = package.GetSetting(PackageSetting.ActiveConfig.Name, string.Empty);
+            string? activeConfig = package.GetSetting(PackageSettings.ActiveConfig.Name, string.Empty);
             log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;
@@ -100,9 +100,9 @@ namespace NUnit.Engine.Services
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
-            foreach (string key in tempPackage.Settings.Keys)
-                if (!package.Settings.ContainsKey(key)) // Don't override settings from command line
-                    package.Settings[key] = tempPackage.Settings[key];
+            foreach (var setting in tempPackage.Settings)
+                if (!package.Settings.HasSetting(setting.Name)) // Don't override settings from command line
+                    package.Settings.Add(setting);
 
             foreach (var subPackage in tempPackage.SubPackages)
                 package.AddSubPackage(subPackage);
@@ -110,11 +110,11 @@ namespace NUnit.Engine.Services
             // If no config file is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use its own config, if present.
-            if (!tempPackage.Settings.ContainsKey(PackageSetting.ConfigurationFile.Name))
+            if (!tempPackage.Settings.HasSetting(PackageSettings.ConfigurationFile.Name))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
                 if (File.Exists(packageConfig))
-                    package.AddSetting(PackageSetting.ConfigurationFile.WithValue(packageConfig));
+                    package.AddSetting(PackageSettings.ConfigurationFile.WithValue(packageConfig));
             }
         }
 

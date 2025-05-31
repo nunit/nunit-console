@@ -52,7 +52,7 @@ namespace NUnit.Engine.Services
         public void GetAgentsForPackage_Net462()
         {
             var package = new TestPackage("test-assembly.dll");
-            package.AddSetting(PackageSetting.TargetFrameworkName.WithValue(
+            package.AddSetting(PackageSettings.TargetFrameworkName.WithValue(
                 new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()));
             Assert.That(_testAgency.GetAgentsForPackage(package).Select(a => a.AgentName), Is.EquivalentTo(new[] { NET462AGENT }));
         }
@@ -61,7 +61,7 @@ namespace NUnit.Engine.Services
         public void GetAgentsForPackage_Net80()
         {
             var package = new TestPackage("test-assembly.dll");
-            package.AddSetting(PackageSetting.TargetFrameworkName.WithValue(
+            package.AddSetting(PackageSettings.TargetFrameworkName.WithValue(
                 new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()));
             Assert.That(_testAgency.GetAgentsForPackage(package).Select(a => a.AgentName), Is.EquivalentTo(new[] { NET80AGENT }));
         }
@@ -70,9 +70,9 @@ namespace NUnit.Engine.Services
         public void GetAgentsForPackage_ConflictingAssemblies()
         {
             var package = new TestPackage("test1.dll", "test2.dll");
-            package.SubPackages[0].AddSetting(PackageSetting.TargetFrameworkName.WithValue(
+            package.SubPackages[0].AddSetting(PackageSettings.TargetFrameworkName.WithValue(
                 new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()));
-            package.SubPackages[1].AddSetting(PackageSetting.TargetFrameworkName.WithValue(
+            package.SubPackages[1].AddSetting(PackageSettings.TargetFrameworkName.WithValue(
                 new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()));
             Assert.That(_testAgency.GetAgentsForPackage(package), Is.Empty);
         }

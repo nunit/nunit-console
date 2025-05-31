@@ -52,7 +52,7 @@ namespace NUnit.Engine.Runners
                 assemblies.Add($"test{i}.dll");
             var package = new TestPackage(assemblies);
             if (maxAgents > 0)
-                package.AddSetting(PackageSetting.MaxAgents.WithValue(maxAgents));
+                package.AddSetting(PackageSettings.MaxAgents.WithValue(maxAgents));
             var runner = new MultipleTestProcessRunner(_serviceContext, package, _processorCount);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
         }
@@ -81,7 +81,7 @@ namespace NUnit.Engine.Runners
             for (int i = 1; i <= assemblyCount; i++)
                 package.SubPackages[0].AddSubPackage(new TestPackage($"test{i}.dll"));
             if (maxAgents > 0)
-                package.AddSetting(PackageSetting.MaxAgents.WithValue(maxAgents));
+                package.AddSetting(PackageSettings.MaxAgents.WithValue(maxAgents));
             var runner = new MultipleTestProcessRunner(_serviceContext, package, _processorCount);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
         }
