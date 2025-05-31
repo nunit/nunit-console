@@ -3,7 +3,7 @@
 namespace NUnit.Engine
 {
     /// <summary>
-    /// Base Class for all package Settings
+    /// Abstract base for all generic package Settings
     /// </summary>
     public abstract class PackageSetting
     {
@@ -24,7 +24,7 @@ namespace NUnit.Engine
         public string Name { get; }
 
         /// <summary>
-        /// Gets the value of this setting.
+        /// Gets the value of this setting as an object.
         /// </summary>
         public object Value { get; }
     }
@@ -39,7 +39,7 @@ namespace NUnit.Engine
         where T : notnull
     {
         /// <summary>
-        /// Construct a PackageSetting with a string value
+        /// Construct a PackageSetting
         /// </summary>
         /// <param name="name">The setting name.</param>
         /// <param name="value">The value of this setting instance.</param>
@@ -49,24 +49,8 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Get the setting value as correct Type.
+        /// Get the setting value
         /// </summary>
         public new T Value { get; }
-
-        // TODO: Remove this experiment when no longer needed
-        //public T GetSettingOrDefault<T>(T defaultValue)
-        //    where T : notnull
-        //{
-        //    if (Value is T)
-        //        return (T)Value;
-
-        //    string? s = Value as string;
-        //    if (s is not null)
-        //        if (typeof(T) == typeof(int))
-        //            return int.Parse(s);
-        //        else
-        //        if (typeof(T) == typeof(bool))
-        //            return bool.Parse(s);
-        //}
     }
 }

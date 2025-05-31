@@ -11,6 +11,9 @@ namespace NUnit.Common
     /// for settings used by the NUnit Framework. It is based on and references the
     /// FrameworkPackageSettings Type imported from the framework. We rely on these
     /// definitions to allow us to properly transmit the settings to the framework.
+    /// <para>Coding Examples:
+    /// <code>Settings.Add(FrameworkSettings.DefaultTimeout).WithValue(5000);</code>
+    /// </para>
     /// </summary>
     /// <remarks>
     /// Both files must be maintained in sync and deletion of any settings should be

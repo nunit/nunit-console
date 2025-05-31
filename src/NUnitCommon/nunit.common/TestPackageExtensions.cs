@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Xml;
 using NUnit.Common;
+using System.Runtime;
 
 namespace NUnit.Engine
 {
@@ -48,12 +49,46 @@ namespace NUnit.Engine
         {
             var writer = new StringWriter();
             var xmlWriter = XmlWriter.Create(writer, new XmlWriterSettings() { OmitXmlDeclaration = true });
-            var serializer = new XmlSerializer(typeof(TestPackage));
-            serializer.Serialize(xmlWriter, package);
+
+            WriteXml(package, xmlWriter);
+
             xmlWriter.Flush();
             xmlWriter.Close();
 
             return writer.ToString();
+        }
+
+        private static void WriteXml(TestPackage package, XmlWriter xmlWriter)
+        {
+            xmlWriter.WriteStartElement("TestPackage");
+
+            // Write ID and FullName
+            xmlWriter.WriteAttributeString("id", package.ID);
+            if (package.FullName is not null)
+                xmlWriter.WriteAttributeString("fullname", package.FullName);
+
+            // Write Settings
+            if (package.Settings.Count != 0)
+            {
+                xmlWriter.WriteStartElement("Settings");
+
+                foreach (PackageSetting setting in package.Settings)
+                {
+                    var type = setting.Value.GetType();
+                    string? val;
+                    if (type.IsPrimitive)
+                        val = Convert.ToString(setting.Value);
+                    xmlWriter.WriteAttributeString(setting.Name, setting.Value.ToString());
+                }
+
+                xmlWriter.WriteEndElement();
+            }
+
+            // Write any SubPackages recursively
+            foreach (TestPackage subPackage in package.SubPackages)
+                WriteXml(subPackage, xmlWriter);
+
+            xmlWriter.WriteEndElement();
         }
 
         /// <summary>
@@ -69,14 +104,12 @@ namespace NUnit.Engine
             var reader = new StringReader(doc.OuterXml);
             var xmlReader = XmlReader.Create(reader);
 
+            // The first element must be TestPackage
             if (!ReadTestPackageElement())
                 throw new InvalidOperationException("Invalid TestPackage XML");
 
-            package.ReadXml(xmlReader);
-            return package;
+            return package.Populate(xmlReader);
 
-            // The reader must be positioned on the top-level TestPackage element
-            // before calling ReadXml.
             bool ReadTestPackageElement()
             {
                 while (xmlReader.Read())
@@ -84,6 +117,48 @@ namespace NUnit.Engine
                         return xmlReader.Name == "TestPackage";
                 return false;
             }
+        }
+
+        private static TestPackage Populate(this TestPackage package, XmlReader xmlReader)
+        {
+            package.ID = xmlReader.GetAttribute("id").ShouldNotBeNull();
+            package.FullName = xmlReader.GetAttribute("fullname");
+
+            if (!xmlReader.IsEmptyElement)
+            {
+                while (xmlReader.Read())
+                {
+                    switch (xmlReader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            switch (xmlReader.Name)
+                            {
+                                case "Settings":
+                                    // We don't use AddSettings, which copies settings downward.
+                                    // Instead, each package handles it's own settings.
+                                    while (xmlReader.MoveToNextAttribute())
+                                        package.Settings.Add(new PackageSetting<string>(xmlReader.Name, xmlReader.Value));
+                                    xmlReader.MoveToElement();
+                                    break;
+
+                                case "TestPackage":
+                                    package.SubPackages.Add(new TestPackage().Populate(xmlReader));
+                                    break;
+                            }
+                            break;
+
+                        case XmlNodeType.EndElement:
+                            if (xmlReader.Name == "TestPackage")
+                                return package;
+                            else
+                                throw new Exception("Unexpected EndElement: " + xmlReader.Name);
+                    }
+                }
+
+                throw new Exception("Invalid XML: TestPackage Element not terminated.");
+            }
+
+            return package;
         }
     }
 }

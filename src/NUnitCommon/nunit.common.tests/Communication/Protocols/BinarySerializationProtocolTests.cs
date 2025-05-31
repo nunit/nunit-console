@@ -3,12 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Serialization;
 using NUnit.Framework;
 using NUnit.Engine.Communication.Messages;
-using NUnit.Engine.Internal;
-using System.Xml;
-using NUnit.TestData.Assemblies;
 
 namespace NUnit.Engine.Communication.Protocols
 {

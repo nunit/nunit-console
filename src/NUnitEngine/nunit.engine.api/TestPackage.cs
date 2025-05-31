@@ -26,7 +26,7 @@ namespace NUnit.Engine
     /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
     [Serializable]
-    public class TestPackage : IXmlSerializable
+    public class TestPackage
     {
         /// <summary>
         /// Construct a top-level TestPackage that wraps one or more
@@ -62,7 +62,8 @@ namespace NUnit.Engine
 
         /// <summary>
         ///  Construct an empty TestPackage
-        /// </summary>()
+        /// </summary>
+        /// <remarks>Used in deserializing a package from xml.</remarks>
         public TestPackage()
         {
         }
@@ -81,7 +82,9 @@ namespace NUnit.Engine
         /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
-        public string ID { get; private set; } = GetNextID();
+        // TODO: Setter is temporarily public for use in deserialization.
+        // We should find a better solution for setting the ID.
+        public string ID { get; set; } = GetNextID();
 
         /// <summary>
         /// Gets the name of the package
@@ -95,7 +98,7 @@ namespace NUnit.Engine
         /// Gets the path to the file containing tests. It may be
         /// an assembly or a recognized project type.
         /// </summary>
-        public string? FullName { get; private set; }
+        public string? FullName { get; set; }
 
         /// <summary>
         /// Gets the list of SubPackages contained in this package
@@ -106,6 +109,19 @@ namespace NUnit.Engine
         /// Gets the settings dictionary for this package.
         /// </summary>
         public PackageSettingsList Settings { get; } = new PackageSettingsList();
+
+        /// <summary>
+        /// Return the value of a setting or a default.
+        /// </summary>
+        /// <param name="name">The name of the setting</param>
+        /// <param name="defaultSetting">The default value</param>
+        /// <returns></returns>
+        public T GetSetting<T>(string name, T defaultSetting)
+        {
+            return (Settings.TryGetSetting(name, out PackageSetting? setting) && setting is not null)
+                ? (T)setting.Value
+                : defaultSetting;
+        }
 
         /// <summary>
         /// Add a subpackage to the package.
@@ -150,99 +166,17 @@ namespace NUnit.Engine
                 subPackage.AddSetting(setting);
         }
 
-        /// <summary>
-        /// Return the value of a setting or a default.
-        /// </summary>
-        /// <param name="name">The name of the setting</param>
-        /// <param name="defaultSetting">The default value</param>
-        /// <returns></returns>
-        public T GetSetting<T>(string name, T defaultSetting)
-        {
-            return (Settings.TryGetSetting(name, out PackageSetting? setting) && setting is not null)
-                ? (T)setting.Value
-                : defaultSetting;
-        }
-
-        #region IXmlSerializable Implementation
-
-        /// <inheritdoc />
-        public XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public void ReadXml(XmlReader xmlReader)
-        {
-            ID = xmlReader.GetAttribute("id") ?? GetNextID();
-            FullName = xmlReader.GetAttribute("fullname");
-            if (!xmlReader.IsEmptyElement)
-            {
-                while (xmlReader.Read())
-                {
-                    switch (xmlReader.NodeType)
-                    {
-                        case XmlNodeType.Element:
-                            switch (xmlReader.Name)
-                            {
-                                case "Settings":
-                                    // We don't use AddSettings, which copies settings downward.
-                                    // Instead, each package handles it's own settings.
-                                    while (xmlReader.MoveToNextAttribute())
-                                        Settings.Add(new PackageSetting<string>(xmlReader.Name, xmlReader.Value));
-                                    xmlReader.MoveToElement();
-                                    break;
-
-                                case "TestPackage":
-                                    TestPackage subPackage = new TestPackage();
-                                    subPackage.ReadXml(xmlReader);
-                                    SubPackages.Add(subPackage);
-                                    break;
-                            }
-                            break;
-
-                        case XmlNodeType.EndElement:
-                            if (xmlReader.Name == "TestPackage")
-                                return;
-                            break;
-
-                        default:
-                            throw new Exception("Unexpected EndElement: " + xmlReader.Name);
-                    }
-                }
-
-                throw new Exception("Invalid XML: TestPackage Element not terminated.");
-            }
-        }
-
-        /// <inheritdoc />
-        public void WriteXml(XmlWriter xmlWriter)
-        {
-            // Write ID and FullName
-            xmlWriter.WriteAttributeString("id", ID);
-            if (FullName is not null)
-                xmlWriter.WriteAttributeString("fullname", FullName);
-
-            // Write Settings
-            if (Settings.Count != 0)
-            {
-                xmlWriter.WriteStartElement("Settings");
-
-                foreach (PackageSetting setting in Settings)
-                    xmlWriter.WriteAttributeString(setting.Name, setting.Value.ToString());
-
-                xmlWriter.WriteEndElement();
-            }
-
-            // Write any SubPackages recursively
-            foreach (TestPackage subPackage in SubPackages)
-            {
-                xmlWriter.WriteStartElement("TestPackage");
-                subPackage.WriteXml(xmlWriter);
-                xmlWriter.WriteEndElement();
-            }
-        }
+        ///// <summary>
+        ///// Return the value of a setting or a default.
+        ///// </summary>
+        ///// <param name="name">The name of the setting</param>
+        ///// <param name="defaultSetting">The default value</param>
+        ///// <returns></returns>
+        //public T GetSetting<T>(string name, T defaultSetting)
+        //{
+        //    return (Settings.TryGetSetting(name, out PackageSetting? setting) && setting is not null)
+        //        ? (T)setting.Value
+        //        : defaultSetting;
+        //}
     }
-
-    #endregion
 }
