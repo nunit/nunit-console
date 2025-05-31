@@ -29,7 +29,7 @@ namespace NUnit.ConsoleRunner
 #endif
 
             var package = new TestPackage(fullname);
-            package.AddSetting("ProcessModel", "InProcess");
+            package.AddSetting(new PackageSetting<string>("ProcessModel", "InProcess"));
 
             var runner = new MasterTestRunner(services, package);
 

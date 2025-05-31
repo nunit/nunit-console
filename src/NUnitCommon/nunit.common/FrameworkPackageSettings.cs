@@ -1,14 +1,21 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-namespace NUnit.ConsoleRunner
+namespace NUnit.Common // Namespace changed to distinguish from the framework's version in tests
 {
     /// <summary>
     /// FrameworkPackageSettings is a static class containing constant values that
     /// are used as keys in setting up a TestPackage. These values are used in
     /// the framework, and set in the runner. Setting values may be a string, int or bool.
     /// </summary>
+    /// <remarks>
+    /// This is a copy of the file of the same name taken from the framework project
+    /// on 30 May 2025. It should be updated as needed but, for compatibility with
+    /// earlier framework versions, any removed settings should be retained here.
+    /// </remarks>
     public static class FrameworkPackageSettings
     {
+        #region Settings used in Framework
+
         /// <summary>
         /// Flag (bool) indicating whether tests are being debugged.
         /// </summary>
@@ -41,6 +48,20 @@ namespace NUnit.ConsoleRunner
         public const string DefaultTimeout = "DefaultTimeout";
 
         /// <summary>
+        /// A string representing the default thread culture to be used for
+        /// running tests. String should be a valid BCP-47 culture name. If
+        /// culture is unset, tests run on the machine's default culture.
+        /// </summary>
+        public const string DefaultCulture = "DefaultCulture";
+
+        /// <summary>
+        /// A string representing the default thread UI culture to be used for
+        /// running tests. String should be a valid BCP-47 culture name. If
+        /// culture is unset, tests run on the machine's default culture.
+        /// </summary>
+        public const string DefaultUICulture = "DefaultUICulture";
+
+        /// <summary>
         /// A TextWriter to which the internal trace will be sent.
         /// </summary>
         public const string InternalTraceWriter = "InternalTraceWriter";
@@ -48,7 +69,6 @@ namespace NUnit.ConsoleRunner
         /// <summary>
         /// A list of tests to be loaded.
         /// </summary>
-        // TODO: Remove?
         public const string LOAD = "LOAD";
 
         /// <summary>
@@ -73,6 +93,11 @@ namespace NUnit.ConsoleRunner
         public const string StopOnError = "StopOnError";
 
         /// <summary>
+        /// If true, asserts in multiple asserts block will throw first-chance exception on failure.
+        /// </summary>
+        public const string ThrowOnEachFailureUnderDebugger = "ThrowOnEachFailureUnderDebugger";
+
+        /// <summary>
         /// If true, use of the event queue is suppressed and test events are synchronous.
         /// </summary>
         public const string SynchronousEvents = "SynchronousEvents";
@@ -91,5 +116,12 @@ namespace NUnit.ConsoleRunner
         /// Parameters to be passed on to the tests, already parsed into an IDictionary&lt;string, string>. Replaces <see cref="TestParameters"/>.
         /// </summary>
         public const string TestParametersDictionary = "TestParametersDictionary";
+
+        /// <summary>
+        /// If true, the tests will run on the same thread as the NUnit runner itself
+        /// </summary>
+        public const string RunOnMainThread = "RunOnMainThread";
+
+        #endregion
     }
 }

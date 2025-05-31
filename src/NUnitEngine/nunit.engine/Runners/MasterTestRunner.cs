@@ -354,40 +354,12 @@ namespace NUnit.Engine.Runners
                 && _projectService.CanLoadFrom(package.FullName);
         }
 
-        private struct ObsoletePackageSetting
-        {
-            public string OldKey;
-            public string NewKey;
-        }
-
-        private static ObsoletePackageSetting[] ObsoleteSettings = new ObsoletePackageSetting[]
-        {
-            new ObsoletePackageSetting() { OldKey = "RuntimeFramework", NewKey = "RequestedRuntimeFramework" }
-        };
-
-#if NETFRAMEWORK
         // Any Errors thrown from this method indicate that the client
         // runner is putting invalid values into the package.
-        private void ValidatePackageSettings()
-        {
-            // TODO: How do we validate runtime framework for .NET Standard 2.0?
-            var frameworkSetting = TestPackage.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, string.Empty);
-            var runAsX86 = TestPackage.GetSetting(EnginePackageSettings.RunAsX86, false);
-
-            foreach (var entry in ObsoleteSettings)
-            {
-                var oldKey = entry.OldKey;
-                var newKey = entry.NewKey;
-                if (TestPackage.Settings.TryGetValue(oldKey, out object? value) && !TestPackage.Settings.ContainsKey(newKey))
-                    TestPackage.Settings[newKey] = value;
-            }
-        }
-#else
         private static void ValidatePackageSettings()
         {
-            // No settings to validate in .NET Core
+            // No settings to validate at this time
         }
-#endif
 
         /// <summary>
         /// Unload any loaded TestPackage.

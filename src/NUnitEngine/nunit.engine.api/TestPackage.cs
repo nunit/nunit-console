@@ -105,7 +105,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string, object> Settings { get; } = new Dictionary<string, object>();
+        public PackageSettingsList Settings { get; } = new PackageSettingsList();
 
         /// <summary>
         /// Add a subpackage to the package.
@@ -115,8 +115,8 @@ namespace NUnit.Engine
         {
             SubPackages.Add(subPackage);
 
-            foreach (var key in Settings.Keys)
-                subPackage.Settings[key] = Settings[key];
+            foreach (var setting in Settings)
+                subPackage.AddSetting(setting);
         }
 
         /// <summary>
@@ -135,8 +135,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Add a setting to a package and all of its subpackages.
         /// </summary>
-        /// <param name="name">The name of the setting</param>
-        /// <param name="value">The value of the setting</param>
+        /// <param name="setting">The setting to be added</param>
         /// <remarks>
         /// Once a package is created, subpackages may have been created
         /// as well. If you add a setting directly to the Settings dictionary
@@ -144,11 +143,11 @@ namespace NUnit.Engine
         /// used when the settings are intended to be reflected to all the
         /// subpackages under the package.
         /// </remarks>
-        public void AddSetting(string name, object value)
+        public void AddSetting(PackageSetting setting)
         {
-            Settings[name] = value;
+            Settings.Add(setting);
             foreach (var subPackage in SubPackages)
-                subPackage.AddSetting(name, value);
+                subPackage.AddSetting(setting);
         }
 
         /// <summary>
@@ -159,8 +158,8 @@ namespace NUnit.Engine
         /// <returns></returns>
         public T GetSetting<T>(string name, T defaultSetting)
         {
-            return (Settings.TryGetValue(name, out object? setting) && setting is not null)
-                ? (T)setting
+            return (Settings.TryGetSetting(name, out PackageSetting? setting) && setting is not null)
+                ? (T)setting.Value
                 : defaultSetting;
         }
 
@@ -190,7 +189,7 @@ namespace NUnit.Engine
                                     // We don't use AddSettings, which copies settings downward.
                                     // Instead, each package handles it's own settings.
                                     while (xmlReader.MoveToNextAttribute())
-                                        Settings.Add(xmlReader.Name, xmlReader.Value);
+                                        Settings.Add(new PackageSetting<string>(xmlReader.Name, xmlReader.Value));
                                     xmlReader.MoveToElement();
                                     break;
 
@@ -229,8 +228,8 @@ namespace NUnit.Engine
             {
                 xmlWriter.WriteStartElement("Settings");
 
-                foreach (KeyValuePair<string, object> setting in Settings)
-                    xmlWriter.WriteAttributeString(setting.Key, setting.Value.ToString());
+                foreach (PackageSetting setting in Settings)
+                    xmlWriter.WriteAttributeString(setting.Name, setting.Value.ToString());
 
                 xmlWriter.WriteEndElement();
             }

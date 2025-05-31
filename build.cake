@@ -213,7 +213,7 @@ public class ConsoleRunnerSelfTester : TestRunner, IPackageTestRunner
 
     public int RunPackageTest(string arguments, bool redirectOutput)
     {
-        Console.WriteLine("Running package test");
+        Console.WriteLine($"Running package test with arguments {arguments}");
         return base.RunPackageTest(_executablePath, new ProcessSettings() { Arguments = arguments, RedirectStandardOutput = redirectOutput });
     }
 }

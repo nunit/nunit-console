@@ -26,12 +26,12 @@ namespace NUnit.Engine.Internal
             SUBPACKAGE2 = TEST_PACKAGE.SubPackages[1];
 
             // Add settings intended for top level and both subpackages
-            TEST_PACKAGE.AddSetting("foo", "bar");
-            TEST_PACKAGE.AddSetting("num", 42);
-            TEST_PACKAGE.AddSetting("critical", true);
+            TEST_PACKAGE.AddSetting(new PackageSetting<string>("foo", "bar"));
+            TEST_PACKAGE.AddSetting(new PackageSetting<int>("num", 42));
+            TEST_PACKAGE.AddSetting(new PackageSetting<bool>("critical", true));
 
             // Add a setting to the first subpackage only
-            SUBPACKAGE1.AddSetting("cpu", "x86");
+            SUBPACKAGE1.Settings.Add(new PackageSetting<string>("cpu", "x86"));
 
             // Multi-line for ease of editing only
             EXPECTED_XML = $"""
@@ -96,11 +96,12 @@ namespace NUnit.Engine.Internal
                 Assert.That(newPackage.Settings.Count, Is.EqualTo(oldPackage.Settings.Count));
                 Assert.That(newPackage.SubPackages.Count, Is.EqualTo(oldPackage.SubPackages.Count));
 
-                foreach (var key in oldPackage.Settings.Keys)
+                foreach (var setting in oldPackage.Settings)
                 {
-                    Assert.That(newPackage.Settings.ContainsKey(key));
-                    var oldValue = oldPackage.Settings[key];
-                    var newValue = newPackage.Settings[key];
+                    var key = setting.Name;
+                    Assert.That(newPackage.Settings.HasSetting(key));
+                    var oldValue = oldPackage.Settings[key].Value;
+                    var newValue = newPackage.Settings[key].Value;
 
                     // TODO: Reinstate after fixing issue #1677
                     //Assert.That(newValue, Is.EqualTo(oldValue));
