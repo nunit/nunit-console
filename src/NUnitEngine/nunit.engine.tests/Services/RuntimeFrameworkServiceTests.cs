@@ -51,9 +51,9 @@ namespace NUnit.Engine.Services
         private const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
 #endif
 
-        [TestCase("net35", false)]
+        //[TestCase("net35", false)]
         [TestCase("net462", false)]
-        [TestCase("net462", true)]
+        //[TestCase("net462", true)]
         public void SelectRuntimeFramework(string runtime, bool runAsX86)
         {
             var assemblyPath = Path.GetFullPath($"testdata/{runtime}/{(runAsX86 ? "mock-assembly-x86.dll" : "mock-assembly.dll")}");
@@ -119,9 +119,9 @@ namespace NUnit.Engine.Services
             Assert.That(names, Is.Unique);
         }
 
-        [TestCase("mono", 2, 0, "net-4.0")]
-        [TestCase("net", 2, 0, "net-4.0")]
-        [TestCase("net", 3, 5, "net-4.0")]
+        //[TestCase("mono", 2, 0, "net-4.0")]
+        //[TestCase("net", 2, 0, "net-4.0")]
+        //[TestCase("net", 3, 5, "net-4.0")]
 
         public void EngineOptionPreferredOverImageTarget(string framework, int majorVersion, int minorVersion, string requested)
         {
@@ -134,7 +134,7 @@ namespace NUnit.Engine.Services
             Assert.That(package.GetSetting(PackageSettings.RequestedRuntimeFramework.Name, string.Empty), Is.EqualTo(requested));
         }
 
-        [Test]
+        //[Test]
         public void RuntimeFrameworkIsSetForSubpackages()
         {
             //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available

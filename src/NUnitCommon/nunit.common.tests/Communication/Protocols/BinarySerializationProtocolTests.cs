@@ -49,7 +49,7 @@ namespace NUnit.Engine.Communication.Protocols
 
             Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
             Assert.That(message.Data, Is.EqualTo(originalPackage.ToXml()));
-            var newPackage = new TestPackage().FromXml(message.Data);
+            var newPackage = PackageHelper.FromXml(message.Data);
             ComparePackages(newPackage, originalPackage);
         }
 
@@ -87,7 +87,7 @@ namespace NUnit.Engine.Communication.Protocols
             foreach (TestEngineMessage message in messages)
             {
                 Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
-                var newPackage = new TestPackage().FromXml(message.Data!);
+                var newPackage = PackageHelper.FromXml(message.Data!);
                 ComparePackages(newPackage, originalPackage);
             }
         }

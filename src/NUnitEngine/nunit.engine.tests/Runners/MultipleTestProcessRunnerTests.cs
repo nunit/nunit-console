@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
+using NUnit.Common;
 using NUnit.Engine.Services;
 using NUnit.Framework;
 using NSubstitute;

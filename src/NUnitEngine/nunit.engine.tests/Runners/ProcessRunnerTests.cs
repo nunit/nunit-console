@@ -8,7 +8,7 @@
 
 #if NETFRAMEWORK
 using System.IO;
-using System.Xml;
+using NUnit.Common;
 using NUnit.Engine.Services;
 using NUnit.Framework;
 using NUnit.TestData.Assemblies;

@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
-    <PackageReference Include="nunit" Version="4.2.2" />
+    <PackageReference Include="nunit" Version="4.3.2" />
   </ItemGroup>
 
 </Project>
