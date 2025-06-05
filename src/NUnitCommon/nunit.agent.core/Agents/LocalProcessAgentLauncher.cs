@@ -27,9 +27,9 @@ namespace NUnit.Engine.Agents
         public bool CanCreateAgent(TestPackage package)
         {
             // Get target runtime from package
-            string runtimeSetting = package.GetSetting(PackageSettings.TargetFrameworkName.Name, string.Empty);
+            string runtimeSetting = package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty);
             var targetRuntime = new FrameworkName(runtimeSetting);
-            bool runAsX86 = package.GetSetting(PackageSettings.RunAsX86.Name, false);
+            bool runAsX86 = package.GetSetting(SettingDefinitions.RunAsX86, false);
 
             // Running under X86 under .NET Core is currently only supported on Windows
             if (runAsX86 && targetRuntime.Identifier == FrameworkIdentifiers.NetCoreApp && Path.DirectorySeparatorChar != '\\')
@@ -49,12 +49,12 @@ namespace NUnit.Engine.Agents
             };
 
             // Access package settings
-            bool runAsX86 = package.GetSetting(PackageSettings.RunAsX86.Name, false);
-            bool debugTests = package.GetSetting(PackageSettings.DebugTests.Name, false);
-            bool debugAgent = package.GetSetting(PackageSettings.DebugAgent.Name, false);
-            string traceLevel = package.GetSetting(PackageSettings.InternalTraceLevel.Name, "Off");
-            bool loadUserProfile = package.GetSetting(PackageSettings.LoadUserProfile.Name, false);
-            string workDirectory = package.GetSetting(PackageSettings.WorkDirectory.Name, string.Empty);
+            bool runAsX86 = package.GetSetting(SettingDefinitions.RunAsX86, false);
+            bool debugTests = package.GetSetting(SettingDefinitions.DebugTests, false);
+            bool debugAgent = package.GetSetting(SettingDefinitions.DebugAgent, false);
+            string traceLevel = package.GetSetting(SettingDefinitions.InternalTraceLevel, "Off");
+            bool loadUserProfile = package.GetSetting(SettingDefinitions.LoadUserProfile, false);
+            string workDirectory = package.GetSetting(SettingDefinitions.WorkDirectory, string.Empty);
 
             var sb = new StringBuilder($"--agentId={agentId} --agencyUrl={agencyUrl} --pid={Process.GetCurrentProcess().Id}");
 

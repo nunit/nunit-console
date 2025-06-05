@@ -43,7 +43,7 @@ namespace NUnit.Engine.Runners
             Assert.That(File.Exists(assemblyPath), Is.True);
             _package = new TestPackage(assemblyPath).SubPackages[0];
             _package.Settings.Add(
-                PackageSettings.TargetFrameworkName.WithValue(
+                SettingDefinitions.TargetFrameworkName.WithValue(
                     _runtimeDir.StartsWith("net4") || _runtimeDir.StartsWith("net3")
                         ? ".NETFramework,Version=v4.6.2"
                         : ".NETCoreApp,Version=v8.0.0"));

@@ -79,7 +79,7 @@ namespace NUnit.Engine
             xmlWriter.WriteEndElement();
         }
 
-        private static void WriteSettings(PackageSettingsList packageSettings, XmlWriter xmlWriter)
+        private static void WriteSettings(PackageSettings packageSettings, XmlWriter xmlWriter)
         {
             xmlWriter.WriteStartElement("Settings");
 
@@ -88,39 +88,35 @@ namespace NUnit.Engine
                 switch (setting.Name)
                 {
                     // Some settings require special handling
-                    case "InternalTraceWriter":
+                    case FrameworkPackageSettings.InternalTraceWriter:
                         // NYI
                         break;
-                    case "LOAD":
-                        var filters = setting.Value as string[];
-                        if (filters is not null)
-                            xmlWriter.WriteAttributeString("LOAD", $"{string.Join(";", filters)}");
+                    case FrameworkPackageSettings.LOAD:
+                        var filters = (string[])setting.Value;
+                        xmlWriter.WriteAttributeString(FrameworkPackageSettings.LOAD, $"{string.Join(";", filters)}");
                         break;
-                    case "TestParametersDictionary":
-                        var dict = setting.Value as IDictionary<string, string>;
-                        if (dict is not null)
+                    case FrameworkPackageSettings.TestParametersDictionary:
+                        var dict = (IDictionary<string, string>)setting.Value;
+                        xmlWriter.WriteStartAttribute(setting.Name);
+
+                        // Quick and Dirty code for attribute value containing XML.
+                        xmlWriter.WriteRaw("&lt;parms>");
+                        foreach (var entry in dict)
                         {
-                            StringBuilder sb = new StringBuilder();
-                            xmlWriter.WriteStartAttribute(setting.Name);
-
-                            // Quick and Dirty code for attribute value containing XML.
-                            xmlWriter.WriteRaw("&lt;parms>");
-                            foreach (var entry in dict)
-                            {
-                                xmlWriter.WriteRaw("&lt;parm ");
-                                // NOTE: Non-XML chars in value will be replaced
-                                xmlWriter.WriteString($"key='{entry.Key}' value='{entry.Value}'");
-                                xmlWriter.WriteRaw(" />");
-                            }
-                            xmlWriter.WriteRaw("&lt;/parms>");
-
-                            xmlWriter.WriteEndAttribute();
+                            xmlWriter.WriteRaw("&lt;parm ");
+                            // NOTE: Non-XML chars in value will be replaced
+                            xmlWriter.WriteString($"key='{entry.Key}' value='{entry.Value}'");
+                            xmlWriter.WriteRaw(" />");
                         }
+                        xmlWriter.WriteRaw("&lt;/parms>");
+
+                        xmlWriter.WriteEndAttribute();
                         break;
                     default:
-                        var type = setting.Value.GetType();
+                        object value = setting.Value;
+                        var type = value.GetType();
                         if (type.IsPrimitive || type == typeof(string))
-                            xmlWriter.WriteAttributeString(setting.Name, Convert.ToString(setting.Value));
+                            xmlWriter.WriteAttributeString(setting.Name, Convert.ToString(value));
                         break;
                 }
             }
@@ -158,7 +154,7 @@ namespace NUnit.Engine
 
         private static TestPackage ReadXml(XmlReader xmlReader)
         {
-            TestPackage package = new TestPackage();
+            var package = new TestPackage();
             package.ID = xmlReader.GetAttribute("id").ShouldNotBeNull();
             package.FullName = xmlReader.GetAttribute("fullname");
 
@@ -195,47 +191,46 @@ namespace NUnit.Engine
             return package;
         }
 
-        private static void ReadSettings(this PackageSettingsList packageSettings, XmlReader xmlReader)
+        private static void ReadSettings(this PackageSettings packageSettings, XmlReader xmlReader)
         {
             while (xmlReader.MoveToNextAttribute())
             {
                 var name = xmlReader.Name;
                 var value = xmlReader.Value;
-                var prop = typeof(PackageSettings).GetProperty(name, BindingFlags.Public | BindingFlags.Static);
+                var prop = typeof(SettingDefinitions).GetProperty(name, BindingFlags.Public | BindingFlags.Static);
 
                 if (prop is not null) // Standard SettingDefinition
                 {
-                    var settingDefinition = prop.GetValue(null) as SettingDefinition;
+                    var settingDefinition = (SettingDefinition)prop.GetValue(null)!;
 
-                    if (settingDefinition is not null)
-                        switch (name)
-                        {
-                            case "InternalTraceWriter":
-                                // NYI
-                                break;
-                            case "LOAD":
-                                packageSettings.Add(settingDefinition.WithValue(value.Split(new[] { ';' })));
-                                break;
-                            case "TestParametersDictionary":
-                                XmlDocument doc = new XmlDocument();
-                                doc.LoadXml(value);
-                                var dict = new Dictionary<string, string>();
-                                foreach (XmlNode node in doc.SelectNodes("parms/parm").ShouldNotBeNull())
-                                    dict.Add(node.GetAttribute("key").ShouldNotBeNull(), node.GetAttribute("value").ShouldNotBeNull());
-                                packageSettings.Add(settingDefinition.WithValue(dict));
-                                break;
-                            default:
-                                switch (settingDefinition.ValueType)
-                                {
-                                    case Type t when t.IsPrimitive | t.IsAssignableFrom(typeof(string)):
-                                        var data = Convert.ChangeType(value, t);
-                                        packageSettings.Add(settingDefinition.WithValue(data));
-                                        break;
-                                    default:
-                                        packageSettings.Add(new PackageSetting<string>(name, value));
-                                        break;
-                                }
-                                break;
+                    switch (name)
+                    {
+                        case FrameworkPackageSettings.InternalTraceWriter:
+                            // NYI
+                            break;
+                        case FrameworkPackageSettings.LOAD:
+                            packageSettings.Add(SettingDefinitions.LOAD.WithValue(value.Split([';'])));
+                            break;
+                        case FrameworkPackageSettings.TestParametersDictionary:
+                            var doc = new XmlDocument();
+                            doc.LoadXml(value);
+                            var dict = new Dictionary<string, string>();
+                            foreach (XmlNode node in doc.SelectNodes("parms/parm").ShouldNotBeNull())
+                                dict.Add(node.GetAttribute("key").ShouldNotBeNull(), node.GetAttribute("value").ShouldNotBeNull());
+                            packageSettings.Add(SettingDefinitions.TestParametersDictionary.WithValue(dict));
+                            break;
+                        default:
+                            switch (settingDefinition.ValueType)
+                            {
+                                case Type t when t.IsPrimitive || t.IsAssignableFrom(typeof(string)):
+                                    var data = Convert.ChangeType(value, t);
+                                    packageSettings.Add(settingDefinition.WithValue(data));
+                                    break;
+                                default:
+                                    // Setting doesn't match the expected type, ignore or throw an exception?
+                                    break;
+                            }
+                            break;
                     }
                 }
                 else // Non-standard Setting created by user
@@ -243,11 +238,11 @@ namespace NUnit.Engine
                     // We assume that a setting that parses as a bool or an int
                     // is intended as that type, otherwise we use string.
                     if (bool.TryParse(value, out var flag))
-                        packageSettings.Add(new PackageSetting<bool>(name, flag));
+                        packageSettings.Add(name, flag);
                     else if (int.TryParse(value, out var num))
-                        packageSettings.Add(new PackageSetting<int>(name, num));
+                        packageSettings.Add(name, num);
                     else
-                        packageSettings.Add(new PackageSetting<string>(name, value));
+                        packageSettings.Add(name, value);
                 }
             }
 

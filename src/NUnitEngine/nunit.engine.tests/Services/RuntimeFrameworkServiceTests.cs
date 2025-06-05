@@ -63,8 +63,8 @@ namespace NUnit.Engine.Services
 
             var expectedFrameworkName = RuntimeFramework.Parse(_runtimeService.SelectRuntimeFramework(package)).FrameworkName.ToString();
 
-            Assert.That(package.GetSetting(PackageSettings.TargetFrameworkName.Name, string.Empty), Is.EqualTo(expectedFrameworkName));
-            Assert.That(package.GetSetting(PackageSettings.RunAsX86.Name, false), Is.EqualTo(runAsX86));
+            Assert.That(package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty), Is.EqualTo(expectedFrameworkName));
+            Assert.That(package.GetSetting(SettingDefinitions.RunAsX86, false), Is.EqualTo(runAsX86));
         }
 
         [Test]
@@ -126,12 +126,12 @@ namespace NUnit.Engine.Services
         public void EngineOptionPreferredOverImageTarget(string framework, int majorVersion, int minorVersion, string requested)
         {
             var package = new TestPackage("test");
-            package.AddSetting(PackageSettings.ImageTargetFrameworkName.WithValue(framework));
-            package.AddSetting(PackageSettings.ImageRuntimeVersion.WithValue($"{majorVersion}.{minorVersion}"));
-            package.AddSetting(PackageSettings.RequestedRuntimeFramework.WithValue(requested));
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(framework));
+            package.AddSetting(SettingDefinitions.ImageRuntimeVersion.WithValue($"{majorVersion}.{minorVersion}"));
+            package.AddSetting(SettingDefinitions.RequestedRuntimeFramework.WithValue(requested));
 
             _runtimeService.SelectRuntimeFramework(package);
-            Assert.That(package.GetSetting(PackageSettings.RequestedRuntimeFramework.Name, string.Empty), Is.EqualTo(requested));
+            Assert.That(package.GetSetting(SettingDefinitions.RequestedRuntimeFramework, string.Empty), Is.EqualTo(requested));
         }
 
         //[Test]
@@ -146,9 +146,9 @@ namespace NUnit.Engine.Services
             var topLevelPackage = new TestPackage(new string[] { "a.dll", "b.dll" });
 
             var net20Package = topLevelPackage.SubPackages[0];
-            net20Package.Settings.Add(PackageSettings.ImageRuntimeVersion.WithValue("2.0"));
+            net20Package.Settings.Add(SettingDefinitions.ImageRuntimeVersion.WithValue("2.0"));
             var net40Package = topLevelPackage.SubPackages[1];
-            net40Package.Settings.Add(PackageSettings.ImageRuntimeVersion.WithValue("4.0"));
+            net40Package.Settings.Add(SettingDefinitions.ImageRuntimeVersion.WithValue("4.0"));
 
             _runtimeService.SelectRuntimeFramework(topLevelPackage);
 
@@ -157,10 +157,10 @@ namespace NUnit.Engine.Services
 #pragma warning disable 612, 618
                 var NF = FrameworkIdentifiers.NetFramework;
                 Assert.That(
-                    net20Package.GetSetting(PackageSettings.TargetFrameworkName.Name, string.Empty),
+                    net20Package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty),
                     Is.EqualTo($"{NF},Version=v2.0"));
                 Assert.That(
-                    net40Package.GetSetting(PackageSettings.TargetFrameworkName.Name, string.Empty),
+                    net40Package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty),
                     Is.EqualTo($"{NF},Version=v4.0"));
                 // No Longer working but may be removed anyway
                 //Assert.That(

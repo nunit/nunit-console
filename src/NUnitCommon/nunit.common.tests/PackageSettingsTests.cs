@@ -9,13 +9,13 @@ namespace NUnit.Common
 {
     public class PackageSettingsTests
     {
-        private static readonly BindingFlags PublicStatic = BindingFlags.Public | BindingFlags.Static;
+        private const BindingFlags PublicStatic = BindingFlags.Public | BindingFlags.Static;
         private static readonly string[] CurrentFrameworkSettingNames =
             typeof(NUnit.FrameworkPackageSettings).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
         private static readonly string[] SupportedFrameworkSettingNames =
             typeof(FrameworkPackageSettings).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
         private static readonly string[] SettingDefinitions =
-            typeof(PackageSettings).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
+            typeof(SettingDefinitions).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
 
         [Test]
         public void CurrentFrameworkSettingsAreAllSupported()

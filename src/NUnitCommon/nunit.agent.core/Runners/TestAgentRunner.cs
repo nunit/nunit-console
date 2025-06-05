@@ -102,8 +102,8 @@ namespace NUnit.Engine.Runners
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
 
-            string? targetFramework = assemblyPackage.GetSetting(PackageSettings.ImageTargetFrameworkName.Name, string.Empty);
-            bool skipNonTestAssemblies = assemblyPackage.GetSetting(PackageSettings.SkipNonTestAssemblies.Name, false);
+            string? targetFramework = assemblyPackage.GetSetting(SettingDefinitions.ImageTargetFrameworkName, string.Empty);
+            bool skipNonTestAssemblies = assemblyPackage.GetSetting(SettingDefinitions.SkipNonTestAssemblies, false);
 
             // TODO: Restore this code after changes to PackageSettings implementation
             //if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()

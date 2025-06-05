@@ -3,9 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace NUnit.Engine
 {
@@ -108,19 +105,18 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public PackageSettingsList Settings { get; } = new PackageSettingsList();
+        public PackageSettings Settings { get; } = new PackageSettings();
 
         /// <summary>
         /// Return the value of a setting or a default.
         /// </summary>
-        /// <param name="name">The name of the setting</param>
+        /// <param name="definition">The name and type of the setting</param>
         /// <param name="defaultSetting">The default value</param>
         /// <returns></returns>
-        public T GetSetting<T>(string name, T defaultSetting)
+        public T GetSetting<T>(SettingDefinition<T> definition, T defaultSetting)
+            where T : notnull
         {
-            return (Settings.TryGetSetting(name, out PackageSetting? setting) && setting is not null)
-                ? (T)setting.Value
-                : defaultSetting;
+            return Settings.GetSetting(definition, defaultSetting);
         }
 
         /// <summary>
@@ -166,17 +162,22 @@ namespace NUnit.Engine
                 subPackage.AddSetting(setting);
         }
 
-        ///// <summary>
-        ///// Return the value of a setting or a default.
-        ///// </summary>
-        ///// <param name="name">The name of the setting</param>
-        ///// <param name="defaultSetting">The default value</param>
-        ///// <returns></returns>
-        //public T GetSetting<T>(string name, T defaultSetting)
-        //{
-        //    return (Settings.TryGetSetting(name, out PackageSetting? setting) && setting is not null)
-        //        ? (T)setting.Value
-        //        : defaultSetting;
-        //}
+        /// <summary>
+        /// Add a setting to a package and all of its subpackages.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        /// <remarks>
+        /// Once a package is created, subpackages may have been created
+        /// as well. If you add a setting directly to the Settings dictionary
+        /// of the package, the subpackages are not updated. This method is
+        /// used when the settings are intended to be reflected to all the
+        /// subpackages under the package.
+        /// </remarks>
+        public void AddSetting<T>(string name, T value)
+            where T : notnull
+        {
+            AddSetting(new PackageSetting<T>(name, value));
+        }
     }
 }

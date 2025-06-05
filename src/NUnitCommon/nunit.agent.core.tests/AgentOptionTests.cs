@@ -14,9 +14,9 @@ namespace NUnit.Agents
             new TestCaseData("AgencyUrl", string.Empty),
             new TestCaseData("AgencyPid", string.Empty),
             new TestCaseData("DebugAgent", false),
-            new TestCaseData("DebugTests", false),
+            new TestCaseData(FrameworkPackageSettings.DebugTests, false),
             new TestCaseData("TraceLevel", InternalTraceLevel.Off),
-            new TestCaseData("WorkDirectory", string.Empty)
+            new TestCaseData(FrameworkPackageSettings.WorkDirectory, string.Empty)
         };
 
         [TestCaseSource(nameof(DefaultSettings))]
@@ -33,18 +33,18 @@ namespace NUnit.Agents
         {
             // Boolean options - no values provided
             new TestCaseData("--debug-agent", "DebugAgent", true),
-            new TestCaseData("--debug-tests", "DebugTests", true),
+            new TestCaseData("--debug-tests", FrameworkPackageSettings.DebugTests, true),
             // Options with values - using '=' as delimiter
             new TestCaseData($"--agentId={AGENT_GUID}", "AgentId", AGENT_GUID),
             new TestCaseData("--agencyUrl=THEURL", "AgencyUrl", "THEURL"),
             new TestCaseData("--pid=1234", "AgencyPid", "1234"),
             new TestCaseData("--trace=Info", "TraceLevel", InternalTraceLevel.Info),
-            new TestCaseData("--work=WORKDIR", "WorkDirectory", "WORKDIR"),
+            new TestCaseData("--work=WORKDIR", FrameworkPackageSettings.WorkDirectory, "WORKDIR"),
             // Options with values - using ':' as delimiter
             new TestCaseData("--trace:Error", "TraceLevel", InternalTraceLevel.Error),
-            new TestCaseData("--work:WORKDIR", "WorkDirectory", "WORKDIR"),
+            new TestCaseData("--work:WORKDIR", FrameworkPackageSettings.WorkDirectory, "WORKDIR"),
             // Value with spaces (provided OS passes them through)
-            new TestCaseData("--work:MY WORK DIR", "WorkDirectory", "MY WORK DIR"),
+            new TestCaseData("--work:MY WORK DIR", FrameworkPackageSettings.WorkDirectory, "MY WORK DIR"),
         };
 
         [TestCaseSource(nameof(ValidSettings))]

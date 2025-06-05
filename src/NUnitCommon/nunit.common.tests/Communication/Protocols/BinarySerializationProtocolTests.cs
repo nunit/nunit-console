@@ -124,7 +124,8 @@ namespace NUnit.Engine.Communication.Protocols
                 foreach (var setting in oldPackage.Settings)
                 {
                     Assert.That(newPackage.Settings.HasSetting(setting.Name));
-                    Assert.That(newPackage.Settings[setting.Name], Is.EqualTo(oldPackage.Settings[setting.Name]));
+                    Assert.That(newPackage.Settings.GetSetting(setting.Name),
+                                Is.EqualTo(oldPackage.Settings.GetSetting(setting.Name)));
                 }
 
                 for (int i = 0; i < oldPackage.SubPackages.Count; i++)

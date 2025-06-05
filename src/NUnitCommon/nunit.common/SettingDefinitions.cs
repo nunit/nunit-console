@@ -16,7 +16,7 @@ namespace NUnit.Common
     /// Although 'SettingDefinitions' might be a better descriptive name for the class,
     /// 'PackageSettings' seems to work slightly better frp, a usage point of view.
     /// </remarks>
-    public static class PackageSettings
+    public static class SettingDefinitions
     {
         #region Settings Used by the Engine
 
@@ -24,14 +24,14 @@ namespace NUnit.Common
         /// The name of the config to use in loading a project.
         /// If not specified, the first config found is used.
         /// </summary>
-        public static SettingDefinition ActiveConfig => new SettingDefinition<string>(nameof(ActiveConfig));
+        public static SettingDefinition<string> ActiveConfig { get; } = new(nameof(ActiveConfig));
 
         /// <summary>
         /// Bool indicating whether the engine should determine the private
         /// bin path by examining the paths to all the tests. Defaults to
         /// true unless PrivateBinPath is specified.
         /// </summary>
-        public static SettingDefinition AutoBinPath => new SettingDefinition<bool>(nameof(AutoBinPath));
+        public static SettingDefinition<bool> AutoBinPath { get; } = new(nameof(AutoBinPath));
 
         /// <summary>
         /// The ApplicationBase to use in loading the tests. If not
@@ -39,119 +39,119 @@ namespace NUnit.Common
         /// location of the assembly is used. For multiple  assemblies
         /// in a single process, the closest common root directory is used.
         /// </summary>
-        public static SettingDefinition BasePath => new SettingDefinition<string>(nameof(BasePath));
+        public static SettingDefinition<string> BasePath { get; } = new(nameof(BasePath));
 
         /// <summary>
         /// Path to the config file to use in running the tests.
         /// </summary>
-        public static SettingDefinition ConfigurationFile => new SettingDefinition<string>(nameof(ConfigurationFile));
+        public static SettingDefinition<string> ConfigurationFile { get; } = new(nameof(ConfigurationFile));
 
         ///// <summary>
         ///// Flag (bool) indicating whether tests are being debugged.
         ///// </summary>
-        //public static SettingDefinition DebugTests => new SettingDefinition<bool>(nameof(DebugTests));
+        //public static SettingDefinition<bool> DebugTests { get; } = new(nameof(DebugTests));
 
         /// <summary>
         /// Bool flag indicating whether a debugger should be launched at agent
         /// startup. Used only for debugging NUnit itself.
         /// </summary>
-        public static SettingDefinition DebugAgent => new SettingDefinition<bool>(nameof(DebugAgent));
+        public static SettingDefinition<bool> DebugAgent { get; } = new(nameof(DebugAgent));
 
         /// <summary>
         /// The private binpath used to locate assemblies. Directory paths
         /// is separated by a semicolon. It's an error to specify this and
         /// also set AutoBinPath to true.
         /// </summary>
-        public static SettingDefinition PrivateBinPath => new SettingDefinition<string>(nameof(PrivateBinPath));
+        public static SettingDefinition<string> PrivateBinPath { get; } = new(nameof(PrivateBinPath));
 
         /// <summary>
         /// The maximum number of test agents permitted to run simultaneously.
         /// Ignored if the ProcessModel is not set or defaulted to Multiple.
         /// </summary>
-        public static SettingDefinition MaxAgents => new SettingDefinition<int>(nameof(MaxAgents));
+        public static SettingDefinition<int> MaxAgents { get; } = new(nameof(MaxAgents));
 
         /// <summary>
         /// Indicates the desired runtime to use for the tests. Values
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
-        public static SettingDefinition RequestedRuntimeFramework => new SettingDefinition<string>(nameof(RequestedRuntimeFramework));
+        public static SettingDefinition<string> RequestedRuntimeFramework { get; } = new(nameof(RequestedRuntimeFramework));
 
         /// <summary>
         /// Indicates the desired runtime to use for the tests. Values
         /// are strings like "net-4.5", "mono-4.0", etc. Default is to
         /// use the target framework for which an assembly was built.
         /// </summary>
-        public static SettingDefinition RequestedFrameworkName => new SettingDefinition<string>(nameof(RequestedFrameworkName));
+        public static SettingDefinition<string> RequestedFrameworkName { get; } = new(nameof(RequestedFrameworkName));
 
         /// <summary>
         /// Indicates the Target runtime selected for use by the engine,
         /// based on the requested runtime and assembly metadata.
         /// </summary>
-        public static SettingDefinition TargetFrameworkName => new SettingDefinition<string>(nameof(TargetFrameworkName));
+        public static SettingDefinition<string> TargetFrameworkName { get; } = new(nameof(TargetFrameworkName));
 
         /// <summary>
         /// Indicates the name of the agent requested by the user.
         /// </summary>
-        public static SettingDefinition RequestedAgentName => new SettingDefinition<string>(nameof(RequestedAgentName));
+        public static SettingDefinition<string> RequestedAgentName { get; } = new(nameof(RequestedAgentName));
 
         /// <summary>
         /// Indicates the name of the agent that was actually used.
         /// </summary>
-        public static SettingDefinition SelectedAgentName => new SettingDefinition<string>(nameof(SelectedAgentName));
+        public static SettingDefinition<string> SelectedAgentName { get; } = new(nameof(SelectedAgentName));
 
         /// <summary>
         /// Bool flag indicating that the test should be run in a 32-bit process
         /// on a 64-bit system. By default, NUNit runs in a 64-bit process on
         /// a 64-bit system. Ignored if set on a 32-bit system.
         /// </summary>
-        public static SettingDefinition RunAsX86 => new SettingDefinition<bool>(nameof(RunAsX86));
+        public static SettingDefinition<bool> RunAsX86 { get; } = new(nameof(RunAsX86));
 
         /// <summary>
         /// Indicates that test runners should be disposed after the tests are executed
         /// </summary>
-        public static SettingDefinition DisposeRunners => new SettingDefinition<bool>(nameof(DisposeRunners));
+        public static SettingDefinition<bool> DisposeRunners { get; } = new(nameof(DisposeRunners));
 
         /// <summary>
         /// Bool flag indicating that the test assemblies should be shadow copied.
         /// Defaults to false.
         /// </summary>
-        public static SettingDefinition ShadowCopyFiles => new SettingDefinition<bool>(nameof(ShadowCopyFiles));
+        public static SettingDefinition<bool> ShadowCopyFiles { get; } = new(nameof(ShadowCopyFiles));
 
         /// <summary>
         /// Bool flag indicating that user profile should be loaded on test runner processes
         /// </summary>
-        public static SettingDefinition LoadUserProfile => new SettingDefinition<bool>(nameof(LoadUserProfile));
+        public static SettingDefinition<bool> LoadUserProfile { get; } = new(nameof(LoadUserProfile));
 
         /// <summary>
         /// Bool flag indicating that non-test assemblies should be skipped without error.
         /// </summary>
-        public static SettingDefinition SkipNonTestAssemblies => new SettingDefinition<bool>(nameof(SkipNonTestAssemblies));
+        public static SettingDefinition<bool> SkipNonTestAssemblies { get; } = new(nameof(SkipNonTestAssemblies));
 
         ///// <summary>
         ///// Flag (bool) indicating whether to pause execution of tests to allow
         ///// the user to attach a debugger.
         ///// </summary>
-        //public static SettingDefinition PauseBeforeRun => new SettingDefinition<bool>(nameof(PauseBeforeRun));
+        //public static SettingDefinition<bool> PauseBeforeRun { get; } = new(nameof(PauseBeforeRun));
 
         ///// <summary>
         ///// The InternalTraceLevel for this run. Values are: "Default",
         ///// "Off", "Error", "Warning", "Info", "Debug", "Verbose".
         ///// Default is "Off". "Debug" and "Verbose" are synonyms.
         ///// </summary>
-        //public static SettingDefinition InternalTraceLevel => new SettingDefinition<string>(nameof(InternalTraceLevel));
+        //public static SettingDefinition<string> InternalTraceLevel { get; } = new(nameof(InternalTraceLevel));
 
         /// <summary>
         /// The PrincipalPolicy to set on the test application domain. Values are:
         /// "UnauthenticatedPrincipal", "NoPrincipal" and "WindowsPrincipal".
         /// </summary>
-        public static SettingDefinition PrincipalPolicy => new SettingDefinition<string>(nameof(PrincipalPolicy));
+        public static SettingDefinition<string> PrincipalPolicy { get; } = new(nameof(PrincipalPolicy));
 
         ///// <summary>
         ///// Full path of the directory to be used for work and result files.
         ///// This path is provided to tests by the framework TestContext.
         ///// </summary>
-        //public static SettingDefinition WorkDirectory => new SettingDefinition<string>(nameof(WorkDirectory));
+        //public static SettingDefinition<string> WorkDirectory { get; } = new(nameof(WorkDirectory));
 
         #endregion
 
@@ -160,30 +160,30 @@ namespace NUnit.Common
         /// <summary>
         /// Flag (bool) indicating whether tests are being debugged.
         /// </summary>
-        public static SettingDefinition DebugTests =>
-            new SettingDefinition<bool>(FrameworkPackageSettings.DebugTests);
+        public static SettingDefinition<bool> DebugTests { get; } =
+            new(FrameworkPackageSettings.DebugTests);
 
         /// <summary>
         /// Flag (bool) indicating whether to pause execution of tests to allow
         /// the user to attach a debugger.
         /// </summary>
-        public static SettingDefinition PauseBeforeRun =>
-            new SettingDefinition<bool>(FrameworkPackageSettings.PauseBeforeRun);
+        public static SettingDefinition<bool> PauseBeforeRun { get; } =
+            new(FrameworkPackageSettings.PauseBeforeRun);
 
         /// <summary>
         /// The InternalTraceLevel for this run. Values are: "Default",
         /// "Off", "Error", "Warning", "Info", "Debug", "Verbose".
         /// Default is "Off". "Debug" and "Verbose" are synonyms.
         /// </summary>
-        public static SettingDefinition<string> InternalTraceLevel =>
-            new SettingDefinition<string>(FrameworkPackageSettings.InternalTraceLevel);
+        public static SettingDefinition<string> InternalTraceLevel { get; } =
+            new(FrameworkPackageSettings.InternalTraceLevel);
 
         /// <summary>
         /// Full path of the directory to be used for work and result files.
         /// This path is provided to tests by the framework TestContext.
         /// </summary>
-        public static SettingDefinition<string> WorkDirectory =>
-            new SettingDefinition<string>(FrameworkPackageSettings.WorkDirectory);
+        public static SettingDefinition<string> WorkDirectory { get; } =
+            new(FrameworkPackageSettings.WorkDirectory);
 
         #endregion
 
@@ -194,24 +194,24 @@ namespace NUnit.Common
         /// stored in the assembly image. If it represents a project or other
         /// group of assemblies, it is the maximum version for all the assemblies.
         /// </summary>
-        public static SettingDefinition ImageRuntimeVersion => new SettingDefinition<string>(nameof(ImageRuntimeVersion));
+        public static SettingDefinition<string> ImageRuntimeVersion { get; } = new(nameof(ImageRuntimeVersion));
 
         /// <summary>
         /// True if any assembly in the package requires running as a 32-bit
         /// process when on a 64-bit system.
         /// </summary>
-        public static SettingDefinition ImageRequiresX86 => new SettingDefinition<bool>(nameof(ImageRequiresX86));
+        public static SettingDefinition<bool> ImageRequiresX86 { get; } = new(nameof(ImageRequiresX86));
 
         /// <summary>
         /// True if any assembly in the package requires a special assembly resolution hook
         /// in the default application domain in order to find dependent assemblies.
         /// </summary>
-        public static SettingDefinition ImageRequiresDefaultAppDomainAssemblyResolver => new SettingDefinition<bool>(nameof(ImageRequiresDefaultAppDomainAssemblyResolver));
+        public static SettingDefinition<bool> ImageRequiresDefaultAppDomainAssemblyResolver { get; } = new(nameof(ImageRequiresDefaultAppDomainAssemblyResolver));
 
         /// <summary>
         /// The FrameworkName specified on a TargetFrameworkAttribute for the assembly
         /// </summary>
-        public static SettingDefinition ImageTargetFrameworkName => new SettingDefinition<string>(nameof(ImageTargetFrameworkName));
+        public static SettingDefinition<string> ImageTargetFrameworkName { get; } = new(nameof(ImageTargetFrameworkName));
 
         #endregion
 
@@ -222,44 +222,44 @@ namespace NUnit.Common
         /// for test cases. If not specified, there is no timeout except
         /// as specified by attributes on the tests themselves.
         /// </summary>
-        public static SettingDefinition<int> DefaultTimeout =>
-            new SettingDefinition<int>(FrameworkPackageSettings.DefaultTimeout);
+        public static SettingDefinition<int> DefaultTimeout { get; } =
+            new(FrameworkPackageSettings.DefaultTimeout);
 
         /// <summary>
         /// A string representing the default thread culture to be used for
         /// running tests. String should be a valid BCP-47 culture name. If
         /// culture is unset, tests run on the machine's default culture.
         /// </summary>
-        public static SettingDefinition<string> DefaultCulture =>
-            new SettingDefinition<string>(FrameworkPackageSettings.DefaultCulture);
+        public static SettingDefinition<string> DefaultCulture { get; } =
+            new(FrameworkPackageSettings.DefaultCulture);
 
         /// <summary>
         /// A string representing the default thread UI culture to be used for
         /// running tests. String should be a valid BCP-47 culture name. If
         /// culture is unset, tests run on the machine's default culture.
         /// </summary>
-        public static SettingDefinition<string> DefaultUICulture =>
-            new SettingDefinition<string>(FrameworkPackageSettings.DefaultUICulture);
+        public static SettingDefinition<string> DefaultUICulture { get; } =
+            new(FrameworkPackageSettings.DefaultUICulture);
 
         /// <summary>
         /// A TextWriter to which the internal trace will be sent.
         /// </summary>
-        public static SettingDefinition<TextWriter> InternalTraceWriter =>
-            new SettingDefinition<TextWriter>(FrameworkPackageSettings.InternalTraceWriter);
+        public static SettingDefinition<TextWriter> InternalTraceWriter { get; } =
+            new(FrameworkPackageSettings.InternalTraceWriter);
 
         /// <summary>
         /// A list of tests to be loaded.
         /// </summary>
-        public static SettingDefinition<IList<string>> LOAD =>
-            new SettingDefinition<IList<string>>(FrameworkPackageSettings.LOAD);
+        public static SettingDefinition<IList<string>> LOAD { get; } =
+            new(FrameworkPackageSettings.LOAD);
 
         /// <summary>
         /// The number of test threads to run for the assembly. If set to
         /// 1, a single queue is used. If set to 0, tests are executed
         /// directly, without queuing.
         /// </summary>
-        public static SettingDefinition<int> NumberOfTestWorkers =>
-            new SettingDefinition<int>(FrameworkPackageSettings.NumberOfTestWorkers);
+        public static SettingDefinition<int> NumberOfTestWorkers { get; } =
+            new(FrameworkPackageSettings.NumberOfTestWorkers);
 
         /// <summary>
         /// The random seed to be used for this assembly. If specified
@@ -268,50 +268,51 @@ namespace NUnit.Common
         /// that run, provided that no change has been made to the test
         /// assembly. Default is a random value itself.
         /// </summary>
-        public static SettingDefinition<int> RandomSeed =>
-            new SettingDefinition<int>(FrameworkPackageSettings.RandomSeed);
+        public static SettingDefinition<int> RandomSeed { get; } =
+            new(FrameworkPackageSettings.RandomSeed);
 
         /// <summary>
         /// If true, execution stops after the first error or failure.
         /// </summary>
-        public static SettingDefinition StopOnError =>
-            new SettingDefinition<bool>(FrameworkPackageSettings.StopOnError);
+        public static SettingDefinition<bool> StopOnError { get; } =
+            new(FrameworkPackageSettings.StopOnError);
 
         /// <summary>
         /// If true, asserts in multiple asserts block will throw first-chance exception on failure.
         /// </summary>
-        public static SettingDefinition ThrowOnEachFailureUnderDebugger =>
-            new SettingDefinition<bool>(FrameworkPackageSettings.ThrowOnEachFailureUnderDebugger);
+        public static SettingDefinition<bool> ThrowOnEachFailureUnderDebugger { get; } =
+            new(FrameworkPackageSettings.ThrowOnEachFailureUnderDebugger);
 
         /// <summary>
         /// If true, use of the event queue is suppressed and test events are synchronous.
         /// </summary>
-        public static SettingDefinition SynchronousEvents =>
-            new SettingDefinition<bool>(FrameworkPackageSettings.SynchronousEvents);
+        public static SettingDefinition<bool> SynchronousEvents { get; } =
+            new(FrameworkPackageSettings.SynchronousEvents);
 
         /// <summary>
         /// The default naming pattern used in generating test names
         /// </summary>
-        public static SettingDefinition<string> DefaultTestNamePattern =>
-            new SettingDefinition<string>(FrameworkPackageSettings.DefaultTestNamePattern);
+        public static SettingDefinition<string> DefaultTestNamePattern { get; } =
+            new(FrameworkPackageSettings.DefaultTestNamePattern);
 
         /// <summary>
-        /// Parameters to be passed on to the tests, serialized to a single string which needs parsing. Obsoleted by <see cref=>"TestParametersDictionary"/>; kept for backward compatibility.
+        /// Parameters to be passed on to the tests, serialized to a single string which needs parsing.
+        /// Obsoleted by <see cref="TestParametersDictionary"/>; kept for backward compatibility.
         /// </summary>
-        public static SettingDefinition<string> TestParameters =>
-            new SettingDefinition<string>(FrameworkPackageSettings.TestParameters);
+        public static SettingDefinition<string> TestParameters { get; } =
+            new(FrameworkPackageSettings.TestParameters);
 
         /// <summary>
         /// If true, the tests will run on the same thread as the NUnit runner itself
         /// </summary>
-        public static SettingDefinition RunOnMainThread =>
-            new SettingDefinition<bool>(FrameworkPackageSettings.RunOnMainThread);
+        public static SettingDefinition<bool> RunOnMainThread { get; } =
+            new(FrameworkPackageSettings.RunOnMainThread);
 
         /// <summary>
-        /// Parameters to be passed on to the tests, already parsed into an IDictionary&lt;string, string>. Replaces <see cref=>"TestParameters"/>.
+        /// Parameters to be passed on to the tests, already parsed into an IDictionary&lt;string, string>. Replaces <see cref="TestParameters"/>.
         /// </summary>
-        public static SettingDefinition TestParametersDictionary =>
-            new SettingDefinition<IDictionary<string, string>>(FrameworkPackageSettings.TestParametersDictionary);
+        public static SettingDefinition<IDictionary<string, string>> TestParametersDictionary { get; } =
+            new(FrameworkPackageSettings.TestParametersDictionary);
 
         #endregion
     }

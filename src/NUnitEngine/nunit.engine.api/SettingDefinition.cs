@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace NUnit.Engine
 {
@@ -11,6 +9,9 @@ namespace NUnit.Engine
     /// </summary>
     public abstract class SettingDefinition
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SettingDefinition"/> class.
+        /// </summary>
         public SettingDefinition(string name, Type valueType)
         {
             Name = name;
@@ -59,14 +60,14 @@ namespace NUnit.Engine
 
         //public override Type ValueType => typeof(T);
 
-        ///// <summary>
-        ///// Create a PackageSetting based on this definition.
-        ///// </summary>
-        ///// <param name="value">The value to assign the setting.</param>
-        ///// <returns>A PackageSetting.</returns>
-        //public PackageSetting WithValue(T value)
-        //{
-        //    return new PackageSetting<T>(Name, value);
-        //}
+        /// <summary>
+        /// Create a PackageSetting based on this definition.
+        /// </summary>
+        /// <param name="value">The value to assign the setting.</param>
+        /// <returns>A PackageSetting.</returns>
+        public PackageSetting<T> WithValue(T value)
+        {
+            return new PackageSetting<T>(Name, value);
+        }
     }
 }
