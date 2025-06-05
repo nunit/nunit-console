@@ -3,10 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml;
 using NUnit.Framework;
-using NUnit.TestData;
 using NUnit.TestData.Assemblies;
 
 namespace NUnit.Engine.Runners.Tests

@@ -167,7 +167,6 @@ using System.IO;
 using System.Reflection;
 #else
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 #endif
 using System.Text;
 using System.Text.RegularExpressions;

@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Extensibility;
-using System.Reflection;
 
 namespace NUnit.Engine.Drivers
 {
