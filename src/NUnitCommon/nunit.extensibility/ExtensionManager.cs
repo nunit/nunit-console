@@ -211,7 +211,6 @@ namespace NUnit.Extensibility
         /// Get the first or only ExtensionNode for a given ExtensionPoint
         /// </summary>
         /// <param name="path">The identifying path for an ExtensionPoint</param>
-        /// <returns></returns>
         public IExtensionNode? GetExtensionNode(string path)
         {
             LoadExtensions();

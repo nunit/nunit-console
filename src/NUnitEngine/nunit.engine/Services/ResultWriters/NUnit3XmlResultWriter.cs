@@ -17,7 +17,6 @@ namespace NUnit.Engine.Services
         /// Checks if the output is writable by creating a stub result file. If the output is not
         /// writable, this method should throw an exception.
         /// </summary>
-        /// <param name="outputPath"></param>
         public void CheckWritability(string outputPath)
         {
             XmlNode stub = GetStubResult();

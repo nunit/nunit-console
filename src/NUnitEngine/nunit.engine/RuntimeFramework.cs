@@ -102,8 +102,6 @@ namespace NUnit.Engine
         /// a Version or a hyphenated RuntimeType-Version or
         /// a Version prefixed by 'v'.
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static RuntimeFramework Parse(string s)
         {
             Guard.ArgumentNotNullOrEmpty(s);
@@ -143,7 +141,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Overridden to return the short name of the framework
         /// </summary>
-        /// <returns></returns>
         public override string ToString() => Id;
 
         /// <summary>

@@ -112,7 +112,6 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="definition">The name and type of the setting</param>
         /// <param name="defaultSetting">The default value</param>
-        /// <returns></returns>
         public T GetSetting<T>(SettingDefinition<T> definition, T defaultSetting)
             where T : notnull
         {

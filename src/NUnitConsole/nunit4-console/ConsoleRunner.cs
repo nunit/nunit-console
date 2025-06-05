@@ -128,7 +128,6 @@ namespace NUnit.ConsoleRunner
         /// <summary>
         /// Executes tests according to the provided command-line options.
         /// </summary>
-        /// <returns></returns>
         public int Execute()
         {
             if (!VerifyEngineSupport(_options))

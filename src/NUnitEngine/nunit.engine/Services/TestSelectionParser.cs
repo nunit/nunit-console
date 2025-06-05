@@ -63,7 +63,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Parse a single term or an or expression, returning the xml
         /// </summary>
-        /// <returns></returns>
         private string ParseFilterExpression()
         {
             var terms = new List<string>();

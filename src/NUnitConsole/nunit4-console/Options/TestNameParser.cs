@@ -11,10 +11,8 @@ namespace NUnit.ConsoleRunner.Options
     public class TestNameParser
     {
         /// <summary>
-        /// Parse the -run argument and return an array of argument
+        /// Parse the -run argument and return an array of arguments
         /// </summary>
-        /// <param name="argument">argument</param>
-        /// <returns></returns>
         public static string[] Parse(string argument)
         {
             List<string> list = new List<string>();

@@ -34,7 +34,6 @@ namespace NUnit.Engine
         /// Return the value of a setting or a default.
         /// </summary>
         /// <param name="name">The name of the setting</param>
-        /// <returns></returns>
         public object GetSetting(string name)
         {
             return _settings[name].Value;
@@ -69,7 +68,6 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="definition">The name and type of the setting</param>
         /// <param name="value">The value stored for the setting</param>
-        /// <returns></returns>
         public bool TryGetSetting<T>(SettingDefinition<T> definition, [NotNullWhen(true)] out T? value)
             where T : notnull
         {
@@ -88,7 +86,6 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="definition">The name and type of the setting</param>
         /// <param name="defaultSetting">The default value</param>
-        /// <returns></returns>
         public T GetSetting<T>(SettingDefinition<T> definition, T defaultSetting)
             where T : notnull
         {
@@ -106,7 +103,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Adds a setting to the list.
         /// </summary>
-        /// <param name="setting"></param>
         public void Add(PackageSetting setting) => _settings.Add(setting.Name, setting);
 
         /// <summary>
@@ -123,7 +119,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Adds or replaces a setting to the list.
         /// </summary>
-        /// <param name="setting"></param>
         public void Set(PackageSetting setting) => _settings[setting.Name] = setting;
 
         /// <summary>

@@ -339,7 +339,6 @@ namespace NUnit.Engine.Services
         /// Use Mono.Cecil to get information about all assemblies and
         /// apply it to the package using special internal keywords.
         /// </summary>
-        /// <param name="package"></param>
         private static void ApplyImageData(TestPackage package)
         {
             string packageName = package.FullName ?? string.Empty;
