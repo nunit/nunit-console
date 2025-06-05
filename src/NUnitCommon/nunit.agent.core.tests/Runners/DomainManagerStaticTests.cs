@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using NUnit.Common;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Runners
@@ -90,7 +91,7 @@ namespace NUnit.Engine.Runners
 
             var package = new TestPackage(filePath);
             if (appBase is not null)
-                package.Settings.Add("BasePath", appBase);
+                package.Settings.Add(SettingDefinitions.BasePath.WithValue(appBase));
 
             Assert.That(DomainManager.GetApplicationBase(package), Is.SamePath(expected));
         }
@@ -121,7 +122,7 @@ namespace NUnit.Engine.Runners
 
             var package = new TestPackage(filePath);
             if (configSetting is not null)
-                package.Settings.Add("ConfigurationFile", configSetting);
+                package.Settings.Add(SettingDefinitions.ConfigurationFile.WithValue(configSetting));
 
             Assert.That(DomainManager.GetConfigFile(appBase, package), Is.EqualTo(expected));
         }

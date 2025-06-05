@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using NUnit.TestData.Assemblies;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {
@@ -51,7 +51,7 @@ namespace NUnit.Engine.Runners
             string basePath = Path.GetDirectoryName(Path.GetDirectoryName(assemblyDir))!;
             string relPath = assemblyDir.Substring(basePath.Length + 1);
 
-            _package.Settings.Add("BasePath", basePath);
+            _package.Settings.Add(SettingDefinitions.BasePath.WithValue(basePath));
             var domain = _domainManager.CreateDomain(_package);
 
             Assert.That(domain, Is.Not.Null);

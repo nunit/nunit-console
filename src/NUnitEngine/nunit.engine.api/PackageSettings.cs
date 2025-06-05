@@ -101,19 +101,39 @@ namespace NUnit.Engine
         IEnumerator IEnumerable.GetEnumerator() => _settings.Values.GetEnumerator();
 
         /// <summary>
-        /// Adds a setting to the list.
+        /// Adds a setting to the list directly.
         /// </summary>
+        /// <param name="setting">A PackageSetting instance</param>
         public void Add(PackageSetting setting) => _settings.Add(setting.Name, setting);
 
         /// <summary>
-        /// Adds a setting to the list.
+        /// Adds a custom string setting to the list, specifying the name and value.
         /// </summary>
         /// <param name="name">The name of the setting.</param>
         /// <param name="value">The corresponding value to set.</param>
-        public void Add<T>(string name, T value)
-            where T : notnull
+        public void Add(string name, string value)
         {
-            Add(new PackageSetting<T>(name, value));
+            Add(new PackageSetting<string>(name, value));
+        }
+
+        /// <summary>
+        /// Adds a custom boolean setting to the list, specifying the name and value.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        public void Add(string name, bool value)
+        {
+            Add(new PackageSetting<bool>(name, value));
+        }
+
+        /// <summary>
+        /// Adds a custom int setting to the list, specifying the name and value.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        public void Add(string name, int value)
+        {
+            Add(new PackageSetting<int>(name, value));
         }
 
         /// <summary>
