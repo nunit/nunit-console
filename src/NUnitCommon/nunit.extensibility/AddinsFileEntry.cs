@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using NUnit.Common;
 

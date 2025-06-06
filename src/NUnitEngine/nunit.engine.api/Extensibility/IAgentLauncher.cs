@@ -23,17 +23,11 @@ namespace NUnit.Engine.Extensibility
         /// <summary>
         /// Returns true if the launcher can create an agent for the supplied package, otherwise false.
         /// </summary>
-        /// <param name="package"></param>
-        /// <returns></returns>
         bool CanCreateAgent(TestPackage package);
 
         /// <summary>
         /// Returns an agent capable of running the specified package.
         /// </summary>
-        /// <param name="agentId"></param>
-        /// <param name="agencyUrl"></param>
-        /// <param name="package"></param>
-        /// <returns></returns>
         Process CreateAgent(Guid agentId, string agencyUrl, TestPackage package);
     }
 }

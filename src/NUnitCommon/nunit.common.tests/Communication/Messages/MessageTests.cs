@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Engine.Communication.Protocols;
-using NUnit.Engine.Internal;
 
 namespace NUnit.Engine.Communication.Messages
 {

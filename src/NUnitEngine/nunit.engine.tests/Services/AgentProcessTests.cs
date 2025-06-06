@@ -6,6 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using NUnit.Framework;
 using NSubstitute;
+using NUnit.Common;
 
 namespace NUnit.Engine.Services
 {
@@ -24,7 +25,7 @@ namespace NUnit.Engine.Services
             _agency.RemotingUrl.ReturnsForAnyArgs(REMOTING_URL);
             _package = new TestPackage("junk.dll");
             // Only required setting, some tests may change this
-            _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = "net-4.5";
+            _package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue("net-4.5"));
         }
 
 #if DEBUG
@@ -59,8 +60,8 @@ namespace NUnit.Engine.Services
         [TestCase("netcore-9.0", true, "net8.0/nunit-agent-net80.dll")]
         public void AgentSelection(string runtime, bool x86, string agentPath)
         {
-            _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = runtime;
-            _package.Settings[EnginePackageSettings.RunAsX86] = x86;
+            _package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(runtime));
+            _package.Settings.Set(SettingDefinitions.RunAsX86.WithValue(x86));
 
             var agentProcess = GetAgentProcess();
             agentPath = Path.GetFullPath(AGENTS_DIR + agentPath);
@@ -79,7 +80,7 @@ namespace NUnit.Engine.Services
         [TestCase("mono-2.0")]
         public void DefaultValues(string framework)
         {
-            _package.Settings[EnginePackageSettings.TargetRuntimeFramework] = framework;
+            _package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(framework));
             var process = GetAgentProcess();
 
             Assert.That(process.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS));
@@ -110,7 +111,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void DebugTests()
         {
-            _package.Settings[EnginePackageSettings.DebugTests] = true;
+            _package.Settings.Set(SettingDefinitions.DebugTests.WithValue(true));
             var agentProcess = GetAgentProcess();
 
             // Not reflected in args because framework handles it
@@ -120,7 +121,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void DebugAgent()
         {
-            _package.Settings[EnginePackageSettings.DebugAgent] = true;
+            _package.Settings.Set(SettingDefinitions.DebugAgent.WithValue(true));
             var agentProcess = GetAgentProcess();
             Assert.That(agentProcess.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS + " --debug-agent"));
         }
@@ -128,7 +129,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void LoadUserProfile()
         {
-            _package.Settings[EnginePackageSettings.LoadUserProfile] = true;
+            _package.Settings.Set(SettingDefinitions.LoadUserProfile.WithValue(true));
             var agentProcess = GetAgentProcess();
             Assert.That(agentProcess.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS));
         }
@@ -136,7 +137,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void TraceLevel()
         {
-            _package.Settings[EnginePackageSettings.InternalTraceLevel] = "Debug";
+            _package.Settings.Set(SettingDefinitions.InternalTraceLevel.WithValue("Debug"));
             var agentProcess = GetAgentProcess();
             Assert.That(agentProcess.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS + " --trace=Debug"));
         }
@@ -144,7 +145,7 @@ namespace NUnit.Engine.Services
         [Test]
         public void WorkDirectory()
         {
-            _package.Settings[EnginePackageSettings.WorkDirectory] = "WORKDIRECTORY";
+            _package.Settings.Set(SettingDefinitions.WorkDirectory.WithValue("WORKDIRECTORY"));
             var agentProcess = GetAgentProcess();
             Assert.That(agentProcess.AgentArgs.ToString(), Is.EqualTo(REQUIRED_ARGS + " --work=WORKDIRECTORY"));
         }

@@ -17,7 +17,6 @@ namespace NUnit.Engine.Extensibility
         /// Checks if the output path is writable. If the output is not
         /// writable, this method should throw an exception.
         /// </summary>
-        /// <param name="outputPath"></param>
         void CheckWritability(string outputPath);
 
         /// <summary>

@@ -131,8 +131,8 @@ namespace NUnit.Engine.Services
             IRuntimeFramework currentFramework = CurrentFramework;
             log.Debug("Current framework is " + currentFramework);
 
-            string frameworkSetting = package.GetSetting(EnginePackageSettings.RequestedRuntimeFramework, string.Empty);
-            bool runAsX86 = package.GetSetting(EnginePackageSettings.RunAsX86, false);
+            string frameworkSetting = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework);
+            bool runAsX86 = package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86);
 
             if (frameworkSetting.Length > 0)
             {
@@ -145,15 +145,16 @@ namespace NUnit.Engine.Services
                     throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
 
                 var frameworkName = requestedFramework.FrameworkName.ToString();
-                package.Settings[EnginePackageSettings.RequestedFrameworkName] = frameworkName;
-                package.Settings[EnginePackageSettings.TargetFrameworkName] = frameworkName;
+                package.Settings.Set(SettingDefinitions.RequestedFrameworkName.WithValue(frameworkName));
+                package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(frameworkName));
 
                 return requestedFramework;
             }
 
             log.Debug($"No specific framework requested for {package.Name}");
 
-            string imageTargetFrameworkNameSetting = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
+            string imageTargetFrameworkNameSetting =
+                package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
             Runtime targetRuntime;
             Version targetVersion;
 
@@ -161,7 +162,7 @@ namespace NUnit.Engine.Services
             {
                 // Assume .NET Framework
                 targetRuntime = Runtime.Net;
-                var trialVersion = new Version(package.GetSetting(EnginePackageSettings.ImageRuntimeVersion, "2.0"));
+                var trialVersion = new Version(package.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion));
                 targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
             else
@@ -196,7 +197,7 @@ namespace NUnit.Engine.Services
             }
 
             RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);
-            package.Settings[EnginePackageSettings.TargetFrameworkName] = targetFramework.FrameworkName.ToString();
+            package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(targetFramework.FrameworkName.ToString()));
 
             log.Debug($"Test will use {targetFramework} for {package.Name}");
             return targetFramework;
@@ -338,7 +339,6 @@ namespace NUnit.Engine.Services
         /// Use Mono.Cecil to get information about all assemblies and
         /// apply it to the package using special internal keywords.
         /// </summary>
-        /// <param name="package"></param>
         private static void ApplyImageData(TestPackage package)
         {
             string packageName = package.FullName ?? string.Empty;
@@ -361,13 +361,13 @@ namespace NUnit.Engine.Services
                     ApplyImageData(subPackage);
 
                     // Collect the highest version required
-                    Version v = new Version(subPackage.GetSetting(EnginePackageSettings.ImageRuntimeVersion, "0.0"));
+                    Version v = new Version(subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion));
                     if (v > targetVersion)
                         targetVersion = v;
 
                     // Collect highest framework name
                     // TODO: This assumes lexical ordering is valid - check it
-                    string fn = subPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
+                    string fn = subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
                     if (fn != string.Empty)
                     {
                         if (frameworkName is null || fn.CompareTo(frameworkName) < 0)
@@ -375,10 +375,10 @@ namespace NUnit.Engine.Services
                     }
 
                     // If any assembly requires X86, then the aggregate package requires it
-                    if (subPackage.GetSetting(EnginePackageSettings.ImageRequiresX86, false))
+                    if (subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageRequiresX86))
                         requiresX86 = true;
 
-                    if (subPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
+                    if (subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver))
                         requiresAssemblyResolver = true;
                 }
             }
@@ -419,16 +419,17 @@ namespace NUnit.Engine.Services
             }
 
             if (targetVersion.Major > 0)
-                package.Settings[EnginePackageSettings.ImageRuntimeVersion] = targetVersion.ToString();
+                package.Settings.Set(SettingDefinitions.ImageRuntimeVersion.WithValue(targetVersion.ToString()));
 
             if (!string.IsNullOrEmpty(frameworkName))
-                package.Settings[EnginePackageSettings.ImageTargetFrameworkName] = frameworkName;
+                package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue(frameworkName));
 
-            package.Settings[EnginePackageSettings.ImageRequiresX86] = requiresX86;
+            // TODO: Why both?
+            package.Settings.Set(SettingDefinitions.ImageRequiresX86.WithValue(requiresX86));
             if (requiresX86)
-                package.Settings[EnginePackageSettings.RunAsX86] = true;
+                package.Settings.Set(SettingDefinitions.RunAsX86.WithValue(true));
 
-            package.Settings[EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver] = requiresAssemblyResolver;
+            package.Settings.Set(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver.WithValue(requiresAssemblyResolver));
         }
     }
 }

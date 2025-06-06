@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -212,7 +211,6 @@ namespace NUnit.Extensibility
         /// Get the first or only ExtensionNode for a given ExtensionPoint
         /// </summary>
         /// <param name="path">The identifying path for an ExtensionPoint</param>
-        /// <returns></returns>
         public IExtensionNode? GetExtensionNode(string path)
         {
             LoadExtensions();

@@ -27,7 +27,6 @@ namespace NUnit
         /// Construct an InternalTraceWriter that writes to a
         /// TextWriter provided by the caller.
         /// </summary>
-        /// <param name="writer"></param>
         public InternalTraceWriter(TextWriter writer)
         {
             Guard.ArgumentNotNull(writer);

@@ -138,7 +138,7 @@ namespace NUnit.ConsoleRunner
 
         [TestCase("ShowHelp", "help|h")]
         [TestCase("ShowVersion", "version|V")]
-        [TestCase("StopOnError", "stoponerror")]
+        [TestCase(FrameworkPackageSettings.StopOnError, "stoponerror")]
         [TestCase("WaitBeforeExit", "wait")]
         [TestCase("NoHeader", "noheader|noh")]
         [TestCase("DisposeRunners", "dispose-runners")]
@@ -147,8 +147,8 @@ namespace NUnit.ConsoleRunner
 #if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
-        [TestCase("DebugTests", "debug")]
-        [TestCase("PauseBeforeRun", "pause")]
+        [TestCase(FrameworkPackageSettings.DebugTests, "debug")]
+        [TestCase(FrameworkPackageSettings.PauseBeforeRun, "pause")]
         [TestCase("LoadUserProfile", "loaduserprofile")]
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
@@ -190,10 +190,10 @@ namespace NUnit.ConsoleRunner
         [TestCase("WhereClause", "where", new string[] { "cat==Fast" }, new string[0])]
         [TestCase("ActiveConfig", "config", new string[] { "Debug" }, new string[0])]
         [TestCase("OutFile", "output|out", new string[] { "output.txt" }, new string[0])]
-        [TestCase("WorkDirectory", "work", new string[] { "results" }, new string[0])]
+        [TestCase(FrameworkPackageSettings.WorkDirectory, "work", new string[] { "results" }, new string[0])]
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter" }, new string[] { "JUNK" })]
-        [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
-        [TestCase("DefaultTestNamePattern", "test-name-format", new string[] { "{m}{a}" }, new string[0])]
+        [TestCase(FrameworkPackageSettings.InternalTraceLevel, "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
+        [TestCase(FrameworkPackageSettings.DefaultTestNamePattern, "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
 #if NETFRAMEWORK
        // We can't predict which runtimes are available on the test machine, so we don't
@@ -229,7 +229,7 @@ namespace NUnit.ConsoleRunner
         }
 
         [TestCase("DisplayTestLabels", "labels", new string[] { "Off", "On", "OnOutput", "Before", "After", "BeforeAndAfter" })]
-        [TestCase("InternalTraceLevel", "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
+        [TestCase(FrameworkPackageSettings.InternalTraceLevel, "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
             PropertyInfo property = GetPropertyInfo(propertyName);
@@ -246,8 +246,8 @@ namespace NUnit.ConsoleRunner
         }
 
         [TestCase("DefaultTestCaseTimeout", "testCaseTimeout")]
-        [TestCase("RandomSeed", "seed")]
-        [TestCase("NumberOfTestWorkers", "workers")]
+        [TestCase(FrameworkPackageSettings.RandomSeed, "seed")]
+        [TestCase(FrameworkPackageSettings.NumberOfTestWorkers, "workers")]
 #if NETFRAMEWORK
         [TestCase("MaxAgents", "agents")]
 #endif

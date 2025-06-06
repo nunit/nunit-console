@@ -22,10 +22,8 @@ namespace NUnit.TextDisplay
         }
 
         /// <summary>
-        /// By using styles, we can keep everything consistent
+        /// Gets the ConsoleColor associated with a style
         /// </summary>
-        /// <param name="style"></param>
-        /// <returns></returns>
         public static ConsoleColor GetColor(ColorStyle style)
         {
             ConsoleColor color = GetColorForStyle(style);

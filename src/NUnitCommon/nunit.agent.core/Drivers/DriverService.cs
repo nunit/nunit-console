@@ -50,7 +50,6 @@ namespace NUnit.Engine.Drivers
         /// <param name="assemblyPath">The full path to the test assembly</param>
         /// <param name="targetFramework">The value of any TargetFrameworkAttribute on the assembly, or null</param>
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
-        /// <returns></returns>
         public IFrameworkDriver GetDriver(AppDomain domain, TestPackage package, string assemblyPath, string? targetFramework, bool skipNonTestAssemblies)
         {
             if (!File.Exists(assemblyPath))

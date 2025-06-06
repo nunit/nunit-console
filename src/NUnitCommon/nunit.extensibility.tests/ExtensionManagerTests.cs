@@ -316,7 +316,6 @@ namespace NUnit.Extensibility
         /// bin\release\netstandard2.0.
         /// </summary>
         /// <param name="dir">The sibling directory</param>
-        /// <returns></returns>
         private static string GetSiblingDirectory(string dir)
         {
             var file = new FileInfo(typeof(ExtensionManagerTests).Assembly.Location);
@@ -328,7 +327,6 @@ namespace NUnit.Extensibility
         /// assembly based on the argument provided.
         /// </summary>
         /// <param name="tfm">A test framework moniker. Must be one for which the fake extensions are built.</param>
-        /// <returns></returns>
         private static ExtensionAssembly FakeExtensions(string tfm)
         {
             return new ExtensionAssembly(

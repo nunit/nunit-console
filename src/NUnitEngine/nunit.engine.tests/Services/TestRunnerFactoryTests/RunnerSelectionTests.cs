@@ -1,11 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
-using NUnitLite;
 
 namespace NUnit.Engine.Services.TestRunnerFactoryTests
 {

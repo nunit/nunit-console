@@ -3,7 +3,6 @@
 using System.IO;
 using System.Xml;
 using NUnit.Engine.Runners;
-using NUnit.Engine.Services;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services.ResultWriters

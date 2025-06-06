@@ -41,7 +41,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Used by tests
         /// </summary>
-        /// <param name="result"></param>
         public void SetResult(TestEngineResult result)
         {
             if (result is null)

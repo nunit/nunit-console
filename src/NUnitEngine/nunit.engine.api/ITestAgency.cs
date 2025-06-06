@@ -1,7 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-
 namespace NUnit.Engine
 {
     /// <summary>
@@ -13,7 +11,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Registers an agent with an agency
         /// </summary>
-        /// <param name="agent"></param>
         void Register(ITestAgent agent);
     }
 }

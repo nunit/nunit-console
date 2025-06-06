@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System.Reflection;
 using NUnitLite;
 
 namespace NUnit.Engine.Tests

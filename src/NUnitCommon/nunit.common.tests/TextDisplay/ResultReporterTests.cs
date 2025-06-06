@@ -41,9 +41,9 @@ namespace NUnit.TextDisplay
             var mockAssembly = typeof(MockAssembly).Assembly;
             var frameworkSettings = new Dictionary<string, object>
             {
-                { "TestParameters", "1=d;2=c" },
+                { FrameworkPackageSettings.TestParameters, "1=d;2=c" },
                 {
-                    "TestParametersDictionary", new Dictionary<string, string>
+                    FrameworkPackageSettings.TestParametersDictionary, new Dictionary<string, string>
                 {
                     { "1", "d" },
                     { "2", "c" }

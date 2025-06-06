@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {
@@ -139,7 +140,7 @@ namespace NUnit.Engine.Runners
         {
             var results = new List<TestEngineResult>();
 
-            bool disposeRunners = TestPackage.GetSetting(EnginePackageSettings.DisposeRunners, false);
+            bool disposeRunners = TestPackage.Settings.GetValueOrDefault(SettingDefinitions.DisposeRunners);
 
             if (LevelOfParallelism <= 1)
             {

@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net6.0' OR '$(TargetFramework)'=='net8.0'">
-    <PackageReference Include="NUnit" Version="4.2.2" />
-    <PackageReference Include="NUnitLite" Version="4.2.2" />
+    <PackageReference Include="NUnit" Version="4.3.2" />
+    <PackageReference Include="NUnitLite" Version="4.3.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">

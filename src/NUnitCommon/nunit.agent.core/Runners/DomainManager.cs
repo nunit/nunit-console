@@ -48,10 +48,10 @@ namespace NUnit.Engine.Runners
             AppDomain runnerDomain = AppDomain.CreateDomain(domainName, evidence, setup);
 
             // Set PrincipalPolicy for the domain if called for in the package settings
-            if (package.Settings.ContainsKey(EnginePackageSettings.PrincipalPolicy))
+            string policyName = package.Settings.GetValueOrDefault(SettingDefinitions.PrincipalPolicy);
+            if (policyName != string.Empty)
             {
-                PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy),
-                    package.GetSetting(EnginePackageSettings.PrincipalPolicy, "UnauthenticatedPrincipal"));
+                PrincipalPolicy policy = (PrincipalPolicy)Enum.Parse(typeof(PrincipalPolicy), policyName);
 
                 runnerDomain.SetPrincipalPolicy(policy);
             }
@@ -83,13 +83,13 @@ namespace NUnit.Engine.Runners
                 // If property is null, .NET 4.5+ is not installed, so there is no need
                 if (TargetFrameworkNameProperty is not null)
                 {
-                    var frameworkName = package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
+                    var frameworkName = package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
                     if (frameworkName != string.Empty)
                         TargetFrameworkNameProperty.SetValue(setup, frameworkName, null);
                 }
             }
 
-            if (package.GetSetting(EnginePackageSettings.ShadowCopyFiles, false))
+            if (package.Settings.GetValueOrDefault(SettingDefinitions.ShadowCopyFiles))
             {
                 setup.ShadowCopyFiles = "true";
                 setup.ShadowCopyDirectories = setup.ApplicationBase;
@@ -172,7 +172,7 @@ namespace NUnit.Engine.Runners
         {
             Guard.ArgumentNotNull(package);
 
-            var appBase = package.GetSetting(EnginePackageSettings.BasePath, string.Empty);
+            var appBase = package.Settings.GetValueOrDefault(SettingDefinitions.BasePath);
 
             if (string.IsNullOrEmpty(appBase))
                 appBase = string.IsNullOrEmpty(package.FullName)
@@ -195,7 +195,7 @@ namespace NUnit.Engine.Runners
             Guard.ArgumentNotNull(package);
 
             // Use provided setting if available
-            string configFile = package.GetSetting(EnginePackageSettings.ConfigurationFile, string.Empty);
+            string configFile = package.Settings.GetValueOrDefault(SettingDefinitions.ConfigurationFile);
             if (configFile != string.Empty)
                 return Path.Combine(appBase, configFile);
 
@@ -262,9 +262,9 @@ namespace NUnit.Engine.Runners
 
         public static string? GetPrivateBinPath(string appBase, TestPackage package)
         {
-            var binPath = package.GetSetting(EnginePackageSettings.PrivateBinPath, string.Empty);
+            var binPath = package.Settings.GetValueOrDefault(SettingDefinitions.PrivateBinPath);
 
-            if (package.GetSetting(EnginePackageSettings.AutoBinPath, binPath == string.Empty))
+            if (binPath == string.Empty || package.Settings.GetValueOrDefault(SettingDefinitions.AutoBinPath))
                 binPath = package.SubPackages.Count > 0
                     ? GetPrivateBinPath(appBase, package.SubPackages)
                     : package.FullName is not null
