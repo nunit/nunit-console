@@ -33,8 +33,6 @@ namespace NUnit.Engine
     /// The PackageSetting class represents one setting value contained in a
     /// TestPackage. Instances of PackageSetting are immutable.
     /// </summary>
-    // TODO: Move this class out of the api assembly when possible. This will
-    // require modifying or moving the TestPackage serialization code.
     public sealed class PackageSetting<T> : PackageSetting
         where T : notnull
     {

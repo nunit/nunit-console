@@ -72,18 +72,20 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", "--param:X=5", "--param:Y=7");
             var settings = ConsoleRunner.MakeTestPackage(options).Settings;
 
-            Assert.That(settings.TryGetSetting(SettingDefinitions.TestParametersDictionary,
-                                               out IDictionary<string, string>? paramDictionary),
-                        $"{SettingDefinitions.TestParametersDictionary.Name} setting not included.");
-            Assert.That(paramDictionary, Is.Not.Null);
-            string[] expectedKeys = new[] { "X", "Y" };
+            // Both the newer dictionary setting and the legacy string representation should be included
+            var dictionarySetting = SettingDefinitions.TestParametersDictionary;
+            var legacySetting = SettingDefinitions.TestParameters;
+
+            Assert.That(settings.HasSetting(dictionarySetting), $"{dictionarySetting.Name} setting not included.");
+            var paramDictionary = settings.GetValueOrDefault(dictionarySetting);
+
+            string[] expectedKeys = { "X", "Y" };
             Assert.That(paramDictionary.Keys, Is.EqualTo(expectedKeys));
             Assert.That(paramDictionary["X"], Is.EqualTo("5"));
             Assert.That(paramDictionary["Y"], Is.EqualTo("7"));
 
-            Assert.That(settings.TryGetSetting(SettingDefinitions.TestParameters, out string? paramString),
-                        $"{SettingDefinitions.TestParameters.Name} setting not included.");
-            Assert.That(paramString, Is.EqualTo("X=5;Y=7"));
+            Assert.That(settings.HasSetting(legacySetting), $"{legacySetting.Name} setting not included.");
+            Assert.That(settings.GetValueOrDefault(legacySetting), Is.EqualTo("X=5;Y=7"));
         }
 
 #if NETFRAMEWORK
@@ -93,8 +95,8 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", "--debug");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.GetSetting(SettingDefinitions.DebugTests, false), Is.EqualTo(true));
-            Assert.That(package.GetSetting(SettingDefinitions.NumberOfTestWorkers, 1), Is.EqualTo(0));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.DebugTests), Is.EqualTo(true));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.NumberOfTestWorkers), Is.EqualTo(0));
         }
 
         [Test]
@@ -103,8 +105,8 @@ namespace NUnit.ConsoleRunner
             var options = ConsoleMocks.Options("test.dll", "--debug", "--workers=3");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            Assert.That(package.GetSetting(SettingDefinitions.DebugTests, false), Is.EqualTo(true));
-            Assert.That(package.GetSetting(SettingDefinitions.NumberOfTestWorkers, 1), Is.EqualTo(3));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.DebugTests), Is.EqualTo(true));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.NumberOfTestWorkers), Is.EqualTo(3));
         }
 #endif
 

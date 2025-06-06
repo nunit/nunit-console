@@ -131,8 +131,8 @@ namespace NUnit.Engine.Services
             IRuntimeFramework currentFramework = CurrentFramework;
             log.Debug("Current framework is " + currentFramework);
 
-            string frameworkSetting = package.GetSetting(SettingDefinitions.RequestedRuntimeFramework, string.Empty);
-            bool runAsX86 = package.GetSetting(SettingDefinitions.RunAsX86, false);
+            string frameworkSetting = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework);
+            bool runAsX86 = package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86);
 
             if (frameworkSetting.Length > 0)
             {
@@ -154,7 +154,7 @@ namespace NUnit.Engine.Services
             log.Debug($"No specific framework requested for {package.Name}");
 
             string imageTargetFrameworkNameSetting =
-                package.GetSetting(SettingDefinitions.ImageTargetFrameworkName, string.Empty);
+                package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
             Runtime targetRuntime;
             Version targetVersion;
 
@@ -162,7 +162,7 @@ namespace NUnit.Engine.Services
             {
                 // Assume .NET Framework
                 targetRuntime = Runtime.Net;
-                var trialVersion = new Version(package.GetSetting(SettingDefinitions.ImageRuntimeVersion, "2.0"));
+                var trialVersion = new Version(package.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion));
                 targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
             else
@@ -361,13 +361,13 @@ namespace NUnit.Engine.Services
                     ApplyImageData(subPackage);
 
                     // Collect the highest version required
-                    Version v = new Version(subPackage.GetSetting(SettingDefinitions.ImageRuntimeVersion, "0.0"));
+                    Version v = new Version(subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion));
                     if (v > targetVersion)
                         targetVersion = v;
 
                     // Collect highest framework name
                     // TODO: This assumes lexical ordering is valid - check it
-                    string fn = subPackage.GetSetting(SettingDefinitions.ImageTargetFrameworkName, string.Empty);
+                    string fn = subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
                     if (fn != string.Empty)
                     {
                         if (frameworkName is null || fn.CompareTo(frameworkName) < 0)
@@ -375,10 +375,10 @@ namespace NUnit.Engine.Services
                     }
 
                     // If any assembly requires X86, then the aggregate package requires it
-                    if (subPackage.GetSetting(SettingDefinitions.ImageRequiresX86, false))
+                    if (subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageRequiresX86))
                         requiresX86 = true;
 
-                    if (subPackage.GetSetting(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver, false))
+                    if (subPackage.Settings.GetValueOrDefault(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver))
                         requiresAssemblyResolver = true;
                 }
             }

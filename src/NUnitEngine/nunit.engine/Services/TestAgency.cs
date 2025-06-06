@@ -125,7 +125,7 @@ namespace NUnit.Engine.Services
         public virtual ITestAgent GetAgent(TestPackage package)
         {
             // Target Runtime must be specified by this point
-            string runtimeSetting = package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty);
+            string runtimeSetting = package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName);
             Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no target runtime specified");
 
             var targetRuntime = new FrameworkName(runtimeSetting);
@@ -146,8 +146,8 @@ namespace NUnit.Engine.Services
             const int pollTime = 200;
 
             // Increase the timeout to give time to attach a debugger
-            bool debug = package.GetSetting(SettingDefinitions.DebugAgent, false) ||
-                         package.GetSetting(SettingDefinitions.PauseBeforeRun, false);
+            bool debug = package.Settings.GetValueOrDefault(SettingDefinitions.DebugAgent) ||
+                         package.Settings.GetValueOrDefault(SettingDefinitions.PauseBeforeRun);
 
             int waitTime = debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT;
 
@@ -332,7 +332,7 @@ namespace NUnit.Engine.Services
         private Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
         {
             // Check to see if a specific agent was selected
-            string requestedAgentName = package.GetSetting(SettingDefinitions.RequestedAgentName, "DEFAULT");
+            string requestedAgentName = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
             log.Debug($"RequestedAgentName: {requestedAgentName}");
 
             foreach (var launcher in _launchers)
@@ -340,7 +340,7 @@ namespace NUnit.Engine.Services
                 var launcherName = launcher.GetType().Name;
                 log.Debug($"Examining Launcher {launcherName}");
 
-                if ((launcherName == requestedAgentName || requestedAgentName == "DEFAULT") && launcher.CanCreateAgent(package))
+                if ((launcherName == requestedAgentName || requestedAgentName == string.Empty) && launcher.CanCreateAgent(package))
                 {
                     log.Info($"Selected launcher {launcherName}");
                     package.AddSetting(SettingDefinitions.SelectedAgentName.WithValue(launcherName));

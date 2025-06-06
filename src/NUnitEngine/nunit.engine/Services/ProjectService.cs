@@ -89,7 +89,7 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
             log.Debug("Got project");
 
-            string? activeConfig = package.GetSetting(SettingDefinitions.ActiveConfig, string.Empty);
+            string? activeConfig = package.Settings.GetValueOrDefault(SettingDefinitions.ActiveConfig);
             log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;

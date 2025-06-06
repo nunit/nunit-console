@@ -31,7 +31,7 @@ namespace NUnit.Engine
         public bool HasSetting(SettingDefinition setting) => _settings.ContainsKey(setting.Name);
 
         /// <summary>
-        /// Return the value of a setting or a default.
+        /// Return the value of a setting if present, otherwise null.
         /// </summary>
         /// <param name="name">The name of the setting</param>
         public object GetSetting(string name)
@@ -40,58 +40,17 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Tries to get a setting by definition.
+        /// Return the value of a setting or its defined default value.
         /// </summary>
-        private bool TryGetSetting<T>(SettingDefinition<T> definition, [NotNullWhen(true)] out PackageSetting<T>? setting)
+        /// <param name="definition">The name and type of the setting</param>
+        public T GetValueOrDefault<T>(SettingDefinition<T> definition)
             where T : notnull
         {
             if (_settings.TryGetValue(definition.Name, out PackageSetting? unTypedSetting))
-            {
-                if (unTypedSetting is PackageSetting<T> typedSetting)
-                {
-                    setting = typedSetting;
-                    return true;
-                }
-                else
-                {
-                    setting = null;
-                    return false; // Type mismatch. Should we throw an exception instead?
-                }
-            }
+                if (unTypedSetting is PackageSetting<T> typedSetting && typedSetting is not null)
+                    return typedSetting.Value;
 
-            setting = null;
-            return false; // Setting not found
-        }
-
-        /// <summary>
-        /// Return the value of a setting or a default.
-        /// </summary>
-        /// <param name="definition">The name and type of the setting</param>
-        /// <param name="value">The value stored for the setting</param>
-        public bool TryGetSetting<T>(SettingDefinition<T> definition, [NotNullWhen(true)] out T? value)
-            where T : notnull
-        {
-            if (TryGetSetting(definition, out PackageSetting<T>? setting))
-            {
-                value = setting.Value;
-                return true;
-            }
-
-            value = default;
-            return false;
-        }
-
-        /// <summary>
-        /// Return the value of a setting or a default.
-        /// </summary>
-        /// <param name="definition">The name and type of the setting</param>
-        /// <param name="defaultSetting">The default value</param>
-        public T GetSetting<T>(SettingDefinition<T> definition, T defaultSetting)
-            where T : notnull
-        {
-            return TryGetSetting(definition, out PackageSetting<T>? setting)
-                ? setting.Value
-                : defaultSetting;
+            return definition.DefaultValue;
         }
 
         /// <inheritdoc />
@@ -107,7 +66,7 @@ namespace NUnit.Engine
         public void Add(PackageSetting setting) => _settings.Add(setting.Name, setting);
 
         /// <summary>
-        /// Adds a custom string setting to the list, specifying the name and value.
+        /// Creates and adds a custom string setting to the list, specifying the name and value.
         /// </summary>
         /// <param name="name">The name of the setting.</param>
         /// <param name="value">The corresponding value to set.</param>
@@ -117,7 +76,7 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Adds a custom boolean setting to the list, specifying the name and value.
+        /// Creates and adds a custom boolean setting to the list, specifying the name and value.
         /// </summary>
         /// <param name="name">The name of the setting.</param>
         /// <param name="value">The corresponding value to set.</param>
@@ -127,7 +86,7 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Adds a custom int setting to the list, specifying the name and value.
+        /// Creates and adds a custom int setting to the list, specifying the name and value.
         /// </summary>
         /// <param name="name">The name of the setting.</param>
         /// <param name="value">The corresponding value to set.</param>

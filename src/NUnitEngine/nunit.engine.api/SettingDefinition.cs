@@ -53,12 +53,17 @@ namespace NUnit.Engine
         /// Construct a SettingDefinition
         /// </summary>
         /// <param name="name">Name of this setting</param>
-        public SettingDefinition(string name)
+        /// <param name="defaultValue">The default value used when the setting is not provided</param>
+        public SettingDefinition(string name, T defaultValue)
             : base(name, typeof(T))
         {
+            DefaultValue = defaultValue;
         }
 
-        //public override Type ValueType => typeof(T);
+        /// <summary>
+        /// The Default value used if the setting is not present
+        /// </summary>
+        public T DefaultValue { get; }
 
         /// <summary>
         /// Create a PackageSetting based on this definition.

@@ -108,17 +108,6 @@ namespace NUnit.Engine
         public PackageSettings Settings { get; } = new PackageSettings();
 
         /// <summary>
-        /// Return the value of a setting or a default.
-        /// </summary>
-        /// <param name="definition">The name and type of the setting</param>
-        /// <param name="defaultSetting">The default value</param>
-        public T GetSetting<T>(SettingDefinition<T> definition, T defaultSetting)
-            where T : notnull
-        {
-            return Settings.GetSetting(definition, defaultSetting);
-        }
-
-        /// <summary>
         /// Add a subpackage to the package.
         /// </summary>
         /// <param name="subPackage">The subpackage to be added</param>

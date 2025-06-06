@@ -63,8 +63,8 @@ namespace NUnit.Engine.Services
 
             var expectedFrameworkName = RuntimeFramework.Parse(_runtimeService.SelectRuntimeFramework(package)).FrameworkName.ToString();
 
-            Assert.That(package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty), Is.EqualTo(expectedFrameworkName));
-            Assert.That(package.GetSetting(SettingDefinitions.RunAsX86, false), Is.EqualTo(runAsX86));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName), Is.EqualTo(expectedFrameworkName));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86), Is.EqualTo(runAsX86));
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace NUnit.Engine.Services
             package.AddSetting(SettingDefinitions.RequestedRuntimeFramework.WithValue(requested));
 
             _runtimeService.SelectRuntimeFramework(package);
-            Assert.That(package.GetSetting(SettingDefinitions.RequestedRuntimeFramework, string.Empty), Is.EqualTo(requested));
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework), Is.EqualTo(requested));
         }
 
         //[Test]
@@ -157,15 +157,11 @@ namespace NUnit.Engine.Services
 #pragma warning disable 612, 618
                 var NF = FrameworkIdentifiers.NetFramework;
                 Assert.That(
-                    net20Package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty),
+                    net20Package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName),
                     Is.EqualTo($"{NF},Version=v2.0"));
                 Assert.That(
-                    net40Package.GetSetting(SettingDefinitions.TargetFrameworkName, string.Empty),
+                    net40Package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName),
                     Is.EqualTo($"{NF},Version=v4.0"));
-                // No Longer working but may be removed anyway
-                //Assert.That(
-                //    topLevelPackage.GetSetting(PackageSetting.TargetFrameworkName.Name, string.Empty),
-                //    Is.EqualTo($"{NF},Version=v4.0"));
 #pragma warning restore 612, 618
             });
         }

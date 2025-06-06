@@ -101,18 +101,18 @@ namespace NUnit.Engine.Runners
                 DriverService = new DriverService();
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
+            var settings = assemblyPackage.Settings;
 
-            string? targetFramework = assemblyPackage.GetSetting(SettingDefinitions.ImageTargetFrameworkName, string.Empty);
-            bool skipNonTestAssemblies = assemblyPackage.GetSetting(SettingDefinitions.SkipNonTestAssemblies, false);
+            string? targetFramework = settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+            bool skipNonTestAssemblies = settings.GetValueOrDefault(SettingDefinitions.SkipNonTestAssemblies);
 
-            // TODO: Restore this code after changes to PackageSettings implementation
-            //if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
-            //    && assemblyPackage.GetSetting(PackageSetting.ImageRequiresDefaultAppDomainAssemblyResolver, false))
-            //{
-            //    // It's OK to do this in the loop because the Add method
-            //    // checks to see if the path is already present.
-            //    _assemblyResolver.AddPathFromFile(testFile);
-            //}
+            if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
+                && settings.GetValueOrDefault(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver))
+            {
+                // It's OK to do this in the loop because the Add method
+                // checks to see if the path is already present.
+                _assemblyResolver.AddPathFromFile(testFile);
+            }
 
             _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
             var frameworkSettings = new Dictionary<string, object>();
