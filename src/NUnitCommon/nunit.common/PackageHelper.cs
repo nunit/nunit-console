@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Linq;
 using NUnit.Common;
 
 namespace NUnit.Engine
@@ -86,14 +87,14 @@ namespace NUnit.Engine
                 switch (setting.Name)
                 {
                     // Some settings require special handling
-                    case FrameworkPackageSettings.InternalTraceWriter:
+                    case nameof(SettingDefinitions.InternalTraceWriter):
                         // NYI
                         break;
-                    case FrameworkPackageSettings.LOAD:
+                    case nameof(SettingDefinitions.LOAD):
                         var filters = (string[])setting.Value;
-                        xmlWriter.WriteAttributeString(FrameworkPackageSettings.LOAD, $"{string.Join(";", filters)}");
+                        xmlWriter.WriteAttributeString(nameof(SettingDefinitions.LOAD), $"{string.Join(";", filters)}");
                         break;
-                    case FrameworkPackageSettings.TestParametersDictionary:
+                    case nameof(SettingDefinitions.TestParametersDictionary):
                         var dict = (IDictionary<string, string>)setting.Value;
                         xmlWriter.WriteStartAttribute(setting.Name);
 
@@ -203,13 +204,13 @@ namespace NUnit.Engine
 
                     switch (name)
                     {
-                        case FrameworkPackageSettings.InternalTraceWriter:
+                        case nameof(SettingDefinitions.InternalTraceWriter):
                             // NYI
                             break;
-                        case FrameworkPackageSettings.LOAD:
+                        case nameof(SettingDefinitions.LOAD):
                             packageSettings.Add(SettingDefinitions.LOAD.WithValue(value.Split([';'])));
                             break;
-                        case FrameworkPackageSettings.TestParametersDictionary:
+                        case nameof(SettingDefinitions.TestParametersDictionary):
                             var doc = new XmlDocument();
                             doc.LoadXml(value);
                             var dict = new Dictionary<string, string>();
@@ -246,5 +247,5 @@ namespace NUnit.Engine
 
             xmlReader.MoveToElement();
         }
-    }
+                                                                  }
 }

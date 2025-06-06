@@ -160,30 +160,26 @@ namespace NUnit.Common
         /// <summary>
         /// Flag (bool) indicating whether tests are being debugged.
         /// </summary>
-        public static SettingDefinition<bool> DebugTests { get; } =
-            new(FrameworkPackageSettings.DebugTests);
+        public static SettingDefinition<bool> DebugTests { get; } = new(nameof(DebugTests));
 
         /// <summary>
         /// Flag (bool) indicating whether to pause execution of tests to allow
         /// the user to attach a debugger.
         /// </summary>
-        public static SettingDefinition<bool> PauseBeforeRun { get; } =
-            new(FrameworkPackageSettings.PauseBeforeRun);
+        public static SettingDefinition<bool> PauseBeforeRun { get; } = new(nameof(PauseBeforeRun));
 
         /// <summary>
         /// The InternalTraceLevel for this run. Values are: "Default",
         /// "Off", "Error", "Warning", "Info", "Debug", "Verbose".
         /// Default is "Off". "Debug" and "Verbose" are synonyms.
         /// </summary>
-        public static SettingDefinition<string> InternalTraceLevel { get; } =
-            new(FrameworkPackageSettings.InternalTraceLevel);
+        public static SettingDefinition<string> InternalTraceLevel { get; } = new(nameof(InternalTraceLevel));
 
         /// <summary>
         /// Full path of the directory to be used for work and result files.
         /// This path is provided to tests by the framework TestContext.
         /// </summary>
-        public static SettingDefinition<string> WorkDirectory { get; } =
-            new(FrameworkPackageSettings.WorkDirectory);
+        public static SettingDefinition<string> WorkDirectory { get; } = new(nameof(WorkDirectory));
 
         #endregion
 
@@ -222,44 +218,38 @@ namespace NUnit.Common
         /// for test cases. If not specified, there is no timeout except
         /// as specified by attributes on the tests themselves.
         /// </summary>
-        public static SettingDefinition<int> DefaultTimeout { get; } =
-            new(FrameworkPackageSettings.DefaultTimeout);
+        public static SettingDefinition<int> DefaultTimeout { get; } = new(nameof(DefaultTimeout));
 
         /// <summary>
         /// A string representing the default thread culture to be used for
         /// running tests. String should be a valid BCP-47 culture name. If
         /// culture is unset, tests run on the machine's default culture.
         /// </summary>
-        public static SettingDefinition<string> DefaultCulture { get; } =
-            new(FrameworkPackageSettings.DefaultCulture);
+        public static SettingDefinition<string> DefaultCulture { get; } = new(nameof(DefaultCulture));
 
         /// <summary>
         /// A string representing the default thread UI culture to be used for
         /// running tests. String should be a valid BCP-47 culture name. If
         /// culture is unset, tests run on the machine's default culture.
         /// </summary>
-        public static SettingDefinition<string> DefaultUICulture { get; } =
-            new(FrameworkPackageSettings.DefaultUICulture);
+        public static SettingDefinition<string> DefaultUICulture { get; } = new(nameof(DefaultUICulture));
 
         /// <summary>
         /// A TextWriter to which the internal trace will be sent.
         /// </summary>
-        public static SettingDefinition<TextWriter> InternalTraceWriter { get; } =
-            new(FrameworkPackageSettings.InternalTraceWriter);
+        public static SettingDefinition<TextWriter> InternalTraceWriter { get; } = new(nameof(InternalTraceWriter));
 
         /// <summary>
         /// A list of tests to be loaded.
         /// </summary>
-        public static SettingDefinition<IList<string>> LOAD { get; } =
-            new(FrameworkPackageSettings.LOAD);
+        public static SettingDefinition<IList<string>> LOAD { get; } = new(nameof(LOAD));
 
         /// <summary>
         /// The number of test threads to run for the assembly. If set to
         /// 1, a single queue is used. If set to 0, tests are executed
         /// directly, without queuing.
         /// </summary>
-        public static SettingDefinition<int> NumberOfTestWorkers { get; } =
-            new(FrameworkPackageSettings.NumberOfTestWorkers);
+        public static SettingDefinition<int> NumberOfTestWorkers { get; } = new(nameof(NumberOfTestWorkers));
 
         /// <summary>
         /// The random seed to be used for this assembly. If specified
@@ -268,51 +258,43 @@ namespace NUnit.Common
         /// that run, provided that no change has been made to the test
         /// assembly. Default is a random value itself.
         /// </summary>
-        public static SettingDefinition<int> RandomSeed { get; } =
-            new(FrameworkPackageSettings.RandomSeed);
+        public static SettingDefinition<int> RandomSeed { get; } = new(nameof(RandomSeed));
 
         /// <summary>
         /// If true, execution stops after the first error or failure.
         /// </summary>
-        public static SettingDefinition<bool> StopOnError { get; } =
-            new(FrameworkPackageSettings.StopOnError);
+        public static SettingDefinition<bool> StopOnError { get; } = new(nameof(StopOnError));
 
         /// <summary>
         /// If true, asserts in multiple asserts block will throw first-chance exception on failure.
         /// </summary>
-        public static SettingDefinition<bool> ThrowOnEachFailureUnderDebugger { get; } =
-            new(FrameworkPackageSettings.ThrowOnEachFailureUnderDebugger);
+        public static SettingDefinition<bool> ThrowOnEachFailureUnderDebugger { get; } = new(nameof(ThrowOnEachFailureUnderDebugger));
 
         /// <summary>
         /// If true, use of the event queue is suppressed and test events are synchronous.
         /// </summary>
-        public static SettingDefinition<bool> SynchronousEvents { get; } =
-            new(FrameworkPackageSettings.SynchronousEvents);
+        public static SettingDefinition<bool> SynchronousEvents { get; } = new(nameof(SynchronousEvents));
 
         /// <summary>
         /// The default naming pattern used in generating test names
         /// </summary>
-        public static SettingDefinition<string> DefaultTestNamePattern { get; } =
-            new(FrameworkPackageSettings.DefaultTestNamePattern);
+        public static SettingDefinition<string> DefaultTestNamePattern { get; } = new(nameof(DefaultTestNamePattern));
 
         /// <summary>
         /// Parameters to be passed on to the tests, serialized to a single string which needs parsing.
         /// Obsoleted by <see cref="TestParametersDictionary"/>; kept for backward compatibility.
         /// </summary>
-        public static SettingDefinition<string> TestParameters { get; } =
-            new(FrameworkPackageSettings.TestParameters);
+        public static SettingDefinition<string> TestParameters { get; } = new(nameof(TestParameters));
 
         /// <summary>
         /// If true, the tests will run on the same thread as the NUnit runner itself
         /// </summary>
-        public static SettingDefinition<bool> RunOnMainThread { get; } =
-            new(FrameworkPackageSettings.RunOnMainThread);
+        public static SettingDefinition<bool> RunOnMainThread { get; } = new(nameof(RunOnMainThread));
 
         /// <summary>
         /// Parameters to be passed on to the tests, already parsed into an IDictionary&lt;string, string>. Replaces <see cref="TestParameters"/>.
         /// </summary>
-        public static SettingDefinition<IDictionary<string, string>> TestParametersDictionary { get; } =
-            new(FrameworkPackageSettings.TestParametersDictionary);
+        public static SettingDefinition<IDictionary<string, string>> TestParametersDictionary { get; } = new(nameof(TestParametersDictionary));
 
         #endregion
     }

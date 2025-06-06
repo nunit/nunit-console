@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Engine;
@@ -10,24 +11,13 @@ namespace NUnit.Common
     public class PackageSettingsTests
     {
         private const BindingFlags PublicStatic = BindingFlags.Public | BindingFlags.Static;
-        private static readonly string[] CurrentFrameworkSettingNames =
-            typeof(NUnit.FrameworkPackageSettings).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
-        private static readonly string[] SupportedFrameworkSettingNames =
-            typeof(FrameworkPackageSettings).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
-        private static readonly string[] SettingDefinitions =
-            typeof(SettingDefinitions).GetProperties(PublicStatic).Select(p => p.Name).ToArray();
-
-        [Test]
-        public void CurrentFrameworkSettingsAreAllSupported()
-        {
-            Assert.That(SupportedFrameworkSettingNames, Is.SupersetOf(CurrentFrameworkSettingNames));
-        }
 
         [Test]
         public void AllFrameworkSettingsHaveDefinitions()
         {
-            // Currently equivalent, but may change if we combine SettingDefinitions into one class.
-            Assert.That(SettingDefinitions, Is.SupersetOf(SupportedFrameworkSettingNames));
+            Assert.That(
+                typeof(SettingDefinitions).GetProperties(PublicStatic).Select(p => p.Name),
+                Is.SupersetOf(typeof(FrameworkPackageSettings).GetProperties(PublicStatic).Select(p => p.Name)));
         }
     }
 }
