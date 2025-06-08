@@ -151,7 +151,7 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Add a setting to a package and all of its subpackages.
+        /// Create and add a custom string setting to a package and all of its subpackages.
         /// </summary>
         /// <param name="name">The name of the setting.</param>
         /// <param name="value">The corresponding value to set.</param>
@@ -162,10 +162,43 @@ namespace NUnit.Engine
         /// used when the settings are intended to be reflected to all the
         /// subpackages under the package.
         /// </remarks>
-        public void AddSetting<T>(string name, T value)
-            where T : notnull
+        public void AddSetting(string name, string value)
         {
-            AddSetting(new PackageSetting<T>(name, value));
+            AddSetting(new PackageSetting<string>(name, value));
+        }
+
+        /// <summary>
+        /// Create and add a custom boolean setting to a package and all of its subpackages.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        /// <remarks>
+        /// Once a package is created, subpackages may have been created
+        /// as well. If you add a setting directly to the Settings dictionary
+        /// of the package, the subpackages are not updated. This method is
+        /// used when the settings are intended to be reflected to all the
+        /// subpackages under the package.
+        /// </remarks>
+        public void AddSetting(string name, bool value)
+        {
+            AddSetting(new PackageSetting<bool>(name, value));
+        }
+
+        /// <summary>
+        /// Create and add a custom int setting to a package and all of its subpackages.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        /// <remarks>
+        /// Once a package is created, subpackages may have been created
+        /// as well. If you add a setting directly to the Settings dictionary
+        /// of the package, the subpackages are not updated. This method is
+        /// used when the settings are intended to be reflected to all the
+        /// subpackages under the package.
+        /// </remarks>
+        public void AddSetting(string name, int value)
+        {
+            AddSetting(new PackageSetting<int>(name, value));
         }
     }
 }

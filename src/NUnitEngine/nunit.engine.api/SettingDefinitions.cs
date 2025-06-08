@@ -13,10 +13,6 @@ namespace NUnit.Common
     /// starting "Image...", the runner creates the settings. Some settings are
     /// used by the engine, some by the framework and some by both.
     /// </summary>
-    /// <remarks>
-    /// Although 'SettingDefinitions' might be a better descriptive name for the class,
-    /// 'PackageSettings' seems to work slightly better frp, a usage point of view.
-    /// </remarks>
     public static class SettingDefinitions
     {
         #region Settings Used by the Engine
@@ -191,7 +187,7 @@ namespace NUnit.Common
         /// stored in the assembly image. If it represents a project or other
         /// group of assemblies, it is the maximum version for all the assemblies.
         /// </summary>
-        public static SettingDefinition<string> ImageRuntimeVersion { get; } = new(nameof(ImageRuntimeVersion), string.Empty);
+        public static SettingDefinition<string> ImageRuntimeVersion { get; } = new(nameof(ImageRuntimeVersion), "2.0");
 
         /// <summary>
         /// True if any assembly in the package requires running as a 32-bit
