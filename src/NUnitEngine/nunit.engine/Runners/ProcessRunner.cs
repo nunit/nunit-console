@@ -27,9 +27,8 @@ namespace NUnit.Engine.Runners
         {
             _agency = Services.GetService<TestAgency>();
 
-            // Ensure that the package arg contains only one assembly package, and save it.
-            var assemblyPackages = package.Select(p => !p.HasSubPackages());
-            Guard.ArgumentValid(assemblyPackages.Count == 1, $"{GetType().Name} requires a package with a single assembly", nameof(package));
+            // Ensure that the TestPackage represents an assembly.
+            Guard.ArgumentValid(!TestPackage.HasSubPackages(), $"{GetType().Name} requires a package with a single assembly", nameof(package));
         }
 
         /// <summary>
@@ -130,6 +129,8 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestResult giving the result of the test execution</returns>
         protected override TestEngineResult RunTests(ITestEventListener listener, TestFilter filter)
         {
+            Guard.OperationValid(TestPackage.IsAssemblyPackage(), "TestPackage is not an assembly package");
+
             log.Info("Running " + TestPackage.Name);
 
             try

@@ -41,32 +41,32 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
                 yield return new TestRunnerFactoryData(
                     "OneProject",
                     new TestPackage("xy.nunit"),
-                    RunnerResult.AggregatingTestRunner(2));
+                    RunnerResult.MultipleTestProcessRunner(2));
 
                 yield return new TestRunnerFactoryData(
                     "TwoProjects",
                     new TestPackage("xy.nunit", "xy.nunit"),
-                    RunnerResult.AggregatingTestRunner(4));
+                    RunnerResult.MultipleTestProcessRunner(4));
 
                 yield return new TestRunnerFactoryData(
                     "OneProjectOneAssembly",
                     new TestPackage("xy.nunit", "c.dll"),
-                    RunnerResult.AggregatingTestRunner(RunnerResult.ProcessRunner, 3));
+                    RunnerResult.MultipleTestProcessRunner(3));
 
                 yield return new TestRunnerFactoryData(
                     "TwoProjectsOneAssembly",
                     new TestPackage("xy.nunit", "xy.nunit", "x.dll"),
-                    RunnerResult.AggregatingTestRunner(5));
+                    RunnerResult.MultipleTestProcessRunner(5));
 
                 yield return new TestRunnerFactoryData(
                     "TwoAssembliesOneProject",
                     new TestPackage("x.dll", "y.dll", "xy.nunit"),
-                    RunnerResult.AggregatingTestRunner(4));
+                    RunnerResult.MultipleTestProcessRunner(4));
 
                 yield return new TestRunnerFactoryData(
                     "OneUnknownOneAssemblyOneProject",
                     new TestPackage("a.junk", "a.dll", "xy.nunit"),
-                    RunnerResult.AggregatingTestRunner(4));
+                    RunnerResult.MultipleTestProcessRunner(4));
 #else
                 // NOTE: Some unsupported test cases are commented out in case
                 // we want to reinstate the feature that allows running multiple

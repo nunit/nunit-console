@@ -1,6 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -51,16 +52,22 @@ namespace NUnit.Engine.Runners
             Guard.ArgumentNotNull(package);
 
             _services = services;
-            TestPackage = package;
 
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
             _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
-
 #if NETFRAMEWORK
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
             _extensionService = _services.GetService<ExtensionService>();
+
+            // Some files in the top level package may be projects.
+            // Expand them so that they contain subprojects for
+            // each contained assembly.
+            EnsurePackagesAreExpanded(package);
+
+            TestPackage = package;
+            TestPackages = package.Select(p => !p.HasSubPackages());
 
             // Last chance to catch invalid settings in package,
             // in case the client runner missed them.
@@ -68,9 +75,15 @@ namespace NUnit.Engine.Runners
         }
 
         /// <summary>
-        /// The TestPackage for which this is the runner
+        /// The Top-level TestPackage for which this is the runner.
         /// </summary>
-        protected TestPackage TestPackage { get; set; }
+        protected TestPackage TestPackage { get; }
+
+        /// <summary>
+        /// A list of all leaf packages, i.e. packages contained
+        /// under the top-level package, which have no subpackages.
+        /// </summary>
+        protected IList<TestPackage> TestPackages { get; }
 
         /// <summary>
         /// The result of the last call to LoadPackage
@@ -243,17 +256,11 @@ namespace NUnit.Engine.Runners
         {
             if (_engineRunner is null)
             {
-                // Some files in the top level package may be projects.
-                // Expand them so that they contain subprojects for
-                // each contained assembly.
-                EnsurePackagesAreExpanded(TestPackage);
-
-                // Use SelectRuntimeFramework for its side effects.
-                // Info will be left behind in the package about
-                // each contained assembly, which will subsequently
-                // be used to determine how to run the assembly.
+                // Analyze each TestPackage, adding settings that describe
+                // each contained assembly, including it's target runtime.
 #if NETFRAMEWORK
-                _runtimeService.SelectRuntimeFramework(TestPackage);
+                foreach (var assemblyPackage in TestPackages)
+                    _runtimeService.SelectRuntimeFramework(assemblyPackage);
 #endif
 
                 _engineRunner = _testRunnerFactory.MakeTestRunner(TestPackage);
