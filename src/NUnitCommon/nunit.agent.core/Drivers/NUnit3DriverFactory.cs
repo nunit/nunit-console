@@ -41,7 +41,6 @@ namespace NUnit.Engine.Drivers
         /// Gets a driver for a given test framework.
         /// </summary>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        /// <returns></returns>
         public IFrameworkDriver GetDriver(string id, AssemblyName reference)
         {
             Guard.ArgumentNotNullOrEmpty(id);

@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics.CodeAnalysis;
+using NUnit.Common;
 using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Runners
@@ -255,8 +256,8 @@ namespace NUnit.Engine.Runners
             if (_agent is null)
             {
                 // Increase the timeout to give time to attach a debugger
-                bool debug = TestPackage.GetSetting(EnginePackageSettings.DebugAgent, false) ||
-                             TestPackage.GetSetting(EnginePackageSettings.PauseBeforeRun, false);
+                bool debug = TestPackage.Settings.GetValueOrDefault(SettingDefinitions.DebugAgent) ||
+                             TestPackage.Settings.GetValueOrDefault(SettingDefinitions.PauseBeforeRun);
 
                 _agent = _agency.GetAgent(TestPackage);
             }

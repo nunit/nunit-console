@@ -3,12 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Serialization;
 using NUnit.Framework;
 using NUnit.Engine.Communication.Messages;
-using NUnit.Engine.Internal;
-using System.Xml;
-using NUnit.TestData.Assemblies;
 
 namespace NUnit.Engine.Communication.Protocols
 {
@@ -53,7 +49,7 @@ namespace NUnit.Engine.Communication.Protocols
 
             Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
             Assert.That(message.Data, Is.EqualTo(originalPackage.ToXml()));
-            var newPackage = new TestPackage().FromXml(message.Data);
+            var newPackage = PackageHelper.FromXml(message.Data);
             ComparePackages(newPackage, originalPackage);
         }
 
@@ -91,7 +87,7 @@ namespace NUnit.Engine.Communication.Protocols
             foreach (TestEngineMessage message in messages)
             {
                 Assert.That(message.Code, Is.EqualTo(MessageCode.CommandResult));
-                var newPackage = new TestPackage().FromXml(message.Data!);
+                var newPackage = PackageHelper.FromXml(message.Data!);
                 ComparePackages(newPackage, originalPackage);
             }
         }
@@ -125,10 +121,11 @@ namespace NUnit.Engine.Communication.Protocols
                 Assert.That(newPackage.Settings.Count, Is.EqualTo(oldPackage.Settings.Count));
                 Assert.That(newPackage.SubPackages.Count, Is.EqualTo(oldPackage.SubPackages.Count));
 
-                foreach (var key in oldPackage.Settings.Keys)
+                foreach (var setting in oldPackage.Settings)
                 {
-                    Assert.That(newPackage.Settings.ContainsKey(key));
-                    Assert.That(newPackage.Settings[key], Is.EqualTo(oldPackage.Settings[key]));
+                    Assert.That(newPackage.Settings.HasSetting(setting.Name));
+                    Assert.That(newPackage.Settings.GetSetting(setting.Name),
+                                Is.EqualTo(oldPackage.Settings.GetSetting(setting.Name)));
                 }
 
                 for (int i = 0; i < oldPackage.SubPackages.Count; i++)

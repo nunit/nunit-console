@@ -44,7 +44,6 @@
     <Compile Include="..\nunit4-console\ConsoleOptions.cs" Link="ConsoleOptions.cs" />
     <Compile Include="..\nunit4-console\ConsoleRunner.cs" Link="ConsoleRunner.cs" />
     <Compile Include="..\nunit4-console\FileSystem.cs" Link="FileSystem.cs" />
-    <Compile Include="..\nunit4-console\FrameworkPackageSettings.cs" Link="FrameworkPackageSettings.cs" />
     <Compile Include="..\nunit4-console\Options\OptionParser.cs" Link="Options\OptionParser.cs" />
     <Compile Include="..\nunit4-console\Options\Options.cs" Link="Options\Options.cs" />
     <Compile Include="..\nunit4-console\Options\OutputSpecification.cs" Link="Options\OutputSpecification.cs" />

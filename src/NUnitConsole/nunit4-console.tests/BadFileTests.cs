@@ -2,7 +2,6 @@
 
 using System.IO;
 using System.Text;
-using NUnit.ConsoleRunner.Options;
 using NUnit.Engine;
 using NUnit.Engine.Runners;
 using NUnit.Engine.Services;

@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Xml;
 using System.Xml.Xsl;
 using NUnit.Engine.Extensibility;
@@ -46,7 +45,6 @@ namespace NUnit.Engine.Services
         /// Checks if the output is writable. If the output is not
         /// writable, this method should throw an exception.
         /// </summary>
-        /// <param name="outputPath"></param>
         public void CheckWritability(string outputPath)
         {
             using (new StreamWriter(outputPath, false))

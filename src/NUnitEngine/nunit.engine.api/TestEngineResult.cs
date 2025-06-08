@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Xml;
 
 namespace NUnit.Engine
@@ -119,7 +118,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Add an XmlNode to the TestEngineResult
         /// </summary>
-        /// <param name="xml"></param>
         public void Add(XmlNode xml)
         {
             this._xmlText.Add(xml.OuterXml);

@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using NUnit.Common;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
 
@@ -99,24 +101,27 @@ namespace NUnit.Engine.Runners
                 DriverService = new DriverService();
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
+            var settings = assemblyPackage.Settings;
 
-            string? targetFramework = assemblyPackage.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty);
-            bool skipNonTestAssemblies = assemblyPackage.GetSetting(EnginePackageSettings.SkipNonTestAssemblies, false);
+            string? targetFramework = settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+            bool skipNonTestAssemblies = settings.GetValueOrDefault(SettingDefinitions.SkipNonTestAssemblies);
 
-            // TODO: Restore this code after changes to PackageSettings implementation
-            //if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
-            //    && assemblyPackage.GetSetting(EnginePackageSettings.ImageRequiresDefaultAppDomainAssemblyResolver, false))
-            //{
-            //    // It's OK to do this in the loop because the Add method
-            //    // checks to see if the path is already present.
-            //    _assemblyResolver.AddPathFromFile(testFile);
-            //}
+            if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
+                && settings.GetValueOrDefault(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver))
+            {
+                // It's OK to do this in the loop because the Add method
+                // checks to see if the path is already present.
+                _assemblyResolver.AddPathFromFile(testFile);
+            }
 
             _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
+            var frameworkSettings = new Dictionary<string, object>();
+
+            // TODO: Add Values to settings
 
             try
             {
-                return LoadResult = new TestEngineResult(_driver.Load(testFile, assemblyPackage.Settings));
+                return LoadResult = new TestEngineResult(_driver.Load(testFile, frameworkSettings));
             }
             catch (Exception ex) when (ex is not NUnitEngineException)
             {

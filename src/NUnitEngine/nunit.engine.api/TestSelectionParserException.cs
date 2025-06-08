@@ -22,8 +22,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Construct with a message and inner exception
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="innerException"></param>
         public TestSelectionParserException(string message, Exception innerException) : base(message, innerException)
         {
         }

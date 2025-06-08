@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace System.Runtime.CompilerServices
 {
@@ -77,7 +76,6 @@ namespace NUnit
         /// <param name="node">The node to which the element should be added.</param>
         /// <param name="name">The element name.</param>
         /// <param name="data">The data for the CDataSection.</param>
-        /// <returns></returns>
         public static XmlNode AddElementWithCDataSection(this XmlNode node, string name, string data)
         {
             XmlNode childNode = node.AddElement(name);
@@ -90,7 +88,6 @@ namespace NUnit
         /// </summary>
         /// <param name="result">The result.</param>
         /// <param name="name">The name.</param>
-        /// <returns></returns>
         public static string? GetAttribute(this XmlNode result, string name)
         {
             XmlAttribute? attr = result.Attributes?[name];
@@ -104,7 +101,6 @@ namespace NUnit
         /// <param name="result">The result.</param>
         /// <param name="name">The name.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <returns></returns>
         public static int GetAttribute(this XmlNode result, string name, int defaultValue)
         {
             XmlAttribute? attr = result.Attributes?[name];
@@ -120,7 +116,6 @@ namespace NUnit
         /// <param name="result">The result.</param>
         /// <param name="name">The name.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <returns></returns>
         public static double GetAttribute(this XmlNode result, string name, double defaultValue)
         {
             XmlAttribute? attr = result.Attributes?[name];
@@ -136,7 +131,6 @@ namespace NUnit
         /// <param name="result">The result.</param>
         /// <param name="name">The name.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <returns></returns>
         public static DateTime GetAttribute(this XmlNode result, string name, DateTime defaultValue)
         {
             string? dateStr = GetAttribute(result, name);

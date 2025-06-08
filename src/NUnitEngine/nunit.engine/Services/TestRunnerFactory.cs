@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Diagnostics.CodeAnalysis;
+using NUnit.Common;
 using NUnit.Engine.Runners;
 
 namespace NUnit.Engine.Services
@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services
             if (ServiceContext is null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
-            if (package.GetSetting(EnginePackageSettings.ImageTargetFrameworkName, string.Empty).StartsWith("Unmanaged,"))
+            if (package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName).StartsWith("Unmanaged,"))
                 return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
 
 #if NETFRAMEWORK

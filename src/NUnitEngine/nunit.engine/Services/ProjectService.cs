@@ -3,8 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
+using NUnit.Common;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
 
@@ -90,7 +89,7 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
             log.Debug("Got project");
 
-            string? activeConfig = package.GetSetting(EnginePackageSettings.ActiveConfig, string.Empty);
+            string? activeConfig = package.Settings.GetValueOrDefault(SettingDefinitions.ActiveConfig);
             log.Debug($"Got ActiveConfig setting {activeConfig ?? "<null>"}");
             if (activeConfig is null)
                 activeConfig = project.ActiveConfigName;
@@ -102,9 +101,9 @@ namespace NUnit.Engine.Services
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
-            foreach (string key in tempPackage.Settings.Keys)
-                if (!package.Settings.ContainsKey(key)) // Don't override settings from command line
-                    package.Settings[key] = tempPackage.Settings[key];
+            foreach (var setting in tempPackage.Settings)
+                if (!package.Settings.HasSetting(setting.Name)) // Don't override settings from command line
+                    package.Settings.Add(setting);
 
             foreach (var subPackage in tempPackage.SubPackages)
                 package.AddSubPackage(subPackage);
@@ -112,11 +111,11 @@ namespace NUnit.Engine.Services
             // If no config file is specified (by user or by the project loader) check
             // to see if one exists in same directory as the package. If so, we
             // use it. If not, each assembly will use its own config, if present.
-            if (!tempPackage.Settings.ContainsKey(EnginePackageSettings.ConfigurationFile))
+            if (!tempPackage.Settings.HasSetting(SettingDefinitions.ConfigurationFile))
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
                 if (File.Exists(packageConfig))
-                    package.Settings[EnginePackageSettings.ConfigurationFile] = packageConfig;
+                    package.AddSetting(SettingDefinitions.ConfigurationFile.WithValue(packageConfig));
             }
         }
 

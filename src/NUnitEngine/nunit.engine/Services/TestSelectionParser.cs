@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 // Missing XML Docs
@@ -65,7 +63,6 @@ namespace NUnit.Engine
         /// <summary>
         /// Parse a single term or an or expression, returning the xml
         /// </summary>
-        /// <returns></returns>
         private string ParseFilterExpression()
         {
             var terms = new List<string>();

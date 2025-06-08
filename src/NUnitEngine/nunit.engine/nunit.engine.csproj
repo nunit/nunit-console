@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Net462Agent\launcher\agent-launcher-net462.csproj" />
-    <ProjectReference Include="..\..\Net80Agent\launcher\agent-launcher-net80.csproj" />
+    <ProjectReference Condition="'$(TargetFramework)'=='net462'" Include="..\..\Net462Agent\launcher\agent-launcher-net462.csproj" />
+    <ProjectReference Condition="'$(TargetFramework)'=='net462'" Include="..\..\Net80Agent\launcher\agent-launcher-net80.csproj" />
     <ProjectReference Condition="'$(TargetFramework)'=='net8.0'" Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />

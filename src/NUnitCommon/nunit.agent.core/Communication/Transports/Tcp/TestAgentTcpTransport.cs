@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -83,7 +82,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                 switch (command.Code)
                 {
                     case MessageCode.CreateRunner:
-                        var package = new TestPackage().FromXml(command.Data!);
+                        var package = PackageHelper.FromXml(command.Data!);
                         _runner = CreateRunner(package);
                         break;
                     case MessageCode.LoadCommand:

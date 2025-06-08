@@ -28,7 +28,6 @@ namespace NUnit.Engine.Extensibility
         /// <param name="domain">The domain in which the assembly will be loaded</param>
         /// <param name="id">The driver id.</param>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        /// <returns></returns>
         IFrameworkDriver GetDriver(AppDomain domain, string id, AssemblyName reference);
 #else
         /// <summary>
@@ -37,7 +36,6 @@ namespace NUnit.Engine.Extensibility
         /// </summary>
         /// <param name="id">The driver id.</param>
         /// <param name="reference">An AssemblyName referring to the test framework.</param>
-        /// <returns></returns>
         IFrameworkDriver GetDriver(string id, AssemblyName reference);
 #endif
     }

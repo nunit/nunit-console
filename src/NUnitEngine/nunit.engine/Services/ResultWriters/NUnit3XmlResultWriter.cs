@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.Text;
 using System.Xml;
 using System.IO;
 using NUnit.Engine.Extensibility;
@@ -18,7 +17,6 @@ namespace NUnit.Engine.Services
         /// Checks if the output is writable by creating a stub result file. If the output is not
         /// writable, this method should throw an exception.
         /// </summary>
-        /// <param name="outputPath"></param>
         public void CheckWritability(string outputPath)
         {
             XmlNode stub = GetStubResult();

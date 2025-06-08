@@ -3,9 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace NUnit.Engine
 {
@@ -26,7 +23,7 @@ namespace NUnit.Engine
     /// tests in the reloaded assembly to match those originally loaded.
     /// </summary>
     [Serializable]
-    public class TestPackage : IXmlSerializable
+    public class TestPackage
     {
         /// <summary>
         /// Construct a top-level TestPackage that wraps one or more
@@ -62,7 +59,8 @@ namespace NUnit.Engine
 
         /// <summary>
         ///  Construct an empty TestPackage
-        /// </summary>()
+        /// </summary>
+        /// <remarks>Used in deserializing a package from xml.</remarks>
         public TestPackage()
         {
         }
@@ -81,7 +79,9 @@ namespace NUnit.Engine
         /// The generated ID is only unique for packages created within the same application domain.
         /// For that reason, NUnit pre-creates all test packages that will be needed.
         /// </remarks>
-        public string ID { get; private set; } = GetNextID();
+        // TODO: Setter is temporarily public for use in deserialization.
+        // We should find a better solution for setting the ID.
+        public string ID { get; set; } = GetNextID();
 
         /// <summary>
         /// Gets the name of the package
@@ -95,7 +95,7 @@ namespace NUnit.Engine
         /// Gets the path to the file containing tests. It may be
         /// an assembly or a recognized project type.
         /// </summary>
-        public string? FullName { get; private set; }
+        public string? FullName { get; set; }
 
         /// <summary>
         /// Gets the list of SubPackages contained in this package
@@ -105,7 +105,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the settings dictionary for this package.
         /// </summary>
-        public IDictionary<string, object> Settings { get; } = new Dictionary<string, object>();
+        public PackageSettings Settings { get; } = new PackageSettings();
 
         /// <summary>
         /// Add a subpackage to the package.
@@ -115,8 +115,8 @@ namespace NUnit.Engine
         {
             SubPackages.Add(subPackage);
 
-            foreach (var key in Settings.Keys)
-                subPackage.Settings[key] = Settings[key];
+            foreach (var setting in Settings)
+                subPackage.AddSetting(setting);
         }
 
         /// <summary>
@@ -135,8 +135,7 @@ namespace NUnit.Engine
         /// <summary>
         /// Add a setting to a package and all of its subpackages.
         /// </summary>
-        /// <param name="name">The name of the setting</param>
-        /// <param name="value">The value of the setting</param>
+        /// <param name="setting">The setting to be added</param>
         /// <remarks>
         /// Once a package is created, subpackages may have been created
         /// as well. If you add a setting directly to the Settings dictionary
@@ -144,106 +143,62 @@ namespace NUnit.Engine
         /// used when the settings are intended to be reflected to all the
         /// subpackages under the package.
         /// </remarks>
-        public void AddSetting(string name, object value)
+        public void AddSetting(PackageSetting setting)
         {
-            Settings[name] = value;
+            Settings.Add(setting);
             foreach (var subPackage in SubPackages)
-                subPackage.AddSetting(name, value);
+                subPackage.AddSetting(setting);
         }
 
         /// <summary>
-        /// Return the value of a setting or a default.
+        /// Create and add a custom string setting to a package and all of its subpackages.
         /// </summary>
-        /// <param name="name">The name of the setting</param>
-        /// <param name="defaultSetting">The default value</param>
-        /// <returns></returns>
-        public T GetSetting<T>(string name, T defaultSetting)
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        /// <remarks>
+        /// Once a package is created, subpackages may have been created
+        /// as well. If you add a setting directly to the Settings dictionary
+        /// of the package, the subpackages are not updated. This method is
+        /// used when the settings are intended to be reflected to all the
+        /// subpackages under the package.
+        /// </remarks>
+        public void AddSetting(string name, string value)
         {
-            return (Settings.TryGetValue(name, out object? setting) && setting is not null)
-                ? (T)setting
-                : defaultSetting;
+            AddSetting(new PackageSetting<string>(name, value));
         }
 
-        #region IXmlSerializable Implementation
-
-        /// <inheritdoc />
-        public XmlSchema GetSchema()
+        /// <summary>
+        /// Create and add a custom boolean setting to a package and all of its subpackages.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        /// <remarks>
+        /// Once a package is created, subpackages may have been created
+        /// as well. If you add a setting directly to the Settings dictionary
+        /// of the package, the subpackages are not updated. This method is
+        /// used when the settings are intended to be reflected to all the
+        /// subpackages under the package.
+        /// </remarks>
+        public void AddSetting(string name, bool value)
         {
-            throw new NotImplementedException();
+            AddSetting(new PackageSetting<bool>(name, value));
         }
 
-        /// <inheritdoc />
-        public void ReadXml(XmlReader xmlReader)
+        /// <summary>
+        /// Create and add a custom int setting to a package and all of its subpackages.
+        /// </summary>
+        /// <param name="name">The name of the setting.</param>
+        /// <param name="value">The corresponding value to set.</param>
+        /// <remarks>
+        /// Once a package is created, subpackages may have been created
+        /// as well. If you add a setting directly to the Settings dictionary
+        /// of the package, the subpackages are not updated. This method is
+        /// used when the settings are intended to be reflected to all the
+        /// subpackages under the package.
+        /// </remarks>
+        public void AddSetting(string name, int value)
         {
-            ID = xmlReader.GetAttribute("id") ?? GetNextID();
-            FullName = xmlReader.GetAttribute("fullname");
-            if (!xmlReader.IsEmptyElement)
-            {
-                while (xmlReader.Read())
-                {
-                    switch (xmlReader.NodeType)
-                    {
-                        case XmlNodeType.Element:
-                            switch (xmlReader.Name)
-                            {
-                                case "Settings":
-                                    // We don't use AddSettings, which copies settings downward.
-                                    // Instead, each package handles it's own settings.
-                                    while (xmlReader.MoveToNextAttribute())
-                                        Settings.Add(xmlReader.Name, xmlReader.Value);
-                                    xmlReader.MoveToElement();
-                                    break;
-
-                                case "TestPackage":
-                                    TestPackage subPackage = new TestPackage();
-                                    subPackage.ReadXml(xmlReader);
-                                    SubPackages.Add(subPackage);
-                                    break;
-                            }
-                            break;
-
-                        case XmlNodeType.EndElement:
-                            if (xmlReader.Name == "TestPackage")
-                                return;
-                            break;
-
-                        default:
-                            throw new Exception("Unexpected EndElement: " + xmlReader.Name);
-                    }
-                }
-
-                throw new Exception("Invalid XML: TestPackage Element not terminated.");
-            }
-        }
-
-        /// <inheritdoc />
-        public void WriteXml(XmlWriter xmlWriter)
-        {
-            // Write ID and FullName
-            xmlWriter.WriteAttributeString("id", ID);
-            if (FullName is not null)
-                xmlWriter.WriteAttributeString("fullname", FullName);
-
-            // Write Settings
-            if (Settings.Count != 0)
-            {
-                xmlWriter.WriteStartElement("Settings");
-
-                foreach (KeyValuePair<string, object> setting in Settings)
-                    xmlWriter.WriteAttributeString(setting.Key, setting.Value.ToString());
-
-                xmlWriter.WriteEndElement();
-            }
-
-            // Write any SubPackages recursively
-            foreach (TestPackage subPackage in SubPackages)
-            {
-                xmlWriter.WriteStartElement("TestPackage");
-                subPackage.WriteXml(xmlWriter);
-                xmlWriter.WriteEndElement();
-            }
+            AddSetting(new PackageSetting<int>(name, value));
         }
     }
-
-    #endregion
 }
