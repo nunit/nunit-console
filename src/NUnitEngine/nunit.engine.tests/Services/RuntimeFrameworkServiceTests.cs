@@ -51,17 +51,17 @@ namespace NUnit.Engine.Services
         private const string AGENTS_DIR = "../../../../nunit.engine/bin/Release/agents/";
 #endif
 
-        //[TestCase("net35", false)]
-        [TestCase("net462", false)]
-        //[TestCase("net462", true)]
-        public void SelectRuntimeFramework(string runtime, bool runAsX86)
+        [TestCase("net35", false, ".NETFramework,Version=v2.0")]
+        [TestCase("net462", false, ".NETFramework,Version=v4.6.2")]
+        [TestCase("net462", true, ".NETFramework,Version=v4.6.2")]
+        public void SelectRuntimeFramework(string runtime, bool runAsX86, string expectedFrameworkName)
         {
             var assemblyPath = Path.GetFullPath($"testdata/{runtime}/{(runAsX86 ? "mock-assembly-x86.dll" : "mock-assembly.dll")}");
 
             Assert.That(File.Exists(assemblyPath), $"File does not exist: {assemblyPath}");
             var package = new TestPackage(assemblyPath).SubPackages[0];
 
-            var expectedFrameworkName = RuntimeFramework.Parse(_runtimeService.SelectRuntimeFramework(package)).FrameworkName.ToString();
+            _runtimeService.SelectRuntimeFramework(package);
 
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName), Is.EqualTo(expectedFrameworkName));
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86), Is.EqualTo(runAsX86));

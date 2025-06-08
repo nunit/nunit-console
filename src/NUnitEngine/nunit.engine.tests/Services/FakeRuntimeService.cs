@@ -13,9 +13,8 @@ namespace NUnit.Engine.Services
             return true;
         }
 
-        string IRuntimeFrameworkService.SelectRuntimeFramework(TestPackage package)
+        void IRuntimeFrameworkService.SelectRuntimeFramework(TestPackage package)
         {
-            return string.Empty;
         }
 
         public IList<IRuntimeFramework> AvailableRuntimes => throw new System.NotImplementedException();

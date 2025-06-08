@@ -23,7 +23,7 @@ namespace NUnit.Engine
                 using (var engine = TestEngineActivator.CreateInstance())
                 {
                     var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
-                    var package = new TestPackage(mockAssemblyPath);
+                    var package = new TestPackage(mockAssemblyPath).SubPackages[0];
                     using (var runner = engine.GetRunner(package))
                     {
                         runner.Run(new NullListener(), TestFilter.Empty);

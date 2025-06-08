@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace NUnit.Engine.Runners
@@ -13,18 +14,26 @@ namespace NUnit.Engine.Runners
     {
         public TestEngineRunner(IServiceLocator services, TestPackage package)
         {
-            Guard.ArgumentNotNull(services);
-            Guard.ArgumentNotNull(package);
+            Guard.ArgumentNotNull(services, nameof(package));
+            Guard.ArgumentNotNull(package, nameof(package));
 
-            TestPackage = package;
+            TestPackages = package.Select(p => !p.HasSubPackages());
+            TestPackage = TestPackages.Count == 1
+                ? TestPackages[0]
+                : package;
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
         }
 
         /// <summary>
-        /// The TestPackage for which this is the runner
+        /// The top-level TestPackage for which this is the runner
         /// </summary>
         protected TestPackage TestPackage { get; }
+
+        /// <summary>
+        /// A list of leaf packages, expected to be assemblies.
+        /// </summary>
+        protected IList<TestPackage> TestPackages { get; }
 
         /// <summary>
         /// Our Service Context
@@ -136,7 +145,7 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public TestEngineResult Reload()
         {
-            if (this.TestPackage is null)
+            if (TestPackage is null)
                 throw new InvalidOperationException("MasterTestRunner: Reload called before Load");
 
             return LoadResult = ReloadPackage();

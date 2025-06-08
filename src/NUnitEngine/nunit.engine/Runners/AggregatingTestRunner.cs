@@ -10,14 +10,17 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// AggregatingTestRunner runs tests using multiple subordinate runners
     /// and combines the results. The individual runners may be run in parallel
-    /// if a derived class sets the LevelOfParallelism
-    /// property in its constructor.
+    /// if a derived class sets the LevelOfParallelism property in its constructor.
+    /// MultipleAssemblyProcessRunner is currently the only derived class, but
+    /// we expect new derived types to be created so this base class is retained.
     /// </summary>
     /// <remarks>
     /// AggregatingTestRunner may be called with a TestPackage that specifies a single
     /// assembly, multiple assemblies, a single project, multiple projects or any
     /// combination of projects and asemblies. In all cases, it extracts a list of the
     /// actual assemblies to be run and creates a separate runner for each of them.
+    /// </remarks>
+    /// <remarks>
     /// </remarks>
     public class AggregatingTestRunner : TestEngineRunner
     {
@@ -47,10 +50,10 @@ namespace NUnit.Engine.Runners
                 if (_runners is null)
                 {
                     _runners = new List<ITestEngineRunner>();
-                    foreach (var subPackage in TestPackage.Select(p => !p.HasSubPackages()))
+                    foreach (var assemblyPackage in TestPackages)
                     {
-                        var runner = CreateRunner(subPackage);
-                        log.Debug($"Using {runner.GetType()} for {subPackage.Name}");
+                        var runner = CreateRunner(assemblyPackage);
+                        log.Debug($"Using {runner.GetType()} for {assemblyPackage.Name}");
                         _runners.Add(runner);
                     }
                 }
