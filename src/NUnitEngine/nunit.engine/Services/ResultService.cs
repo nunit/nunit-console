@@ -64,7 +64,7 @@ namespace NUnit.Engine.Services
                     if (_extensionNodes is not null)
                         foreach (var node in _extensionNodes)
                             foreach (var supported in node.GetValues("Format"))
-                                if (supported == format)
+                                if (supported == format && node is ExtensionNode)
                                 {
                                     log.Debug($"  Returning {node.TypeName}");
                                     return (IResultWriter)node.ExtensionObject;
@@ -82,12 +82,10 @@ namespace NUnit.Engine.Services
 
                 var extensionService = ServiceContext.GetService<ExtensionService>();
 
-                if (extensionService.Status != ServiceStatus.Started)
-                    throw new NUnitEngineException("ExtensionService must be added before ResultService");
+                if (extensionService is not null && extensionService.Status == ServiceStatus.Started)
+                    _extensionNodes = extensionService.GetExtensionNodes<IResultWriter>();
 
-                _extensionNodes = extensionService.GetExtensionNodes<IResultWriter>();
-
-                // If there is no extension service, we start anyway using builtin writers
+                // If there is no extension service, we start anyway using built-in writers
                 Status = ServiceStatus.Started;
             }
             catch

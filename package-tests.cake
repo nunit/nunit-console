@@ -310,7 +310,14 @@ AddToBothLists(new PackageTest(1, "Net80WPFTest")
 // TESTS OF EXTENSION LISTING
 //////////////////////////////////////////////////////////////////////
 
-AddToBothLists(new PackageTest(1, "NoExtensionsInstalled")
+StandardRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
+{
+    Description = "List Extensions shows only our agent launchers",
+    Arguments = "--list-extensions",
+    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.Net80AgentLauncher", exactly: 1) }
+});
+
+NetCoreRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
 {
     Description = "List Extensions shows none installed",
     Arguments = "--list-extensions",
@@ -328,12 +335,12 @@ AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 // RUN TESTS USING EACH OF OUR EXTENSIONS
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(1, "FakeEventListenerTest")
-{
-    Description = "Test that event listener gets all reports",
-    Arguments = "testdata/net462/mock-assembly.dll --extensionDirectory ../../src/TestData/FakeExtensions",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-4.6.2")
-});
+//StandardRunnerTests.Add(new PackageTest(1, "FakeEventListenerTest")
+//{
+//    Description = "Test that event listener gets all reports",
+//    Arguments = "testdata/net462/mock-assembly.dll --extensionDirectory ../../src/TestData/FakeExtensions",
+//    ExpectedResult = new MockAssemblyExpectedResult("netcore-4.6.2")
+//});
 
 // TODO: Add back extension tests after latest changes to ExtensionManager
 // are ported. Most extensions will require an update to work under V4.

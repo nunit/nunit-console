@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Versioning;
-using NUnit.Common;
 using NUnit.Engine.Agents;
+using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {
@@ -31,8 +32,30 @@ namespace NUnit.Engine.Services
 
         private IRuntimeFrameworkService? _runtimeService;
         private IAvailableRuntimes? _availableRuntimeService;
+        private ExtensionService? _extensionService;
 
-        private readonly List<IAgentLauncher> _launchers = new List<IAgentLauncher>();
+        private List<IAgentLauncher>? _launchers;
+        private List<IAgentLauncher> Launchers
+        {
+            get
+            {
+                if (_launchers is null)
+                {
+                    _launchers = [new Net462AgentLauncher() /*, new Net80AgentLauncher()*/];
+
+                    foreach (var node in _extensionService.ShouldNotBeNull().GetExtensionNodes<IAgentLauncher>())
+                    {
+                        var launcher = (IAgentLauncher)node.ExtensionObject;
+                        _launchers.Add(launcher);
+                    }
+
+                    foreach (var launcher in _launchers)
+                        AvailableAgents.Add(launcher.AgentInfo);
+                }
+
+                return _launchers;
+            }
+        }
 
         // Index used to retrieve the agentId of a terminated process
         private readonly Dictionary<Process, Guid> _agentProcessIndex = new Dictionary<Process, Guid>();
@@ -84,7 +107,7 @@ namespace NUnit.Engine.Services
             {
                 // Collect names of agents that work for each assembly
                 var agentsForAssembly = new HashSet<string>();
-                foreach (var launcher in _launchers.Where(l => validAgentNames.Contains(l.AgentInfo.AgentName)))
+                foreach (var launcher in Launchers.Where(l => validAgentNames.Contains(l.AgentInfo.AgentName)))
                     if (launcher.CanCreateAgent(assemblyPackage))
                         agentsForAssembly.Add(launcher.AgentInfo.AgentName);
 
@@ -107,7 +130,7 @@ namespace NUnit.Engine.Services
         /// <param name="package">A TestPackage</param>
         public bool IsAgentAvailable(TestPackage package)
         {
-            foreach (var launcher in _launchers)
+            foreach (var launcher in Launchers)
                 if (launcher.CanCreateAgent(package))
                     return true;
 
@@ -254,7 +277,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        [MemberNotNull(nameof(_runtimeService), nameof(_availableRuntimeService))]
+        [MemberNotNull(nameof(_runtimeService), nameof(_availableRuntimeService), nameof(_extensionService))]
         public void StartService()
         {
             try
@@ -262,14 +285,9 @@ namespace NUnit.Engine.Services
                 if (ServiceContext is null)
                     throw new InvalidOperationException("ServiceContext is required for TestAgency");
 
-                _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>();
-                _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>();
-
-                _launchers.Add(new Net462AgentLauncher());
-                _launchers.Add(new Net80AgentLauncher());
-
-                foreach (var launcher in _launchers)
-                    AvailableAgents.Add(launcher.AgentInfo);
+                _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>().ShouldNotBeNull();
+                _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>().ShouldNotBeNull();
+                _extensionService = ServiceContext.GetService<ExtensionService>().ShouldNotBeNull();
 
                 _tcpTransport.Start();
 
@@ -333,9 +351,9 @@ namespace NUnit.Engine.Services
         {
             // Check to see if a specific agent was selected
             string requestedAgentName = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
-            log.Debug($"RequestedAgentName: {requestedAgentName}");
+            log.Debug($"RequestedAgentName: {requestedAgentName ?? "NONE"}");
 
-            foreach (var launcher in _launchers)
+            foreach (var launcher in Launchers)
             {
                 var launcherName = launcher.GetType().Name;
                 log.Debug($"Examining Launcher {launcherName}");

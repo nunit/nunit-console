@@ -24,6 +24,9 @@
     <language>en-US</language>
     <tags>nunit console runner test testing tdd</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
+    <dependencies>
+      <dependency id="nunit-extension-net80-pluggable-agent" version="4.0.0-alpha.2" />
+    </dependencies>
   </metadata>
   <files>
     <file src = "../LICENSE.txt" target = "tools" />

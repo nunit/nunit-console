@@ -11,6 +11,15 @@ using TestCentric.Metadata;
 
 namespace NUnit.Extensibility
 {
+    /// <summary>
+    /// ExtensionManager provides a low-level implementation of the NUnit extension model.
+    /// </summary>
+    /// <remarks>
+    /// Methods and properties returning extensions or extension points return the actual
+    /// classes rather than the corresponding interfaces. It's up to the caller, e.g. the
+    /// engine's ExtensionService to decide how much to make available publicly. This
+    /// approach gives the most flexibility in using ExtensionManager for various purposes.
+    /// </remarks>
     public class ExtensionManager
     {
         private static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
@@ -64,7 +73,7 @@ namespace NUnit.Extensibility
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
         /// </summary>
-        public IEnumerable<IExtensionPoint> ExtensionPoints
+        public IEnumerable<ExtensionPoint> ExtensionPoints
         {
             get { return _extensionPoints.ToArray(); }
         }
@@ -72,7 +81,7 @@ namespace NUnit.Extensibility
         /// <summary>
         /// Gets an enumeration of all installed Extensions.
         /// </summary>
-        public IEnumerable<IExtensionNode> Extensions
+        public IEnumerable<ExtensionNode> Extensions
         {
             get
             {
@@ -180,7 +189,7 @@ namespace NUnit.Extensibility
         /// <summary>
         /// Get an ExtensionPoint based on its unique identifying path.
         /// </summary>
-        public IExtensionPoint? GetExtensionPoint(string path)
+        public ExtensionPoint? GetExtensionPoint(string path)
         {
             return _extensionPointIndex.TryGetValue(path, out ExtensionPoint? ep) ? ep : null;
         }
@@ -197,7 +206,7 @@ namespace NUnit.Extensibility
         /// <summary>
         /// Get all ExtensionNodes for a path
         /// </summary>
-        public IEnumerable<IExtensionNode> GetExtensionNodes(string path)
+        public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
         {
             LoadExtensions();
 
@@ -211,7 +220,7 @@ namespace NUnit.Extensibility
         /// Get the first or only ExtensionNode for a given ExtensionPoint
         /// </summary>
         /// <param name="path">The identifying path for an ExtensionPoint</param>
-        public IExtensionNode? GetExtensionNode(string path)
+        public ExtensionNode? GetExtensionNode(string path)
         {
             LoadExtensions();
 

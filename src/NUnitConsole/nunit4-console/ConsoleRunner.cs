@@ -73,9 +73,6 @@ namespace NUnit.ConsoleRunner
             _extensionService = _engine.Services.GetService<IExtensionService>();
             Guard.OperationValid(_extensionService is not null, "Internal Error: ExtensionService was not found");
 
-            _extensionService = _engine.Services.GetService<IExtensionService>();
-            Guard.OperationValid(_extensionService is not null, "Internal Error: ExtensionService was not found");
-
             var extensionPath = Environment.GetEnvironmentVariable(NUNIT_EXTENSION_DIRECTORIES);
             if (!string.IsNullOrEmpty(extensionPath))
                 foreach (string extensionDirectory in extensionPath.Split(PathSeparator, StringSplitOptions.RemoveEmptyEntries))
@@ -83,6 +80,8 @@ namespace NUnit.ConsoleRunner
 
             foreach (string extensionDirectory in _options.ExtensionDirectories)
                 _extensionService.FindExtensionAssemblies(extensionDirectory);
+
+            _extensionService.LoadExtensions();
 
             _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
 
