@@ -12,6 +12,9 @@ using NUnit.Engine.Extensibility;
 using NUnit.TextDisplay;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Reflection;
+using System.Linq;
+using System.Data;
 
 namespace NUnit.ConsoleRunner
 {
