@@ -16,12 +16,12 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProjectService));
 
-        private IEnumerable<ExtensionNode>? _extensionNodes;
+        private IEnumerable<IExtensionNode>? _extensionNodes;
         private ExtensionService? _extensionService;
 
         public bool CanLoadFrom(string path)
         {
-            ExtensionNode? node = GetNodeForPath(path);
+            var node = GetNodeForPath(path) as ExtensionNode;
             if (node is not null && ((IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
             {
                 log.Debug($"{node.ExtensionObject.GetType()} can load {path}");
@@ -38,7 +38,7 @@ namespace NUnit.Engine.Services
         {
             if (File.Exists(path))
             {
-                ExtensionNode? node = GetNodeForPath(path);
+                var node = GetNodeForPath(path) as ExtensionNode;
                 IProjectLoader loader;
                 if (node is not null && (loader = (IProjectLoader)node.ExtensionObject).CanLoadFrom(path))
                 {
@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services
             return null;
         }
 
-        private ExtensionNode? GetNodeForPath(string path)
+        private IExtensionNode? GetNodeForPath(string path)
         {
             var ext = Path.GetExtension(path);
 

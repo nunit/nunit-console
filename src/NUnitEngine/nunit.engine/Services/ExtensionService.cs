@@ -14,7 +14,9 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
-        private readonly ExtensionManager _extensionManager;
+        // The Extension Manager is available internally to allow direct
+        // access to ExtensionPoints and ExtensionNodes.
+        internal readonly ExtensionManager _extensionManager;
 
         public ExtensionService()
         {
@@ -32,9 +34,19 @@ namespace NUnit.Engine.Services
             _extensionManager = new ExtensionManager(fileSystem, directoryFinder);
         }
 
-        public IEnumerable<IExtensionPoint> ExtensionPoints => _extensionManager.ExtensionPoints;
+        #region IExtensionService Implementation
 
-        public IEnumerable<IExtensionNode> Extensions => _extensionManager.Extensions;
+        /// <summary>
+        /// Gets an enumeration of all extension points in the engine.
+        /// </summary>
+        /// <returns>An enumeration of IExtensionPoints. </returns>
+        IEnumerable<IExtensionPoint> IExtensionService.ExtensionPoints => this.ExtensionPoints;
+
+        /// <summary>
+        /// Gets an enumeration of all installed Extensions.
+        /// </summary>
+        /// <returns>An enumeration of IExtensionNodes</returns>
+        IEnumerable<IExtensionNode> IExtensionService.Extensions => this.Extensions;
 
         /// <summary>
         /// Find candidate extension assemblies starting from a given base directory,
@@ -57,22 +69,81 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Get an enumeration of ExtensionNodes based on their identifying path.
         /// </summary>
-        IEnumerable<IExtensionNode> IExtensionService.GetExtensionNodes(string path)
-        {
-            foreach (var node in _extensionManager.GetExtensionNodes(path))
-                yield return node;
-        }
+        IEnumerable<IExtensionNode> IExtensionService.GetExtensionNodes(string path) => this.GetExtensionNodes(path);
 
+        /// <summary>
+        /// Enable or disable an extension
+        /// </summary>
         public void EnableExtension(string typeName, bool enabled)
         {
             _extensionManager.EnableExtension(typeName, enabled);
         }
 
+        /// <summary>
+        /// If extensions have not yet been loaded, examine all candidate assemblies
+        /// and load them. Subsequent calls are ignored.
+        /// </summary>
+        public void LoadExtensions() => _extensionManager.LoadExtensions();
+
+        /// <summary>
+        /// Get extension objects for all nodes of a given type
+        /// </summary>
+        /// <returns>An enumeration of T</returns>
         public IEnumerable<T> GetExtensions<T>() => _extensionManager.GetExtensions<T>();
 
-        public IExtensionNode? GetExtensionNode(string path) => _extensionManager.GetExtensionNode(path);
+        /// <summary>
+        /// Get all extension nodes of a given Type.
+        /// </summary>
+        /// An enumeration of IExtensionNodes for Type T.
+        IEnumerable<IExtensionNode> IExtensionService.GetExtensionNodes<T>() => this.GetExtensionNodes<T>();
 
+        #endregion
+
+        #region Class Properties and Methods
+
+        /// <summary>
+        /// Gets an enumeration of all extension points in the engine.
+        /// </summary>
+        /// <returns>An enumeration of ExtensionPoints. </returns>
+        /// <remarks>This class property returns actual ExtensionPoints rather than the IExtensionPoint interface.</remarks>
+        public IEnumerable<ExtensionPoint> ExtensionPoints => _extensionManager.ExtensionPoints;
+
+        /// <summary>
+        /// Gets an enumeration of all installed Extensions.
+        /// </summary>
+        /// <returns>An enumeration of ExtensionNodes</returns>
+        /// <remarks>This class property returns actual ExtensionNodes rather than the IExtensionNode interface.</remarks>
+        public IEnumerable<ExtensionNode> Extensions => _extensionManager.Extensions;
+
+        /// <summary>
+        /// Get an ExtensionPoint based on its unique identifying path.
+        /// </summary>
+        /// <remarks>This class method returns an actual ExtensionPoint rather than the IExtensionPoint interface.</remarks>
+        public ExtensionPoint? GetExtensionPoint(string path)
+        {
+            return _extensionManager.GetExtensionPoint(path);
+        }
+
+        /// <summary>
+        /// Get an enumeration of ExtensionNodes based on their identifying path.
+        /// </summary>
+        /// <remarks>This class method returns actual ExtensionNodes rather than the IExtensionNode interface.</remarks>
+        public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
+        {
+            foreach (var node in _extensionManager.GetExtensionNodes(path))
+                yield return node;
+        }
+
+        /// <summary>
+        /// Get all extension nodes of a given Type.
+        /// </summary>
+        /// <returns>An enumeration of ExtensionNodes for Type T.</returns>
+        /// <remarks>This class method returns actual ExtensionNodes rather than the IExtensionNode interface.</remarks>
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>() => _extensionManager.GetExtensionNodes<T>();
+
+        #endregion
+
+        #region IService Implementation
 
         public override void StartService()
         {
@@ -100,5 +171,7 @@ namespace NUnit.Engine.Services
 
             Status = ServiceStatus.Stopped;
         }
+
+        #endregion
     }
 }

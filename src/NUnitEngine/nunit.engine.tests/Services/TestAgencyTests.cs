@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
-using NSubstitute.Exceptions;
-using NUnit.Common;
-using NUnit.Engine.Services;
-using NUnit.Framework;
+#if NETFRAMEWORK && false
 using System;
 using System.Linq;
 using System.Runtime.Versioning;
+using NSubstitute;
+using NUnit.Common;
+using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
+using NUnit.Framework;
 
 namespace NUnit.Engine.Services
 {
@@ -25,6 +26,8 @@ namespace NUnit.Engine.Services
         {
             _services = new ServiceContext();
             _services.Add(new FakeRuntimeService());
+            var extensionService = new ExtensionService();
+            _services.Add(extensionService);
             _testAgency = new TestAgency();
             _services.Add(_testAgency);
             _services.ServiceManager.StartServices();

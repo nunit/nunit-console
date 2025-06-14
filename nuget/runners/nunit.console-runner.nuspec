@@ -22,6 +22,9 @@
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
+    <dependencies>
+      <dependency id="NUnit.Extension.Net80PluggableAgent" version="4.0.0-alpha.2" />
+    </dependencies>
   </metadata>
   <files>
     <file src="../../LICENSE.txt" />
