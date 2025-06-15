@@ -31,44 +31,6 @@
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
 
-    <!--<file src="agents/net462/nunit-agent-net462.exe" target="tools/agents/net462" />
-    <file src="agents/net462/nunit-agent-net462.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/nunit-agent-net462.exe.config" target="tools/agents/net462" />
-    <file src="agents/net462/nunit-agent-net462-x86.exe" target="tools/agents/net462" />
-    <file src="agents/net462/nunit-agent-net462-x86.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/nunit-agent-net462-x86.exe.config" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.engine.api.dll" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.engine.api.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.agent.core.dll" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.agent.core.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.extensibility.dll" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.extensibility.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.extensibility.api.dll" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.extensibility.api.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.common.dll" target="tools/agents/net462" />
-    <file src="agents/net462/nunit.common.pdb" target="tools/agents/net462" />
-    <file src="agents/net462/testcentric.metadata.dll" target="tools/agents/net462" />
-
-    <file src="agents/net8.0/nunit-agent-net80.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit-agent-net80.pdb" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit-agent-net80.dll.config" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit-agent-net80.deps.json" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit-agent-net80.runtimeconfig.json" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.engine.api.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.engine.api.pdb" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.engine.api.xml" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.agent.core.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.agent.core.pdb" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.extensibility.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.extensibility.pdb" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.extensibility.api.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.extensibility.api.pdb" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.common.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/nunit.common.pdb" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/testcentric.metadata.dll" target="tools/agents/net8.0" />
-    <file src="agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />-->
-
     <file src="net462/nunit-console.exe" target="tools" />
     <file src="net462/nunit-console.pdb" target="tools" />
     <file src="net462/nunit-console.exe.config" target="tools" />
@@ -86,13 +48,5 @@
     <file src="net462/testcentric.metadata.dll" target="tools" />
     <file src="../../nuget/runners/nunit.console.nuget.addins" target="tools"/>
     <file src="../../nunit_256.png" target="images"/>
-
-    <!-- Temporarily added until agents are dependencies -->
-    <!--<file src="agents/net462/agent-launcher-net462.dll" target="tools" />
-    <file src="agents/net462/agent-launcher-net462.pdb" target="tools" />
-    <file src="agents/net462/agent-launcher-net80.dll" target="tools" />
-    <file src="agents/net462/agent-launcher-net80.pdb" target="tools" />
-    <file src="agents/net462/nunit.agent.core.dll" target="tools" />
-    <file src="agents/net462/nunit.agent.core.pdb" target="tools" />-->
   </files>
 </package>
