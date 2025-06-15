@@ -25,7 +25,8 @@
     <tags>nunit console runner test testing tdd</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
-      <dependency id="nunit-extension-net80-pluggable-agent" version="4.0.0-alpha.2" />
+      <dependency id="nunit-extension-net462-pluggable-agent" version="4.0.0-alpha.6" />
+      <dependency id="nunit-extension-net80-pluggable-agent" version="4.0.0-alpha.4" />
     </dependencies>
   </metadata>
   <files>
@@ -43,38 +44,5 @@
     <file src = "$BIN_DIR$net462/nunit.common.dll" target="tools" />
     <file src = "$BIN_DIR$net462/nunit.engine.dll" target="tools" />
     <file src = "$BIN_DIR$net462/testcentric.metadata.dll" target="tools" />
-
-    <file src = "$BIN_DIR$agents/net462/nunit-agent-net462.exe" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit-agent-net462.exe.config" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit-agent-net462-x86.exe" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit-agent-net462-x86.exe.config" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.engine.api.dll" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.engine.api.xml" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.agent.core.dll" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.extensibility.dll" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.extensibility.api.dll" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/nunit.common.dll" target="tools/agents/net462" />
-    <file src = "$BIN_DIR$agents/net462/testcentric.metadata.dll" target="tools/agents/net462" />
-    <file src = "nunit-agent.exe.ignore" target="tools/agents/net462" />
-    <file src = "nunit-agent-x86.exe.ignore" target="tools/agents/net462" />
-
-    <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.dll.config" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.deps.json" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit-agent-net80.runtimeconfig.json" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.engine.api.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.engine.api.xml" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.agent.core.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.extensibility.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.extensibility.api.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/nunit.common.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/testcentric.metadata.dll" target="tools/agents/net8.0" />
-    <file src = "$BIN_DIR$agents/net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net8.0" />
-
-    <!-- Temporarily added until agents are dependencies -->
-    <file src="$BIN_DIR$agents/net462/agent-launcher-net462.dll" target="tools" />
-    <file src="$BIN_DIR$agents/net462/agent-launcher-net80.dll" target="tools" />
-    <file src="$BIN_DIR$agents/net462/nunit.agent.core.dll" target="tools" />
-    <file src="$BIN_DIR$agents/net462/nunit.agent.core.pdb" target="tools" />
   </files>
 </package>

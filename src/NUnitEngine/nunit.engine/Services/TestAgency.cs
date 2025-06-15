@@ -9,11 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Versioning;
-using NUnit.Engine.Agents;
 using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
-using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {
@@ -39,11 +37,13 @@ namespace NUnit.Engine.Services
         {
             get
             {
+                Guard.OperationValid(_extensionService is not null, "ExtensionService has not been initialized");
+
                 if (_launchers is null)
                 {
-                    _launchers = [new Net462AgentLauncher() /*, new Net80AgentLauncher()*/];
+                    _launchers = new();
 
-                    foreach (var node in _extensionService.ShouldNotBeNull().GetExtensionNodes<IAgentLauncher>())
+                    foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
                     {
                         var launcher = (IAgentLauncher)node.ExtensionObject;
                         _launchers.Add(launcher);
