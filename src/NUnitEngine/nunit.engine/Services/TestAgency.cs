@@ -12,7 +12,6 @@ using System.Runtime.Versioning;
 using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
-using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {
