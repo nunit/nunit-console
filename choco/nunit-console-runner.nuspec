@@ -27,6 +27,7 @@
     <dependencies>
       <dependency id="nunit-extension-net462-pluggable-agent" version="4.0.0-alpha.6" />
       <dependency id="nunit-extension-net80-pluggable-agent" version="4.0.0-alpha.4" />
+      <dependency id="nunit-extension-net90-pluggable-agent" version="4.0.0-alpha.1" />
     </dependencies>
   </metadata>
   <files>
