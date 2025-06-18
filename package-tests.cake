@@ -54,6 +54,14 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
 });
 
+// This works under the .NET 8.0 runner but the test is minimal
+AddToBothLists(new PackageTest(1, "Net90Test")
+{
+    Description = "Run mock-assembly.dll under .NET 9.0",
+    Arguments = "testdata/net9.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-9.0")
+});
+
 AddToBothLists(new PackageTest(1, "Net80Test")
 {
     Description = "Run mock-assembly.dll under .NET 8.0",
@@ -110,8 +118,14 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462X86Test")
 if (dotnetX86Available)
 {
     // TODO: Make tests run on all build platforms
-    bool onAppVeyor = BuildSystem.IsRunningOnAppVeyor;
     bool onGitHubActions = BuildSystem.IsRunningOnGitHubActions;
+
+    StandardRunnerTests.Add(new PackageTest(1, "Net90X86Test")
+    {
+        Description = "Run mock-assembly-x86.dll under .NET 9.0",
+        Arguments = "testdata/net9.0/mock-assembly-x86.dll",
+        ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-9.0")
+    });
 
     StandardRunnerTests.Add(new PackageTest(1, "Net80X86Test")
     {
@@ -159,9 +173,9 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462Test")
 
 StandardRunnerTests.Add(new PackageTest(1, "Net60PlusNet80Test")
 {
-    Description = "Run mock-assembly under .NET6.0 and 8.0 together",
-    Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0")
+    Description = "Run mock-assembly under .NET6.0, 8.0 and 9.0 together",
+    Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net9.0/mock-assembly.dll --agents:1",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-9.0")
 });
 
 StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet60Test")
@@ -251,6 +265,23 @@ AddToBothLists(new PackageTest(1, "Net80AspNetCoreTest")
     }
 });
 
+// This works under the .NET 8.0 runner but the test is minimal
+AddToBothLists(new PackageTest(1, "Net90AspNetCoreTest")
+{
+    Description = "Run test using AspNetCore targeting .NET 9.0",
+    Arguments = "testdata/net9.0/aspnetcore-test.dll",
+    ExpectedResult = new ExpectedResult("Passed")
+    {
+        Total = 2,
+        Passed = 2,
+        Failed = 0,
+        Warnings = 0,
+        Inconclusive = 0,
+        Skipped = 0,
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-9.0") }
+    }
+});
+
 //////////////////////////////////////////////////////////////////////
 // WINDOWS FORMS TESTS
 //////////////////////////////////////////////////////////////////////
@@ -271,8 +302,7 @@ AddToBothLists(new PackageTest(1, "Net60WindowsFormsTest")
     }
 });
 
-// Runs under Net80 runner but not NetCore
-StandardRunnerTests.Add(new PackageTest(1, "Net80WindowsFormsTest")
+AddToBothLists(new PackageTest(1, "Net80WindowsFormsTest")
 {
     Description = "Run test using windows forms under .NET 8.0",
     Arguments = "testdata/net8.0-windows/windows-test.dll",
@@ -285,6 +315,23 @@ StandardRunnerTests.Add(new PackageTest(1, "Net80WindowsFormsTest")
         Inconclusive = 0,
         Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-8.0") }
+    }
+});
+
+// This won't work under the .NET 8.0 runner
+StandardRunnerTests.Add(new PackageTest(1, "Net90WindowsFormsTest")
+{
+    Description = "Run test using windows forms under .NET 9.0",
+    Arguments = "testdata/net9.0-windows/windows-test.dll",
+    ExpectedResult = new ExpectedResult("Passed")
+    {
+        Total = 2,
+        Passed = 2,
+        Failed = 0,
+        Warnings = 0,
+        Inconclusive = 0,
+        Skipped = 0,
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-9.0") }
     }
 });
 
@@ -304,6 +351,14 @@ AddToBothLists(new PackageTest(1, "Net80WPFTest")
     Description = "Run test using WPF under .NET 8.0",
     Arguments = "testdata/net8.0-windows/WpfTest.dll",
     ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }
+});
+
+// This won't work under the .NET 8.0 runner
+StandardRunnerTests.Add(new PackageTest(1, "Net90WPFTest")
+{
+    Description = "Run test using WPF under .NET 9.0",
+    Arguments = "testdata/net9.0-windows/WpfTest.dll",
+    ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-9.0") } }
 });
 
 //////////////////////////////////////////////////////////////////////

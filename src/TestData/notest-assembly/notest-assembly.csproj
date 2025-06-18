@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.TestData</RootNamespace>
-    <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0;net9.0</TargetFrameworks>
     <OutputPath>../../../bin/$(Configuration)/testdata</OutputPath>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
