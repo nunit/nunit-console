@@ -32,6 +32,7 @@ namespace NUnit.Engine.Services
         private IAvailableRuntimes? _availableRuntimeService;
         private ExtensionService? _extensionService;
 
+        private object _launchersLock = new object(); // Lock for lazy initialization of Launchers
         private List<IAgentLauncher>? _launchers;
         private List<IAgentLauncher> Launchers
         {
@@ -41,16 +42,25 @@ namespace NUnit.Engine.Services
 
                 if (_launchers is null)
                 {
-                    _launchers = new();
-
-                    foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
+                    lock (_launchersLock)
                     {
-                        var launcher = (IAgentLauncher)node.ExtensionObject;
-                        _launchers.Add(launcher);
-                    }
+                        if (_launchers is not null)
+                            return _launchers; // Double-check locking
 
-                    foreach (var launcher in _launchers)
-                        AvailableAgents.Add(launcher.AgentInfo);
+                        log.Debug("Initializing agent launchers from extension service");
+                        var launchers = new List<IAgentLauncher>();
+
+                        foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
+                        {
+                            var launcher = (IAgentLauncher)node.ExtensionObject;
+                            launchers.Add(launcher);
+                        }
+
+                        foreach (var launcher in launchers)
+                            AvailableAgents.Add(launcher.AgentInfo);
+
+                        _launchers = launchers;
+                    }
                 }
 
                 return _launchers;
