@@ -167,7 +167,7 @@ if (dotnetX86Available)
 StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462Test")
 {
     Description = "Run two copies of mock-assembly together",
-    Arguments = "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll --agents:1",
+    Arguments = "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-4.6.2")
 });
 
@@ -181,7 +181,7 @@ StandardRunnerTests.Add(new PackageTest(1, "Net60PlusNet80Test")
 StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet60Test")
 {
     Description = "Run mock-assembly under .Net Framework 4.6.2 and .Net 6.0 together",
-    Arguments = "testdata/net462/mock-assembly.dll testdata/net6.0/mock-assembly.dll --agents:1",
+    Arguments = "testdata/net462/mock-assembly.dll testdata/net6.0/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "netcore-6.0")
 });
 
