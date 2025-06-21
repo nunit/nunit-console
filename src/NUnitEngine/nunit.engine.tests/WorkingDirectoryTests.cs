@@ -26,7 +26,7 @@ namespace NUnit.Engine
         [Test]
         public void EngineCanBeCreatedFromAnyWorkingDirectory()
         {
-            Assert.That(() => TestEngineActivator.CreateInstance(), Throws.Nothing);
+            Assert.That(() => new TestEngine(), Throws.Nothing);
         }
     }
 }
