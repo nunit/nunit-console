@@ -124,21 +124,31 @@ namespace NUnit.Engine
                 return ParseExpressionInParentheses();
 
             Token lhs = Expect(TokenKind.Word);
+            Token op;
+            Token rhs;
 
             switch (lhs.Text)
             {
-                case "id":
+                case "test":
+                    op = Expect(REL_OPS);
+                    rhs = op == MATCH_OP || op == NOMATCH_OP
+                        ? Expect(TokenKind.String, TokenKind.Word)
+                        : GetTestName();
+                    return EmitFilterElement(lhs, op, rhs);
+
                 case "cat":
                 case "method":
                 case "class":
                 case "name":
-                case "test":
                 case "namespace":
                 case "partition":
-                    Token op = lhs.Text == "id"
-                        ? Expect(EQ_OPS)
-                        : Expect(REL_OPS);
-                    Token rhs = Expect(TokenKind.String, TokenKind.Word);
+                    op = Expect(REL_OPS);
+                    rhs = Expect(TokenKind.String, TokenKind.Word);
+                    return EmitFilterElement(lhs, op, rhs);
+
+                case "id":
+                    op = Expect(EQ_OPS);
+                    rhs = Expect(TokenKind.String, TokenKind.Word);
                     return EmitFilterElement(lhs, op, rhs);
 
                 default:
@@ -148,6 +158,58 @@ namespace NUnit.Engine
                     return EmitPropertyElement(lhs, op, rhs);
                     //throw InvalidTokenError(lhs);
             }
+        }
+
+        // TODO: We do extra work for test names due to the fact that
+        // Windows drops double quotes from arguments in many situations.
+        // It would be better to parse the command-line directly but
+        // that will mean a significant rewrite.
+        private Token GetTestName()
+        {
+            var result = Expect(TokenKind.String, TokenKind.Word);
+            var sb = new StringBuilder();
+
+            if (result.Kind == TokenKind.String)
+            {
+                var inQuotes = false;
+                var inEscape = false;
+                foreach (var ch in result.Text)
+                {
+                    if (ch == ' ' && !inQuotes)
+                        continue;
+                    sb.Append(ch);
+                    inQuotes = (!inQuotes && ch == '"') || (inQuotes && ch != '"') || (inQuotes && ch == '"' && inEscape);
+                    inEscape = inQuotes && !inEscape && ch == '\\';
+                }
+            }
+            else
+            {
+                // Word Token - check to see if it's followed by a left parenthesis
+                if (_tokenizer.LookAhead != LPAREN)
+                    return result;
+
+                // We have a "Word" token followed by a left parenthesis
+                // This may be a testname entered without quotes or one
+                // using double quotes, which were removed by the shell.
+
+                sb = new StringBuilder(result.Text);
+                var token = NextToken();
+
+                while (token != EOF)
+                {
+                    bool isString = token.Kind == TokenKind.String;
+
+                    if (isString)
+                        sb.Append('"');
+                    sb.Append(token.Text);
+                    if (isString)
+                        sb.Append('"');
+
+                    token = NextToken();
+                }
+            }
+
+            return new Token(TokenKind.String, sb.ToString());
         }
 
         private static string EmitFilterElement(Token lhs, Token op, Token rhs)

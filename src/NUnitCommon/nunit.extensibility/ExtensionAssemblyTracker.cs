@@ -7,7 +7,7 @@ namespace NUnit.Extensibility
 {
     /// <summary>
     /// This is a simple utility class used by the ExtensionManager to keep track of ExtensionAssemblies.
-    /// It maps assemblies by there name nad keeps track of evealuated assembly paths.
+    /// It maps assemblies by their name and keeps track of evaluated assembly paths.
     /// It allows writing tests to show that no duplicate extension assemblies are loaded.
     /// </summary>
     internal class ExtensionAssemblyTracker : IEnumerable<ExtensionAssembly>
