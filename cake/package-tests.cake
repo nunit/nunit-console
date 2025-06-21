@@ -475,7 +475,7 @@ StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
 StandardRunnerTests.Add(new PackageTest(1, "TeamCityListenerTest")
 {
     Description = "Run mock-assembly with --teamcity enabled",
-    Arguments = "testdata/net462/mock-assembly.dll --teamcity",
+    Arguments = "testdata/net462/mock-assembly.dll --enable NUnit.Engine.Listeners.TeamCityEventListener",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
     ExtensionsNeeded = new[] { Extensions.TeamCityEventListener }
 });

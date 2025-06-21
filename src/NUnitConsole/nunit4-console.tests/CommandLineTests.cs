@@ -274,6 +274,9 @@ namespace NUnit.ConsoleRunner
         [TestCase("--test-name-format")]
         [TestCase("--param")]
         [TestCase("--encoding")]
+        [TestCase("--extensionDirectory")]
+        [TestCase("--enable")]
+        [TestCase("--disable")]
 #if NETFRAMEWORK
         [TestCase("--framework")]
 #endif
