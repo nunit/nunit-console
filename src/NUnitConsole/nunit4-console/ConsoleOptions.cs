@@ -310,9 +310,6 @@ namespace NUnit.ConsoleRunner
             this.Add("trace=", "Set internal trace {LEVEL}.\nValues: Off, Error, Warning, Info, Verbose (Debug)",
                 v => InternalTraceLevel = parser.RequiredValue(v, "--trace", "Off", "Error", "Warning", "Info", "Verbose", "Debug"));
 
-            this.Add("teamcity", "Turns on use of TeamCity service messages. TeamCity engine extension is required.",
-                v => EnableExtensions.Add("NUnit.Engine.Listeners.TeamCityEventListener"));
-
             this.Add("enable=", "Enables the specified extension. May be repeated.", v =>
             {
                 string extension = parser.RequiredValue(v, "--enable");

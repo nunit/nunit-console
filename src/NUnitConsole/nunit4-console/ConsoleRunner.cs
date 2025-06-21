@@ -96,6 +96,7 @@ namespace NUnit.ConsoleRunner
                     throw new RequiredExtensionException(typeName);
 
                 EnableExtension(typeName);
+                Console.WriteLine($"Enabled extension {typeName}");
             }
 
             // Also enable TeamCity extension under TeamCity, if it is installed
