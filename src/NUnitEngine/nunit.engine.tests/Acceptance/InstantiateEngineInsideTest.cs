@@ -20,7 +20,7 @@ namespace NUnit.Engine
         {
             Assert.DoesNotThrow(() =>
             {
-                using (var engine = TestEngineActivator.CreateInstance())
+                using (var engine = new TestEngine())
                 {
                     var mockAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "mock-assembly.dll");
                     var package = new TestPackage(mockAssemblyPath).SubPackages[0];

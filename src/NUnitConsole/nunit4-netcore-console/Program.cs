@@ -83,7 +83,8 @@ namespace NUnit.ConsoleRunner
                     OutWriter.WriteLine();
                 }
 
-                using (ITestEngine engine = TestEngineActivator.CreateInstance())
+#pragma warning disable CA1859 // Use concrete types when possible for improved performance
+                using (ITestEngine engine = new TestEngine())
                 {
                     if (Options.ErrorMessages.Count > 0)
                     {
@@ -138,6 +139,7 @@ namespace NUnit.ConsoleRunner
                         }
                     }
                 }
+#pragma warning restore CA1859 // Use concrete types when possible for improved performance
             }
             finally
             {

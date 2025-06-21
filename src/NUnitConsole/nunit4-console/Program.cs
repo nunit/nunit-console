@@ -84,7 +84,7 @@ namespace NUnit.ConsoleRunner
                     OutWriter.WriteLine();
                 }
 
-                using (ITestEngine engine = TestEngineActivator.CreateInstance())
+                using (ITestEngine engine = new TestEngine())
                 {
                     if (Options.ErrorMessages.Count > 0)
                     {

@@ -9,6 +9,7 @@ on:
     paths-ignore:
       - "*.txt"
       - "*.md"
+  release:
 
 env:
   DOTNET_NOLOGO: true # Disable the .NET logo
