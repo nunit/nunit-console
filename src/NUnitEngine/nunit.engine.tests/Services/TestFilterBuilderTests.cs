@@ -18,7 +18,7 @@ namespace NUnit.Engine.Services
         public void EmptyFilter()
         {
             TestFilter filter = builder.GetFilter();
-            Assert.That(filter.Text, Is.EqualTo("<filter></filter>"));
+            Assert.That(filter.Text, Is.EqualTo("<filter />"));
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace NUnit.Engine.Services
             TestFilter filter = builder.GetFilter();
 
             Assert.That(filter.Text, Is.EqualTo(
-                "<filter><test>My.Test.Name</test></filter>"));
+                "<filter><test><![CDATA[My.Test.Name]]></test></filter>"));
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace NUnit.Engine.Services
             TestFilter filter = builder.GetFilter();
 
             Assert.That(filter.Text, Is.EqualTo(
-                "<filter><test>My.Test.Name&lt;T&gt;(&quot;abc&quot;)</test></filter>"));
+                "<filter><test><![CDATA[My.Test.Name<T>(\"abc\")]]></test></filter>"));
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace NUnit.Engine.Services
             TestFilter filter = builder.GetFilter();
 
             Assert.That(filter.Text, Is.EqualTo(
-                "<filter><or><test>My.First.Test</test><test>My.Second.Test</test><test>My.Third.Test</test></or></filter>"));
+                "<filter><or><test><![CDATA[My.First.Test]]></test><test><![CDATA[My.Second.Test]]></test><test><![CDATA[My.Third.Test]]></test></or></filter>"));
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace NUnit.Engine.Services
             TestFilter filter = builder.GetFilter();
 
             Assert.That(filter.Text, Is.EqualTo(
-                "<filter><test>My.Test.Name</test><not><cat>Slow</cat></not></filter>"));
+                "<filter><test><![CDATA[My.Test.Name]]></test><not><cat>Slow</cat></not></filter>"));
         }
     }
 }
