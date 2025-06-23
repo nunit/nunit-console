@@ -44,40 +44,23 @@ namespace NUnit.Engine
 
             xmlWriter.WriteStartElement("filter");
 
-            switch (_testList.Count)
-            {
-                case 0:
-                    break;
-                case 1:
-                    WriteTestElement(_testList[0]);
-                    break;
-                default:
-                    xmlWriter.WriteStartElement("or");
-                    foreach (string test in _testList)
-                        WriteTestElement(test);
-                    xmlWriter.WriteEndElement();
-                    break;
-            }
-
-            // TODO: We use the result of the where clause directly,
-            // as a raw string. This assumes that TestSelectionParser
-            // produces valid XML. This is not actually the case and
-            // TestSelectionParser needs to use similar techniques
-            // for encoding test and category names as are used here.
-            if (_whereClause is not null)
-                xmlWriter.WriteRaw(TestSelectionParser.Parse(_whereClause));
-
-            xmlWriter.WriteEndElement();
-            xmlWriter.Close();
-
-            return new TestFilter(filter.ToString());
-
-            void WriteTestElement(string test)
+            // NOTE: Top level "filter" element works like "or"
+            foreach (string test in _testList)
             {
                 xmlWriter.WriteStartElement("test");
                 xmlWriter.WriteCData(test);
                 xmlWriter.WriteEndElement();
             }
+
+            // We pass our XmlWriter to TestSelectionParser so it can parse
+            // the where clause and leave the result where we will find it.
+            if (_whereClause is not null)
+                TestSelectionParser.Parse(_whereClause, xmlWriter);
+
+            xmlWriter.WriteEndElement();
+            xmlWriter.Close();
+
+            return new TestFilter(filter.ToString());
         }
     }
 }

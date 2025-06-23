@@ -1,13 +1,31 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 // Missing XML Docs
 #pragma warning disable 1591
 
 namespace NUnit.Engine
 {
+    /// <summary>
+    /// TestSelectionParser parses the content of a where clause in TSL
+    /// (Test Selection Language) and produces the XML representation
+    /// of the required TestFilter.
+    /// </summary>
+    /// <remarks>
+    /// This is a simple recursive descent parser, with a single level
+    /// of look-ahead. It makes uses of a separate Tokenizer to extract
+    /// individual tokens from the input. The original parser produced
+    /// output directly but sometimes incorporated invalid XML. To fix
+    /// that problem, it now produces an intermediate representation of
+    /// the filter as a tree of nodes, which is then walked to produce
+    /// final output using an XmlWriter.
+    /// </remarks>
     public class TestSelectionParser
     {
         private readonly Tokenizer _tokenizer;
@@ -41,7 +59,16 @@ namespace NUnit.Engine
         {
             var parser = new TestSelectionParser(new Tokenizer(input));
 
-            return parser.Parse();
+            StringBuilder filter = new StringBuilder();
+            var xmlWriter = XmlWriter.Create(filter, new XmlWriterSettings { OmitXmlDeclaration = true });
+            parser.Parse().Emit(xmlWriter);
+            xmlWriter.Close();
+            return filter.ToString();
+        }
+
+        public static void Parse(string input, XmlWriter xmlWriter)
+        {
+            new TestSelectionParser(new Tokenizer(input)).Parse().Emit(xmlWriter);
         }
 
         private TestSelectionParser(Tokenizer tokenizer)
@@ -49,23 +76,24 @@ namespace NUnit.Engine
             _tokenizer = tokenizer;
         }
 
-        private string Parse()
+        private FilterNode Parse()
         {
             if (_tokenizer.LookAhead == EOF)
                 throw new TestSelectionParserException("No input provided for test selection.");
 
             var result = ParseFilterExpression();
 
-            Expect(EOF);
+            //Expect(EOF);
             return result;
         }
 
         /// <summary>
         /// Parse a single term or an or expression, returning the xml
         /// </summary>
-        private string ParseFilterExpression()
+        private FilterNode ParseFilterExpression()
         {
-            var terms = new List<string>();
+            // <FilterExpression> ::= <FilterTerm> | <FilterExpression> "or" <FilterTerm>
+            var terms = new List<FilterNode>();
             terms.Add(ParseFilterTerm());
 
             while (LookingAt(OR_OPS))
@@ -77,22 +105,16 @@ namespace NUnit.Engine
             if (terms.Count == 1)
                 return terms[0];
 
-            var sb = new StringBuilder("<or>");
-
-            foreach (string term in terms)
-                sb.Append(term);
-
-            sb.Append("</or>");
-
-            return sb.ToString();
+            return new FilterExpression(terms.ToArray());
         }
 
         /// <summary>
         /// Parse a single element or an and expression and return the xml
         /// </summary>
-        private string ParseFilterTerm()
+        private FilterNode ParseFilterTerm()
         {
-            var elements = new List<string>();
+            // <FilterTerm> ::= <FilterElement> | <FilterTerm> "and" <FilterElement>
+            var elements = new List<FilterNode>();
             elements.Add(ParseFilterElement());
 
             while (LookingAt(AND_OPS))
@@ -104,60 +126,46 @@ namespace NUnit.Engine
             if (elements.Count == 1)
                 return elements[0];
 
-            var sb = new StringBuilder("<and>");
-
-            foreach (string element in elements)
-                sb.Append(element);
-
-            sb.Append("</and>");
-
-            return sb.ToString();
+            return new AndOp(elements.ToArray());
         }
 
         /// <summary>
         /// Parse a single filter element such as a category expression
         /// and return the xml representation of the filter.
         /// </summary>
-        private string ParseFilterElement()
+        private FilterNode ParseFilterElement()
         {
-            if (LookingAt(LPAREN, NOT_OP))
-                return ParseExpressionInParentheses();
+            Token token = NextToken();
+            if (token == NOT_OP)
+                return new NegatedElement(ParseFilterElement());
 
-            Token lhs = Expect(TokenKind.Word);
-            Token op;
-            Token rhs;
-
-            switch (lhs.Text)
+            if (token == LPAREN)
             {
-                case "test":
-                    op = Expect(REL_OPS);
-                    rhs = op == MATCH_OP || op == NOMATCH_OP
-                        ? Expect(TokenKind.String, TokenKind.Word)
-                        : GetTestName();
-                    return EmitFilterElement(lhs, op, rhs);
-
-                case "cat":
-                case "method":
-                case "class":
-                case "name":
-                case "namespace":
-                case "partition":
-                    op = Expect(REL_OPS);
-                    rhs = Expect(TokenKind.String, TokenKind.Word);
-                    return EmitFilterElement(lhs, op, rhs);
-
-                case "id":
-                    op = Expect(EQ_OPS);
-                    rhs = Expect(TokenKind.String, TokenKind.Word);
-                    return EmitFilterElement(lhs, op, rhs);
-
-                default:
-                    // Assume it's a property name
-                    op = Expect(REL_OPS);
-                    rhs = Expect(TokenKind.String, TokenKind.Word);
-                    return EmitPropertyElement(lhs, op, rhs);
-                    //throw InvalidTokenError(lhs);
+                FilterNode result = ParseFilterExpression();
+                Expect(RPAREN);
+                return result;
             }
+
+            if (token.Kind != TokenKind.Word)
+                InvalidTokenError(token);
+
+            Token op = Expect(REL_OPS);
+            bool negated = op == NE_OP || op == NOMATCH_OP;
+            if (negated)
+                op = op == NE_OP
+                    ? EQ_OP1
+                    : MATCH_OP;
+            string lhs = token.Text;
+            string rhs = op == MATCH_OP && lhs == "test"
+                ? Expect(TokenKind.String, TokenKind.Word).Text
+                : GetTestName().Text;
+
+            FilterNode element = new FilterElement(op, lhs, rhs);
+
+            if (negated)
+                element = new NegatedElement(element);
+
+            return element;
         }
 
         // TODO: We do extra work for test names due to the fact that
@@ -212,62 +220,102 @@ namespace NUnit.Engine
             return new Token(TokenKind.String, sb.ToString());
         }
 
-        private static string EmitFilterElement(Token lhs, Token op, Token rhs)
+        private abstract class FilterNode
         {
-            string? fmt = null;
-
-            if (op == EQ_OP1 || op == EQ_OP2)
-                fmt = "<{0}>{1}</{0}>";
-            else if (op == NE_OP)
-                fmt = "<not><{0}>{1}</{0}></not>";
-            else if (op == MATCH_OP)
-                fmt = "<{0} re='1'>{1}</{0}>";
-            else if (op == NOMATCH_OP)
-                fmt = "<not><{0} re='1'>{1}</{0}></not>";
-            else
-                fmt = "<{0} op='" + op.Text + "'>{1}</{0}>";
-
-            return EmitElement(fmt, lhs, rhs);
+            public abstract void Emit(XmlWriter xmlWriter);
         }
 
-        private static string EmitPropertyElement(Token lhs, Token op, Token rhs)
+        private class FilterExpression : FilterNode
         {
-            string? fmt = null;
+            public FilterNode[] Terms;
 
-            if (op == EQ_OP1 || op == EQ_OP2)
-                fmt = "<prop name='{0}'>{1}</prop>";
-            else if (op == NE_OP)
-                fmt = "<not><prop name='{0}'>{1}</prop></not>";
-            else if (op == MATCH_OP)
-                fmt = "<prop name='{0}' re='1'>{1}</prop>";
-            else if (op == NOMATCH_OP)
-                fmt = "<not><prop name='{0}' re='1'>{1}</prop></not>";
-            else
-                fmt = "<prop name='{0}' op='" + op.Text + "'>{1}</prop>";
+            public FilterExpression(FilterNode[] terms)
+            {
+                Terms = terms;
+            }
 
-            return EmitElement(fmt, lhs, rhs);
+            public override void Emit(XmlWriter xmlWriter)
+            {
+                xmlWriter.WriteStartElement("or");
+                foreach (var element in Terms)
+                    element.Emit(xmlWriter);
+                xmlWriter.WriteEndElement();
+            }
         }
 
-        private static string EmitElement(string fmt, Token lhs, Token rhs)
+        private class AndOp : FilterNode
         {
-            return string.Format(fmt, lhs.Text, XmlEscape(rhs.Text));
+            public FilterNode[] Elements;
+
+            public AndOp(FilterNode[] elements)
+            {
+                Elements = elements;
+            }
+
+            public override void Emit(XmlWriter xmlWriter)
+            {
+                xmlWriter.WriteStartElement("and");
+                foreach (var element in Elements)
+                    element.Emit(xmlWriter);
+                xmlWriter.WriteEndElement();
+            }
         }
 
-        private string ParseExpressionInParentheses()
+        private class NegatedElement : FilterNode
         {
-            Token op = Expect(LPAREN, NOT_OP);
+            public FilterNode Arg;
 
-            if (op == NOT_OP)
-                Expect(LPAREN);
+            public NegatedElement(FilterNode arg)
+            {
+                Arg = arg;
+            }
 
-            string result = ParseFilterExpression();
+            public override void Emit(XmlWriter xmlWriter)
+            {
+                xmlWriter.WriteStartElement("not");
+                Arg.Emit(xmlWriter);
+                xmlWriter.WriteEndElement();
+            }
+        }
 
-            Expect(RPAREN);
+        private class FilterElement : FilterNode
+        {
+            private static readonly string[] KNOWN_LHS_NAMES =
+            {
+                "test", "cat", "method", "class", "name", "namespace", "partition", "id"
+            };
 
-            if (op == NOT_OP)
-                result = "<not>" + result + "</not>";
+            public Token OpCode;
+            public string LHS;
+            public string RHS;
 
-            return result;
+            public FilterElement(Token opCode, string lhs, string rhs)
+            {
+                Guard.ArgumentValid(opCode == EQ_OP1 || opCode == EQ_OP2 || opCode == MATCH_OP,
+                    $"Invalid OpCode: {opCode}", nameof(opCode));
+
+                LHS = lhs;
+                OpCode = opCode;
+                RHS = rhs;
+            }
+
+            public override void Emit(XmlWriter xmlWriter)
+            {
+                bool isProperty = !KNOWN_LHS_NAMES.Contains(LHS);
+
+                if (isProperty)
+                {
+                    xmlWriter.WriteStartElement("prop");
+                    xmlWriter.WriteAttributeString("name", LHS);
+                }
+                else
+                    xmlWriter.WriteStartElement(LHS);
+
+                if (OpCode == MATCH_OP)
+                    xmlWriter.WriteAttributeString("re", "1");
+                xmlWriter.WriteCData(RHS);
+                xmlWriter.WriteEndElement();
+            }
         }
 
         // Require a token of one or more kinds
