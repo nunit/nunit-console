@@ -174,7 +174,7 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462Test")
 StandardRunnerTests.Add(new PackageTest(1, "Net60PlusNet80Test")
 {
     Description = "Run mock-assembly under .NET6.0, 8.0 and 9.0 together",
-    Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net9.0/mock-assembly.dll --agents:1",
+    Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net9.0/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-9.0")
 });
 
