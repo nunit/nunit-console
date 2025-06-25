@@ -182,7 +182,7 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                _remoteRunner?.ForcedStop();
+                _remoteRunner?.RequestStop();
             }
             catch (Exception e)
             {
@@ -266,6 +266,13 @@ namespace NUnit.Engine.Runners
 
             if (_remoteRunner is null)
                 _remoteRunner = _agent.CreateRunner(TestPackage);
+        }
+
+        // Used for testing
+        internal void ForceRemoteRunnerCreation()
+        {
+            _agent = _agency.GetAgent(TestPackage);
+            _remoteRunner = _agent.CreateRunner(TestPackage);
         }
 
         private TestEngineResult CreateFailedResult(Exception e)

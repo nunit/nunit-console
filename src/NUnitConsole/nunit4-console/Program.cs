@@ -198,7 +198,11 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      is used, no tests are executed but a description of the tests");
                 OutWriter.WriteLine("      is saved in the specified or default format.");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      The --where option is intended to extend or replace the earlier");
+            }
+            OutWriter.WriteLine(ColorStyle.SectionHeader, "Notes:");
+            using (new ColorConsole(ColorStyle.Default))
+            {
+                OutWriter.WriteLine("   1. The --where option is intended to extend or replace the earlier");
                 OutWriter.WriteLine("      --test, --include and --exclude options by use of a selection expression");
                 OutWriter.WriteLine("      describing exactly which tests to use. Examples of usage are:");
                 OutWriter.WriteLine("          --where:cat==Data");
@@ -210,7 +214,7 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine("      See the docs for more information and a full description of the syntax");
                 OutWriter.WriteLine("      information and a full description of the syntax.");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      Several options that specify processing of XML output take");
+                OutWriter.WriteLine("   2. Several options that specify processing of XML output take");
                 OutWriter.WriteLine("      an output specification as a value. A SPEC may take one of");
                 OutWriter.WriteLine("      the following forms:");
                 OutWriter.WriteLine("          --OPTION:filename");
@@ -233,7 +237,14 @@ namespace NUnit.ConsoleRunner
                 OutWriter.WriteLine();
                 OutWriter.WriteLine("      Any transforms provided must handle input in the native nunit3 format.");
                 OutWriter.WriteLine();
-                OutWriter.WriteLine("      To be able to load NUnit projects, file type .nunit, the engine");
+                OutWriter.WriteLine("   3. If the --agents option is specified, the runner will not load any tests");
+                OutWriter.WriteLine("      until an agent is available. Consequently, it is not possible to provide");
+                OutWriter.WriteLine("      a count of the tests to be run at the start of the run. The count included");
+                OutWriter.WriteLine("      in the <start-run> event will be zero in this case. This has no effect on");
+                OutWriter.WriteLine("      the console runner's execution of the tests but may cause a problem for");
+                OutWriter.WriteLine("      extensions that rely on that field to display progress information.");
+                OutWriter.WriteLine();
+                OutWriter.WriteLine("   4. To be able to load NUnit projects, file type .nunit, the engine");
                 OutWriter.WriteLine("      extension NUnitProjectLoader is required. For Visual Studio projects");
                 OutWriter.WriteLine("      and solutions the engine extension VSProjectLoader is required.");
                 OutWriter.WriteLine();

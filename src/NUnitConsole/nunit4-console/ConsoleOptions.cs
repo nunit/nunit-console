@@ -240,7 +240,7 @@ namespace NUnit.ConsoleRunner
                     }
                 });
 
-            this.Add("where=", "Test selection {EXPRESSION} indicating what tests will be run. See description below.",
+            this.Add("where=", "Test selection {EXPRESSION} indicating what tests will be run. See note 1 below.",
                 v => WhereClause = parser.RequiredValue(v, "--where"));
 
             this.Add("param|p=", "Followed by a key-value pair separated by an equals sign. Test code can access the value by name. This option may be repeated.",
@@ -275,7 +275,7 @@ namespace NUnit.ConsoleRunner
             this.Add("output|out=", "File {PATH} to contain text output from the tests.",
                 v => OutFile = parser.RequiredValue(v, "--output"));
 
-            this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated.",
+            this.Add("result=", "An output {SPEC} for saving the test results.\nThis option may be repeated. See note 2.",
                 v =>
                 {
                     var spec = parser.ResolveOutputSpecification(parser.RequiredValue(v, "--resultxml"), resultOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
@@ -283,7 +283,7 @@ namespace NUnit.ConsoleRunner
                         resultOutputSpecifications.Add(spec);
                 });
 
-            this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated.", v =>
+            this.Add("explore:", "Display or save test info rather than running tests. Optionally provide an output {SPEC} for saving the test info. This option may be repeated. See note 2.", v =>
             {
                 Explore = true;
                 var spec = parser.ResolveOutputSpecification(v, ExploreOutputSpecifications, _fileSystem, CURRENT_DIRECTORY_ON_ENTRY);
@@ -373,7 +373,7 @@ namespace NUnit.ConsoleRunner
             this.Add("skipnontestassemblies", "Skip any non-test assemblies specified, without error.",
                 v => SkipNonTestAssemblies = !string.IsNullOrEmpty(v));
 
-            this.AddNetFxOnlyOption("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit.",
+            this.AddNetFxOnlyOption("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit. See note below.",
                 NetFxOnlyOption("agents=", v => _maxAgents = parser.RequiredInt(v, "--agents")));
 
             this.AddNetFxOnlyOption("debug", "Launch debugger to debug tests.",
