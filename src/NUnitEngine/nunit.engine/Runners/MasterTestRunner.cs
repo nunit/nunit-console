@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Xml;
 using NUnit.Engine.Services;
 using System.ComponentModel;
+using NUnit.Common;
 
 namespace NUnit.Engine.Runners
 {
@@ -384,7 +385,7 @@ namespace NUnit.Engine.Runners
         /// <returns>The count of test cases</returns>
         private int CountTests(TestFilter filter)
         {
-            if (!IsPackageLoaded)
+            if (!IsPackageLoaded && TestPackage.Settings.HasSetting(SettingDefinitions.MaxAgents))
                 return 0;
 
             return GetEngineRunner().CountTestCases(filter);

@@ -7,17 +7,19 @@
 //#define TESTAGENCY_INTEGRATION
 
 #if NETFRAMEWORK
+using System;
 using System.IO;
 using NUnit.Common;
 using NUnit.Engine.Services;
 using NUnit.Framework;
-using NUnit.TestData.Assemblies;
 using NSubstitute;
+using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 
 namespace NUnit.Engine.Runners
 {
-    [TestFixture("net462")]
 #if TESTAGENCY_INTEGRATION
+    [TestFixture("net462")]
     [TestFixture("net35")]
     [TestFixture("net8.0")]
     [TestFixture("net7.0")]
@@ -27,14 +29,18 @@ namespace NUnit.Engine.Runners
     public class ProcessRunnerTests : ITestEventListener
     {
         private TestPackage _package;
-        private ProcessRunner _runner;
+        private ProcessRunner _processRunner;
+        private ITestEngineRunner? _remoteRunner;
 
-        private string _runtimeDir;
+        private string _runtimeDir = "net462";
 
+#if TESTAGENCY_INTEGRATION
         public ProcessRunnerTests(string runtimeDir)
         {
             _runtimeDir = runtimeDir;
         }
+#else
+#endif
 
         [SetUp]
         public void Initialize()
@@ -57,17 +63,17 @@ namespace NUnit.Engine.Runners
             agency.StartService();
 #else
             // Create Substitutes for All Components
-            var remoteRunner = Substitute.For<ITestEngineRunner>();
-            remoteRunner.Load().Returns(new TestEngineResult("<LOAD_RESULT />"));
-            remoteRunner.CountTestCases(TestFilter.Empty).Returns(42);
-            remoteRunner.Explore(TestFilter.Empty).Returns(new TestEngineResult("<EXPLORE_RESULT />"));
-            remoteRunner.Run(this, TestFilter.Empty).Returns(new TestEngineResult("<RUN_RESULT />"));
+            _remoteRunner = Substitute.For<ITestEngineRunner>();
+            _remoteRunner.Load().Returns(new TestEngineResult("<LOAD_RESULT />"));
+            _remoteRunner.CountTestCases(TestFilter.Empty).Returns(42);
+            _remoteRunner.Explore(TestFilter.Empty).Returns(new TestEngineResult("<EXPLORE_RESULT />"));
+            _remoteRunner.Run(this, TestFilter.Empty).Returns(new TestEngineResult("<RUN_RESULT />"));
             var asyncResult = new AsyncTestEngineResult();
             asyncResult.SetResult(new TestEngineResult("<RUN_ASYNC_RESULT />"));
-            remoteRunner.RunAsync(this, TestFilter.Empty).Returns(asyncResult);
+            _remoteRunner.RunAsync(this, TestFilter.Empty).Returns(asyncResult);
 
             var agent = Substitute.For<ITestAgent>();
-            agent.CreateRunner(_package).ReturnsForAnyArgs(remoteRunner);
+            agent.CreateRunner(_package).ReturnsForAnyArgs(_remoteRunner);
 
             var agency = Substitute.For<TestAgency>();
             agency.GetAgent(_package).ReturnsForAnyArgs(agent);
@@ -75,23 +81,24 @@ namespace NUnit.Engine.Runners
             context.GetService<TestAgency>().Returns(agency);
 #endif
 
-            _runner = new ProcessRunner(context, _package);
+            _processRunner = new ProcessRunner(context, _package);
         }
 
         [TearDown]
         public void Cleanup()
         {
-            if (_runner is not null)
-                _runner.Dispose();
+            _remoteRunner?.Dispose();
+            _processRunner?.Dispose();
         }
 
         [Test]
         public void Load()
         {
-            TestEngineResult result = _runner.Load();
+            TestEngineResult result = _processRunner.Load();
 #if TESTAGENCY_INTEGRATION
             CheckBasicResult(result);
 #else
+            _remoteRunner?.Received().Load();
             Assert.That(result.Xml.Name, Is.EqualTo("LOAD_RESULT"));
 #endif
         }
@@ -99,10 +106,11 @@ namespace NUnit.Engine.Runners
         [Test]
         public void CountTestCases()
         {
-            int count = _runner.CountTestCases(TestFilter.Empty);
+            int count = _processRunner.CountTestCases(TestFilter.Empty);
 #if TESTAGENCY_INTEGRATION
             Assert.That(count, Is.EqualTo(MockAssembly.Tests));
 #else
+            _remoteRunner?.Received().CountTestCases(TestFilter.Empty);
             Assert.That(count, Is.EqualTo(42));
 #endif
         }
@@ -110,10 +118,11 @@ namespace NUnit.Engine.Runners
         [Test]
         public void Explore()
         {
-            var result = _runner.Explore(TestFilter.Empty);
+            var result = _processRunner.Explore(TestFilter.Empty);
 #if TESTAGENCY_INTEGRATION
             CheckBasicResult(result);
 #else
+            _remoteRunner?.Received().Explore(TestFilter.Empty);
             Assert.That(result.Xml.Name, Is.EqualTo("EXPLORE_RESULT"));
 #endif
         }
@@ -121,10 +130,11 @@ namespace NUnit.Engine.Runners
         [Test]
         public void Run()
         {
-            var result = _runner.Run(this, TestFilter.Empty);
+            var result = _processRunner.Run(this, TestFilter.Empty);
 #if TESTAGENCY_INTEGRATION
             CheckRunResult(result);
 #else
+            _remoteRunner?.Received().Run(this, TestFilter.Empty);
             Assert.That(result.Xml.Name, Is.EqualTo("RUN_RESULT"));
 #endif
         }
@@ -132,12 +142,13 @@ namespace NUnit.Engine.Runners
         [Test]
         public void RunAsync()
         {
-            var asyncResult = _runner.RunAsync(this, TestFilter.Empty);
+            var asyncResult = _processRunner.RunAsync(this, TestFilter.Empty);
             Assert.That(asyncResult.Wait(-1), Is.True);
             Assert.That(asyncResult.IsComplete, Is.True);
 #if TESTAGENCY_INTEGRATION
             CheckRunResult(asyncResult.EngineResult);
 #else
+            _remoteRunner?.Received().RunAsync(this, TestFilter.Empty);
             Assert.That(asyncResult.EngineResult.Xml.Name, Is.EqualTo("RUN_ASYNC_RESULT"));
 #endif
         }
@@ -170,11 +181,27 @@ namespace NUnit.Engine.Runners
             Assert.That(result.GetAttribute("skipped", 0), Is.EqualTo(MockAssembly.Skipped));
             Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
         }
+#else
+        [Test]
+        public void RequestStop()
+        {
+            _processRunner.ForceRemoteRunnerCreation();
+            _processRunner.RequestStop();
+            _remoteRunner?.Received().RequestStop();
+        }
+
+        [Test]
+        public void ForcedStop()
+        {
+            _processRunner.ForceRemoteRunnerCreation();
+            _processRunner.ForcedStop();
+            _remoteRunner?.Received().ForcedStop();
+        }
 #endif
 
         public void OnTestEvent(string report)
         {
-            // Do Nothing
+             // Do nothing
         }
     }
 }
