@@ -74,7 +74,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
 
     NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
         PackageType.Chocolatey,
-        id: "nunit-console-runner-v4",
+        id: "nunit-console-runner",
         source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
         checks: new PackageCheck[] {
             HasDirectory("tools").WithFiles(
@@ -86,7 +86,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDependency("nunit-extension-net90-pluggable-agent", "4.0.0-alpha.1")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner-v4.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
+            + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
         tests: StandardRunnerTests),
 
     NUnitAgentCorePackage = new PackageDefinition(

@@ -189,8 +189,32 @@ Task("Publish")
             Information("Nothing to publish from this run.");
     });
 
+// This task may be run independently when recovering from errors.
+Task("PublishToMyGet")
+    .Description("""
+		Publishes packages to MyGet for a dev build. If not, or if the --nopush
+		option was used, a message is displayed.
+		""")
+    .Does(() => PackageReleaseManager.PublishToMyGet());
+
+// This task may be run independently when recovering from errors.
+Task("PublishToNuGet")
+    .Description("""
+	Publishes packages to NuGet for an alpha, beta, rc or final release. If not,
+	or if the --nopush option was used, a message is displayed.
+	""")
+    .Does(() => PackageReleaseManager.PublishToNuGet());
+
+// This task may be run independently when recovering from errors.
+Task("PublishToChocolatey")
+    .Description("""
+	Publishes packages to Chocolatey for an alpha, beta, rc or final release.
+	If not, or if the --nopush option was used, a message is displayed.
+	""")
+    .Does(() => PackageReleaseManager.PublishToChocolatey());
+
 Task("PublishSymbolsPackage")
-    .Description("\"Re-publish a specific symbols package to NuGet after a failure\"")
+    .Description("Re-publish a specific symbols package to NuGet after a failure")
     .Does(() => PackageReleaseManager.PublishSymbolsPackage());
 
 Task("CreateDraftRelease")
@@ -230,7 +254,6 @@ Task("DumpSettings")
         Console.WriteLine("IsLocalBuild:                 " + BuildSettings.IsLocalBuild);
         Console.WriteLine("IsRunningOnWindows:           " + BuildSettings.IsRunningOnWindows);
         Console.WriteLine("IsRunningOnUnix:              " + BuildSettings.IsRunningOnUnix);
-        Console.WriteLine("IsRunningOnAppVeyor:          " + BuildSettings.IsRunningOnAppVeyor);
         Console.WriteLine("IsRunningOnGitHubActions:     " + BuildSettings.IsRunningOnGitHubActions);
 
         Console.WriteLine("\nVERSIONING");

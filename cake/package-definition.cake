@@ -37,7 +37,6 @@ public class PackageDefinition
 
         PackageType = packageType;
         PackageId = id;
-        PackageVersion = BuildSettings.PackageVersion;
         PackageSource = source;
         BasePath = basePath ?? BuildSettings.OutputDirectory;
         TestRunner = testRunner;
@@ -49,18 +48,21 @@ public class PackageDefinition
         switch (packageType)
         {
             case PackageType.NuGet:
+                PackageVersion = BuildSettings.PackageVersion;
                 PackageInstallDirectory = BuildSettings.NuGetTestDirectory;
                 PackageResultDirectory = BuildSettings.NuGetResultDirectory;
                 ExtensionInstallDirectory = BuildSettings.NuGetTestDirectory;
                 PackageTestDirectory = $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
                 break;
             case PackageType.Chocolatey:
+                PackageVersion = BuildSettings.PackageVersion;
                 PackageInstallDirectory = BuildSettings.ChocolateyTestDirectory;
                 PackageResultDirectory = BuildSettings.ChocolateyResultDirectory;
                 ExtensionInstallDirectory = BuildSettings.ChocolateyTestDirectory;
                 PackageTestDirectory = $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
                 break;
             case PackageType.Tool:
+                PackageVersion = BuildSettings.PackageVersion;
                 PackageInstallDirectory = BuildSettings.PackageTestDirectory;
                 PackageResultDirectory = BuildSettings.NuGetResultDirectory;
                 ExtensionInstallDirectory = BuildSettings.NuGetTestDirectory;

@@ -105,13 +105,6 @@ public static class BuildSettings
         if (solutionFile == null && SolutionFile != null)
             Context.Warning($"  SolutionFile: '{SolutionFile}'");
         Context.Information($"  PackageTestLevel: {PackageTestLevel}");
-
-        // Keep this last
-        if (IsRunningOnAppVeyor)
-        {
-            var buildNumber = _buildSystem.AppVeyor.Environment.Build.Number;
-            _buildSystem.AppVeyor.UpdateBuildVersion($"{PackageVersion}-{buildNumber}");
-        }
     }
 
     // If solution file was not provided, uses TITLE.sln if it exists or 
@@ -135,8 +128,6 @@ public static class BuildSettings
 
         // TODO: The prerelease label is no longer being set to pr by GitVersion
         // for some reason. This check is a workaround.
-        if (IsRunningOnAppVeyor && _buildSystem.AppVeyor.Environment.PullRequest.IsPullRequest)
-            return 2;
         if (IsRunningOnGitHubActions && _buildSystem.GitHubActions.Environment.PullRequest.IsPullRequest)
             return 2;
 
@@ -184,7 +175,6 @@ public static class BuildSettings
     public static bool IsLocalBuild => _buildSystem.IsLocalBuild;
     public static bool IsRunningOnUnix => Context.IsRunningOnUnix();
     public static bool IsRunningOnWindows => Context.IsRunningOnWindows();
-    public static bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
     public static bool IsRunningOnGitHubActions => _buildSystem.GitHubActions.IsRunningOnGitHubActions;
 
     // Versioning
