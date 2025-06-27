@@ -23,9 +23,9 @@
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
-      <dependency id="NUnit.Extension.Net462PluggableAgent" version="4.0.0-alpha.6" />
-      <dependency id="NUnit.Extension.Net80PluggableAgent" version="4.0.0-alpha.4" />
-      <dependency id="NUnit.Extension.Net90PluggableAgent" version="4.0.0-alpha.1" />
+      <dependency id="NUnit.Extension.Net462PluggableAgent" version="4.0.0" />
+      <dependency id="NUnit.Extension.Net80PluggableAgent" version="4.0.0" />
+      <dependency id="NUnit.Extension.Net90PluggableAgent" version="4.0.0" />
     </dependencies>
   </metadata>
   <files>

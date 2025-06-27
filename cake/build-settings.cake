@@ -182,6 +182,7 @@ public static class BuildSettings
     public static string BranchName => BuildVersion.BranchName;
     public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch;
     public static string PackageVersion => BuildVersion.PackageVersion;
+    public static string LegacyPackageVersion => BuildVersion.LegacyPackageVersion;
     public static string AssemblyVersion => BuildVersion.AssemblyVersion;
     public static string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
     public static string AssemblyInformationalVersion => BuildVersion.AssemblyInformationalVersion;

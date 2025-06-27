@@ -288,16 +288,23 @@ public class BuildVersion
         PreReleaseLabel = label;
         PreReleaseSuffix = suffix;
 
-        PackageVersion = packageVersion;
+        PackageVersion = LegacyPackageVersion = packageVersion;
         AssemblyVersion = SemVer + ".0";
         AssemblyFileVersion = SemVer;
         AssemblyInformationalVersion = packageVersion;
+
+        // We use a legacy SemVer 1.0 format for alpha, beta and rc releases on chocolatey
+        var labelWithDot = label + ".";
+        int num;
+        if (suffix.StartsWith(labelWithDot) && int.TryParse(suffix.Substring(labelWithDot.Length), out num))
+            LegacyPackageVersion = $"{SemVer}-{label}{num:000}";
     }
 
     public string BranchName { get; }
     public bool IsReleaseBranch { get; }
 
     public string PackageVersion { get; }
+    public string LegacyPackageVersion { get; }
     public string AssemblyVersion { get; }
     public string AssemblyFileVersion { get; }
     public string AssemblyInformationalVersion { get; }
