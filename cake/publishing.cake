@@ -80,7 +80,7 @@ public static class PackageReleaseManager
         else
             foreach (var package in BuildSettings.Packages)
             {
-                var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.nupkg";
+                var packageName = $"{package.PackageId}.{BuildSettings.LegacyPackageVersion}.nupkg";
                 var packagePath = BuildSettings.PackageDirectory + packageName;
                 try
                 {

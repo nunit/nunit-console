@@ -258,6 +258,7 @@ Task("DumpSettings")
 
         Console.WriteLine("\nVERSIONING");
         Console.WriteLine("PackageVersion:               " + BuildSettings.PackageVersion);
+        Console.WriteLine("LegacyPackageVersion:         " + BuildSettings.LegacyPackageVersion);
         Console.WriteLine("AssemblyVersion:              " + BuildSettings.AssemblyVersion);
         Console.WriteLine("AssemblyFileVersion:          " + BuildSettings.AssemblyFileVersion);
         Console.WriteLine("AssemblyInformationalVersion: " + BuildSettings.AssemblyInformationalVersion);
