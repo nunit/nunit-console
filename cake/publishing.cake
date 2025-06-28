@@ -30,14 +30,20 @@ public static class PackageReleaseManager
         else
             foreach (var package in BuildSettings.Packages)
             {
-                var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.nupkg";
-                var packagePath = BuildSettings.PackageDirectory + packageName;
                 try
                 {
                     if (package.PackageType == PackageType.NuGet)
+                    {
+                        var packageName = $"{package.PackageId}.{BuildSettings.PackageVersion}.nupkg";
+                        var packagePath = BuildSettings.PackageDirectory + packageName;
                         PushNuGetPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                    }
                     else if (package.PackageType == PackageType.Chocolatey)
+                    {
+                        var packageName = $"{package.PackageId}.{BuildSettings.LegacyPackageVersion}.nupkg";
+                        var packagePath = BuildSettings.PackageDirectory + packageName;
                         PushChocolateyPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
+                    }
                 }
                 catch (Exception ex)
                 {

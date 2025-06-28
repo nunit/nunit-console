@@ -22,14 +22,43 @@ namespace NUnit.Engine.Api
             _testEngine.Dispose();
         }
 
-        [TestCase(typeof(IResultService))]
-        [TestCase(typeof(ITestRunnerFactory))]
-        public void CanAccessService(Type serviceType)
+        [TestCase(TypeArgs = new[] { typeof(IResultService) })]
+        [TestCase(TypeArgs = new[] { typeof(ITestRunnerFactory) })]
+        public void GetService<T>()
+            where T : class
         {
-            IService? service = _testEngine.Services.GetService(serviceType) as IService;
-            Assert.That(service, Is.Not.Null, "GetService(Type) returned null");
-            Assert.That(service, Is.InstanceOf(serviceType));
-            Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
+            T service = _testEngine.Services.GetService<T>();
+            Assert.That(service, Is.Not.Null, "GetService returned null");
+            Assert.That(((IService)service).Status, Is.EqualTo(ServiceStatus.Started));
+        }
+
+        [TestCase(TypeArgs = new[] { typeof(IResultService) })]
+        [TestCase(TypeArgs = new[] { typeof(ITestRunnerFactory) })]
+        public void TryGetService<T>()
+            where T : class
+        {
+            T? service;
+            Assert.That(_testEngine.Services.TryGetService<T>(out service), Is.True);
+            Assert.That(service, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetService_ThrowsWhenServiceIsNotFound()
+        {
+            var ex = Assert.Throws(typeof(NUnitEngineException), () => _testEngine.Services.GetService<InvalidService>());
+            Assert.That(ex.Message, Contains.Substring("Unable to acquire InvalidService"));
+        }
+
+        [Test]
+        public void TryGetService_FalseWhenServiceIsNotFound()
+        {
+            InvalidService? service;
+            Assert.That(_testEngine.Services.TryGetService<InvalidService>(out service), Is.False);
+            Assert.That(service, Is.Null);
+        }
+
+        internal class InvalidService
+        {
         }
     }
 }
