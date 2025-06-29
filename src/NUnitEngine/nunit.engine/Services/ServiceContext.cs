@@ -34,7 +34,7 @@ namespace NUnit.Engine
         public T GetService<T>()
             where T : class
         {
-            T? service = (T?)ServiceManager.GetService(typeof(T));
+            T? service = (T?)ServiceManager.GetServiceOrNull(typeof(T));
             if (service is not null)
                 return service;
 
@@ -44,7 +44,7 @@ namespace NUnit.Engine
         public bool TryGetService<T>([NotNullWhen(true)] out T? service)
             where T : class
         {
-            return (service = (T?)ServiceManager.GetService(typeof(T))) is not null;
+            return (service = (T?)ServiceManager.GetServiceOrNull(typeof(T))) is not null;
         }
     }
 }

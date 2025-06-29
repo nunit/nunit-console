@@ -22,7 +22,7 @@ namespace NUnit.Engine.Services
             get { return _services.Count; }
         }
 
-        public IService? GetService(Type serviceType)
+        public IService? GetServiceOrNull(Type serviceType)
         {
             if (!_serviceIndex.TryGetValue(serviceType, out IService? theService))
                 foreach (IService service in _services)

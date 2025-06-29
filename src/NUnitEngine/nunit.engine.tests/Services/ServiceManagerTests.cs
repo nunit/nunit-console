@@ -32,10 +32,12 @@ namespace NUnit.Engine.Services
         {
             _serviceManager.StartServices();
 
-            IService? service = _serviceManager.GetService(typeof(IFakeService));
-            Assert.That(service?.Status, Is.EqualTo(ServiceStatus.Started));
-            service = _serviceManager.GetService(typeof(IExtensionService));
-            Assert.That(service?.Status, Is.EqualTo(ServiceStatus.Started));
+            IService? service = _serviceManager.GetServiceOrNull(typeof(IFakeService));
+            Assert.That(service, Is.Not.Null);
+            Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
+            service = _serviceManager.GetServiceOrNull(typeof(IExtensionService));
+            Assert.That(service, Is.Not.Null);
+            Assert.That(service.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
         [Test]
@@ -58,14 +60,14 @@ namespace NUnit.Engine.Services
         [Test]
         public void AccessServiceByClass()
         {
-            IService? service = _serviceManager.GetService(typeof(FakeService));
+            IService? service = _serviceManager.GetServiceOrNull(typeof(FakeService));
             Assert.That(service, Is.SameAs(_fakeService));
         }
 
         [Test]
         public void AccessServiceByInterface()
         {
-            IService? service = _serviceManager.GetService(typeof(IFakeService));
+            IService? service = _serviceManager.GetServiceOrNull(typeof(IFakeService));
             Assert.That(service, Is.SameAs(_fakeService));
         }
     }
