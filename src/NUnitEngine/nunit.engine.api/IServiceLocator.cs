@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NUnit.Engine
 {
@@ -23,7 +24,7 @@ namespace NUnit.Engine
         /// Return true and set service to an instance of the specified
         /// type of service if it is available, otherwise return false;
         /// </summary>
-        bool TryGetService<T>(out T? service)
+        bool TryGetService<T>([NotNullWhen(true)] out T? service)
             where T : class;
     }
 }

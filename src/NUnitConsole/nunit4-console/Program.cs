@@ -96,7 +96,7 @@ namespace NUnit.ConsoleRunner
 
                     if (Options.RuntimeFrameworkSpecified)
                     {
-                        if (engine.Services.TryGetService<IAvailableRuntimes>(out var availableRuntimes) && availableRuntimes is not null)
+                        if (engine.Services.TryGetService<IAvailableRuntimes>(out var availableRuntimes))
                         {
                             bool runtimeAvailable = false;
                             var runtimes = Options.RunAsX86 ? availableRuntimes.AvailableX86Runtimes : availableRuntimes.AvailableRuntimes;
