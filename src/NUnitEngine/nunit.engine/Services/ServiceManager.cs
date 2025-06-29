@@ -6,8 +6,7 @@ using System.Collections.Generic;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// ServiceManager handles access to all services - global
-    /// facilities shared by all instances of TestEngine.
+    /// ServiceManager handles access to all services within the engine.
     /// </summary>
     public class ServiceManager : IDisposable
     {
@@ -23,7 +22,7 @@ namespace NUnit.Engine.Services
             get { return _services.Count; }
         }
 
-        public IService GetService(Type serviceType)
+        public IService? GetServiceOrNull(Type serviceType)
         {
             if (!_serviceIndex.TryGetValue(serviceType, out IService? theService))
                 foreach (IService service in _services)
@@ -36,16 +35,15 @@ namespace NUnit.Engine.Services
                     }
                 }
 
-            if (theService is null)
+            if (theService is not null)
             {
-                string message = $"Requested service {serviceType.FullName} was not found";
-                log.Error(message);
-                throw new NUnitEngineException(message);
+                log.Debug(string.Format("Request for service {0} satisfied by {1}", serviceType.Name, theService.GetType().Name));
+                return theService;
             }
 
-            log.Debug(string.Format("Request for service {0} satisfied by {1}", serviceType.Name, theService.GetType().Name));
-
-            return theService;
+            string message = $"Requested service {serviceType.FullName} was not found";
+            log.Error(message);
+            return null;
         }
 
         public void AddService(IService service)

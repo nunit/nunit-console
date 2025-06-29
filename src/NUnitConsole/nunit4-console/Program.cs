@@ -96,23 +96,24 @@ namespace NUnit.ConsoleRunner
 
                     if (Options.RuntimeFrameworkSpecified)
                     {
-                        var availableRuntimeService = engine.Services.GetService<IAvailableRuntimes>();
-                        if (availableRuntimeService is null)
+                        if (engine.Services.TryGetService<IAvailableRuntimes>(out var availableRuntimes))
+                        {
+                            bool runtimeAvailable = false;
+                            var runtimes = Options.RunAsX86 ? availableRuntimes.AvailableX86Runtimes : availableRuntimes.AvailableRuntimes;
+                            foreach (var runtime in runtimes)
+                            {
+                                if (runtimeAvailable = runtime.Id == Options.RuntimeFramework)
+                                    break;
+                            }
+
+                            if (!runtimeAvailable)
+                                WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
+                        }
+                        else
                         {
                             WriteErrorMessage("Unable to acquire AvailableRuntimeService from engine");
                             return ConsoleRunner.UNEXPECTED_ERROR;
                         }
-
-                        bool runtimeAvailable = false;
-                        var runtimes = Options.RunAsX86 ? availableRuntimeService.AvailableX86Runtimes : availableRuntimeService.AvailableRuntimes;
-                        foreach (var runtime in runtimes)
-                        {
-                            if (runtimeAvailable = runtime.Id == Options.RuntimeFramework)
-                                break;
-                        }
-
-                        if (!runtimeAvailable)
-                            WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
                     }
 
                     if (Options.WorkDirectory is not null)

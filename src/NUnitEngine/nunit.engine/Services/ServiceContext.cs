@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Engine.Services;
 
 namespace NUnit.Engine
@@ -33,12 +34,17 @@ namespace NUnit.Engine
         public T GetService<T>()
             where T : class
         {
-            return (T)ServiceManager.GetService(typeof(T));
+            T? service = (T?)ServiceManager.GetServiceOrNull(typeof(T));
+            if (service is not null)
+                return service;
+
+            throw new NUnitEngineException($"Unable to acquire {typeof(T).Name}");
         }
 
-        public object GetService(Type serviceType)
+        public bool TryGetService<T>([NotNullWhen(true)] out T? service)
+            where T : class
         {
-            return ServiceManager.GetService(serviceType);
+            return (service = (T?)ServiceManager.GetServiceOrNull(typeof(T))) is not null;
         }
     }
 }
