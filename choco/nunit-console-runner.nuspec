@@ -34,7 +34,6 @@
     <file src = "../LICENSE.txt" target = "tools" />
     <file src = "../NOTICES.txt" target = "tools" />
     <file src = "VERIFICATION.txt" target = "tools" />
-    <file src = "nunit.choco.addins" target = "tools" />
 
     <file src = "$BIN_DIR$net462/nunit-console.exe" target="tools" />
     <file src = "$BIN_DIR$net462/nunit-console.exe.config" target="tools" />
