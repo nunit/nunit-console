@@ -99,7 +99,7 @@ namespace NUnit.Engine.Drivers
         public void RunTestsAction_AfterLoad_ReturnsRunnableSuite()
         {
             _driver.Load(_mockAssemblyPath, _settings);
-            var result = XmlHelper.CreateXmlNode(_driver.Run(new NullListener(), TestFilter.Empty.Text));
+            var result = XmlHelper.CreateXmlNode(_driver.Run(null, TestFilter.Empty.Text));
 
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("type"), Is.EqualTo("Assembly"));
@@ -116,7 +116,7 @@ namespace NUnit.Engine.Drivers
         [Test]
         public void RunTestsAction_WithoutLoad_ThrowsInvalidOperationException()
         {
-            var ex = Assert.Catch(() => _driver.Run(new NullListener(), TestFilter.Empty.Text));
+            var ex = Assert.Catch(() => _driver.Run(null, TestFilter.Empty.Text));
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
         }
@@ -127,7 +127,7 @@ namespace NUnit.Engine.Drivers
             _driver.Load(_mockAssemblyPath, _settings);
 
             var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
-            var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
+            var ex = Assert.Catch(() => _driver.Run(null, invalidFilter));
 
             if (_whichApi == "2018")
             {
@@ -174,13 +174,5 @@ namespace NUnit.Engine.Drivers
             }
         }
 #endif
-
-        public class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string testEvent)
-            {
-                // No action
-            }
-        }
     }
 }

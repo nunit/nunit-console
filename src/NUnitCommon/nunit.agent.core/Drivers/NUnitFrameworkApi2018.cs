@@ -128,7 +128,7 @@ namespace NUnit.Engine.Drivers
             return (string)ExecuteMethod(RUN_METHOD, [typeof(Action<string>), typeof(string)], callback, filter);
         }
 
-        public void RunAsync(Action<string> callback, string filter)
+        public void RunAsync(Action<string>? callback, string filter)
         {
             CheckLoadWasCalled();
             log.Info("Running {0} - see separate log file", Path.GetFileName(_testAssemblyPath.ShouldNotBeNull()));
@@ -218,6 +218,7 @@ namespace NUnit.Engine.Drivers
 
         // API methods with overloads
         private static readonly string RUN_METHOD = "RunTests";
+        // Framework RunAsync method is not public
         private static readonly string RUN_ASYNC_METHOD = "RunTests";
 
         // Execute overloaded methods specifying argument types

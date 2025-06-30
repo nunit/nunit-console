@@ -9,13 +9,13 @@ namespace NUnit.Engine
 {
     public class RunTestsCallbackHandler : MarshalByRefObject, ICallbackEventHandler
     {
-        private readonly ITestEventListener _listener;
+        private readonly ITestEventListener? _listener;
 
         public string? Result { get; private set; }
 
         public RunTestsCallbackHandler(ITestEventListener? listener)
         {
-            _listener = listener ?? new NullListener();
+            _listener = listener;
         }
 
         public override object InitializeLifetimeService()
@@ -38,7 +38,7 @@ namespace NUnit.Engine
 
         private void ReportProgress(string state)
         {
-            _listener.OnTestEvent(state);
+            _listener?.OnTestEvent(state);
         }
 
         private static bool IsFinalResult(string eventArgument)
@@ -73,13 +73,6 @@ namespace NUnit.Engine
 
             // Heuristic: only final results have nested suites
             return eventArgument.IndexOf("<test-suite", 12, StringComparison.Ordinal) > 0;
-        }
-
-        private class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string report)
-            {
-            }
         }
     }
 }

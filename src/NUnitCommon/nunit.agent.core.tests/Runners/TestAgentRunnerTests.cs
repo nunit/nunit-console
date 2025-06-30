@@ -67,7 +67,7 @@ namespace NUnit.Engine.Runners
         [Test]
         public void RunAsync()
         {
-            var asyncResult = _runner.RunAsync(this, TestFilter.Empty);
+            var asyncResult = _runner.RunAsync(null, TestFilter.Empty);
             asyncResult.Wait(-1);
             Assert.That(asyncResult.IsComplete, "Async result is not complete");
 

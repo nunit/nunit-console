@@ -132,17 +132,15 @@ namespace NUnit.Engine.Drivers
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        public string Run(ITestEventListener? listener, string filter)
-        {
-            return _api.Run(listener is not null ? new EventInterceptor(listener) : null, filter);
-        }
+        public string Run(ITestEventListener? listener, string filter) => _api.Run(listener, filter);
 
         /// <summary>
         /// Executes the tests in an assembly asynchronously.
         /// </summary>
         /// <param name="callback">A callback that receives XML progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
-        public void RunAsync(Action<string> callback, string filter) => _api.RunAsync(callback, filter);
+        public void RunAsync(ITestEventListener? listener, string filter) =>
+            _api.RunAsync(listener is not null ? new Action<string>(listener.OnTestEvent) : null, filter);
 
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.

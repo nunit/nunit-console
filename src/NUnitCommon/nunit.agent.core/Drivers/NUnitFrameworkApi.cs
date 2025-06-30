@@ -33,7 +33,7 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         /// <param name="callback">A callback that receives XML progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
-        void RunAsync(Action<string> callback, string filter);
+        void RunAsync(Action<string>? callback, string filter);
 
         /// <summary>
         /// Returns information about the tests in an assembly.

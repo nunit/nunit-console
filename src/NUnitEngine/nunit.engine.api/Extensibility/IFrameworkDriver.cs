@@ -39,6 +39,13 @@ namespace NUnit.Engine.Extensibility
         string Run(ITestEventListener? listener, string filter);
 
         /// <summary>
+        /// Executes the tests in an assembly asynchronously.
+        /// </summary>
+        /// <param name="listener">An ITestEventHandler that receives progress notices</param>
+        /// <param name="filter">A filter that controls which tests are executed</param>
+        void RunAsync(ITestEventListener? listener, string filter);
+
+        /// <summary>
         /// Returns information about the tests in an assembly.
         /// </summary>
         /// <param name="filter">An XML string representing the filter that controls which tests are included</param>

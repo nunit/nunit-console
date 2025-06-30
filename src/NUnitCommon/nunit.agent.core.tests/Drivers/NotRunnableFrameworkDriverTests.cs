@@ -6,6 +6,8 @@ using System.Xml;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using NUnit.Engine.Extensibility;
+using System;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Drivers
 {
@@ -25,17 +27,7 @@ namespace NUnit.Engine.Drivers
         public void Load(string filePath, string expectedType)
         {
             IFrameworkDriver driver = GetDriver(filePath);
-            var result = XmlHelper.CreateXmlNode(driver.Load(filePath, new Dictionary<string, object>()));
-
-            Assert.That(result.Name, Is.EqualTo("test-suite"));
-            Assert.That(result.GetAttribute("type"), Is.EqualTo(expectedType));
-            Assert.That(result.GetAttribute("id"), Is.EqualTo(EXPECTED_ID));
-            Assert.That(result.GetAttribute("name"), Is.EqualTo(filePath));
-            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(filePath)));
-            Assert.That(result.GetAttribute("runstate"), Is.EqualTo(_expectedRunState));
-            Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
-            Assert.That(GetSkipReason(result), Is.EqualTo(_expectedReason));
-            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Load result should not have child tests");
+            CheckLoadResult(XmlHelper.CreateXmlNode(driver.Load(filePath, new Dictionary<string, object>())), filePath, expectedType);
         }
 
         [TestCase("junk.dll", "Assembly")]
@@ -44,17 +36,7 @@ namespace NUnit.Engine.Drivers
         public void Explore(string filePath, string expectedType)
         {
             IFrameworkDriver driver = GetDriver(filePath);
-            var result = XmlHelper.CreateXmlNode(driver.Explore(TestFilter.Empty.Text));
-
-            Assert.That(result.Name, Is.EqualTo("test-suite"));
-            Assert.That(result.GetAttribute("id"), Is.EqualTo(EXPECTED_ID));
-            Assert.That(result.GetAttribute("name"), Is.EqualTo(filePath));
-            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(filePath)));
-            Assert.That(result.GetAttribute("type"), Is.EqualTo(expectedType));
-            Assert.That(result.GetAttribute("runstate"), Is.EqualTo(_expectedRunState));
-            Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
-            Assert.That(GetSkipReason(result), Is.EqualTo(_expectedReason));
-            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Result should not have child tests");
+            CheckLoadResult(XmlHelper.CreateXmlNode(driver.Explore(TestFilter.Empty.Text)), filePath, expectedType);
         }
 
         [TestCase("junk.dll")]
@@ -72,7 +54,36 @@ namespace NUnit.Engine.Drivers
         public void Run(string filePath, string expectedType)
         {
             IFrameworkDriver driver = GetDriver(filePath);
-            var result = XmlHelper.CreateXmlNode(driver.Run(new NullListener(), TestFilter.Empty.Text));
+            CheckRunResult(XmlHelper.CreateXmlNode(driver.Run(null, TestFilter.Empty.Text)), filePath, expectedType);
+        }
+
+        [TestCase("junk.dll", "Assembly")]
+        [TestCase("junk.exe", "Assembly")]
+        [TestCase("junk.cfg", "Unknown")]
+        public void RunAsync(string filePath, string expectedType)
+        {
+            IFrameworkDriver driver = GetDriver(filePath);
+            var events = new EventListener();
+            driver.RunAsync(events, TestFilter.Empty.Text);
+            Assert.That(events.Count, Is.EqualTo(1));
+            CheckRunResult(XmlHelper.CreateXmlNode(events[0]), filePath, expectedType);
+        }
+
+        private void CheckLoadResult(XmlNode result, string filePath, string expectedType)
+        {
+            Assert.That(result.Name, Is.EqualTo("test-suite"));
+            Assert.That(result.GetAttribute("type"), Is.EqualTo(expectedType));
+            Assert.That(result.GetAttribute("id"), Is.EqualTo(EXPECTED_ID));
+            Assert.That(result.GetAttribute("name"), Is.EqualTo(filePath));
+            Assert.That(result.GetAttribute("fullname"), Is.EqualTo(Path.GetFullPath(filePath)));
+            Assert.That(result.GetAttribute("runstate"), Is.EqualTo(_expectedRunState));
+            Assert.That(result.GetAttribute("testcasecount"), Is.EqualTo("0"));
+            Assert.That(GetSkipReason(result), Is.EqualTo(_expectedReason));
+            Assert.That(result.SelectNodes("test-suite")?.Count, Is.EqualTo(0), "Load result should not have child tests");
+        }
+
+        private void CheckRunResult(XmlNode result, string filePath, string expectedType)
+        {
             Assert.That(result.Name, Is.EqualTo("test-suite"));
             Assert.That(result.GetAttribute("id"), Is.EqualTo(EXPECTED_ID));
             Assert.That(result.GetAttribute("name"), Is.EqualTo(filePath));
@@ -87,6 +98,14 @@ namespace NUnit.Engine.Drivers
             Assert.That(result.SelectSingleNode("reason/message")?.InnerText, Is.EqualTo(_expectedReason));
         }
 
+        private class EventListener : List<string>, ITestEventListener
+        {
+            public void OnTestEvent(string report)
+            {
+                Add(report);
+            }
+        }
+
         protected abstract IFrameworkDriver CreateDriver(string filePath);
 
         private IFrameworkDriver GetDriver(string filePath)
@@ -99,14 +118,6 @@ namespace NUnit.Engine.Drivers
         {
             var propNode = result.SelectSingleNode(string.Format("properties/property[@name='{0}']", PropertyNames.SkipReason));
             return propNode is null ? null : propNode.GetAttribute("value");
-        }
-
-        private class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string testEvent)
-            {
-                // No action
-            }
         }
     }
 
