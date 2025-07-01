@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Engine.Extensibility;
@@ -8,23 +9,6 @@ namespace NUnit.Engine.Drivers
 {
     public abstract class NotRunnableFrameworkDriver : IFrameworkDriver
     {
-        private const string LOAD_RESULT_FORMAT =
-            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='{4}'>" +
-                "<properties>" +
-                    "<property name='_SKIPREASON' value='{5}'/>" +
-                "</properties>" +
-            "</test-suite>";
-
-        private const string RUN_RESULT_FORMAT =
-            "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='{4}' result='{5}' label='{6}'>" +
-                "<properties>" +
-                    "<property name='_SKIPREASON' value='{7}'/>" +
-                "</properties>" +
-                "<reason>" +
-                    "<message>{7}</message>" +
-                "</reason>" +
-            "</test-suite>";
-
         private readonly string _name;
         private readonly string _fullname;
         private readonly string _message;
@@ -59,8 +43,12 @@ namespace NUnit.Engine.Drivers
 
         public string Run(ITestEventListener? listener, string filter)
         {
-            return string.Format(RUN_RESULT_FORMAT,
-                _type, TestID, _name, _fullname, _runstate, _result, _label, _message);
+            return GetRunResult();
+        }
+
+        public void RunAsync(ITestEventListener? listener, string filter)
+        {
+            listener?.OnTestEvent(GetRunResult());
         }
 
         public string Explore(string filter)
@@ -82,12 +70,22 @@ namespace NUnit.Engine.Drivers
                 .Replace(">", "&gt;");
         }
 
-        private string GetLoadResult()
-        {
-            return string.Format(
-                LOAD_RESULT_FORMAT,
-                _type, TestID, _name, _fullname, _runstate, _message);
-        }
+        private string GetLoadResult() =>
+            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}'>" +
+                "<properties>" +
+                    $"<property name='_SKIPREASON' value='{_message}'/>" +
+                "</properties>" +
+            "</test-suite>";
+
+        private string GetRunResult() =>
+            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}' result='{_result}' label='{_label}'>" +
+                "<properties>" +
+                    $"<property name='_SKIPREASON' value='{_message}'/>" +
+                "</properties>" +
+                "<reason>" +
+                    $"<message>{_message}</message>" +
+                "</reason>" +
+            "</test-suite>";
 
         private string TestID => ID + "-1";
     }

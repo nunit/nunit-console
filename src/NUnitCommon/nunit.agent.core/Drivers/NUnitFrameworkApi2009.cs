@@ -101,7 +101,7 @@ namespace NUnit.Engine.Drivers
             return ExecuteAction(RUN_ACTION, listener, filter);
         }
 
-        public void RunAsync(Action<string> callback, string filter) => throw new NotImplementedException();
+        public void RunAsync(Action<string>? callback, string filter) => throw new NotImplementedException();
 
         public void StopRun(bool force) => ExecuteAction(STOP_RUN_ACTION, force);
 

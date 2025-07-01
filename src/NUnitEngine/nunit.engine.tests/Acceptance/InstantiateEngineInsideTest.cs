@@ -26,18 +26,10 @@ namespace NUnit.Engine
                     var package = new TestPackage(mockAssemblyPath).SubPackages[0];
                     using (var runner = engine.GetRunner(package))
                     {
-                        runner.Run(new NullListener(), TestFilter.Empty);
+                        runner.Run(null, TestFilter.Empty);
                     }
                 }
             });
-        }
-
-        private class NullListener : ITestEventListener
-        {
-            public void OnTestEvent(string testEvent)
-            {
-                // No action
-            }
         }
     }
 }
