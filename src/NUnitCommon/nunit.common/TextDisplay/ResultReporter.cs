@@ -1,16 +1,31 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using NUnit.Common;
 
 namespace NUnit.TextDisplay
 {
-    public static class ResultReporter
+    public class ResultReporter
     {
+        private ResultReporterSettings _settings;
+
+        public ResultReporter()
+        {
+            _settings = new ResultReporterSettings();
+        }
+
+        public ResultReporter(ResultReporterSettings settings)
+        {
+            _settings = settings;
+        }
+
         public static void WriteHeader(ExtendedTextWriter writer)
         {
             Assembly entryAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
@@ -27,24 +42,22 @@ namespace NUnit.TextDisplay
         /// <summary>
         /// Reports the results to the console
         /// </summary>
-        public static void ReportResults(ResultSummary summary, ExtendedTextWriter writer, bool stopOnError = false)
+        public void ReportResults(ResultSummary summary, ExtendedTextWriter writer)
         {
-            writer.WriteLine();
-
             var topLevelResult = summary.ResultNode;
 
             if (summary.ExplicitCount + summary.SkipCount + summary.IgnoreCount > 0)
                 WriteNotRunReport(topLevelResult, writer);
 
             if (summary.OverallResult == "Failed" || summary.WarningCount > 0)
-                WriteErrorsFailuresAndWarningsReport(topLevelResult, writer, stopOnError);
+                WriteErrorsFailuresAndWarningsReport(topLevelResult, writer);
 
             WriteRunSettingsReport(topLevelResult, writer);
 
             WriteSummaryReport(summary, writer);
         }
 
-        public static void WriteRunSettingsReport(XmlNode topLevelResult, ExtendedTextWriter writer)
+        internal static void WriteRunSettingsReport(XmlNode topLevelResult, ExtendedTextWriter writer)
         {
             var firstSuite = topLevelResult.SelectSingleNode("test-suite");
             if (firstSuite is not null)
@@ -84,7 +97,7 @@ namespace NUnit.TextDisplay
             }
         }
 
-        public static void WriteSummaryReport(ResultSummary summary, ExtendedTextWriter writer)
+        internal static void WriteSummaryReport(ResultSummary summary, ExtendedTextWriter writer)
         {
             const string INDENT4 = "    ";
             const string INDENT8 = "        ";
@@ -135,7 +148,7 @@ namespace NUnit.TextDisplay
             writer.WriteLine();
         }
 
-        public static void WriteErrorsFailuresAndWarningsReport(XmlNode resultNode, ExtendedTextWriter writer, bool stopOnError = false)
+        internal void WriteErrorsFailuresAndWarningsReport(XmlNode resultNode, ExtendedTextWriter writer)
         {
             int reportIndex = 0;
             writer.WriteLine(ColorStyle.SectionHeader, "Errors, Failures and Warnings");
@@ -143,7 +156,7 @@ namespace NUnit.TextDisplay
 
             WriteErrorsFailuresAndWarnings(resultNode, writer, ref reportIndex);
 
-            if (stopOnError)
+            if (_settings.StopOnError)
             {
                 writer.WriteLine(ColorStyle.Failure, "Execution terminated after first error");
                 writer.WriteLine();
@@ -211,7 +224,7 @@ namespace NUnit.TextDisplay
             }
         }
 
-        public static void WriteNotRunReport(XmlNode resultNode, ExtendedTextWriter writer)
+        internal void WriteNotRunReport(XmlNode resultNode, ExtendedTextWriter writer)
         {
             int reportIndex = 0;
             writer.WriteLine(ColorStyle.SectionHeader, "Tests Not Run");
@@ -219,7 +232,7 @@ namespace NUnit.TextDisplay
             WriteNotRunResults(resultNode, writer, ref reportIndex);
         }
 
-        private static void WriteNotRunResults(XmlNode resultNode, ExtendedTextWriter writer, ref int reportIndex)
+        private void WriteNotRunResults(XmlNode resultNode, ExtendedTextWriter writer, ref int reportIndex)
         {
             switch (resultNode.Name)
             {
@@ -227,7 +240,21 @@ namespace NUnit.TextDisplay
                     string? status = resultNode.GetAttribute("result");
 
                     if (status == "Skipped")
-                        new ClientTestResult(resultNode, ++reportIndex).WriteResult(writer);
+                    {
+                        bool display = true;
+                        string? label = resultNode.GetAttribute("label");
+                        switch (label)
+                        {
+                            case "Explicit":
+                                display = !_settings.OmitExplicitTests;
+                                break;
+                            case "Ignored":
+                                display = !_settings.OmitIgnoredTests;
+                                break;
+                        }
+                        if (display)
+                            new ClientTestResult(resultNode, ++reportIndex).WriteResult(writer);
+                    }
 
                     break;
 

@@ -40,7 +40,7 @@ namespace NUnit.Agents
                 var xmlResult = runner.Run(null, TestFilter.Empty).Xml;
                 var summary = new ResultSummary(xmlResult);
 
-                ResultReporter.ReportResults(summary, OutWriter);
+                new ResultReporter().ReportResults(summary, OutWriter);
 
                 var pathToResultFile = Path.Combine(_options.WorkDirectory, "TestResult.xml");
                 WriteResultFile(xmlResult, pathToResultFile);

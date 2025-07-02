@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using NUnit.Common;
@@ -71,17 +72,12 @@ namespace NUnit.TextDisplay
         [TearDown]
         public void TearDown() => _writer.Dispose();
 
-        [Test]
-        public void ReportSequenceTest()
+        [TestCase(false, "Tests Not Run", "Errors, Failures and Warnings", "Test Run Summary")]
+        [TestCase(true, "Errors, Failures and Warnings", "Test Run Summary")]
+        public void ReportSequenceTest(bool omitNotRunReport, params string[] reportSequence)
         {
-            ResultReporter.ReportResults(new ResultSummary(_result), _writer);
-
-            var reportSequence = new[]
-            {
-                "Tests Not Run",
-                "Errors, Failures and Warnings",
-                "Test Run Summary"
-            };
+            var settings = new ResultReporterSettings() { OmitNotRunReport = omitNotRunReport };
+            new ResultReporter(settings).ReportResults(new ResultSummary(_result), _writer);
 
             int last = -1;
 
@@ -89,7 +85,7 @@ namespace NUnit.TextDisplay
             foreach (string title in reportSequence)
             {
                 var index = reportOutput.IndexOf(title);
-                Assert.That(index > 0, "Report not found: " + title);
+                Assert.That(index >= 0, "Report not found: " + title);
                 Assert.That(index > last, "Report out of sequence: " + title);
                 last = index;
             }
@@ -139,7 +135,7 @@ namespace NUnit.TextDisplay
                 "No suitable constructor was found"
             };
 
-            ResultReporter.WriteErrorsFailuresAndWarningsReport(_result, _writer);
+            new ResultReporter().WriteErrorsFailuresAndWarningsReport(_result, _writer);
 
             string reportOutput = _reportBuilder.ToString();
             foreach (var item in expected)
@@ -175,8 +171,32 @@ namespace NUnit.TextDisplay
                 string.Empty
             };
 
-            ResultReporter.WriteNotRunReport(_result, _writer);
+            new ResultReporter().WriteNotRunReport(_result, _writer);
             Assert.That(ReportLines, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void TestsNotRun_OmitExplicit()
+        {
+            var settings = new ResultReporterSettings() { OmitExplicitTests = true };
+            new ResultReporter(settings).WriteNotRunReport(_result, _writer);
+            Assert.That(ReportLines.Where(line => line.Contains("Explicit")), Is.Empty);
+        }
+
+        [Test]
+        public void TestsNotRun_OmitIgnored()
+        {
+            var settings = new ResultReporterSettings() { OmitIgnoredTests = true };
+            new ResultReporter(settings).WriteNotRunReport(_result, _writer);
+            Assert.That(ReportLines.Where(line => line.Contains("Ignored")), Is.Empty);
+        }
+
+        [Test]
+        public void TestsNotRun_OmitExplicitAndIgnored()
+        {
+            var settings = new ResultReporterSettings() { OmitExplicitTests = true, OmitIgnoredTests = true };
+            new ResultReporter(settings).WriteNotRunReport(_result, _writer);
+            Assert.That(ReportLines.Where(line => line.Contains("Explicit") || line.Contains("Ignored")), Is.Empty);
         }
 
         [Test]
