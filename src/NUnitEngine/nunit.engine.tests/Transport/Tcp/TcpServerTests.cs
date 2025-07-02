@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
@@ -28,42 +30,58 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             _server.Stop();
         }
 
-        [Test]
-        public void SingleClientConnection()
+        [TestCase(1)]
+        [TestCase(3)]
+        [TestCase(20)]
+        public void ClientConnectionTest(int numClients)
         {
-            using (TcpClient client = new TcpClient())
+            var clients = new TcpClient[numClients];
+            var workers = new BackgroundWorker[numClients];
+
+            var allTasksComplete = new ManualResetEvent(false);
+            int pendingTasks = numClients;
+
+            for (int i = 0; i < numClients; i++)
             {
-                client.Connect(_server.EndPoint);
-                client.Client.Send(new Guid().ToByteArray());
+                var client = new TcpClient();
+                clients[i] = client;
 
-                Thread.Sleep(1); // Allow the connection event to run
-                Assert.That(_serverConnections.Count, Is.EqualTo(1), "Should have received 1 connection event");
-                Assert.That(_serverConnections[0].Connected, "Server is not connected to client");
+                using (var worker = new BackgroundWorker())
+                {
+                    worker.DoWork += (s, e) =>
+                    {
+                        client.Connect(_server.EndPoint);
+                        client.Client.Send(new Guid().ToByteArray());
+                    };
 
-                Assert.That(client.Connected, Is.True, "Client is not connected to server");
-            }
-        }
+                    worker.RunWorkerCompleted += (s, e) =>
+                    {
+                        if (Interlocked.Decrement(ref pendingTasks) == 0)
+                            allTasksComplete.Set();
+                    };
 
-        [Test]
-        public void MultipleClientConnections()
-        {
-            TcpClient[] clients = new[] { new TcpClient(), new TcpClient(), new TcpClient() };
-            int num = clients.Length;
-
-            foreach (var client in clients)
-            {
-                client.Connect(_server.EndPoint);
-                client.Client.Send(new Guid().ToByteArray());
+                    workers[i] = worker;
+                }
             }
 
-            Thread.Sleep(1); // Allow the connection events to run
-            Assert.That(_serverConnections.Count, Is.EqualTo(num), $"Should have received {num} connection events");
+            foreach (var worker in workers)
+                worker.RunWorkerAsync();
 
-            for (int i = 0; i < num; i++)
+            allTasksComplete.WaitOne();
+
+            Assert.That(_serverConnections.Count, Is.EqualTo(numClients), $"Should have received {numClients} connection events");
+
+            for (int i = 0; i < numClients; i++)
             {
                 Assert.That(_serverConnections[i].Connected, $"Server is not connected to client {i + 1}");
                 Assert.That(clients[i].Connected, Is.True, $"Client {i + 1} is not connected to server");
             }
+        }
+
+        private void RunTask(TcpClient client)
+        {
+            client.Connect(_server.EndPoint);
+            client.Client.Send(new Guid().ToByteArray());
         }
     }
 }
