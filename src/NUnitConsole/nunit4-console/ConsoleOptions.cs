@@ -68,11 +68,10 @@ namespace NUnit.ConsoleRunner
             get { return WhereClause is not null; }
         }
 
+        public int TestRunTimeout { get; private set; } = -1;
+        public bool TestRunTimeoutSpecified => TestRunTimeout >= 0;
         public int DefaultTestCaseTimeout { get; private set; } = -1;
-        public bool DefaultTestCaseTimeoutSpecified
-        {
-            get { return DefaultTestCaseTimeout >= 0; }
-        }
+        public bool DefaultTestCaseTimeoutSpecified => DefaultTestCaseTimeout >= 0;
 
         public int RandomSeed { get; private set; } = -1;
         public bool RandomSeedSpecified
@@ -253,7 +252,10 @@ namespace NUnit.ConsoleRunner
                     }
                 });
 
-            this.Add("testCaseTimeout=", "Set timeout for each test case in {MILLISECONDS}. May be overridden with TimeoutAttribute.",
+            this.Add("testRunTimeout=", "Set timeout for the entire test run in {MILLISECONDS}",
+                v => TestRunTimeout = parser.RequiredInt(v, "--testRunTimeout"));
+
+            this.Add("testCaseTimeout=", "Set default timeout for each test case in {MILLISECONDS}. May be overridden with TimeoutAttribute.",
                 v => DefaultTestCaseTimeout = parser.RequiredInt(v, "--testCaseTimeout"));
 
             this.Add("seed=", "Set the random {SEED} used to generate test cases.",

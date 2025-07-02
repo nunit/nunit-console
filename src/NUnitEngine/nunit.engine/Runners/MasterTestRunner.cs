@@ -2,12 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Timers;
 using System.Xml;
 using NUnit.Engine.Services;
-using System.ComponentModel;
 using NUnit.Common;
 
 namespace NUnit.Engine.Runners
@@ -45,6 +46,9 @@ namespace NUnit.Engine.Runners
         private TestEventDispatcher _eventDispatcher = new TestEventDispatcher();
         private WorkItemTracker _workItemTracker = new WorkItemTracker();
 
+        private int _testRunTimeout;
+        private System.Timers.Timer? _testRunTimer;
+
         private const int WAIT_FOR_CANCEL_TO_COMPLETE = 5000;
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
@@ -61,6 +65,8 @@ namespace NUnit.Engine.Runners
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
             _extensionService = _services.GetService<ExtensionService>();
+
+            _testRunTimeout = package.Settings.GetValueOrDefault(SettingDefinitions.TestRunTimeout);
 
             // Some files in the top level package may be projects.
             // Expand them so that they contain subprojects for
@@ -429,9 +435,20 @@ namespace NUnit.Engine.Runners
 
             _eventDispatcher.OnTestEvent(startRunNode.OuterXml);
 
+            if (_testRunTimeout > 0)
+            {
+                _testRunTimer = new Timer(_testRunTimeout);
+                _testRunTimer.Elapsed += OnTestRunTimeout;
+                _testRunTimer.AutoReset = false;
+                _testRunTimer.Enabled = true;
+            }
+
             long startTicks = Stopwatch.GetTimestamp();
 
-            TestEngineResult result = PrepareResult(GetEngineRunner().Run(_eventDispatcher, filter)).MakeTestRunResult(TestPackage);
+            TestEngineResult result = GetEngineRunner().Run(_eventDispatcher, filter);
+            result = result.MakeTestRunResult(TestPackage);
+            result = PrepareResult(result);
+            //TestEngineResult result = PrepareResult(GetEngineRunner().Run(_eventDispatcher, filter)).MakeTestRunResult(TestPackage);
 
             // These are inserted in reverse order, since each is added as the first child.
             InsertFilterElement(result.Xml, filter);
@@ -450,6 +467,20 @@ namespace NUnit.Engine.Runners
             _eventDispatcher.OnTestEvent(result.Xml.OuterXml);
 
             return result;
+        }
+
+        private void OnTestRunTimeout(object? sender, ElapsedEventArgs e)
+        {
+            // Unlikely as it is, let's see if we an stop this coopeatively
+            StopRun(false);
+
+            // We wait for the cooperative stop and do a forced stop if it fails.
+            // WaitForCompletion will actually be called twice, once here and
+            // again in StopRun(true), so the wait is doubled but no harm done.
+            // StopRun(True) also calls _workItemTracker to try to fix up any
+            // in-flight items and produce as informative a result as possible.
+            if (!_workItemTracker.WaitForCompletion(WAIT_FOR_CANCEL_TO_COMPLETE))
+                StopRun(true);
         }
 
         private AsyncTestEngineResult RunTestsAsync(ITestEventListener? listener, TestFilter filter)

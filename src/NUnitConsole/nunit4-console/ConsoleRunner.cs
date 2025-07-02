@@ -459,6 +459,8 @@ namespace NUnit.ConsoleRunner
             if (options.SkipNonTestAssemblies)
                 package.AddSetting(SettingDefinitions.SkipNonTestAssemblies.WithValue(true));
 
+            if (options.TestRunTimeout > 0)
+                package.AddSetting(SettingDefinitions.TestRunTimeout.WithValue(options.TestRunTimeout));
             if (options.DefaultTestCaseTimeout >= 0)
                 package.AddSetting(SettingDefinitions.DefaultTimeout.WithValue(options.DefaultTestCaseTimeout));
 
