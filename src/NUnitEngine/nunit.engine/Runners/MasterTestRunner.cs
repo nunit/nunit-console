@@ -2,12 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Timers;
 using System.Xml;
 using NUnit.Engine.Services;
-using System.ComponentModel;
 using NUnit.Common;
 
 namespace NUnit.Engine.Runners
@@ -45,6 +46,9 @@ namespace NUnit.Engine.Runners
         private TestEventDispatcher _eventDispatcher = new TestEventDispatcher();
         private WorkItemTracker _workItemTracker = new WorkItemTracker();
 
+        private int _testRunTimeout;
+        private System.Timers.Timer? _testRunTimer;
+
         private const int WAIT_FOR_CANCEL_TO_COMPLETE = 5000;
 
         public MasterTestRunner(IServiceLocator services, TestPackage package)
@@ -61,6 +65,8 @@ namespace NUnit.Engine.Runners
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
 #endif
             _extensionService = _services.GetService<ExtensionService>();
+
+            _testRunTimeout = package.Settings.GetValueOrDefault(SettingDefinitions.TestRunTimeout);
 
             // Some files in the top level package may be projects.
             // Expand them so that they contain subprojects for
@@ -112,7 +118,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the loaded assembly.</returns>
         public XmlNode Load()
         {
-            LoadResult = PrepareResult(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);
+            LoadResult = AdjustResultForProjects(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -133,7 +139,7 @@ namespace NUnit.Engine.Runners
         /// <exception cref="InvalidOperationException">If no package has been loaded</exception>
         public XmlNode Reload()
         {
-            LoadResult = PrepareResult(GetEngineRunner().Reload()).MakeTestRunResult(TestPackage);
+            LoadResult = AdjustResultForProjects(GetEngineRunner().Reload()).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -226,7 +232,7 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            LoadResult = PrepareResult(GetEngineRunner().Explore(filter))
+            LoadResult = AdjustResultForProjects(GetEngineRunner().Explore(filter))
                 .MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
@@ -274,7 +280,7 @@ namespace NUnit.Engine.Runners
         // about projects. At this point, if there are any projects, the result
         // needs to be modified to include info about them. Doing it this way
         // allows the lower-level runners to be completely ignorant of projects
-        private TestEngineResult PrepareResult(TestEngineResult result)
+        private TestEngineResult AdjustResultForProjects(TestEngineResult result)
         {
             Guard.ArgumentNotNull(result);
 
@@ -429,27 +435,62 @@ namespace NUnit.Engine.Runners
 
             _eventDispatcher.OnTestEvent(startRunNode.OuterXml);
 
+            if (_testRunTimeout > 0)
+            {
+                _testRunTimer = new Timer(_testRunTimeout)
+                {
+                    AutoReset = false,
+                    Enabled = true
+                };
+
+                _testRunTimer.Elapsed += OnTestRunTimeout;
+            }
+
             long startTicks = Stopwatch.GetTimestamp();
 
-            TestEngineResult result = PrepareResult(GetEngineRunner().Run(_eventDispatcher, filter)).MakeTestRunResult(TestPackage);
+            // Separate calls to allow easy debugging.
+            // First Run the test getting a result with separate XML for each assembly
+            var initialResult = GetEngineRunner().Run(_eventDispatcher, filter);
+
+            // Next adjust the results adding aggregate layers for each project
+            var adjustedResult = AdjustResultForProjects(initialResult);
+
+            // Finally, create a single top-level aggregate result
+            var finalResult = adjustedResult.MakeTestRunResult(TestPackage);
 
             // These are inserted in reverse order, since each is added as the first child.
-            InsertFilterElement(result.Xml, filter);
+            InsertFilterElement(finalResult.Xml, filter);
 
-            InsertCommandLineElement(result.Xml);
+            // Add the command-line element
+            InsertCommandLineElement(finalResult.Xml);
 
-            result.Xml.AddAttribute("engine-version", engineVersion);
-            result.Xml.AddAttribute("clr-version", clrVersion);
+            // Insert additional top-level information not present in lower layers
+            finalResult.Xml.AddAttribute("engine-version", engineVersion);
+            finalResult.Xml.AddAttribute("clr-version", clrVersion);
             double duration = (double)(Stopwatch.GetTimestamp() - startTicks) / Stopwatch.Frequency;
-            result.Xml.AddAttribute("start-time", XmlConvert.ToString(startTime, "u"));
-            result.Xml.AddAttribute("end-time", XmlConvert.ToString(DateTime.UtcNow, "u"));
-            result.Xml.AddAttribute("duration", duration.ToString("0.000000", NumberFormatInfo.InvariantInfo));
+            finalResult.Xml.AddAttribute("start-time", XmlConvert.ToString(startTime, "u"));
+            finalResult.Xml.AddAttribute("end-time", XmlConvert.ToString(DateTime.UtcNow, "u"));
+            finalResult.Xml.AddAttribute("duration", duration.ToString("0.000000", NumberFormatInfo.InvariantInfo));
 
             IsTestRunning = false;
 
-            _eventDispatcher.OnTestEvent(result.Xml.OuterXml);
+            _eventDispatcher.OnTestEvent(finalResult.Xml.OuterXml);
 
-            return result;
+            return finalResult;
+        }
+
+        private void OnTestRunTimeout(object? sender, ElapsedEventArgs e)
+        {
+            // Unlikely as it is, let's see if we can stop this cooperatively
+            StopRun(false);
+
+            // We wait for the cooperative stop and do a forced stop if it fails.
+            // WaitForCompletion will actually be called twice, once here and
+            // again in StopRun(true), so the wait is doubled but no harm done.
+            // StopRun(True) also calls _workItemTracker to try to fix up any
+            // in-flight items and produce as informative a result as possible.
+            if (!_workItemTracker.WaitForCompletion(WAIT_FOR_CANCEL_TO_COMPLETE))
+                StopRun(true);
         }
 
         private AsyncTestEngineResult RunTestsAsync(ITestEventListener? listener, TestFilter filter)

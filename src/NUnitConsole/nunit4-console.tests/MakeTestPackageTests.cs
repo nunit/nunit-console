@@ -34,6 +34,7 @@ namespace NUnit.ConsoleRunner
             Assert.That(package.SubPackages[2].FullName, Is.EqualTo(Path.GetFullPath("test3.dll")));
         }
 
+        [TestCase("--testRunTimeout=200000", "TestRunTimeout", 200000)]
         [TestCase("--testCaseTimeout=50", FrameworkPackageSettings.DefaultTimeout, 50)]
         [TestCase("--dispose-runners", "DisposeRunners", true)]
         [TestCase("--config=Release", "ActiveConfig", "Release")]

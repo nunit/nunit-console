@@ -249,6 +249,7 @@ namespace NUnit.ConsoleRunner
             }
         }
 
+        [TestCase("TestRunTimeout", "testRunTimeout")]
         [TestCase("DefaultTestCaseTimeout", "testCaseTimeout")]
         [TestCase(FrameworkPackageSettings.RandomSeed, "seed")]
         [TestCase(FrameworkPackageSettings.NumberOfTestWorkers, "workers")]

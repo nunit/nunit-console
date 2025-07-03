@@ -125,6 +125,11 @@ namespace NUnit.Common
         /// </summary>
         public static SettingDefinition<bool> SkipNonTestAssemblies { get; } = new(nameof(SkipNonTestAssemblies), false);
 
+        /// <summary>
+        /// Int value in milliseconds used to cancel the entire test run if it is exceeded.
+        /// </summary>
+        public static SettingDefinition<int> TestRunTimeout { get; } = new SettingDefinition<int>(nameof(TestRunTimeout), 0);
+
         ///// <summary>
         ///// Flag (bool) indicating whether to pause execution of tests to allow
         ///// the user to attach a debugger.
