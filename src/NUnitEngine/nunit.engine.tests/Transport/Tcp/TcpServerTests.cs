@@ -6,7 +6,9 @@ using System.ComponentModel;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
@@ -14,13 +16,21 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     {
         private TcpServer _server;
         private List<Socket> _serverConnections;
+        private object _lock = new object();
 
         [SetUp]
         public void StartServer()
         {
             _serverConnections = new List<Socket>();
             _server = new TcpServer();
-            _server.ClientConnected += (c, g) => _serverConnections.Add(c);
+            _server.ClientConnected += (c, g) =>
+            {
+                lock (_lock)
+                {
+                    _serverConnections.Add(c);
+                }
+            };
+
             _server.Start();
         }
 
@@ -32,6 +42,13 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
         [TestCase(1)]
         [TestCase(3)]
+        [TestCase(20)]
+        [TestCase(20)]
+        [TestCase(20)]
+        [TestCase(20)]
+        [TestCase(20)]
+        [TestCase(20)]
+        [TestCase(20)]
         [TestCase(20)]
         public void ClientConnectionTest(int numClients)
         {
@@ -46,22 +63,21 @@ namespace NUnit.Engine.Communication.Transports.Tcp
                 var client = new TcpClient();
                 clients[i] = client;
 
-                using (var worker = new BackgroundWorker())
+                var worker = new BackgroundWorker();
+
+                worker.DoWork += (s, e) =>
                 {
-                    worker.DoWork += (s, e) =>
-                    {
-                        client.Connect(_server.EndPoint);
-                        client.Client.Send(new Guid().ToByteArray());
-                    };
+                    client.Connect(_server.EndPoint);
+                    client.Client.Send(new Guid().ToByteArray());
+                };
 
-                    worker.RunWorkerCompleted += (s, e) =>
-                    {
-                        if (Interlocked.Decrement(ref pendingTasks) == 0)
-                            allTasksComplete.Set();
-                    };
+                worker.RunWorkerCompleted += (s, e) =>
+                {
+                    if (Interlocked.Decrement(ref pendingTasks) == 0)
+                        allTasksComplete.Set();
+                };
 
-                    workers[i] = worker;
-                }
+                workers[i] = worker;
             }
 
             foreach (var worker in workers)
@@ -69,19 +85,26 @@ namespace NUnit.Engine.Communication.Transports.Tcp
 
             allTasksComplete.WaitOne();
 
-            Assert.That(_serverConnections.Count, Is.EqualTo(numClients), $"Should have received {numClients} connection events");
+            foreach (var worker in workers)
+                worker.Dispose();
 
-            for (int i = 0; i < numClients; i++)
+            Thread.Sleep(1); // Allow everything to complete
+
+            try
             {
-                Assert.That(_serverConnections[i].Connected, $"Server is not connected to client {i + 1}");
-                Assert.That(clients[i].Connected, Is.True, $"Client {i + 1} is not connected to server");
-            }
-        }
+                Assert.That(_serverConnections.Count, Is.EqualTo(numClients), $"Should have received {numClients} connection events");
 
-        private void RunTask(TcpClient client)
-        {
-            client.Connect(_server.EndPoint);
-            client.Client.Send(new Guid().ToByteArray());
+                for (int i = 0; i < numClients; i++)
+                {
+                    Assert.That(_serverConnections[i].Connected, $"Server is not connected to client {i + 1}");
+                    Assert.That(clients[i].Connected, Is.True, $"Client {i + 1} is not connected to server");
+                }
+            }
+            finally
+            {
+                foreach (var client in clients)
+                    client.Close();
+            }
         }
     }
 }
