@@ -3,10 +3,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.ConsoleRunner.Options;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {
@@ -34,6 +36,13 @@ namespace NUnit.ConsoleRunner
             ConfigureOptions();
             if (args is not null)
                 Parse(args);
+
+            ResultReporterSettings = new ResultReporterSettings()
+            {
+                OmitExplicitTests = OmitExplicitTests,
+                OmitIgnoredTests = OmitIgnoredTests,
+                OmitNotRunReport = OmitNotRunReport
+            };
         }
 
         // Action to Perform
@@ -96,6 +105,13 @@ namespace NUnit.ConsoleRunner
         public string? ConsoleEncoding { get; private set; }
 
         public bool NoHeader { get; private set; }
+
+        public bool OmitIgnoredTests { get; private set; }
+        public bool OmitExplicitTests { get; private set; }
+
+        public bool OmitNotRunReport { get; private set; }
+
+        public ResultReporterSettings ResultReporterSettings { get; private set; }
 
         public bool NoColor { get; private set; }
 
@@ -326,6 +342,15 @@ namespace NUnit.ConsoleRunner
 
             this.Add("noheader|noh", "Suppress display of program information at start of run.",
                 v => NoHeader = !string.IsNullOrEmpty(v));
+
+            this.Add("omitignored", "Suppress listing of tests not run because they were ignored.",
+                v => OmitIgnoredTests = !string.IsNullOrEmpty(v));
+
+            this.Add("omitexplicit", "Suppress listing of tests not run because they are explicit.",
+                v => OmitExplicitTests = !string.IsNullOrEmpty(v));
+
+            this.Add("omitnotrunreport", "Suppress the entire report of tests not run.",
+                v => OmitNotRunReport = !string.IsNullOrEmpty(v));
 
             this.Add("nocolor|noc", "Displays console output without color.",
                 v => NoColor = !string.IsNullOrEmpty(v));

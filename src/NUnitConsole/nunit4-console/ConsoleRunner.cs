@@ -271,7 +271,9 @@ namespace NUnit.ConsoleRunner
             if (result is not null)
             {
                 var summary = new ResultSummary(result);
-                ResultReporter.ReportResults(summary, writer, _options.StopOnError);
+                var settings = _options.ResultReporterSettings;
+
+                new ResultReporter(settings).ReportResults(summary, writer);
 
                 foreach (var spec in _options.ResultOutputSpecifications)
                 {

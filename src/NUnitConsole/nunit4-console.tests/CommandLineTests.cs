@@ -8,6 +8,7 @@ using NUnit.Framework;
 using NUnit.ConsoleRunner.Options;
 
 using Spec = NUnit.ConsoleRunner.Options.OutputSpecification;
+using NUnit.TextDisplay;
 
 namespace NUnit.ConsoleRunner
 {
@@ -141,6 +142,9 @@ namespace NUnit.ConsoleRunner
         [TestCase(FrameworkPackageSettings.StopOnError, "stoponerror")]
         [TestCase("WaitBeforeExit", "wait")]
         [TestCase("NoHeader", "noheader|noh")]
+        [TestCase("OmitExplicitTests", "omitexplicit")]
+        [TestCase("OmitIgnoredTests", "omitignored")]
+        [TestCase("OmitNotRunReport", "omitnotrunreport")]
         [TestCase("DisposeRunners", "dispose-runners")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
         [TestCase("NoResultSpecified", "noresult")]
@@ -727,6 +731,20 @@ namespace NUnit.ConsoleRunner
             ConsoleOptions options = ConsoleMocks.Options("--disable=NUnit.Engine.Listeners.TeamCityEventListener");
             Assert.That(options.DisableExtensions.Contains("NUnit.Engine.Listeners.TeamCityEventListener"));
         }
+
+        [TestCase("--omitexplicit", true, false, false)]
+        [TestCase("--omitignored", false, true, false)]
+        [TestCase("--omitignored --omitexplicit", true, true, false)]
+        [TestCase("--omitnotrunreport", false, false, true)]
+        public void ResultReporterSettingsTest(string arglist, bool explicitOmitted, bool ignoredOmitted, bool reportOmitted)
+        {
+            ConsoleOptions options = ConsoleMocks.Options(arglist.Split(' '));
+
+            Assert.That(options.ResultReporterSettings.OmitExplicitTests, Is.EqualTo(explicitOmitted));
+            Assert.That(options.ResultReporterSettings.OmitIgnoredTests, Is.EqualTo(ignoredOmitted));
+            Assert.That(options.ResultReporterSettings.OmitNotRunReport, Is.EqualTo(reportOmitted));
+        }
+
         private static VirtualFileSystem GetFileSystemContainingFile(string fileName)
         {
             var fileSystem = new VirtualFileSystem();
