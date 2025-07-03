@@ -69,9 +69,7 @@ namespace NUnit.ConsoleRunner
         }
 
         public int TestRunTimeout { get; private set; } = -1;
-        public bool TestRunTimeoutSpecified => TestRunTimeout >= 0;
         public int DefaultTestCaseTimeout { get; private set; } = -1;
-        public bool DefaultTestCaseTimeoutSpecified => DefaultTestCaseTimeout >= 0;
 
         public int RandomSeed { get; private set; } = -1;
         public bool RandomSeedSpecified
