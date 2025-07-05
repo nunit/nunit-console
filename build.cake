@@ -86,7 +86,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDependency("nunit-extension-net90-pluggable-agent", "4.0.0")
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner.{BuildSettings.LegacyPackageVersion}/tools/nunit-console.exe"),
+            + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
         tests: StandardRunnerTests),
 
     NUnitAgentCorePackage = new PackageDefinition(

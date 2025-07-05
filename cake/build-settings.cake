@@ -182,11 +182,53 @@ public static class BuildSettings
     public static string BranchName => BuildVersion.BranchName;
     public static bool IsReleaseBranch => BuildVersion.IsReleaseBranch;
     public static string PackageVersion => BuildVersion.PackageVersion;
-    public static string LegacyPackageVersion => BuildVersion.LegacyPackageVersion;
     public static string AssemblyVersion => BuildVersion.AssemblyVersion;
     public static string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
     public static string AssemblyInformationalVersion => BuildVersion.AssemblyInformationalVersion;
     public static bool IsDevelopmentRelease => PackageVersion.Contains("-dev");
+    
+    // Chocolatey.org does not yet support semver 2.0, so we have to use a legacy format
+    private static string _chocolateyPackageVersion;
+    public static string ChocolateyPackageVersion
+    {
+        get
+        {
+            if (!IsPreRelease)
+                return PackageVersion;
+
+            if (_chocolateyPackageVersion == null)
+            {
+                // Use PackageVersion as default
+                _chocolateyPackageVersion = PackageVersion;
+
+                var semver = BuildVersion.SemVer;
+                var label = BuildVersion.PreReleaseLabel;
+                var suffix = BuildVersion.PreReleaseSuffix;
+                int num1, num2;
+
+                // Our standard pre-releases are in the form <label> "." <num1> ["." <num2>]
+                // If anything else comes up, we just use the default PackageVersion
+                if (!suffix.StartsWith(label + "."))
+                    return _chocolateyPackageVersion;
+
+                suffix = suffix.Substring(label.Length + 1);
+                int dot2 = suffix.IndexOf('.');
+                if (dot2 > 0) // another dot?
+                {
+                    if (int.TryParse(suffix.Substring(0, dot2), out num1) && int.TryParse(suffix.Substring(dot2 + 1), out num2))
+                        _chocolateyPackageVersion = $"{semver}-{label}{num1:000}-{num2:000}";
+                }
+                else // just one dot
+                {
+                    if (int.TryParse(suffix, out num1))
+                        _chocolateyPackageVersion = $"{semver}-{label}{num1:000}";
+                }
+            }
+
+            return _chocolateyPackageVersion;
+        }
+    }
+
 
     // Standard Directory Structure - not changeable by user
     public static string ProjectDirectory => Context.Environment.WorkingDirectory.FullPath + "/";
