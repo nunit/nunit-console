@@ -6,7 +6,7 @@ commits-since-version-source-padding: 5
 branches:
   master:
     regex: ^(main|version4)$
-    tag: alpha
+    tag: beta.1
   release:
     tag: pre
   pull-request:
