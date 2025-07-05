@@ -40,7 +40,7 @@ public static class PackageReleaseManager
                     }
                     else if (package.PackageType == PackageType.Chocolatey)
                     {
-                        var packageName = $"{package.PackageId}.{BuildSettings.LegacyPackageVersion}.nupkg";
+                        var packageName = $"{package.PackageId}.{BuildSettings.ChocolateyPackageVersion}.nupkg";
                         var packagePath = BuildSettings.PackageDirectory + packageName;
                         PushChocolateyPackage(packagePath, BuildSettings.MyGetApiKey, BuildSettings.MyGetPushUrl);
                     }
@@ -86,7 +86,7 @@ public static class PackageReleaseManager
         else
             foreach (var package in BuildSettings.Packages)
             {
-                var packageName = $"{package.PackageId}.{BuildSettings.LegacyPackageVersion}.nupkg";
+                var packageName = $"{package.PackageId}.{BuildSettings.ChocolateyPackageVersion}.nupkg";
                 var packagePath = BuildSettings.PackageDirectory + packageName;
                 try
                 {

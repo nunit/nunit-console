@@ -343,13 +343,11 @@ public class BuildVersion
             case "dev":
             case "pre":
             case "pr":
-                suffix += "." + _gitVersion.PreReleaseNumber;
-                break;
             case "rc":
             case "alpha":
             case "beta":
             default:
-                suffix += "." + _gitVersion.CommitsSinceVersionSource;
+                suffix += "." + _gitVersion.PreReleaseNumber;
                 break;
         }
 

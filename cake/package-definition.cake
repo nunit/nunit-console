@@ -55,7 +55,7 @@ public class PackageDefinition
                 PackageTestDirectory = $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
                 break;
             case PackageType.Chocolatey:
-                PackageVersion = BuildSettings.LegacyPackageVersion;
+                PackageVersion = BuildSettings.ChocolateyPackageVersion;
                 PackageInstallDirectory = BuildSettings.ChocolateyTestDirectory;
                 PackageResultDirectory = BuildSettings.ChocolateyResultDirectory;
                 ExtensionInstallDirectory = BuildSettings.ChocolateyTestDirectory;
