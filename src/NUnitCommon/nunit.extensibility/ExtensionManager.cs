@@ -474,25 +474,6 @@ namespace NUnit.Extensibility
                 return;
             }
 
-#if NETFRAMEWORK
-            //// Use special properties provided by our backport of RuntimeInformation
-            //Version currentVersion = RuntimeInformation.FrameworkVersion;
-            //var frameworkName = extensionAssembly.FrameworkName;
-
-            //if (frameworkName.Identifier != FrameworkIdentifiers.NetFramework || frameworkName.Version > currentVersion)
-            //{
-            //    if (!extensionAssembly.FromWildCard)
-            //    {
-            //        throw new NUnitEngineException($"Extension {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available.");
-            //    }
-            //    else
-            //    {
-            //        log.Info($"Assembly {extensionAssembly.FilePath} targets {assemblyTargetFramework.DisplayName}, which is not available. Assembly found via wildcard.");
-            //        return;
-            //    }
-            //}
-#endif
-
             foreach (TypeDefinition extensionType in extensionAssembly.Assembly.MainModule.GetTypes())
             {
                 bool isV3Extension = false;

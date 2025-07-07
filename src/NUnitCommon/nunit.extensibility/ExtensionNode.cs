@@ -36,9 +36,19 @@ namespace NUnit.Extensibility
         }
 
         /// <summary>
+        /// Gets the path to the assembly where the extension is defined.
+        /// </summary>
+        public string AssemblyPath { get; }
+
+        /// <summary>
+        /// Gets the version of the extension assembly.
+        /// </summary>
+        public Version AssemblyVersion { get; }
+
+        /// <summary>
         /// Gets the full name of the Type of the extension object.
         /// </summary>
-        public string TypeName { get; private set; }
+        public string TypeName { get; }
 
         /// <summary>
         /// True for V3 extensions, which require a wrapper
@@ -86,16 +96,6 @@ namespace NUnit.Extensibility
         }
 
         /// <summary>
-        /// Gets the path to the assembly where the extension is defined.
-        /// </summary>
-        public string AssemblyPath { get; private set; }
-
-        /// <summary>
-        /// Gets the version of the extension assembly.
-        /// </summary>
-        public Version AssemblyVersion { get; private set; }
-
-        /// <summary>
         /// Gets an object of the specified extension type, loading the Assembly
         /// and creating the object as needed. Note that this property always
         /// returns the same object. Use CreateExtensionObject if a new one is
@@ -130,12 +130,13 @@ namespace NUnit.Extensibility
         /// </summary>
         public object CreateExtensionObject(params object[] args)
         {
-#if !NETFRAMEWORK
+#if NETFRAMEWORK
+            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(
+                AssemblyPath, TypeName, false, 0, null, args, null, null).ShouldNotBeNull();
+#else
             var assembly = Assembly.LoadFrom(AssemblyPath);
             var type = assembly.GetType(TypeName, throwOnError: true)!;
             return Activator.CreateInstance(type, args)!;
-#else
-            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(AssemblyPath, TypeName, false, 0, null, args, null, null)!;
 #endif
         }
 

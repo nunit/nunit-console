@@ -25,9 +25,9 @@
     <tags>nunit console runner test testing tdd</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
-      <dependency id="nunit-extension-net462-pluggable-agent" version="4.0.0" />
-      <dependency id="nunit-extension-net80-pluggable-agent" version="4.0.0" />
-      <dependency id="nunit-extension-net90-pluggable-agent" version="4.0.0" />
+      <dependency id="nunit-extension-net462-pluggable-agent" version="4.1.0-alpha.3" />
+      <dependency id="nunit-extension-net80-pluggable-agent" version="4.1.0-alpha.4" />
+      <dependency id="nunit-extension-net90-pluggable-agent" version="4.1.0-alpha.3" />
     </dependencies>
   </metadata>
   <files>
