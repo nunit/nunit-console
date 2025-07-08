@@ -50,21 +50,21 @@ public class PackageDefinition
             case PackageType.NuGet:
                 PackageVersion = BuildSettings.PackageVersion;
                 PackageInstallDirectory = BuildSettings.NuGetTestDirectory;
-                PackageResultDirectory = BuildSettings.NuGetResultDirectory;
+                PackageResultDirectory = $"{BuildSettings.NuGetResultDirectory}{PackageId}.{PackageVersion}";
                 ExtensionInstallDirectory = BuildSettings.NuGetTestDirectory;
                 PackageTestDirectory = $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
                 break;
             case PackageType.Chocolatey:
                 PackageVersion = BuildSettings.ChocolateyPackageVersion;
                 PackageInstallDirectory = BuildSettings.ChocolateyTestDirectory;
-                PackageResultDirectory = BuildSettings.ChocolateyResultDirectory;
+                PackageResultDirectory = $"{BuildSettings.ChocolateyResultDirectory}{PackageId}.{PackageVersion}";
                 ExtensionInstallDirectory = BuildSettings.ChocolateyTestDirectory;
                 PackageTestDirectory = $"{PackageInstallDirectory}{PackageId}.{PackageVersion}/";
                 break;
             case PackageType.Tool:
                 PackageVersion = BuildSettings.PackageVersion;
                 PackageInstallDirectory = BuildSettings.PackageTestDirectory;
-                PackageResultDirectory = BuildSettings.NuGetResultDirectory;
+                PackageResultDirectory = $"{BuildSettings.NuGetResultDirectory}{PackageId}.{PackageVersion}";
                 ExtensionInstallDirectory = BuildSettings.NuGetTestDirectory;
                 PackageTestDirectory = PackageInstallDirectory;
                 break;

@@ -169,6 +169,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C3D1ADBF-7497-4725-8AE4-6B4693F68622}"
 	ProjectSection(SolutionItems) = preProject
 		cake\build-settings.cake = cake\build-settings.cake
+		cake\commandline-options.cake = cake\commandline-options.cake
 		cake\execution.cake = cake\execution.cake
 		cake\package-definition.cake = cake\package-definition.cake
 		cake\package-tests.cake = cake\package-tests.cake
@@ -178,6 +179,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C3D1ADBF-7
 		cake\targets.cake = cake\targets.cake
 		cake\testing.cake = cake\testing.cake
 		cake\utilities.cake = cake\utilities.cake
+		cake\versioning.cake = cake\versioning.cake
 	EndProjectSection
 EndProject
 Global
