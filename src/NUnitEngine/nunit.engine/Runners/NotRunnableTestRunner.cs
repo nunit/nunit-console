@@ -65,15 +65,21 @@ namespace NUnit.Engine.Runners
             return 0;
         }
 
-        TestEngineResult ITestEngineRunner.Run(ITestEventListener listener, TestFilter filter)
+        TestEngineResult ITestEngineRunner.Run(ITestEventListener? listener, TestFilter filter)
         {
             return new TestEngineResult(string.Format(RUN_RESULT_FORMAT,
                 _type, TestID, _name, _fullname, _runstate, _result, _label, _message));
         }
 
-        AsyncTestEngineResult ITestEngineRunner.RunAsync(ITestEventListener listener, TestFilter filter)
+        AsyncTestEngineResult ITestEngineRunner.RunAsync(ITestEventListener? listener, TestFilter filter)
         {
-            throw new NotImplementedException();
+            var result = GetRunResult();
+
+            listener?.OnTestEvent(result);
+
+            var asyncResult = new AsyncTestEngineResult();
+            asyncResult.SetResult(new TestEngineResult(result));
+            return asyncResult;
         }
 
         /// <summary>
@@ -119,6 +125,16 @@ namespace NUnit.Engine.Runners
                 _type, TestID, _name, _fullname, _runstate, _message));
         }
 
+        private string GetRunResult() =>
+            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}' result='{_result}' label='{_label}'>" +
+                "<properties>" +
+                    $"<property name='_SKIPREASON' value='{_message}'/>" +
+                "</properties>" +
+                "<reason>" +
+                    $"<message>{_message}</message>" +
+                "</reason>" +
+            "</test-suite>";
+
         private string TestID
         {
             get
@@ -135,6 +151,31 @@ namespace NUnit.Engine.Runners
         public UnmanagedExecutableTestRunner(string assemblyPath)
             : base(assemblyPath, "Unmanaged libraries or applications are not supported")
         {
+            _runstate = "NotRunnable";
+            _result = "Failed";
+            _label = "Invalid";
+        }
+    }
+
+    public class InvalidAssemblyTestRunner : NotRunnableTestRunner
+    {
+        public InvalidAssemblyTestRunner(string assemblyPath, string message)
+            : base(assemblyPath, message)
+        {
+            _runstate = "NotRunnable";
+            _result = "Failed";
+            _label = "Invalid";
+        }
+    }
+
+    public class SkippedAssemblyTestRunner : NotRunnableTestRunner
+    {
+        public SkippedAssemblyTestRunner(string assemblyPath)
+            : base(assemblyPath, "Skipping non-test assembly")
+        {
+            _runstate = "Runnable";
+            _result = "Skipped";
+            _label = "NoTests";
         }
     }
 }

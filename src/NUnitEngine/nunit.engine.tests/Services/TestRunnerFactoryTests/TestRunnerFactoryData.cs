@@ -19,14 +19,19 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             {
 #if NETFRAMEWORK
                 yield return new TestRunnerFactoryData(
-                    "SingleAssembly",
-                    new TestPackage("a.dll"),
+                    "SingleAssembly_Exists",
+                    new TestPackage("net462/mock-assembly.dll").SubPackages[0],
                     RunnerResult.ProcessRunner);
 
                 yield return new TestRunnerFactoryData(
+                    "SingleAssembly_NotFound",
+                    new TestPackage("a.dll").SubPackages[0],
+                    RunnerResult.InvalidAssemblyTestRunner);
+
+                yield return new TestRunnerFactoryData(
                     "SingleUnknown",
-                    new TestPackage("a.junk"),
-                    RunnerResult.ProcessRunner);
+                    new TestPackage("a.junk").SubPackages[0],
+                    RunnerResult.InvalidAssemblyTestRunner);
 
                 yield return new TestRunnerFactoryData(
                     "TwoAssemblies",
@@ -72,20 +77,26 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
                 // we want to reinstate the feature that allows running multiple
                 // compatible assemblies under the .NET Core runner. Major
                 // decisions need to be made about the features of this runner!
+
                 yield return new TestRunnerFactoryData(
-                    "SingleAssembly",
-                    new TestPackage("a.dll"),
+                    "SingleAssembly_Exists",
+                    new TestPackage("net8.0/mock-assembly.dll").SubPackages[0],
                     RunnerResult.LocalTestRunner);
+
+                yield return new TestRunnerFactoryData(
+                    "SingleAssembly_NotFound",
+                    new TestPackage("a.dll").SubPackages[0],
+                    RunnerResult.InvalidAssemblyTestRunner);
 
                 //yield return new TestRunnerFactoryData(
                 //    "Two assemblies",
                 //    new TestPackage("a.dll", "b.dll"),
                 //    RunnerResult.AggregatingTestRunner(2));
 
-                yield return new TestRunnerFactoryData(
-                    "SingleProject, One assembly",
-                    new TestPackage("z.nunit"),
-                    RunnerResult.LocalTestRunner);
+                //yield return new TestRunnerFactoryData(
+                //    "SingleProject, One assembly",
+                //    new TestPackage("z.nunit"),
+                //    RunnerResult.LocalTestRunner);
 
                 //yield return new TestRunnerFactoryData(
                 //    "SingleProject, Two assemblies",
@@ -94,8 +105,8 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
 
                 yield return new TestRunnerFactoryData(
                     "Single unknown extension",
-                    new TestPackage("a.junk"),
-                    RunnerResult.LocalTestRunner);
+                    new TestPackage("a.junk").SubPackages[0],
+                    RunnerResult.InvalidAssemblyTestRunner);
 
                 //yield return new TestRunnerFactoryData(
                 //    "Two projects",

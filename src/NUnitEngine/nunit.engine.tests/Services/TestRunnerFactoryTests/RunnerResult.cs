@@ -31,6 +31,10 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
 #endif
         public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
+        public static RunnerResult InvalidAssemblyTestRunner => new RunnerResult(typeof(InvalidAssemblyTestRunner));
+
+        public static RunnerResult UnmanagedExecutableTestRunner => new RunnerResult(typeof(UnmanagedExecutableTestRunner));
+
         public RunnerResult(Type testRunner)
         {
             TestRunner = testRunner;

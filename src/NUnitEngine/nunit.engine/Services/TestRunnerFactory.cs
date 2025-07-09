@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections;
+using System.IO;
 using NUnit.Common;
 using NUnit.Engine.Runners;
 
@@ -50,34 +52,37 @@ namespace NUnit.Engine.Services
             if (ServiceContext is null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
-            if (package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName).StartsWith("Unmanaged,"))
-                return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
-
             // Any package without subpackages is either an assembly or unknown.
             // If it's unknown, that will be found out we try to load it.
-            var assemblyPackages = package.Select(p => !p.HasSubPackages());
+            var leafPackages = package.Select(p => !p.HasSubPackages());
+            var firstOrOnlyPackage = leafPackages[0];
 
 #if NETFRAMEWORK
-            if (assemblyPackages.Count > 1)
+            if (leafPackages.Count > 1)
                 return new MultipleTestProcessRunner(ServiceContext, package);
-            else
-                return new ProcessRunner(ServiceContext, package);
+
+            return MakePseudoRunnerIfNeeded(firstOrOnlyPackage) ?? new ProcessRunner(ServiceContext, firstOrOnlyPackage);
 #else
             // TODO: Currently, the .NET Core runner doesn't support multiple assemblies.
             // We therefore only properly deal with the situation where a single assembly
             // package is provided. This could change. :-)
-            // Zero case included but should never occur
-
-            switch (assemblyPackages.Count)
-            {
-                case 1:
-                    return new LocalTestRunner(assemblyPackages[0]);
-                case 0:
-                    return new LocalTestRunner(package);
-                default:
-                    throw new InvalidOperationException("Multi-assembly packages are not supported under .NET Core");
-            }
+            return MakePseudoRunnerIfNeeded(firstOrOnlyPackage) ?? new LocalTestRunner(firstOrOnlyPackage);
 #endif
+        }
+
+        /// <summary>
+        /// Check for various package errors and return a pseudo-runner if needed, otherwise null
+        /// </summary>
+        private static ITestEngineRunner? MakePseudoRunnerIfNeeded(TestPackage package)
+        {
+            string assemblyPath = package.FullName.ShouldNotBeNull();
+            if (!File.Exists(assemblyPath))
+                return new InvalidAssemblyTestRunner(assemblyPath, $"File not found: {assemblyPath}");
+
+            if (package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName).StartsWith("Unmanaged,"))
+                return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
+
+            return null;
         }
     }
 }
