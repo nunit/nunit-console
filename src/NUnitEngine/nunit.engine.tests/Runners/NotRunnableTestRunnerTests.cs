@@ -1,11 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -22,36 +19,35 @@ namespace NUnit.Engine.Runners
         protected string? _expectedResult;
         protected string? _expectedLabel;
 
-        [TestCase("junk.dll", "Assembly")]
-        [TestCase("junk.exe", "Assembly")]
-        [TestCase("junk.cfg", "Unknown")]
+        private static readonly IEnumerable<TestCaseData> TestCases = new List<TestCaseData>()
+        {
+            new TestCaseData("junk.dll", "Assembly"),
+            new TestCaseData("junk.exe", "Assembly"),
+            new TestCaseData("junk.cfg", "Unknown"),
+        };
+
+        [TestCaseSource(nameof(TestCases))]
         public void Load(string filePath, string expectedType)
         {
             ITestEngineRunner runner = CreateRunner(filePath);
             CheckLoadResult(runner.Load(), filePath, expectedType);
         }
 
-        [TestCase("junk.dll", "Assembly")]
-        [TestCase("junk.exe", "Assembly")]
-        [TestCase("junk.cfg", "Unknown")]
+        [TestCaseSource(nameof(TestCases))]
         public void Explore(string filePath, string expectedType)
         {
             ITestEngineRunner runner = CreateRunner(filePath);
             CheckLoadResult(runner.Explore(TestFilter.Empty), filePath, expectedType);
         }
 
-        [TestCase("junk.dll")]
-        [TestCase("junk.exe")]
-        [TestCase("junk.cfg")]
-        public void CountTestCases(string filePath)
+        [TestCaseSource(nameof(TestCases))]
+        public void CountTestCases(string filePath, string _)
         {
             ITestEngineRunner runner = CreateRunner(filePath);
             Assert.That(runner.CountTestCases(TestFilter.Empty), Is.EqualTo(0));
         }
 
-        [TestCase("junk.dll", "Assembly")]
-        [TestCase("junk.exe", "Assembly")]
-        [TestCase("junk.cfg", "Unknown")]
+        [TestCaseSource(nameof(TestCases))]
         public void Run(string filePath, string expectedType)
         {
             ITestEngineRunner runner = CreateRunner(filePath);
@@ -59,9 +55,7 @@ namespace NUnit.Engine.Runners
             CheckRunResult(runner.Run(events, TestFilter.Empty), filePath, expectedType);
         }
 
-        [TestCase("junk.dll", "Assembly")]
-        [TestCase("junk.exe", "Assembly")]
-        [TestCase("junk.cfg", "Unknown")]
+        [TestCaseSource(nameof(TestCases))]
         public void RunAsync(string filePath, string expectedType)
         {
             ITestEngineRunner runner = CreateRunner(filePath);

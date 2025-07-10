@@ -118,12 +118,12 @@ namespace NUnit.Engine.Runners
                 .Replace(">", "&gt;");
         }
 
-        private TestEngineResult GetLoadResult()
-        {
-            return new TestEngineResult(string.Format(
-                LOAD_RESULT_FORMAT,
-                _type, TestID, _name, _fullname, _runstate, _message));
-        }
+        private TestEngineResult GetLoadResult() => new TestEngineResult(
+            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}'>" +
+                "<properties>" +
+                    $"<property name='_SKIPREASON' value='{_message}'/>" +
+                "</properties>" +
+            "</test-suite>");
 
         private string GetRunResult() =>
             $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}' result='{_result}' label='{_label}'>" +
@@ -146,17 +146,6 @@ namespace NUnit.Engine.Runners
         }
     }
 
-    public class UnmanagedExecutableTestRunner : NotRunnableTestRunner
-    {
-        public UnmanagedExecutableTestRunner(string assemblyPath)
-            : base(assemblyPath, "Unmanaged libraries or applications are not supported")
-        {
-            _runstate = "NotRunnable";
-            _result = "Failed";
-            _label = "Invalid";
-        }
-    }
-
     public class InvalidAssemblyTestRunner : NotRunnableTestRunner
     {
         public InvalidAssemblyTestRunner(string assemblyPath, string message)
@@ -165,6 +154,14 @@ namespace NUnit.Engine.Runners
             _runstate = "NotRunnable";
             _result = "Failed";
             _label = "Invalid";
+        }
+    }
+
+    public class UnmanagedExecutableTestRunner : InvalidAssemblyTestRunner
+    {
+        public UnmanagedExecutableTestRunner(string assemblyPath)
+            : base(assemblyPath, "Unmanaged libraries or applications are not supported")
+        {
         }
     }
 
