@@ -53,8 +53,8 @@ namespace NUnit.Engine.Services
             if (ServiceContext is null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
-            // Any package without subpackages is either an assembly or unknown.
-            // If it's unknown, that will be found out we try to load it.
+            // First get subRunners for each leaf package, i.e. any package without
+            // subpackages, which will either be assemblies or unknown file types.
             var leafPackages = package.Select(p => !p.HasSubPackages());
 
 #if NETFRAMEWORK
@@ -62,7 +62,7 @@ namespace NUnit.Engine.Services
             // We therefore only properly deal with the situation where a single assembly
             // package is provided. This could change. :-)
             if (leafPackages.Count > 1)
-                return new MultipleTestProcessRunner(ServiceContext, package);
+                return new AggregatingTestRunner(ServiceContext, package);
 #endif
             // Find a runner for the first or only leaf package
             package = leafPackages[0];

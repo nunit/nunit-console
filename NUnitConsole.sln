@@ -177,6 +177,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C3D1ADBF-7
 		cake\publishing.cake = cake\publishing.cake
 		cake\reporting.cake = cake\reporting.cake
 		cake\targets.cake = cake\targets.cake
+		cake\test-results.cake = cake\test-results.cake
 		cake\testing.cake = cake\testing.cake
 		cake\utilities.cake = cake\utilities.cake
 		cake\versioning.cake = cake\versioning.cake

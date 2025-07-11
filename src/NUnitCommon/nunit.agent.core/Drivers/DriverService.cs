@@ -59,24 +59,13 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentValid(File.Exists(assemblyPath), InternalErrorMessage("File not found"), nameof(assemblyPath));
             Guard.ArgumentValid(PathUtils.IsAssemblyFileType(assemblyPath), InternalErrorMessage("Not an assembly type"), nameof(assemblyPath));
 
-            //if (targetFramework is not null)
-            //{
-            //    // This takes care of an issue with Roslyn. It may get fixed, but we still
-            //    // have to deal with assemblies having this setting. I'm assuming that
-            //    // any true Portable assembly would have a Profile as part of its name.
-            //    var platform = targetFramework == ".NETPortable,Version=v5.0"
-            //        ? ".NETStandard"
-            //        : targetFramework.Split(CommaSeparator)[0];
-
-            //    if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
-            //        throw new InvalidOperationException(InternalErrorMessage($"Platform {platform} is not supported"));
-            //}
-
             log.Debug("Looking for a driver");
             using (var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath))
             {
                 if (skipNonTestAssemblies)
                 {
+                    // TODO: We should not get here since the engine should have eliminated any
+                    // such assemblies. Double-check for now but remove before the next release.
                     foreach (var attr in assemblyDef.CustomAttributes)
                         if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
                             throw new InvalidOperationException(InternalErrorMessage("Assembly should have been skipped"));
@@ -101,7 +90,8 @@ namespace NUnit.Engine.Drivers
                 }
             }
 
-            throw new InvalidOperationException(InternalErrorMessage("No driver was found"));
+            return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID,
+                $"No suitable test driver has not been found for {assemblyPath}");
         }
     }
 }

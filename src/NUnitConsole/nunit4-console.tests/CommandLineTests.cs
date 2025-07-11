@@ -156,6 +156,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("LoadUserProfile", "loaduserprofile")]
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
+        [TestCase("DebugConsole", "debug-console")]
 #endif
 #endif
         public void CanRecognizeBooleanOptions(string propertyName, string pattern)

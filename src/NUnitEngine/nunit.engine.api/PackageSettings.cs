@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace NUnit.Engine
 {
     /// <summary>
-    /// PackageSettingList contains all the PackageSettings for a TestPackage.
+    /// PackageSettings contains all the settings applied to a TestPackage.
     /// It supports enumeration of the settings and various operations on
     /// individual settings in the list.
     /// </summary>

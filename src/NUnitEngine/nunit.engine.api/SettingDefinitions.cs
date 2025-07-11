@@ -55,6 +55,12 @@ namespace NUnit.Common
         public static SettingDefinition<bool> DebugAgent { get; } = new(nameof(DebugAgent), false);
 
         /// <summary>
+        /// Bool flag indicating whether a debugger should be launched at console
+        /// startup. Used only for debugging NUnit itself.
+        /// </summary>
+        public static SettingDefinition<bool> DebugConsole { get; } = new(nameof(DebugConsole), false);
+
+        /// <summary>
         /// The private binpath used to locate assemblies. Directory paths
         /// is separated by a semicolon. It's an error to specify this and
         /// also set AutoBinPath to true.

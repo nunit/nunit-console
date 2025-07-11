@@ -7,6 +7,7 @@ using NUnit.Engine;
 using NUnit.TextDisplay;
 
 using NUnit.ConsoleRunner.Options;
+using System.Diagnostics;
 
 namespace NUnit.ConsoleRunner
 {
@@ -46,6 +47,11 @@ namespace NUnit.ConsoleRunner
                 WriteErrorMessage(string.Format(ex.Message, ex.OptionName));
                 return ConsoleRunner.INVALID_ARG;
             }
+
+#if DEBUG
+            if (Options.DebugConsole)
+                Debugger.Launch();
+#endif
 
             if (!string.IsNullOrEmpty(Options.ConsoleEncoding))
             {

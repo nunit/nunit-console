@@ -204,6 +204,8 @@ namespace NUnit.ConsoleRunner
 
         public bool DebugAgent { get; private set; }
 
+        public bool DebugConsole { get; private set; }
+
         public bool PauseBeforeRun { get; private set; }
 
         public string? PrincipalPolicy { get; private set; }
@@ -416,6 +418,8 @@ namespace NUnit.ConsoleRunner
 #if DEBUG
             this.AddNetFxOnlyOption("debug-agent", "Launch debugger in nunit-agent when it starts.",
                 NetFxOnlyOption("debug-agent", v => DebugAgent = !string.IsNullOrEmpty(v)));
+            this.Add("debug-console", "Launch debugger in nunit-console when it starts.",
+                v => DebugConsole = !string.IsNullOrEmpty(v));
 #endif
         }
 
