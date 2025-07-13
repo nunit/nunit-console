@@ -14,161 +14,178 @@ BuildSettings.Initialize(
 // INDIVIDUAL PACKAGE DEFINITIONS
 //////////////////////////////////////////////////////////////////////
 
-PackageDefinition NUnitConsoleNuGetPackage;
-PackageDefinition NUnitConsoleRunnerNuGetPackage;
-PackageDefinition NUnitConsoleRunnerDotNetToolPackage;
-PackageDefinition NUnitConsoleRunnerNet80Package;
-PackageDefinition NUnitAgentCorePackage;
-PackageDefinition NUnitEnginePackage;
-PackageDefinition NUnitEngineApiPackage;
-PackageDefinition NUnitExtensibilityApiPackage;
-PackageDefinition NUnitConsoleRunnerChocolateyPackage;
+PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.ConsoleRunner",
+    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
+    checks: new PackageCheck[] {
+        HasFiles("LICENSE.txt", "NOTICES.txt"),
+        HasDirectory("tools").WithFiles(
+            "nunit-console.exe", "nunit-console.exe.config", "nunit.engine.dll",
+            "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll",
+            "nunit.engine.api.dll", "testcentric.metadata.dll"),
+        HasDependency("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.3"),
+        HasDependency("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.4"),
+        HasDependency("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.3")
+    },
+    symbols: new PackageCheck[] {
+        HasDirectory("tools").WithFiles(
+            "nunit.engine.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+            "nunit.common.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
+    },
+    testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
+        + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
+    tests: StandardRunnerTests);
 
+// NOTE: Must follow ConsoleRunner, upon which it depends
+PackageDefinition NUnitConsoleNuGetPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Console",
+    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
+    checks: new PackageCheck[] { HasFile("LICENSE.txt") });
+
+PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
+    PackageType.Tool,
+    id: "NUnit.ConsoleRunner.NetCore",
+    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
+    checks: new PackageCheck[]
+    {
+        HasFiles("nunit.exe"),
+        HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
+            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
+            "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll",
+            "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
+            "Microsoft.Extensions.DependencyModel.dll")
+    },
+    testRunner: new ConsoleRunnerSelfTester(BuildSettings.PackageTestDirectory + "nunit.exe"),
+    tests: NetCoreRunnerTests);
+
+PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
+    PackageType.Chocolatey,
+    id: "nunit-console-runner",
+    source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
+    checks: new PackageCheck[] {
+        HasDirectory("tools").WithFiles(
+            "LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit-console.exe", "nunit-console.exe.config",
+            "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
+        HasDependency("nunit-extension-net462-pluggable-agent", "4.1.0-alpha.3"),
+        HasDependency("nunit-extension-net80-pluggable-agent", "4.1.0-alpha.4"),
+        HasDependency("nunit-extension-net90-pluggable-agent", "4.1.0-alpha.3")
+    },
+    testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
+        + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
+    tests: StandardRunnerTests);
+
+PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Agent.Core",
+    source: BuildSettings.NuGetDirectory + "nunit.agent.core/nunit.agent.core.nuspec",
+    checks: new PackageCheck[]
+    {
+        HasFiles("LICENSE.txt", "NOTICES.txt"),
+        HasDirectory("lib/net462").WithFiles(
+            "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
+        HasDirectory("lib/net8.0").WithFiles(
+            "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
+            "Microsoft.Extensions.DependencyModel.dll")
+    },
+    symbols: new PackageCheck[]
+    {
+        HasDirectory("lib/net462").WithFiles(
+            "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+            "nunit.common.pdb", "nunit.engine.api.pdb"),
+        HasDirectory("lib/net8.0").WithFiles(
+            "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+            "nunit.common.pdb", "nunit.engine.api.pdb")
+    },
+    testRunner: new DirectTestAgentRunner(),
+    tests: AgentCoreTests);
+
+PackageDefinition NUnitEnginePackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Engine",
+    source: BuildSettings.NuGetDirectory + "engine/nunit.engine.nuspec",
+    checks: new PackageCheck[] {
+        HasFiles("LICENSE.txt", "NOTICES.txt"),
+        HasDirectory("lib/net462").WithFiles(
+            "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
+        HasDirectory("lib/net8.0").WithFiles(
+            "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
+            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll", "Microsoft.Extensions.DependencyModel.dll") },
+    symbols: new PackageCheck[] {
+        HasDirectory("lib/net462").WithFiles(
+            "nunit.engine.pdb", "nunit.extensibility.pdb",
+            "nunit.extensibility.api.pdb", "nunit.engine.api.pdb"),
+        HasDirectory("lib/net8.0").WithFiles(
+            "nunit.engine.pdb","nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
+            "nunit.common.pdb", "nunit.engine.api.pdb") });
+// TODO: Revise AgentSelector and reinstate tests
+//testRunner: new AgentSelector(
+//    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
+//tests: EngineTests),
+
+PackageDefinition NUnitEngineApiPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Engine.Api",
+    source: BuildSettings.NuGetDirectory + "engine/nunit.engine.api.nuspec",
+    checks: new PackageCheck[] {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.engine.api.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
+    },
+    symbols: new PackageCheck[] {
+        HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
+    });
+
+PackageDefinition NUnitExtensibilityApiPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Extensibility.Api",
+    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
+    checks: new PackageCheck[] {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.extensibility.api.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.dll")
+    },
+    symbols: new PackageCheck[] {
+        HasDirectory("lib/net462").WithFile("nunit.extensibility.api.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
+    });
+
+PackageDefinition NUnitCommonPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Common",
+    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.common/nunit.common.csproj",
+    checks: new PackageCheck[]
+    {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.common.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.common.dll"),
+        HasDependency("NUnit.Engine.Api")
+    },
+    symbols: new PackageCheck[]
+    {
+        HasDirectory("lib/net462").WithFile("nunit.common.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.common.pdb"),
+    });
+
+// Add all packages to BuildSettings in order they should be build.
+// Dependencies must precede all the packages that depend on them.
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
-
-    NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
-        PackageType.NuGet,
-        id: "NUnit.ConsoleRunner",
-        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
-        checks: new PackageCheck[] {
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("tools").WithFiles(
-                "nunit-console.exe", "nunit-console.exe.config", "nunit.engine.dll",
-                "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll",
-                "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDependency("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.3"),
-            HasDependency("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.4"),
-            HasDependency("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.3")
-        },
-        symbols: new PackageCheck[] {
-            HasDirectory("tools").WithFiles(
-                "nunit.engine.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-                "nunit.common.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
-        },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
-            + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
-        tests: StandardRunnerTests),
-
-    // NOTE: Must follow ConsoleRunner, upon which it depends
-    NUnitConsoleNuGetPackage = new PackageDefinition(
-        PackageType.NuGet,
-        id: "NUnit.Console",
-        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
-        checks: new PackageCheck[] { HasFile("LICENSE.txt") }),
-
-    NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
-        PackageType.Tool,
-        id: "NUnit.ConsoleRunner.NetCore",
-        source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
-        checks: new PackageCheck[]
-        {
-            HasFiles("nunit.exe"),
-            HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
-                "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-                "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll",
-                "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
-                "Microsoft.Extensions.DependencyModel.dll")
-        },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.PackageTestDirectory + "nunit.exe"),
-        tests: NetCoreRunnerTests),
-
-    NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
-        PackageType.Chocolatey,
-        id: "nunit-console-runner",
-        source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
-        checks: new PackageCheck[] {
-            HasDirectory("tools").WithFiles(
-                "LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit-console.exe", "nunit-console.exe.config",
-                "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDependency("nunit-extension-net462-pluggable-agent", "4.1.0-alpha.3"),
-            HasDependency("nunit-extension-net80-pluggable-agent", "4.1.0-alpha.4"),
-            HasDependency("nunit-extension-net90-pluggable-agent", "4.1.0-alpha.3")
-        },
-        testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
-        tests: StandardRunnerTests),
-
-    NUnitAgentCorePackage = new PackageDefinition(
-        PackageType.NuGet,
-        id: "NUnit.Agent.Core",
-        source: BuildSettings.NuGetDirectory + "nunit.agent.core/nunit.agent.core.nuspec",
-        checks: new PackageCheck[]
-        {
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("lib/net462").WithFiles(
-                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
-                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDirectory("lib/net8.0").WithFiles(
-                "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", 
-                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
-                "Microsoft.Extensions.DependencyModel.dll")
-        },
-        symbols: new PackageCheck[]
-        {
-            HasDirectory("lib/net462").WithFiles(
-                "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-                "nunit.common.pdb", "nunit.engine.api.pdb"),
-            HasDirectory("lib/net8.0").WithFiles(
-                "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-                "nunit.common.pdb", "nunit.engine.api.pdb")
-        },
-        testRunner: new DirectTestAgentRunner(),
-        tests: AgentCoreTests),
-
-    NUnitEnginePackage = new PackageDefinition(
-        PackageType.NuGet,
-        id: "NUnit.Engine",
-        source: BuildSettings.NuGetDirectory + "engine/nunit.engine.nuspec",
-        checks: new PackageCheck[] {
-            HasFiles("LICENSE.txt", "NOTICES.txt"),
-            HasDirectory("lib/net462").WithFiles(
-                "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-            HasDirectory("lib/net8.0").WithFiles(
-                "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-                "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll", "Microsoft.Extensions.DependencyModel.dll") },
-        symbols: new PackageCheck[] {
-            HasDirectory("lib/net462").WithFiles(
-                "nunit.engine.pdb", "nunit.extensibility.pdb",
-                "nunit.extensibility.api.pdb", "nunit.engine.api.pdb"),
-            HasDirectory("lib/net8.0").WithFiles(
-                "nunit.engine.pdb","nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-                "nunit.common.pdb", "nunit.engine.api.pdb") } ),
-        // TODO: Revise AgentSelector and reinstate tests
-        //testRunner: new AgentSelector(
-        //    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
-        //tests: EngineTests),
-
-    NUnitEngineApiPackage = new PackageDefinition(
-        PackageType.NuGet,
-        id: "NUnit.Engine.Api",
-        source: BuildSettings.NuGetDirectory + "engine/nunit.engine.api.nuspec",
-        checks: new PackageCheck[] {
-            HasFile("LICENSE.txt"),
-            HasDirectory("lib/net462").WithFile("nunit.engine.api.dll"),
-            HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
-        },
-        symbols: new PackageCheck[] {
-            HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
-            HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
-        }),
-
-    NUnitExtensibilityApiPackage = new PackageDefinition(
-        PackageType.NuGet,
-        id: "NUnit.Extensibility.Api",
-        source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
-        checks: new PackageCheck[] {
-            HasFile("LICENSE.txt"),
-            HasDirectory("lib/net462").WithFile("nunit.extensibility.api.dll"),
-            HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.dll")
-        },
-        symbols: new PackageCheck[] {
-            HasDirectory("lib/net462").WithFile("nunit.extensibility.api.pdb"),
-            HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
-        })
+    NUnitEngineApiPackage,
+    NUnitExtensibilityApiPackage,
+    NUnitCommonPackage,
+    NUnitEnginePackage,
+    NUnitConsoleRunnerNuGetPackage,
+    NUnitConsoleNuGetPackage,
+    NUnitConsoleRunnerDotNetToolPackage,
+    NUnitAgentCorePackage,
+    NUnitConsoleRunnerChocolateyPackage,
 });
-
 
 //////////////////////////////////////////////////////////////////////
 // CONSOLE PACKAGE TEST RUNNER

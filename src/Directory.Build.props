@@ -17,7 +17,7 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <!-- Signing Assemblies -->
         <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)/nunit.snk</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\nunit.snk</AssemblyOriginatorKeyFile>
         <!-- Debugging -->
         <DebugType>portable</DebugType>
         <DebugSymbols>true</DebugSymbols>
@@ -34,13 +34,22 @@
 
     <!-- Common package metadata -->
     <PropertyGroup>
-        <PackageOutputPath>$(MSBuildThisFileDirectory)../package</PackageOutputPath>
+        <PackageOutputPath>$(MSBuildThisFileDirectory)..\package</PackageOutputPath>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Authors>CharliePoole;Rob Prouse</Authors>
-        <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
+        <Owners>CharliePoole;Rob Prouse</Owners>
+        <Copyright>Charlie Poole, Rob Prouse and Contributors. MIT License.</Copyright>
+        <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+        <PackageIcon>nunit_256.png</PackageIcon>
+        <PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</PackageIconUrl>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)..\LICENSE.txt" Pack="true" PackagePath="\" />
+        <None Include="$(MSBuildThisFileDirectory)..\nunit_256.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <!-- Code Style Analyzers -->
     <ItemGroup>
