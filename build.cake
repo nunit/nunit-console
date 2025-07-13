@@ -59,6 +59,24 @@ PackageDefinition NUnitCommonPackage = new PackageDefinition(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.common.pdb"),
     });
 
+PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Agent.Core",
+    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.agent.core/nunit.agent.core.csproj",
+    checks: new PackageCheck[]
+    {
+        HasFiles("LICENSE.txt"/*, "NOTICES.txt"*/),
+        HasDirectory("lib/net462").WithFile("nunit.agent.core.dll" ),
+        HasDirectory("lib/net8.0").WithFiles("nunit.agent.core.dll")
+    },
+    symbols: new PackageCheck[]
+    {
+        HasDirectory("lib/net462").WithFile("nunit.agent.core.pdb"),
+        HasDirectory("lib/net8.0").WithFile("nunit.agent.core.pdb")
+    },
+    testRunner: new DirectTestAgentRunner(),
+    tests: AgentCoreTests);
+
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.ConsoleRunner",
@@ -122,33 +140,6 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
         + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
-PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
-    PackageType.NuGet,
-    id: "NUnit.Agent.Core",
-    source: BuildSettings.NuGetDirectory + "nunit.agent.core/nunit.agent.core.nuspec",
-    checks: new PackageCheck[]
-    {
-        HasFiles("LICENSE.txt", "NOTICES.txt"),
-        HasDirectory("lib/net462").WithFiles(
-            "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-        HasDirectory("lib/net8.0").WithFiles(
-            "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
-            "Microsoft.Extensions.DependencyModel.dll")
-    },
-    symbols: new PackageCheck[]
-    {
-        HasDirectory("lib/net462").WithFiles(
-            "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-            "nunit.common.pdb", "nunit.engine.api.pdb"),
-        HasDirectory("lib/net8.0").WithFiles(
-            "nunit.agent.core.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-            "nunit.common.pdb", "nunit.engine.api.pdb")
-    },
-    testRunner: new DirectTestAgentRunner(),
-    tests: AgentCoreTests);
-
 PackageDefinition NUnitEnginePackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.Engine",
@@ -179,11 +170,11 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityApiPackage,
     NUnitEngineApiPackage,
     NUnitCommonPackage,
+    NUnitAgentCorePackage,
     NUnitEnginePackage,
     NUnitConsoleRunnerNuGetPackage,
     NUnitConsoleNuGetPackage,
     NUnitConsoleRunnerDotNetToolPackage,
-    NUnitAgentCorePackage,
     NUnitConsoleRunnerChocolateyPackage,
 });
 

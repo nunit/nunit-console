@@ -5,6 +5,11 @@
     <TargetFrameworks>net462;netcoreapp3.1;net6.0;net8.0</TargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NUnit.Agent.Core</PackageId>
+    <Description>Contains Types used by agents.</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="nunit.agent.core.tests, PublicKey=$(NUnitPublicKey)" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
