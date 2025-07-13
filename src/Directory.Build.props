@@ -35,15 +35,17 @@
     <!-- Common package metadata -->
     <PropertyGroup>
         <PackageOutputPath>$(MSBuildThisFileDirectory)..\package</PackageOutputPath>
-        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Authors>CharliePoole;Rob Prouse</Authors>
         <Owners>CharliePoole;Rob Prouse</Owners>
         <Copyright>Charlie Poole, Rob Prouse and Contributors. MIT License.</Copyright>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+        <PackageProjectUrl>>https://nunit.org</PackageProjectUrl>
         <PackageIcon>nunit_256.png</PackageIcon>
         <PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</PackageIconUrl>
+        <PackageReleaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

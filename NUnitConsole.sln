@@ -58,7 +58,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitConsole", "NUnitConsol
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{43A219A8-2995-4884-806F-FDB9CD25D403}"
 	ProjectSection(SolutionItems) = preProject
-		nuget\engine\nunit.engine.api.nuspec = nuget\engine\nunit.engine.api.nuspec
 		nuget\engine\nunit.engine.nuspec = nuget\engine\nunit.engine.nuspec
 	EndProjectSection
 EndProject
