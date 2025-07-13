@@ -5,6 +5,11 @@
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NUnit.Common</PackageId>
+    <Description>Contains Types used by both the engine and agents.</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="nunit.common.tests, PublicKey=$(NUnitPublicKey)" />
     <InternalsVisibleTo Include="nunit4-console.tests, PublicKey=$(NUnitPublicKey)" />

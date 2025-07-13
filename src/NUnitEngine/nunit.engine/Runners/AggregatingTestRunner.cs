@@ -17,7 +17,7 @@ namespace NUnit.Engine.Runners
     /// <remarks>
     /// AggregatingTestRunner may be called with a TestPackage that specifies a single
     /// assembly, multiple assemblies, a single project, multiple projects or any
-    /// combination of projects and asemblies. In all cases, it extracts a list of the
+    /// combination of projects and assemblies. In all cases, it extracts a list of the
     /// actual assemblies to be run and creates a separate runner for each of them.
     /// </remarks>
     /// <remarks>
