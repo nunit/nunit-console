@@ -14,6 +14,51 @@ BuildSettings.Initialize(
 // INDIVIDUAL PACKAGE DEFINITIONS
 //////////////////////////////////////////////////////////////////////
 
+PackageDefinition NUnitExtensibilityApiPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Extensibility.Api",
+    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
+    checks: new PackageCheck[] {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.extensibility.api.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.dll")
+    },
+    symbols: new PackageCheck[] {
+        HasDirectory("lib/net462").WithFile("nunit.extensibility.api.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
+    });
+
+PackageDefinition NUnitEngineApiPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Engine.Api",
+    source: BuildSettings.SourceDirectory + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj",
+    checks: new PackageCheck[] {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.engine.api.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
+    },
+    symbols: new PackageCheck[] {
+        HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
+    });
+
+PackageDefinition NUnitCommonPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Common",
+    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.common/nunit.common.csproj",
+    checks: new PackageCheck[]
+    {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.common.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.common.dll"),
+        HasDependency("NUnit.Engine.Api")
+    },
+    symbols: new PackageCheck[]
+    {
+        HasDirectory("lib/net462").WithFile("nunit.common.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.common.pdb"),
+    });
+
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.ConsoleRunner",
@@ -128,56 +173,11 @@ PackageDefinition NUnitEnginePackage = new PackageDefinition(
 //    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
 //tests: EngineTests),
 
-PackageDefinition NUnitEngineApiPackage = new PackageDefinition(
-    PackageType.NuGet,
-    id: "NUnit.Engine.Api",
-    source: BuildSettings.NuGetDirectory + "engine/nunit.engine.api.nuspec",
-    checks: new PackageCheck[] {
-        HasFile("LICENSE.txt"),
-        HasDirectory("lib/net462").WithFile("nunit.engine.api.dll"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
-    },
-    symbols: new PackageCheck[] {
-        HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
-    });
-
-PackageDefinition NUnitExtensibilityApiPackage = new PackageDefinition(
-    PackageType.NuGet,
-    id: "NUnit.Extensibility.Api",
-    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
-    checks: new PackageCheck[] {
-        HasFile("LICENSE.txt"),
-        HasDirectory("lib/net462").WithFile("nunit.extensibility.api.dll"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.dll")
-    },
-    symbols: new PackageCheck[] {
-        HasDirectory("lib/net462").WithFile("nunit.extensibility.api.pdb"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
-    });
-
-PackageDefinition NUnitCommonPackage = new PackageDefinition(
-    PackageType.NuGet,
-    id: "NUnit.Common",
-    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.common/nunit.common.csproj",
-    checks: new PackageCheck[]
-    {
-        HasFile("LICENSE.txt"),
-        HasDirectory("lib/net462").WithFile("nunit.common.dll"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.common.dll"),
-        HasDependency("NUnit.Engine.Api")
-    },
-    symbols: new PackageCheck[]
-    {
-        HasDirectory("lib/net462").WithFile("nunit.common.pdb"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.common.pdb"),
-    });
-
 // Add all packages to BuildSettings in order they should be build.
 // Dependencies must precede all the packages that depend on them.
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
-    NUnitEngineApiPackage,
     NUnitExtensibilityApiPackage,
+    NUnitEngineApiPackage,
     NUnitCommonPackage,
     NUnitEnginePackage,
     NUnitConsoleRunnerNuGetPackage,
