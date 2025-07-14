@@ -19,7 +19,8 @@
 
   <PropertyGroup>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>dotnet-nunit</ToolCommandName>
+    <PackageType>DotnetTool</PackageType>
+    <ToolCommandName>NUnit</ToolCommandName>
     <PackageId>NUnit.ConsoleRunner.NetCore</PackageId>
     <Title>NUnit Console Runner (.NET Core)</Title>
     <Authors>Charlie Poole, Rob Prouse,</Authors>
