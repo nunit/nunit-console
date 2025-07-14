@@ -59,6 +59,22 @@ PackageDefinition NUnitCommonPackage = new PackageDefinition(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.common.pdb"),
     });
 
+PackageDefinition NUnitExtensibilityPackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Extensibility",
+    source: BuildSettings.SourceDirectory + "NUnitCommmon/nunit.extensibility/nunit.extensibility.csproj",
+    checks: new PackageCheck[]
+    {
+        HasFile("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.extensibility.dll"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.dll")
+    },
+    symbols: new PackageCheck[]
+    {
+        HasDirectory("lib/net462").WithFile("nunit.extensibility.pdb"),
+        HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.pdb")
+    });
+
 PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.Agent.Core",
