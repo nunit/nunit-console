@@ -81,7 +81,7 @@ PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.agent.core/nunit.agent.core.csproj",
     checks: new PackageCheck[]
     {
-        HasFiles("LICENSE.txt"/*, "NOTICES.txt"*/),
+        HasFiles("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.agent.core.dll" ),
         HasDirectory("lib/net8.0").WithFiles("nunit.agent.core.dll")
     },
@@ -92,6 +92,26 @@ PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
     },
     testRunner: new DirectTestAgentRunner(),
     tests: AgentCoreTests);
+
+PackageDefinition NUnitEnginePackage = new PackageDefinition(
+    PackageType.NuGet,
+    id: "NUnit.Engine",
+    source: BuildSettings.SourceDirectory + "NUnitEngine/nunit.engine/nunit.engine.csproj",
+    checks: new PackageCheck[]
+    {
+        HasFiles("LICENSE.txt"),
+        HasDirectory("lib/net462").WithFile("nunit.engine.dll"),
+        HasDirectory("lib/net8.0").WithFile("nunit.engine.dll")
+    },
+    symbols: new PackageCheck[]
+    {
+        HasDirectory("lib/net462").WithFile("nunit.engine.pdb"),
+        HasDirectory("lib/net8.0").WithFile("nunit.engine.pdb")
+    });
+// TODO: Revise AgentSelector and reinstate tests
+//testRunner: new AgentSelector(
+//    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
+//tests: EngineTests),
 
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
@@ -155,30 +175,6 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
         + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
-
-PackageDefinition NUnitEnginePackage = new PackageDefinition(
-    PackageType.NuGet,
-    id: "NUnit.Engine",
-    source: BuildSettings.NuGetDirectory + "engine/nunit.engine.nuspec",
-    checks: new PackageCheck[] {
-        HasFiles("LICENSE.txt", "NOTICES.txt"),
-        HasDirectory("lib/net462").WithFiles(
-            "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-        HasDirectory("lib/net8.0").WithFiles(
-            "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll", "Microsoft.Extensions.DependencyModel.dll") },
-    symbols: new PackageCheck[] {
-        HasDirectory("lib/net462").WithFiles(
-            "nunit.engine.pdb", "nunit.extensibility.pdb",
-            "nunit.extensibility.api.pdb", "nunit.engine.api.pdb"),
-        HasDirectory("lib/net8.0").WithFiles(
-            "nunit.engine.pdb","nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-            "nunit.common.pdb", "nunit.engine.api.pdb") });
-// TODO: Revise AgentSelector and reinstate tests
-//testRunner: new AgentSelector(
-//    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
-//tests: EngineTests),
 
 // Add all packages to BuildSettings in order they should be build.
 // Dependencies must precede all the packages that depend on them.
