@@ -62,7 +62,7 @@ PackageDefinition NUnitCommonPackage = new PackageDefinition(
 PackageDefinition NUnitExtensibilityPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.Extensibility",
-    source: BuildSettings.SourceDirectory + "NUnitCommmon/nunit.extensibility/nunit.extensibility.csproj",
+    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility/nunit.extensibility.csproj",
     checks: new PackageCheck[]
     {
         HasFile("LICENSE.txt"),
@@ -186,6 +186,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityApiPackage,
     NUnitEngineApiPackage,
     NUnitCommonPackage,
+    NUnitExtensibilityPackage,
     NUnitAgentCorePackage,
     NUnitEnginePackage,
     NUnitConsoleRunnerNuGetPackage,
