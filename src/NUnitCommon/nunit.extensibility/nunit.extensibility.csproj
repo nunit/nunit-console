@@ -6,6 +6,11 @@
     <NoWarn>$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>NUnit.Extensibility</PackageId>
+    <Description>Contains implementation of the NUnit extensibility model.</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="TestCentric.Metadata" Version="3.0.3" />
   </ItemGroup>
