@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <PackageId>NUnit.Engine.Api</PackageId>
     <AssemblyTitle>NUnit Engine API ($(TargetFramework))</AssemblyTitle>
     <Description>Defines the interfaces used by runners and engine extensions to access the NUnit Engine. Not normally needed by direct users who simply want to run tests.</Description>
   </PropertyGroup>

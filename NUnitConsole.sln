@@ -60,9 +60,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runners", "runners", "{F3E8
 	ProjectSection(SolutionItems) = preProject
 		nuget\runners\DotnetToolSettings.xml = nuget\runners\DotnetToolSettings.xml
 		nuget\runners\nunit.console-runner-with-extensions.nuspec = nuget\runners\nunit.console-runner-with-extensions.nuspec
-		nuget\runners\nunit.console-runner.netcore.nuspec = nuget\runners\nunit.console-runner.netcore.nuspec
 		nuget\runners\nunit.console-runner.nuspec = nuget\runners\nunit.console-runner.nuspec
-		nuget\runners\nunit.console.nuget.addins = nuget\runners\nunit.console.nuget.addins
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\TestData\mock-assembly\mock-assembly.csproj", "{D2C80E4B-1117-4F02-AB02-E453BDA0C58E}"

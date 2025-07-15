@@ -125,6 +125,25 @@ PackageDefinition NUnitEnginePackage = new PackageDefinition(
 //    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
 //tests: EngineTests),
 
+PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
+    PackageType.Tool,
+    id: "NUnit.ConsoleRunner.NetCore",
+    source: BuildSettings.SourceDirectory + "NUnitConsole/nunit4-netcore-console/nunit4-netcore-console.csproj",
+    checks: new PackageCheck[]
+    {
+        HasFiles("nunit.exe"),
+        HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
+            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
+            "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll",
+            "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
+            "Microsoft.Extensions.DependencyModel.dll")
+    },
+    testRunner: new ConsoleRunnerSelfTester(BuildSettings.PackageTestDirectory + "nunit.exe"),
+    tests: NetCoreRunnerTests);
+
+// NOTE: The final three packages continue to use a nuspec file for various reasons
+
+// 1. NUnit.ConsoleRunner needs to use it to specify the bundled pluggable agents
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.ConsoleRunner",
@@ -148,29 +167,14 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
-// NOTE: Must follow ConsoleRunner, upon which it depends
+// 2. NUnit.Console is a meta-package
 PackageDefinition NUnitConsoleNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.Console",
     source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
     checks: new PackageCheck[] { HasFile("LICENSE.txt") });
 
-PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
-    PackageType.Tool,
-    id: "NUnit.ConsoleRunner.NetCore",
-    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.netcore.nuspec",
-    checks: new PackageCheck[]
-    {
-        HasFiles("nunit.exe"),
-        HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
-            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-            "nunit.engine.dll", "nunit.agent.core.dll", "nunit.extensibility.dll",
-            "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
-            "Microsoft.Extensions.DependencyModel.dll")
-    },
-    testRunner: new ConsoleRunnerSelfTester(BuildSettings.PackageTestDirectory + "nunit.exe"),
-    tests: NetCoreRunnerTests);
-
+// 3. The chocolatey console runner has to follow special chocolatey conventions
 PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
     PackageType.Chocolatey,
     id: "nunit-console-runner",
@@ -197,8 +201,8 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityPackage,
     NUnitAgentCorePackage,
     NUnitEnginePackage,
-    NUnitConsoleRunnerNuGetPackage,
     NUnitConsoleRunnerDotNetToolPackage,
+    NUnitConsoleRunnerNuGetPackage,
     NUnitConsoleRunnerChocolateyPackage,
     NUnitConsoleNuGetPackage
 });
