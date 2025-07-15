@@ -141,6 +141,9 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.PackageTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);
 
+// NOTE: The final three packages continue to use a nuspec file for various reasons
+
+// 1. NUnit.ConsoleRunner needs to use it to specify the bundled pluggable agents
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.ConsoleRunner",
@@ -164,13 +167,14 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
-// NOTE: Must follow ConsoleRunner, upon which it depends
+// 2. NUnit.Console is a meta-package
 PackageDefinition NUnitConsoleNuGetPackage = new PackageDefinition(
     PackageType.NuGet,
     id: "NUnit.Console",
     source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
     checks: new PackageCheck[] { HasFile("LICENSE.txt") });
 
+// 3. The chocolatey console runner has to follow special chocolatey conventions
 PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
     PackageType.Chocolatey,
     id: "nunit-console-runner",
