@@ -1,8 +1,11 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections;
+using System.IO;
 using NUnit.Common;
 using NUnit.Engine.Runners;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Services
 {
@@ -50,33 +53,52 @@ namespace NUnit.Engine.Services
             if (ServiceContext is null)
                 throw new InvalidOperationException("ServiceContext not set.");
 
-            if (package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName).StartsWith("Unmanaged,"))
-                return new UnmanagedExecutableTestRunner(package.FullName ?? "Package Suite");
-
-            // Any package without subpackages is either an assembly or unknown.
-            // If it's unknown, that will be found out we try to load it.
-            var assemblyPackages = package.Select(p => !p.HasSubPackages());
+            // First get subRunners for each leaf package, i.e. any package without
+            // subpackages, which will either be assemblies or unknown file types.
+            var leafPackages = package.Select(p => !p.HasSubPackages());
 
 #if NETFRAMEWORK
-            if (assemblyPackages.Count > 1)
-                return new MultipleTestProcessRunner(ServiceContext, package);
-            else
-                return new ProcessRunner(ServiceContext, package);
-#else
             // TODO: Currently, the .NET Core runner doesn't support multiple assemblies.
             // We therefore only properly deal with the situation where a single assembly
             // package is provided. This could change. :-)
-            // Zero case included but should never occur
+            if (leafPackages.Count > 1)
+                return new AggregatingTestRunner(ServiceContext, package);
+#endif
+            // Find a runner for the first or only leaf package
+            package = leafPackages[0];
 
-            switch (assemblyPackages.Count)
+            string assemblyPath = package.FullName.ShouldNotBeNull();
+
+            if (!File.Exists(assemblyPath))
+                return new InvalidAssemblyTestRunner(assemblyPath, $"File not found: {assemblyPath}");
+            if (!PathUtils.IsAssemblyFileType(assemblyPath))
+                return new InvalidAssemblyTestRunner(assemblyPath, $"Not a valid assembly: {assemblyPath}");
+
+            string targetFrameworkName = package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+            if (!string.IsNullOrEmpty(targetFrameworkName))
             {
-                case 1:
-                    return new LocalTestRunner(assemblyPackages[0]);
-                case 0:
-                    return new LocalTestRunner(package);
-                default:
-                    throw new InvalidOperationException("Multi-assembly packages are not supported under .NET Core");
+                string platform = targetFrameworkName.Split(',')[0];
+                if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
+                    return new InvalidAssemblyTestRunner(assemblyPath, $"Platform {platform} is not supported");
+
+                if (platform == "Unmanaged")
+                    return new UnmanagedExecutableTestRunner(assemblyPath);
             }
+
+            bool skipNonTestAssemblies = package.Settings.GetValueOrDefault(SettingDefinitions.SkipNonTestAssemblies);
+            if (skipNonTestAssemblies)
+                // TODO: It would be better to capture this when we first examine the assembly image
+                using (var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath))
+                {
+                    foreach (var attr in assemblyDef.CustomAttributes)
+                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
+                            return new SkippedAssemblyTestRunner(assemblyPath);
+                }
+
+#if NETFRAMEWORK
+            return new ProcessRunner(ServiceContext, package);
+#else
+            return new LocalTestRunner(package);
 #endif
         }
     }

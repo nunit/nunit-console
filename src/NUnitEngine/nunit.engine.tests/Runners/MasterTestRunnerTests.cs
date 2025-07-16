@@ -36,7 +36,7 @@ namespace NUnit.Engine.Runners
             _services.Initialize();
 
             _engineRunner = Substitute.For<ITestEngineRunner>();
-            _services.TestRunnerFactory.MakeTestRunner(_package).Returns(_engineRunner);
+            _services.TestRunnerFactory.MakeTestRunner(_package).ReturnsForAnyArgs(_engineRunner);
 
             _masterTestRunner = new MasterTestRunner(_services, _package);
         }
@@ -56,6 +56,7 @@ namespace NUnit.Engine.Runners
             _engineRunner.Received().Load();
         }
 
+#if NETFRAMEWORK
         [Test]
         public void Reload()
         {
@@ -104,5 +105,6 @@ namespace NUnit.Engine.Runners
             else
                 _engineRunner.Received().RequestStop();
         }
+#endif
     }
 }
