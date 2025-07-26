@@ -102,6 +102,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "windows-test", "src\TestData\windows-test\windows-test.csproj", "{5BD1B0BA-6DD3-4619-B5E0-4FFF19F941C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{B25157A1-B3CD-40FB-89F2-A7206C0B553A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{9375E2BF-5AF9-4773-A5D1-EA16D9006940}"
 	ProjectSection(SolutionItems) = preProject
@@ -157,7 +160,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C3D1ADBF-7497-4725-8AE4-6B4693F68622}"
 	ProjectSection(SolutionItems) = preProject
 		cake\build-settings.cake = cake\build-settings.cake
-		cake\commandline-options.cake = cake\commandline-options.cake
 		cake\execution.cake = cake\execution.cake
 		cake\package-definition.cake = cake\package-definition.cake
 		cake\package-tests.cake = cake\package-tests.cake
@@ -165,10 +167,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C3D1ADBF-7
 		cake\publishing.cake = cake\publishing.cake
 		cake\reporting.cake = cake\reporting.cake
 		cake\targets.cake = cake\targets.cake
-		cake\test-results.cake = cake\test-results.cake
 		cake\testing.cake = cake\testing.cake
 		cake\utilities.cake = cake\utilities.cake
-		cake\versioning.cake = cake\versioning.cake
 	EndProjectSection
 EndProject
 Global
