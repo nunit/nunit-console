@@ -23,8 +23,8 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             _services.Add(new ExtensionService());
             var projectService = new FakeProjectService();
             ((IService)projectService).StartService();
-            projectService.Add("xy.nunit", "x.dll", "y.dll");
-            projectService.Add("z.nunit", "z.dll");
+            projectService.Add("mock2.nunit", "testdata/net462/mock-assembly.dll", "testdata/net462/mock-assembly.dll");
+            projectService.Add("mock1.nunit", "testdata/net462/mock-assembly.dll");
             _services.Add(projectService);
             Assert.That(((IService)projectService).Status, Is.EqualTo(ServiceStatus.Started));
             _factory = new TestRunnerFactory();

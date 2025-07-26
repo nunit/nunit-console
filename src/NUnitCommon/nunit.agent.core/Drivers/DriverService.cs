@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using NUnit.Common;
 using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 using TestCentric.Metadata;
 
 namespace NUnit.Engine.Drivers
@@ -24,23 +25,23 @@ namespace NUnit.Engine.Drivers
 
         public DriverService()
         {
+            _factories.Add(new NUnit3DriverFactory());
+
 #if NETFRAMEWORK // TODO: Restore extensibility to .NET 8.0 build
-            //var thisAssembly = Assembly.GetExecutingAssembly();
-            //var extensionManager = new ExtensionManager();
+            var thisAssembly = Assembly.GetExecutingAssembly();
+            var extensionManager = new ExtensionManager();
 
-            //extensionManager.FindExtensionPoints(thisAssembly);
-            //extensionManager.FindExtensionAssemblies(thisAssembly);
+            extensionManager.FindExtensionPoints(thisAssembly);
+            extensionManager.FindExtensionAssemblies(thisAssembly);
 
-            //foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
-            //    _factories.Add(factory);
+            foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
+                _factories.Add(factory);
 
-            //// HACK
-            //var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver") as ExtensionNode;
-            //if (node != null)
-            //    _factories.Add(new NUnit2DriverFactory(node));
+            var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
+            if (node is not null)
+                _factories.Add(new NUnit2DriverFactory(node));
 #endif
 
-            _factories.Add(new NUnit3DriverFactory());
         }
 
         /// <summary>
@@ -52,69 +53,45 @@ namespace NUnit.Engine.Drivers
         /// <param name="skipNonTestAssemblies">True if non-test assemblies should simply be skipped rather than reporting an error</param>
         public IFrameworkDriver GetDriver(AppDomain domain, TestPackage package, string assemblyPath, string? targetFramework, bool skipNonTestAssemblies)
         {
-            if (!File.Exists(assemblyPath))
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, "File not found: " + assemblyPath);
+            string InternalErrorMessage(string message) =>
+                $"Internal Error: {message} {assemblyPath}";
 
-            if (!PathUtils.IsAssemblyFileType(assemblyPath))
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, "File type is not supported");
+            Guard.ArgumentValid(File.Exists(assemblyPath), InternalErrorMessage("File not found"), nameof(assemblyPath));
+            Guard.ArgumentValid(PathUtils.IsAssemblyFileType(assemblyPath), InternalErrorMessage("Not an assembly type"), nameof(assemblyPath));
 
-            if (targetFramework is not null)
-            {
-                // This takes care of an issue with Roslyn. It may get fixed, but we still
-                // have to deal with assemblies having this setting. I'm assuming that
-                // any true Portable assembly would have a Profile as part of its name.
-                var platform = targetFramework == ".NETPortable,Version=v5.0"
-                    ? ".NETStandard"
-                    : targetFramework.Split(CommaSeparator)[0];
-
-                if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
-                    if (skipNonTestAssemblies)
-                        return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
-                    else
-                        return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, platform +
-                            " test assemblies are not supported by this version of the engine");
-            }
             log.Debug("Looking for a driver");
-            try
+            using (var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath))
             {
-                using (var assemblyDef = AssemblyDefinition.ReadAssembly(assemblyPath))
+                if (skipNonTestAssemblies)
                 {
-                    if (skipNonTestAssemblies)
-                    {
-                        foreach (var attr in assemblyDef.CustomAttributes)
-                            if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
-                                return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
-                    }
+                    // TODO: We should not get here since the engine should have eliminated any
+                    // such assemblies. Double-check for now but remove before the next release.
+                    foreach (var attr in assemblyDef.CustomAttributes)
+                        if (attr.AttributeType.FullName == "NUnit.Framework.NonTestAssemblyAttribute")
+                            throw new InvalidOperationException(InternalErrorMessage("Assembly should have been skipped"));
+                }
 
-                    foreach (var factory in _factories)
-                    {
-                        log.Debug($"Trying {factory.GetType().Name}");
+                foreach (var factory in _factories)
+                {
+                    log.Debug($"Trying {factory.GetType().Name}");
 
-                        foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
+                    foreach (var cecilRef in assemblyDef.MainModule.AssemblyReferences)
+                    {
+                        var assemblyName = new AssemblyName(cecilRef.FullName);
+                        if (factory.IsSupportedTestFramework(assemblyName))
                         {
-                            var assemblyName = new AssemblyName(cecilRef.FullName);
-                            if (factory.IsSupportedTestFramework(assemblyName))
-                            {
 #if NETFRAMEWORK
-                                return factory.GetDriver(domain, package.ID, assemblyName);
+                            return factory.GetDriver(domain, package.ID, assemblyName);
 #else
-                                return factory.GetDriver(package.ID, assemblyName);
+                            return factory.GetDriver(package.ID, assemblyName);
 #endif
-                            }
                         }
                     }
                 }
             }
-            catch (BadImageFormatException ex)
-            {
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID, ex.Message);
-            }
 
-            if (skipNonTestAssemblies)
-                return new SkippedAssemblyFrameworkDriver(assemblyPath, package.ID);
-            else
-                return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID,
-                    $"No suitable tests found in '{assemblyPath}'.\r\nEither assembly contains no tests or proper test driver has not been found.");
+            return new InvalidAssemblyFrameworkDriver(assemblyPath, package.ID,
+                $"No suitable test driver has not been found for {assemblyPath}");
         }
     }
 }

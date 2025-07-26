@@ -505,6 +505,8 @@ namespace NUnit.ConsoleRunner
 #if DEBUG
             if (options.DebugAgent)
                 package.AddSetting(SettingDefinitions.DebugAgent.WithValue(true));
+            if (options.DebugConsole)
+                package.AddSetting(SettingDefinitions.DebugConsole.WithValue(true));
 
             //foreach (KeyValuePair<string, object> entry in package.Settings)
             //    if (!(entry.Value is string || entry.Value is int || entry.Value is bool))

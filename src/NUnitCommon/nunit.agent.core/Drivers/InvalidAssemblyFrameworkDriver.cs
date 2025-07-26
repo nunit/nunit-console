@@ -3,29 +3,28 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using NUnit.Common;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Drivers
 {
-    public abstract class NotRunnableFrameworkDriver : IFrameworkDriver
+    public sealed class InvalidAssemblyFrameworkDriver : IFrameworkDriver
     {
         private readonly string _name;
         private readonly string _fullname;
         private readonly string _message;
         private readonly string _type;
 
-        protected string _runstate;
-        protected string _result;
-        protected string _label;
+        private const string RUNSTATE = "NotRunnable";
+        private const string RESULT = "FAILED";
+        private const string LABEL = "INVALID";
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public NotRunnableFrameworkDriver(string assemblyPath, string id, string message)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        public InvalidAssemblyFrameworkDriver(string assemblyPath, string id, string message)
         {
             _name = Escape(Path.GetFileName(assemblyPath));
             _fullname = Escape(Path.GetFullPath(assemblyPath));
             _message = Escape(message);
-            _type = new List<string> { ".dll", ".exe" }.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
+            _type = PathUtils.IsAssemblyFileType(assemblyPath) ? "Assembly" : "Unknown";
             ID = id;
         }
 
@@ -71,14 +70,14 @@ namespace NUnit.Engine.Drivers
         }
 
         private string GetLoadResult() =>
-            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}'>" +
+            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{RUNSTATE}'>" +
                 "<properties>" +
                     $"<property name='_SKIPREASON' value='{_message}'/>" +
                 "</properties>" +
             "</test-suite>";
 
         private string GetRunResult() =>
-            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{_runstate}' result='{_result}' label='{_label}'>" +
+            $"<test-suite type='{_type}' id='{TestID}' name='{_name}' fullname='{_fullname}' testcasecount='0' runstate='{RUNSTATE}' result='{RESULT}' label='{LABEL}'>" +
                 "<properties>" +
                     $"<property name='_SKIPREASON' value='{_message}'/>" +
                 "</properties>" +
@@ -88,27 +87,5 @@ namespace NUnit.Engine.Drivers
             "</test-suite>";
 
         private string TestID => ID + "-1";
-    }
-
-    public class InvalidAssemblyFrameworkDriver : NotRunnableFrameworkDriver
-    {
-        public InvalidAssemblyFrameworkDriver(string assemblyPath, string id, string message)
-            : base(assemblyPath, id, message)
-        {
-            _runstate = "NotRunnable";
-            _result = "Failed";
-            _label = "Invalid";
-        }
-    }
-
-    public class SkippedAssemblyFrameworkDriver : NotRunnableFrameworkDriver
-    {
-        public SkippedAssemblyFrameworkDriver(string assemblyPath, string id)
-            : base(assemblyPath, id, "Skipping non-test assembly")
-        {
-            _runstate = "Runnable";
-            _result = "Skipped";
-            _label = "NoTests";
-        }
     }
 }

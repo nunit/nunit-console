@@ -15,13 +15,11 @@ namespace NUnit.Engine.Drivers
         private readonly IExtensionNode _driverNode;
 
         // TODO: This should be a central service but for now it's local
-        private readonly ProvidedPathsAssemblyResolver _resolver;
-        private bool _resolverInstalled;
+        private ProvidedPathsAssemblyResolver? _resolver;
 
         public NUnit2DriverFactory(IExtensionNode driverNode)
         {
             _driverNode = driverNode;
-            _resolver = new ProvidedPathsAssemblyResolver();
         }
 
         /// <summary>
@@ -46,10 +44,10 @@ namespace NUnit.Engine.Drivers
             if (!IsSupportedTestFramework(reference))
                 throw new ArgumentException("Invalid framework", nameof(reference));
 
-            if (!_resolverInstalled)
+            if (_resolver is null)
             {
+                _resolver = new ProvidedPathsAssemblyResolver();
                 _resolver.Install();
-                _resolverInstalled = true;
                 _resolver.AddPathFromFile(_driverNode.AssemblyPath);
             }
 

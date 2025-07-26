@@ -74,7 +74,6 @@ namespace NUnit.Engine.Runners
             EnsurePackagesAreExpanded(package);
 
             TestPackage = package;
-            TestPackages = package.Select(p => !p.HasSubPackages());
 
             // Last chance to catch invalid settings in package,
             // in case the client runner missed them.
@@ -85,12 +84,6 @@ namespace NUnit.Engine.Runners
         /// The Top-level TestPackage for which this is the runner.
         /// </summary>
         protected TestPackage TestPackage { get; }
-
-        /// <summary>
-        /// A list of all leaf packages, i.e. packages contained
-        /// under the top-level package, which have no subpackages.
-        /// </summary>
-        protected IList<TestPackage> TestPackages { get; }
 
         /// <summary>
         /// The result of the last call to LoadPackage
@@ -263,13 +256,14 @@ namespace NUnit.Engine.Runners
         {
             if (_engineRunner is null)
             {
+                var leafPackages = TestPackage.Select(p => !p.HasSubPackages());
+
+#if NETFRAMEWORK
                 // Analyze each TestPackage, adding settings that describe
                 // each contained assembly, including it's target runtime.
-#if NETFRAMEWORK
-                foreach (var assemblyPackage in TestPackages)
+                foreach (var assemblyPackage in leafPackages)
                     _runtimeService.SelectRuntimeFramework(assemblyPackage);
 #endif
-
                 _engineRunner = _testRunnerFactory.MakeTestRunner(TestPackage);
             }
 
