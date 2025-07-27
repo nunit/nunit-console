@@ -103,7 +103,7 @@ namespace NUnit.Extensibility
                 foreach (ExtensionPointAttribute attr in assembly.GetCustomAttributes(typeof(ExtensionPointAttribute), false))
                 {
                     if (_extensionPointIndex.ContainsKey(attr.Path))
-                        throw new NUnitExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
+                        throw new ExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
 
                     var ep = new ExtensionPoint(attr.Path, attr.Type)
                     {
@@ -123,7 +123,7 @@ namespace NUnit.Extensibility
                         string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
 
                         if (_extensionPointIndex.ContainsKey(path))
-                            throw new NUnitExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
+                            throw new ExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
 
                         var ep = new ExtensionPoint(path, type)
                         {
@@ -535,7 +535,7 @@ namespace NUnit.Extensibility
                 {
                     ep = DeduceExtensionPointFromType(extensionType);
                     if (ep is null)
-                        throw new NUnitExtensibilityException($"Unable to deduce ExtensionPoint for Type {extensionType.FullName}. Specify Path on ExtensionAttribute to resolve.");
+                        throw new ExtensibilityException($"Unable to deduce ExtensionPoint for Type {extensionType.FullName}. Specify Path on ExtensionAttribute to resolve.");
 
                     node.Path = ep.Path;
                 }
@@ -546,7 +546,7 @@ namespace NUnit.Extensibility
                     // TODO: Remove need for the cast
                     ep = GetExtensionPoint(node.Path) as ExtensionPoint;
                     if (ep is null)
-                        throw new NUnitExtensibilityException($"Unable to locate ExtensionPoint for Type {extensionType.FullName}. The Path {node.Path} cannot be found.");
+                        throw new ExtensibilityException($"Unable to locate ExtensionPoint for Type {extensionType.FullName}. The Path {node.Path} cannot be found.");
                 }
 
                 ep.Install(node);

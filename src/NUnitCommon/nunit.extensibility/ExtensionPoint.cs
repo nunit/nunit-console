@@ -64,7 +64,7 @@ namespace NUnit.Extensibility
         public void Install(ExtensionNode node)
         {
             if (node.Path != Path)
-                throw new NUnitExtensibilityException($"Non-matching extension path. Expected {Path} but got {node.Path}.");
+                throw new ExtensibilityException($"Non-matching extension path. Expected {Path} but got {node.Path}.");
 
             // TODO: Verify that the type is correct using Cecil or Reflection
             // depending on whether the assembly is pre-loaded. For now, it's not
