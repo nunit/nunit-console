@@ -11,6 +11,7 @@ using System.Collections.Generic;
 
 namespace NUnit.Extensibility
 {
+    [TestFixture("/NUnit/Engine/TypeExtensions/")]
     public class ExtensionManagerTests
     {
         private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionManagerTests).Assembly;
@@ -20,30 +21,6 @@ namespace NUnit.Extensibility
             Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2");
         private static readonly string FAKE_EXTENSIONS_SOURCE_DIRECTORY =
             Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.Parent!.Parent!.FullName, "src/TestData/FakeExtensions");
-
-        private static readonly string[] KnownExtensionPointPaths =
-        {
-            "/NUnit/Engine/TypeExtensions/IAgentLauncher",
-            "/NUnit/Engine/TypeExtensions/IDriverFactory",
-            "/NUnit/Engine/TypeExtensions/IProjectLoader",
-            "/NUnit/Engine/TypeExtensions/IResultWriter",
-            "/NUnit/Engine/TypeExtensions/ITestEventListener",
-            "/NUnit/Engine/TypeExtensions/IService",
-            "/NUnit/Engine/NUnitV2Driver"
-        };
-
-        private static readonly Type[] KnownExtensionPointTypes =
-        {
-            typeof(IAgentLauncher),
-            typeof(IDriverFactory),
-            typeof(IProjectLoader),
-            typeof(IResultWriter),
-            typeof(ITestEventListener),
-            typeof(IService),
-            typeof(IFrameworkDriver)
-        };
-
-        private static readonly int[] KnownExtensionPointCounts = { 1, 1, 1, 1, 2, 1, 0 };
 
         private const string FAKE_AGENT_LAUNCHER_EXTENSION = "NUnit.Engine.Fakes.FakeAgentLauncherExtension";
         private const string FAKE_FRAMEWORK_DRIVER_EXTENSION = "NUnit.Engine.Fakes.FakeFrameworkDriverExtension";
@@ -67,11 +44,50 @@ namespace NUnit.Extensibility
         };
 
         private ExtensionManager _extensionManager;
+        private static string? _defaultTestExtensionPath;
+
+        private string[] _expectedExtensionPointPaths;
+        private Type[] _expectedExtensionPointTypes;
+        private int[] _expectedExtensionCounts;
+
+        public ExtensionManagerTests(string defaultTestExtensionPath)
+        {
+            Guard.ArgumentValid(
+                defaultTestExtensionPath.StartsWith('/') && defaultTestExtensionPath.EndsWith('/'),
+                "Path must start and end with '/'", nameof(defaultTestExtensionPath));
+
+            _defaultTestExtensionPath = defaultTestExtensionPath;
+            var prefix = defaultTestExtensionPath ?? "/NUnit/Extensibility/TypeExtensions/";
+
+            _expectedExtensionPointPaths =
+            [
+                prefix + "IAgentLauncher",
+                prefix + "IDriverFactory",
+                prefix + "IProjectLoader",
+                prefix + "IResultWriter",
+                prefix + "ITestEventListener",
+                prefix + "IService",
+                "/NUnit/Engine/NUnitV2Driver"
+            ];
+
+            _expectedExtensionPointTypes =
+            [
+                typeof(IAgentLauncher),
+                typeof(IDriverFactory),
+                typeof(IProjectLoader),
+                typeof(IResultWriter),
+                typeof(ITestEventListener),
+                typeof(IService),
+                typeof(IFrameworkDriver)
+            ];
+
+            _expectedExtensionCounts = [1, 1, 1, 1, 2, 1, 0];
+        }
 
         [SetUp]
         public void CreateExtensionManager()
         {
-            _extensionManager = new ExtensionManager();
+            _extensionManager = new ExtensionManager(_defaultTestExtensionPath);
 
             // Find actual extension points.
             _extensionManager.FindExtensionPoints(typeof(ExtensionManager).Assembly);
@@ -86,7 +102,7 @@ namespace NUnit.Extensibility
         public void AllKnownExtensionPointsAreFound()
         {
             Assert.That(_extensionManager.ExtensionPoints.Select(ep => ep.Path),
-                Is.EquivalentTo(KnownExtensionPointPaths));
+                Is.EquivalentTo(_expectedExtensionPointPaths));
         }
 
         [Test]
@@ -115,37 +131,45 @@ namespace NUnit.Extensibility
             }
         }
 
-        [Test, Sequential]
-        public void CanGetExtensionPointByPath(
-            [ValueSource(nameof(KnownExtensionPointPaths))] string path,
-            [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
+        [Test]
+        public void CanGetExtensionPointsByPath()
         {
-            var ep = _extensionManager.GetExtensionPoint(path);
-            Assert.That(ep, Is.Not.Null);
-            Assert.That(ep.Path, Is.EqualTo(path));
-            Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
+            for (int i = 0; i < _expectedExtensionPointPaths.Length; i++)
+            {
+                var path = _expectedExtensionPointPaths[i];
+                var type = _expectedExtensionPointTypes[i];
+                var ep = _extensionManager.GetExtensionPoint(path);
+                Assert.That(ep, Is.Not.Null);
+                Assert.That(ep.Path, Is.EqualTo(path));
+                Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
+            }
         }
 
-        [Test, Sequential]
-        public void CanGetExtensionPointByType(
-            [ValueSource(nameof(KnownExtensionPointPaths))] string path,
-            [ValueSource(nameof(KnownExtensionPointTypes))] Type type)
+        [Test]
+        public void CanGetExtensionPointByType()
         {
-            var ep = _extensionManager.GetExtensionPoint(type);
-            Assert.That(ep, Is.Not.Null);
-            Assert.That(ep.Path, Is.EqualTo(path));
-            Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
+            for (int i = 0; i < _expectedExtensionPointPaths.Length; i++)
+            {
+                var path = _expectedExtensionPointPaths[i];
+                var type = _expectedExtensionPointTypes[i];
+                var ep = _extensionManager.GetExtensionPoint(type);
+                Assert.That(ep, Is.Not.Null);
+                Assert.That(ep.Path, Is.EqualTo(path));
+                Assert.That(ep.TypeName, Is.EqualTo(type.FullName));
+            }
         }
 
-        [Test, Sequential]
-        public void ExtensionsAreAddedToExtensionPoint(
-            [ValueSource(nameof(KnownExtensionPointPaths))] string path,
-            [ValueSource(nameof(KnownExtensionPointCounts))] int extensionCount)
+        [Test]
+        public void ExtensionsAreAddedToExtensionPoint()
         {
-            var ep = _extensionManager.GetExtensionPoint(path);
-            Assume.That(ep, Is.Not.Null);
-
-            Assert.That(ep.Extensions.Count, Is.EqualTo(extensionCount));
+            for (int i = 0; i < _expectedExtensionPointPaths.Length; i++)
+            {
+                var path = _expectedExtensionPointPaths[i];
+                var extensionCount = _expectedExtensionCounts[i];
+                var ep = _extensionManager.GetExtensionPoint(path);
+                Assume.That(ep, Is.Not.Null);
+                Assert.That(ep.Extensions.Count, Is.EqualTo(extensionCount));
+            }
         }
 
         [Test]

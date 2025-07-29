@@ -29,7 +29,7 @@ namespace NUnit.Engine.Drivers
 
 #if NETFRAMEWORK // TODO: Restore extensibility to .NET 8.0 build
             var thisAssembly = Assembly.GetExecutingAssembly();
-            var extensionManager = new ExtensionManager();
+            var extensionManager = new ExtensionManager("/NUnit/Engine/TypeExtensions/");
 
             extensionManager.FindExtensionPoints(thisAssembly);
             extensionManager.FindExtensionAssemblies(thisAssembly);

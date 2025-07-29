@@ -22,6 +22,10 @@ namespace NUnit.Extensibility
     /// </remarks>
     public class ExtensionManager
     {
+        // Default path prefix for Type Extensions if the caller does not supply
+        // it as an argument to the constructor.
+        public const string DEFAULT_TYPE_EXTENSION_PATH = "/NUnit/Extensibility/TypeExtensions/";
+
         private static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
         private static readonly string EXTENSION_ATTRIBUTE = typeof(ExtensionAttribute).FullName.ShouldNotBeNull();
         private static readonly string EXTENSION_PROPERTY_ATTRIBUTE = typeof(ExtensionPropertyAttribute).FullName.ShouldNotBeNull();
@@ -30,6 +34,7 @@ namespace NUnit.Extensibility
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
+        private readonly string _typeExtensionPath;
         private readonly IFileSystem _fileSystem;
         private readonly IDirectoryFinder _directoryFinder;
 
@@ -52,18 +57,19 @@ namespace NUnit.Extensibility
         // used to ignore duplicate calls to FindExtensionAssemblies.
         private readonly List<string> _extensionDirectories = new List<string>();
 
-        public ExtensionManager()
-            : this(new FileSystem())
+        public ExtensionManager(string? typeExtensionPath = null)
+            : this(typeExtensionPath, new FileSystem())
         {
         }
 
-        public ExtensionManager(IFileSystem fileSystem)
-            : this(fileSystem, new DirectoryFinder(fileSystem))
+        public ExtensionManager(string? typeExtensionPath, IFileSystem fileSystem)
+            : this(typeExtensionPath, fileSystem, new DirectoryFinder(fileSystem))
         {
         }
 
-        public ExtensionManager(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        public ExtensionManager(string? typeExtensionPath, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
+            _typeExtensionPath = typeExtensionPath ?? DEFAULT_TYPE_EXTENSION_PATH;
             _fileSystem = fileSystem;
             _directoryFinder = directoryFinder;
         }
@@ -120,7 +126,7 @@ namespace NUnit.Extensibility
                 {
                     foreach (TypeExtensionPointAttribute attr in type.GetCustomAttributes(typeof(TypeExtensionPointAttribute), false))
                     {
-                        string path = attr.Path ?? "/NUnit/Engine/TypeExtensions/" + type.Name;
+                        string path = attr.Path ?? _typeExtensionPath + type.Name;
 
                         if (_extensionPointIndex.ContainsKey(path))
                             throw new ExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");

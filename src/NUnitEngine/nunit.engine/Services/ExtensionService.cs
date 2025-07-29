@@ -14,24 +14,26 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class ExtensionService : Service, IExtensionService
     {
+        private const string ENGINE_TYPE_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/";
+
         // The Extension Manager is available internally to allow direct
         // access to ExtensionPoints and ExtensionNodes.
         internal readonly ExtensionManager _extensionManager;
 
         public ExtensionService()
         {
-            _extensionManager = new ExtensionManager();
+            _extensionManager = new ExtensionManager(ENGINE_TYPE_EXTENSION_PATH);
         }
 
         internal ExtensionService(IFileSystem fileSystem)
             : this(fileSystem, new DirectoryFinder(fileSystem))
         {
-            _extensionManager = new ExtensionManager(fileSystem);
+            _extensionManager = new ExtensionManager(ENGINE_TYPE_EXTENSION_PATH, fileSystem);
         }
 
         internal ExtensionService(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _extensionManager = new ExtensionManager(fileSystem, directoryFinder);
+            _extensionManager = new ExtensionManager(ENGINE_TYPE_EXTENSION_PATH, fileSystem, directoryFinder);
         }
 
         #region IExtensionService Implementation
