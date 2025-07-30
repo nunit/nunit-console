@@ -8,6 +8,7 @@
 
   <PropertyGroup>
     <PackageId>NUnit.Extensibility.Api</PackageId>
+    <Title>NUnit Extensibility Api</Title>
     <Description>Contains the Types required for creating an NUnit extension of any kind.</Description>
   </PropertyGroup>
   

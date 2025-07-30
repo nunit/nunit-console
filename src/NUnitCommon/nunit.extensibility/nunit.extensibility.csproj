@@ -8,6 +8,7 @@
 
   <PropertyGroup>
     <PackageId>NUnit.Extensibility</PackageId>
+    <Title>NUnit Extensibility</Title>
     <Description>Contains implementation of the NUnit extensibility model.</Description>
   </PropertyGroup>
 
