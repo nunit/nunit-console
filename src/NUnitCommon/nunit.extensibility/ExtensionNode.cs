@@ -26,7 +26,6 @@ namespace NUnit.Extensibility
         /// <param name="assemblyPath">The path to the assembly where this extension is found.</param>
         /// <param name="assemblyVersion">The version of the extension assembly.</param>
         /// <param name="typeName">The full name of the Type of the extension object.</param>
-        ///// <param name="targetFramework">The target framework of the extension assembly.</param>
         public ExtensionNode(ExtensionAssembly extensionAssembly, TypeDefinition extensionType)
         {
             AssemblyPath = extensionAssembly.FilePath;
@@ -34,6 +33,8 @@ namespace NUnit.Extensibility
             TypeName = extensionType.FullName;
             Enabled = true; // By default
         }
+
+        #region IExtensionNode Implementation
 
         /// <summary>
         /// Gets the path to the assembly where the extension is defined.
@@ -106,20 +107,7 @@ namespace NUnit.Extensibility
             get
             {
                 if (_extensionObject is null)
-                {
-                    object obj = CreateExtensionObject();
-
-                    if (IsV3Extension)
-                    {
-                        log.Debug("Creating Wrapper for extension object");
-                        _extensionObject = ExtensionWrapper.Wrap(obj, Path);
-                    }
-                    else
-                    {
-                        log.Debug("No wrapper necessary for extension object");
-                        _extensionObject = obj;
-                    }
-                }
+                    _extensionObject = CreateExtensionObject();
 
                 return _extensionObject;
             }
@@ -131,14 +119,20 @@ namespace NUnit.Extensibility
         public object CreateExtensionObject(params object[] args)
         {
 #if NETFRAMEWORK
-            return AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(
+            object obj = AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(
                 AssemblyPath, TypeName, false, 0, null, args, null, null).ShouldNotBeNull();
 #else
             var assembly = Assembly.LoadFrom(AssemblyPath);
             var type = assembly.GetType(TypeName, throwOnError: true)!;
-            return Activator.CreateInstance(type, args)!;
+            object obj = Activator.CreateInstance(type, args)!;
 #endif
+
+            return IsV3Extension
+                ? ExtensionWrapper.Wrap(obj, Path)
+                : obj;
         }
+
+        #endregion
 
         public void AddProperty(string name, string val)
         {

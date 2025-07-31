@@ -7,6 +7,7 @@
 
   <PropertyGroup>
     <PackageId>NUnit.Agent.Core</PackageId>
+    <Title>Agent Core</Title>
     <Description>Contains Types used by agents.</Description>
   </PropertyGroup>
 

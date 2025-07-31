@@ -17,6 +17,15 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class DriverService : IDriverService
     {
+#if NETFRAMEWORK
+        private const string TYPE_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/";
+
+        private static readonly Assembly THIS_ASSEMBLY = typeof(DriverService).Assembly;
+        private static readonly bool RUNNING_UNDER_CHOCOLATEY =
+            System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(THIS_ASSEMBLY.Location)!, "VERIFICATION.txt"));
+        private static readonly string PACKAGE_PREFIX = RUNNING_UNDER_CHOCOLATEY ? "nunit-extension-" : "NUnit.Extension.";
+#endif
+
         private static readonly Logger log = InternalTrace.GetLogger("DriverService");
 
         private static readonly char[] CommaSeparator = [','];
@@ -28,11 +37,14 @@ namespace NUnit.Engine.Drivers
             _factories.Add(new NUnit3DriverFactory());
 
 #if NETFRAMEWORK // TODO: Restore extensibility to .NET 8.0 build
-            var thisAssembly = Assembly.GetExecutingAssembly();
-            var extensionManager = new ExtensionManager();
+            var extensionManager = new ExtensionManager()
+            {
+                TypeExtensionPath = TYPE_EXTENSION_PATH,
+                PackagePrefixes = [PACKAGE_PREFIX]
+            };
 
-            extensionManager.FindExtensionPoints(thisAssembly);
-            extensionManager.FindExtensionAssemblies(thisAssembly);
+            extensionManager.FindExtensionPoints(THIS_ASSEMBLY);
+            extensionManager.FindExtensionAssemblies(THIS_ASSEMBLY);
 
             foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
                 _factories.Add(factory);
@@ -41,7 +53,6 @@ namespace NUnit.Engine.Drivers
             if (node is not null)
                 _factories.Add(new NUnit2DriverFactory(node));
 #endif
-
         }
 
         /// <summary>
