@@ -22,6 +22,8 @@ namespace NUnit.Extensibility
     /// </remarks>
     public class ExtensionManager
     {
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
+
         // Default path prefix for Type Extensions if the caller does not supply
         // it as an argument to the constructor.
         public const string DEFAULT_TYPE_EXTENSION_PATH = "/NUnit/Extensibility/TypeExtensions/";
@@ -31,8 +33,6 @@ namespace NUnit.Extensibility
         private static readonly string EXTENSION_PROPERTY_ATTRIBUTE = typeof(ExtensionPropertyAttribute).FullName.ShouldNotBeNull();
         private static readonly string V3_EXTENSION_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionAttribute";
         private static readonly string V3_EXTENSION_PROPERTY_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionPropertyAttribute";
-
-        private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
         private readonly IFileSystem _fileSystem;
         private readonly IDirectoryFinder _directoryFinder;
@@ -72,10 +72,10 @@ namespace NUnit.Extensibility
             _directoryFinder = directoryFinder;
         }
 
-        #region Public Properties and Methods
-
         public string[] PackagePrefixes { get; set; } = ["NUnit.Extension."];
         public string TypeExtensionPath { get; set; } = DEFAULT_TYPE_EXTENSION_PATH;
+
+        #region Extension Points
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -83,19 +83,6 @@ namespace NUnit.Extensibility
         public IEnumerable<ExtensionPoint> ExtensionPoints
         {
             get { return _extensionPoints.ToArray(); }
-        }
-
-        /// <summary>
-        /// Gets an enumeration of all installed Extensions.
-        /// </summary>
-        public IEnumerable<ExtensionNode> Extensions
-        {
-            get
-            {
-                LoadExtensions();
-
-                return _extensions.ToArray();
-            }
         }
 
         /// <summary>
@@ -147,6 +134,83 @@ namespace NUnit.Extensibility
         }
 
         /// <summary>
+        /// Get an ExtensionPoint based on its unique identifying path.
+        /// </summary>
+        public ExtensionPoint? GetExtensionPoint(string path)
+        {
+            return _extensionPointIndex.TryGetValue(path, out ExtensionPoint? ep) ? ep : null;
+        }
+
+        /// <summary>
+        /// Get an ExtensionPoint based on the required Type for extensions.
+        /// </summary>
+        public ExtensionPoint? GetExtensionPoint(Type type)
+        {
+            foreach (var ep in _extensionPoints)
+                if (ep.TypeName == type.FullName)
+                    return ep;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get an ExtensionPoint based on a Cecil TypeReference.
+        /// </summary>
+        public ExtensionPoint? GetExtensionPoint(TypeReference type)
+        {
+            foreach (var ep in _extensionPoints)
+                if (ep.TypeName == type.FullName)
+                    return ep;
+
+            return null;
+        }
+
+        #endregion
+
+        #region Extensions
+
+        /// <summary>
+        /// Gets an enumeration of all installed Extensions.
+        /// </summary>
+        public IEnumerable<ExtensionNode> Extensions
+        {
+            get
+            {
+                LoadExtensions();
+
+                return _extensions.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Find ExtensionAssemblies for a host assembly using
+        /// a built-in algorithm that searches in certain known locations.
+        /// </summary>
+        /// <param name="hostAssembly">An assembly that supports NUnit extensions.</param>
+        public void FindExtensionAssemblies(Assembly hostAssembly)
+        {
+            log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
+
+            var extensionPatterns = new List<string>();
+            foreach (string prefix in PackagePrefixes)
+            {
+                extensionPatterns.Add($"{prefix}*/**/tools/");
+                extensionPatterns.Add($"{prefix}*/**/tools/*/");
+            }
+
+            IDirectory? startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
+
+            while (startDir is not null)
+            {
+                foreach (var pattern in extensionPatterns)
+                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
+                        ProcessDirectory(dir, true);
+
+                startDir = startDir.Parent;
+            }
+        }
+
+        /// <summary>
         /// Find extension assemblies starting from a given base directory,
         /// and using the contained '.addins' files to direct the search.
         /// </summary>
@@ -168,95 +232,12 @@ namespace NUnit.Extensibility
         }
 
         /// <summary>
-        /// Find ExtensionAssemblies for a host assembly using
-        /// a built-in algorithm that searches in certain known locations.
-        /// </summary>
-        /// <param name="hostAssembly">An assembly that supports NUnit extensions.</param>
-        public void FindExtensionAssemblies(Assembly hostAssembly)
-        {
-            log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
-
-            bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(hostAssembly.Location)!, "VERIFICATION.txt"));
-            var extensionPatterns = new List<string>();
-            foreach (string prefix in PackagePrefixes)
-            {
-                var pfx = isChocolateyPackage
-                    ? prefix.ToLower().Replace('.', '-')
-                    : prefix;
-
-                extensionPatterns.Add($"{pfx}*/**/tools/");
-                extensionPatterns.Add($"{pfx}*/**/tools/*/");
-            }
-
-            IDirectory? startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
-
-            while (startDir is not null)
-            {
-                foreach (var pattern in extensionPatterns)
-                    foreach (var dir in _directoryFinder.GetDirectories(startDir, pattern))
-                        ProcessDirectory(dir, true);
-
-                startDir = startDir.Parent;
-            }
-        }
-
-        /// <summary>
-        /// Get an ExtensionPoint based on its unique identifying path.
-        /// </summary>
-        public ExtensionPoint? GetExtensionPoint(string path)
-        {
-            return _extensionPointIndex.TryGetValue(path, out ExtensionPoint? ep) ? ep : null;
-        }
-
-        /// <summary>
         /// Get extension objects for all nodes of a given type
         /// </summary>
         public IEnumerable<T> GetExtensions<T>()
         {
             foreach (var node in GetExtensionNodes<T>())
                 yield return (T)node.ExtensionObject;
-        }
-
-        /// <summary>
-        /// Get all ExtensionNodes for a path
-        /// </summary>
-        public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
-        {
-            LoadExtensions();
-
-            var ep = GetExtensionPoint(path);
-            if (ep is not null)
-                foreach (var node in ep.Extensions)
-                    yield return node;
-        }
-
-        /// <summary>
-        /// Get the first or only ExtensionNode for a given ExtensionPoint
-        /// </summary>
-        /// <param name="path">The identifying path for an ExtensionPoint</param>
-        public ExtensionNode? GetExtensionNode(string path)
-        {
-            LoadExtensions();
-
-            // TODO: Remove need for the cast
-            var ep = GetExtensionPoint(path) as ExtensionPoint;
-
-            return ep is not null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
-        }
-
-        /// <summary>
-        /// Get all extension nodes of a given Type.
-        /// </summary>
-        /// <param name="includeDisabled">If true, disabled nodes are included</param>
-        public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
-        {
-            LoadExtensions();
-
-            var ep = GetExtensionPoint(typeof(T));
-            if (ep is not null)
-                foreach (var node in ep.Extensions)
-                    if (includeDisabled || node.Enabled)
-                        yield return node;
         }
 
         /// <summary>
@@ -289,28 +270,49 @@ namespace NUnit.Extensibility
             }
         }
 
-        /// <summary>
-        /// Get an ExtensionPoint based on the required Type for extensions.
-        /// </summary>
-        public ExtensionPoint? GetExtensionPoint(Type type)
-        {
-            foreach (var ep in _extensionPoints)
-                if (ep.TypeName == type.FullName)
-                    return ep;
+        #endregion
 
-            return null;
+        #region Extension Nodes
+
+        /// <summary>
+        /// Get all ExtensionNodes for a path
+        /// </summary>
+        public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
+        {
+            LoadExtensions();
+
+            var ep = GetExtensionPoint(path);
+            if (ep is not null)
+                foreach (var node in ep.Extensions)
+                    yield return node;
         }
 
         /// <summary>
-        /// Get an ExtensionPoint based on a Cecil TypeReference.
+        /// Get the first or only ExtensionNode for a given ExtensionPoint
         /// </summary>
-        public ExtensionPoint? GetExtensionPoint(TypeReference type)
+        /// <param name="path">The identifying path for an ExtensionPoint</param>
+        public ExtensionNode? GetExtensionNode(string path)
         {
-            foreach (var ep in _extensionPoints)
-                if (ep.TypeName == type.FullName)
-                    return ep;
+            LoadExtensions();
 
-            return null;
+            var ep = GetExtensionPoint(path);
+
+            return ep is not null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
+        }
+
+        /// <summary>
+        /// Get all extension nodes of a given Type.
+        /// </summary>
+        /// <param name="includeDisabled">If true, disabled nodes are included</param>
+        public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
+        {
+            LoadExtensions();
+
+            var ep = GetExtensionPoint(typeof(T));
+            if (ep is not null)
+                foreach (var node in ep.Extensions)
+                    if (includeDisabled || node.Enabled)
+                        yield return node;
         }
 
         #endregion
