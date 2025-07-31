@@ -44,7 +44,7 @@ namespace NUnit.Extensibility
         };
 
         private ExtensionManager _extensionManager;
-        private static string? _defaultTestExtensionPath;
+        private string _defaultTestExtensionPath;
 
         private string[] _expectedExtensionPointPaths;
         private Type[] _expectedExtensionPointTypes;
@@ -87,7 +87,7 @@ namespace NUnit.Extensibility
         [SetUp]
         public void CreateExtensionManager()
         {
-            _extensionManager = new ExtensionManager(_defaultTestExtensionPath);
+            _extensionManager = new ExtensionManager() { TypeExtensionPath = _defaultTestExtensionPath };
 
             // Find actual extension points.
             _extensionManager.FindExtensionPoints(typeof(ExtensionManager).Assembly);

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using NUnit.Extensibility;
 using NUnit.FileSystemAccess;
@@ -16,24 +17,41 @@ namespace NUnit.Engine.Services
     {
         private const string ENGINE_TYPE_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/";
 
+        private static readonly Assembly THIS_ASSEMBLY = typeof(ExtensionService).Assembly;
+        private static readonly bool RUNNING_UNDER_CHOCOLATEY =
+            System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(THIS_ASSEMBLY.Location)!, "VERIFICATION.txt"));
+        private static readonly string PACKAGE_PREFIX = RUNNING_UNDER_CHOCOLATEY ? "nunit-extension-" : "NUnit.Extension.";
+
         // The Extension Manager is available internally to allow direct
         // access to ExtensionPoints and ExtensionNodes.
         internal readonly ExtensionManager _extensionManager;
 
         public ExtensionService()
         {
-            _extensionManager = new ExtensionManager(ENGINE_TYPE_EXTENSION_PATH);
+            _extensionManager = new ExtensionManager
+            {
+                TypeExtensionPath = ENGINE_TYPE_EXTENSION_PATH,
+                PackagePrefixes = [PACKAGE_PREFIX]
+            };
         }
 
         internal ExtensionService(IFileSystem fileSystem)
             : this(fileSystem, new DirectoryFinder(fileSystem))
         {
-            _extensionManager = new ExtensionManager(ENGINE_TYPE_EXTENSION_PATH, fileSystem);
+            _extensionManager = new ExtensionManager(fileSystem)
+            {
+                TypeExtensionPath = ENGINE_TYPE_EXTENSION_PATH,
+                PackagePrefixes = [PACKAGE_PREFIX]
+            };
         }
 
         internal ExtensionService(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _extensionManager = new ExtensionManager(ENGINE_TYPE_EXTENSION_PATH, fileSystem, directoryFinder);
+            _extensionManager = new ExtensionManager(fileSystem, directoryFinder)
+            {
+                TypeExtensionPath = ENGINE_TYPE_EXTENSION_PATH,
+                PackagePrefixes = [PACKAGE_PREFIX]
+            };
         }
 
         #region IExtensionService Implementation

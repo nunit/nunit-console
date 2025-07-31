@@ -34,7 +34,6 @@ namespace NUnit.Extensibility
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ExtensionManager));
 
-        private readonly string _typeExtensionPath;
         private readonly IFileSystem _fileSystem;
         private readonly IDirectoryFinder _directoryFinder;
 
@@ -51,30 +50,32 @@ namespace NUnit.Extensibility
 
         // AssemblyTracker is a List of candidate ExtensionAssemblies, with built-in indexing
         // by file path and assembly name, eliminating the need to update indices separately.
-        private readonly ExtensionAssemblyTracker _assemblies = new ExtensionAssemblyTracker();
+        private readonly ExtensionAssemblyTracker _assemblyTracker = new ExtensionAssemblyTracker();
 
         // List of all extensionDirectories specified on command-line or in environment,
         // used to ignore duplicate calls to FindExtensionAssemblies.
         private readonly List<string> _extensionDirectories = new List<string>();
 
-        public ExtensionManager(string? typeExtensionPath = null)
-            : this(typeExtensionPath, new FileSystem())
+        public ExtensionManager()
+            : this(new FileSystem())
         {
         }
 
-        public ExtensionManager(string? typeExtensionPath, IFileSystem fileSystem)
-            : this(typeExtensionPath, fileSystem, new DirectoryFinder(fileSystem))
+        public ExtensionManager(IFileSystem fileSystem)
+            : this(fileSystem, new DirectoryFinder(fileSystem))
         {
         }
 
-        public ExtensionManager(string? typeExtensionPath, IFileSystem fileSystem, IDirectoryFinder directoryFinder)
+        public ExtensionManager(IFileSystem fileSystem, IDirectoryFinder directoryFinder)
         {
-            _typeExtensionPath = typeExtensionPath ?? DEFAULT_TYPE_EXTENSION_PATH;
             _fileSystem = fileSystem;
             _directoryFinder = directoryFinder;
         }
 
         #region Public Properties and Methods
+
+        public string[] PackagePrefixes { get; set; } = ["NUnit.Extension."];
+        public string TypeExtensionPath { get; set; } = DEFAULT_TYPE_EXTENSION_PATH;
 
         /// <summary>
         /// Gets an enumeration of all ExtensionPoints in the engine.
@@ -126,7 +127,7 @@ namespace NUnit.Extensibility
                 {
                     foreach (TypeExtensionPointAttribute attr in type.GetCustomAttributes(typeof(TypeExtensionPointAttribute), false))
                     {
-                        string path = attr.Path ?? _typeExtensionPath + type.Name;
+                        string path = attr.Path ?? TypeExtensionPath + type.Name;
 
                         if (_extensionPointIndex.ContainsKey(path))
                             throw new ExtensibilityException($"The Path {attr.Path} is already in use for another extension point.");
@@ -176,9 +177,16 @@ namespace NUnit.Extensibility
             log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
 
             bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(hostAssembly.Location)!, "VERIFICATION.txt"));
-            string[] extensionPatterns = isChocolateyPackage
-                ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
-                : new[] { "NUnit.Extension.*/**/tools/", "NUnit.Extension.*/**/tools/*/" };
+            var extensionPatterns = new List<string>();
+            foreach (string prefix in PackagePrefixes)
+            {
+                var pfx = isChocolateyPackage
+                    ? prefix.ToLower().Replace('.', '-')
+                    : prefix;
+
+                extensionPatterns.Add($"{pfx}*/**/tools/");
+                extensionPatterns.Add($"{pfx}*/**/tools/*/");
+            }
 
             IDirectory? startDir = _fileSystem.GetDirectory(AssemblyHelper.GetDirectoryName(hostAssembly));
 
@@ -276,7 +284,7 @@ namespace NUnit.Extensibility
             {
                 _extensionsAreLoaded = true;
 
-                foreach (var candidate in _assemblies)
+                foreach (var candidate in _assemblyTracker)
                     FindExtensionsInAssembly(candidate);
             }
         }
@@ -420,7 +428,7 @@ namespace NUnit.Extensibility
         {
             log.Debug($"Processing candidate assembly {filePath}");
             // Did we already process this file?
-            if (_assemblies.ContainsPath(filePath))
+            if (_assemblyTracker.ContainsPath(filePath))
             {
                 log.Debug("  Skipping assembly already processed");
                 return;
@@ -438,7 +446,7 @@ namespace NUnit.Extensibility
                     return;
                 }
 
-                _assemblies.AddOrUpdate(candidateAssembly);
+                _assemblyTracker.AddOrUpdate(candidateAssembly);
             }
             catch (BadImageFormatException e)
             {
@@ -647,7 +655,7 @@ namespace NUnit.Extensibility
         public void Dispose()
         {
             // Make sure all assemblies release the underlying file streams.
-            foreach (var candidate in _assemblies)
+            foreach (var candidate in _assemblyTracker)
             {
                 candidate.Dispose();
             }
