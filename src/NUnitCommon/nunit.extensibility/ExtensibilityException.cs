@@ -6,31 +6,31 @@ using System.Runtime.Serialization;
 namespace NUnit.Extensibility
 {
     /// <summary>
-    /// NUnitEngineException is thrown when the engine has been
-    /// called with improper values or when a particular facility
+    /// ExtensibilityException is thrown when the extensibility features
+    /// are used with improper values or when a particular feature
     /// is not available.
     /// </summary>
     [Serializable]
-    public class NUnitExtensibilityException : Exception
+    public class ExtensibilityException : Exception
     {
         /// <summary>
         /// Construct with a message
         /// </summary>
-        public NUnitExtensibilityException(string message) : base(message)
+        public ExtensibilityException(string message) : base(message)
         {
         }
 
         /// <summary>
         /// Construct with a message and inner exception
         /// </summary>
-        public NUnitExtensibilityException(string message, Exception? innerException) : base(message, innerException)
+        public ExtensibilityException(string message, Exception? innerException) : base(message, innerException)
         {
         }
 
         /// <summary>
         /// Serialization constructor
         /// </summary>
-        public NUnitExtensibilityException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public ExtensibilityException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

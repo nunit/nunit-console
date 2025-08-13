@@ -35,7 +35,7 @@ namespace NUnit.Extensibility
                 case "/NUnit/Engine/TypeExtensions/IResultWriter":
                     return new ResultWriterWrapper(extension);
                 default:
-                    throw new NUnitExtensibilityException($"No wrapper available for extension path {path}");
+                    throw new ExtensibilityException($"No wrapper available for extension path {path}");
             }
         }
 
