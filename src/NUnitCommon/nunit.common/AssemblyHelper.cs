@@ -53,9 +53,9 @@ namespace NUnit
         /// <summary>
         /// Gets the assembly path from code base.
         /// </summary>
-        /// <remarks>Public for testing purposes</remarks>
+        /// <remarks>Internal for testing purposes</remarks>
         /// <param name="codeBase">The code base.</param>
-        public static string GetAssemblyPathFromCodeBase(string codeBase)
+        internal static string GetAssemblyPathFromCodeBase(string codeBase)
         {
             // Skip over the file:// part
             int start = Uri.UriSchemeFile.Length + Uri.SchemeDelimiter.Length;

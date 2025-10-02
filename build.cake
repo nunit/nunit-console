@@ -154,9 +154,9 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
             "nunit-console.exe", "nunit-console.exe.config", "nunit.engine.dll",
             "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll",
             "nunit.engine.api.dll", "testcentric.metadata.dll"),
-        HasDependency("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.3"),
-        HasDependency("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.4"),
-        HasDependency("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.3")
+        HasDependency("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.5"),
+        HasDependency("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.6"),
+        HasDependency("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.4")
     },
     symbols: new PackageCheck[] {
         HasDirectory("tools").WithFiles(
@@ -184,9 +184,9 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
             "LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit-console.exe", "nunit-console.exe.config",
             "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
             "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-        HasDependency("nunit-extension-net462-pluggable-agent", "4.1.0-alpha.3"),
-        HasDependency("nunit-extension-net80-pluggable-agent", "4.1.0-alpha.4"),
-        HasDependency("nunit-extension-net90-pluggable-agent", "4.1.0-alpha.3")
+        HasDependency("nunit-extension-net462-pluggable-agent", "4.1.0-alpha.5"),
+        HasDependency("nunit-extension-net80-pluggable-agent", "4.1.0-alpha.6"),
+        HasDependency("nunit-extension-net90-pluggable-agent", "4.1.0-alpha.4")
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
         + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
@@ -272,6 +272,19 @@ public class DirectTestAgentRunner : TestRunner, IPackageTestRunner
         });
     }
 }
+
+//////////////////////////////////////////////////////////////////////
+// ADDITIONAL TARGETS USED IN DEVELOPMENT
+//////////////////////////////////////////////////////////////////////
+
+Task("InstallBundledAgents")
+    .Description("Installs just the agents we bundle with the GUI runner.")
+    .Does(() =>
+    {
+        new PackageReference("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.5").Install(BuildSettings.ProjectDirectory + "bin");
+        new PackageReference("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.6").Install(BuildSettings.ProjectDirectory + "bin");
+        new PackageReference("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.4").Install(BuildSettings.ProjectDirectory + "bin");
+    });
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

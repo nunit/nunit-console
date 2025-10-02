@@ -8,12 +8,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.Versioning;
 using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
-using System.Configuration.Assemblies;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {
@@ -30,44 +29,44 @@ namespace NUnit.Engine.Services
 
         private readonly AgentStore _agentStore = new AgentStore();
 
-        private IRuntimeFrameworkService? _runtimeService;
-        private IAvailableRuntimes? _availableRuntimeService;
         private ExtensionService? _extensionService;
 
-        private object _launchersLock = new object(); // Lock for lazy initialization of Launchers
-        private List<IAgentLauncher>? _launchers;
-        private List<IAgentLauncher> Launchers
-        {
-            get
-            {
-                Guard.OperationValid(_extensionService is not null, "ExtensionService has not been initialized");
+        private readonly List<ExtensionNode> _launcherNodes = new List<ExtensionNode>();
 
-                if (_launchers is null)
-                {
-                    lock (_launchersLock)
-                    {
-                        if (_launchers is not null)
-                            return _launchers; // Double-check locking
+        //private object _launchersLock = new object(); // Lock for lazy initialization of Launchers
+        //private List<IAgentLauncher>? _launchers;
+        //private List<IAgentLauncher> Launchers
+        //{
+        //    get
+        //    {
+        //        Guard.OperationValid(_extensionService is not null, "ExtensionService has not been initialized");
 
-                        log.Debug("Initializing agent launchers from extension service");
-                        var launchers = new List<IAgentLauncher>();
+        //        if (_launchers is null)
+        //        {
+        //            lock (_launchersLock)
+        //            {
+        //                if (_launchers is not null)
+        //                    return _launchers; // Double-check locking
 
-                        foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
-                        {
-                            var launcher = (IAgentLauncher)node.ExtensionObject;
-                            launchers.Add(launcher);
-                        }
+        //                log.Debug("Initializing agent launchers from extension service");
+        //                var launchers = new List<IAgentLauncher>();
 
-                        foreach (var launcher in launchers)
-                            AvailableAgents.Add(launcher.AgentInfo);
+        //                foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
+        //                {
+        //                    var launcher = (IAgentLauncher)node.ExtensionObject;
+        //                    launchers.Add(launcher);
+        //                }
 
-                        _launchers = launchers;
-                    }
-                }
+        //                foreach (var launcher in launchers)
+        //                    AvailableAgents.Add(launcher.AgentInfo);
 
-                return _launchers;
-            }
-        }
+        //                _launchers = launchers;
+        //            }
+        //        }
+
+        //        return _launchers;
+        //    }
+        //}
 
         // Index used to retrieve the agentId of a terminated process
         private readonly Dictionary<Process, Guid> _agentProcessIndex = new Dictionary<Process, Guid>();
@@ -119,9 +118,11 @@ namespace NUnit.Engine.Services
             {
                 // Collect names of agents that work for each assembly
                 var agentsForAssembly = new HashSet<string>();
-                foreach (var launcher in Launchers.Where(l => validAgentNames.Contains(l.AgentInfo.AgentName)))
-                    if (launcher.CanCreateAgent(assemblyPackage))
-                        agentsForAssembly.Add(launcher.AgentInfo.AgentName);
+                foreach (var node in _launcherNodes)
+                {
+                    if (CanCreateAgent(node, assemblyPackage))
+                        agentsForAssembly.Add(node.TypeName);
+                }
 
                 // Remove agents from final result if they don't work for this assembly
                 validAgentNames.IntersectWith(agentsForAssembly);
@@ -142,9 +143,11 @@ namespace NUnit.Engine.Services
         /// <param name="package">A TestPackage</param>
         public bool IsAgentAvailable(TestPackage package)
         {
-            foreach (var launcher in Launchers)
-                if (launcher.CanCreateAgent(package))
+            foreach (var node in _launcherNodes)
+            {
+                if (CanCreateAgent(node, package))
                     return true;
+            }
 
             return false;
         }
@@ -289,7 +292,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        [MemberNotNull(nameof(_runtimeService), nameof(_availableRuntimeService), nameof(_extensionService))]
+        [MemberNotNull(nameof(_extensionService))]
         public void StartService()
         {
             try
@@ -297,9 +300,11 @@ namespace NUnit.Engine.Services
                 if (ServiceContext is null)
                     throw new InvalidOperationException("ServiceContext is required for TestAgency");
 
-                _runtimeService = ServiceContext.GetService<IRuntimeFrameworkService>().ShouldNotBeNull();
-                _availableRuntimeService = ServiceContext.GetService<IAvailableRuntimes>().ShouldNotBeNull();
                 _extensionService = ServiceContext.GetService<ExtensionService>().ShouldNotBeNull();
+
+                // Add nodes for pluggable agent extensions
+                foreach (var launcherNode in _extensionService.GetExtensionNodes("/NUnit/Engine/TypeExtensions/IAgentLauncher"))
+                    _launcherNodes.Add(launcherNode);
 
                 _tcpTransport.Start();
 
@@ -362,24 +367,77 @@ namespace NUnit.Engine.Services
         private Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
         {
             // Check to see if a specific agent was selected
-            string requestedAgentName = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
-            log.Debug($"RequestedAgentName: {requestedAgentName ?? "NONE"}");
+            string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
+            bool specificAgentRequested = !string.IsNullOrEmpty(requestedAgent);
 
-            foreach (var launcher in Launchers)
+            foreach (var node in _launcherNodes)
             {
-                var launcherName = launcher.GetType().Name;
-                log.Debug($"Examining Launcher {launcherName}");
+                if (specificAgentRequested && node.TypeName != requestedAgent)
+                    continue;
 
-                if ((launcherName == requestedAgentName || requestedAgentName == string.Empty) && launcher.CanCreateAgent(package))
+                if (CanCreateAgent(node, package))
                 {
+                    var launcher = GetLauncherInstance(node);
+
+                    var launcherName = launcher.GetType().Name;
                     log.Info($"Selected launcher {launcherName}");
-                    package.AddSetting(SettingDefinitions.SelectedAgentName.WithValue(launcherName));
+                    package.Settings.Set(SettingDefinitions.SelectedAgentName.WithValue(launcherName));
                     return launcher.CreateAgent(agentId, agencyUrl, package);
                 }
             }
 
-            throw new NUnitEngineException($"No agent available for TestPackage {package.Name}");
+            if (specificAgentRequested)
+                throw new NUnitEngineException($"The requested launcher {requestedAgent} cannot load package {package.Name}");
+            else
+                throw new NUnitEngineException($"No agent available for TestPackage {package.Name}");
         }
+
+        private IAgentLauncher? GetLauncherByName(string name)
+        {
+            foreach (var node in _launcherNodes)
+                if (node.TypeName == name)
+                    return GetLauncherInstance(node);
+
+            return null;
+        }
+
+        private bool CanCreateAgent(IExtensionNode node, TestPackage package)
+        {
+            // Newer implementations use a TargetFramework property to avoid
+            // intantiating any agents, which will not be used.
+            var runtimes = node.GetValues("TargetFramework");
+
+            // If there is no property, we have to instantiate it to check.
+            if (runtimes.Count() == 0)
+            {
+                var launcher = GetLauncherInstance(node);
+                return launcher is not null && launcher.CanCreateAgent(package);
+            }
+
+            // The property is present, so no instantiation is needed.
+            var agentTarget = new FrameworkName(runtimes.First());
+            log.Debug($"Agent {node.TypeName} targets {agentTarget}");
+            var packageTargetSetting =
+                package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+
+            if (!string.IsNullOrEmpty(packageTargetSetting))
+            {
+                var packageTarget = new FrameworkName(packageTargetSetting);
+                return agentTarget.Identifier == packageTarget.Identifier
+                    && agentTarget.Version.Major >= packageTarget.Version.Major;
+            }
+
+            var packageRuntimeVersion =
+                package.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion);
+            if (!string.IsNullOrEmpty(packageRuntimeVersion))
+                return agentTarget.Identifier == FrameworkIdentifiers.NetFramework &&
+                    new Version(packageRuntimeVersion).Major <= agentTarget.Version.Major;
+
+            return false;
+        }
+
+        private IAgentLauncher GetLauncherInstance(IExtensionNode node) =>
+            (IAgentLauncher)((ExtensionNode)node).ExtensionObject;
     }
 }
 #endif

@@ -640,13 +640,13 @@ var AgentCoreTests = new List<PackageTest>()
     new PackageTest(1, "Net462AgentTest")
     {
         Description = "Run mock-assembly.dll under .NET 4.6.2",
-        Arguments = "testdata/net462/mock-assembly.dll",
+        Arguments = "testdata/net462/mock-assembly.dll --trace:Debug",
         ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
     },
     new PackageTest(1, "Net80AgentTest")
     {
         Description = "Run mock-assembly.dll under .NET 8.0",
-        Arguments = "testdata/net8.0/mock-assembly.dll",
+        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
         ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0")
     }
 };

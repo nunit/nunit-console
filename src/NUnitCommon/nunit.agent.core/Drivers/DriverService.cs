@@ -36,23 +36,22 @@ namespace NUnit.Engine.Drivers
         {
             _factories.Add(new NUnit3DriverFactory());
 
-#if NETFRAMEWORK // TODO: Restore extensibility to .NET 8.0 build
-            var extensionManager = new ExtensionManager()
-            {
-                TypeExtensionPath = TYPE_EXTENSION_PATH,
-                PackagePrefixes = [PACKAGE_PREFIX]
-            };
+            // TODO: Restore extensibility to Driver Service
+            //var extensionManager = new ExtensionManager()
+            //{
+            //    TypeExtensionPath = TYPE_EXTENSION_PATH,
+            //    PackagePrefixes = [PACKAGE_PREFIX]
+            //};
 
-            extensionManager.FindExtensionPoints(THIS_ASSEMBLY);
-            extensionManager.FindExtensionAssemblies(THIS_ASSEMBLY);
+            //extensionManager.FindExtensionPoints(THIS_ASSEMBLY);
+            //extensionManager.FindExtensionAssemblies(THIS_ASSEMBLY);
 
-            foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
-                _factories.Add(factory);
+            //foreach (IDriverFactory factory in extensionManager.GetExtensions<IDriverFactory>())
+            //    _factories.Add(factory);
 
-            var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
-            if (node is not null)
-                _factories.Add(new NUnit2DriverFactory(node));
-#endif
+            //var node = extensionManager.GetExtensionNode("/NUnit/Engine/NUnitV2Driver");
+            //if (node is not null)
+            //    _factories.Add(new NUnit2DriverFactory(node));
         }
 
         /// <summary>
