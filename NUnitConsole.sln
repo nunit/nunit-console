@@ -157,20 +157,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeExtensionsV1", "src\Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeExtensionsV2", "src\TestData\FakeExtensions\2.0\FakeExtensionsV2.csproj", "{E3A8037B-83EF-CB79-3EED-492C89F47BF9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C3D1ADBF-7497-4725-8AE4-6B4693F68622}"
-	ProjectSection(SolutionItems) = preProject
-		cake\build-settings.cake = cake\build-settings.cake
-		cake\execution.cake = cake\execution.cake
-		cake\package-definition.cake = cake\package-definition.cake
-		cake\package-tests.cake = cake\package-tests.cake
-		cake\packaging.cake = cake\packaging.cake
-		cake\publishing.cake = cake\publishing.cake
-		cake\reporting.cake = cake\reporting.cake
-		cake\targets.cake = cake\targets.cake
-		cake\testing.cake = cake\testing.cake
-		cake\utilities.cake = cake\utilities.cake
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -336,7 +322,6 @@ Global
 		{0E415863-1621-41DB-9DB0-36B5664DFF35} = {3B30D2E5-1587-4D68-B848-1BDDB3C24BFC}
 		{3AA135F1-CF80-C1D9-89FF-1DF30F567CA1} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
 		{E3A8037B-83EF-CB79-3EED-492C89F47BF9} = {37D508B2-91E0-4B32-869B-DFF9E68EA213}
-		{C3D1ADBF-7497-4725-8AE4-6B4693F68622} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D8E4FC26-5422-4C51-8BBC-D1AC0A578711}
