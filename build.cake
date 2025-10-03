@@ -1,5 +1,10 @@
-// Load the additional cake files
-#load cake/*.cake
+// Load the recipe
+#load nuget:?package=NUnit.Cake.Recipe&version=1.5.1-alpha.1
+// Comment out above line and uncomment below for local tests of recipe changes
+//#load ../NUnit.Cake.Recipe/recipe/*.cake
+
+// Load additional cake files
+#load package-tests.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -15,8 +20,7 @@ BuildSettings.Initialize(
 //////////////////////////////////////////////////////////////////////
 
 var THIS_VERSION = BuildSettings.PackageVersion;
-PackageDefinition NUnitExtensibilityApiPackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitExtensibilityApiPackage = new NuGetPackage(
     id: "NUnit.Extensibility.Api",
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
     checks: new PackageCheck[] {
@@ -29,8 +33,7 @@ PackageDefinition NUnitExtensibilityApiPackage = new PackageDefinition(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
     });
 
-PackageDefinition NUnitEngineApiPackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitEngineApiPackage = new NuGetPackage(
     id: "NUnit.Engine.Api",
     source: BuildSettings.SourceDirectory + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj",
     checks: new PackageCheck[] {
@@ -44,8 +47,7 @@ PackageDefinition NUnitEngineApiPackage = new PackageDefinition(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
     });
 
-PackageDefinition NUnitCommonPackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitCommonPackage = new NuGetPackage(
     id: "NUnit.Common",
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.common/nunit.common.csproj",
     checks: new PackageCheck[]
@@ -61,8 +63,7 @@ PackageDefinition NUnitCommonPackage = new PackageDefinition(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.common.pdb"),
     });
 
-PackageDefinition NUnitExtensibilityPackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitExtensibilityPackage = new NuGetPackage(
     id: "NUnit.Extensibility",
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility/nunit.extensibility.csproj",
     checks: new PackageCheck[]
@@ -81,8 +82,7 @@ PackageDefinition NUnitExtensibilityPackage = new PackageDefinition(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.pdb")
     });
 
-PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitAgentCorePackage = new NuGetPackage(
     id: "NUnit.Agent.Core",
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.agent.core/nunit.agent.core.csproj",
     checks: new PackageCheck[]
@@ -102,8 +102,7 @@ PackageDefinition NUnitAgentCorePackage = new PackageDefinition(
     testRunner: new DirectTestAgentRunner(),
     tests: AgentCoreTests);
 
-PackageDefinition NUnitEnginePackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitEnginePackage = new NuGetPackage(
     id: "NUnit.Engine",
     source: BuildSettings.SourceDirectory + "NUnitEngine/nunit.engine/nunit.engine.csproj",
     checks: new PackageCheck[]
@@ -125,8 +124,7 @@ PackageDefinition NUnitEnginePackage = new PackageDefinition(
 //    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
 //tests: EngineTests),
 
-PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
-    PackageType.Tool,
+PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     id: "NUnit.ConsoleRunner.NetCore",
     source: BuildSettings.SourceDirectory + "NUnitConsole/nunit4-netcore-console/nunit4-netcore-console.csproj",
     checks: new PackageCheck[]
@@ -138,14 +136,13 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new PackageDefinition(
             "nunit.extensibility.api.dll", "nunit.engine.api.dll", "testcentric.metadata.dll",
             "Microsoft.Extensions.DependencyModel.dll")
     },
-    testRunner: new ConsoleRunnerSelfTester(BuildSettings.PackageTestDirectory + "nunit.exe"),
+    testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);
 
 // NOTE: The final three packages continue to use a nuspec file for various reasons
 
 // 1. NUnit.ConsoleRunner needs to use it to specify the bundled pluggable agents
-PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     id: "NUnit.ConsoleRunner",
     source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
     checks: new PackageCheck[] {
@@ -168,15 +165,13 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new PackageDefinition(
     tests: StandardRunnerTests);
 
 // 2. NUnit.Console is a meta-package
-PackageDefinition NUnitConsoleNuGetPackage = new PackageDefinition(
-    PackageType.NuGet,
+PackageDefinition NUnitConsoleNuGetPackage = new NuGetPackage(
     id: "NUnit.Console",
     source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
     checks: new PackageCheck[] { HasFile("LICENSE.txt") });
 
 // 3. The chocolatey console runner has to follow special chocolatey conventions
-PackageDefinition NUnitConsoleRunnerChocolateyPackage = new PackageDefinition(
-    PackageType.Chocolatey,
+PackageDefinition NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
     id: "nunit-console-runner",
     source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
     checks: new PackageCheck[] {
