@@ -189,37 +189,35 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet60Test")
 // TEST WITH MISSING AND INVALID FILES
 //////////////////////////////////////////////////////////////////////
 
-// TOOD: Reinstate the next three tests
+StandardRunnerTests.Add(new PackageTest(1, "NonExistentTest")
+{
+    Description = "Run non-existent unknown.dll",
+    Arguments = "unknown.dll",
+    ExpectedResult = new ExpectedResult("Failed:Invalid")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("unknown.dll") }
+    }
+});
 
-//StandardRunnerTests.Add(new PackageTest(1, "NonExistentTest")
-//{
-//    Description = "Run non-existent unknown.dll",
-//    Arguments = "unknown.dll",
-//    ExpectedResult = new ExpectedResult("Failed")
-//    {
-//        Assemblies = new[] { new ExpectedAssemblyResult("unknown.dll") }
-//    }
-//});
+StandardRunnerTests.Add(new PackageTest(1, "InValidFileTypeTest")
+{
+    Description = "Run file with an invalid file type",
+    Arguments = "testdata/net462/mock-assembly.pdb",
+    ExpectedResult = new ExpectedResult("Failed:Invalid")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.pdb") }
+    }
+});
 
-//StandardRunnerTests.Add(new PackageTest(1, "InValidFileTypeTest")
-//{
-//    Description = "Run file with an invalid file type",
-//    Arguments = "testdata/net462/mock-assembly.pdb",
-//    ExpectedResult = new ExpectedResult("Failed")
-//    {
-//        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.pdb") }
-//    }
-//});
-
-//StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNonExistentTest")
-//{
-//    Description = "Run mock-assembly and non-existent unknown.dll together",
-//    Arguments = "testdata/net462/mock-assembly.dll unknown.dll",
-//    ExpectedResult = new ExpectedResult("Failed")
-//    {
-//        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll"), new ExpectedAssemblyResult("unknown.dll") }
-//    }
-//});
+StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNonExistentTest")
+{
+    Description = "Run mock-assembly and non-existent unknown.dll together",
+    Arguments = "testdata/net462/mock-assembly.dll unknown.dll",
+    ExpectedResult = new ExpectedResult("Failed:Invalid")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll"), new ExpectedAssemblyResult("unknown.dll") }
+    }
+});
 
 //////////////////////////////////////////////////////////////////////
 // TEST OLDER VERSIONS OF NUNIT SWITCHING API IF NEEDED
