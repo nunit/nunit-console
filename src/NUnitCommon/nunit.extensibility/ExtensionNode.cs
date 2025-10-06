@@ -31,6 +31,7 @@ namespace NUnit.Extensibility
             AssemblyPath = extensionAssembly.FilePath;
             AssemblyVersion = extensionAssembly.AssemblyVersion;
             TypeName = extensionType.FullName;
+            Status = ExtensionStatus.Unloaded;
             Enabled = true; // By default
         }
 
@@ -61,6 +62,16 @@ namespace NUnit.Extensibility
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         public bool Enabled { get; set; }
+
+        /// <summary>
+        /// Status of this extension
+        /// </summary>
+        public ExtensionStatus Status { get; set; }
+
+        /// <summary>
+        /// Exception thrown in creating the ExtensionObject, if Status is error, otherwise null.
+        /// </summary>
+        public Exception? Exception { get; set; }
 
         /// <summary>
         /// Gets and sets the unique string identifying the ExtensionPoint for which
@@ -127,6 +138,8 @@ namespace NUnit.Extensibility
             object obj = Activator.CreateInstance(type, args)!;
 #endif
 
+            // TODO: Determine whether to continue support for V3 extensions here,
+            // defer it to the engine or eliminate it entirely.
             return IsV3Extension
                 ? ExtensionWrapper.Wrap(obj, Path)
                 : obj;
@@ -134,6 +147,9 @@ namespace NUnit.Extensibility
 
         #endregion
 
+        /// <summary>
+        /// Used by ExtensionManger to add a value to the node's properties collection.
+        /// </summary>
         public void AddProperty(string name, string val)
         {
             if (_properties.TryGetValue(name, out List<string>? list))
@@ -145,6 +161,9 @@ namespace NUnit.Extensibility
             }
         }
 
+        /// <summary>
+        /// Gets the string representation of this node.
+        /// </summary>
         public override string ToString()
         {
             return $"{TypeName} - {Path}";

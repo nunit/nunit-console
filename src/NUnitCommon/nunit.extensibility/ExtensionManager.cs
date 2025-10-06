@@ -547,25 +547,19 @@ namespace NUnit.Extensibility
 
                 _extensions.Add(node);
 
-                ExtensionPoint? ep;
-                if (extensionAttrPath is null)
-                {
-                    ep = DeduceExtensionPointFromType(extensionType);
-                    if (ep is null)
-                        throw new ExtensibilityException($"Unable to deduce ExtensionPoint for Type {extensionType.FullName}. Specify Path on ExtensionAttribute to resolve.");
+                ExtensionPoint? ep = extensionAttrPath is not null
+                    ? GetExtensionPoint(extensionAttrPath)
+                    : DeduceExtensionPointFromType(extensionType);
 
-                    node.Path = ep.Path;
-                }
-                else
+                if (ep is null)
                 {
-                    node.Path = extensionAttrPath;
-
-                    // TODO: Remove need for the cast
-                    ep = GetExtensionPoint(node.Path) as ExtensionPoint;
-                    if (ep is null)
-                        throw new ExtensibilityException($"Unable to locate ExtensionPoint for Type {extensionType.FullName}. The Path {node.Path} cannot be found.");
+                    log.Warning($"Extension ignored - Unable to deduce ExtensionPoint.");
+                    node.Status = ExtensionStatus.Unknown;
+                    node.Exception = new Exception("Unable to deduce ExtensionPoint");
+                    continue;
                 }
 
+                node.Path = ep.Path;
                 ep.Install(node);
             }
         }
@@ -619,28 +613,6 @@ namespace NUnit.Extensibility
                             return false;
                     }
             }
-
-            //string extensionFrameworkName = AssemblyDefinition.ReadAssembly(extensionAsm.FilePath).GetFrameworkName();
-            //string runnerFrameworkName = AssemblyDefinition.ReadAssembly(runnerAsm.Location).GetFrameworkName();
-            //if (runnerFrameworkName?.StartsWith(".NETStandard") == true)
-            //{
-            //    throw new NUnitEngineException($"{runnerAsm.FullName} test runner must target .NET Core or .NET Framework, not .NET Standard");
-            //}
-            //else if (runnerFrameworkName?.StartsWith(".NETCoreApp") == true)
-            //{
-            //    if (extensionFrameworkName?.StartsWith(".NETStandard") != true && extensionFrameworkName?.StartsWith(".NETCoreApp") != true)
-            //    {
-            //        log.Info($".NET Core runners require .NET Core or .NET Standard extension for {extensionAsm.FilePath}");
-            //        return false;
-            //    }
-            //}
-            //else if (extensionFrameworkName?.StartsWith(".NETCoreApp") == true)
-            //{
-            //    log.Info($".NET Framework runners cannot load .NET Core extension {extensionAsm.FilePath}");
-            //    return false;
-            //}
-
-            //return true;
         }
 
         private static System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
