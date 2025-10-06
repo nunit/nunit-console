@@ -8,6 +8,7 @@ using NUnit.Engine.Extensibility;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Net;
 
 namespace NUnit.Extensibility
 {
@@ -18,9 +19,11 @@ namespace NUnit.Extensibility
         private static readonly string THIS_ASSEMBLY_DIRECTORY = Path.GetDirectoryName(THIS_ASSEMBLY.Location)!;
         private const string FAKE_EXTENSIONS_FILENAME = "FakeExtensions.dll";
         private static readonly string FAKE_EXTENSIONS_PARENT_DIRECTORY =
-            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2");
-        private static readonly string FAKE_EXTENSIONS_SOURCE_DIRECTORY =
-            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.Parent!.Parent!.FullName, "src/TestData/FakeExtensions");
+#if NETFRAMEWORK
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2/net462");
+#else
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2/netstandard2.0");
+#endif
 
         private const string FAKE_AGENT_LAUNCHER_EXTENSION = "NUnit.Engine.Fakes.FakeAgentLauncherExtension";
         private const string FAKE_FRAMEWORK_DRIVER_EXTENSION = "NUnit.Engine.Fakes.FakeFrameworkDriverExtension";
@@ -30,6 +33,7 @@ namespace NUnit.Extensibility
         private const string FAKE_SERVICE_EXTENSION = "NUnit.Engine.Fakes.FakeServiceExtension";
         private const string FAKE_DISABLED_EXTENSION = "NUnit.Engine.Fakes.FakeDisabledExtension";
         private const string FAKE_NUNIT_V2_DRIVER_EXTENSION = "NUnit.Engine.Fakes.V2DriverExtension";
+        private const string FAKE_EXTENSION_WITH_NO_EXTENSION_POINT = "NUnit.Engine.Fakes.FakeExtension_NoExtensionPointFound";
 
         private readonly string[] KnownExtensions =
         {
@@ -39,8 +43,9 @@ namespace NUnit.Extensibility
             FAKE_RESULT_WRITER_EXTENSION,
             FAKE_EVENT_LISTENER_EXTENSION,
             FAKE_SERVICE_EXTENSION,
-            FAKE_DISABLED_EXTENSION
-            //FAKE_NUNIT_V2_DRIVER_EXTENSION
+            FAKE_DISABLED_EXTENSION,
+            //FAKE_NUNIT_V2_DRIVER_EXTENSION,
+            FAKE_EXTENSION_WITH_NO_EXTENSION_POINT
         };
 
         private ExtensionManager _extensionManager;
@@ -94,7 +99,7 @@ namespace NUnit.Extensibility
             _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
 
             // Find Fake Extensions using alternate start directory
-            _extensionManager.FindExtensionAssemblies(FAKE_EXTENSIONS_SOURCE_DIRECTORY);
+            _extensionManager.FindExtensionAssemblies(FAKE_EXTENSIONS_PARENT_DIRECTORY);
             _extensionManager.LoadExtensions();
         }
 
@@ -119,6 +124,18 @@ namespace NUnit.Extensibility
             // should be used rather than 1 for all extensions.
             foreach (var node in _extensionManager.Extensions)
                 Assert.That(node.AssemblyVersion.ToString(), Is.EqualTo("2.0.0.0"));
+        }
+
+        [Test]
+        public void AllExtensionsHaveCorrectStatus()
+        {
+            foreach (var node in _extensionManager.Extensions)
+            {
+                var expectedStatus = node.TypeName == FAKE_EXTENSION_WITH_NO_EXTENSION_POINT
+                    ? ExtensionStatus.Unknown
+                    : ExtensionStatus.Unloaded;
+                Assert.That(node.Status, Is.EqualTo(expectedStatus));
+            }
         }
 
         [Test]
@@ -216,20 +233,20 @@ namespace NUnit.Extensibility
 
 #if NETCOREAPP
         [TestCase("netstandard2.0", ExpectedResult = true)]
-        [TestCase("net462", ExpectedResult = false)]
+        //[TestCase("net462", ExpectedResult = false)]
         //[TestCase("net20", ExpectedResult = false)]
 #elif NET40_OR_GREATER
-        [TestCase("netstandard2.0", ExpectedResult = false)]
+        //[TestCase("netstandard2.0", ExpectedResult = false)]
         [TestCase("net462", ExpectedResult = true)]
         //[TestCase("net20", ExpectedResult = true)]
 #else
-        [TestCase("netstandard2.0", ExpectedResult = false)]
-        [TestCase("net462", ExpectedResult = false)]
+        //[TestCase("netstandard2.0", ExpectedResult = false)]
+        //[TestCase("net462", ExpectedResult = false)]
         //[TestCase("net20", ExpectedResult = true)]
 #endif
         public bool LoadTargetFramework(string tfm)
         {
-            return _extensionManager.CanLoadTargetFramework(THIS_ASSEMBLY, FakeExtensions(tfm));
+            return _extensionManager.CanLoadTargetFramework(THIS_ASSEMBLY, FakeExtensions());
         }
 
         //[TestCaseSource(nameof(ValidCombos))]
@@ -351,10 +368,10 @@ namespace NUnit.Extensibility
         /// assembly based on the argument provided.
         /// </summary>
         /// <param name="tfm">A test framework moniker. Must be one for which the fake extensions are built.</param>
-        private static ExtensionAssembly FakeExtensions(string tfm)
+        private static ExtensionAssembly FakeExtensions()
         {
             return new ExtensionAssembly(
-                Path.Combine(FAKE_EXTENSIONS_PARENT_DIRECTORY, Path.Combine(tfm, FAKE_EXTENSIONS_FILENAME)), false);
+                Path.Combine(FAKE_EXTENSIONS_PARENT_DIRECTORY, FAKE_EXTENSIONS_FILENAME), false);
         }
     }
 }

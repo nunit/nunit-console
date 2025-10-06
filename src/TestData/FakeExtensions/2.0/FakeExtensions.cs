@@ -132,4 +132,10 @@ namespace NUnit.Engine.Fakes
 
         public Process CreateAgent(Guid agentId, string agencyUrl, TestPackage package) => throw new NotImplementedException();
     }
+
+    [Extension]
+    public class FakeExtension_NoExtensionPointFound
+    {
+        public void SomeMethod() => throw new NotImplementedException();
+    }
 }

@@ -1,17 +1,20 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
+using NUnit.ConsoleRunner.Options;
+using NUnit.ConsoleRunner.Utilities;
+using NUnit.Engine;
+using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
+using NUnit.TextDisplay;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using NUnit.Common;
-using NUnit.ConsoleRunner.Utilities;
-using NUnit.ConsoleRunner.Options;
-using NUnit.Engine;
-using NUnit.Engine.Extensibility;
-using NUnit.TextDisplay;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace NUnit.ConsoleRunner
 {
@@ -21,7 +24,7 @@ namespace NUnit.ConsoleRunner
     /// </summary>
     public class ConsoleRunner
     {
-        private static Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(ConsoleRunner));
 
         private static readonly char[] PathSeparator = [Path.PathSeparator];
 
@@ -36,6 +39,7 @@ namespace NUnit.ConsoleRunner
         private const string INDENT4 = "    ";
         private const string INDENT6 = "      ";
         private const string INDENT8 = "        ";
+        private const string INDENT10 = "          ";
 
         private const string NUNIT_EXTENSION_DIRECTORIES = "NUNIT_EXTENSION_DIRECTORIES";
 
@@ -330,9 +334,12 @@ namespace NUnit.ConsoleRunner
             OutWriter.WriteLine();
         }
 
+#if NETFRAMEWORK
+        [DllImport("libc")]
+        private static extern int uname(IntPtr buf);
+
         private static string GetOSVersion()
         {
-#if NETFRAMEWORK
             OperatingSystem os = Environment.OSVersion;
             string osString = os.ToString();
             if (os.Platform == PlatformID.Unix)
@@ -349,13 +356,13 @@ namespace NUnit.ConsoleRunner
                 Marshal.FreeHGlobal(buf);
             }
             return osString;
-#else
-            return RuntimeInformation.OSDescription;
-#endif
         }
-
-        [DllImport("libc")]
-        private static extern int uname(IntPtr buf);
+#else
+        private static string GetOSVersion()
+        {
+            return RuntimeInformation.OSDescription;
+        }
+#endif
 
         private void DisplayExtensionList()
         {
@@ -369,33 +376,57 @@ namespace NUnit.ConsoleRunner
 
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Installed Extensions");
 
-            if (_extensionService?.ExtensionPoints is not null)
+            if (_extensionService.ExtensionPoints is not null)
                 foreach (var ep in _extensionService.ExtensionPoints)
                 {
                     _outWriter.WriteLabelLine(INDENT4 + "Extension Point: ", ep.Path);
                     foreach (var node in ep.Extensions)
-                    {
-                        _outWriter.Write(INDENT6 + "Extension: ");
-                        _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-                        _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
-
-                        _outWriter.Write(INDENT8 + "Version: ");
-                        _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
-
-                        _outWriter.Write(INDENT8 + "Path: ");
-                        _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
-
-                        foreach (var prop in node.PropertyNames)
-                        {
-                            _outWriter.Write(INDENT8 + prop + ":");
-                            foreach (var val in node.GetValues(prop))
-                                _outWriter.Write(ColorStyle.Value, " " + val);
-                            _outWriter.WriteLine();
-                        }
-                    }
+                        DisplayExtension(node);
                 }
 
+            var unknownExtensions = _extensionService.Extensions.Where(n => n.Status == ExtensionStatus.Unknown);
+            if (unknownExtensions.Any())
+            {
+                _outWriter.WriteLine();
+                _outWriter.WriteLine(ColorStyle.Label, "Unknown Extensions");
+                _outWriter.WriteLine(INDENT4 + "Extensions not matching any known ExtensionPoint");
+                foreach (var node in unknownExtensions)
+                    DisplayExtension(node);
+            }
+
             _outWriter.WriteLine();
+        }
+
+        private void DisplayExtension(IExtensionNode node)
+        {
+            _outWriter.Write(INDENT6 + "Extension: ");
+            _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
+            _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
+
+            _outWriter.Write(INDENT8 + "Version: ");
+            _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
+
+            _outWriter.Write(INDENT8 + "Status: ");
+            _outWriter.WriteLine(ColorStyle.Value, node.Status.ToString());
+
+            _outWriter.Write(INDENT8 + "Enabled: ");
+            _outWriter.WriteLine(ColorStyle.Value, node.Enabled.ToString());
+
+            _outWriter.Write(INDENT8 + "Path: ");
+            _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
+
+            if (node.PropertyNames.Any())
+            {
+                _outWriter.WriteLine(INDENT8 + "Properties -");
+
+                foreach (var prop in node.PropertyNames)
+                {
+                    _outWriter.Write(INDENT10 + prop + ":");
+                    foreach (var val in node.GetValues(prop))
+                        _outWriter.Write(ColorStyle.Value, " " + val);
+                    _outWriter.WriteLine();
+                }
+            }
         }
 
         private void DisplayTestFilters()

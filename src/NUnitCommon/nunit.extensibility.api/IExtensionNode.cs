@@ -9,6 +9,18 @@ namespace NUnit.Extensibility
     /// The IExtensionNode interface is implemented by a class that represents a
     /// single extension being installed on a particular extension point.
     /// </summary>
+    public enum ExtensionStatus
+    {
+        /// <summary>Extension is not yet loaded</summary>
+        Unloaded,
+        /// <summary>Extension has been loaded</summary>
+        Loaded,
+        /// <summary>An error occurred trying to load the extension</summary>
+        Error,
+        /// <summary>Extension without a corresponding path./summary>
+        Unknown,
+    }
+
     public interface IExtensionNode
     {
         /// <summary>
@@ -21,6 +33,16 @@ namespace NUnit.Extensibility
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         bool Enabled { get; }
+
+        /// <summary>
+        /// Status of this extension.
+        /// </summary>
+        ExtensionStatus Status { get; }
+
+        /// <summary>
+        /// Exception thrown in creating the ExtensionObject, if Status is error, otherwise null.
+        /// </summary>
+        Exception? Exception { get; }
 
         /// <summary>
         /// Gets the unique string identifying the ExtensionPoint for which
@@ -40,14 +62,6 @@ namespace NUnit.Extensibility
         IEnumerable<string> PropertyNames { get; }
 
         /// <summary>
-        /// Gets a collection of the values of a particular named property
-        /// If none are present, returns an empty enumerator.
-        /// </summary>
-        /// <param name="name">The property name</param>
-        /// <returns>A collection of values</returns>
-        IEnumerable<string> GetValues(string name);
-
-        /// <summary>
         /// The path to the assembly implementing this extension.
         /// </summary>
         string AssemblyPath { get; }
@@ -56,5 +70,13 @@ namespace NUnit.Extensibility
         /// The version of the assembly implementing this extension.
         /// </summary>
         Version AssemblyVersion { get; }
+
+        /// <summary>
+        /// Gets a collection of the values of a particular named property.
+        /// If none are present, returns an empty enumerator.
+        /// </summary>
+        /// <param name="name">The property name</param>
+        /// <returns>A collection of values</returns>
+        IEnumerable<string> GetValues(string name);
     }
 }
