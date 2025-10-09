@@ -13,7 +13,7 @@ namespace NUnit.Engine.Services
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ResultService));
 
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases", "user" };
-        private IEnumerable<ExtensionNode>? _extensionNodes;
+        private List<ExtensionNode> _extensionNodes = new List<ExtensionNode>();
 
         private string[]? _formats;
 
@@ -64,26 +64,26 @@ namespace NUnit.Engine.Services
                     if (_extensionNodes is not null)
                         foreach (var node in _extensionNodes)
                             foreach (var supported in node.GetValues("Format"))
-                                if (supported == format && node is ExtensionNode)
+                                if (supported == format && node.ExtensionObject is not null)
                                 {
                                     log.Debug($"  Returning {node.TypeName}");
                                     return (IResultWriter)node.ExtensionObject;
                                 }
+
                     throw new NUnitEngineException("ResultWriter not found for format: " + format);
             }
         }
 
         public override void StartService()
         {
+            base.StartService();
+
             try
             {
-                if (ServiceContext is null)
-                    throw new InvalidOperationException("Only services that have a ServiceContext can be started.");
-
                 var extensionService = ServiceContext.GetService<ExtensionService>();
 
                 if (extensionService is not null && extensionService.Status == ServiceStatus.Started)
-                    _extensionNodes = extensionService.GetExtensionNodes<IResultWriter>();
+                    _extensionNodes.AddRange(extensionService.GetExtensionNodes<IResultWriter>());
 
                 // If there is no extension service, we start anyway using built-in writers
                 Status = ServiceStatus.Started;

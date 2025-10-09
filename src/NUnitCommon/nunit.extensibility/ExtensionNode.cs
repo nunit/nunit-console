@@ -113,12 +113,26 @@ namespace NUnit.Extensibility
         /// returns the same object. Use CreateExtensionObject if a new one is
         /// needed each time or to specify arguments.
         /// </summary>
-        public object ExtensionObject
+        public object? ExtensionObject
         {
             get
             {
                 if (_extensionObject is null)
-                    _extensionObject = CreateExtensionObject();
+                    try
+                    {
+                        _extensionObject = CreateExtensionObject();
+                        Status = ExtensionStatus.Loaded;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is TargetInvocationException)
+                            ex = ex.InnerException!;
+
+                        Status = ExtensionStatus.Error;
+                        Enabled = false;
+                        Exception = new ExtensibilityException(
+                            $"Error constructing '{TypeName}'.", ex);
+                    }
 
                 return _extensionObject;
             }

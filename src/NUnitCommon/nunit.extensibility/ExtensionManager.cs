@@ -47,7 +47,7 @@ namespace NUnit.Extensibility
         // List of ExtensionNodes for all extensions discovered.
         private readonly List<ExtensionNode> _extensions = new List<ExtensionNode>();
 
-        private bool _extensionsAreLoaded;
+        private bool _extensionsAreInstalled;
 
         // AssemblyTracker is a List of candidate ExtensionAssemblies, with built-in indexing
         // by file path and assembly name, eliminating the need to update indices separately.
@@ -173,15 +173,7 @@ namespace NUnit.Extensibility
         /// <summary>
         /// Gets an enumeration of all installed Extensions.
         /// </summary>
-        public IEnumerable<ExtensionNode> Extensions
-        {
-            get
-            {
-                LoadExtensions();
-
-                return _extensions.ToArray();
-            }
-        }
+        public IEnumerable<ExtensionNode> Extensions => _extensions.ToArray();
 
         /// <summary>
         /// Find ExtensionAssemblies for a host assembly using
@@ -237,8 +229,9 @@ namespace NUnit.Extensibility
         /// </summary>
         public IEnumerable<T> GetExtensions<T>()
         {
-            foreach (var node in GetExtensionNodes<T>())
-                yield return (T)node.ExtensionObject;
+            foreach (ExtensionNode node in GetExtensionNodes<T>())
+                if (node.ExtensionObject is T)
+                    yield return (T)node.ExtensionObject;
         }
 
         /// <summary>
@@ -246,25 +239,23 @@ namespace NUnit.Extensibility
         /// </summary>
         public void EnableExtension(string typeName, bool enabled)
         {
-            LoadExtensions();
-
             foreach (var node in _extensions)
                 if (node.TypeName == typeName)
                     node.Enabled = enabled;
         }
 
         /// <summary>
-        /// We can only load extensions after all candidate assemblies are identified.
+        /// We can only install extensions after all candidate assemblies are identified.
         /// This method may be called by the user after all "Find" calls are complete.
         /// If the user fails to call it and subsequently tries to examine extensions
         /// using other ExtensionManager properties or methods, it will be called
         /// but calls not going through ExtensionManager may fail.
         /// </summary>
-        public void LoadExtensions()
+        public void InstallExtensions()
         {
-            if (!_extensionsAreLoaded)
+            if (!_extensionsAreInstalled)
             {
-                _extensionsAreLoaded = true;
+                _extensionsAreInstalled = true;
 
                 foreach (var candidate in _assemblyTracker)
                     FindExtensionsInAssembly(candidate);
@@ -280,12 +271,13 @@ namespace NUnit.Extensibility
         /// </summary>
         public IEnumerable<ExtensionNode> GetExtensionNodes(string path)
         {
-            LoadExtensions();
-
-            var ep = GetExtensionPoint(path);
-            if (ep is not null)
-                foreach (var node in ep.Extensions)
+            foreach (var node in _extensions)
+                if (node.Path == path)
                     yield return node;
+            //var ep = GetExtensionPoint(path);
+            //if (ep is not null)
+            //    foreach (var node in ep.Extensions)
+            //        yield return node;
         }
 
         /// <summary>
@@ -294,8 +286,6 @@ namespace NUnit.Extensibility
         /// <param name="path">The identifying path for an ExtensionPoint</param>
         public ExtensionNode? GetExtensionNode(string path)
         {
-            LoadExtensions();
-
             var ep = GetExtensionPoint(path);
 
             return ep is not null && ep.Extensions.Count > 0 ? ep.Extensions[0] : null;
@@ -307,8 +297,6 @@ namespace NUnit.Extensibility
         /// <param name="includeDisabled">If true, disabled nodes are included</param>
         public IEnumerable<ExtensionNode> GetExtensionNodes<T>(bool includeDisabled = false)
         {
-            LoadExtensions();
-
             var ep = GetExtensionPoint(typeof(T));
             if (ep is not null)
                 foreach (var node in ep.Extensions)

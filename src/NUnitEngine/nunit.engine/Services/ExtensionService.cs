@@ -103,7 +103,7 @@ namespace NUnit.Engine.Services
         /// If extensions have not yet been loaded, examine all candidate assemblies
         /// and load them. Subsequent calls are ignored.
         /// </summary>
-        public void LoadExtensions() => _extensionManager.LoadExtensions();
+        public void InstallExtensions() => _extensionManager.InstallExtensions();
 
         /// <summary>
         /// Get extension objects for all nodes of a given type
@@ -167,6 +167,8 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
+            base.StartService();
+
             try
             {
                 _extensionManager.FindExtensionPoints(

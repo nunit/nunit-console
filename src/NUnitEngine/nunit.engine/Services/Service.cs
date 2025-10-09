@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NUnit.Engine.Services
 {
@@ -24,8 +25,12 @@ namespace NUnit.Engine.Services
         /// <summary>
         /// Initialize the Service
         /// </summary>
+        [MemberNotNull(nameof(ServiceContext))]
         public virtual void StartService()
         {
+            if (ServiceContext is null)
+                throw new InvalidOperationException("A Service must be added to a ServiceContext before starting it.");
+
             Status = ServiceStatus.Started;
         }
 

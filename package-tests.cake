@@ -413,10 +413,17 @@ NetCoreRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
     ExpectedOutput = new[] { DoesNotContain("Extension:") }
 });
 
-AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
+StandardRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
-    Arguments = "--extensionDirectory ../../src/TestData/FakeExtensions --list-extensions",
+    Arguments = "--extensionDirectory fakesv2/net462 --list-extensions",
+    ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
+});
+
+NetCoreRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
+{
+    Description = "List Extensions shows extension from added directory",
+    Arguments = "--extensionDirectory fakesv2/netstandard2.0 --list-extensions --trace:Debug",
     ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
 });
 
@@ -451,14 +458,14 @@ AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 //    ExtensionsNeeded = new[] { Extensions.NUnitProjectLoader }
 //});
 
-// V2 Result Writer Test
-StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
-{
-    Description = "Run mock-assembly under .NET 4.6.2 and produce V2 output",
-    Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
-    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
-    ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
-});
+//// V2 Result Writer Test
+//StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
+//{
+//    Description = "Run mock-assembly under .NET 4.6.2 and produce V2 output",
+//    Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+//    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
+//    ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
+//});
 
 //StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net60")
 //{

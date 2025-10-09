@@ -82,7 +82,7 @@ namespace NUnit.ConsoleRunner
                 if (Options.ShowVersion)
                     return ConsoleRunner.OK;
 
-                if (Options.WarningMessages.Count != 0)
+                if (Options.WarningMessages.Count > 0)
                 {
                     foreach (string message in Options.WarningMessages)
                         OutWriter.WriteLine(ColorStyle.Warning, message);
@@ -90,16 +90,16 @@ namespace NUnit.ConsoleRunner
                     OutWriter.WriteLine();
                 }
 
+                if (Options.ErrorMessages.Count > 0)
+                {
+                    foreach (string message in Options.ErrorMessages)
+                        WriteErrorMessage(message);
+
+                    return ConsoleRunner.INVALID_ARG;
+                }
+
                 using (ITestEngine engine = new TestEngine())
                 {
-                    if (Options.ErrorMessages.Count > 0)
-                    {
-                        foreach (string message in Options.ErrorMessages)
-                            WriteErrorMessage(message);
-
-                        return ConsoleRunner.INVALID_ARG;
-                    }
-
                     if (Options.RuntimeFrameworkSpecified)
                     {
                         if (engine.Services.TryGetService<IAvailableRuntimes>(out var availableRuntimes))
