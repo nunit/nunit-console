@@ -43,6 +43,11 @@ namespace NUnit.Common
         /// </summary>
         public static SettingDefinition<string> ConfigurationFile { get; } = new(nameof(ConfigurationFile), string.Empty);
 
+        /// <summary>
+        /// A list of the available configs for this project.
+        /// </summary>
+        public static SettingDefinition<string> ConfigNames { get; } = new(nameof(ConfigNames), string.Empty);
+
         ///// <summary>
         ///// Flag (bool) indicating whether tests are being debugged.
         ///// </summary>
@@ -69,7 +74,6 @@ namespace NUnit.Common
 
         /// <summary>
         /// The maximum number of test agents permitted to run simultaneously.
-        /// Ignored if the ProcessModel is not set or defaulted to Multiple.
         /// </summary>
         public static SettingDefinition<int> MaxAgents { get; } = new(nameof(MaxAgents), 0);
 

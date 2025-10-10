@@ -193,6 +193,8 @@ namespace NUnit.Engine.Services
 
         public override void StartService()
         {
+            base.StartService();
+
             try
             {
                 FindAvailableRuntimes();

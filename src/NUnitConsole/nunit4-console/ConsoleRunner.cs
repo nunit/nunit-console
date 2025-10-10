@@ -85,7 +85,7 @@ namespace NUnit.ConsoleRunner
             foreach (string extensionDirectory in _options.ExtensionDirectories)
                 _extensionService.FindExtensionAssemblies(extensionDirectory);
 
-            _extensionService.LoadExtensions();
+            _extensionService.InstallExtensions();
 
             _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
 

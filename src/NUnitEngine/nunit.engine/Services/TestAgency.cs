@@ -20,7 +20,7 @@ namespace NUnit.Engine.Services
     /// The TestAgency class provides RemoteTestAgents
     /// on request and tracks their status.
     /// </summary>
-    public class TestAgency : ITestAgentProvider, ITestAgency, IAgentInfoProvider, IService
+    public class TestAgency : Service, ITestAgentProvider, ITestAgency, IAgentInfoProvider
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
@@ -29,44 +29,8 @@ namespace NUnit.Engine.Services
 
         private readonly AgentStore _agentStore = new AgentStore();
 
-        private ExtensionService? _extensionService;
-
         private readonly List<ExtensionNode> _launcherNodes = new List<ExtensionNode>();
-
-        //private object _launchersLock = new object(); // Lock for lazy initialization of Launchers
-        //private List<IAgentLauncher>? _launchers;
-        //private List<IAgentLauncher> Launchers
-        //{
-        //    get
-        //    {
-        //        Guard.OperationValid(_extensionService is not null, "ExtensionService has not been initialized");
-
-        //        if (_launchers is null)
-        //        {
-        //            lock (_launchersLock)
-        //            {
-        //                if (_launchers is not null)
-        //                    return _launchers; // Double-check locking
-
-        //                log.Debug("Initializing agent launchers from extension service");
-        //                var launchers = new List<IAgentLauncher>();
-
-        //                foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
-        //                {
-        //                    var launcher = (IAgentLauncher)node.ExtensionObject;
-        //                    launchers.Add(launcher);
-        //                }
-
-        //                foreach (var launcher in launchers)
-        //                    AvailableAgents.Add(launcher.AgentInfo);
-
-        //                _launchers = launchers;
-        //            }
-        //        }
-
-        //        return _launchers;
-        //    }
-        //}
+        private ExtensionService? _extensionService;
 
         // Index used to retrieve the agentId of a terminated process
         private readonly Dictionary<Process, Guid> _agentProcessIndex = new Dictionary<Process, Guid>();
@@ -274,41 +238,25 @@ namespace NUnit.Engine.Services
 
         #region IService Implementation
 
-        public IServiceLocator? ServiceContext { get; set; }
-
-        public ServiceStatus Status { get; private set; }
-
         // TODO: it would be better if we had a list of transports to start and stop!
 
-        public void StopService()
+        public override void StopService()
         {
-            try
-            {
-                _tcpTransport.Stop();
-            }
-            finally
-            {
-                Status = ServiceStatus.Stopped;
-            }
+            _tcpTransport.Stop();
+            base.StopService();
         }
 
-        [MemberNotNull(nameof(_extensionService))]
-        public void StartService()
+        public override void StartService()
         {
+            base.StartService();
+
             try
             {
-                if (ServiceContext is null)
-                    throw new InvalidOperationException("ServiceContext is required for TestAgency");
-
                 _extensionService = ServiceContext.GetService<ExtensionService>().ShouldNotBeNull();
-
-                // Add nodes for pluggable agent extensions
-                foreach (var launcherNode in _extensionService.GetExtensionNodes("/NUnit/Engine/TypeExtensions/IAgentLauncher"))
-                    _launcherNodes.Add(launcherNode);
 
                 _tcpTransport.Start();
 
-                Status = ServiceStatus.Started;
+                base.StartService();
             }
             catch
             {
@@ -366,11 +314,14 @@ namespace NUnit.Engine.Services
 
         private Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
         {
+            if (_extensionService is null)
+                throw new InvalidOperationException("The field '_extensionService' must be non null when calling this method");
+
             // Check to see if a specific agent was selected
             string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
             bool specificAgentRequested = !string.IsNullOrEmpty(requestedAgent);
 
-            foreach (var node in _launcherNodes)
+            foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
             {
                 if (specificAgentRequested && node.TypeName != requestedAgent)
                     continue;
@@ -392,16 +343,7 @@ namespace NUnit.Engine.Services
                 throw new NUnitEngineException($"No agent available for TestPackage {package.Name}");
         }
 
-        private IAgentLauncher? GetLauncherByName(string name)
-        {
-            foreach (var node in _launcherNodes)
-                if (node.TypeName == name)
-                    return GetLauncherInstance(node);
-
-            return null;
-        }
-
-        private bool CanCreateAgent(IExtensionNode node, TestPackage package)
+        private bool CanCreateAgent(ExtensionNode node, TestPackage package)
         {
             // Newer implementations use a TargetFramework property to avoid
             // intantiating any agents, which will not be used.
@@ -436,8 +378,14 @@ namespace NUnit.Engine.Services
             return false;
         }
 
-        private IAgentLauncher GetLauncherInstance(IExtensionNode node) =>
-            (IAgentLauncher)((ExtensionNode)node).ExtensionObject;
+        private IAgentLauncher GetLauncherInstance(ExtensionNode node)
+        {
+            var launcher = node.ExtensionObject as IAgentLauncher;
+            if (launcher is not null)
+                return launcher;
+
+            throw new NUnitEngineException("Internal Error: Expected an IAgentLancher");
+        }
     }
 }
 #endif

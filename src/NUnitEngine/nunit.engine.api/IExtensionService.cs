@@ -47,17 +47,16 @@ namespace NUnit.Engine
         void EnableExtension(string typeName, bool enabled);
 
         /// <summary>
-        /// If extensions have not yet been loaded, examine all candidate assemblies
+        /// If extensions have not yet been installed, examine all candidate assemblies
         /// and load them. Subsequent calls are ignored.
         /// </summary>
         /// <remarks>
-        /// We can only load extensions after all candidate assemblies are identified.
+        /// We can only install extensions after all candidate assemblies are identified.
         /// This method may be called by the user after all "Find" calls are complete.
         /// If the user fails to call it and subsequently tries to examine extensions
-        /// using other ExtensionManager properties or methods, it will be called
-        /// but calls not going through ExtensionManager may fail.
+        /// using certain ExtensionManager methods, it is called automatically.
         /// </remarks>
-        void LoadExtensions();
+        void InstallExtensions();
 
         /// <summary>
         /// Get extension objects for all nodes of a given type

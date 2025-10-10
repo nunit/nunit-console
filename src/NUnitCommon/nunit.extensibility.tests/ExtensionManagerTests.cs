@@ -100,7 +100,7 @@ namespace NUnit.Extensibility
 
             // Find Fake Extensions using alternate start directory
             _extensionManager.FindExtensionAssemblies(FAKE_EXTENSIONS_PARENT_DIRECTORY);
-            _extensionManager.LoadExtensions();
+            _extensionManager.InstallExtensions();
         }
 
         [Test]

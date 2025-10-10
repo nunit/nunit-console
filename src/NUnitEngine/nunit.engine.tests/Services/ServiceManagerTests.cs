@@ -9,15 +9,17 @@ namespace NUnit.Engine.Services
     {
         private IService _fakeService;
         private ServiceManager _serviceManager;
+        private ServiceContext _context;
 
         [SetUp]
         public void SetUp()
         {
-            _serviceManager = new ServiceManager();
+            _context = new ServiceContext();
+            _serviceManager = _context.ServiceManager;
 
             _fakeService = new FakeService();
-            _serviceManager.AddService(_fakeService);
-            _serviceManager.AddService(new ExtensionService());
+            _context.Add(_fakeService);
+            _context.Add(new ExtensionService());
         }
 
         [TearDown]
