@@ -42,10 +42,14 @@ namespace NUnit.Engine.Runners
 
         public NotRunnableTestRunner(string assemblyPath, string message)
         {
-            _name = Escape(Path.GetFileName(assemblyPath));
-            _fullname = Escape(Path.GetFullPath(assemblyPath));
-            _message = Escape(message);
-            _type = new List<string> { ".dll", ".exe" }.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
+            if (assemblyPath != null)
+            {
+                _name = Escape(Path.GetFileName(assemblyPath));
+                _fullname = Escape(Path.GetFullPath(assemblyPath));
+                _type = new List<string> { ".dll", ".exe" }.Contains(Path.GetExtension(assemblyPath)) ? "Assembly" : "Unknown";
+            }
+            if (message != null)
+                _message = Escape(message);
         }
 
         public string ID { get; set; }
@@ -134,6 +138,10 @@ namespace NUnit.Engine.Runners
     {
         public UnmanagedExecutableTestRunner(string assemblyPath)
             : base (assemblyPath, "Unmanaged libraries or applications are not supported")
-        { }
+        { 
+            _runstate = "NotRunnable";
+            _result = "Failed";
+            _label = "Invalid";
+        }
     }
 }
