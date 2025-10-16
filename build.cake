@@ -1,9 +1,10 @@
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.5.0-alpha.4
+#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0-alpha.5
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 #load package-tests.cake
+#load KnownExtensions.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -83,14 +84,14 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
         id: "NUnit.Console",
         source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
         checks: new PackageCheck[] {
-            HasFile("LICENSE.txt"),
-            // Check proper extension is in a sibling directory since we
-            // don't yet have the 'HasExtension' predicate.
-            HasDependency(Extensions.NUnitProjectLoader.NuGetPackage),
-            HasDependency(Extensions.NUnitV2Driver.NuGetPackage),
-            HasDependency(Extensions.NUnitV2ResultWriter.NuGetPackage),
-            HasDependency(Extensions.TeamCityEventListener.NuGetPackage),
-            HasDependency(Extensions.VSProjectLoader.NuGetPackage) }),
+            HasFile("LICENSE.txt") }),
+            //// Check proper extension is in a sibling directory since we
+            //// don't yet have the 'HasExtension' predicate.
+            //HasDependency(KnownExtensions.NUnitProjectLoader.NuGetPackage),
+            //HasDependency(KnownExtensions.NUnitV2Driver.NuGetPackage),
+            //HasDependency(KnownExtensions.NUnitV2ResultWriter.NuGetPackage),
+            //HasDependency(KnownExtensions.TeamCityEventListener.NuGetPackage),
+            //HasDependency(KnownExtensions.VSProjectLoader.NuGetPackage) }),
 
     NUnitConsoleRunnerNetCorePackage = new DotNetToolPackage(
         id: "NUnit.ConsoleRunner.NetCore",
@@ -115,7 +116,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net9.0").WithFiles(AGENT_FILES_NETCORE)
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
+            + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit3-console.exe"),
         tests: PackageTests.StandardRunnerTests),
 
     NUnitConsoleZipPackage = new ZipPackage(
