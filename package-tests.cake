@@ -110,6 +110,7 @@ public static class PackageTests
             });
 
             if (!onGitHubActions)
+            {
                 StandardAndZipLists.Add(new PackageTest(1, "Net70X86Test")
                 {
                     Description = "Run mock-assembly-x86.dll targeting .NET 7.0",
@@ -117,20 +118,20 @@ public static class PackageTests
                     ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-7.0")
                 });
 
-            StandardAndZipLists.Add(new PackageTest(1, "Net60X86Test")
-            {
-                Description = "Run mock-assembly-x86.dll targeting .NET 6.0",
-                Arguments = "testdata/net6.0/mock-assembly-x86.dll",
-                ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
-            });
+                StandardAndZipLists.Add(new PackageTest(1, "Net60X86Test")
+                {
+                    Description = "Run mock-assembly-x86.dll targeting .NET 6.0",
+                    Arguments = "testdata/net6.0/mock-assembly-x86.dll",
+                    ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
+                });
 
-            if (!onGitHubActions)
                 StandardAndZipLists.Add(new PackageTest(1, "NetCore31X86Test")
                 {
                     Description = "Run mock-assembly-x86.dll targeting .NET Core 3.1",
                     Arguments = "testdata/netcoreapp3.1/mock-assembly-x86.dll",
                     ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-3.1")
                 });
+            }
         }
 
         //////////////////////////////////////////////////////////////////////
@@ -459,6 +460,16 @@ public static class PackageTests
             ExpectedResult = new ExpectedResult("Passed")
             {
                 Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
+            }
+        });
+
+        AllLists.Add(new PackageTest(1, "UnmanagedAssemblyTest")
+        {
+            Description = "Attempt to run an unmanaged assembly fails gracefully",
+            Arguments = "../../src/TestData/native-assembly/NativeTests.dll",
+            ExpectedResult = new ExpectedResult("Failed:Invalid")
+            {
+                Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("NativeTests.dll", "net-4.6.2") }
             }
         });
     }

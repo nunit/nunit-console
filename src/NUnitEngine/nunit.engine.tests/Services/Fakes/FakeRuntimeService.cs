@@ -9,9 +9,8 @@ namespace NUnit.Engine.Services.Tests.Fakes
             return true;
         }
 
-        string IRuntimeFrameworkService.SelectRuntimeFramework(TestPackage package)
+        void IRuntimeFrameworkService.SelectRuntimeFramework(TestPackage package)
         {
-            return string.Empty;
         }
     }
 }

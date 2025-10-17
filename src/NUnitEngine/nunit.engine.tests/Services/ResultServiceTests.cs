@@ -30,7 +30,8 @@ namespace NUnit.Engine.Services.Tests
         [Test]
         public void AvailableFormats()
         {
-            Assert.That(_resultService.Formats, Is.EquivalentTo(new string[] { "nunit3", "cases", "user" }));
+            // Changed from Is.Equivalent.To since developers may have installed other formats locally for testing
+            Assert.That(_resultService.Formats, Is.SupersetOf(new string[] { "nunit3", "cases", "user" }));
         }
 
         [TestCase("nunit3", null, ExpectedResult = "NUnit3XmlResultWriter")]

@@ -1,13 +1,9 @@
-next-version: 3.20.0
 mode: ContinuousDelivery
-legacy-semver-padding: 5
-build-metadata-padding: 5
-commits-since-version-source-padding: 5
 branches:
-  master:
-    regex: ^(main|version4)$
-    tag: alpha
+  main:
+    regex: ^version3$
+    label: alpha
   release:
-    tag: pre
+    label: pre
   pull-request:
-    tag: pr
+    label: pr

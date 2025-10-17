@@ -92,16 +92,15 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">A TestPackage</param>
         /// <returns>A string representing the selected RuntimeFramework</returns>
-        public string SelectRuntimeFramework(TestPackage package)
+        public void SelectRuntimeFramework(TestPackage package)
         {
             // Evaluate package target framework
             ApplyImageData(package);
 
-            var targetFramework = SelectRuntimeFrameworkInner(package);
-            return targetFramework.ToString();
+            SelectRuntimeFrameworkInner(package);
         }
 
-        private RuntimeFramework SelectRuntimeFrameworkInner(TestPackage package)
+        private void SelectRuntimeFrameworkInner(TestPackage package)
         {
             foreach (var subPackage in package.SubPackages)
             {
@@ -126,15 +125,13 @@ namespace NUnit.Engine.Services
                     throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
 
                 package.Settings[EnginePackageSettings.TargetRuntimeFramework] = frameworkSetting;
-
-                return requestedFramework;
             }
 
             log.Debug($"No specific framework requested for {package.Name}");
 
             string imageTargetFrameworkNameSetting = package.GetSetting(InternalEnginePackageSettings.ImageTargetFrameworkName, "");
-            RuntimeType targetRuntime;
-            Version targetVersion;
+            RuntimeType targetRuntime = RuntimeType.Any;
+            Version targetVersion = new Version(0,0);
 
             if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
             {
@@ -161,24 +158,29 @@ namespace NUnit.Engine.Services
                         targetVersion = new Version(3, 1);
                         break;
                     case "Unmanaged":
-                        return null;
+                        break;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
                 }
             }
 
-            if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id, runAsX86))
+            // All cases except Unmanaged set the runtime type
+            if (targetRuntime == RuntimeType.Any)
+                package.Settings[InternalEnginePackageSettings.ImageTargetFrameworkName] = "Unmanaged,Version=0.0";
+            else
             {
-                log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
-                if (targetVersion < currentFramework.FrameworkVersion)
-                    targetVersion = currentFramework.FrameworkVersion;
+                if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id, runAsX86))
+                {
+                    log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
+                    if (targetVersion < currentFramework.FrameworkVersion)
+                        targetVersion = currentFramework.FrameworkVersion;
+                }
+
+                RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);
+                package.Settings[EnginePackageSettings.TargetRuntimeFramework] = targetFramework.ToString();
+
+                log.Debug($"Test will use {targetFramework} for {package.Name}");
             }
-
-            RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);
-            package.Settings[EnginePackageSettings.TargetRuntimeFramework] = targetFramework.ToString();
-
-            log.Debug($"Test will use {targetFramework} for {package.Name}");
-            return targetFramework;
         }
 
         public override void StartService()

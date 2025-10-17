@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		GitReleaseManager.yaml = GitReleaseManager.yaml
 		GitVersion.yml = GitVersion.yml
 		global.json = global.json
+		KnownExtensions.cake = KnownExtensions.cake
 		LICENSE.txt = LICENSE.txt
 		MixedTests.nunit = MixedTests.nunit
 		NetCoreTests.nunit = NetCoreTests.nunit
