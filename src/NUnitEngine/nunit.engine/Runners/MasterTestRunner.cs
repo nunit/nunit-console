@@ -1,15 +1,18 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
+using NUnit.Engine.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Timers;
 using System.Xml;
-using NUnit.Engine.Services;
-using NUnit.Common;
+using TestCentric.Metadata;
 
 namespace NUnit.Engine.Runners
 {
@@ -263,6 +266,33 @@ namespace NUnit.Engine.Runners
                 // each contained assembly, including it's target runtime.
                 foreach (var assemblyPackage in leafPackages)
                     _runtimeService.SelectRuntimeFramework(assemblyPackage);
+#else
+                var package = leafPackages[0];
+                string packageName = package.FullName ?? string.Empty;
+
+                if (File.Exists(packageName))
+                try
+                {
+                    using (var assembly = AssemblyDefinition.ReadAssembly(packageName))
+                    {
+                        string targetVersion = assembly.GetRuntimeVersion().ToString();
+                        string frameworkName = assembly.GetFrameworkName();
+                        bool requiresX86 = assembly.RequiresX86();
+                        bool requiresAssemblyResolver = assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute");
+
+                        package.Settings.Set(SettingDefinitions.ImageRuntimeVersion.WithValue(targetVersion));
+                        package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue(frameworkName));
+                        package.Settings.Set(SettingDefinitions.ImageRequiresX86.WithValue(true));
+                        package.Settings.Set(SettingDefinitions.RunAsX86.WithValue(true));
+                        package.Settings.Set(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver.WithValue(requiresAssemblyResolver));
+                    }
+                }
+                catch (BadImageFormatException)
+                {
+                    // "Unmanaged" is not a valid framework identifier but we handle it upstream
+                    // using UnmanagedCodeTestRunner, which doesn't actually try to run it.
+                    package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"));
+                }
 #endif
                 _engineRunner = _testRunnerFactory.MakeTestRunner(TestPackage);
             }

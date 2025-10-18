@@ -495,15 +495,16 @@ namespace NUnit.Extensibility
                 // TODO: This is a remnant of older code. In principle, this should be generalized
                 // to something like "HostVersion". However, this can safely remain until
                 // we separate ExtensionManager into its own assembly.
-                string? versionArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.EngineVersion)) as string;
-                if (versionArg is not null)
-                {
-                    if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
-                    {
-                        log.Warning($"  Ignoring {extensionType.Name}. It requires version {versionArg}.");
-                        continue;
-                    }
-                }
+                // Temporarily removing this check for testing
+                //string? versionArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.EngineVersion)) as string;
+                //if (versionArg is not null)
+                //{
+                //    if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
+                //    {
+                //        log.Warning($"  Ignoring {extensionType.Name}. It requires version {versionArg}.");
+                //        continue;
+                //    }
+                //}
 
                 string? extensionAttrPath = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Path));
                 var node = new ExtensionNode(extensionAssembly, extensionType)

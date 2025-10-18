@@ -173,6 +173,8 @@ namespace NUnit.Engine.Services
                         targetVersion = new Version(3, 1);
                         break;
                     case "Unmanaged":
+                        package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"));
+                        return;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
                 }
