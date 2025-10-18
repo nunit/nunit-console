@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Emit;
 
 namespace NUnit.Engine.Runners
 {
@@ -157,11 +158,14 @@ namespace NUnit.Engine.Runners
         }
     }
 
-    public class UnmanagedExecutableTestRunner : InvalidAssemblyTestRunner
+    public class UnmanagedExecutableTestRunner : NotRunnableTestRunner
     {
         public UnmanagedExecutableTestRunner(string assemblyPath)
             : base(assemblyPath, "Unmanaged libraries or applications are not supported")
         {
+            _runstate = "NotRunnable";
+            _result = "Failed";
+            _label = "Invalid";
         }
     }
 

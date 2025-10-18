@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.IO;
 using NUnit.Common;
 using NUnit.Engine.Runners;
@@ -75,15 +76,13 @@ namespace NUnit.Engine.Services
                 return new InvalidAssemblyTestRunner(assemblyPath, $"Not a valid assembly: {assemblyPath}");
 
             string targetFrameworkName = package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+            string platform = targetFrameworkName.Split(',')[0];
             if (!string.IsNullOrEmpty(targetFrameworkName))
-            {
-                string platform = targetFrameworkName.Split(',')[0];
                 if (platform == "Silverlight" || platform == ".NETPortable" || platform == ".NETStandard" || platform == ".NETCompactFramework")
                     return new InvalidAssemblyTestRunner(assemblyPath, $"Platform {platform} is not supported");
 
-                if (platform == "Unmanaged")
-                    return new UnmanagedExecutableTestRunner(assemblyPath);
-            }
+            if (platform == "Unmanaged")
+                return new UnmanagedExecutableTestRunner(assemblyPath);
 
             bool skipNonTestAssemblies = package.Settings.GetValueOrDefault(SettingDefinitions.SkipNonTestAssemblies);
             if (skipNonTestAssemblies)

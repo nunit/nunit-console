@@ -609,6 +609,16 @@ AddToBothLists(new PackageTest(1, "AppContextBaseDirectory_NET80")
     }
 });
 
+AddToBothLists(new PackageTest(1, "UnmanagedAssemblyTest")
+{
+    Description = "Attempt to run an unmanaged assembly fails gracefully",
+    Arguments = "../../src/TestData/native-assembly/NativeTests.dll",
+    ExpectedResult = new ExpectedResult("Failed:Invalid")
+    {
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("NativeTests.dll", "net-4.6.2") }
+    }
+});
+
 // NOTE: Tests for NUnit.Engine and NUnit.Agent.Core here are quite limited. At this
 // point, the main purpose they serve is to demonstrate that we are ABLE to  run
 // the tests without using the console runner.
