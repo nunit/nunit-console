@@ -23,8 +23,6 @@ namespace NUnit.Engine
     /// is extensible, it does not reside in the Extensibility namespace
     /// because it is so widely used by the engine.
     /// </summary>
-    [TypeExtensionPoint(
-        Description="Provides a service within the engine and possibly externally as well.")]
     public interface IService
     {
         /// <summary>

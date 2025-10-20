@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics;
-using NUnit.Extensibility;
 
 namespace NUnit.Engine.Extensibility
 {
@@ -11,8 +10,6 @@ namespace NUnit.Engine.Extensibility
     /// a test package, evaluate whether it can create an agent for it and
     /// create the agent itself on request.
     /// </summary>
-    [TypeExtensionPoint(
-        Description = "Launches an Agent Process for supported target runtimes")]
     public interface IAgentLauncher
     {
         /// <summary>

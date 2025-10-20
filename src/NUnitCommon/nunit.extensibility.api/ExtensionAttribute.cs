@@ -38,8 +38,13 @@ namespace NUnit.Extensibility
         public bool Enabled { get; set; }
 
         /// <summary>
-        /// The minimum Engine version for which this extension is designed
+        /// The version of NUnit.Extensibility used by this extension
         /// </summary>
-        public string? EngineVersion { get; set; }
+        public string? ExtensibilityVersion { get; set; }
+
+        /// <summary>
+        /// The minimum version of the host required by this extension
+        /// </summary>
+        public string? HostVersion { get; set; }
     }
 }

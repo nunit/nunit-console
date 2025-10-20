@@ -20,9 +20,9 @@ namespace NUnit.Extensibility
         private const string FAKE_EXTENSIONS_FILENAME = "FakeExtensions.dll";
         private static readonly string FAKE_EXTENSIONS_PARENT_DIRECTORY =
 #if NETFRAMEWORK
-            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2/net462");
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakes/net462");
 #else
-            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakesv2/netstandard2.0");
+            Path.Combine(new DirectoryInfo(THIS_ASSEMBLY_DIRECTORY).Parent!.FullName, "fakes/netstandard2.0");
 #endif
 
         private const string FAKE_AGENT_LAUNCHER_EXTENSION = "NUnit.Engine.Fakes.FakeAgentLauncherExtension";
@@ -32,7 +32,6 @@ namespace NUnit.Extensibility
         private const string FAKE_EVENT_LISTENER_EXTENSION = "NUnit.Engine.Fakes.FakeEventListenerExtension";
         private const string FAKE_SERVICE_EXTENSION = "NUnit.Engine.Fakes.FakeServiceExtension";
         private const string FAKE_DISABLED_EXTENSION = "NUnit.Engine.Fakes.FakeDisabledExtension";
-        private const string FAKE_NUNIT_V2_DRIVER_EXTENSION = "NUnit.Engine.Fakes.V2DriverExtension";
         private const string FAKE_EXTENSION_WITH_NO_EXTENSION_POINT = "NUnit.Engine.Fakes.FakeExtension_NoExtensionPointFound";
 
         private readonly string[] KnownExtensions =
@@ -44,7 +43,6 @@ namespace NUnit.Extensibility
             FAKE_EVENT_LISTENER_EXTENSION,
             FAKE_SERVICE_EXTENSION,
             FAKE_DISABLED_EXTENSION,
-            //FAKE_NUNIT_V2_DRIVER_EXTENSION,
             FAKE_EXTENSION_WITH_NO_EXTENSION_POINT
         };
 
@@ -66,13 +64,12 @@ namespace NUnit.Extensibility
 
             _expectedExtensionPointPaths =
             [
-                prefix + "IAgentLauncher",
-                prefix + "IDriverFactory",
-                prefix + "IProjectLoader",
-                prefix + "IResultWriter",
-                prefix + "ITestEventListener",
-                prefix + "IService",
-                "/NUnit/Engine/NUnitV2Driver"
+                "/NUnit/Engine/AgentLaunchers",
+                "/NUnit/Engine/FrameworkDrivers",
+                "/NUnit/Engine/ProjectLoaders",
+                "/NUnit/Engine/ResultWriters",
+                "/NUnit/Engine/TestEventListeners",
+                "/NUnit/Engine/Services"
             ];
 
             _expectedExtensionPointTypes =
@@ -82,11 +79,10 @@ namespace NUnit.Extensibility
                 typeof(IProjectLoader),
                 typeof(IResultWriter),
                 typeof(ITestEventListener),
-                typeof(IService),
-                typeof(IFrameworkDriver)
+                typeof(IService)
             ];
 
-            _expectedExtensionCounts = [1, 1, 1, 1, 2, 1, 0];
+            _expectedExtensionCounts = [1, 1, 1, 1, 2, 1];
         }
 
         [SetUp]
@@ -95,8 +91,7 @@ namespace NUnit.Extensibility
             _extensionManager = new ExtensionManager() { TypeExtensionPath = _defaultTestExtensionPath };
 
             // Find actual extension points.
-            _extensionManager.FindExtensionPoints(typeof(ExtensionManager).Assembly);
-            _extensionManager.FindExtensionPoints(typeof(ITestEngine).Assembly);
+            _extensionManager.FindExtensionPoints(Assembly.LoadFrom(Path.Combine(FAKE_EXTENSIONS_PARENT_DIRECTORY, FAKE_EXTENSIONS_FILENAME)));
 
             // Find Fake Extensions using alternate start directory
             _extensionManager.FindExtensionAssemblies(FAKE_EXTENSIONS_PARENT_DIRECTORY);
@@ -134,7 +129,7 @@ namespace NUnit.Extensibility
                 var expectedStatus = node.TypeName == FAKE_EXTENSION_WITH_NO_EXTENSION_POINT
                     ? ExtensionStatus.Unknown
                     : ExtensionStatus.Unloaded;
-                Assert.That(node.Status, Is.EqualTo(expectedStatus));
+                Assert.That(node.Status, Is.EqualTo(expectedStatus), $"Invalid Status for {node.TypeName}");
             }
         }
 

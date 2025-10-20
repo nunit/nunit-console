@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
-    <RootNamespace>NUnit.Extensibility</RootNamespace>
-    <OutputPath>..\..\..\..\bin\$(Configuration)\fakesv2</OutputPath>
+    <RootNamespace>NUnit.Extensions.Fakes</RootNamespace>
+    <OutputPath>..\..\..\..\bin\$(Configuration)\fakes</OutputPath>
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <FileVersion>2.0.0</FileVersion>
     <AssemblyName>FakeExtensions</AssemblyName>
@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\..\..\NUnitCommon\nunit.extensibility.api\nunit.extensibility.api.csproj" />
+    <ProjectReference Include="..\..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>
 
   <ItemGroup>
