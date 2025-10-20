@@ -29,7 +29,6 @@ namespace NUnit.Extensibility
         // it as an argument to the constructor.
         public const string DEFAULT_TYPE_EXTENSION_PATH = "/NUnit/Extensibility/TypeExtensions/";
 
-        private static readonly Version CURRENT_ENGINE_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
         private static readonly string EXTENSION_ATTRIBUTE = typeof(ExtensionAttribute).FullName.ShouldNotBeNull();
         private static readonly string EXTENSION_PROPERTY_ATTRIBUTE = typeof(ExtensionPropertyAttribute).FullName.ShouldNotBeNull();
         private static readonly string V3_EXTENSION_ATTRIBUTE = "NUnit.Engine.Extensibility.ExtensionAttribute";
@@ -464,6 +463,9 @@ namespace NUnit.Extensibility
             _visited.Add($"path={path}_visited={fromWildcard}", null);
         }
 
+        private static readonly Version THIS_VERSION = Assembly.GetExecutingAssembly().GetName().Version ?? new Version();
+        private static readonly Version DEFAULT_EXTENSIBILITY_VERSION = new Version(4, 0);
+
         /// <summary>
         /// Scan a single assembly for extensions marked by ExtensionAttribute.
         /// For each extension, create an ExtensionNode and link it to the
@@ -489,68 +491,82 @@ namespace NUnit.Extensibility
                     isV3Extension = true;
                 }
 
-                if (extensionAttr is null)
-                    continue;
-
-                // TODO: This is a remnant of older code. In principle, this should be generalized
-                // to something like "HostVersion". However, this can safely remain until
-                // we separate ExtensionManager into its own assembly.
-                // Temporarily removing this check for testing
-                //string? versionArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.EngineVersion)) as string;
-                //if (versionArg is not null)
-                //{
-                //    if (new Version(versionArg) > CURRENT_ENGINE_VERSION)
-                //    {
-                //        log.Warning($"  Ignoring {extensionType.Name}. It requires version {versionArg}.");
-                //        continue;
-                //    }
-                //}
-
-                string? extensionAttrPath = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Path));
-                var node = new ExtensionNode(extensionAssembly, extensionType)
+                if (extensionAttr is not null)
                 {
-                    IsV3Extension = isV3Extension,
-                    Description = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Description)),
-                };
-
-                object? enabledArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Enabled));
-                node.Enabled = enabledArg is null || (bool)enabledArg;
-
-                log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
-
-                var propertyAttributes = isV3Extension
-                    ? extensionType.GetAttributes(V3_EXTENSION_PROPERTY_ATTRIBUTE)
-                    : extensionType.GetAttributes(EXTENSION_PROPERTY_ATTRIBUTE);
-
-                foreach (var attr in propertyAttributes)
-                {
-                    string? name = attr.ConstructorArguments[0].Value as string;
-                    string? value = attr.ConstructorArguments[1].Value as string;
-
-                    if (name is not null && value is not null)
+                    string? extensibilityVersionSetting = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.ExtensibilityVersion)) as string;
+                    Version extensibilityVersion = extensibilityVersionSetting is not null
+                        ? new Version(extensibilityVersionSetting)
+                        : DEFAULT_EXTENSIBILITY_VERSION;
+                    if (!CheckExtensibilityVersion(extensibilityVersion))
                     {
-                        node.AddProperty(name, value);
-                        log.Info("        ExtensionProperty {0} = {1}", name, value);
+                        log.Warning($"  Ignoring {extensionType.Name}. It requires extensibility version {extensibilityVersionSetting}.");
+                        continue;
                     }
+
+                    string? extensionAttrPath = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Path));
+                    var node = new ExtensionNode(extensionAssembly, extensionType)
+                    {
+                        IsV3Extension = isV3Extension,
+                        Description = (string?)extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Description)),
+                    };
+
+                    object? enabledArg = extensionAttr.GetNamedArgument(nameof(ExtensionAttribute.Enabled));
+                    node.Enabled = enabledArg is null || (bool)enabledArg;
+
+                    log.Info("  Found ExtensionAttribute on Type " + extensionType.Name);
+
+                    var propertyAttributes = isV3Extension
+                        ? extensionType.GetAttributes(V3_EXTENSION_PROPERTY_ATTRIBUTE)
+                        : extensionType.GetAttributes(EXTENSION_PROPERTY_ATTRIBUTE);
+
+                    foreach (var attr in propertyAttributes)
+                    {
+                        string? name = attr.ConstructorArguments[0].Value as string;
+                        string? value = attr.ConstructorArguments[1].Value as string;
+
+                        if (name is not null && value is not null)
+                        {
+                            node.AddProperty(name, value);
+                            log.Info("        ExtensionProperty {0} = {1}", name, value);
+                        }
+                    }
+
+                    _extensions.Add(node);
+
+                    ExtensionPoint? ep = extensionAttrPath is not null
+                        ? GetExtensionPoint(extensionAttrPath)
+                        : DeduceExtensionPointFromType(extensionType);
+
+                    if (ep is null)
+                    {
+                        log.Warning($"Extension ignored - Unable to deduce ExtensionPoint.");
+                        node.Status = ExtensionStatus.Unknown;
+                        node.Exception = new Exception("Unable to deduce ExtensionPoint");
+                        continue;
+                    }
+
+                    node.Path = ep.Path;
+                    ep.Install(node);
                 }
-
-                _extensions.Add(node);
-
-                ExtensionPoint? ep = extensionAttrPath is not null
-                    ? GetExtensionPoint(extensionAttrPath)
-                    : DeduceExtensionPointFromType(extensionType);
-
-                if (ep is null)
-                {
-                    log.Warning($"Extension ignored - Unable to deduce ExtensionPoint.");
-                    node.Status = ExtensionStatus.Unknown;
-                    node.Exception = new Exception("Unable to deduce ExtensionPoint");
-                    continue;
-                }
-
-                node.Path = ep.Path;
-                ep.Install(node);
             }
+        }
+
+        private bool CheckExtensibilityVersion(Version extensibilityVersion)
+        {
+            Guard.OperationValid(extensibilityVersion.Major >= 0 && extensibilityVersion.Minor >= 0,
+                $"At least major and minor components must be specified for the ExtensibilityVersion property");
+
+            if (extensibilityVersion.Major > THIS_VERSION.Major)
+                return true;
+            if (extensibilityVersion.Major < THIS_VERSION.Major)
+                return false;
+
+            if (extensibilityVersion.Minor > THIS_VERSION.Minor)
+                return true;
+            if (extensibilityVersion.Minor < THIS_VERSION.Minor)
+                return false;
+
+            return extensibilityVersion.Build == -1 || extensibilityVersion.Build >= THIS_VERSION.Build;
         }
 
         private const string NETFRAMEWORK = ".NETFramework";

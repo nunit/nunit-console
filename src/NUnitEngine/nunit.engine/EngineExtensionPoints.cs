@@ -11,7 +11,7 @@ using NUnit.Extensibility;
     Description = "Supplies a writer to write the result of a test to a file using a specific format.")]
 [assembly: ExtensionPoint("/NUnit/Engine/TestEventListeners", typeof(NUnit.Engine.ITestEventListener),
     Description = "Allows an extension to process progress reports and other events from the test.")]
-[assembly: ExtensionPoint("/NUnit/Engine/DriverFactories", typeof(NUnit.Engine.Extensibility.IDriverFactory),
+[assembly: ExtensionPoint("/NUnit/Engine/FrameworkDrivers", typeof(NUnit.Engine.Extensibility.IDriverFactory),
     Description = "Supplies a driver to run tests that use a specific test framework.")]
 [assembly: ExtensionPoint("/NUnit/Engine/Services", typeof(NUnit.Engine.IService),
     Description = "Provides a service within the engine and possibly externally as well.")]
