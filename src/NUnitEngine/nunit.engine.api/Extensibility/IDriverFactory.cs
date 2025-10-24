@@ -2,15 +2,12 @@
 
 using System;
 using System.Reflection;
-using NUnit.Extensibility;
 
 namespace NUnit.Engine.Extensibility
 {
     /// <summary>
     /// Interface implemented by a Type that knows how to create a driver for a test assembly.
     /// </summary>
-    [TypeExtensionPoint(
-        Description = "Supplies a driver to run tests that use a specific test framework.")]
     public interface IDriverFactory
     {
         /// <summary>

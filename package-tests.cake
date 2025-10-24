@@ -416,14 +416,14 @@ NetCoreRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
 StandardRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
-    Arguments = "--extensionDirectory fakesv2/net462 --list-extensions",
+    Arguments = "--extensionDirectory fakes/net462 --list-extensions",
     ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
 });
 
 NetCoreRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
-    Arguments = "--extensionDirectory fakesv2/netstandard2.0 --list-extensions --trace:Debug",
+    Arguments = "--extensionDirectory fakes/netstandard2.0 --list-extensions --trace:Debug",
     ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
 });
 

@@ -10,7 +10,7 @@ using NUnit.Extensibility;
 
 namespace NUnit.Engine.Fakes
 {
-    [Extension]
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeFrameworkDriverExtension : IDriverFactory
     {
 #if NETFRAMEWORK
@@ -22,7 +22,7 @@ namespace NUnit.Engine.Fakes
         public bool IsSupportedTestFramework(AssemblyName reference) => throw new NotImplementedException();
     }
 
-    [Extension]
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeProjectLoaderExtension : IProjectLoader
     {
         public bool CanLoadFrom(string path) => throw new NotImplementedException();
@@ -30,7 +30,7 @@ namespace NUnit.Engine.Fakes
         public IProject LoadFrom(string path) => throw new NotImplementedException();
     }
 
-    [Extension]
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeResultWriterExtension : IResultWriter
     {
         public void CheckWritability(string outputPath) => throw new NotImplementedException();
@@ -40,7 +40,7 @@ namespace NUnit.Engine.Fakes
         public void WriteResultFile(XmlNode resultNode, string outputPath) => throw new NotImplementedException();
     }
 
-    [Extension]
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeEventListenerExtension : ITestEventListener
     {
         public void OnTestEvent(string report)
@@ -51,7 +51,13 @@ namespace NUnit.Engine.Fakes
         }
     }
 
-    [Extension]
+    [Extension(ExtensibilityVersion = "3.4.0")]
+    public class Version3Extension : ITestEventListener
+    {
+        public void OnTestEvent(string report) => throw new NotImplementedException();
+    }
+
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeServiceExtension : IService
     {
         public IServiceLocator ServiceContext
@@ -74,56 +80,13 @@ namespace NUnit.Engine.Fakes
         public void StopService() => throw new NotImplementedException();
     }
 
-    // TODO: Determine whether we support the V2 driver and, if so, how
-    //[Extension(Path= "/NUnit/Engine/NUnitV2Driver")]
-    //public class V2DriverExtension : IFrameworkDriver
-    //{
-    //    public string ID
-    //    {
-    //        get
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-
-    //        set
-    //        {
-    //            throw new NotImplementedException();
-    //        }
-    //    }
-
-    //    public int CountTestCases(string filter)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public string Explore(string filter)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public string Load(string testAssemblyPath, IDictionary<string, object> settings)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public string Run(ITestEventListener? listener, string filter)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void StopRun(bool force)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
-    [Extension(Enabled=false)]
+    [Extension(Enabled=false, ExtensibilityVersion = "4.0.0")]
     public class FakeDisabledExtension : ITestEventListener
     {
         public void OnTestEvent(string report) => throw new NotImplementedException();
     }
 
-    [Extension]
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeAgentLauncherExtension : IAgentLauncher
     {
         public TestAgentInfo AgentInfo => throw new NotImplementedException();
@@ -133,7 +96,7 @@ namespace NUnit.Engine.Fakes
         public Process CreateAgent(Guid agentId, string agencyUrl, TestPackage package) => throw new NotImplementedException();
     }
 
-    [Extension]
+    [Extension(ExtensibilityVersion = "4.0.0")]
     public class FakeExtension_NoExtensionPointFound
     {
         public void SomeMethod() => throw new NotImplementedException();

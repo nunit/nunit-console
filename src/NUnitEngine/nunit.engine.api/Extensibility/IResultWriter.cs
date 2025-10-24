@@ -2,15 +2,12 @@
 
 using System.IO;
 using System.Xml;
-using NUnit.Extensibility;
 
 namespace NUnit.Engine.Extensibility
 {
     /// <summary>
     /// Common interface for objects that process and write out test results
     /// </summary>
-    [TypeExtensionPoint(
-        Description = "Supplies a writer to write the result of a test to a file using a specific format.")]
     public interface IResultWriter
     {
         /// <summary>
