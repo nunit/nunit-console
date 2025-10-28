@@ -3,7 +3,6 @@
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics.CodeAnalysis;
-using NUnit.Common;
 using NUnit.Engine.Services;
 
 namespace NUnit.Engine.Runners

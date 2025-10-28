@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using NUnit.Common;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Runners

@@ -5,7 +5,6 @@ using NUnit.Framework;
 using NUnit.ConsoleRunner.Options;
 using System.Linq;
 using NUnit.Engine;
-using NUnit.Common;
 
 namespace NUnit.ConsoleRunner
 {

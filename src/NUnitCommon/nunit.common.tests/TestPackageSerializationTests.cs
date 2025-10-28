@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Common;
 using NUnit.Framework;
 using Org.XmlUnit.Constraints;
 

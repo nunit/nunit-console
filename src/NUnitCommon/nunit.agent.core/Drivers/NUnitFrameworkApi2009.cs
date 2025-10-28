@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using NUnit.Common;
 
 namespace NUnit.Engine.Drivers
 {

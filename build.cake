@@ -189,6 +189,8 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
 
 // Add all packages to BuildSettings in order they should be build.
 // Dependencies must precede all the packages that depend on them.
+// Specify --engine-only argument to package the engine alone. This
+// is useful when you need to update both the engine and the agents.
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityApiPackage,
     NUnitEngineApiPackage,
@@ -196,11 +198,15 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityPackage,
     NUnitAgentCorePackage,
     NUnitEnginePackage,
-    NUnitConsoleRunnerDotNetToolPackage,
-    NUnitConsoleRunnerNuGetPackage,
-    NUnitConsoleRunnerChocolateyPackage,
-    NUnitConsoleNuGetPackage
 });
+
+if (!HasArgument("engine-only"))
+    BuildSettings.Packages.AddRange(new PackageDefinition[] {
+        NUnitConsoleRunnerDotNetToolPackage,
+        NUnitConsoleRunnerNuGetPackage,
+        NUnitConsoleRunnerChocolateyPackage,
+        NUnitConsoleNuGetPackage
+    });
 
 //////////////////////////////////////////////////////////////////////
 // CONSOLE PACKAGE TEST RUNNER

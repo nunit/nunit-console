@@ -9,7 +9,6 @@
 #if NETFRAMEWORK
 using System;
 using System.IO;
-using NUnit.Common;
 using NUnit.Engine.Services;
 using NUnit.Framework;
 using NSubstitute;
