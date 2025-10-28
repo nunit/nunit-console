@@ -259,7 +259,7 @@ namespace NUnit.Engine.Runners
         {
             if (_engineRunner is null)
             {
-                var leafPackages = TestPackage.Select(p => !p.HasSubPackages());
+                var leafPackages = TestPackage.Select(p => !p.HasSubPackages);
 
 #if NETFRAMEWORK
                 // Analyze each TestPackage, adding settings that describe
@@ -313,7 +313,7 @@ namespace NUnit.Engine.Runners
             // we expanded.
             bool hasProjects = false;
             foreach (var p in TestPackage.SubPackages)
-                hasProjects |= p.HasSubPackages();
+                hasProjects |= p.HasSubPackages;
 
             // If no Projects, there's nothing to do
             if (!hasProjects)
@@ -339,7 +339,7 @@ namespace NUnit.Engine.Runners
 
             foreach (var subPackage in TestPackage.SubPackages)
             {
-                if (subPackage.HasSubPackages())
+                if (subPackage.HasSubPackages)
                 {
                     // This is a project, create an intermediate result
                     var projectResult = new TestEngineResult();

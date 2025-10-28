@@ -98,6 +98,26 @@ namespace NUnit.Engine
         public string? FullName { get; set; }
 
         /// <summary>
+        /// Get a flag indicating whether this package represents an assembly.
+        /// </summary>
+        public bool IsAssemblyPackage
+        {
+            get
+            {
+                if (FullName is null)
+                    return false;
+
+                string extension = Path.GetExtension(FullName).ToLower();
+                return extension == ".dll" || extension == ".exe";
+            }
+        }
+
+        /// <summary>
+        /// Get a flag indicating whether any subpackages exist
+        /// </summary>
+        public bool HasSubPackages => SubPackages.Count > 0;
+
+        /// <summary>
         /// Gets the list of SubPackages contained in this package
         /// </summary>
         public IList<TestPackage> SubPackages { get; } = new List<TestPackage>();
@@ -199,6 +219,34 @@ namespace NUnit.Engine
         public void AddSetting(string name, int value)
         {
             AddSetting(new PackageSetting<int>(name, value));
+        }
+
+        /// <summary>
+        /// Predicate delegate for use with the Select method
+        /// </summary>
+        public delegate bool TestPackageSelectorDelegate(TestPackage p);
+
+        /// <summary>
+        /// Select a list of all packages and subpackages matching a predicate
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public IList<TestPackage> Select(TestPackageSelectorDelegate selector)
+        {
+            var selection = new List<TestPackage>();
+
+            AccumulatePackages(this, selection, selector);
+
+            return selection;
+        }
+
+        private void AccumulatePackages(TestPackage package, IList<TestPackage> selection, TestPackageSelectorDelegate selector)
+        {
+            if (selector(package))
+                selection.Add(package);
+
+            foreach (var subPackage in package.SubPackages)
+                AccumulatePackages(subPackage, selection, selector);
         }
     }
 }

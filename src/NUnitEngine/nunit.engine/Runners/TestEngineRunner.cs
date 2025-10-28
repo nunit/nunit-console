@@ -17,7 +17,7 @@ namespace NUnit.Engine.Runners
             Guard.ArgumentNotNull(services, nameof(package));
             Guard.ArgumentNotNull(package, nameof(package));
 
-            TestPackages = package.Select(p => !p.HasSubPackages());
+            TestPackages = package.Select(p => !p.HasSubPackages);
             TestPackage = TestPackages.Count == 1
                 ? TestPackages[0]
                 : package;

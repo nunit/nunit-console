@@ -50,7 +50,7 @@ namespace NUnit.Engine.Runners
         public TestAgentRunner(TestPackage package)
         {
             Guard.ArgumentNotNull(package);
-            var assemblyPackages = package.Select(p => !p.HasSubPackages());
+            var assemblyPackages = package.Select(p => !p.HasSubPackages);
             Guard.ArgumentValid(assemblyPackages.Count == 1, "TestAgentRunner requires a package with a single assembly", nameof(package));
 
             TestPackage = package;
@@ -96,7 +96,7 @@ namespace NUnit.Engine.Runners
 
             // The TestAgentRunner constructor guarantees that TestPackage has
             // only a single assembly.
-            var assemblyPackage = TestPackage.Select(p => !p.HasSubPackages()).First();
+            var assemblyPackage = TestPackage.Select(p => !p.HasSubPackages).First();
 
             if (DriverService is null)
                 DriverService = new DriverService();
