@@ -56,7 +56,7 @@ namespace NUnit.Engine.Services
 
             // First get subRunners for each leaf package, i.e. any package without
             // subpackages, which will either be assemblies or unknown file types.
-            var leafPackages = package.Select(p => !p.HasSubPackages());
+            var leafPackages = package.Select(p => !p.HasSubPackages);
 
 #if NETFRAMEWORK
             // TODO: Currently, the .NET Core runner doesn't support multiple assemblies.

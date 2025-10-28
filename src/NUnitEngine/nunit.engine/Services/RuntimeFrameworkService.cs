@@ -115,11 +115,11 @@ namespace NUnit.Engine.Services
         /// <returns>A string representing the selected RuntimeFramework</returns>
         public void SelectRuntimeFramework(TestPackage package)
         {
-            Guard.ArgumentValid(!package.HasSubPackages(),
+            Guard.ArgumentValid(!package.HasSubPackages,
                 "SelectRuntimeFramework must be called with a package representing an assembly", nameof(package));
 
             // Evaluate package target framework
-            if (package.IsAssemblyPackage())
+            if (package.IsAssemblyPackage)
                 ApplyImageData(package);
 
             string frameworkSetting = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework);
