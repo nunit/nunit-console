@@ -26,6 +26,7 @@ namespace NUnit.Engine.Internal.Tests
         public void CreateTracker()
         {
             _tracker = new ExtensionAssemblyTracker();
+            Console.WriteLine($"Current assembly version is {THIS_ASSEMBLY_VERSION}");
         }
 
         [Test]

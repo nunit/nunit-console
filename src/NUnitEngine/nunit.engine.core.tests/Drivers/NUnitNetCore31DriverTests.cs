@@ -1,36 +1,34 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETCOREAPP2_1
-
+#if NETCOREAPP
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
 using NUnit.Tests.Assemblies;
 using NUnit.Framework;
-using NUnit.Engine.Extensibility;
+using NUnit.Framework.Internal;
+using System.Runtime.Loader;
 
 namespace NUnit.Engine.Drivers.Tests
 {
-    [TestOf(typeof(NUnitNetStandardDriver))]
-    public class NUnitNetStandardDriverTests
+    // Functional tests of the NUnitFrameworkDriver calling into the framework.
+    public class NUnitNetCore31DriverTests
     {
         private const string MOCK_ASSEMBLY = "mock-assembly.dll";
-        private const string MISSING_FILE = "junk.dll";
-        private const string NUNIT_FRAMEWORK = "nunit.framework";
         private const string LOAD_MESSAGE = "Method called without calling Load first";
 
         private IDictionary<string, object> _settings = new Dictionary<string, object>();
 
-        private IFrameworkDriver _driver;
+        private NUnitNetCore31Driver _driver;
         private string _mockAssemblyPath;
 
         [SetUp]
         public void CreateDriver()
         {
+            var assemblyName = typeof(NUnit.Framework.TestAttribute).Assembly.GetName();
             _mockAssemblyPath = System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, MOCK_ASSEMBLY);
-            _driver = new NUnitNetStandardDriver();
-
+            _driver = new NUnitNetCore31Driver();
         }
 
         [Test]
@@ -111,6 +109,32 @@ namespace NUnit.Engine.Drivers.Tests
                 ex = ex.InnerException;
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
+        }
+
+        [Test]
+        public void RunTestsAction_WithInvalidFilterElement_ThrowsNUnitEngineException()
+        {
+            _driver.Load(_mockAssemblyPath, _settings);
+
+            var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
+            var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
+            Assert.That(ex, Is.TypeOf<TargetInvocationException>());
+            Assert.That(ex.InnerException, Is.TypeOf<ArgumentException>());
+        }
+
+        private class CallbackEventHandler : System.Web.UI.ICallbackEventHandler
+        {
+            private string _result;
+
+            public string GetCallbackResult()
+            {
+                return _result;
+            }
+
+            public void RaiseCallbackEvent(string eventArgument)
+            {
+                _result = eventArgument;
+            }
         }
 
         public class NullListener : ITestEventListener
