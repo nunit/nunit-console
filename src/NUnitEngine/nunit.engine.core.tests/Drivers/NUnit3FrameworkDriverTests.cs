@@ -104,6 +104,8 @@ namespace NUnit.Engine.Drivers.Tests
         public void RunTestsAction_WithoutLoad_ThrowsInvalidOperationException()
         {
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), TestFilter.Empty.Text));
+            if (ex is TargetInvocationException)
+                ex = ex.InnerException;
             Assert.That(ex, Is.TypeOf<InvalidOperationException>());
             Assert.That(ex.Message, Is.EqualTo(LOAD_MESSAGE));
         }
@@ -116,12 +118,6 @@ namespace NUnit.Engine.Drivers.Tests
             var invalidFilter = "<filter><invalidElement>foo</invalidElement></filter>";
             var ex = Assert.Catch(() => _driver.Run(new NullListener(), invalidFilter));
             Assert.That(ex, Is.TypeOf<NUnitEngineException>());
-        }
-
-        private static string GetSkipReason(XmlNode result)
-        {
-            var propNode = result.SelectSingleNode(string.Format("properties/property[@name='{0}']", PropertyNames.SkipReason));
-            return propNode == null ? null : propNode.GetAttribute("value");
         }
 
         private class CallbackEventHandler : System.Web.UI.ICallbackEventHandler
