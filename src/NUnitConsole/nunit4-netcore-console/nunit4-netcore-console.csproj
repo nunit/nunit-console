@@ -31,7 +31,7 @@
     <RepostoryUrl>https://github.com/nunit/nunit-console</RepostoryUrl>
     <PackageIcon>content\nunit_256.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</PackageReleaseNotes>
+    <PackageReleaseNotes>https://docs.nunit.org/articles/nunit-engine/release-notes.html</PackageReleaseNotes>
     <PackageTags>nunit test testing tdd runner</PackageTags>
     <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
   </PropertyGroup>

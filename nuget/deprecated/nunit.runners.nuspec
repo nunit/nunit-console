@@ -16,7 +16,7 @@
     <description>
       This package is now obsolete and has been replaced by the NUnit.Console package.
     </description>
-    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit-engine/release-notes.html</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2021 Charlie Poole</copyright>

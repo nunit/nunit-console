@@ -46,9 +46,9 @@
         <PackageProjectUrl>>https://nunit.org</PackageProjectUrl>
         <PackageIcon>nunit_256.png</PackageIcon>
         <PackageIconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</PackageIconUrl>
-        <PackageReleaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</PackageReleaseNotes>
+        <PackageReleaseNotes>https://docs.nunit.org/articles/nunit-engine/release-notes.html</PackageReleaseNotes>
         <RepositoryUrl>https://github.com/NUnit/nunit-console</RepositoryUrl>
-        <ReleaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</ReleaseNotes>
+        <ReleaseNotes>https://docs.nunit.org/articles/nunit-engine/release-notes.html</ReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

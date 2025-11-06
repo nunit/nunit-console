@@ -18,7 +18,7 @@
 
       Any extensions, if needed, may be installed as separate packages.
     </description>
-    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
+    <releaseNotes>https://docs.nunit.org/articles/nunit-engine/release-notes.html</releaseNotes>
     <language>en-US</language>
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
