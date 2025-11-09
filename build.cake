@@ -1,5 +1,5 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0-alpha.4
+#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0-alpha.6
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -184,7 +184,7 @@ PackageDefinition NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
         HasDependency("nunit-extension-net90-pluggable-agent", "4.1.0-alpha.4")
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-        + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit-console.exe"),
+        + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
 // Add all packages to BuildSettings in order they should be build.
