@@ -10,7 +10,7 @@
     <projectUrl>https://nunit.org</projectUrl>
     <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
-    <icon>images\nunit_256.png</icon>
+    <icon>nunit_256.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Console runner for the NUnit unit-testing framework with selected extensions.</summary>
     <description>
@@ -35,7 +35,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../../LICENSE.txt" />
-    <file src="../../nunit_256.png" target="images" />
+    <file src="LICENSE.txt" />
+    <file src="nunit_256.png" />
   </files>
 </package>
