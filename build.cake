@@ -1,10 +1,11 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0-alpha.6
+#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0-alpha.8
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Load additional cake files
 #load package-tests.cake
+#load KnownExtensions.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -20,6 +21,10 @@ BuildSettings.Initialize(
 //////////////////////////////////////////////////////////////////////
 
 var THIS_VERSION = BuildSettings.PackageVersion;
+var RUNNER_DESCRIPTION =
+      "This package includes the console runner and test engine for version 3 and higher of the NUnit unit-testing framework." +
+      "\r\n\nAny extensions, if needed, may be installed as separate packages.";
+
 PackageDefinition NUnitExtensibilityApiPackage = new NuGetPackage(
     id: "NUnit.Extensibility.Api",
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj",
@@ -144,48 +149,51 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
 // 1. NUnit.ConsoleRunner needs to use it to specify the bundled pluggable agents
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     id: "NUnit.ConsoleRunner",
-    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
+    description: RUNNER_DESCRIPTION,
+    packageContent: new PackageContent()
+        .WithRootFiles("../../LICENSE.txt", "../../NOTICES.txt", "../../nunit_256.png")
+        .WithDirectories(
+            new DirectoryContent("tools").WithFiles(
+                "net462/nunit-console.exe", "net462/nunit-console.exe.config", "net462/nunit.engine.dll",
+                "net462/nunit.extensibility.dll", "net462/nunit.extensibility.api.dll", "net462/nunit.common.dll",
+                "net462/nunit-console.pdb", "net462/nunit.engine.pdb", "net462/nunit.engine.api.pdb",
+                "net462/nunit.extensibility.pdb", "net462/nunit.extensibility.api.pdb", "net462/nunit.common.pdb",
+                "net462/nunit.engine.api.dll", "net462/testcentric.metadata.dll"))
+        .WithDependencies(KnownExtensions.BundledNuGetAgents),
+    // Keeping separate check for dependencies until PackageContent automatic verification handles them
     checks: new PackageCheck[] {
-        HasFiles("LICENSE.txt", "NOTICES.txt"),
-        HasDirectory("tools").WithFiles(
-            "nunit-console.exe", "nunit-console.exe.config", "nunit.engine.dll",
-            "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll",
-            "nunit.engine.api.dll", "testcentric.metadata.dll"),
-        HasDependency("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.5"),
-        HasDependency("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.6"),
-        HasDependency("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.4")
-    },
-    symbols: new PackageCheck[] {
-        HasDirectory("tools").WithFiles(
-            "nunit.engine.pdb", "nunit.extensibility.pdb", "nunit.extensibility.api.pdb",
-            "nunit.common.pdb", "nunit.engine.api.pdb", "nunit-console.pdb"),
+        HasDependencies(KnownExtensions.BundledNuGetAgents)
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
-// 2. NUnit.Console is a meta-package
-PackageDefinition NUnitConsoleNuGetPackage = new NuGetPackage(
-    id: "NUnit.Console",
-    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
-    checks: new PackageCheck[] { HasFile("LICENSE.txt") });
-
 // 3. The chocolatey console runner has to follow special chocolatey conventions
 PackageDefinition NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
     id: "nunit-console-runner",
-    source: BuildSettings.ChocolateyDirectory + "nunit-console-runner.nuspec",
+    description: RUNNER_DESCRIPTION,
+    packageContent: new PackageContent()
+        .WithDirectories(
+            new DirectoryContent("tools").WithFiles(
+                "../../LICENSE.txt", "../../NOTICES.txt", "../../choco/VERIFICATION.txt",
+                "net462/nunit-console.exe", "net462/nunit-console.exe.config",
+                "net462/nunit.engine.dll", "net462/nunit.extensibility.dll", "net462/nunit.extensibility.api.dll",
+                "net462/nunit.common.dll", "net462/nunit.engine.api.dll", "net462/testcentric.metadata.dll") )
+        .WithDependencies(KnownExtensions.BundledChocolateyAgents),
+    // Keeping separate check for dependencies until PackageContent automatic verification handles them
     checks: new PackageCheck[] {
-        HasDirectory("tools").WithFiles(
-            "LICENSE.txt", "NOTICES.txt", "VERIFICATION.txt", "nunit-console.exe", "nunit-console.exe.config",
-            "nunit.engine.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll",
-            "nunit.common.dll", "nunit.engine.api.dll", "testcentric.metadata.dll"),
-        HasDependency("nunit-extension-net462-pluggable-agent", "4.1.0-alpha.5"),
-        HasDependency("nunit-extension-net80-pluggable-agent", "4.1.0-alpha.6"),
-        HasDependency("nunit-extension-net90-pluggable-agent", "4.1.0-alpha.4")
+        HasDependencies(KnownExtensions.BundledChocolateyAgents)
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
         + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
+
+// NUnit.Console is a meta-package and is built using a nuspec file
+PackageDefinition NUnitConsoleNuGetPackage = new NuGetPackage(
+    id: "NUnit.Console",
+    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
+    basePath: BuildSettings.ProjectDirectory,
+    checks: new PackageCheck[] { HasFile("LICENSE.txt") });
 
 // Add all packages to BuildSettings in order they should be build.
 // Dependencies must precede all the packages that depend on them.
@@ -267,19 +275,6 @@ public class DirectTestAgentRunner : TestRunner, IPackageTestRunner
         });
     }
 }
-
-//////////////////////////////////////////////////////////////////////
-// ADDITIONAL TARGETS USED IN DEVELOPMENT
-//////////////////////////////////////////////////////////////////////
-
-Task("InstallBundledAgents")
-    .Description("Installs just the agents we bundle with the GUI runner.")
-    .Does(() =>
-    {
-        new PackageReference("NUnit.Extension.Net462PluggableAgent", "4.1.0-alpha.5").Install(BuildSettings.ProjectDirectory + "bin");
-        new PackageReference("NUnit.Extension.Net80PluggableAgent", "4.1.0-alpha.6").Install(BuildSettings.ProjectDirectory + "bin");
-        new PackageReference("NUnit.Extension.Net90PluggableAgent", "4.1.0-alpha.4").Install(BuildSettings.ProjectDirectory + "bin");
-    });
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
