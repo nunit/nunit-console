@@ -37,7 +37,10 @@ namespace NUnit.Engine
         public PackageSetting WithValue<T>(T value)
             where T : notnull
         {
-            return new PackageSetting<T>(Name, value);
+            if (ValueType.IsAssignableFrom(typeof(T)))
+                return new PackageSetting<T>(Name, (T)Convert.ChangeType(value, ValueType));
+
+            throw (new ArgumentException($"The {Name} setting requires a value of type {ValueType.Name}"));
         }
     }
 

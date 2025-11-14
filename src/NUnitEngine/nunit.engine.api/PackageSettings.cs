@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace NUnit.Engine
 {
@@ -65,12 +68,20 @@ namespace NUnit.Engine
         public void Add(PackageSetting setting) => _settings.Add(setting.Name, setting);
 
         /// <summary>
-        /// Creates and adds a custom string setting to the list, specifying the name and value.
+        /// Creates and adds a setting to the list, specified by the name and a string value.
+        /// The string value is converted to a typed PackageSetting if the name specifies a known SettingDefinition.
         /// </summary>
         /// <param name="name">The name of the setting.</param>
         /// <param name="value">The corresponding value to set.</param>
         public void Add(string name, string value)
         {
+            var definition = SettingDefinitions.Lookup(name);
+
+            // If this is a known setting but not a string throw an exception
+            if (definition is not null && !definition.ValueType.IsAssignableFrom(typeof(string)))
+                throw (new ArgumentException($"The {name} setting requires a value of type {definition.ValueType.Name}"));
+
+            // Otherwise add it
             Add(new PackageSetting<string>(name, value));
         }
 
@@ -81,6 +92,12 @@ namespace NUnit.Engine
         /// <param name="value">The corresponding value to set.</param>
         public void Add(string name, bool value)
         {
+            var definition = SettingDefinitions.Lookup(name);
+
+            // If this is a known setting but not a boolean throw an exception
+            if (definition is not null && !definition.ValueType.IsAssignableFrom(typeof(bool)))
+                throw (new ArgumentException($"The {name} setting requires a value of type {definition.ValueType.Name}"));
+
             Add(new PackageSetting<bool>(name, value));
         }
 
@@ -91,6 +108,12 @@ namespace NUnit.Engine
         /// <param name="value">The corresponding value to set.</param>
         public void Add(string name, int value)
         {
+            var definition = SettingDefinitions.Lookup(name);
+
+            // If this is a known setting but not an int throw an exception
+            if (definition is not null && !definition.ValueType.IsAssignableFrom(typeof(int)))
+                throw (new ArgumentException($"The {name} setting requires a value of type {definition.ValueType.Name}"));
+
             Add(new PackageSetting<int>(name, value));
         }
 
@@ -108,6 +131,24 @@ namespace NUnit.Engine
             where T : notnull
         {
             Set(new PackageSetting<T>(name, value));
+        }
+
+        /// <summary>
+        /// Remove a setting
+        /// </summary>
+        /// <param name="setting">The setting to remove</param>
+        public void Remove(SettingDefinition setting)
+        {
+            _settings.Remove(setting.Name);
+        }
+
+        /// <summary>
+        /// Remove a setting
+        /// </summary>
+        /// <param name="settingName">The name of the setting to remove</param>
+        public void Remove(string settingName)
+        {
+            _settings.Remove(settingName);
         }
     }
 }

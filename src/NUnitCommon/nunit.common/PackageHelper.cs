@@ -165,12 +165,11 @@ namespace NUnit.Engine
             {
                 var name = xmlReader.Name;
                 var value = xmlReader.Value;
-                var prop = typeof(SettingDefinitions).GetProperty(name, BindingFlags.Public | BindingFlags.Static);
 
-                if (prop is not null) // Standard SettingDefinition
+                var settingDefinition = SettingDefinitions.Lookup(name);
+                if (settingDefinition is not null) // Known setting name
                 {
-                    var settingDefinition = (SettingDefinition)prop.GetValue(null)!;
-
+                    // A few settings require special handling when deserializing
                     switch (name)
                     {
                         case nameof(SettingDefinitions.InternalTraceWriter):
@@ -190,9 +189,14 @@ namespace NUnit.Engine
                         default:
                             switch (settingDefinition.ValueType)
                             {
-                                case Type t when t.IsPrimitive || t.IsAssignableFrom(typeof(string)):
-                                    var data = Convert.ChangeType(value, t);
-                                    packageSettings.Add(settingDefinition.WithValue(data));
+                                case Type t when t.IsAssignableFrom(typeof(string)):
+                                    packageSettings.Add(name, value);
+                                    break;
+                                case Type t when t.IsAssignableFrom(typeof(bool)):
+                                    packageSettings.Add(name, bool.Parse(value));
+                                    break;
+                                case Type t when t.IsAssignableFrom(typeof(int)):
+                                    packageSettings.Add(name, int.Parse(value));
                                     break;
                                 default:
                                     // Setting doesn't match the expected type, ignore or throw an exception?
