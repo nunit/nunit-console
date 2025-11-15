@@ -4,6 +4,7 @@ using NUnit.Engine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace NUnit.Common
 {
@@ -15,6 +16,35 @@ namespace NUnit.Common
     /// </summary>
     public static class SettingDefinitions
     {
+        private static readonly Dictionary<string, SettingDefinition> _knownSettings;
+
+        static SettingDefinitions()
+        {
+            // Use Reflection to build a dictionary of all known setting definitions
+            var properties = typeof(SettingDefinitions).GetProperties(BindingFlags.Public | BindingFlags.Static);
+
+            _knownSettings = new Dictionary<string, SettingDefinition>();
+
+            foreach (var property in properties)
+            {
+                var propValue = property.GetValue(null, null) as SettingDefinition;
+                if (propValue is not null)
+                    _knownSettings.Add(property.Name, propValue);
+            }
+        }
+
+        /// <summary>
+        /// Lookup a known SettingDefinition by name
+        /// </summary>
+        /// <param name="name">The name of the setting</param>
+        /// <returns>A SettingDefinition if there is one, otherwise null.</returns>
+        public static SettingDefinition? Lookup(string name)
+        {
+            if (_knownSettings.TryGetValue(name, out var definition))
+                return definition;
+            return null;
+        }
+
         #region Settings Used by the Engine
 
         /// <summary>
