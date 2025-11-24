@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,19 +23,8 @@ namespace NUnit.Engine.Internal
 
         private readonly AssemblyLoadContext _loadContext;
 
-        private static readonly string INSTALL_DIR;
-        private static readonly string WINDOWS_DESKTOP_DIR;
-        private static readonly string ASP_NET_CORE_DIR;
-
         // Our Strategies for resolving references
         List<ResolutionStrategy> ResolutionStrategies;
-
-        static TestAssemblyResolver()
-        {
-            INSTALL_DIR = DotNet.GetInstallDirectory();
-            WINDOWS_DESKTOP_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.WindowsDesktop.App");
-            ASP_NET_CORE_DIR = Path.Combine(INSTALL_DIR, "shared", "Microsoft.AspNetCore.App");
-        }
 
         public TestAssemblyResolver(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
@@ -47,34 +37,37 @@ namespace NUnit.Engine.Internal
 
         private void InitializeResolutionStrategies(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
-            // First, looking only at direct references by the test assembly, try to determine if
-            // this assembly is using WindowsDesktop (either SWF or WPF) and/or AspNetCore.
+            // Decide whether to try WindowsDeskTop and/or AspNetCore runtimes before any others.
+            // We base this on direct references only, so we will eventually try each of them
+            // later in case there are any indirect references.
             AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(testAssemblyPath);
-            bool isWindowsDesktop = false;
-            bool isAspNetCore = false;
+            bool tryWindowsDesktopFirst = false;
+            bool tryAspNetCoreFirst = false;
             foreach (var reference in assemblyDef.MainModule.GetTypeReferences())
             {
                 string fn = reference.FullName;
                 if (fn.StartsWith("System.Windows.") || fn.StartsWith("PresentationFramework"))
-                    isWindowsDesktop = true;
+                    tryWindowsDesktopFirst = true;
                 if (fn.StartsWith("Microsoft.AspNetCore."))
-                    isAspNetCore = true;
+                    tryAspNetCoreFirst = true;
             }
 
             // Initialize the list of ResolutionStrategies in the best order depending on
             // what we learned.
             ResolutionStrategies = new List<ResolutionStrategy>();
             
-            if (isWindowsDesktop && Directory.Exists(WINDOWS_DESKTOP_DIR))
-                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(WINDOWS_DESKTOP_DIR));
-            if (isAspNetCore && Directory.Exists(ASP_NET_CORE_DIR))
-                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(ASP_NET_CORE_DIR));
+            if (tryWindowsDesktopFirst)
+                ResolutionStrategies.Add(new WindowsDesktopStrategy());
+            if (tryAspNetCoreFirst)
+                ResolutionStrategies.Add(new AspNetCoreStrategy());
+
             ResolutionStrategies.Add(new TrustedPlatformAssembliesStrategy());
             ResolutionStrategies.Add(new RuntimeLibrariesStrategy(loadContext, testAssemblyPath));
-            if (!isWindowsDesktop && Directory.Exists(WINDOWS_DESKTOP_DIR))
-                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(WINDOWS_DESKTOP_DIR));
-            if (!isAspNetCore && Directory.Exists(ASP_NET_CORE_DIR))
-                ResolutionStrategies.Add(new AdditionalDirectoryStrategy(ASP_NET_CORE_DIR));
+
+            if (!tryWindowsDesktopFirst)
+                ResolutionStrategies.Add(new WindowsDesktopStrategy());
+            if (!tryAspNetCoreFirst)
+                ResolutionStrategies.Add(new AspNetCoreStrategy());
         }
 
         public void Dispose()
@@ -201,96 +194,58 @@ namespace NUnit.Engine.Internal
             }
         }
 
-        public class AdditionalDirectoryStrategy : ResolutionStrategy
+        public class AdditionalRuntimesStrategy : ResolutionStrategy
         {
-            private string _frameworkDirectory;
+            private IEnumerable<DotNet.RuntimeInfo> _additionalRuntimes;
 
-            public AdditionalDirectoryStrategy(string frameworkDirectory)
+            public AdditionalRuntimesStrategy(string runtimeName)
             {
-                _frameworkDirectory = frameworkDirectory;
+                _additionalRuntimes = DotNet.GetRuntimes(runtimeName);
             }
 
-            public override bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
+            public override bool TryToResolve(AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
             {
                 loadedAssembly = null;
-                if (assemblyName.Version == null)
+
+                DotNet.RuntimeInfo runtime;
+                if (!FindBestRuntime(assemblyName, out runtime))
                     return false;
 
-                var versionDir = FindBestVersionDir(_frameworkDirectory, assemblyName.Version);
+                string candidate = Path.Combine(runtime.Path, runtime.Version.ToString(), assemblyName.Name + ".dll");
+                if (!File.Exists(candidate))
+                    return false;
 
-                if (versionDir != null)
-                {
-                    string candidate = Path.Combine(_frameworkDirectory, versionDir, assemblyName.Name + ".dll");
-                    if (File.Exists(candidate))
-                    {
-                        loadedAssembly = loadContext.LoadFromAssemblyPath(candidate);
-                        log.Info("'{0}' ({1}) assembly is loaded from AdditionalFrameworkDirectory {2} dependencies with best candidate version {3}",
-                            assemblyName,
-                            loadedAssembly.Location,
-                            _frameworkDirectory,
-                            versionDir);
-
-                        return true;
-                    }
-                    else
-                    {
-                        log.Debug("Best version dir for {0} is {1}, but there is no {2} file", _frameworkDirectory, versionDir, candidate);
-                        return false;
-                    }
-                }
-
-                return false;
-            }
-        }
-
-        #endregion
-
-        #region HelperMethods
-
-        private static string FindBestVersionDir(string libraryDir, Version targetVersion)
-        {
-            string target = targetVersion.ToString();
-            Version bestVersion = new Version(0, 0);
-            foreach (var subdir in Directory.GetDirectories(libraryDir))
-            {
-                Version version;
-                if (TryGetVersionFromString(Path.GetFileName(subdir), out version))
-                {
-                    if (version >= targetVersion)
-                        if (bestVersion.Major == 0 || bestVersion > version)
-                            bestVersion = version;
-                }
-            }
-
-            return bestVersion.Major > 0
-                ? bestVersion.ToString()
-                : null;
-        }
-
-        private static bool TryGetVersionFromString(string text, out Version newVersion)
-        {
-            const string VERSION_CHARS = ".0123456789";
-
-            int len = 0;
-            foreach (char c in text)
-            {
-                if (VERSION_CHARS.IndexOf(c) >= 0)
-                    len++;
-                else
-                    break;
-            }
-
-            try
-            {
-                newVersion = new Version(text.Substring(0, len));
+                loadedAssembly = loadContext.LoadFromAssemblyPath(candidate);
                 return true;
             }
-            catch
+
+            private bool FindBestRuntime(AssemblyName assemblyName, out DotNet.RuntimeInfo bestRuntime)
             {
-                newVersion = new Version();
-                return false;
+                bestRuntime = null;
+                var targetVersion = assemblyName.Version;
+
+                if (targetVersion is null)
+                    return false;
+
+                foreach (var candidate in _additionalRuntimes)
+                {
+                    if (candidate.Version >= targetVersion)
+                        if (bestRuntime is null || bestRuntime.Version > candidate.Version)
+                            bestRuntime = candidate;
+                }
+
+                return bestRuntime is not null;
             }
+        }
+
+        public class WindowsDesktopStrategy : AdditionalRuntimesStrategy
+        {
+            public WindowsDesktopStrategy() : base("Microsoft.WindowsDesktop.App") { }
+        }
+
+        public class AspNetCoreStrategy : AdditionalRuntimesStrategy
+        {
+            public AspNetCoreStrategy() : base("Microsoft.AspNetCore.App") { }
         }
 
         #endregion
