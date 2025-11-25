@@ -200,7 +200,7 @@ namespace NUnit.Engine.Internal
 
             public AdditionalRuntimesStrategy(string runtimeName)
             {
-                _additionalRuntimes = DotNet.GetRuntimes(runtimeName);
+                _additionalRuntimes = DotNet.GetRuntimes(runtimeName, !Environment.Is64BitProcess);
             }
 
             public override bool TryToResolve(AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly)
@@ -222,7 +222,7 @@ namespace NUnit.Engine.Internal
             private bool FindBestRuntime(AssemblyName assemblyName, out DotNet.RuntimeInfo bestRuntime)
             {
                 bestRuntime = null;
-                var targetVersion = assemblyName.Version;
+                var targetVersion = new Version(assemblyName.Version.Major, assemblyName.Version.Minor, assemblyName.Version.Build);
 
                 if (targetVersion is null)
                     return false;

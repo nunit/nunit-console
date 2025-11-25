@@ -63,21 +63,17 @@ namespace NUnit.Engine.Services
             }
             else if (TargetRuntime.Runtime == RuntimeType.NetCore)
             {
-                StartInfo.FileName = "dotnet";
+                StartInfo.FileName = DotNet.GetDotnetExecutable(runAsX86);
                 StartInfo.Arguments = $"\"{AgentExePath}\" {AgentArgs}";
                 StartInfo.LoadUserProfile = loadUserProfile;
 
-                // TODO: Remove the windows limitation and the use of a hard-coded path.
                 if (runAsX86)
                 {
                     if (Path.DirectorySeparatorChar != '\\')
                         throw new Exception("Running .NET Core as X86 is currently only supported on Windows");
 
-                    var x86_dotnet_exe = Path.Combine(DotNet.X86InstallDirectory, "dotnet.exe");
-                    if (!File.Exists(x86_dotnet_exe))
+                    if (!File.Exists(StartInfo.FileName))
                         throw new Exception("The X86 version of dotnet.exe is not installed");
-
-                    StartInfo.FileName = x86_dotnet_exe;
                 }
             }
             else

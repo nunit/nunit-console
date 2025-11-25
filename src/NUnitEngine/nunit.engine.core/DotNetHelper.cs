@@ -18,9 +18,30 @@ namespace NUnit.Engine
         private const string X86_SUBKEY1 = @"SOFTWARE\dotnet\SetUp\InstalledVersions\x86\InstallLocation\";
         private const string X86_SUBKEY2 = @"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\";
 
-        public static readonly string X64InstallDirectory;
-        public static readonly string X86InstallDirectory;
-        public static readonly List<RuntimeInfo> Runtimes;
+#pragma warning disable CA1416
+        private static readonly Lazy<string> _x64InstallDirectory = new Lazy<string>(() =>
+                Environment.GetEnvironmentVariable("DOTNET_ROOT") ?? (
+                    OS.IsWindows
+                        ? (string) Registry.LocalMachine.OpenSubKey(X64_SUBKEY1)?.GetValue("Path") ??
+                          (string) Registry.LocalMachine.OpenSubKey(X64_SUBKEY2)?.GetValue("Path") ?? @"C:\Program Files\dotnet"
+                        : "/usr/shared/dotnet/"));
+        private static readonly Lazy<string> _x86InstallDirectory = new Lazy<string>(() =>
+                Environment.GetEnvironmentVariable("DOTNET_ROOT_X86") ?? (
+                    OS.IsWindows
+                        ? (string) Registry.LocalMachine.OpenSubKey(X86_SUBKEY1)?.GetValue("InstallLocation") ??
+                          (string) Registry.LocalMachine.OpenSubKey(X86_SUBKEY2)?.GetValue("InstallLocation") ?? @"C:\Program Files (x86)\dotnet"
+                        : "/usr/shared/dotnet/"));
+#pragma warning restore CA1416
+
+        private static Lazy<List<RuntimeInfo>> _x64Runtimes = new Lazy<List<RuntimeInfo>>(() => [.. GetAllRuntimes(x86: false)]);
+        private static Lazy<List<RuntimeInfo>> _x86Runtimes = new Lazy<List<RuntimeInfo>>(() => [.. GetAllRuntimes(x86: true)]);
+
+        public enum Architecture
+        {
+            Unspecified,
+            X64,
+            X86
+        }
 
         public class RuntimeInfo
         {
@@ -40,49 +61,42 @@ namespace NUnit.Engine
         }
 
         /// <summary>
-        /// Static constructor initializes everything once
-        /// </summary>
-        static DotNet()
-        {
-#pragma warning disable CA1416
-            X64InstallDirectory = 
-                Environment.GetEnvironmentVariable("DOTNET_ROOT") ?? (
-                    IsWindows
-                        ? (string)Registry.LocalMachine.OpenSubKey(X64_SUBKEY1)?.GetValue("Path") ??
-                          (string)Registry.LocalMachine.OpenSubKey(X64_SUBKEY2)?.GetValue("Path") ?? @"C:\Program Files\dotnet"
-                        : "/usr/shared/dotnet/");
-            X86InstallDirectory = 
-                Environment.GetEnvironmentVariable("DOTNET_ROOT_X86") ?? (
-                    IsWindows
-                        ? (string)Registry.LocalMachine.OpenSubKey(X86_SUBKEY1)?.GetValue("InstallLocation") ??
-                          (string)Registry.LocalMachine.OpenSubKey(X86_SUBKEY2)?.GetValue("InstallLocation") ?? @"C:\Program Files (x86)\dotnet"
-                        : "/usr/shared/dotnet/");
-#pragma warning restore CA1416
-            Runtimes = new List<RuntimeInfo>();
-            foreach (string line in DotnetCommand("--list-runtimes"))
-            {
-                string[] parts = line.Trim().Split([' '], 3);
-                Runtimes.Add(new RuntimeInfo(parts[0], parts[1], parts[2].Trim(['[', ']'])));
-            }
-        }
-
-        /// <summary>
         /// Get the correct install directory, depending on whether we need X86 or X64 architecture.
         /// </summary>
         /// <param name="x86">Flag indicating whether the X86 architecture is needed</param>
         /// <returns></returns>
         public static string GetInstallDirectory(bool x86) => x86
-            ? X86InstallDirectory : X64InstallDirectory;
+            ? _x86InstallDirectory.Value : _x64InstallDirectory.Value;
 
-        public static IEnumerable<RuntimeInfo> GetRuntimes(string name) => Runtimes.Where(r => r.Name == name);
+        /// <summary>
+        /// Get the correct dotnet.exe, depending on whether we need X86 or X64 architecture.
+        /// </summary>
+        /// <param name="x86">Flag indicating whether the X86 architecture is needed</param>
+        /// <returns></returns>
+        public static string GetDotnetExecutable(bool x86) => Path.Combine(GetInstallDirectory(x86), "dotnet.exe");
 
-        private static IEnumerable<string> DotnetCommand(string arguments)
+        public static IEnumerable<RuntimeInfo> GetRuntimes(string name, bool x86)
+        {
+            var runtimes = x86 ? _x86Runtimes.Value : _x64Runtimes.Value;
+            return runtimes.Where(r => r.Name == name);
+        }
+
+        private static IEnumerable<RuntimeInfo> GetAllRuntimes(bool x86)
+        {
+            foreach (string line in DotnetCommand("--list-runtimes", x86: x86))
+            {
+                string[] parts = line.Trim().Split([' '], 3);
+                yield return new RuntimeInfo(parts[0], parts[1], parts[2].Trim(['[', ']']));
+            }
+        }
+
+        private static IEnumerable<string> DotnetCommand(string arguments, bool x86 = false)
         {
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "dotnet",
+                    FileName = GetDotnetExecutable(x86),
                     Arguments = arguments,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -103,12 +117,5 @@ namespace NUnit.Engine
             while (!process.StandardOutput.EndOfStream)
                 yield  return process.StandardOutput.ReadLine();
         }
-
-#if NETFRAMEWORK
-        private static bool IsWindows => Path.DirectorySeparatorChar == '\\';
-#else
-        private static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#endif
-
     }
 }

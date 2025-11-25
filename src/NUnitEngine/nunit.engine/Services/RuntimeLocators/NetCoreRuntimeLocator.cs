@@ -13,7 +13,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
         {
             List<Version> alreadyFound = new List<Version>();
 
-            foreach (var runtime in DotNet.GetRuntimes("Microsoft.NETCore.App"))
+            foreach (var runtime in DotNet.GetRuntimes("Microsoft.NETCore.App", x86))
             {
                 if (!alreadyFound.Contains(runtime.Version))
                 {
