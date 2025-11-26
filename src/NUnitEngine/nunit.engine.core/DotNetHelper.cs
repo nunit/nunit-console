@@ -84,7 +84,7 @@ namespace NUnit.Engine
             foreach (string line in DotnetCommand("--list-runtimes", x86: x86))
             {
                 string[] parts = line.Trim().Split([' '], 3);
-                yield return new RuntimeInfo(parts[0], parts[1] + ".0", parts[2].Trim(['[', ']']));
+                yield return new RuntimeInfo(parts[0], parts[1], parts[2].Trim(['[', ']']));
             }
         }
 
