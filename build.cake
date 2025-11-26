@@ -79,7 +79,7 @@ PackageDefinition NUnitExtensibilityPackage = new NuGetPackage(
         HasDependency("NUnit.Extensibility.Api", THIS_VERSION),
         HasDependency("NUnit.Engine.Api", THIS_VERSION),
         HasDependency("NUnit.Common", THIS_VERSION),
-        HasDependency("TestCentric.Metadata", "3.0.3")
+        HasDependency("TestCentric.Metadata", "3.0.4")
     },
     symbols: new PackageCheck[]
     {
@@ -97,7 +97,7 @@ PackageDefinition NUnitAgentCorePackage = new NuGetPackage(
         HasDirectory("lib/net8.0").WithFiles("nunit.agent.core.dll"),
         HasDependency("NUnit.Engine.Api", THIS_VERSION),
         HasDependency("NUnit.Common", THIS_VERSION),
-        HasDependency("TestCentric.Metadata", "3.0.3")
+        HasDependency("TestCentric.Metadata", "3.0.4")
     },
     symbols: new PackageCheck[]
     {
