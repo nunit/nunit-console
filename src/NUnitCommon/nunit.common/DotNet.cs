@@ -2,82 +2,114 @@
 
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace NUnit.Common
 {
     public static class DotNet
     {
-        public static string? GetInstallDirectory() => Environment.Is64BitProcess
-            ? GetX64InstallDirectory() : GetX86InstallDirectory();
+        private const string X64_SUBKEY1 = @"SOFTWARE\dotnet\SetUp\InstalledVersions\x64\sharedHost\";
+        private const string X64_SUBKEY2 = @"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x64\";
+        private const string X86_SUBKEY1 = @"SOFTWARE\dotnet\SetUp\InstalledVersions\x86\InstallLocation\";
+        private const string X86_SUBKEY2 = @"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\";
 
-        public static string? GetInstallDirectory(bool x86) => x86
-            ? GetX86InstallDirectory() : GetX64InstallDirectory();
+#pragma warning disable CA1416
+        private static readonly Lazy<string> _x64InstallDirectory = new Lazy<string>(() =>
+                Environment.GetEnvironmentVariable("DOTNET_ROOT") ?? (
+                    OS.IsWindows
+                        ? (string?)Registry.LocalMachine.OpenSubKey(X64_SUBKEY1)?.GetValue("Path") ??
+                          (string?)Registry.LocalMachine.OpenSubKey(X64_SUBKEY2)?.GetValue("Path") ?? @"C:\Program Files\dotnet"
+                        : "/usr/shared/dotnet/"));
+        private static readonly Lazy<string> _x86InstallDirectory = new Lazy<string>(() =>
+                Environment.GetEnvironmentVariable("DOTNET_ROOT_X86") ?? (
+                    OS.IsWindows
+                        ? (string?)Registry.LocalMachine.OpenSubKey(X86_SUBKEY1)?.GetValue("InstallLocation") ??
+                          (string?)Registry.LocalMachine.OpenSubKey(X86_SUBKEY2)?.GetValue("InstallLocation") ?? @"C:\Program Files (x86)\dotnet"
+                        : "/usr/shared/dotnet/"));
+#pragma warning restore CA1416
 
-        private static string? _x64InstallDirectory;
-        public static string? GetX64InstallDirectory()
+        private static Lazy<List<RuntimeInfo>> _x64Runtimes = new Lazy<List<RuntimeInfo>>(() => [.. GetAllRuntimes(x86: false)]);
+        private static Lazy<List<RuntimeInfo>> _x86Runtimes = new Lazy<List<RuntimeInfo>>(() => [.. GetAllRuntimes(x86: true)]);
+
+        public class RuntimeInfo
         {
-            if (_x64InstallDirectory is null)
-                _x64InstallDirectory = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            public string Name;
+            public Version Version;
+            public string Path;
 
-            if (_x64InstallDirectory is null)
+            public RuntimeInfo(string name, string version, string path)
+                : this(name, new Version(version), path)
             {
-#if NETFRAMEWORK
-                if (Path.DirectorySeparatorChar == '\\')
-#else
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
-                {
-                    using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\SetUp\InstalledVersions\x64\sharedHost\"))
-                        _x64InstallDirectory = (string?)key?.GetValue("Path");
-                }
-                else
-                    _x64InstallDirectory = "/usr/shared/dotnet/";
             }
 
-            return _x64InstallDirectory;
+            public RuntimeInfo(string name, Version version, string path)
+            {
+                Name = name;
+                Version = version;
+                Path = path;
+            }
         }
 
-        private static string? _x86InstallDirectory;
-        public static string? GetX86InstallDirectory()
+        /// <summary>
+        /// Get the correct install directory, depending on whether we need X86 or X64 architecture.
+        /// </summary>
+        /// <param name="x86">Flag indicating whether the X86 architecture is needed</param>
+        /// <returns></returns>
+        public static string GetInstallDirectory(bool x86) => x86
+            ? _x86InstallDirectory.Value : _x64InstallDirectory.Value;
+
+        /// <summary>
+        /// Get the correct dotnet.exe, depending on whether we need X86 or X64 architecture.
+        /// </summary>
+        /// <param name="x86">Flag indicating whether the X86 architecture is needed</param>
+        /// <returns></returns>
+        public static string GetDotnetExecutable(bool x86) => Path.Combine(GetInstallDirectory(x86), OS.IsWindows ? "dotnet.exe" : "dotnet");
+
+        public static IEnumerable<RuntimeInfo> GetRuntimes(string name, bool x86)
         {
-            if (_x86InstallDirectory is null)
-                _x86InstallDirectory = Environment.GetEnvironmentVariable("DOTNET_ROOT_X86");
-
-            if (_x86InstallDirectory is null)
-            {
-#if NETFRAMEWORK
-                if (Path.DirectorySeparatorChar == '\\')
-#else
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-#endif
-                {
-                    using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\dotnet\SetUp\InstalledVersions\x86\"))
-                        _x86InstallDirectory = (string?)key?.GetValue("InstallLocation");
-                }
-                else
-                    _x86InstallDirectory = "/usr/shared/dotnet/";
-            }
-
-            return _x86InstallDirectory;
+            var runtimes = x86 ? _x86Runtimes.Value : _x64Runtimes.Value;
+            return runtimes.Where(r => r.Name == name);
         }
 
-        public static string GetDotNetExe(bool runAsX86)
+        private static IEnumerable<RuntimeInfo> GetAllRuntimes(bool x86)
         {
-            string? installDirectory = DotNet.GetInstallDirectory(runAsX86);
-            if (installDirectory is not null)
+            foreach (string line in DotnetCommand("--list-runtimes", x86: x86))
             {
-                var dotnet_exe = Path.Combine(installDirectory, "dotnet.exe");
-                if (File.Exists(dotnet_exe))
-                    return dotnet_exe;
+                string[] parts = line.Trim().Split([' '], 3);
+                yield return new RuntimeInfo(parts[0], parts[1], parts[2].Trim(['[', ']']));
+            }
+        }
+
+        private static IEnumerable<string> DotnetCommand(string arguments, bool x86 = false)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = GetDotnetExecutable(x86),
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            try
+            {
+                process.Start();
+            }
+            catch (Exception)
+            {
+                // Failed to start dotnet command. Assume no versions are installed and just return
+                yield break;
             }
 
-            var msg = runAsX86
-                ? "The X86 version of dotnet.exe is not installed."
-                : "Unable to locate dotnet.exe.";
-
-            throw new Exception(msg);
+            while (!process.StandardOutput.EndOfStream)
+                yield return process.StandardOutput.ReadLine()!;
         }
     }
 }
