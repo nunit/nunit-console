@@ -12,6 +12,7 @@
         <!-- Informational Settings -->
         <Company>NUnit Software</Company>
         <Copyright>Copyright (c) 2022 Charlie Poole, Rob Prouse</Copyright>
+        <NoWarn>$(NoWarn);NU1603</NoWarn>
     </PropertyGroup>
 
 </Project>
