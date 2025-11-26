@@ -31,7 +31,7 @@ namespace NUnit.Engine.Internal
             Guard.ArgumentNotNull(startDirectory, nameof(startDirectory));
             Guard.ArgumentNotNull(pattern, nameof(pattern));
 
-            if (Path.DirectorySeparatorChar == '\\')
+            if (OS.IsWindows)
                 pattern = pattern.Replace(Path.DirectorySeparatorChar, '/');
 
             var dirList = new List<IDirectory> { startDirectory };

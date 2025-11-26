@@ -147,7 +147,7 @@ namespace NUnit.Engine.Internal
                 return string.Compare( path1, path2, RunningOnWindows ) == 0;
 
             // path 2 is longer than path 1: see if initial parts match
-            if ( string.Compare( path1, path2.Substring( 0, length1 ), RunningOnWindows ) != 0 )
+            if ( string.Compare( path1, path2.Substring( 0, length1 ), RunningOnWindows) != 0 )
                 return false;
             
             // must match through or up to a directory separator boundary
@@ -178,6 +178,8 @@ namespace NUnit.Engine.Internal
                 ? IsFullyQualifiedWindowsPath(path)
                 : IsFullyQualifiedUnixPath(path);
         }
+
+        private static bool RunningOnWindows => DirectorySeparatorChar == '\\';
 
         /// <summary>
         /// Returns a value that indicates whether the specified file path is fully qualified or not on Windows operating systems.
@@ -249,8 +251,6 @@ namespace NUnit.Engine.Internal
         {
             return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
         }
-
-        private static bool RunningOnWindows => DirectorySeparatorChar == '\\';
 
         private static string[] SplitPath(string path)
         {
