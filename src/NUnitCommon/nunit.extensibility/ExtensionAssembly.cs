@@ -48,8 +48,7 @@ namespace NUnit.Extensibility
         {
             get
             {
-                var framework = Assembly.GetFrameworkName();
-                if (framework is not null)
+                if (Assembly.TryGetFrameworkName(out string framework))
                     return new FrameworkName(framework);
 
                 // No TargetFrameworkAttribute - Assume .NET Framework

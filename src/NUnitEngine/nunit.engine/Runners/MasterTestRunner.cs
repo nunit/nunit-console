@@ -275,8 +275,11 @@ namespace NUnit.Engine.Runners
                 {
                     using (var assembly = AssemblyDefinition.ReadAssembly(packageName))
                     {
-                        string targetVersion = assembly.GetRuntimeVersion().ToString();
-                        string frameworkName = assembly.GetFrameworkName();
+                        string frameworkName;
+                        string targetVersion = assembly.GetRuntimeVersion().ToString(3);
+                        if (!assembly.TryGetFrameworkName(out frameworkName))
+                            frameworkName = $".NETFramework,Version=v{targetVersion}";
+
                         bool requiresX86 = assembly.RequiresX86();
                         bool requiresAssemblyResolver = assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute");
 

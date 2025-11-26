@@ -623,8 +623,8 @@ namespace NUnit.Extensibility
         private static System.Runtime.Versioning.FrameworkName GetTargetRuntime(string filePath)
         {
             var assemblyDef = AssemblyDefinition.ReadAssembly(filePath);
-            var frameworkName = assemblyDef.GetFrameworkName();
-            if (string.IsNullOrEmpty(frameworkName))
+            string frameworkName;
+            if (!assemblyDef.TryGetFrameworkName(out frameworkName))
             {
                 var runtimeVersion = assemblyDef.GetRuntimeVersion();
                 frameworkName = $".NETFramework,Version=v{runtimeVersion.ToString(3)}";
