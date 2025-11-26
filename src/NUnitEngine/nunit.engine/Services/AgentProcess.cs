@@ -69,7 +69,7 @@ namespace NUnit.Engine.Services
 
                 if (runAsX86)
                 {
-                    if (Path.DirectorySeparatorChar != '\\')
+                    if (OS.IsWindows)
                         throw new Exception("Running .NET Core as X86 is currently only supported on Windows");
 
                     if (!File.Exists(StartInfo.FileName))

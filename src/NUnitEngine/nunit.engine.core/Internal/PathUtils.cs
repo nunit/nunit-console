@@ -144,10 +144,10 @@ namespace NUnit.Engine.Internal
 
             // if lengths are the same, check for equality
             if ( length1 == length2 )
-                return string.Compare( path1, path2, RunningOnWindows ) == 0;
+                return string.Compare( path1, path2, OS.IsWindows ) == 0;
 
             // path 2 is longer than path 1: see if initial parts match
-            if ( string.Compare( path1, path2.Substring( 0, length1 ), RunningOnWindows ) != 0 )
+            if ( string.Compare( path1, path2.Substring( 0, length1 ), OS.IsWindows) != 0 )
                 return false;
             
             // must match through or up to a directory separator boundary
@@ -174,7 +174,7 @@ namespace NUnit.Engine.Internal
         /// <exception cref="ArgumentNullException"><paramref name="path"/></exception>
         public static bool IsFullyQualifiedPath(string path )
         {
-            return RunningOnWindows
+            return OS.IsWindows
                 ? IsFullyQualifiedWindowsPath(path)
                 : IsFullyQualifiedUnixPath(path);
         }
@@ -250,8 +250,6 @@ namespace NUnit.Engine.Internal
             return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
         }
 
-        private static bool RunningOnWindows => DirectorySeparatorChar == '\\';
-
         private static string[] SplitPath(string path)
         {
             char[] separators = new char[] { DirectorySeparatorChar, AltDirectorySeparatorChar };
@@ -277,7 +275,7 @@ namespace NUnit.Engine.Internal
 
         private static bool PathsEqual(string path1, string path2)
         {
-            if (RunningOnWindows)
+            if (OS.IsWindows)
                 return path1.ToLower().Equals(path2.ToLower());
             else
                 return path1.Equals(path2);

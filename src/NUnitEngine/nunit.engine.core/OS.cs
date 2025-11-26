@@ -4,7 +4,7 @@ using System.IO;
 
 namespace NUnit.Engine
 {
-    internal static class OS
+    public static class OS
     {
         public static bool IsWindows { get; } = Path.DirectorySeparatorChar == '\\';
     }
