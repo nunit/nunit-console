@@ -54,9 +54,8 @@ namespace NUnit.Engine
 
         private static bool IsValidFrameworkVersion(Version v)
         {
-            // All known framework versions have either two components or
-            // three. If three, then the Build is currently less than 3.
-            return v.Major > 0 && v.Minor >= 0 && v.Build < 3 && v.Revision == -1;
+            // All known framework versions have either two components or three
+            return v.Major > 0 && v.Minor >= 0 && v.Build >= -1 && v.Revision == -1;
         }
 
         #endregion

@@ -83,7 +83,7 @@ namespace NUnit.Engine.Agents
 
             if (AgentRuntime.Identifier == FrameworkIdentifiers.NetCoreApp)
             {
-                startInfo.FileName = DotNet.GetDotNetExe(runAsX86);
+                startInfo.FileName = DotNet.GetDotnetExecutable(runAsX86);
                 startInfo.Arguments = $"\"{AgentPath}\" {arguments}";
             }
 
