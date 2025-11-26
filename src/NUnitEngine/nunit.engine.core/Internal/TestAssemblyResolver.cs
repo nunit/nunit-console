@@ -4,10 +4,8 @@
 
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -84,9 +82,8 @@ namespace NUnit.Engine.Internal
         {
             if (loadContext == null) throw new ArgumentNullException("context");
 
-            Assembly loadedAssembly;
             foreach (var strategy in ResolutionStrategies)
-                if (strategy.TryToResolve(loadContext, assemblyName, out loadedAssembly))
+                if (strategy.TryToResolve(loadContext, assemblyName, out Assembly loadedAssembly))
                     return loadedAssembly;
 
             log.Info("Cannot resolve assembly '{0}'", assemblyName);
@@ -114,7 +111,7 @@ namespace NUnit.Engine.Internal
             {
                 // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
                 loadedAssembly = null;
-                var trustedAssemblies = System.AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
+                var trustedAssemblies = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
                 if (string.IsNullOrEmpty(trustedAssemblies))
                 {
                     return false;
@@ -142,19 +139,19 @@ namespace NUnit.Engine.Internal
 
         public class RuntimeLibrariesStrategy : ResolutionStrategy
         {
-            private DependencyContext _dependencyContext;
-            private readonly ICompilationAssemblyResolver _assemblyResolver;
+            private readonly DependencyContext _dependencyContext;
+            private readonly CompositeCompilationAssemblyResolver _assemblyResolver;
 
             public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
             {
                 _dependencyContext = DependencyContext.Load(loadContext.LoadFromAssemblyPath(testAssemblyPath));
 
-                _assemblyResolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
-                {
+                _assemblyResolver = new CompositeCompilationAssemblyResolver(
+                [
                     new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssemblyPath)),
                     new ReferenceAssemblyPathResolver(),
                     new PackageCompilationAssemblyResolver()
-                });
+                ]);
             }
 
             public override bool TryToResolve(
@@ -196,7 +193,7 @@ namespace NUnit.Engine.Internal
 
         public class AdditionalRuntimesStrategy : ResolutionStrategy
         {
-            private IEnumerable<DotNet.RuntimeInfo> _additionalRuntimes;
+            private readonly IEnumerable<DotNet.RuntimeInfo> _additionalRuntimes;
 
             public AdditionalRuntimesStrategy(string runtimeName)
             {
@@ -207,8 +204,7 @@ namespace NUnit.Engine.Internal
             {
                 loadedAssembly = null;
 
-                DotNet.RuntimeInfo runtime;
-                if (!FindBestRuntime(assemblyName, out runtime))
+                if (!FindBestRuntime(assemblyName, out DotNet.RuntimeInfo runtime))
                     return false;
 
                 string candidate = Path.Combine(runtime.Path, runtime.Version.ToString(), assemblyName.Name + ".dll");
@@ -222,7 +218,7 @@ namespace NUnit.Engine.Internal
             private bool FindBestRuntime(AssemblyName assemblyName, out DotNet.RuntimeInfo bestRuntime)
             {
                 bestRuntime = null;
-                var targetVersion = new Version(assemblyName.Version.Major, assemblyName.Version.Minor, assemblyName.Version.Build);
+                var targetVersion = assemblyName.Version;
 
                 if (targetVersion is null)
                     return false;
