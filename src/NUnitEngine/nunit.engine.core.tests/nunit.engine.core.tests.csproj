@@ -35,10 +35,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1' OR '$(TargetFramework)'=='net6.0' OR '$(TargetFramework)'=='net8.0'">
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\..\TestData\notest-assembly\notest-assembly.csproj" />
