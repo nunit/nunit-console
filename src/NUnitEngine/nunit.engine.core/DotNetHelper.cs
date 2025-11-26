@@ -71,7 +71,7 @@ namespace NUnit.Engine
         /// </summary>
         /// <param name="x86">Flag indicating whether the X86 architecture is needed</param>
         /// <returns></returns>
-        public static string GetDotnetExecutable(bool x86) => Path.Combine(GetInstallDirectory(x86), "dotnet.exe");
+        public static string GetDotnetExecutable(bool x86) => Path.Combine(GetInstallDirectory(x86), OS.IsWindows ? "dotnet.exe" : "dotnet");
 
         public static IEnumerable<RuntimeInfo> GetRuntimes(string name, bool x86)
         {
@@ -84,7 +84,7 @@ namespace NUnit.Engine
             foreach (string line in DotnetCommand("--list-runtimes", x86: x86))
             {
                 string[] parts = line.Trim().Split([' '], 3);
-                yield return new RuntimeInfo(parts[0], parts[1], parts[2].Trim(['[', ']']));
+                yield return new RuntimeInfo(parts[0], parts[1] + ".0", parts[2].Trim(['[', ']']));
             }
         }
 
