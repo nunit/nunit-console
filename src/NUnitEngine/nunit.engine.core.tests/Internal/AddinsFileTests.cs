@@ -49,6 +49,25 @@ namespace NUnit.Engine.Internal.Tests
         }
 
         [Test]
+        public void Read_AddinsFileIsNotOurs()
+        {
+            var content = new[]
+            {
+                "Anything",
+                "<SomeXml>",
+                "  We don't understand this",
+                "</SomeXml>",
+                "More stuff"
+            };
+
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(string.Join(Environment.NewLine, content))))
+            {
+                var result = AddinsFile.Read(stream);
+                Assert.That(result.Count, Is.Zero);
+            }
+        }
+
+        [Test]
         public void Read_InvalidEntry()
         {
             var content = "// This is not valid";
