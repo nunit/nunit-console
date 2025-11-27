@@ -13,6 +13,8 @@ namespace NUnit.Engine.Internal
 {
     internal class AddinsFile : List<AddinsFileEntry>
     {
+        static readonly Logger log = InternalTrace.GetLogger(typeof(AddinsFile));
+
         public static AddinsFile Read(IFile file)
         {
             if (file == null)
@@ -33,28 +35,54 @@ namespace NUnit.Engine.Internal
         /// <remarks>If the executing system uses backslashes ('\') to separate directories, these will be substituted with slashes ('/').</remarks>
         internal static AddinsFile Read(Stream stream, string fullName = null)
         {
+            // Read the whole file first
+            var content = new List<string>();
             using (var reader = new StreamReader(stream))
-            {
-                var addinsFile = new AddinsFile();
-
-                int lineNumber = 0;
+            { 
                 while (!reader.EndOfStream)
-                {
-                    var entry = new AddinsFileEntry(++lineNumber, reader.ReadLine());
-                    if (entry.Text != "" && !entry.IsValid)
-                    {
-                        string msg = $"Invalid Entry in {fullName ?? "addins file"}:\r\n  {entry}";
-                        throw new InvalidOperationException(msg);
-                    }
+                    content.Add(reader.ReadLine().Trim());
+            }
 
-                    addinsFile.Add(entry);
-                }
+            // Create an empty AddinsFile, with no entries
+            var addinsFile = new AddinsFile();
 
+            // Ensure that this is actually an NUnit .addins file, since
+            // the extension is used by others. See, for example,
+            // https://github.com/nunit/nunit-console/issues/1761
+            // TODO: Consider using an extension specific to NUnit for V4
+            if (!IsNUnitAddinsFile(content))
+            {
+                log.Warning($"Ignoring file {fullName} because it's not an NUnit .addins file");
                 return addinsFile;
             }
+
+            // It's our file, so process it
+            int lineNumber = 0;
+            foreach (var line in content)
+            {
+                var entry = new AddinsFileEntry(++lineNumber, line);
+                if (entry.Text != "" && !entry.IsValid)
+                {
+                    string msg = $"Invalid Entry in {fullName ?? "addins file"}:\r\n  {entry}";
+                    throw new InvalidOperationException(msg);
+                }
+
+                addinsFile.Add(entry);
+            }
+
+            return addinsFile;
         }
 
         private AddinsFile() { }
+
+        private static bool IsNUnitAddinsFile(List<string> content)
+        {
+            foreach (var line in content)
+                if (line.Length > 0 && line[0] == '<')
+                    return false;
+
+            return true;
+        }
 
         public override string ToString()
         {

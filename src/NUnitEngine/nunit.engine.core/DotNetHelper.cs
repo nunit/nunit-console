@@ -34,13 +34,6 @@ namespace NUnit.Engine
         private static Lazy<List<RuntimeInfo>> _x64Runtimes = new Lazy<List<RuntimeInfo>>(() => [.. GetAllRuntimes(x86: false)]);
         private static Lazy<List<RuntimeInfo>> _x86Runtimes = new Lazy<List<RuntimeInfo>>(() => [.. GetAllRuntimes(x86: true)]);
 
-        public enum Architecture
-        {
-            Unspecified,
-            X64,
-            X86
-        }
-
         public class RuntimeInfo
         {
             public string Name;
