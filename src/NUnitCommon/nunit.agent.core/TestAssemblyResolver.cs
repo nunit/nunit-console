@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using NUnit.Common;
 using TestCentric.Metadata;
+using System.Runtime.CompilerServices;
 
 namespace NUnit.Engine.Internal
 {
@@ -59,17 +60,17 @@ namespace NUnit.Engine.Internal
             ResolutionStrategies = new List<ResolutionStrategy>();
 
             if (tryWindowsDesktopFirst)
-                ResolutionStrategies.Add(new WindowsDesktopStrategy());
+                ResolutionStrategies.Add(new WindowsDesktopStrategy(false));
             if (tryAspNetCoreFirst)
-                ResolutionStrategies.Add(new AspNetCoreStrategy());
+                ResolutionStrategies.Add(new AspNetCoreStrategy(false));
 
             ResolutionStrategies.Add(new TrustedPlatformAssembliesStrategy());
             ResolutionStrategies.Add(new RuntimeLibrariesStrategy(loadContext, testAssemblyPath));
 
             if (!tryWindowsDesktopFirst)
-                ResolutionStrategies.Add(new WindowsDesktopStrategy());
+                ResolutionStrategies.Add(new WindowsDesktopStrategy(false));
             if (!tryAspNetCoreFirst)
-                ResolutionStrategies.Add(new AspNetCoreStrategy());
+                ResolutionStrategies.Add(new AspNetCoreStrategy(false));
         }
 
         public void Dispose()
@@ -93,173 +94,162 @@ namespace NUnit.Engine.Internal
             log.Info("Cannot resolve assembly '{0}'", assemblyName);
             return null;
         }
+    }
 
-        #region Nested ResolutionStrategy Classes
+    #region ResolutionStrategy Classes
 
-        public abstract class ResolutionStrategy
+    public abstract class ResolutionStrategy
+    {
+        public abstract bool TryToResolve(
+            AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly);
+    }
+
+    public class TrustedPlatformAssembliesStrategy : ResolutionStrategy
+    {
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(TrustedPlatformAssembliesStrategy));
+        public override bool TryToResolve(
+            AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
         {
-            public abstract bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly);
+            return TryLoadFromTrustedPlatformAssemblies(loadContext, assemblyName, out loadedAssembly);
         }
 
-        public class TrustedPlatformAssembliesStrategy : ResolutionStrategy
+        private static bool TryLoadFromTrustedPlatformAssemblies(
+            AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
         {
-            public override bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
+            // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
+            loadedAssembly = null;
+            var trustedAssemblies = System.AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
+            if (string.IsNullOrEmpty(trustedAssemblies))
             {
-                return TryLoadFromTrustedPlatformAssemblies(loadContext, assemblyName, out loadedAssembly);
+                return false;
             }
 
-            private static bool TryLoadFromTrustedPlatformAssemblies(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
+            var separator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ";" : ":";
+            foreach (var assemblyPath in trustedAssemblies.Split(separator))
             {
-                // https://learn.microsoft.com/en-us/dotnet/core/dependency-loading/default-probing
-                loadedAssembly = null;
-                var trustedAssemblies = System.AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string;
-                if (string.IsNullOrEmpty(trustedAssemblies))
+                var fileName = Path.GetFileNameWithoutExtension(assemblyPath);
+                if (FileMatchesAssembly(fileName) && File.Exists(assemblyPath))
                 {
-                    return false;
-                }
+                    loadedAssembly = loadContext.LoadFromAssemblyPath(assemblyPath);
+                    log.Info("'{0}' assembly is loaded from trusted path '{1}'", assemblyPath, loadedAssembly.Location);
 
-                var separator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ";" : ":";
-                foreach (var assemblyPath in trustedAssemblies.Split(separator))
+                    return true;
+                }
+            }
+
+            return false;
+
+            bool FileMatchesAssembly(string fileName) =>
+                string.Equals(fileName, assemblyName.Name, StringComparison.InvariantCultureIgnoreCase);
+        }
+    }
+
+    public class RuntimeLibrariesStrategy : ResolutionStrategy
+    {
+        private static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeLibrariesStrategy));
+
+        private DependencyContext? _dependencyContext;
+        private readonly CompositeCompilationAssemblyResolver _assemblyResolver;
+
+        public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
+        {
+            _dependencyContext = DependencyContext.Load(loadContext.LoadFromAssemblyPath(testAssemblyPath));
+
+            _assemblyResolver = new CompositeCompilationAssemblyResolver(
+            [
+                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssemblyPath)!),
+                new ReferenceAssemblyPathResolver(),
+                new PackageCompilationAssemblyResolver()
+            ]);
+        }
+
+        public override bool TryToResolve(
+            AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
+        {
+            if (_dependencyContext is null)
+            {
+                // TODO: Is this the intended behavior?
+                loadedAssembly = null;
+                return false;
+            }
+
+            foreach (var library in _dependencyContext.RuntimeLibraries)
+            {
+                var wrapper = new CompilationLibrary(
+                    library.Type,
+                    library.Name,
+                    library.Version,
+                    library.Hash,
+                    library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
+                    library.Dependencies,
+                    library.Serviceable);
+
+                var assemblies = new List<string>();
+                _assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies);
+
+                foreach (var assemblyPath in assemblies)
                 {
-                    var fileName = Path.GetFileNameWithoutExtension(assemblyPath);
-                    if (FileMatchesAssembly(fileName) && File.Exists(assemblyPath))
+                    if (assemblyName.Name == Path.GetFileNameWithoutExtension(assemblyPath))
                     {
                         loadedAssembly = loadContext.LoadFromAssemblyPath(assemblyPath);
-                        log.Info("'{0}' assembly is loaded from trusted path '{1}'", assemblyPath, loadedAssembly.Location);
+                        log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
+                            assemblyName,
+                            loadedAssembly.Location,
+                            library.Name);
 
                         return true;
                     }
                 }
+            }
 
+            loadedAssembly = null;
+            return false;
+        }
+    }
+
+    public class AdditionalRuntimesStrategy : ResolutionStrategy
+    {
+        private string _runtimeName;
+        private bool _x86;
+
+        public AdditionalRuntimesStrategy(string runtimeName, bool x86)
+        {
+            _runtimeName = runtimeName;
+            _x86 = x86;
+        }
+
+        public override bool TryToResolve(AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
+        {
+            loadedAssembly = null;
+            if (assemblyName.Version is null)
                 return false;
 
-                bool FileMatchesAssembly(string fileName) =>
-                    string.Equals(fileName, assemblyName.Name, StringComparison.InvariantCultureIgnoreCase);
-            }
-        }
-
-        public class RuntimeLibrariesStrategy : ResolutionStrategy
-        {
-            private DependencyContext? _dependencyContext;
-            private readonly CompositeCompilationAssemblyResolver _assemblyResolver;
-
-            public RuntimeLibrariesStrategy(AssemblyLoadContext loadContext, string testAssemblyPath)
-            {
-                _dependencyContext = DependencyContext.Load(loadContext.LoadFromAssemblyPath(testAssemblyPath));
-
-                _assemblyResolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
-                {
-                    new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssemblyPath)!),
-                    new ReferenceAssemblyPathResolver(),
-                    new PackageCompilationAssemblyResolver()
-                });
-            }
-
-            public override bool TryToResolve(
-                AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
-            {
-                if (_dependencyContext is null)
-                {
-                    // TODO: Is this the intended behavior?
-                    loadedAssembly = null;
-                    return false;
-                }
-
-                foreach (var library in _dependencyContext.RuntimeLibraries)
-                {
-                    var wrapper = new CompilationLibrary(
-                        library.Type,
-                        library.Name,
-                        library.Version,
-                        library.Hash,
-                        library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
-                        library.Dependencies,
-                        library.Serviceable);
-
-                    var assemblies = new List<string>();
-                    _assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies);
-
-                    foreach (var assemblyPath in assemblies)
-                    {
-                        if (assemblyName.Name == Path.GetFileNameWithoutExtension(assemblyPath))
-                        {
-                            loadedAssembly = loadContext.LoadFromAssemblyPath(assemblyPath);
-                            log.Info("'{0}' ({1}) assembly is loaded from runtime libraries {2} dependencies",
-                                assemblyName,
-                                loadedAssembly.Location,
-                                library.Name);
-
-                            return true;
-                        }
-                    }
-                }
-
-                loadedAssembly = null;
+            if (!DotNet.FindBestRuntime(assemblyName.Version, _runtimeName, _x86, out DotNet.RuntimeInfo? runtime))
                 return false;
-            }
-        }
 
-        public class AdditionalRuntimesStrategy : ResolutionStrategy
+            string candidate = Path.Combine(runtime.Path, runtime.Version.ToString(), assemblyName.Name + ".dll");
+            if (!File.Exists(candidate))
+                return false;
+
+            loadedAssembly = loadContext.LoadFromAssemblyPath(candidate);
+            return true;
+        }
+    }
+
+    public class WindowsDesktopStrategy : AdditionalRuntimesStrategy
+    {
+        public WindowsDesktopStrategy(bool x86) : base("Microsoft.WindowsDesktop.App", x86)
         {
-            private readonly IEnumerable<DotNet.RuntimeInfo> _additionalRuntimes;
-
-            public AdditionalRuntimesStrategy(string runtimeName)
-            {
-                _additionalRuntimes = DotNet.GetRuntimes(runtimeName, !Environment.Is64BitProcess);
-            }
-
-            public override bool TryToResolve(AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly)
-            {
-                loadedAssembly = null;
-
-                if (!FindBestRuntime(assemblyName, out DotNet.RuntimeInfo? runtime))
-                    return false;
-
-                string candidate = Path.Combine(runtime.Path, runtime.Version.ToString(), assemblyName.Name + ".dll");
-                if (!File.Exists(candidate))
-                    return false;
-
-                loadedAssembly = loadContext.LoadFromAssemblyPath(candidate);
-                return true;
-            }
-
-            private bool FindBestRuntime(AssemblyName assemblyName, [NotNullWhen(true)] out DotNet.RuntimeInfo? bestRuntime)
-            {
-                bestRuntime = null;
-                var targetVersion = assemblyName.Version;
-
-                if (targetVersion is null)
-                    return false;
-
-                foreach (var candidate in _additionalRuntimes)
-                {
-                    if (candidate.Version >= targetVersion)
-                        if (bestRuntime is null || bestRuntime.Version > candidate.Version)
-                            bestRuntime = candidate;
-                }
-
-                return bestRuntime is not null;
-            }
         }
+    }
 
-        public class WindowsDesktopStrategy : AdditionalRuntimesStrategy
+    public class AspNetCoreStrategy : AdditionalRuntimesStrategy
+    {
+        public AspNetCoreStrategy(bool x86) : base("Microsoft.AspNetCore.App", x86)
         {
-            public WindowsDesktopStrategy() : base("Microsoft.WindowsDesktop.App")
-            {
-            }
         }
-
-        public class AspNetCoreStrategy : AdditionalRuntimesStrategy
-        {
-            public AspNetCoreStrategy() : base("Microsoft.AspNetCore.App")
-            {
-            }
-        }
+    }
 
         #endregion
-    }
 }
 #endif
