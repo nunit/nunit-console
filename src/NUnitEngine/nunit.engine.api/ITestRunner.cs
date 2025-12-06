@@ -21,9 +21,9 @@ namespace NUnit.Engine
         /// </summary>
         /// <returns>An XmlNode representing the loaded package.</returns>
         /// <remarks>
-        /// This method is normally optional, since Explore and Run call
-        /// it automatically when necessary. The method is kept in order
-        /// to make it easier to convert older programs that use it.
+        /// This method is optional, since Explore and Run both load the
+        /// tests automatically when necessary. Programs needing a correct
+        /// test case count may still need to call it in advance.
         /// </remarks>
         XmlNode Load();
 
