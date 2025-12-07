@@ -5,7 +5,6 @@
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net462;net8.0</TargetFrameworks>
 		<OutputPath>..\..\bin\$(Configuration)\direct-test-agent\</OutputPath>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 

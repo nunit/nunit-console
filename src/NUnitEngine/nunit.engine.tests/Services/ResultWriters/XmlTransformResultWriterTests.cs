@@ -32,7 +32,7 @@ namespace NUnit.Engine.Services.ResultWriters
             var package = new TestPackage(assemblyPath);
             using (var runner = new MasterTestRunner(serviceContext, package))
             {
-                runner.Load();
+                //runner.Load();
                 _engineResult = runner.Run(null, TestFilter.Empty);
             }
         }

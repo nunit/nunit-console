@@ -160,10 +160,9 @@ namespace NUnit.ConsoleRunner
 
             TestFilter filter = CreateTestFilter(_options);
 
-            if (_options.Explore)
-                return ExploreTests(package, filter);
-            else
-                return RunTests(package, filter);
+            return _options.Explore
+                ? ExploreTests(package, filter)
+                : RunTests(package, filter);
         }
 
         private void DisplayTestFiles()
@@ -176,22 +175,26 @@ namespace NUnit.ConsoleRunner
 
         private int ExploreTests(TestPackage package, TestFilter filter)
         {
-            XmlNode result;
-
             using (var runner = _engine.GetRunner(package))
-                result = runner.Explore(filter);
+            {
+                XmlNode result = runner.Explore(filter);
 
-            if (_options.ExploreOutputSpecifications.Count == 0)
-            {
-                _resultService.GetResultWriter("cases", null).WriteResultFile(result, Console.Out);
-            }
-            else
-            {
-                foreach (OutputSpecification spec in _options.ExploreOutputSpecifications)
+                if (_options.ExploreOutputSpecifications.Count == 0)
                 {
-                    _resultService.GetResultWriter(spec.Format, spec.Transform).WriteResultFile(result, spec.OutputPath);
-                    _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
+                    _outWriter.WriteLine(ColorStyle.SectionHeader, "Test Cases");
+                    _resultService.GetResultWriter("cases", null).WriteResultFile(result, Console.Out);
                 }
+                else
+                {
+                    foreach (OutputSpecification spec in _options.ExploreOutputSpecifications)
+                    {
+                        _resultService.GetResultWriter(spec.Format, spec.Transform).WriteResultFile(result, spec.OutputPath);
+                        _outWriter.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
+                    }
+                }
+
+                if (_options.ListResolutionStats)
+                    DisplayResolutionStats(result);
             }
 
             return ConsoleRunner.OK;
@@ -285,6 +288,9 @@ namespace NUnit.ConsoleRunner
                     GetResultWriter(spec).WriteResultFile(result, outputPath);
                     writer.WriteLine("Results ({0}) saved as {1}", spec.Format, spec.OutputPath);
                 }
+
+                if (_options.ListResolutionStats)
+                    DisplayResolutionStats(result);
 
                 if (engineException is not null)
                 {
@@ -446,6 +452,31 @@ namespace NUnit.ConsoleRunner
             }
         }
 
+        private void DisplayResolutionStats(XmlNode result)
+        {
+            _outWriter.WriteLine();
+            _outWriter.WriteLine(ColorStyle.SectionHeader, "Assembly Resolution Statistics");
+
+            var assemblies = result.SelectNodes("//test-suite[@type='Assembly']");
+            if (assemblies is not null)
+                foreach (XmlNode assembly in assemblies)
+                {
+                    var name = assembly.GetAttribute("name");
+                    _outWriter.WriteLine($"  {name}");
+                    var resolvers = assembly.SelectNodes("resolver-stats/resolver");
+                    if (resolvers is not null && resolvers.Count > 0)
+                        foreach (XmlNode resolver in resolvers)
+                        {
+                            var strategy = resolver.GetAttribute("name")!.PadRight(36);
+                            var calls = resolver.GetAttribute("calls");
+                            var resolved = resolver.GetAttribute("resolved");
+                            _outWriter.WriteLine($"    {strategy} Calls: {calls}, Resolved: {resolved}");
+                        }
+                    else
+                        _outWriter.WriteLine(ColorStyle.Failure, "    Not Available");
+                }
+        }
+
         private ExtendedTextWriter CreateOutputWriter()
         {
             if (_options.OutFileSpecified)
@@ -552,6 +583,9 @@ namespace NUnit.ConsoleRunner
 
             if (options.ConfigurationFile is not null)
                 package.AddSetting(SettingDefinitions.ConfigurationFile.WithValue(options.ConfigurationFile));
+
+            if (options.ListResolutionStats)
+                package.AddSetting(SettingDefinitions.ListResolutionStats.WithValue(true));
 
             return package;
         }

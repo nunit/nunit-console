@@ -96,7 +96,7 @@ namespace NUnit.ConsoleRunner.Options
 
         public OutputSpecification? ResolveOutputSpecification(string value, IList<OutputSpecification> outputSpecifications, IFileSystem fileSystem, string currentDir)
         {
-            if (value is null)
+            if (string.IsNullOrEmpty(value))
                 return null;
 
             OutputSpecification spec;

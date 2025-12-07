@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -54,6 +53,8 @@ namespace NUnit.ConsoleRunner
         public bool ShowVersion { get; private set; }
 
         public bool ListExtensions { get; private set; }
+
+        public bool ListResolutionStats { get; private set; }
 
         public List<string> EnableExtensions { get; private set; } = new List<string>();
         public List<string> DisableExtensions { get; private set; } = new List<string>();
@@ -411,6 +412,9 @@ namespace NUnit.ConsoleRunner
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = !string.IsNullOrEmpty(v));
+
+            this.Add("list-resolution-stats", "Display usage of each ResolutionStrategy in loading .NET Core assemblies.",
+                v => ListResolutionStats = !string.IsNullOrEmpty(v));
 
             this.AddNetFxOnlyOption("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
                 NetFxOnlyOption("set-principal-policy=", v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal")));

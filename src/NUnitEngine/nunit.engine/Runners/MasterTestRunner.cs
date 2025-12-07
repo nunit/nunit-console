@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -107,11 +108,12 @@ namespace NUnit.Engine.Runners
         public bool IsTestRunning { get; private set; }
 
         /// <summary>
-        /// Load a TestPackage for possible execution. The
+        /// Load a TestPackage for possible execution.The
         /// explicit implementation returns an ITestEngineResult
         /// for consumption by clients.
         /// </summary>
         /// <returns>An XmlNode representing the loaded assembly.</returns>
+        [MemberNotNull("LoadResult")]
         public XmlNode Load()
         {
             LoadResult = AdjustResultForProjects(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);
@@ -228,8 +230,8 @@ namespace NUnit.Engine.Runners
         /// <returns>An XmlNode representing the tests found.</returns>
         public XmlNode Explore(TestFilter filter)
         {
-            LoadResult = AdjustResultForProjects(GetEngineRunner().Explore(filter))
-                .MakeTestRunResult(TestPackage);
+            if (LoadResult is null)
+                LoadResult = AdjustResultForProjects(GetEngineRunner().Explore(filter)).MakeTestRunResult(TestPackage);
 
             return LoadResult.Xml;
         }
@@ -254,7 +256,7 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        //Exposed for testing
+        // Exposed for testing
         internal ITestEngineRunner GetEngineRunner()
         {
             if (_engineRunner is null)

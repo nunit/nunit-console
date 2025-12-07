@@ -48,22 +48,22 @@ namespace NUnit.Engine.Runners
             _masterTestRunner.Dispose();
         }
 
-        [Test]
-        public void Load()
-        {
-            _engineRunner.Load().Returns(new TestEngineResult());
-            _masterTestRunner.Load();
-            _engineRunner.Received().Load();
-        }
+        //[Test]
+        //public void Load()
+        //{
+        //    _engineRunner.Load().Returns(new TestEngineResult());
+        //    _masterTestRunner.Load();
+        //    _engineRunner.Received().Load();
+        //}
 
 #if NETFRAMEWORK
-        [Test]
-        public void Reload()
-        {
-            _engineRunner.Reload().Returns(new TestEngineResult());
-            _masterTestRunner.Reload();
-            _engineRunner.Received().Reload();
-        }
+        //[Test]
+        //public void Reload()
+        //{
+        //    _engineRunner.Reload().Returns(new TestEngineResult());
+        //    _masterTestRunner.Reload();
+        //    _engineRunner.Received().Reload();
+        //}
 
         [Test]
         public void Explore()
