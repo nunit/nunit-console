@@ -44,7 +44,9 @@ namespace NUnit.ConsoleRunner
         [TestCase("--workers=3", FrameworkPackageSettings.NumberOfTestWorkers, 3)]
         [TestCase("--workers=0", FrameworkPackageSettings.NumberOfTestWorkers, 0)]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
-#if NETFRAMEWORK
+#if NETCOREAPP
+        [TestCase("--list-resolution-stats", "ListResolutionStats", true)]
+#else
         [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--shadowcopy", "ShadowCopyFiles", true)]
         [TestCase("--framework=net-4.6.2", "RequestedRuntimeFramework", "net-4.6.2")]

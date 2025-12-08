@@ -5,17 +5,18 @@
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using Microsoft.Win32;
+using NUnit.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
-using NUnit.Common;
+using System.Xml.Linq;
 using TestCentric.Metadata;
-using System.Runtime.CompilerServices;
 
 namespace NUnit.Engine.Internal
 {
@@ -26,7 +27,7 @@ namespace NUnit.Engine.Internal
         private readonly AssemblyLoadContext _loadContext;
 
         // Our Strategies for resolving references
-        private List<ResolutionStrategy> ResolutionStrategies;
+        internal List<ResolutionStrategy> ResolutionStrategies = new List<ResolutionStrategy>();
 
         public TestAssemblyResolver(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
@@ -37,7 +38,6 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving += OnResolving;
         }
 
-        [MemberNotNull(nameof(ResolutionStrategies))]
         private void InitializeResolutionStrategies(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
             // Decide whether to try WindowsDeskTop and/or AspNetCore runtimes before any others.
@@ -56,9 +56,7 @@ namespace NUnit.Engine.Internal
             }
 
             // Initialize the list of ResolutionStrategies in the best order depending on
-            // what we learned.
-            ResolutionStrategies = new List<ResolutionStrategy>();
-
+            // what we learned from examining direct references.
             if (tryWindowsDesktopFirst)
                 ResolutionStrategies.Add(new WindowsDesktopStrategy(false));
             if (tryAspNetCoreFirst)
@@ -88,11 +86,33 @@ namespace NUnit.Engine.Internal
             Guard.ArgumentNotNull(loadContext);
 
             foreach (var strategy in ResolutionStrategies)
+            {
+                strategy.Calls++;
                 if (strategy.TryToResolve(loadContext, assemblyName, out Assembly? loadedAssembly))
+                {
+                    log.Info($"Assembly {assemblyName} ({GetAssemblyLocationInfo(loadedAssembly)}) is loaded using strategy {strategy.Name}");
+                    strategy.Resolved++;
                     return loadedAssembly;
+                }
+            }
 
             log.Info("Cannot resolve assembly '{0}'", assemblyName);
             return null;
+        }
+
+        private static string GetAssemblyLocationInfo(Assembly assembly)
+        {
+            if (assembly.IsDynamic)
+            {
+                return $"Dynamic {assembly.FullName}";
+            }
+
+            if (string.IsNullOrEmpty(assembly.Location))
+            {
+                return $"No location for {assembly.FullName}";
+            }
+
+            return $"{assembly.FullName} from {assembly.Location}";
         }
     }
 
@@ -100,6 +120,10 @@ namespace NUnit.Engine.Internal
 
     public abstract class ResolutionStrategy
     {
+        public string Name => GetType().Name;
+        public int Calls { get; set; }
+        public int Resolved { get; set; }
+
         public abstract bool TryToResolve(
             AssemblyLoadContext loadContext, AssemblyName assemblyName, [NotNullWhen(true)] out Assembly? loadedAssembly);
     }

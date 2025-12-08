@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using NUnit.Common;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using NUnit.TestData.Assemblies;
@@ -42,6 +43,16 @@ namespace NUnit.Engine.Runners
             CheckLoadResult(result);
         }
 
+#if NETCOREAPP3_1_OR_GREATER
+        [Test]
+        public void ListResolutionStats()
+        {
+            _package.AddSetting(SettingDefinitions.ListResolutionStats.WithValue(true));
+            var result = _runner.Load();
+            CheckLoadResult(result);
+        }
+#endif
+
         [Test]
         public void CountTestCases()
         {
@@ -80,6 +91,7 @@ namespace NUnit.Engine.Runners
             Assert.That(result.IsSingle);
             var node = result.XmlNodes[0];
             Assert.That(node.Name, Is.EqualTo("test-suite"));
+            Assert.That(node.GetAttribute("type"), Is.EqualTo("Assembly"));
             Assert.That(node.GetAttribute("testcasecount", 0), Is.EqualTo(MockAssembly.Tests));
             Assert.That(node.GetAttribute("runstate"), Is.EqualTo("Runnable"));
         }

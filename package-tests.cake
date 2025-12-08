@@ -428,6 +428,66 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory
 });
 
 //////////////////////////////////////////////////////////////////////
+// TEST OF ASSEMBLY RESOLUTION STATISTICS
+//////////////////////////////////////////////////////////////////////
+
+// TODO: Standard runner tests will not work until agents are updated.
+
+//StandardRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Explore")
+//{
+//    Description = "Display Assembly resolution statistics with Explore output",
+//    // TODO: Should either fix recipe to detect alternate name in spec and map it to the
+//    // work directory or fix console runner to use work directory in this situation.
+//    Arguments = "testdata/net8.0-windows/windows-test.dll --explore:../../package/results/nuget/NUnit.ConsoleRunner/ListResolutionStatistics_Explore/TestResult.xml --list-resolution-stats",
+//    ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-8.0") } }
+//    //ExpectedOutput = new[] {
+//    //    Contains("Assembly Resolution Statistics"),
+//    //    Contains("windows-test.dll"),
+//    //    Contains("Not Available")
+//});
+
+StandardRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
+{
+    Description = "Display Assembly resolution statistics with Run output",
+    Arguments = "testdata/net8.0-windows/windows-test.dll --list-resolution-stats",
+    ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-8.0") } }
+    //ExpectedOutput = new[] {
+    //    Contains("Assembly Resolution Statistics"),
+    //    Contains("windows-test.dll"),
+    //    Contains("Not Available")
+});
+
+NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Explore")
+{
+    Description = "Display Assembly resolution statistics with Explore output",
+    Arguments = "testdata/net8.0-windows/windows-test.dll --explore:LoadResult.xml --list-resolution-stats",
+    ExpectedOutput = new[] {
+        Contains("Assembly Resolution Statistics"),
+        Contains("windows-test.dll"),
+        // Has an entry for each strategy - counts may vary
+        Contains("WindowsDesktopStrategy"),
+        Contains("TrustedPlatformAssembliesStrategy"),
+        Contains("RuntimeLibrariesStrategy"),
+        Contains("AspNetCoreStrategy")
+    }
+});
+
+NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
+{
+    Description = "Display Assembly resolution statistics with Run output",
+    Arguments = "testdata/net8.0-windows/windows-test.dll --list-resolution-stats",
+    ExpectedOutput = new[] {
+        Contains("Assembly Resolution Statistics"),
+        Contains("windows-test.dll"),
+        // Has an entry for each strategy - counts may vary
+        Contains("WindowsDesktopStrategy"),
+        Contains("TrustedPlatformAssembliesStrategy"),
+        Contains("RuntimeLibrariesStrategy"),
+        Contains("AspNetCoreStrategy")
+    }
+});
+
+//////////////////////////////////////////////////////////////////////
 // RUN TESTS USING EACH OF OUR EXTENSIONS
 //////////////////////////////////////////////////////////////////////
 

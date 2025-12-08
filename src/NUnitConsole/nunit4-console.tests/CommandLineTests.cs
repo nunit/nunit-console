@@ -148,6 +148,8 @@ namespace NUnit.ConsoleRunner
         [TestCase("DisposeRunners", "dispose-runners")]
         [TestCase("SkipNonTestAssemblies", "skipnontestassemblies")]
         [TestCase("NoResultSpecified", "noresult")]
+        [TestCase("ListExtensions", "list-extensions")]
+        [TestCase("ListResolutionStats", "list-resolution-stats")]
 #if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]

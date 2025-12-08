@@ -8,6 +8,7 @@ using System.Runtime.Loader;
 using System.IO;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace NUnit.Engine.Internal
 {
@@ -28,6 +29,8 @@ namespace NUnit.Engine.Internal
             AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", _basePath);
 #endif
         }
+
+        internal List<ResolutionStrategy> ResolutionStrategies => _resolver.ResolutionStrategies;
 
         protected override Assembly? Load(AssemblyName name)
         {

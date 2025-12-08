@@ -1,10 +1,11 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 #if NETFRAMEWORK
-using System;
-using System.Diagnostics.CodeAnalysis;
 using NUnit.Common;
 using NUnit.Engine.Services;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Xml;
 
 namespace NUnit.Engine.Runners
 {
@@ -66,7 +67,14 @@ namespace NUnit.Engine.Runners
             {
                 CreateAgentAndRunnerIfNeeded();
 
-                return _remoteRunner.Load();
+                var loadResult = _remoteRunner.Load();
+
+                // TODO: Make this conditional on a package setting
+                var doc = loadResult.Xml.OwnerDocument.ShouldNotBeNull();
+                XmlNode strategies = doc.CreateElement("strategies");
+                loadResult.Xml.InsertAfter(strategies, null);
+
+                return loadResult;
             }
             catch (Exception)
             {

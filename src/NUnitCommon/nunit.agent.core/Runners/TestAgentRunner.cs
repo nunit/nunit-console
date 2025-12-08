@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using NUnit.Common;
 using NUnit.Engine.Drivers;
 using NUnit.Engine.Extensibility;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Xml;
 //using static NUnit.Engine.Drivers.NUnitFrameworkDriver;
 
 namespace NUnit.Engine.Runners
@@ -76,7 +78,14 @@ namespace NUnit.Engine.Runners
         {
             try
             {
-                return new TestEngineResult(GetLoadedDriver().Explore(filter.Text));
+                var result = new TestEngineResult(GetLoadedDriver().Explore(filter.Text));
+
+#if NETCOREAPP
+                if (TestPackage.Settings.HasSetting(SettingDefinitions.ListResolutionStats))
+                    InsertResolutionStatistics(result.Xml);
+#endif
+
+                return result;
             }
             catch (Exception ex) when (!(ex is NUnitEngineException))
             {
@@ -122,7 +131,14 @@ namespace NUnit.Engine.Runners
 
             try
             {
-                return LoadResult = new TestEngineResult(_driver.Load(testFile, frameworkSettings));
+                LoadResult = new TestEngineResult(_driver.Load(testFile, frameworkSettings));
+
+#if NETCOREAPP
+                if (TestPackage.Settings.HasSetting(SettingDefinitions.ListResolutionStats))
+                    InsertResolutionStatistics(LoadResult.Xml);
+#endif
+
+                return LoadResult;
             }
             catch (Exception ex) when (ex is not NUnitEngineException)
             {
@@ -133,6 +149,7 @@ namespace NUnit.Engine.Runners
         public virtual void Unload()
         {
         }
+
         public TestEngineResult Reload() => Load();
 
         /// <summary>
@@ -166,7 +183,14 @@ namespace NUnit.Engine.Runners
             try
             {
                 log.Debug($"Running");
-                return new TestEngineResult(GetLoadedDriver().Run(listener, filter.Text));
+                var result = new TestEngineResult(GetLoadedDriver().Run(listener, filter.Text));
+
+#if NETCOREAPP
+                if (TestPackage.Settings.HasSetting(SettingDefinitions.ListResolutionStats))
+                    InsertResolutionStatistics(result.Xml);
+#endif
+
+                return result;
             }
             catch (Exception ex) when (!(ex is NUnitEngineException))
             {
@@ -224,6 +248,34 @@ namespace NUnit.Engine.Runners
 
             return _driver.ShouldNotBeNull();
         }
+
+#if NETCOREAPP3_1_OR_GREATER
+        private void InsertResolutionStatistics(XmlNode resultNode)
+        {
+            log.Debug("Inserting ResolutionStatistics");
+            var doc = resultNode.OwnerDocument;
+            if (doc is null)
+                return;
+
+            log.Debug("Creating resolver-stats element");
+            XmlNode resolverStatistics = doc.CreateElement("resolver-stats");
+            resultNode.InsertAfter(resolverStatistics, null);
+            log.Debug("Inserted resolver-stats element");
+
+            var nunitDriver = _driver as NUnitFrameworkDriver;
+            foreach (var strategy in nunitDriver?.ResolutionStrategies!)
+            {
+                log.Debug($"Processing stats for {strategy.Name}");
+                XmlNode resolver = doc.CreateElement("resolver");
+                log.Debug("  Created resolver element");
+                resolver.AddAttribute("name", strategy.Name);
+                resolver.AddAttribute("calls", strategy.Calls.ToString());
+                resolver.AddAttribute("resolved", strategy.Resolved.ToString());
+                resolverStatistics.AppendChild(resolver);
+                log.Debug("  Appended resolver element");
+            }
+        }
+#endif
 
         public void Dispose()
         {

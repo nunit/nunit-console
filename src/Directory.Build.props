@@ -14,7 +14,6 @@
         <CheckEolTargetFramework>false</CheckEolTargetFramework>
         <RollForward>Major</RollForward>
         <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <!-- Signing Assemblies -->
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\nunit.snk</AssemblyOriginatorKeyFile>

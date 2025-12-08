@@ -1,9 +1,13 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Engine.Extensibility;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using NUnit.Engine.Extensibility;
+
+#if NETCOREAPP3_1_OR_GREATER
+using NUnit.Engine.Internal;
+#endif
 
 namespace NUnit.Engine.Drivers
 {
@@ -97,6 +101,8 @@ namespace NUnit.Engine.Drivers
 
             _api = new NUnitFrameworkApi2018(ID, nunitRef);
         }
+
+        internal List<ResolutionStrategy>? ResolutionStrategies => _api?.ResolutionStrategies;
 #endif
 
         /// <summary>

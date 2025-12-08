@@ -42,6 +42,8 @@ namespace NUnit.Engine.Drivers
 #if NETCOREAPP
         private TestAssemblyLoadContext? _assemblyLoadContext;
         private Assembly? _frameworkAssembly;
+
+        internal List<ResolutionStrategy>? ResolutionStrategies => _assemblyLoadContext?.ResolutionStrategies;
 #endif
 
         private string? _testAssemblyPath;

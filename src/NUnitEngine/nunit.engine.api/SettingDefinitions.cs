@@ -195,7 +195,12 @@ namespace NUnit.Common
         ///// </summary>
         //public static SettingDefinition<string> WorkDirectory { get; } = new(nameof(WorkDirectory));
 
-        #endregion
+        /// <summary>
+        /// Set to true to list statistics for dependency resolution under .NET Core.
+        /// </summary>
+        public static SettingDefinition<bool> ListResolutionStats { get; } = new(nameof(ListResolutionStats), false);
+
+#endregion
 
         #region Settings Used by both the Engine and the Framework
 
