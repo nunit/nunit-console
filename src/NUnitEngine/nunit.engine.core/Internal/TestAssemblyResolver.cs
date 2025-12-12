@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
+using System.Xml.Linq;
 using TestCentric.Metadata;
 
 namespace NUnit.Engine.Internal
@@ -20,6 +21,8 @@ namespace NUnit.Engine.Internal
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyResolver));
 
         private readonly AssemblyLoadContext _loadContext;
+        private readonly string _basePath;
+        private readonly AssemblyDependencyResolver _assemblyDependencyResolver;
 
         // Our Strategies for resolving references
         List<ResolutionStrategy> ResolutionStrategies;
@@ -27,6 +30,11 @@ namespace NUnit.Engine.Internal
         public TestAssemblyResolver(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
             _loadContext = loadContext;
+            _basePath = Path.GetDirectoryName(testAssemblyPath);
+            _assemblyDependencyResolver = new AssemblyDependencyResolver(testAssemblyPath);
+#if NET8_0_OR_GREATER
+            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", _basePath);
+#endif
 
             InitializeResolutionStrategies(loadContext, testAssemblyPath);
 
@@ -73,18 +81,47 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
-        public Assembly Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
-        {
-            return OnResolving(context, assemblyName);
-        }
+        //public Assembly Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
+        //{
+        //    return OnResolving(context, assemblyName);
+        //}
 
         private Assembly OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
             if (loadContext == null) throw new ArgumentNullException("context");
 
+            //var runtimeResolverPath = _assemblyDependencyResolver.ResolveAssemblyToPath(assemblyName);
+            //if (!string.IsNullOrEmpty(runtimeResolverPath) && File.Exists(runtimeResolverPath))
+            //{
+            //    var loadedAssembly = _loadContext.LoadFromAssemblyPath(runtimeResolverPath);
+            //    if (loadedAssembly != null)
+            //    {
+            //        log.Info($"Assembly {assemblyName} ({loadedAssembly}) is loaded using the deps.json info");
+            //        return loadedAssembly;
+            //    }
+            //}
+
             foreach (var strategy in ResolutionStrategies)
                 if (strategy.TryToResolve(loadContext, assemblyName, out Assembly loadedAssembly))
                     return loadedAssembly;
+
+            // Load assemblies that are dependencies, and in the same folder as the test assembly,
+            // but are not fully specified in test assembly deps.json file. This happens when the
+            // dependencies reference in the csproj file has CopyLocal=false, and for example, the
+            // reference is a projectReference and has the same output directory as the parent.
+            foreach (var extension in new string[] { ".dll", ".exe" })
+            {
+                string assemblyPath = Path.Combine(_basePath, assemblyName.Name + extension);
+                if (File.Exists(assemblyPath))
+                {
+                    var loadedAssembly = _loadContext.LoadFromAssemblyPath(assemblyPath);
+                    if (loadedAssembly != null)
+                    {
+                        log.Info($"Assembly {assemblyName.Name} ({assemblyPath}) is loaded using base path");
+                        return loadedAssembly;
+                    }
+                }
+            }
 
             log.Info("Cannot resolve assembly '{0}'", assemblyName);
             return null;

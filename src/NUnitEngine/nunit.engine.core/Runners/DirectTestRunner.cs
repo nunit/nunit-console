@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using NUnit.Engine.Extensibility;
 using NUnit.Engine.Internal;

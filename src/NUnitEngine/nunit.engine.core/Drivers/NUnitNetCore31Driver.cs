@@ -8,6 +8,7 @@ using System.IO;
 using NUnit.Engine.Internal;
 using System.Reflection;
 using NUnit.Engine.Extensibility;
+using System.Runtime.Loader;
 
 namespace NUnit.Engine.Drivers
 {
@@ -38,7 +39,8 @@ namespace NUnit.Engine.Drivers
         Assembly _frameworkAssembly;
         object _frameworkController;
         Type _frameworkControllerType;
-        TestAssemblyLoadContext _assemblyLoadContext;
+        AssemblyLoadContext _assemblyLoadContext;
+        TestAssemblyResolver _testAssemblyResolver;
 
         /// <summary>
         /// An id prefix that will be passed to the test framework and used as part of the
@@ -54,11 +56,17 @@ namespace NUnit.Engine.Drivers
         /// <returns>An XML string representing the loaded test</returns>
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
+            //if (assemblyPath.EndsWith("WpfTest.dll"))
+            //    System.Diagnostics.Debugger.Launch();
+
             log.Debug($"Loading {assemblyPath}");
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
-            _assemblyLoadContext = new TestAssemblyLoadContext(assemblyPath);
+            //_assemblyLoadContext = new TestAssemblyLoadContext(assemblyPath);
+            //_assemblyLoadContext = AssemblyLoadContext.Default;
+            _assemblyLoadContext = new AssemblyLoadContext(assemblyPath);
+            _testAssemblyResolver = new TestAssemblyResolver(_assemblyLoadContext, assemblyPath);
 
             try
             {
@@ -102,6 +110,11 @@ namespace NUnit.Engine.Drivers
 
             log.Info("Loading {0} - see separate log file", _testAssembly.FullName);
             return ExecuteMethod(LOAD_METHOD) as string;
+        }
+
+        private Assembly _assemblyLoadContext_Resolving(AssemblyLoadContext arg1, AssemblyName arg2)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

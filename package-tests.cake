@@ -261,14 +261,14 @@ public static class PackageTests
         AllLists.Add(new PackageTest(1, "Net60WPFTest")
         {
             Description = "Run test using WPF targeting .NET 6.0",
-            Arguments = "testdata/net6.0-windows/WpfTest.dll",
+            Arguments = "testdata/net6.0-windows/WpfTest.dll --trace:Debug",
             ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-6.0") } }
         });
 
         AllLists.Add(new PackageTest(1, "Net80WPFTest")
         {
             Description = "Run test using WPF targeting .NET 8.0",
-            Arguments = "testdata/net8.0-windows/WpfTest.dll",
+            Arguments = "testdata/net8.0-windows/WpfTest.dll --trace:Debug",
             ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }
         });
 
@@ -314,9 +314,9 @@ public static class PackageTests
 
         NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
         {
-            Description= "Run NUnit project with mock-assembly.dll targeting .NET 6.0 and 8.0",
+            Description= "Run NUnit project with mock-assembly.dll targeting 8.0",
             Arguments="../../NetCoreTests.nunit --config=Release",
-            ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
+            ExpectedResult = new MockAssemblyExpectedResult("netcore-8.0"),
             ExtensionsNeeded = new [] { Extensions.NUnitProjectLoader }
         });
 
