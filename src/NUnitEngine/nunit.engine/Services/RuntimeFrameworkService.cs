@@ -112,7 +112,6 @@ namespace NUnit.Engine.Services
         /// and a string representing the selected runtime is returned.
         /// </summary>
         /// <param name="package">A TestPackage representing an assembly</param>
-        /// <returns>A string representing the selected RuntimeFramework</returns>
         public void SelectRuntimeFramework(TestPackage package)
         {
             Guard.ArgumentValid(!package.HasSubPackages,
