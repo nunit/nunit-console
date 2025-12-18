@@ -1,19 +1,18 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK && false
+#if NETFRAMEWORK
 using System;
 using System.Linq;
 using System.Runtime.Versioning;
-using NSubstitute;
 using NUnit.Common;
-using NUnit.Engine.Extensibility;
-using NUnit.Extensibility;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services
 {
+    [Ignore("Needs to be rewritten")]
     public class TestAgencyTests
     {
+        private ExtensionService _extensionService;
         private TestAgency _testAgency;
         private ServiceContext _services;
 
@@ -26,8 +25,8 @@ namespace NUnit.Engine.Services
         {
             _services = new ServiceContext();
             _services.Add(new FakeRuntimeService());
-            var extensionService = new ExtensionService();
-            _services.Add(extensionService);
+            _extensionService = new ExtensionService();
+            _services.Add(_extensionService);
             _testAgency = new TestAgency();
             _services.Add(_testAgency);
             _services.ServiceManager.StartServices();
@@ -36,6 +35,8 @@ namespace NUnit.Engine.Services
         [TearDown]
         public void TearDown()
         {
+            _testAgency.Dispose();
+            _extensionService.Dispose();
             _services.ServiceManager.Dispose();
         }
 

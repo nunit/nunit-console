@@ -20,16 +20,16 @@ namespace NUnit.Engine.Services
     /// The TestAgency class provides RemoteTestAgents
     /// on request and tracks their status.
     /// </summary>
-    public class TestAgency : Service, ITestAgentProvider, ITestAgency, IAgentInfoProvider
+    public class TestAgency : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
         private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
         private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
+        private const string AGENT_LAUNCHERS_PATH = "/NUnit/Engine/AgentLaunchers";
 
         private readonly AgentStore _agentStore = new AgentStore();
 
-        private readonly List<ExtensionNode> _launcherNodes = new List<ExtensionNode>();
         private ExtensionService? _extensionService;
 
         // Index used to retrieve the agentId of a terminated process
@@ -49,12 +49,39 @@ namespace NUnit.Engine.Services
             _tcpTransport = new TestAgencyTcpTransport(this, port);
         }
 
-        #region IAgentInfoProvider Implementation
+        #region ITestAgentInfo Implementation
+
+        private List<TestAgentInfo>? _availableAgents;
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.
         /// </summary>
-        public IList<TestAgentInfo> AvailableAgents { get; private set; } = new List<TestAgentInfo>();
+        public IList<TestAgentInfo> AvailableAgents
+        {
+            get
+            {
+                if (_availableAgents is null)
+                {
+                    _availableAgents = new List<TestAgentInfo>();
+
+                    foreach (var node in LauncherNodes)
+                    {
+                        string agentName = node.TypeName;
+                        TestAgentType agentType = TestAgentType.LocalProcess;
+                        string? targetFramework = node.GetValues("TargetFramework").FirstOrDefault();
+                        // We try to avoid instantiating the agent to determine its target runtime,
+                        // which may be specified as a property of the extension node.
+                        var targetFrameworkName = targetFramework is not null
+                            ? new FrameworkName(targetFramework)
+                            : GetLauncherInstance(node).AgentInfo.TargetRuntime;
+
+                        _availableAgents.Add(new TestAgentInfo(agentName, agentType, targetFrameworkName));
+                    }
+                }
+
+                return _availableAgents;
+            }
+        }
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for any available agents,
@@ -82,7 +109,7 @@ namespace NUnit.Engine.Services
             {
                 // Collect names of agents that work for each assembly
                 var agentsForAssembly = new HashSet<string>();
-                foreach (var node in _launcherNodes)
+                foreach (var node in LauncherNodes)
                 {
                     if (CanCreateAgent(node, assemblyPackage))
                         agentsForAssembly.Add(node.TypeName);
@@ -96,7 +123,7 @@ namespace NUnit.Engine.Services
             return AvailableAgents.Where(info => validAgentNames.Contains(info.AgentName)).ToList();
         }
 
-#endregion
+        #endregion
 
         #region ITestAgentProvider Implementation
 
@@ -107,7 +134,7 @@ namespace NUnit.Engine.Services
         /// <param name="package">A TestPackage</param>
         public bool IsAgentAvailable(TestPackage package)
         {
-            foreach (var node in _launcherNodes)
+            foreach (var node in LauncherNodes)
             {
                 if (CanCreateAgent(node, package))
                     return true;
@@ -266,6 +293,25 @@ namespace NUnit.Engine.Services
         }
 
         #endregion
+
+        private List<ExtensionNode>? _launcherNodes;
+        private List<ExtensionNode> LauncherNodes
+        {
+            get
+            {
+                if (_launcherNodes is null)
+                {
+                    Guard.OperationValid(_extensionService is not null, "LauncherNodes property may not be accessed before TestAgency service is started");
+
+                    _launcherNodes = new List<ExtensionNode>();
+
+                    foreach (var node in _extensionService.GetExtensionNodes(AGENT_LAUNCHERS_PATH))
+                        _launcherNodes.Add(node);
+                }
+
+                return _launcherNodes;
+            }
+        }
 
         internal bool IsAgentActive(Guid agentId, [NotNullWhen(true)] out Process? process)
         {
