@@ -9,7 +9,7 @@ namespace NUnit.Engine.Services
     /// available agents. The interface is used by runners in order to provide
     /// to the user or to allow selecting agents.
     /// </summary>
-    public interface IAgentInfoProvider
+    public interface ITestAgentInfo
     {
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.

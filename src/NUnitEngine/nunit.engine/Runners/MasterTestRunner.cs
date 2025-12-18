@@ -1,19 +1,22 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using NUnit.Common;
-using NUnit.Engine.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.Reflection;
-using System.Runtime.Versioning;
 using System.Timers;
 using System.Xml;
+using NUnit.Common;
+using NUnit.Engine.Services;
+
+#if NETFRAMEWORK
+using System.Text;
+#else
+using System.IO;
 using TestCentric.Metadata;
+#endif
 
 namespace NUnit.Engine.Runners
 {
@@ -51,7 +54,7 @@ namespace NUnit.Engine.Runners
         private WorkItemTracker _workItemTracker = new WorkItemTracker();
 
         private int _testRunTimeout;
-        private System.Timers.Timer? _testRunTimer;
+        private Timer? _testRunTimer;
 
         private const int WAIT_FOR_CANCEL_TO_COMPLETE = 5000;
 
@@ -77,11 +80,14 @@ namespace NUnit.Engine.Runners
             // each contained assembly.
             EnsurePackagesAreExpanded(package);
 
-            TestPackage = package;
-
+#if NETFRAMEWORK
             // Last chance to catch invalid settings in package,
-            // in case the client runner missed them.
-            ValidatePackageSettings();
+            // in case the client runner missed them. Currently,
+            // there is nothing to check for the .NET 8.0 build.
+            ValidatePackageSettings(package);
+#endif
+
+            TestPackage = package;
         }
 
         /// <summary>
@@ -372,8 +378,6 @@ namespace NUnit.Engine.Runners
 
         private void EnsurePackagesAreExpanded(TestPackage package)
         {
-            Guard.ArgumentNotNull(package);
-
             foreach (var subPackage in package.SubPackages)
             {
                 EnsurePackagesAreExpanded(subPackage);
@@ -395,12 +399,27 @@ namespace NUnit.Engine.Runners
                 && _projectService.CanLoadFrom(package.FullName);
         }
 
+#if NETFRAMEWORK
         // Any Errors thrown from this method indicate that the client
         // runner is putting invalid values into the package.
-        private static void ValidatePackageSettings()
+        private void ValidatePackageSettings(TestPackage package)
         {
-            // No settings to validate at this time
+            var sb = new StringBuilder();
+
+            var frameworkSetting = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework);
+            var runAsX86 = package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86);
+
+            if (frameworkSetting.Length > 0)
+            {
+                // Check requested framework is actually available
+                if (!_runtimeService.IsAvailable(frameworkSetting, runAsX86))
+                    sb.Append($"\n* The requested framework {frameworkSetting} is unknown or not available.\n");
+            }
+
+            if (sb.Length > 0)
+                throw new NUnitEngineException($"The following errors were detected in the TestPackage:\n{sb}");
         }
+#endif
 
         /// <summary>
         /// Unload any loaded TestPackage.

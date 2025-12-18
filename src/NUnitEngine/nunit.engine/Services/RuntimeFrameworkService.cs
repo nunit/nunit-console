@@ -331,61 +331,54 @@ namespace NUnit.Engine.Services
         /// </summary>
         private static void ApplyImageData(TestPackage package)
         {
-            string packageName = package.FullName ?? string.Empty;
+            Guard.ArgumentNotNull(package, nameof(package));
+            Guard.ArgumentValid(package.IsAssemblyPackage, "ApplyImageSettings called for non-assembly", nameof(package));
 
-            Version targetVersion = new Version(0, 0);
-            string? frameworkName = null;
-            bool requiresX86 = false;
-            bool requiresAssemblyResolver = false;
-
-            if (!File.Exists(packageName))
-                log.Error($"Could not find {packageName}");
-            else
-                try
-                {
-                    using (var assembly = AssemblyDefinition.ReadAssembly(packageName))
-                    {
-                        targetVersion = assembly.GetRuntimeVersion();
-                        log.Debug($"Assembly {packageName} uses version {targetVersion}");
-
-                        if (assembly.TryGetFrameworkName(out string name))
-                            frameworkName = name;
-                        log.Debug($"Assembly {packageName} targets {frameworkName}");
-
-                        if (assembly.RequiresX86())
-                        {
-                            requiresX86 = true;
-                            log.Debug($"Assembly {packageName} will be run x86");
-                        }
-
-                        if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
-                        {
-                            requiresAssemblyResolver = true;
-                            log.Debug($"Assembly {packageName} requires default app domain assembly resolver");
-                        }
-                    }
-                }
-                catch (BadImageFormatException)
-                {
-                    // "Unmanaged" is not a valid framework identifier but we handle it upstream
-                    // using UnmanagedCodeTestRunner, which doesn't actually try to run it.
-                    frameworkName = "Unmanaged,Version=0.0";
-                }
-
-            if (targetVersion.Major > 0)
-                package.Settings.Set(SettingDefinitions.ImageRuntimeVersion.WithValue(targetVersion.ToString()));
-
-            if (!string.IsNullOrEmpty(frameworkName))
-                package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue(frameworkName));
-
-            // If assembly requires X86, it MUST be run as X86, so we apply both settings
-            if (requiresX86)
+            string assemblyPath = package.FullName.ShouldNotBeNull();
+            if (!File.Exists(assemblyPath))
             {
-                package.Settings.Set(SettingDefinitions.ImageRequiresX86.WithValue(true));
-                package.Settings.Set(SettingDefinitions.RunAsX86.WithValue(true));
+                log.Error($"Could not find {assemblyPath}");
+                return;
             }
 
-            package.Settings.Set(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver.WithValue(requiresAssemblyResolver));
+            try
+            {
+                using (var assembly = AssemblyDefinition.ReadAssembly(assemblyPath))
+                {
+                    var targetVersion = assembly.GetRuntimeVersion();
+                    if (targetVersion.Major > 0)
+                    {
+                        log.Debug($"Assembly {assemblyPath} uses version {targetVersion}");
+                        package.Settings.Set(SettingDefinitions.ImageRuntimeVersion.WithValue(targetVersion.ToString()));
+                    }
+
+                    if (assembly.TryGetFrameworkName(out string frameworkName))
+                    {
+                        log.Debug($"Assembly {assemblyPath} targets {frameworkName}");
+                        package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue(frameworkName));
+                    }
+
+                    if (assembly.RequiresX86())
+                    {
+                        // If assembly requires X86, it MUST be run as X86, so we apply both settings
+                        package.Settings.Set(SettingDefinitions.ImageRequiresX86.WithValue(true));
+                        package.Settings.Set(SettingDefinitions.RunAsX86.WithValue(true));
+                        log.Debug($"Assembly {assemblyPath} will be run x86");
+                    }
+
+                    if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
+                    {
+                        package.Settings.Set(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver.WithValue(true));
+                        log.Debug($"Assembly {assemblyPath} requires default app domain assembly resolver");
+                    }
+                }
+            }
+            catch (BadImageFormatException)
+            {
+                // "Unmanaged" is not a valid framework identifier but we handle it upstream
+                // using UnmanagedCodeTestRunner, which doesn't actually try to run it.
+                package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"));
+            }
         }
     }
 }
