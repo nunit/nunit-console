@@ -3,7 +3,7 @@
 
     <PropertyGroup>
         <!-- Compile and Build Settings -->
-        <LangVersion>12</LangVersion>
+        <LangVersion>14</LangVersion>
         <Features>strict</Features>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
