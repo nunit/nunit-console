@@ -34,7 +34,8 @@
     <!-- Common package metadata, may be overridden in individual projects -->
     <!-- Each project should supply properties for PackageId, Title and Description -->
     <PropertyGroup>
-        <PackageOutputPath>$(MSBuildThisFileDirectory)..\package</PackageOutputPath>
+        <!-- TODO: This must match recipe definition. Can we handle it in recipe? -->
+        <PackageOutputPath>$(MSBuildThisFileDirectory)..\packages</PackageOutputPath>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Authors>CharliePoole;Rob Prouse</Authors>
