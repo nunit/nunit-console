@@ -21,10 +21,6 @@
     <PackageReference Include="NUnitLite" Version="4.2.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='net462'">
-    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-  </ItemGroup>
-  
   <ItemGroup>
     <Content Include="TestListWithEmptyLine.tst">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

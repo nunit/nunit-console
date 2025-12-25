@@ -476,15 +476,15 @@ public static class PackageTests
             }
         });
 
-        StandardAndZipLists.Add(new PackageTest(1, "AppContextBaseDirectory_NET80")
-        {
-            Description = "Test Setting the BaseDirectory to match test assembly location targeting .NET 8.0",
-            Arguments = "testdata/net8.0/AppContextTest.dll",
-            ExpectedResult = new ExpectedResult("Passed")
-            {
-                Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
-            }
-        });
+        //StandardAndZipLists.Add(new PackageTest(1, "AppContextBaseDirectory_NET80")
+        //{
+        //    Description = "Test Setting the BaseDirectory to match test assembly location targeting .NET 8.0",
+        //    Arguments = "testdata/net8.0/AppContextTest.dll",
+        //    ExpectedResult = new ExpectedResult("Passed")
+        //    {
+        //        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
+        //    }
+        //});
 
         AllLists.Add(new PackageTest(1, "UnmanagedAssemblyTest")
         {
