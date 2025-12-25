@@ -2,7 +2,12 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+#if NETCOREAPP3_1_OR_GREATER
+using System.Runtime.Loader;
+#endif
+
 namespace NUnit.Engine.Internal
 {
     /// <summary>
@@ -68,6 +73,27 @@ namespace NUnit.Engine.Internal
             }
 
             return codeBase.Substring(start);
+        }
+
+        // For assemblies already loaded by MTP (net core and above) or by means
+        public static Assembly FindLoadedAssemblyByPath(string assemblyPath)
+        {
+            var full = Path.GetFullPath(assemblyPath);
+
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a =>
+                    !a.IsDynamic &&
+                    !string.IsNullOrEmpty(a.Location) &&
+                    StringComparer.OrdinalIgnoreCase.Equals(Path.GetFullPath(a.Location), full));
+        }
+
+        public static Assembly FindLoadedAssemblyByName(AssemblyName assemblyName)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a =>
+                    !a.IsDynamic &&
+                    !string.IsNullOrEmpty(a.Location) &&
+                    a.GetName() == assemblyName);
         }
     }
 }

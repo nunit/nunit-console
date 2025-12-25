@@ -5,10 +5,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using NUnit.Engine.Internal;
 using System.Reflection;
-using NUnit.Engine.Extensibility;
 using System.Runtime.Loader;
+using NUnit.Engine.Internal;
+using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Drivers
 {
@@ -56,21 +56,24 @@ namespace NUnit.Engine.Drivers
         /// <returns>An XML string representing the loaded test</returns>
         public string Load(string assemblyPath, IDictionary<string, object> settings)
         {
-            //if (assemblyPath.EndsWith("WpfTest.dll"))
-            //    System.Diagnostics.Debugger.Launch();
-
             log.Debug($"Loading {assemblyPath}");
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
 
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
-            //_assemblyLoadContext = new TestAssemblyLoadContext(assemblyPath);
-            //_assemblyLoadContext = AssemblyLoadContext.Default;
-            _assemblyLoadContext = new AssemblyLoadContext(assemblyPath);
-            _testAssemblyResolver = new TestAssemblyResolver(_assemblyLoadContext, assemblyPath);
 
             try
             {
-                _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+                _testAssembly = AssemblyHelper.FindLoadedAssemblyByPath(assemblyPath);
+
+                if (_testAssembly != null)
+                    _assemblyLoadContext = AssemblyLoadContext.GetLoadContext(_testAssembly);
+                else
+                {
+                    _assemblyLoadContext = new AssemblyLoadContext(Path.GetFileNameWithoutExtension(assemblyPath));
+                    _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+                }
+
+                _testAssemblyResolver = new TestAssemblyResolver(_assemblyLoadContext, assemblyPath);
             }
             catch (Exception e)
             {
