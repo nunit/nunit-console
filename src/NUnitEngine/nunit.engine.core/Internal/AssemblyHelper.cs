@@ -1,6 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -85,15 +86,6 @@ namespace NUnit.Engine.Internal
                     !a.IsDynamic &&
                     !string.IsNullOrEmpty(a.Location) &&
                     StringComparer.OrdinalIgnoreCase.Equals(Path.GetFullPath(a.Location), full));
-        }
-
-        public static Assembly FindLoadedAssemblyByName(AssemblyName assemblyName)
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .FirstOrDefault(a =>
-                    !a.IsDynamic &&
-                    !string.IsNullOrEmpty(a.Location) &&
-                    a.GetName() == assemblyName);
         }
     }
 }

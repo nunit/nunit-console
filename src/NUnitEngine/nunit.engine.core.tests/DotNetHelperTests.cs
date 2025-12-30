@@ -63,7 +63,7 @@ namespace NUnit.Engine
         [TestCase("Microsoft.NETCore.App", "8.0.0", "8.0.22")]
         [TestCase("Microsoft.NETCore.App", "8.0.0.0", "8.0.22")]
         [TestCase("Microsoft.NETCore.App", "8.0.0.100", "8.0.22")]
-        [TestCase("Microsoft.NETCore.App", "8.0.100", "9.0.11")]
+        [TestCase("Microsoft.NETCore.App", "8.0.100", "8.0.22")]
         [TestCase("Microsoft.AspNetCore.App", "5.0.0", "8.0.22")] // Rather than 8.0.2
         [TestCase("Microsoft.AspNetCore.App", "7.0.0", "8.0.22")] // Rather than 8.0.2
         [TestCase("Microsoft.AspNetCore.App", "8.0.0", "8.0.22")] // Rather than 8.0.2
