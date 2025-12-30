@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -52,7 +53,7 @@ namespace NUnit.Engine.Internal
             foreach (var reference in assemblyDef.MainModule.GetTypeReferences())
             {
                 string fn = reference.FullName;
-                if (fn.StartsWith("System.Windows.") || fn.StartsWith("PresentationFramework"))
+                if (fn.StartsWith("System.Windows.") || fn.StartsWith("PresentationFramework") || fn == "WindowsBase")
                     tryWindowsDesktopFirst = true;
                 if (fn.StartsWith("Microsoft.AspNetCore."))
                     tryAspNetCoreFirst = true;
@@ -81,25 +82,18 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
-        //public Assembly Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
-        //{
-        //    return OnResolving(context, assemblyName);
-        //}
-
         private Assembly OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            if (loadContext == null) throw new ArgumentNullException("context");
-
-            //var runtimeResolverPath = _assemblyDependencyResolver.ResolveAssemblyToPath(assemblyName);
-            //if (!string.IsNullOrEmpty(runtimeResolverPath) && File.Exists(runtimeResolverPath))
-            //{
-            //    var loadedAssembly = _loadContext.LoadFromAssemblyPath(runtimeResolverPath);
-            //    if (loadedAssembly != null)
-            //    {
-            //        log.Info($"Assembly {assemblyName} ({loadedAssembly}) is loaded using the deps.json info");
-            //        return loadedAssembly;
-            //    }
-            //}
+            var runtimeResolverPath = _assemblyDependencyResolver.ResolveAssemblyToPath(assemblyName);
+            if (!string.IsNullOrEmpty(runtimeResolverPath) && File.Exists(runtimeResolverPath))
+            {
+                var loadedAssembly = _loadContext.LoadFromAssemblyPath(runtimeResolverPath);
+                if (loadedAssembly != null)
+                {
+                    log.Info($"Assembly {assemblyName} ({loadedAssembly}) is loaded using the deps.json info");
+                    return loadedAssembly;
+                }
+            }
 
             foreach (var strategy in ResolutionStrategies)
                 if (strategy.TryToResolve(loadContext, assemblyName, out Assembly loadedAssembly))

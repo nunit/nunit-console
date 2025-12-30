@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+//#define USE_DEFAULT_ASSEMBLY_LOAD_CONTEXT
+
 #if NETCOREAPP3_1_OR_GREATER
 using System;
 using System.Linq;
@@ -66,11 +68,19 @@ namespace NUnit.Engine.Drivers
                 _testAssembly = AssemblyHelper.FindLoadedAssemblyByPath(assemblyPath);
 
                 if (_testAssembly != null)
+                {
                     _assemblyLoadContext = AssemblyLoadContext.GetLoadContext(_testAssembly);
+                    log.Debug($"  Already loaded in context {_assemblyLoadContext}");
+                }
                 else
                 {
+#if USE_DEFAULT_ASSEMBLY_LOAD_CONTEXT
+                    _assemblyLoadContext = AssemblyLoadContext.Default;
+#else
                     _assemblyLoadContext = new AssemblyLoadContext(Path.GetFileNameWithoutExtension(assemblyPath));
+#endif
                     _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
+                    log.Debug($"  Loaded into new context {_assemblyLoadContext}");
                 }
 
                 _testAssemblyResolver = new TestAssemblyResolver(_assemblyLoadContext, assemblyPath);
@@ -113,11 +123,6 @@ namespace NUnit.Engine.Drivers
 
             log.Info("Loading {0} - see separate log file", _testAssembly.FullName);
             return ExecuteMethod(LOAD_METHOD) as string;
-        }
-
-        private Assembly _assemblyLoadContext_Resolving(AssemblyLoadContext arg1, AssemblyName arg2)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
