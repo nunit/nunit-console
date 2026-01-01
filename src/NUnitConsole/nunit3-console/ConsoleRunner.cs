@@ -142,6 +142,7 @@ namespace NUnit.ConsoleRunner
             DisplayTestFiles();
 
             TestPackage package = MakeTestPackage(_options);
+            package.AddSetting("UseDefaultAssemblyLoadContext", true);
 
             // We display the filters at this point so  that any exception message
             // thrown by CreateTestFilter will be understandable.

@@ -33,5 +33,17 @@ namespace NUnit.Engine
         /// The FrameworkName specified on a TargetFrameworkAttribute for the assembly
         /// </summary>
         public const string ImageTargetFrameworkName = "ImageTargetFrameworkName";
+
+        /// <summary>
+        /// Set this to true to force use of the default assembly load context for the 
+        /// test assembly and in resolving all dependencies rather than creating and
+        /// using a separate instance of AssemblyLoadContext.
+        /// </summary>
+        /// <remarks>
+        /// This is provided for use by the NUnit3 VS Adapter and may not work if used
+        /// outside of  that context. It must be set in the top-level package via the
+        /// AddSetting method so that the same value is passed to all subpackages.
+        /// </remarks>
+        public const string UseDefaultAssemblyLoadContext = "UseDefaultAssemblyLoadContext";
     }
 }
