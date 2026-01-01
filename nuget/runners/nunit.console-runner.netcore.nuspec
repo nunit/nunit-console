@@ -10,7 +10,7 @@
     <projectUrl>https://nunit.org</projectUrl>
     <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
-    <icon>images\nunit_256.png</icon>
+    <icon>nunit_256.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>.NET Core build of the console runner for the NUnit unit-testing framework.</summary>
     <description>
@@ -29,6 +29,7 @@
   <files>
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
+    <file src="../../nunit_256.png" />
 
     <file src="net8.0/nunit3-console.exe" target="tools/net8.0/any" />
     <file src="net8.0/nunit3-console.pdb" target="tools/net8.0/any" />
@@ -46,7 +47,5 @@
     <file src="net8.0/testcentric.engine.metadata.dll" target="tools/net8.0/any" />
     <file src="net8.0/Microsoft.Extensions.DependencyModel.dll" target="tools/net8.0/any" />
     <file src="../../nuget/runners/DotnetToolSettings.xml" target="tools/net8.0/any"/>
-   
-    <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>
