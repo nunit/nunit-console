@@ -10,7 +10,7 @@
     <projectUrl>https://nunit.org</projectUrl>
     <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
-    <icon>images\nunit_256.png</icon>
+    <icon>nunit_256.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>The NUnit Test Engine is used by runners to discover and execute tests.</summary>
     <description>This package includes nunit.engine and related assemblies, for use by runner programs. It is not intended for direct use by users who simply want to run tests.</description>
@@ -34,6 +34,7 @@
   <files>
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
+    <file src="../../nunit_256.png" />
 
     <file src="net462/nunit.engine.dll" target="lib/net462" />
     <file src="net462/nunit.engine.pdb" target="lib/net462" />
@@ -65,6 +66,5 @@
     <file src="net8.0/Microsoft.Extensions.DependencyModel.dll" target="lib/net8.0" />
 
     <file src="../../nuget/engine/build/**/*" target="build" />
-    <file src="../../nunit_256.png" target="images" />
   </files>
 </package>
