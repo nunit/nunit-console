@@ -60,6 +60,9 @@ namespace NUnit.Engine.Drivers
         {
             log.Debug($"Loading {assemblyPath}");
             var idPrefix = string.IsNullOrEmpty(ID) ? "" : ID + "-";
+            bool useDefaultAssemblyLoadContext = false;
+            if (settings.TryGetValue(InternalEnginePackageSettings.UseDefaultAssemblyLoadContext, out var val))
+                useDefaultAssemblyLoadContext = (bool)val;
 
             assemblyPath = Path.GetFullPath(assemblyPath);  //AssemblyLoadContext requires an absolute path
 
@@ -74,11 +77,9 @@ namespace NUnit.Engine.Drivers
                 }
                 else
                 {
-#if USE_DEFAULT_ASSEMBLY_LOAD_CONTEXT
-                    _assemblyLoadContext = AssemblyLoadContext.Default;
-#else
-                    _assemblyLoadContext = new AssemblyLoadContext(Path.GetFileNameWithoutExtension(assemblyPath));
-#endif
+                    _assemblyLoadContext = useDefaultAssemblyLoadContext
+                        ? AssemblyLoadContext.Default
+                        : new AssemblyLoadContext(Path.GetFileNameWithoutExtension(assemblyPath));
                     _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
                     log.Debug($"  Loaded into new context {_assemblyLoadContext}");
                 }
