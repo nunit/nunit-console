@@ -10,7 +10,7 @@
     <projectUrl>https://nunit.org</projectUrl>
     <repository type="git" url="https://github.com/nunit/nunit-console"/>
     <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
-    <icon>images\nunit_256.png</icon>
+    <icon>nunit_256.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Console runner for the NUnit 3 unit-testing framework, without any extensions.</summary>
     <description>
@@ -26,6 +26,7 @@
   <files>
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
+    <file src="../../nunit_256.png" />
 
     <file src="agents/net462/nunit-agent.exe" target="tools/agents/net462" />
     <file src="agents/net462/nunit-agent.pdb" target="tools/agents/net462" />
@@ -90,6 +91,5 @@
     <file src="net462/nunit.engine.dll" target="tools" />
     <file src="net462/nunit.engine.pdb" target="tools" />
     <file src="net462/testcentric.engine.metadata.dll" target="tools" />
-    <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>
