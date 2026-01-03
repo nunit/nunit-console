@@ -152,7 +152,8 @@ namespace NUnit.Common
 
             foreach (var candidate in availableRuntimes)
             {
-                if (candidate.Version >= targetVersion)
+                if (candidate.Version.Major > targetVersion.Major ||
+                    candidate.Version.Major == targetVersion.Major && candidate.Version.Minor >= candidate.Version.Minor)
                     if (bestRuntime is null || candidate.Version.Major == bestRuntime.Version.Major)
                         bestRuntime = candidate;
             }

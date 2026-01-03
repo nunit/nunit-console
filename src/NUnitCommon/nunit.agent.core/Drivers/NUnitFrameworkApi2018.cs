@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-
+using NUnit.Common;
 #if NETCOREAPP
+using System.Runtime.Loader;
 using NUnit.Engine.Internal;
 #endif
 
@@ -40,10 +41,12 @@ namespace NUnit.Engine.Drivers
         private Type? _frameworkControllerType;
 
 #if NETCOREAPP
-        private TestAssemblyLoadContext? _assemblyLoadContext;
+        private AssemblyLoadContext? _assemblyLoadContext;
+        private TestAssemblyResolver? _testAssemblyResolver;
+        private Assembly? _testAssembly;
         private Assembly? _frameworkAssembly;
 
-        internal List<ResolutionStrategy>? ResolutionStrategies => _assemblyLoadContext?.ResolutionStrategies;
+        internal List<ResolutionStrategy>? ResolutionStrategies => _testAssemblyResolver?.ResolutionStrategies;
 #endif
 
         private string? _testAssemblyPath;
@@ -66,6 +69,10 @@ namespace NUnit.Engine.Drivers
 
             _testAssemblyPath = Path.GetFullPath(testAssemblyPath);
             var idPrefix = _driverId + "-";
+
+            bool useDefaultAssemblyLoadContext = false;
+            if (settings.TryGetValue(SettingDefinitions.UseDefaultAssemblyLoadContext, out var val))
+                useDefaultAssemblyLoadContext = (bool)val;
 
 #if NETFRAMEWORK
             try
@@ -95,12 +102,46 @@ namespace NUnit.Engine.Drivers
             var controllerAssembly = _frameworkControllerType?.Assembly?.GetName();
             log.Debug($"Controller assembly is {controllerAssembly}");
 #else
-            _assemblyLoadContext = new TestAssemblyLoadContext(testAssemblyPath);
+            try
+            {
+                _testAssembly = AssemblyHelper.FindLoadedAssemblyByPath(_testAssemblyPath);
 
-            var testAssembly = LoadAssembly(testAssemblyPath);
-            _frameworkAssembly = LoadAssembly(_nunitRef);
+                if (_testAssembly is not null)
+                {
+                    _assemblyLoadContext = AssemblyLoadContext.GetLoadContext(_testAssembly);
+                    log.Debug($"  Already loaded in context {_assemblyLoadContext}");
+                }
+                else
+                {
+                    _assemblyLoadContext = useDefaultAssemblyLoadContext
+                        ? AssemblyLoadContext.Default
+                        : new AssemblyLoadContext(Path.GetFileNameWithoutExtension(testAssemblyPath));
+                    _testAssembly = _assemblyLoadContext.LoadFromAssemblyPath(testAssemblyPath);
+                    log.Debug($"  Loaded into new context {_assemblyLoadContext}");
+                }
 
-            _frameworkController = CreateInstance(CONTROLLER_TYPE, testAssembly, idPrefix, settings);
+                _testAssemblyResolver = new TestAssemblyResolver(_assemblyLoadContext.ShouldNotBeNull(), testAssemblyPath);
+            }
+            catch (Exception e)
+            {
+                var msg = $"Failed to load test assembly {testAssemblyPath}";
+                log.Error(msg);
+                throw new NUnitEngineException(msg, e);
+            }
+            log.Debug($"Loaded {testAssemblyPath}");
+
+            try
+            {
+                _frameworkAssembly = LoadAssembly(_nunitRef);
+            }
+            catch (Exception e)
+            {
+                log.Error($"{FAILED_TO_LOAD_NUNIT}\r\n{e}");
+                throw new NUnitEngineException(FAILED_TO_LOAD_NUNIT, e);
+            }
+            log.Debug("Loaded nunit.framework");
+
+            _frameworkController = CreateInstance(CONTROLLER_TYPE, _testAssembly, idPrefix, settings);
             if (_frameworkController is null)
             {
                 log.Error(INVALID_FRAMEWORK_MESSAGE);
