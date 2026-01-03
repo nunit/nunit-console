@@ -25,6 +25,8 @@ namespace NUnit.Engine.Internal
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAssemblyResolver));
 
         private readonly AssemblyLoadContext _loadContext;
+        private readonly string _basePath;
+        private readonly AssemblyDependencyResolver _assemblyDependencyResolver;
 
         // Our Strategies for resolving references
         internal List<ResolutionStrategy> ResolutionStrategies = new List<ResolutionStrategy>();
@@ -32,6 +34,11 @@ namespace NUnit.Engine.Internal
         public TestAssemblyResolver(AssemblyLoadContext loadContext, string testAssemblyPath)
         {
             _loadContext = loadContext;
+            _basePath = Path.GetDirectoryName(testAssemblyPath).ShouldNotBeNull();
+            _assemblyDependencyResolver = new AssemblyDependencyResolver(testAssemblyPath);
+#if NET8_0_OR_GREATER
+            AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", _basePath);
+#endif
 
             InitializeResolutionStrategies(loadContext, testAssemblyPath);
 
@@ -76,14 +83,20 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
-        public Assembly? Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
-        {
-            return OnResolving(context, assemblyName);
-        }
-
         private Assembly? OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
             Guard.ArgumentNotNull(loadContext);
+
+            var runtimeResolverPath = _assemblyDependencyResolver.ResolveAssemblyToPath(assemblyName);
+            if (!string.IsNullOrEmpty(runtimeResolverPath) && File.Exists(runtimeResolverPath))
+            {
+                var loadedAssembly = _loadContext.LoadFromAssemblyPath(runtimeResolverPath);
+                if (loadedAssembly is not null)
+                {
+                    log.Info($"Assembly {assemblyName} ({loadedAssembly}) is loaded using the deps.json info");
+                    return loadedAssembly;
+                }
+            }
 
             foreach (var strategy in ResolutionStrategies)
             {

@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 namespace NUnit
 {
@@ -76,5 +77,17 @@ namespace NUnit
             return codeBase.Substring(start);
         }
 #endif
+
+        // For assemblies already loaded by MTP or by some other means
+        public static Assembly? FindLoadedAssemblyByPath(string assemblyPath)
+        {
+            var full = Path.GetFullPath(assemblyPath);
+
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a =>
+                    !a.IsDynamic &&
+                    !string.IsNullOrEmpty(a.Location) &&
+                    StringComparer.OrdinalIgnoreCase.Equals(Path.GetFullPath(a.Location), full));
+        }
     }
 }
