@@ -11,21 +11,6 @@ void AddToBothLists(PackageTest test)
     NetCoreRunnerTests.Add(test);
 }
 
-public static class Extensions
-{
-    // Extensions used in tests, with version specified.
-    public static ExtensionSpecifier NUnitV2Driver = new ExtensionSpecifier(
-        "NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0");
-    public static ExtensionSpecifier NUnitProjectLoader = new ExtensionSpecifier(
-        "NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader", "3.8.0");
-    public static ExtensionSpecifier VSProjectLoader = new ExtensionSpecifier(
-        "NUnit.Extension.VSProjectLoader", "nunit-extension-vs-project-loader", "3.9.0");
-    public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
-        "NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "3.8.0");
-    public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
-        "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
-}
-
 //////////////////////////////////////////////////////////////////////
 // RUN MOCK-ASSEMBLY UNDER EACH RUNTIME
 //////////////////////////////////////////////////////////////////////
@@ -423,8 +408,16 @@ StandardRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirector
 NetCoreRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
-    Arguments = "--extensionDirectory fakes/netstandard2.0 --list-extensions --trace:Debug",
+    Arguments = "--extensionDirectory fakes/netstandard2.0 --list-extensions",
     ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
+});
+
+AddToBothLists(new PackageTest(1, "SpecificExtensionInstalled")
+{
+    Description = "List Extensions shows V2ResultWriter if we include it as needed",
+    Arguments = "--list-extensions",
+    ExpectedOutput = new[] { Contains("nunit-v2-result-writer.dll", exactly: 1) },
+    ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -518,22 +511,24 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
 //    ExtensionsNeeded = new[] { Extensions.NUnitProjectLoader }
 //});
 
-//// V2 Result Writer Test
-//StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
-//{
-//    Description = "Run mock-assembly under .NET 4.6.2 and produce V2 output",
-//    Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
-//    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
-//    ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
-//});
+// V2 Result Writer Tests
+StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
+{
+    Description = "Run mock-assembly under .NET 4.6.2 and produce V2 output",
+    Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
+    // TODO: Check that V2 result file was created
+    ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
+});
 
-//StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net60")
-//{
-//    Description = "Run mock-assembly under .NET 6.0 and produce V2 output",
-//    Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
-//    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0"),
-//    ExtensionsNeeded = new[] { Extensions.NUnitV2ResultWriter }
-//});
+AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net60")
+{
+    Description = "Run mock-assembly under .NET 6.0 and produce V2 output",
+    Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0"),
+    // TODO: Check that V2 result file was created
+    ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
+});
 
 //// VS Project Loader Tests
 //StandardRunnerTests.Add(new PackageTest(1, "VSProjectLoaderTest_Project")
@@ -578,7 +573,7 @@ StandardRunnerTests.Add(new PackageTest(1, "TeamCityListenerTest")
     Description = "Run mock-assembly with --teamcity enabled",
     Arguments = "testdata/net462/mock-assembly.dll --enable NUnit.Engine.Listeners.TeamCityEventListener",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
-    ExtensionsNeeded = new[] { Extensions.TeamCityEventListener }
+    ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener }
 });
 
 //// V2 Framework Driver Tests

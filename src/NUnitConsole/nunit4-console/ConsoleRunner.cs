@@ -68,12 +68,6 @@ namespace NUnit.ConsoleRunner
             Guard.ArgumentNotNull(_outWriter = writer);
 
             // NOTE: Accessing Services triggers the engine to initialize all services
-            _resultService = _engine.Services.GetService<IResultService>();
-            Guard.OperationValid(_resultService is not null, "Internal Error: ResultService was not found");
-
-            _filterService = _engine.Services.GetService<ITestFilterService>();
-            Guard.OperationValid(_filterService is not null, "Internal Error: TestFilterService was not found");
-
             _extensionService = _engine.Services.GetService<IExtensionService>();
             Guard.OperationValid(_extensionService is not null, "Internal Error: ExtensionService was not found");
 
@@ -86,6 +80,12 @@ namespace NUnit.ConsoleRunner
                 _extensionService.FindExtensionAssemblies(extensionDirectory);
 
             _extensionService.InstallExtensions();
+
+            _resultService = _engine.Services.GetService<IResultService>();
+            Guard.OperationValid(_resultService is not null, "Internal Error: ResultService was not found");
+
+            _filterService = _engine.Services.GetService<ITestFilterService>();
+            Guard.OperationValid(_filterService is not null, "Internal Error: TestFilterService was not found");
 
             _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
 

@@ -13,8 +13,8 @@ namespace NUnit.Engine.Services
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ResultService));
 
         private readonly string[] BUILT_IN_FORMATS = new string[] { "nunit3", "cases", "user" };
-        private List<ExtensionNode> _extensionNodes = new List<ExtensionNode>();
 
+        private ExtensionService? _extensionService;
         private string[]? _formats;
 
         [MemberNotNull(nameof(_formats))]
@@ -24,12 +24,13 @@ namespace NUnit.Engine.Services
             {
                 if (_formats is null)
                 {
+                    Guard.OperationValid(_extensionService is not null, "Formats property may not be accessed before ResultService is started");
+
                     var formatList = new List<string>(BUILT_IN_FORMATS);
 
-                    if (_extensionNodes is not null)
-                        foreach (var node in _extensionNodes)
-                            foreach (var format in node.GetValues("Format"))
-                                formatList.Add(format);
+                    foreach (var node in WriterNodes)
+                        foreach (var format in node.GetValues("Format"))
+                            formatList.Add(format);
 
                     _formats = formatList.ToArray();
                 }
@@ -61,14 +62,13 @@ namespace NUnit.Engine.Services
                     return new XmlTransformResultWriter(args!);
 
                 default:
-                    if (_extensionNodes is not null)
-                        foreach (var node in _extensionNodes)
-                            foreach (var supported in node.GetValues("Format"))
-                                if (supported == format && node.ExtensionObject is not null)
-                                {
-                                    log.Debug($"  Returning {node.TypeName}");
-                                    return (IResultWriter)node.ExtensionObject;
-                                }
+                    foreach (var node in WriterNodes)
+                        foreach (var supported in node.GetValues("Format"))
+                            if (supported == format && node.ExtensionObject is not null)
+                            {
+                                log.Debug($"  Returning {node.TypeName}");
+                                return (IResultWriter)node.ExtensionObject;
+                            }
 
                     throw new NUnitEngineException("ResultWriter not found for format: " + format);
             }
@@ -80,10 +80,7 @@ namespace NUnit.Engine.Services
 
             try
             {
-                var extensionService = ServiceContext.GetService<ExtensionService>();
-
-                if (extensionService is not null && extensionService.Status == ServiceStatus.Started)
-                    _extensionNodes.AddRange(extensionService.GetExtensionNodes<IResultWriter>());
+                _extensionService = ServiceContext.GetService<ExtensionService>();
 
                 // If there is no extension service, we start anyway using built-in writers
                 Status = ServiceStatus.Started;
@@ -92,6 +89,22 @@ namespace NUnit.Engine.Services
             {
                 Status = ServiceStatus.Error;
                 throw;
+            }
+        }
+
+        private List<ExtensionNode>? _writerNodes;
+        private List<ExtensionNode> WriterNodes
+        {
+            get
+            {
+                if (_writerNodes is null)
+                {
+                    Guard.OperationValid(_extensionService is not null, "WriterNodes property may not be accessed before ResultService is started");
+
+                    _writerNodes = [.. _extensionService.GetExtensionNodes<IResultWriter>()];
+                }
+
+                return _writerNodes;
             }
         }
     }
