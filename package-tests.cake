@@ -500,7 +500,7 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
 //    Description = "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
 //    Arguments = "../../MixedTests.nunit --config=Release",
 //    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
-//    ExtensionsNeeded = new[] { Extensions.NUnitProjectLoader }
+//    ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
 //});
 
 //NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")

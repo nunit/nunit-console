@@ -136,7 +136,8 @@ namespace NUnit.Engine
             SubPackages.Add(subPackage);
 
             foreach (var setting in Settings)
-                subPackage.AddSetting(setting);
+                if (!subPackage.Settings.HasSetting(setting.Name))
+                    subPackage.AddSetting(setting);
         }
 
         /// <summary>

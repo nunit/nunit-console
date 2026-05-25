@@ -138,7 +138,8 @@ namespace NUnit.Engine.Drivers
         /// <param name="listener">An ITestEventHandler that receives progress notices</param>
         /// <param name="filter">A filter that controls which tests are executed</param>
         /// <returns>An Xml string representing the result</returns>
-        public string Run(ITestEventListener? listener, string filter) => _api.Run(listener, filter);
+        public string Run(ITestEventListener? listener, string filter) =>
+            _api.Run(listener is not null ? new EventInterceptor(listener) : null, filter);
 
         /// <summary>
         /// Executes the tests in an assembly asynchronously.
