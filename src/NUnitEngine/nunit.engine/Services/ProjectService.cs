@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace NUnit.Engine.Services
 {
@@ -16,6 +17,7 @@ namespace NUnit.Engine.Services
     public class ProjectService : Service, IProjectService
     {
         private readonly Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
+        private ExtensionService? _extensionService;
 
         public bool CanLoadFrom(string path)
         {
@@ -49,7 +51,7 @@ namespace NUnit.Engine.Services
             IProject project = LoadFrom(path).ShouldNotBeNull("Unable to load project " + path);
 
             string? activeConfig = package.Settings.GetValueOrDefault(SettingDefinitions.ActiveConfig);
-            if (activeConfig is null)
+            if (string.IsNullOrEmpty(activeConfig))
                 activeConfig = project.ActiveConfigName;
             else
                 Guard.ArgumentValid(project.ConfigNames.Contains(activeConfig), $"Requested configuration {activeConfig} was not found", nameof(package));
@@ -58,16 +60,14 @@ namespace NUnit.Engine.Services
 
             // Add info about the configurations to the project package
             tempPackage.AddSetting(SettingDefinitions.ActiveConfig.WithValue(activeConfig));
-            tempPackage.AddSetting(SettingDefinitions.ConfigNames.WithValue(new List<string>(project.ConfigNames).ToArray()));
+            tempPackage.AddSetting(SettingDefinitions.ConfigNames.WithValue(string.Join(";", project.ConfigNames.ToArray())));
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
             foreach (var setting in tempPackage.Settings)
             {
-                if (package.Settings.HasSetting(setting.Name)) // Don't override settings from command line
-                    continue;
-
-                package.Settings.Add(setting);
+                if (!package.Settings.HasSetting(setting.Name)) // Don't override settings from command line
+                    package.Settings.Add(setting);
             }
 
             foreach (var subPackage in tempPackage.SubPackages)
@@ -90,39 +90,36 @@ namespace NUnit.Engine.Services
 
                 try
                 {
-                    var extensionService = ServiceContext.GetService<ExtensionService>();
+                    _extensionService = ServiceContext.GetService<ExtensionService>();
 
-                    if (extensionService is null)
+                    if (_extensionService is null)
                         Status = ServiceStatus.Started;
-                    else if (extensionService.Status != ServiceStatus.Started)
+                    else if (_extensionService.Status != ServiceStatus.Started)
                         Status = ServiceStatus.Error;
                     else
-                    {
                         Status = ServiceStatus.Started;
-
-                        var extensionNodes = new List<ExtensionNode>();
-                        extensionNodes.AddRange(extensionService.GetExtensionNodes<IProjectLoader>());
-
-                        foreach (var node in extensionNodes)
-                        {
-                            foreach (string ext in node.GetValues("FileExtension"))
-                            {
-                                if (ext is not null)
-                                {
-                                    if (_extensionIndex.ContainsKey(ext))
-                                        throw new NUnitEngineException($"ProjectLoader extension {ext} is already handled by another extension.");
-
-                                    _extensionIndex.Add(ext, node);
-                                }
-                            }
-                        }
-                    }
                 }
                 catch
                 {
                     Status = ServiceStatus.Error;
                     throw;
                 }
+        }
+
+        private List<ExtensionNode>? _projectNodes;
+        private List<ExtensionNode> ProjectNodes
+        {
+            get
+            {
+                if (_projectNodes is null)
+                {
+                    Guard.OperationValid(_extensionService is not null, "ProjectNodes property may not be accessed before ProjectService is started");
+
+                    _projectNodes = [.. _extensionService.GetExtensionNodes<IProjectLoader>()];
+                }
+
+                return _projectNodes;
+            }
         }
 
         private IProject? LoadFrom(string path)
@@ -147,8 +144,9 @@ namespace NUnit.Engine.Services
             if (string.IsNullOrEmpty(ext))
                 return null;
 
-            if (_extensionIndex.TryGetValue(ext, out ExtensionNode? node))
-                return node;
+            foreach (var node in ProjectNodes)
+                if (node.GetValues("FileExtension").Contains(ext))
+                    return node;
 
             return null;
         }

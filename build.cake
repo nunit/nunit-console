@@ -1,7 +1,7 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.1
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.3
 // Comment out above line and uncomment below for local tests of recipe changes
-//#load ../NUnit.Cake.Recipe/recipe/*.cake
+//#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
 
 // Load additional cake files
 #load package-tests.cake
@@ -209,6 +209,15 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitConsoleRunnerChocolateyPackage,
     NUnitConsoleNuGetPackage
 });
+
+Task("BuildPackages")
+    .Description("Just build packages, without installing or running package tests")
+    .IsDependentOn("Build")
+    .Does(() =>
+    {
+        foreach (var package in BuildSettings.Packages)
+            package.BuildPackage();
+    });
 
 //////////////////////////////////////////////////////////////////////
 // CONSOLE PACKAGE TEST RUNNER
