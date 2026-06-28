@@ -7,7 +7,7 @@ public static class KnownExtensions
     public static ExtensionSpecifier NUnitV2Driver = new ExtensionSpecifier(
         "NUnit.Extension.NUnitV2Driver", "nunit-extension-nunit-v2-driver", "3.9.0");
     public static ExtensionSpecifier NUnitProjectLoader = new ExtensionSpecifier(
-        "NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader", "4.0.0-dev00016");
+        "NUnit.Extension.NUnitProjectLoader", "nunit-extension-nunit-project-loader", "4.0.0-beta.1");
     public static ExtensionSpecifier VSProjectLoader = new ExtensionSpecifier(
         "NUnit.Extension.VSProjectLoader", "nunit-extension-vs-project-loader", "3.9.0");
     public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
@@ -49,4 +49,11 @@ Task("InstallChocolateyAgents")
     {
         foreach (var agent in KnownExtensions.BundledNuGetAgents)
             agent.Install(BuildSettings.ProjectDirectory + "bin");
+    });
+
+Task("InstallNUnitProjectLoader")
+    .Description("Installs the NUnit Project Loader extension in the BIN directory for testing.")
+    .Does(() =>
+    {
+        KnownExtensions.NUnitProjectLoader.NuGetPackage.Install(BuildSettings.ProjectDirectory + "bin");
     });

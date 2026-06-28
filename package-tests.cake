@@ -495,13 +495,13 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
 // are ported. Most extensions will require an update to work under V4.
 
 //NUnit Project Loader Tests
-//StandardRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
-//{
-//    Description = "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
-//    Arguments = "../../MixedTests.nunit --config=Release",
-//    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
-//    ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
-//});
+StandardRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
+{
+    Description = "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
+    Arguments = "../../MixedTests.nunit --config=Release",
+    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
+    ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
+});
 
 //NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
 //{
