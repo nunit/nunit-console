@@ -102,30 +102,12 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462X86Test")
 
 if (dotnetX86Available)
 {
-    // TODO: Make tests run on all build platforms
-    bool onGitHubActions = BuildSystem.IsRunningOnGitHubActions;
-
-    StandardRunnerTests.Add(new PackageTest(1, "Net90X86Test")
-    {
-        Description = "Run mock-assembly-x86.dll under .NET 9.0",
-        Arguments = "testdata/net9.0/mock-assembly-x86.dll",
-        ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-9.0")
-    });
-
     StandardRunnerTests.Add(new PackageTest(1, "Net80X86Test")
     {
         Description = "Run mock-assembly-x86.dll under .NET 8.0",
         Arguments = "testdata/net8.0/mock-assembly-x86.dll",
         ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-8.0")
     });
-
-    if (!onGitHubActions)
-        StandardRunnerTests.Add(new PackageTest(1, "Net70X86Test")
-        {
-            Description = "Run mock-assembly-x86.dll under .NET 7.0",
-            Arguments = "testdata/net7.0/mock-assembly-x86.dll",
-            ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-7.0")
-        });
 
     StandardRunnerTests.Add(new PackageTest(1, "Net60X86Test")
     {
@@ -134,13 +116,30 @@ if (dotnetX86Available)
         ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
     });
 
-    if (!onGitHubActions)
+    // TODO: Make tests run on all build platforms
+    if (!BuildSystem.IsRunningOnGitHubActions)
+    {
+        StandardRunnerTests.Add(new PackageTest(1, "Net90X86Test")
+        {
+            Description = "Run mock-assembly-x86.dll under .NET 9.0",
+            Arguments = "testdata/net9.0/mock-assembly-x86.dll",
+            ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-9.0")
+        });
+
+        StandardRunnerTests.Add(new PackageTest(1, "Net70X86Test")
+        {
+            Description = "Run mock-assembly-x86.dll under .NET 7.0",
+            Arguments = "testdata/net7.0/mock-assembly-x86.dll",
+            ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-7.0")
+        });
+
         StandardRunnerTests.Add(new PackageTest(1, "NetCore31X86Test")
         {
             Description = "Run mock-assembly-x86.dll under .NET Core 3.1",
             Arguments = "testdata/netcoreapp3.1/mock-assembly-x86.dll",
             ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-3.1")
         });
+    }
 }
 
 //////////////////////////////////////////////////////////////////////

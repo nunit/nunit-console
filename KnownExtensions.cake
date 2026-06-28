@@ -50,3 +50,10 @@ Task("InstallChocolateyAgents")
         foreach (var agent in KnownExtensions.BundledNuGetAgents)
             agent.Install(BuildSettings.ProjectDirectory + "bin");
     });
+
+Task("InstallNUnitProjectLoader")
+    .Description("Installs the NUnit Project Loader extension in the BIN directory for testing.")
+    .Does(() =>
+    {
+        KnownExtensions.NUnitProjectLoader.NuGetPackage.Install(BuildSettings.ProjectDirectory + "bin");
+    });
