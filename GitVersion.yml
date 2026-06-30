@@ -2,7 +2,7 @@ next-version: 4.0.0
 mode: ContinuousDelivery
 branches:
   main:
-    label: alpha
+    label: beta
   release:
     label: pre
   pull-request:
