@@ -507,7 +507,7 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
 //    Description = "Run NUnit project with mock-assembly.dll built for .NET 6.0 and 8.0",
 //    Arguments = "../../NetCoreTests.nunit --config=Release",
 //    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
-//    ExtensionsNeeded = new[] { Extensions.NUnitProjectLoader }
+//    ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
 //});
 
 // V2 Result Writer Tests
