@@ -144,7 +144,7 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);
 
-// NOTE: The final three packages continue to use a nuspec file for various reasons
+// NOTE: The final two packages continue to use a nuspec file for various reasons
 
 // 1. NUnit.ConsoleRunner needs to use it to specify the bundled pluggable agents
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
@@ -168,27 +168,7 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
-// 3. The chocolatey console runner has to follow special chocolatey conventions
-PackageDefinition NUnitConsoleRunnerChocolateyPackage = new ChocolateyPackage(
-    id: "nunit-console-runner",
-    description: RUNNER_DESCRIPTION,
-    packageContent: new PackageContent()
-        .WithDirectories(
-            new DirectoryContent("tools").WithFiles(
-                "../../LICENSE.txt", "../../NOTICES.txt", "../../choco/VERIFICATION.txt",
-                "net462/nunit-console.exe", "net462/nunit-console.exe.config",
-                "net462/nunit.engine.dll", "net462/nunit.extensibility.dll", "net462/nunit.extensibility.api.dll",
-                "net462/nunit.common.dll", "net462/nunit.engine.api.dll", "net462/testcentric.metadata.dll") )
-        .WithDependencies(KnownExtensions.BundledChocolateyAgents),
-    // Keeping separate check for dependencies until PackageContent automatic verification handles them
-    checks: new PackageCheck[] {
-        HasDependencies(KnownExtensions.BundledChocolateyAgents)
-    },
-    testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-        + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
-    tests: StandardRunnerTests);
-
-// NUnit.Console is a meta-package and is built using a nuspec file
+// 2. NUnit.Console is a meta-package and is built using a nuspec file
 PackageDefinition NUnitConsoleNuGetPackage = new NuGetPackage(
     id: "NUnit.Console",
     source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
@@ -206,7 +186,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitEnginePackage,
     NUnitConsoleRunnerDotNetToolPackage,
     NUnitConsoleRunnerNuGetPackage,
-    NUnitConsoleRunnerChocolateyPackage,
     NUnitConsoleNuGetPackage
 });
 
