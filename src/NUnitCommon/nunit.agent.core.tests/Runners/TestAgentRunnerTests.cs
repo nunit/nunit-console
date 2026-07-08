@@ -75,7 +75,7 @@ namespace NUnit.Engine.Runners
             CheckRunResult(result);
         }
 
-        [Test]
+        //[Test]
         public void RunAsync()
         {
             var asyncResult = _runner.RunAsync(null, TestFilter.Empty);

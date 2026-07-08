@@ -26,6 +26,23 @@ namespace NUnit.Engine.Runners
 
         private IFrameworkDriver? _driver;
 
+        private static SettingDefinition[] _frameworkSettingDefinitions = [
+            SettingDefinitions.DefaultTimeout,
+            SettingDefinitions.DefaultCulture,
+            SettingDefinitions.DefaultUICulture,
+            SettingDefinitions.InternalTraceWriter,
+            SettingDefinitions.LOAD,
+            SettingDefinitions.NumberOfTestWorkers,
+            SettingDefinitions.RandomSeed,
+            SettingDefinitions.StopOnError,
+            SettingDefinitions.ThrowOnEachFailureUnderDebugger,
+            SettingDefinitions.SynchronousEvents,
+            SettingDefinitions.DefaultTestNamePattern,
+            SettingDefinitions.TestParameters,
+            SettingDefinitions.TestParametersDictionary,
+            SettingDefinitions.RunOnMainThread
+        ];
+
         protected AppDomain? TestDomain { get; set; }
 
         // Used to inject DriverService for testing
@@ -111,13 +128,13 @@ namespace NUnit.Engine.Runners
                 DriverService = new DriverService();
 
             var testFile = assemblyPackage.FullName!; // We know it's an assembly
-            var settings = assemblyPackage.Settings;
+            var packageSettings = assemblyPackage.Settings;
 
-            string? targetFramework = settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
-            bool skipNonTestAssemblies = settings.GetValueOrDefault(SettingDefinitions.SkipNonTestAssemblies);
+            string? targetFramework = packageSettings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+            bool skipNonTestAssemblies = packageSettings.GetValueOrDefault(SettingDefinitions.SkipNonTestAssemblies);
 
             if (_assemblyResolver is not null && !TestDomain.IsDefaultAppDomain()
-                && settings.GetValueOrDefault(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver))
+                && packageSettings.GetValueOrDefault(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver))
             {
                 // It's OK to do this in the loop because the Add method
                 // checks to see if the path is already present.
@@ -125,13 +142,19 @@ namespace NUnit.Engine.Runners
             }
 
             _driver = DriverService.GetDriver(TestDomain, assemblyPackage, testFile, targetFramework, skipNonTestAssemblies);
-            var frameworkSettings = new Dictionary<string, object>();
+            var settingsDictionary = new Dictionary<string, object>();
 
-            // TODO: Add Values to settings
+            foreach (var settingDefinition in _frameworkSettingDefinitions)
+            {
+                string key = settingDefinition.Name;
+                if (packageSettings.HasSetting(key))
+                    settingsDictionary.Add(
+                        key, packageSettings.GetSetting(key));
+            }
 
             try
             {
-                LoadResult = new TestEngineResult(_driver.Load(testFile, frameworkSettings));
+                LoadResult = new TestEngineResult(_driver.Load(testFile, settingsDictionary));
 
 #if NETCOREAPP
                 if (TestPackage.Settings.HasSetting(SettingDefinitions.ListResolutionStats))
