@@ -5,12 +5,8 @@
     <OutputPath>..\..\..\bin\$(Configuration)\testdata\</OutputPath>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="nunit" Version="3.14.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp3.1'">
-    <PackageReference Include="nunit" Version="4.3.2" />
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
   </ItemGroup>
 
 </Project>
