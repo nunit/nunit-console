@@ -8,13 +8,16 @@
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+  <ItemGroup>
 		<ProjectReference Include="..\nunit.agent.core\nunit.agent.core.csproj" />
 		<ProjectReference Include="..\nunit.extensibility\nunit.extensibility.csproj" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
+  <ItemGroup>
+    <PackageReference Include="NUnit.Engine.Api" Version="$(EngineApiVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net8.0'">
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
 	</ItemGroup>
 

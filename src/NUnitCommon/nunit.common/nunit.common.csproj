@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
+    <PackageReference Include="NUnit.Engine.Api" Version="$(EngineApiVersion)" />
   </ItemGroup>
 
 </Project>

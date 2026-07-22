@@ -22,6 +22,7 @@
         <DebugSymbols>true</DebugSymbols>
         <!-- Commonly Used Package Versions -->
         <AnnotatedReferenceAssemblyVersion>8.0.0</AnnotatedReferenceAssemblyVersion>
+        <EngineApiVersion>4.0.0-beta.3</EngineApiVersion>
         <!-- Informational Settings -->
         <Company>NUnit Software</Company>
         <Product>NUnit 4 Runner and Engine</Product>
