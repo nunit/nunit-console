@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj" />
     <ProjectReference Include="..\nunit.extensibility\nunit.extensibility.csproj" />
     <ProjectReference Include="..\nunit.common\nunit.common.csproj" />
   </ItemGroup>
@@ -35,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NUnit.Engine.Api" Version="$(EngineApiVersion)" />
     <PackageReference Include="TestCentric.Metadata" Version="3.0.4" />
   </ItemGroup>
 

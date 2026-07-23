@@ -38,20 +38,6 @@ PackageDefinition NUnitExtensibilityApiPackage = new NuGetPackage(
         HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.api.pdb")
     });
 
-PackageDefinition NUnitEngineApiPackage = new NuGetPackage(
-    id: "NUnit.Engine.Api",
-    source: BuildSettings.SourceDirectory + "NUnitEngine/nunit.engine.api/nunit.engine.api.csproj",
-    checks: new PackageCheck[] {
-        HasFile("LICENSE.txt"),
-        HasDirectory("lib/net462").WithFile("nunit.engine.api.dll"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.dll"),
-        HasDependency("NUnit.Extensibility.Api", THIS_VERSION)
-    },
-    symbols: new PackageCheck[] {
-        HasDirectory("lib/net462").WithFile("nunit.engine.api.pdb"),
-        HasDirectory("lib/netstandard2.0").WithFile("nunit.engine.api.pdb")
-    });
-
 PackageDefinition NUnitCommonPackage = new NuGetPackage(
     id: "NUnit.Common",
     source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.common/nunit.common.csproj",
@@ -60,7 +46,7 @@ PackageDefinition NUnitCommonPackage = new NuGetPackage(
         HasFile("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.common.dll"),
         HasDirectory("lib/netstandard2.0").WithFile("nunit.common.dll"),
-        HasDependency("NUnit.Engine.Api", THIS_VERSION)
+        HasDependency("NUnit.Engine.Api")
     },
     symbols: new PackageCheck[]
     {
@@ -77,7 +63,7 @@ PackageDefinition NUnitExtensibilityPackage = new NuGetPackage(
         HasDirectory("lib/net462").WithFile("nunit.extensibility.dll"),
         HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.dll"),
         HasDependency("NUnit.Extensibility.Api", THIS_VERSION),
-        HasDependency("NUnit.Engine.Api", THIS_VERSION),
+        HasDependency("NUnit.Engine.Api"),
         HasDependency("NUnit.Common", THIS_VERSION),
         HasDependency("TestCentric.Metadata", "3.0.4")
     },
@@ -95,7 +81,7 @@ PackageDefinition NUnitAgentCorePackage = new NuGetPackage(
         HasFiles("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.agent.core.dll" ),
         HasDirectory("lib/net8.0").WithFiles("nunit.agent.core.dll"),
-        HasDependency("NUnit.Engine.Api", THIS_VERSION),
+        HasDependency("NUnit.Engine.Api"),
         HasDependency("NUnit.Common", THIS_VERSION),
         HasDependency("TestCentric.Metadata", "3.0.4")
     },
@@ -115,7 +101,7 @@ PackageDefinition NUnitEnginePackage = new NuGetPackage(
         HasFiles("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.engine.dll"),
         HasDirectory("lib/net8.0").WithFile("nunit.engine.dll"),
-        HasDependency("NUnit.Engine.Api", THIS_VERSION),
+        HasDependency("NUnit.Engine.Api"),
         HasDependency("NUnit.Common", THIS_VERSION),
         HasDependency("NUnit.Extensibility", THIS_VERSION)
     },
@@ -156,7 +142,7 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
             new DirectoryContent("tools").WithFiles(
                 "net462/nunit-console.exe", "net462/nunit-console.exe.config", "net462/nunit.engine.dll",
                 "net462/nunit.extensibility.dll", "net462/nunit.extensibility.api.dll", "net462/nunit.common.dll",
-                "net462/nunit-console.pdb", "net462/nunit.engine.pdb", "net462/nunit.engine.api.pdb",
+                "net462/nunit-console.pdb", "net462/nunit.engine.pdb",
                 "net462/nunit.extensibility.pdb", "net462/nunit.extensibility.api.pdb", "net462/nunit.common.pdb",
                 "net462/nunit.engine.api.dll", "net462/testcentric.metadata.dll"))
         .WithDependencies(KnownExtensions.BundledNuGetAgents),
@@ -179,7 +165,6 @@ PackageDefinition NUnitConsoleNuGetPackage = new NuGetPackage(
 // Dependencies must precede all the packages that depend on them.
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityApiPackage,
-    NUnitEngineApiPackage,
     NUnitCommonPackage,
     NUnitExtensibilityPackage,
     NUnitAgentCorePackage,

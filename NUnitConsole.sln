@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.7.11919.86 stable
+VisualStudioVersion = 18.7.11919.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}"
 	ProjectSection(SolutionItems) = preProject
@@ -41,8 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnitEngine", "NUnitEngine"
 	ProjectSection(SolutionItems) = preProject
 		src\NUnitEngine\Directory.Build.props = src\NUnitEngine\Directory.Build.props
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine.api", "src\NUnitEngine\nunit.engine.api\nunit.engine.api.csproj", "{775FAD50-3623-4922-97C4-DFB29A8BE4C7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit.engine", "src\NUnitEngine\nunit.engine\nunit.engine.csproj", "{372A3447-D657-40FF-A089-77C19FEC30C8}"
 EndProject
@@ -161,10 +159,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{775FAD50-3623-4922-97C4-DFB29A8BE4C7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{372A3447-D657-40FF-A089-77C19FEC30C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{372A3447-D657-40FF-A089-77C19FEC30C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{372A3447-D657-40FF-A089-77C19FEC30C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -279,7 +273,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A972031D-2F61-4183-AF75-99EE1A9F6B32} = {49D441DF-39FD-4F4D-AECA-86CF8EFE23AF}
-		{775FAD50-3623-4922-97C4-DFB29A8BE4C7} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{372A3447-D657-40FF-A089-77C19FEC30C8} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{D694CB69-6CFB-4762-86C2-EB27B808B282} = {31B45C4C-206F-4F31-9CC6-33BF11DFEE39}
 		{F3E87D0F-6F06-4C0B-AE06-42C0834C3C6E} = {A972031D-2F61-4183-AF75-99EE1A9F6B32}
