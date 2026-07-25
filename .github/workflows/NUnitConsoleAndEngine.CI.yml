@@ -2,13 +2,10 @@
 
 on:
   workflow_dispatch:
-  pull_request:
   push:
-    branches-ignore:
-      - "azure-*"
-    paths-ignore:
-      - "*.txt"
-      - "*.md"
+    branches:  
+      - main
+  pull_request:
   release:
 
 env:
@@ -18,7 +15,7 @@ env:
 jobs:
   ContinuousIntegration:
     name: Continuous Integration
-    runs-on: windows-2025-vs2026
+    runs-on: windows-latest
 
     env:
         MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
@@ -28,12 +25,12 @@ jobs:
 
     steps:
       - name: ⤵️ Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: 🛠️ Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
             3.1.x
@@ -45,30 +42,22 @@ jobs:
       - name: 🔧 Install dotnet tools
         run: dotnet tool restore
 
-      - name: 🍰 Run cake
-        env:
-            MYGET_API_KEY: ${{ secrets.PUBLISH_MYGET_ORG }}
-            NUGET_API_KEY: ${{ secrets.PUBLISH_NUGET_ORG }}
-            CHOCO_API_KEY: ${{ secrets.PUBLISH_CHOCOLATEY_ORG }}
-            GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_CP }}
+      - name: 🔨 Build, Test and Package
+        run: dotnet cake --target=BuildTestAndPackage --configuration=Release #--verbosity=diagnostic
 
-        # If you need to get more verbose logging, add the following to the dotnet-cake above:  --verbosity=diagnostic
-        run: dotnet cake --target=ContinuousIntegration --configuration=Release
-
-      - name: 🪵 Upload build logs
-        if: always()
-        uses: actions/upload-artifact@v4
+      # Upload packages before publishing in case of later failures
+      - name: 💾 Upload build artifacts
+        uses: actions/upload-artifact@v7
         with:
-          name: NUnitConsoleLogs
-          # This path is defined in build-settings.cake
-          path: "build-results/*.binlog"
-          # if-no-files-found: error
+          name: NUnitConsole Packages
+          path: |
+            packages/*.nupkg
+            packages/results/
 
-      - name: 🪵 Upload NUnit Package Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: NUnit Results
-          # This path is defined in build-settings.cake
-          path: "package/results/"
-          # if-no-files-found: error
+      # TODO: Cake recipe skips build but repeats packaging before deciding
+      # not to publish. We should try to eliminate this, preferably in the
+      # recipe otherwise in this workflow.
+      - name: Publish (Cake script decides whether and where to publish)
+        run: |
+          dotnet minver
+          dotnet cake --target=Publish --configuration=Release --exclusive
