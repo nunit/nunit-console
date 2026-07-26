@@ -42,22 +42,15 @@ jobs:
       - name: 🔧 Install dotnet tools
         run: dotnet tool restore
 
-      - name: 🔨 Build, Test and Package
-        run: dotnet cake --target=BuildTestAndPackage --configuration=Release #--verbosity=diagnostic
+      - name: 🔨 Build, Test, Package and Publish (Cake script decides)
+        run: dotnet cake --target=ContinuousIntegration --configuration=Release #--verbosity=diagnostic
 
       # Upload packages before publishing in case of later failures
       - name: 💾 Upload build artifacts
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: NUnitConsole Packages
           path: |
             packages/*.nupkg
             packages/results/
-
-      # TODO: Cake recipe skips build but repeats packaging before deciding
-      # not to publish. We should try to eliminate this, preferably in the
-      # recipe otherwise in this workflow.
-      - name: Publish (Cake script decides whether and where to publish)
-        run: |
-          dotnet minver
-          dotnet cake --target=Publish --configuration=Release --exclusive
