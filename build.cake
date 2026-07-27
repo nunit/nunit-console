@@ -116,7 +116,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net10.0").WithFiles(AGENT_FILES_NETCORE)
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit3-console.exe"),
+            + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
         tests: PackageTests.StandardRunnerTests),
 
     NUnitConsoleZipPackage = new ZipPackage(
