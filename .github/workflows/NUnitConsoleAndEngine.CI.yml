@@ -4,11 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches-ignore:
-      - "azure-*"
-    paths-ignore:
-      - "*.txt"
-      - "*.md"
+    branches:
+      - version3
 
 env:
   DOTNET_NOLOGO: true # Disable the .NET logo

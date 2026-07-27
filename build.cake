@@ -1,5 +1,5 @@
 ﻿// Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0-alpha.5
+#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -116,7 +116,7 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
             HasDirectory("tools/agents/net10.0").WithFiles(AGENT_FILES_NETCORE)
         },
         testRunner: new ConsoleRunnerSelfTester(BuildSettings.ChocolateyTestDirectory
-            + $"nunit-console-runner.{BuildSettings.ChocolateyPackageVersion}/tools/nunit3-console.exe"),
+            + $"nunit-console-runner.{BuildSettings.PackageVersion}/tools/nunit3-console.exe"),
         tests: PackageTests.StandardRunnerTests),
 
     NUnitConsoleZipPackage = new ZipPackage(
