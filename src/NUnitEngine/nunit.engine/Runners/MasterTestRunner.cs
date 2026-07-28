@@ -51,7 +51,9 @@ namespace NUnit.Engine.Runners
         private bool _disposed;
 
         private TestEventDispatcher _eventDispatcher = new TestEventDispatcher();
+#if USE_WORK_ITEM_TRACKER
         private WorkItemTracker _workItemTracker = new WorkItemTracker();
+#endif
 
         private int _testRunTimeout;
         private Timer? _testRunTimer;
@@ -186,19 +188,16 @@ namespace NUnit.Engine.Runners
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
         /// </summary>
-        /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
-        public void StopRun(bool force)
-        {
-            if (_engineRunner is null)
-                return; // No test is was even started.
+        public void RequestStop() => _engineRunner?.RequestStop();
 
-            if (!force)
-                _engineRunner.RequestStop();
-            else
+        public void ForcedStop()
+        {
+            if (_engineRunner is not null)
             {
                 _engineRunner.ForcedStop();
 
-                // Frameworks should handle StopRun(true) by cancelling all tests and notifying
+#if USE_WORK_ITEM_TRACKER
+                // Framework drivers should handle ForcedStop() by cancelling all tests and notifying
                 // us of the completion of any tests that were running. However, this feature
                 // may be absent in some frameworks or may be broken and we may not pass on the
                 // notifications needed by some runners. In fact, such a bug is present in the
@@ -225,6 +224,7 @@ namespace NUnit.Engine.Runners
 
                     _engineRunner.Unload();
                 }
+#endif
             }
         }
 
@@ -454,9 +454,11 @@ namespace NUnit.Engine.Runners
         /// <returns>A TestEngineResult giving the result of the test execution</returns>
         private TestEngineResult RunTests(ITestEventListener? listener, TestFilter filter)
         {
-            _workItemTracker.Clear();
             _eventDispatcher.Listeners.Clear();
+#if USE_WORK_ITEM_TRACKER
+            _workItemTracker.Clear();
             _eventDispatcher.Listeners.Add(_workItemTracker);
+#endif
 
             if (listener is not null)
                 _eventDispatcher.Listeners.Add(listener);
@@ -530,15 +532,18 @@ namespace NUnit.Engine.Runners
         private void OnTestRunTimeout(object? sender, ElapsedEventArgs e)
         {
             // Unlikely as it is, let's see if we can stop this cooperatively
-            StopRun(false);
+            RequestStop();
+            // TODO: Should we wait for run complete if we are not using WorkItemTracker?
 
             // We wait for the cooperative stop and do a forced stop if it fails.
             // WaitForCompletion will actually be called twice, once here and
-            // again in StopRun(true), so the wait is doubled but no harm done.
-            // StopRun(True) also calls _workItemTracker to try to fix up any
+            // again in ForcedStop(), so the wait is doubled but no harm done.
+            // ForcedStop() also calls _workItemTracker to try to fix up any
             // in-flight items and produce as informative a result as possible.
+#if USE_WORK_ITEM_TRACKER
             if (!_workItemTracker.WaitForCompletion(WAIT_FOR_CANCEL_TO_COMPLETE))
-                StopRun(true);
+                ForcedStop();
+#endif
         }
 
         private AsyncTestEngineResult RunTestsAsync(ITestEventListener? listener, TestFilter filter)

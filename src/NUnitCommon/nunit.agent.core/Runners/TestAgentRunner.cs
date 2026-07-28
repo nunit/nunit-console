@@ -244,25 +244,13 @@ namespace NUnit.Engine.Runners
         /// Request the current test run to stop. If no tests are running,
         /// the call is ignored.
         /// </summary>
-        public void RequestStop() => StopRun(false);
+        public void RequestStop() => GetLoadedDriver().RequestStop();
 
         /// <summary>
         /// Force the current test run to stop, killing threads or processes if necessary.
         /// If no tests are running, the call is ignored.
         /// </summary>
-        public void ForcedStop() => StopRun(true);
-
-        private void StopRun(bool force)
-        {
-            try
-            {
-                GetLoadedDriver().StopRun(force);
-            }
-            catch (Exception ex) when (!(ex is NUnitEngineException))
-            {
-                throw new NUnitEngineException("An exception occurred in the driver while stopping the run.", ex);
-            }
-        }
+        public void ForcedStop() => GetLoadedDriver().ForcedStop();
 
         private IFrameworkDriver GetLoadedDriver()
         {

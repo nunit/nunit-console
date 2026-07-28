@@ -152,8 +152,9 @@ namespace NUnit.Engine.Drivers
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
         /// </summary>
-        /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
-        public void StopRun(bool force) => _api.StopRun(force);
+        public void RequestStop() => _api.RequestStop();
+
+        public void ForcedStop() => _api.ForcedStop();
 
         /// <summary>
         /// Returns information about the tests in an assembly.

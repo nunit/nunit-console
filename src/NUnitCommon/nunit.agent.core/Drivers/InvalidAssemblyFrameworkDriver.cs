@@ -55,7 +55,11 @@ namespace NUnit.Engine.Drivers
             return GetLoadResult();
         }
 
-        public void StopRun(bool force)
+        public void RequestStop()
+        {
+        }
+
+        public void ForcedStop()
         {
         }
 

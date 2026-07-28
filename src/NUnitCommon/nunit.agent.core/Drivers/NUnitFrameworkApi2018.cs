@@ -178,9 +178,14 @@ namespace NUnit.Engine.Drivers
             ExecuteMethod(RUN_ASYNC_METHOD, [typeof(Action<string>), typeof(string)], callback, filter);
         }
 
-        public void StopRun(bool force)
+        public void RequestStop()
         {
-            ExecuteMethod(STOP_RUN_METHOD, force);
+            ExecuteMethod(STOP_RUN_METHOD, false);
+        }
+
+        public void ForcedStop()
+        {
+            ExecuteMethod(STOP_RUN_METHOD, true);
         }
 
         public string Explore(string filter)
