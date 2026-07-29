@@ -1,5 +1,7 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#define USE_WORK_ITEM_TRACKER
+
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
