@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 namespace NUnit.Engine.Drivers
 {
+    /// <summary>
+    /// Driver API for the NUnit Framework. Provides a common interface to al
+    /// versions of the framework, in spite of differences in their own API.
+    /// </summary>
     public interface NUnitFrameworkApi
     {
         /// <summary>
@@ -47,6 +51,15 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         void RequestStop();
 
+        /// <summary>
+        /// Force the current test run to stop, killing threads or processes if necessary.
+        /// </summary>
+        /// <exception cref="NotImplementedException" />
         void ForcedStop();
+
+        /// <summary>
+        /// Gets a flag indicating whether ForcedStop is supported for the framework version in use.
+        /// </summary>
+        bool ForcedStopSupported { get; }
     }
 }

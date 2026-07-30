@@ -188,6 +188,8 @@ namespace NUnit.Engine.Drivers
             ExecuteMethod(STOP_RUN_METHOD, true);
         }
 
+        public bool ForcedStopSupported => _nunitRef.Version.ShouldNotBeNull().Major is 3 or 4;
+
         public string Explore(string filter)
         {
             CheckLoadWasCalled();

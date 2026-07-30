@@ -3,6 +3,7 @@
 using NUnit.Engine.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 #if NETCOREAPP3_1_OR_GREATER
@@ -20,6 +21,8 @@ namespace NUnit.Engine.Drivers
         private static readonly Version MINIMUM_NUNIT_VERSION = new(3, 2, 0);
         private static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
+        private readonly Version _nunitVersion;
+
 #if NETFRAMEWORK
         private readonly NUnitFrameworkApi _api;
 
@@ -35,6 +38,7 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentNotNull(nunitRef);
 
             ID = id;
+            _nunitVersion = nunitRef.Version.ShouldNotBeNull();
 
             if (nunitRef.Version >= MINIMUM_NUNIT_VERSION)
             {
@@ -69,6 +73,8 @@ namespace NUnit.Engine.Drivers
             Guard.ArgumentNotNullOrEmpty(id);
             Guard.ArgumentNotNull(nunitRef);
 
+            _nunitVersion = nunitRef.Version.ShouldNotBeNull();
+
             ID = id;
             API = api;
 
@@ -99,6 +105,7 @@ namespace NUnit.Engine.Drivers
             ID = id;
             API = "2018";
 
+            _nunitVersion = nunitRef.Version.ShouldNotBeNull();
             _api = new NUnitFrameworkApi2018(ID, nunitRef);
         }
 
@@ -154,7 +161,17 @@ namespace NUnit.Engine.Drivers
         /// </summary>
         public void RequestStop() => _api.RequestStop();
 
-        public void ForcedStop() => _api.ForcedStop();
+        /// <summary>
+        /// Force the current test run to stop, killing threads or processes if necessary.
+        /// If no tests are running, the call is ignored.
+        /// </summary>
+        public void ForcedStop()
+        {
+            if (_api.ForcedStopSupported)
+                _api.ForcedStop();
+            else
+                Process.GetCurrentProcess().Kill();
+        }
 
         /// <summary>
         /// Returns information about the tests in an assembly.

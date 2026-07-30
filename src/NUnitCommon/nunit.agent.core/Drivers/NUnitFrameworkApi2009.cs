@@ -107,6 +107,8 @@ namespace NUnit.Engine.Drivers
 
         public void ForcedStop() => ExecuteAction(STOP_RUN_ACTION, true);
 
+        public bool ForcedStopSupported => true;
+
         public string Explore(string filter)
         {
             CheckLoadWasCalled();
