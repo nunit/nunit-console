@@ -103,7 +103,11 @@ namespace NUnit.Engine.Drivers
 
         public void RunAsync(Action<string>? callback, string filter) => throw new NotImplementedException();
 
-        public void StopRun(bool force) => ExecuteAction(STOP_RUN_ACTION, force);
+        public void RequestStop() => ExecuteAction(STOP_RUN_ACTION, false);
+
+        public void ForcedStop() => ExecuteAction(STOP_RUN_ACTION, true);
+
+        public bool ForcedStopSupported => true;
 
         public string Explore(string filter)
         {
