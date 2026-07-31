@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
 using NUnit.Engine.Extensibility;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace NUnit.Engine.Drivers
     /// </summary>
     public class NUnitFrameworkDriver : IFrameworkDriver
     {
-        private static readonly Version MINIMUM_NUNIT_VERSION = new(3, 2, 0);
+        private static readonly Version MINIMUM_NUNIT_VERSION_FOR_2018_API = new(3, 2, 0);
         private static readonly Logger log = InternalTrace.GetLogger(nameof(NUnitFrameworkDriver));
 
         private readonly Version _nunitVersion;
@@ -40,7 +41,7 @@ namespace NUnit.Engine.Drivers
             ID = id;
             _nunitVersion = nunitRef.Version.ShouldNotBeNull();
 
-            if (nunitRef.Version >= MINIMUM_NUNIT_VERSION)
+            if (_nunitVersion >= MINIMUM_NUNIT_VERSION_FOR_2018_API)
             {
                 API = "2018";
                 _api = (NUnitFrameworkApi)testDomain.CreateInstanceFromAndUnwrap(
@@ -170,7 +171,7 @@ namespace NUnit.Engine.Drivers
             if (_api.ForcedStopSupported)
                 _api.ForcedStop();
             else
-                Process.GetCurrentProcess().Kill();
+                Environment.Exit(AgentExitCodes.CANCELLED_BY_FORCED_STOP);
         }
 
         /// <summary>

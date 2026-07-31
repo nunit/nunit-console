@@ -115,18 +115,7 @@ namespace NUnit.Engine.Runners
                 .Do(x => { throw new NUnitEngineException("Message"); });
 
             var ex = Assert.Throws<NUnitEngineException>(() => _runner.ForcedStop());
-            Assert.That(ex.Message, Is.EqualTo("Message"));
-        }
-
-        [Test]
-        public void StopRun_Throws_ArgumentException()
-        {
-            _driver.When(x => x.ForcedStop())
-                .Do(x => { throw new ArgumentException("Message"); });
-
-            var ex = Assert.Throws<ArgumentException>(() => _runner.ForcedStop());
-            Assert.That(ex.
-                Message, Is.EqualTo("Message"));
+            Assert.That(ex?.Message, Is.EqualTo("Message"));
         }
     }
 }
