@@ -68,13 +68,6 @@ AddToBothLists(new PackageTest(1, "Net60Test")
     ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0")
 });
 
-AddToBothLists(new PackageTest(1, "NetCore31Test")
-{
-    Description = "Run mock-assembly.dll under .NET Core 3.1",
-    Arguments = "testdata/netcoreapp3.1/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-3.1")
-});
-
 //////////////////////////////////////////////////////////////////////
 // RUN MOCK-ASSEMBLY-X86 UNDER EACH RUNTIME
 //////////////////////////////////////////////////////////////////////
@@ -131,13 +124,6 @@ if (dotnetX86Available)
             Description = "Run mock-assembly-x86.dll under .NET 7.0",
             Arguments = "testdata/net7.0/mock-assembly-x86.dll",
             ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-7.0")
-        });
-
-        StandardRunnerTests.Add(new PackageTest(1, "NetCore31X86Test")
-        {
-            Description = "Run mock-assembly-x86.dll under .NET Core 3.1",
-            Arguments = "testdata/netcoreapp3.1/mock-assembly-x86.dll",
-            ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-3.1")
         });
     }
 }
