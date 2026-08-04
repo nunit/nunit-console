@@ -10,6 +10,7 @@ namespace NUnit.Common
         public const int DEBUGGER_SECURITY_VIOLATION = -3;
         public const int DEBUGGER_NOT_IMPLEMENTED = -4;
         public const int UNABLE_TO_LOCATE_AGENCY = -5;
+        public const int CANCELLED_BY_FORCED_STOP = -6;
         public const int UNEXPECTED_EXCEPTION = -100;
         public const int STACK_OVERFLOW_EXCEPTION = -1073741571;
     }

@@ -94,16 +94,13 @@ namespace NUnit.Engine.Runners
             _engineRunner.Received().Run(Arg.Any<TestEventDispatcher>(), filter);
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void StopRun(bool force)
+        [Test]
+        public void RequestStop()
         {
             _masterTestRunner.GetEngineRunner();
-            _masterTestRunner.StopRun(force);
-            if (force)
-                _engineRunner.Received().ForcedStop();
-            else
-                _engineRunner.Received().RequestStop();
+            _masterTestRunner.RequestStop();
+
+            _engineRunner.Received().RequestStop();
         }
 #endif
     }
