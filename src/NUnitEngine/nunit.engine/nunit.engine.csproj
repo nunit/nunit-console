@@ -17,13 +17,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Condition="'$(TargetFramework)'=='net8.0'" Include="..\..\NUnitCommon\nunit.agent.core\nunit.agent.core.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit.Engine.Api" Version="$(EngineApiVersion)" />
+    <PackageReference Include="NUnit.Engine.Api" Version="$(NUnitEngineApiVersion)" />
+    <PackageReference Condition="'$(TargetFramework)'=='net8.0'" Include="NUnit.Agent.Core" Version="$(NUnitAgentCoreVersion)"/>
   </ItemGroup>
 
 </Project>

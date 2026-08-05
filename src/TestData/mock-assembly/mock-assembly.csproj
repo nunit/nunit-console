@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>NUnit.TestData</RootNamespace>
-    <TargetFrameworks>net35;net462;netcoreapp3.1;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net462;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <OutputPath>../../../bin/$(Configuration)/testdata</OutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\nunit.snk</AssemblyOriginatorKeyFile>
@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
-    <PackageReference Include="NUnitLite" Version="$(NUnitVersion)" />
+    <PackageReference Include="NUnit" Version="$(NUnitFrameworkVersion)" />
+    <PackageReference Include="NUnitLite" Version="$(NUnitFrameworkVersion)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,5 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.2
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.3
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
 
@@ -72,26 +72,6 @@ PackageDefinition NUnitExtensibilityPackage = new NuGetPackage(
         HasDirectory("lib/net462").WithFile("nunit.extensibility.pdb"),
         HasDirectory("lib/netstandard2.0").WithFile("nunit.extensibility.pdb")
     });
-
-PackageDefinition NUnitAgentCorePackage = new NuGetPackage(
-    id: "NUnit.Agent.Core",
-    source: BuildSettings.SourceDirectory + "NUnitCommon/nunit.agent.core/nunit.agent.core.csproj",
-    checks: new PackageCheck[]
-    {
-        HasFiles("LICENSE.txt"),
-        HasDirectory("lib/net462").WithFile("nunit.agent.core.dll" ),
-        HasDirectory("lib/net8.0").WithFiles("nunit.agent.core.dll"),
-        HasDependency("NUnit.Engine.Api"),
-        HasDependency("NUnit.Common", THIS_VERSION),
-        HasDependency("TestCentric.Metadata", "3.0.4")
-    },
-    symbols: new PackageCheck[]
-    {
-        HasDirectory("lib/net462").WithFile("nunit.agent.core.pdb"),
-        HasDirectory("lib/net8.0").WithFile("nunit.agent.core.pdb")
-    },
-    testRunner: new DirectTestAgentRunner(),
-    tests: AgentCoreTests);
 
 PackageDefinition NUnitEnginePackage = new NuGetPackage(
     id: "NUnit.Engine",
@@ -167,7 +147,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitExtensibilityApiPackage,
     NUnitCommonPackage,
     NUnitExtensibilityPackage,
-    NUnitAgentCorePackage,
     NUnitEnginePackage,
     NUnitConsoleRunnerDotNetToolPackage,
     NUnitConsoleRunnerNuGetPackage,
