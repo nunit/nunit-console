@@ -1,5 +1,8 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+// TODO: Move tests to agent core repository and remove this file. These tests are not
+// really testing the engine, but rather the agents, which are tested in the agent core repository.
+#if false
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -143,3 +146,4 @@ namespace NUnit.Engine.Runners.Tests
         }
     }
 }
+#endif
