@@ -1,11 +1,7 @@
 // Load the recipe
-<<<<<<< HEAD
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.7
-=======
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.3
->>>>>>> 461f4d126df793abe5939e99f25a54edef76d4e4
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.8
 // Comment out above line and uncomment below for local tests of recipe changes
-//#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
+//#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Load additional cake files
 #load package-tests.cake
@@ -17,7 +13,6 @@ BuildSettings.Initialize(
     title: "NUnit Console and Engine",
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.sln",
-    buildWithMSBuild: true,
     exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs", "CallerArgumentExpressionAttribute.cs" });
 
 //////////////////////////////////////////////////////////////////////
