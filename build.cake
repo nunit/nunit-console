@@ -12,7 +12,7 @@ BuildSettings.Initialize(
     Context,
     title: "NUnit Console and Engine",
     githubRepository: "nunit-console",
-    solutionFile: "NUnitConsole.sln",
+    solutionFile: "NUnitConsole.slnx",
     exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs", "CallerArgumentExpressionAttribute.cs" });
 
 //////////////////////////////////////////////////////////////////////
