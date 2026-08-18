@@ -1,0 +1,105 @@
+<Solution>
+  <Folder Name="/NUnitCommon/">
+    <File Path="src/NUnitCommon/Directory.Build.props" />
+    <Project Path="src/NUnitCommon/nunit.common.tests/nunit.common.tests.csproj" />
+    <Project Path="src/NUnitCommon/nunit.common/nunit.common.csproj" />
+    <Project Path="src/NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj" />
+    <Project Path="src/NUnitCommon/nunit.extensibility.tests/nunit.extensibility.tests.csproj" />
+    <Project Path="src/NUnitCommon/nunit.extensibility/nunit.extensibility.csproj" />
+  </Folder>
+  <Folder Name="/NUnitConsole/">
+    <File Path="src/NUnitConsole/Directory.Build.props" />
+    <Project Path="src/NUnitConsole/nunit4-console.tests/nunit4-console.tests.csproj" />
+    <Project Path="src/NUnitConsole/nunit4-console/nunit4-console.csproj" />
+    <Project Path="src/NUnitConsole/nunit4-netcore-console/nunit4-netcore-console.csproj" />
+  </Folder>
+  <Folder Name="/NUnitEngine/">
+    <File Path="src/NUnitEngine/Directory.Build.props" />
+    <Project Path="src/NUnitEngine/nunit.engine.tests/nunit.engine.tests.csproj">
+      <BuildDependency Project="src/TestData/notest-assembly/notest-assembly.csproj" />
+    </Project>
+    <Project Path="src/NUnitEngine/nunit.engine/nunit.engine.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="appveyor.yml" />
+    <File Path="azure-pipelines.yml" />
+    <File Path="BREAKING_CHANGES.md" />
+    <File Path="build.cake" />
+    <File Path="build.ps1" />
+    <File Path="build.sh" />
+    <File Path="BUILDING.md" />
+    <File Path="CHANGES.txt" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="GitReleaseManager.yaml" />
+    <File Path="global.json" />
+    <File Path="KnownExtensions.cake" />
+    <File Path="LICENSE.txt" />
+    <File Path="MixedTests.nunit" />
+    <File Path="NetCoreTests.nunit" />
+    <File Path="NOTICES.txt" />
+    <File Path="NuGet.config" />
+    <File Path="nunit.ico" />
+    <File Path="nunit_256.png" />
+    <File Path="package-tests.cake" />
+    <File Path="README.md" />
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Nullable.props" />
+    <File Path="src/StyleCop.Analyzers.globalconfig" />
+    <File Path="VERSIONING.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.config/" />
+  <Folder Name="/Solution Items/.github/">
+    <File Path=".github/dependabot.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/NUnitConsoleAndEngine.CI.yml" />
+    <File Path=".github/workflows/PublishDraftRelease.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/choco/">
+    <File Path="choco/nunit-agent-x86.exe.ignore" />
+    <File Path="choco/nunit-agent.exe.ignore" />
+    <File Path="choco/nunit-console-runner.nuspec" />
+    <File Path="choco/nunit.choco.addins" />
+    <File Path="choco/VERIFICATION.txt" />
+  </Folder>
+  <Folder Name="/Solution Items/choco/deprecated/">
+    <File Path="choco/deprecated/nunit-console-with-extensions.nuspec" />
+  </Folder>
+  <Folder Name="/Solution Items/nuget/" />
+  <Folder Name="/Solution Items/nuget/deprecated/">
+    <File Path="nuget/deprecated/nunit.engine.netstandard.nuspec" />
+    <File Path="nuget/deprecated/nunit.runners.nuspec" />
+  </Folder>
+  <Folder Name="/Solution Items/nuget/runners/">
+    <File Path="nuget/runners/DotnetToolSettings.xml" />
+    <File Path="nuget/runners/nunit.console-runner-with-extensions.nuspec" />
+    <File Path="nuget/runners/nunit.console-runner.nuspec" />
+  </Folder>
+  <Folder Name="/TestData/">
+    <Project Path="src/TestData/AppContextTest/AppContextTest.csproj" />
+    <Project Path="src/TestData/aspnetcore-test/aspnetcore-test.csproj" />
+    <Project Path="src/TestData/FakeExtensions/2.0/FakeExtensions.csproj" />
+    <Project Path="src/TestData/InvalidTestNames/InvalidTestNames.csproj" />
+    <Project Path="src/TestData/mock-assembly-x86/mock-assembly-x86.csproj" />
+    <Project Path="src/TestData/mock-assembly/mock-assembly.csproj" />
+    <Project Path="src/TestData/notest-assembly/notest-assembly.csproj" />
+    <Project Path="src/TestData/windows-test/windows-test.csproj" />
+    <Project Path="src/TestData/wpf-test/WpfTest.csproj" />
+    <Project Path="src/TestData/WpfApp/WpfApp.csproj" />
+  </Folder>
+  <Folder Name="/TestData/OlderNUnit/">
+    <Project Path="src/TestData/NUnit3.0.1/NUnit3.0.1.csproj" />
+    <Project Path="src/TestData/NUnit3.0/NUnit3.0.csproj" />
+    <Project Path="src/TestData/NUnit3.10/NUnit3.10.csproj" />
+    <Project Path="src/TestData/NUnit3.2/NUnit3.2.csproj" />
+  </Folder>
+  <Properties Name="MonoDevelopProperties">
+    <Property Name="StartupItem" Value="src\NUnitFramework\tests\nunitlite.tests-2.0.csproj" />
+    <Property Name="{11640C9F-03A3-456B-848D-9B4A126F9506}" Value="{31B45C4C-206F-4F31-9CC6-33BF11DFEE39}" />
+    <Property Name="{28B605B2-E2E9-417E-8369-49E263F1F31B}" Value="{31B45C4C-206F-4F31-9CC6-33BF11DFEE39}" />
+    <Property Name="{FFF45826-991F-465B-8A03-0E1DB7E8F38C}" Value="{31B45C4C-206F-4F31-9CC6-33BF11DFEE39}" />
+  </Properties>
+</Solution>
