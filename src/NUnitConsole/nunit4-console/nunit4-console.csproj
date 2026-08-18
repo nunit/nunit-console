@@ -31,4 +31,8 @@
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="TestCentric.Metadata" Version="$(TestCentricMetadataVersion)" />
+  </ItemGroup>
+
 </Project>
