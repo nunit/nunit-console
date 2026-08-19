@@ -11,7 +11,7 @@ public static class KnownExtensions
     public static ExtensionSpecifier VSProjectLoader = new ExtensionSpecifier(
         "NUnit.Extension.VSProjectLoader", "nunit-extension-vs-project-loader", "3.9.0");
     public static ExtensionSpecifier NUnitV2ResultWriter = new ExtensionSpecifier(
-        "NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "4.0.0-beta.1");
+        "NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "4.0.0-beta.2");
     public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
         "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
     public static ExtensionSpecifier Net462PluggableAgent = new ExtensionSpecifier(

@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit.Engine.Api" Version="$(NUnitEngineApiVersion)" />
-    <PackageReference Condition="'$(TargetFramework)'=='net8.0'" Include="NUnit.Agent.Core" Version="$(NUnitAgentCoreVersion)"/>
+    <PackageReference Include="NUnit.Engine.Api" />
+    <PackageReference Condition="'$(TargetFramework)'=='net8.0'" Include="NUnit.Agent.Core" />
   </ItemGroup>
 
 </Project>

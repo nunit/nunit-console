@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit.Engine.Api" Version="$(NUnitEngineApiVersion)" />
-    <PackageReference Include="TestCentric.Metadata" Version="$(TestCentricMetadataVersion)" />
+    <PackageReference Include="NUnit.Engine.Api" />
+    <PackageReference Include="TestCentric.Metadata" />
   </ItemGroup>
 
   <ItemGroup>
