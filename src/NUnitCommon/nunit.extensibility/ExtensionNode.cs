@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using TestCentric.Metadata;
 
 namespace NUnit.Extensibility
@@ -30,6 +31,7 @@ namespace NUnit.Extensibility
         {
             AssemblyPath = extensionAssembly.FilePath;
             AssemblyVersion = extensionAssembly.AssemblyVersion;
+            AssemblyTargetFramework = extensionAssembly.FrameworkName;
             TypeName = extensionType.FullName;
             Status = ExtensionStatus.Unloaded;
             Enabled = true; // By default
@@ -46,6 +48,11 @@ namespace NUnit.Extensibility
         /// Gets the version of the extension assembly.
         /// </summary>
         public Version AssemblyVersion { get; }
+
+        /// <summary>
+        /// Gets the target framework of the extension assembly.
+        /// </summary>
+        public FrameworkName AssemblyTargetFramework { get; }
 
         /// <summary>
         /// Gets the full name of the Type of the extension object.
