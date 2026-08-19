@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NSubstitute" Version="$(NSubstituteVersion)" />
-    <PackageReference Include="NUnit" Version="$(NUnitFrameworkVersion)" />
-    <PackageReference Include="NUnitLite" Version="$(NUnitFrameworkVersion)" />
-    <PackageReference Include="NUnit.Analyzers" Version="$(NUnitAnalyzersVersion)" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnitLite" />
+    <PackageReference Include="NUnit.Analyzers" />
   </ItemGroup>
 
   <ItemGroup>

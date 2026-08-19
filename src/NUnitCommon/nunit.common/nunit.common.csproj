@@ -17,11 +17,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Win32.Registry" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit.Engine.Api" Version="$(NUnitEngineApiVersion)" />
+    <ProjectReference Include="..\nunit.extensibility.api\NUnit.Extensibility.Api.csproj" />
+    <PackageReference Include="NUnit.Engine.Api" />
   </ItemGroup>
 
 </Project>

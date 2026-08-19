@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="TestCentric.Metadata" Version="$(TestCentricMetadataVersion)" />
+    <PackageReference Include="TestCentric.Metadata" />
   </ItemGroup>
 
 </Project>

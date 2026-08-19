@@ -30,15 +30,15 @@
     </PropertyGroup>
 
     <!-- Version of NUnit and NSubstitute used depends on the target framework -->
-    <PropertyGroup Condition="'$(TargetFramework)'=='net35'
+    <!--<PropertyGroup Condition="'$(TargetFramework)'=='net35'
 			OR '$(TargetFramework)'=='netcoreapp2.1' OR '$(TargetFramework)'=='netcoreapp3.1'
 		    OR '$(TargetFramework)'=='net5.0' Or '$(TargetFramework)'=='net5.0-windows'" >
         <NUnitVersion>3.14.0</NUnitVersion>
         <NSubstituteVersion>2.0.3</NSubstituteVersion>
-    </PropertyGroup>
+    </PropertyGroup>-->
 
     <!-- Default versions for NUnit and NSubstitute and other commonly used packages -->
-    <PropertyGroup>
+    <!--<PropertyGroup>
         <AnnotatedReferenceAssemblyVersion>8.0.0</AnnotatedReferenceAssemblyVersion>
         <NUnitAgentCoreVersion>4.0.0-beta.4</NUnitAgentCoreVersion>
         <NUnitAnalyzersVersion>4.14.0</NUnitAnalyzersVersion>
@@ -48,7 +48,7 @@
         <NUnitFrameworkVersion Condition="'$(NUnitFrameworkVersion)'==''">4.6.1</NUnitFrameworkVersion>
         <NSubstituteVersion Condition="'$(NSubstituteVersion)'==''">5.3.0</NSubstituteVersion>
         <TestCentricMetadataVersion>3.0.4</TestCentricMetadataVersion>
-    </PropertyGroup>
+    </PropertyGroup>-->
 
     <!-- Common package metadata, may be overridden in individual projects -->
     <!-- Each project should supply properties for PackageId, Title and Description -->
@@ -77,9 +77,9 @@
 
     <!-- Code Style Analyzers -->
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" PrivateAssets="all" />
+        <PackageReference Include="StyleCop.Analyzers.Unstable" PrivateAssets="all" />
         <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)/StyleCop.Analyzers.globalconfig" />
-        <PackageReference Include="CSharpIsNullAnalyzer" Version="0.1.593" PrivateAssets="all" />
+        <PackageReference Include="CSharpIsNullAnalyzer" PrivateAssets="all" />
     </ItemGroup>
 
 </Project>

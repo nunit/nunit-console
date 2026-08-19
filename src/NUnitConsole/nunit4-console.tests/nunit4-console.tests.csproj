@@ -14,12 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="$(NUnitFrameworkVersion)" />
-    <PackageReference Include="NUnitLite" Version="$(NUnitFrameworkVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-    <PackageReference Include="NSubstitute" Version="$(NSubstituteVersion)" />
-    <PackageReference Include="NUnit.Analyzers" Version="$(NUnitAnalyzersVersion)" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnitLite" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="NUnit.Analyzers" />
   </ItemGroup>
 
   <ItemGroup>
