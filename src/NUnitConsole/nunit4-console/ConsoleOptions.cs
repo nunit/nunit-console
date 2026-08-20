@@ -20,6 +20,7 @@ namespace NUnit.ConsoleRunner
     public class ConsoleOptions : OptionSet
     {
         private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
+        private const string DEFAULT_TRACE_LEVEL = "Warning";
 
         /// <summary>
         /// An abstraction of the file system
@@ -133,13 +134,7 @@ namespace NUnit.ConsoleRunner
             get { return workDirectory is not null; }
         }
 
-        public string? InternalTraceLevel { get; private set; }
-
-        [MemberNotNullWhen(true, nameof(InternalTraceLevel))]
-        public bool InternalTraceLevelSpecified
-        {
-            get { return InternalTraceLevel is not null; }
-        }
+        public string InternalTraceLevel { get; private set; } = DEFAULT_TRACE_LEVEL;
 
         private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
         public IList<OutputSpecification> ResultOutputSpecifications

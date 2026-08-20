@@ -558,8 +558,7 @@ namespace NUnit.ConsoleRunner
             if (options.DefaultTestCaseTimeout >= 0)
                 package.AddSetting(SettingDefinitions.DefaultTimeout.WithValue(options.DefaultTestCaseTimeout));
 
-            if (options.InternalTraceLevelSpecified)
-                package.AddSetting(SettingDefinitions.InternalTraceLevel.WithValue(options.InternalTraceLevel));
+            package.AddSetting(SettingDefinitions.InternalTraceLevel.WithValue(options.InternalTraceLevel));
 
             if (options.ActiveConfigSpecified)
                 package.AddSetting(SettingDefinitions.ActiveConfig.WithValue(options.ActiveConfig));

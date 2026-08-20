@@ -69,6 +69,14 @@ namespace NUnit.ConsoleRunner
         }
 
         [Test]
+        public void DefaultInternalTraceLevelIsWarning()
+        {
+            var options = ConsoleMocks.Options("test.dll");
+            var package = ConsoleRunner.MakeTestPackage(options);
+            Assert.That(package.Settings.GetSetting(FrameworkPackageSettings.InternalTraceLevel), Is.EqualTo("Warning"));
+        }
+
+        [Test]
         public void TestRunParametersAreIncludedInSettings()
         {
             var options = ConsoleMocks.Options("test.dll", "--param:X=5", "--param:Y=7");
@@ -113,12 +121,12 @@ namespace NUnit.ConsoleRunner
 #endif
 
         [Test]
-        public void WhenNoOptionsAreSpecified_PackageContainsOnlyTwoSettings()
+        public void WhenNoOptionsAreSpecified_PackageContainsOnlyThreeSettings()
         {
             var options = ConsoleMocks.Options("test.dll");
             var package = ConsoleRunner.MakeTestPackage(options);
 
-            string[] expected = new string[] { FrameworkPackageSettings.WorkDirectory, "DisposeRunners" };
+            string[] expected = new string[] { "WorkDirectory", "InternalTraceLevel", "DisposeRunners" };
             Assert.That(package.Settings.Select(s => s.Name), Is.EquivalentTo(expected));
         }
     }
