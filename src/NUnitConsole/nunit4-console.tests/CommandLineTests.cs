@@ -140,6 +140,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("ShowHelp", "help|h")]
         [TestCase("ShowVersion", "version|V")]
         [TestCase(FrameworkPackageSettings.StopOnError, "stoponerror")]
+        [TestCase(FrameworkPackageSettings.RunOnMainThread, "mainthread")]
         [TestCase("WaitBeforeExit", "wait")]
         [TestCase("NoHeader", "noheader|noh")]
         [TestCase("OmitExplicitTests", "omitexplicit")]

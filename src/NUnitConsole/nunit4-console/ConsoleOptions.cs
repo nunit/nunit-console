@@ -97,6 +97,8 @@ namespace NUnit.ConsoleRunner
 
         public bool StopOnError { get; private set; }
 
+        public bool RunOnMainThread { get; private set; }
+
         public bool WaitBeforeExit { get; private set; }
 
         // Output Control
@@ -278,6 +280,9 @@ namespace NUnit.ConsoleRunner
 
             this.Add("stoponerror", "Stop run immediately upon any test failure or error.",
                 v => StopOnError = !string.IsNullOrEmpty(v));
+
+            this.Add("mainthread", "Run tests on the main thread.",
+                v => RunOnMainThread = !string.IsNullOrEmpty(v));
 
             this.Add("wait", "Wait for input before closing console window.",
                 v => WaitBeforeExit = !string.IsNullOrEmpty(v));

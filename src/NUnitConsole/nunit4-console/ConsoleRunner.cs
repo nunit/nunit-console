@@ -543,6 +543,9 @@ namespace NUnit.ConsoleRunner
             if (options.StopOnError)
                 package.AddSetting(SettingDefinitions.StopOnError.WithValue(true));
 
+            if (options.RunOnMainThread)
+                package.AddSetting(SettingDefinitions.RunOnMainThread.WithValue(true));
+
             if (options.MaxAgentsSpecified)
                 package.AddSetting(SettingDefinitions.MaxAgents.WithValue(options.MaxAgents));
 

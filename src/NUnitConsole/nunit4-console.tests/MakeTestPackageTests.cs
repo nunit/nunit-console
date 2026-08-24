@@ -43,6 +43,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("--seed=1234", FrameworkPackageSettings.RandomSeed, 1234)]
         [TestCase("--workers=3", FrameworkPackageSettings.NumberOfTestWorkers, 3)]
         [TestCase("--workers=0", FrameworkPackageSettings.NumberOfTestWorkers, 0)]
+        [TestCase("--mainthread", FrameworkPackageSettings.RunOnMainThread, true)]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
 #if NETCOREAPP
         [TestCase("--list-resolution-stats", "ListResolutionStats", true)]
