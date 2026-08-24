@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 
 namespace NUnit.Extensibility
 {
@@ -70,6 +71,11 @@ namespace NUnit.Extensibility
         /// The version of the assembly implementing this extension.
         /// </summary>
         Version AssemblyVersion { get; }
+
+        /// <summary>
+        /// The target framework of the assembly implementing this extension.
+        /// </summary>
+        FrameworkName AssemblyTargetFramework { get; }
 
         /// <summary>
         /// Gets a collection of the values of a particular named property.
