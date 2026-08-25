@@ -18,11 +18,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
-    <ProjectReference Include="..\..\NUnitCommon\nunit.extensibility\nunit.extensibility.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NUnit.Engine.Api" />
+    <PackageReference Include="NUnit.Extensibility" />
+    <PackageReference Include="NUnit.Extensibility.Api" />
     <PackageReference Condition="'$(TargetFramework)'=='net8.0'" Include="NUnit.Agent.Core" />
   </ItemGroup>
 

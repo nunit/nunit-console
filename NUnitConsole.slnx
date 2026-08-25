@@ -3,9 +3,6 @@
     <File Path="src/NUnitCommon/Directory.Build.props" />
     <Project Path="src/NUnitCommon/nunit.common.tests/nunit.common.tests.csproj" />
     <Project Path="src/NUnitCommon/nunit.common/nunit.common.csproj" />
-    <Project Path="src/NUnitCommon/nunit.extensibility.api/nunit.extensibility.api.csproj" />
-    <Project Path="src/NUnitCommon/nunit.extensibility.tests/nunit.extensibility.tests.csproj" />
-    <Project Path="src/NUnitCommon/nunit.extensibility/nunit.extensibility.csproj" />
   </Folder>
   <Folder Name="/NUnitConsole/">
     <File Path="src/NUnitConsole/Directory.Build.props" />

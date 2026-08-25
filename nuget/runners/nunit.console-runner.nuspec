@@ -23,29 +23,26 @@
     <tags>nunit test testing tdd runner</tags>
     <copyright>Copyright (c) 2021 Charlie Poole, Rob Prouse</copyright>
     <dependencies>
-      <dependency id="NUnit.Extension.Net462PluggableAgent" version="4.1.1" />
-      <dependency id="NUnit.Extension.Net80PluggableAgent" version="4.1.1" />
-      <dependency id="NUnit.Extension.Net90PluggableAgent" version="4.1.1" />
+      <dependency id="NUnit.Extension.Net462PluggableAgent" version="4.1.2" />
+      <dependency id="NUnit.Extension.Net80PluggableAgent" version="4.1.3" />
+      <dependency id="NUnit.Extension.Net90PluggableAgent" version="4.1.2" />
     </dependencies>
   </metadata>
   <files>
     <file src="../../LICENSE.txt" />
     <file src="../../NOTICES.txt" />
+    <file src="../../nunit_256.png" />
 
     <file src="net462/nunit-console.exe" target="tools" />
     <file src="net462/nunit-console.pdb" target="tools" />
     <file src="net462/nunit-console.exe.config" target="tools" />
     <file src="net462/nunit.engine.api.dll" target="tools" />
-    <file src="net462/nunit.engine.api.xml" target="tools" />
     <file src="net462/nunit.extensibility.dll" target="tools" />
-    <file src="net462/nunit.extensibility.pdb" target="tools" />
     <file src="net462/nunit.extensibility.api.dll" target="tools" />
-    <file src="net462/nunit.extensibility.api.pdb" target="tools" />
     <file src="net462/nunit.common.dll" target="tools" />
     <file src="net462/nunit.common.pdb" target="tools" />
     <file src="net462/nunit.engine.dll" target="tools" />
     <file src="net462/nunit.engine.pdb" target="tools" />
     <file src="net462/testcentric.metadata.dll" target="tools" />
-    <file src="../../nunit_256.png" target="images"/>
   </files>
 </package>

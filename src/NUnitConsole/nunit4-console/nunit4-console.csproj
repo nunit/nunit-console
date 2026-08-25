@@ -32,6 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NUnit.Engine.Api" />
+    <PackageReference Include="NUnit.Extensibility.Api" />
     <PackageReference Include="TestCentric.Metadata" />
   </ItemGroup>
 

@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\nunit.extensibility.api\NUnit.Extensibility.Api.csproj" />
     <PackageReference Include="NUnit.Engine.Api" />
   </ItemGroup>
 

@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NUnitCommon\nunit.extensibility.api\NUnit.Extensibility.Api.csproj" />
     <PackageReference Include="NUnit.Engine.Api" />
   </ItemGroup>
 
