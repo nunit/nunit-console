@@ -3,8 +3,8 @@
 # Please see the documentation for all configuration options
 # httpshelp.github.comgithubadministering-a-repositoryconfiguration-options-for-dependency-updates
 
-version 2
-updates
+version: 2
+updates:
   # Maintain dependencies for Nuget
   - package-ecosystem: "nuget"
     directory: "/"  # Location of package manifests
