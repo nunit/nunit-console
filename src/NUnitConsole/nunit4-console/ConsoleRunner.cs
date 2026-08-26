@@ -414,7 +414,7 @@ namespace NUnit.ConsoleRunner
             _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
 
             _outWriter.Write(INDENT8 + "Framework: ");
-            _outWriter.WriteLine(ColorStyle.Value, GetTargetFrameworkDisplayName(node.AssemblyPath));
+            _outWriter.WriteLine(ColorStyle.Value, node.AssemblyTargetFramework.ToString());
 
             _outWriter.Write(INDENT8 + "Status: ");
             _outWriter.WriteLine(ColorStyle.Value, node.Status.ToString());
@@ -436,32 +436,6 @@ namespace NUnit.ConsoleRunner
                         _outWriter.Write(ColorStyle.Value, " " + val);
                     _outWriter.WriteLine();
                 }
-            }
-        }
-
-        // Reads the target framework declared by the extension's own assembly metadata,
-        // rather than the runtime framework of this console, which is what an extension
-        // node's own runtime type may otherwise appear to reflect. See issue #839.
-        private static string GetTargetFrameworkDisplayName(string assemblyPath)
-        {
-            try
-            {
-                var resolver = new DefaultAssemblyResolver();
-                resolver.AddSearchDirectory(Path.GetDirectoryName(assemblyPath));
-                resolver.AddSearchDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location));
-                var parameters = new ReaderParameters { AssemblyResolver = resolver };
-
-                using var assemblyDefinition = AssemblyDefinition.ReadAssembly(assemblyPath, parameters);
-
-                if (assemblyDefinition.TryGetFrameworkName(out string frameworkName))
-                    return frameworkName;
-
-                var runtimeVersion = assemblyDefinition.GetRuntimeVersion();
-                return $".NETFramework,Version=v{runtimeVersion.Major}.{runtimeVersion.Minor}";
-            }
-            catch (Exception)
-            {
-                return "Unknown";
             }
         }
 
