@@ -39,7 +39,13 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
 });
 
-// This works under the .NET 8.0 runner but the test is minimal
+AddToBothLists(new PackageTest(1, "Net10Test")
+{
+    Description = "Run mock-assembly.dll under .NET 10.0",
+    Arguments = "testdata/net10.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0")
+});
+
 AddToBothLists(new PackageTest(1, "Net90Test")
 {
     Description = "Run mock-assembly.dll under .NET 9.0",

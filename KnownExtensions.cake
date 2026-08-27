@@ -20,12 +20,15 @@ public static class KnownExtensions
         "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.3");
     public static ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.2");
+    public static ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
+        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.0-beta.1");
 
     private static ExtensionSpecifier[] BundledAgents =>
     [
         Net462PluggableAgent,
         Net80PluggableAgent,
-        Net90PluggableAgent
+        Net90PluggableAgent,
+        Net10PluggableAgent
     ];
 
     public static IEnumerable<PackageReference> BundledNuGetAgents =>
