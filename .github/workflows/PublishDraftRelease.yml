@@ -1,4 +1,4 @@
-﻿name: Publish Draft Release on GitHub
+name: Publish Draft Release on GitHub
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
         fetch-depth: 0
 
     - name: 🛠️ Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 8.0.100
 
