@@ -23,7 +23,7 @@
         <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
         <PackageVersion Include="TestCentric.Metadata" Version="3.0.4" />
 		<PackageVersion Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" Version="1.0.0-alpha.160" />
-        <PackageVersion Include="XmlUnit.NUnit4.Constraints" Version="2.11.1" />
+        <PackageVersion Include="XmlUnit.NUnit4.Constraints" Version="2.11.2" />
 	</ItemGroup>
 
 </Project>
