@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
     <ItemGroup>
-	    <PackageVersion Include="CSharpIsNullAnalyzer" Version="0.1.593" />
+	    <PackageVersion Include="CSharpIsNullAnalyzer" Version="0.2.19" />
 		<PackageVersion Include="IsExternalInit" Version="1.0.3" />
         <PackageVersion Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
         <PackageVersion Include="Microsoft.Win32.Registry" Version="4.3.0" />
