@@ -17,7 +17,7 @@
         <PackageVersion Include="NUnit.Analyzers" Version="4.14.0" />
         <PackageVersion Include="NUnit.Agent.Core" Version="4.0.0-beta.5" />
         <PackageVersion Include="NUnit.Common" Version="4.0.0-beta.4" />
-        <PackageVersion Include="NUnit.Engine.Api" Version="4.0.0-beta.8.1" />
+        <PackageVersion Include="NUnit.Engine.Api" Version="4.0.0-beta.8.2" />
         <PackageVersion Include="NUnit.Extensibility" Version="4.0.0-beta.4.1" />
         <PackageVersion Include="NUnit.Extensibility.Api" Version="4.0.0-beta.4.1" />
         <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
