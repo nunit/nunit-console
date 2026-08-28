@@ -61,6 +61,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="NUnit.Extensibility" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
   </ItemGroup>
