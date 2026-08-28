@@ -19,7 +19,7 @@
         <PackageVersion Include="NUnit.Common" Version="4.0.0-beta.4" />
         <PackageVersion Include="NUnit.Engine.Api" Version="4.0.0-beta.8.5" />
         <PackageVersion Include="NUnit.Extensibility" Version="4.0.0-beta.4.1" />
-        <PackageVersion Include="NUnit.Extensibility.Api" Version="4.0.0-beta.4.1" />
+        <PackageVersion Include="NUnit.Extensibility.Api" Version="4.0.0-beta.4.5" />
         <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
         <PackageVersion Include="TestCentric.Metadata" Version="3.0.4" />
 		<PackageVersion Include="TunnelVisionLabs.ReferenceAssemblyAnnotator" Version="1.0.0-alpha.160" />
