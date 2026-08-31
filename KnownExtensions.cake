@@ -15,13 +15,13 @@ public static class KnownExtensions
     public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
         "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
     public static ExtensionSpecifier Net462PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.2");
+        "NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.3-beta.1");
     public static ExtensionSpecifier Net80PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.3");
+        "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.4-beta.1");
     public static ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.2");
+        "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.3-beta.1");
     public static ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.0-beta.1");
+        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.0-beta.2");
 
     private static ExtensionSpecifier[] BundledAgents =>
     [
