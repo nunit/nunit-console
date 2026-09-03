@@ -76,9 +76,7 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);
 
-// NOTE: The final two packages continue to use a nuspec file for various reasons
-
-// 1. NUnit.ConsoleRunner needs to use it to specify the bundled pluggable agents
+// NUnit.ConsoleRunner uses a nuspec file to specify the bundled pluggable agents
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     id: "NUnit.ConsoleRunner",
     source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
@@ -90,13 +88,6 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
     tests: StandardRunnerTests);
 
-// 2. NUnit.Console is a meta-package and is built using a nuspec file
-PackageDefinition NUnitConsoleNuGetPackage = new NuGetPackage(
-    id: "NUnit.Console",
-    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner-with-extensions.nuspec",
-    basePath: BuildSettings.ProjectDirectory,
-    checks: new PackageCheck[] { HasFile("LICENSE.txt") });
-
 // Add all packages to BuildSettings in order they should be build.
 // Dependencies must precede all the packages that depend on them.
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
@@ -104,7 +95,6 @@ BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitEnginePackage,
     NUnitConsoleRunnerDotNetToolPackage,
     NUnitConsoleRunnerNuGetPackage,
-    NUnitConsoleNuGetPackage
 });
 
 Task("BuildPackages")
