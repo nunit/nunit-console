@@ -30,6 +30,7 @@
     <File Path="BUILDING.md" />
     <File Path="CHANGES.txt" />
     <File Path="CONTRIBUTING.md" />
+    <File Path="Directory.Packages.props" />
     <File Path="GitReleaseManager.yaml" />
     <File Path="global.json" />
     <File Path="KnownExtensions.cake" />

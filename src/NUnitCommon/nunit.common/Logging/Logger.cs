@@ -14,25 +14,28 @@ namespace NUnit
         private const string TimeFmt = "HH:mm:ss.fff";
         private const string TraceFmt = "{0} {1,-5} [{2,2}] {3}: {4}";
 
-        private readonly string _name;
-        private readonly Func<TextWriter> _getWriterFn;
-        private readonly Func<InternalTraceLevel> _getLevelFn;
+        public string Name { get; }
+        public bool EchoToConsole { get; }
 
-        public InternalTraceLevel TraceLevel => _getLevelFn.Invoke();
+        public InternalTraceLevel TraceLevel { get; }
+
+        public InternalTraceWriter TraceWriter { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Logger"/> class.
         /// </summary>
         /// <param name="fullName">The name.</param>
-        /// <param name="getLevelFn">The log level.</param>
-        /// <param name="getWriterFn">The writer where logs are sent.</param>
-        public Logger(string fullName, Func<InternalTraceLevel> getLevelFn, Func<TextWriter> getWriterFn)
+        /// <param name="level">The log level.</param>
+        /// <param name="traceWriter">The writer where logs are sent.</param>
+        internal Logger(string fullName, InternalTraceLevel level, InternalTraceWriter traceWriter, bool echo = false)
         {
-            _getLevelFn = getLevelFn;
-            _getWriterFn = getWriterFn;
+            TraceLevel = level;
+            TraceWriter = traceWriter;
 
             var index = fullName.LastIndexOf('.');
-            _name = index >= 0 ? fullName.Substring(index + 1) : fullName;
+            Name = index >= 0 ? fullName.Substring(index + 1) : fullName;
+
+            EchoToConsole = echo;
         }
 
         /// <summary>
@@ -125,15 +128,7 @@ namespace NUnit
 
         private void WriteLog(InternalTraceLevel level, string message)
         {
-            _getWriterFn.Invoke().WriteLine(TraceFmt,
-                DateTime.Now.ToString(TimeFmt),
-                level,
-#if NET20
-                System.Threading.Thread.CurrentThread.ManagedThreadId,
-#else
-                Environment.CurrentManagedThreadId,
-#endif
-                _name, message);
+            TraceWriter.WriteLogEntry(this, level, message, EchoToConsole);
         }
     }
 }
