@@ -23,15 +23,21 @@ namespace NUnit
     /// </summary>
     public static class InternalTrace
     {
-        private static InternalTraceWriter? _traceWriter;
-
-        public static InternalTraceLevel DefaultTraceLevel { get; private set; }
+        /// <summary>
+        /// The InternalTraceWriter used to write trace messages, created here as a singleton.
+        /// It is initialized when the InternalTrace is initialized.
+        /// </summary>
+        private static readonly InternalTraceWriter _traceWriter = new InternalTraceWriter();
 
         /// <summary>
         /// Gets a flag indicating whether the InternalTrace is initialized
         /// </summary>
-        [MemberNotNullWhen(true, nameof(_traceWriter))]
-        public static bool Initialized { get; private set; }
+        public static bool Initialized => _traceWriter.Initialized;
+
+        /// <summary>
+        /// Gets the default trace level used by the writer.
+        /// </summary>
+        public static InternalTraceLevel DefaultTraceLevel => _traceWriter.DefaultTraceLevel;
 
         /// <summary>
         /// Initialize the internal trace facility using the name of the log
@@ -40,30 +46,22 @@ namespace NUnit
         /// <param name="logName">The log name</param>
         /// <param name="level">The trace level</param>
         public static void Initialize(string logName, InternalTraceLevel level)
-        {
-            if (!Initialized)
-            {
-                DefaultTraceLevel = level;
+            => _traceWriter.Initialize(logName, level);
 
-                // We create the trace writer even if tracing is off, because
-                // individual loggers are able to override the default level.
-                _traceWriter = new InternalTraceWriter(logName);
-
-                if (DefaultTraceLevel > InternalTraceLevel.Off)
-                    _traceWriter.WriteLine("InternalTrace: Initializing at level {0}", DefaultTraceLevel);
-
-                Initialized = true;
-            }
-            else
-                _traceWriter.WriteLine("InternalTrace: Ignoring attempted re-initialization at level {0}", level);
-        }
+        /// <summary>
+        /// Initialize the trace specifying only the trace level.
+        /// The log name will be set to a default value.
+        /// </summary>
+        /// <param name="level"></param>
+        public static void Initialize(InternalTraceLevel level)
+            => _traceWriter.Initialize(level);
 
         /// <summary>
         /// Get a named Logger specifying the TraceLevel
         /// </summary>
         public static Logger GetLogger(string name, InternalTraceLevel level)
         {
-            return new Logger(name, () => level, () => _traceWriter.ShouldNotBeNull());
+            return GetLogger(name, level, false);
         }
 
         /// <summary>
@@ -79,7 +77,7 @@ namespace NUnit
         /// </summary>
         public static Logger GetLogger(string name)
         {
-            return new Logger(name, () => DefaultTraceLevel, () => _traceWriter.ShouldNotBeNull());
+            return new Logger(name, InternalTraceLevel.Default, _traceWriter);
         }
 
         /// <summary>
@@ -89,5 +87,16 @@ namespace NUnit
         {
             return GetLogger(type.FullName ?? type.Name);
         }
+
+        /// <summary>
+        /// Get a Logger specifying the log file name and optionally the trace level and echo flag.
+        /// </summary>
+        public static Logger GetLogger(string name, InternalTraceLevel level = InternalTraceLevel.Default, bool echo = false)
+            => _traceWriter.GetLogger(name, level, echo);
+        /// <summary>
+        /// Get a logger named for a particular Type, specifying the TraceLevel.
+        /// </summary>
+        public static Logger GetLogger(Type type, InternalTraceLevel level = InternalTraceLevel.Default, bool echo = false)
+            => _traceWriter.GetLogger(type.FullName ?? type.Name, level, echo);
     }
 }
