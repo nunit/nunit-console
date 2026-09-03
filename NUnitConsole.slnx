@@ -73,7 +73,6 @@
   </Folder>
   <Folder Name="/Solution Items/nuget/runners/">
     <File Path="nuget/runners/DotnetToolSettings.xml" />
-    <File Path="nuget/runners/nunit.console-runner-with-extensions.nuspec" />
     <File Path="nuget/runners/nunit.console-runner.nuspec" />
   </Folder>
   <Folder Name="/TestData/">
