@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Threading;
 using System.Diagnostics;
@@ -389,14 +388,14 @@ namespace NUnit.Engine.Services
                 throw new NUnitEngineException($"No agent available for TestPackage {package.Name}");
         }
 
-        private bool CanCreateAgent(ExtensionNode node, TestPackage package)
+        private static bool CanCreateAgent(ExtensionNode node, TestPackage package)
         {
             // Newer implementations use a TargetFramework property to avoid
             // intantiating any agents, which will not be used.
             var runtimes = node.GetValues("TargetFramework");
 
             // If there is no property, we have to instantiate it to check.
-            if (runtimes.Count() == 0)
+            if (runtimes.Any())
             {
                 var launcher = GetLauncherInstance(node);
                 return launcher is not null && launcher.CanCreateAgent(package);
@@ -424,7 +423,7 @@ namespace NUnit.Engine.Services
             return false;
         }
 
-        private IAgentLauncher GetLauncherInstance(ExtensionNode node)
+        private static IAgentLauncher GetLauncherInstance(ExtensionNode node)
         {
             var launcher = node.ExtensionObject as IAgentLauncher;
             if (launcher is not null)
@@ -434,4 +433,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif

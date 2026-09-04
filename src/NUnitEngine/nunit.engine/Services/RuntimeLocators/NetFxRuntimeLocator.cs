@@ -1,12 +1,15 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 
 namespace NUnit.Engine.Services.RuntimeLocators
 {
+#if !NETFRAMEWORK
+    [SupportedOSPlatform("windows")]
+#endif
     public static class NetFxRuntimeLocator
     {
         // Note: this method cannot be generalized past V4, because (a)  it has
@@ -14,6 +17,9 @@ namespace NUnit.Engine.Services.RuntimeLocators
         // microsoft will do in the future
         public static IEnumerable<RuntimeFramework> FindRuntimes()
         {
+            if (!Platform.IsWindows)
+                throw new PlatformNotSupportedException("NetFxRuntimeLocator is supported only on Windows.");
+
             // Handle Version 1.0, using a different registry key
             foreach (var framework in FindExtremelyOldDotNetFrameworkVersions())
                 yield return framework;
@@ -23,7 +29,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
             {
                 foreach (string name in key.GetSubKeyNames())
                 {
-                    if (name.StartsWith("v") && name != "v4.0") // v4.0 is a duplicate, legacy key
+                    if (name.StartsWith('v') && name != "v4.0") // v4.0 is a duplicate, legacy key
                     {
                         var versionKey = key.OpenSubKey(name);
                         if (versionKey is null)
@@ -112,4 +118,3 @@ namespace NUnit.Engine.Services.RuntimeLocators
         }
     }
 }
-#endif

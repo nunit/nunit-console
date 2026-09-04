@@ -72,10 +72,8 @@ namespace NUnit.Engine
                 Services.Add(new TestFilterService());
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
-#if NETFRAMEWORK
                 Services.Add(new RuntimeFrameworkService());
                 Services.Add(new TestAgency());
-#endif
                 Services.Add(new ResultService());
                 Services.Add(new TestRunnerFactory());
             }
