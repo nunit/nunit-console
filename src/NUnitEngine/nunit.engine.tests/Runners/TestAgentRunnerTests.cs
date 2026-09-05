@@ -92,12 +92,6 @@ namespace NUnit.Engine.Runners.Tests
         [Test]
         public void RunAsync()
         {
-// TODO
-//#if NETFRAMEWORK
-//            if (_runner is ProcessRunner || _runner is MultipleTestProcessRunner)
-//                Assert.Ignore("RunAsync is not working for ProcessRunner");
-//#endif
-
             var asyncResult = _runner.RunAsync(null, TestFilter.Empty);
             asyncResult.Wait(-1);
             Assert.That(asyncResult.IsComplete, "Async result is not complete");

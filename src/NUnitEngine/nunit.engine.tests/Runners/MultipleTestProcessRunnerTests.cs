@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using NUnit.Common;
@@ -61,7 +60,7 @@ namespace NUnit.Engine.Runners
         [Test]
         public void CheckLevelOfParallelism_SingleAssembly()
         {
-            var package = new TestPackage(new string[] { "junk.dll" });
+            var package = new TestPackage(["junk.dll"]);
             Assert.That(new MultipleTestProcessRunner(_serviceContext, package, _processorCount).LevelOfParallelism, Is.EqualTo(1));
         }
 
@@ -78,7 +77,7 @@ namespace NUnit.Engine.Runners
             if (maxAgents <= 0)
                 expected = Math.Min(assemblyCount, _processorCount);
 
-            var package = new TestPackage(new string[] { "proj.nunit" });
+            var package = new TestPackage(["proj.nunit"]);
             for (int i = 1; i <= assemblyCount; i++)
                 package.SubPackages[0].AddSubPackage(new TestPackage($"test{i}.dll"));
             if (maxAgents > 0)
@@ -88,4 +87,3 @@ namespace NUnit.Engine.Runners
         }
     }
 }
-#endif

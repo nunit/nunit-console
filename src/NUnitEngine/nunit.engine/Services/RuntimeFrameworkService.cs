@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -209,7 +208,7 @@ namespace NUnit.Engine.Services
             }
         }
 
-        private RuntimeFramework GetCurrentFramework()
+        private static RuntimeFramework GetCurrentFramework()
         {
             Type? monoRuntimeType = Type.GetType("Mono.Runtime", throwOnError: false);
 
@@ -233,32 +232,40 @@ namespace NUnit.Engine.Services
                         break;
                 }
             }
-            else /* It's windows */
-                if (major == 2)
+            else if (Platform.IsWindows)
             {
-                using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
-                if (key is not null)
+                if (major == 2)
                 {
-                    string? installRoot = key.GetValue("InstallRoot") as string;
-                    if (installRoot is not null)
+                    using RegistryKey? key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework");
+                    if (key is not null)
                     {
-                        if (Directory.Exists(Path.Combine(installRoot, "v3.5")))
+                        string? installRoot = key.GetValue("InstallRoot") as string;
+                        if (installRoot is not null)
                         {
-                            major = 3;
-                            minor = 5;
-                        }
-                        else if (Directory.Exists(Path.Combine(installRoot, "v3.0")))
-                        {
-                            major = 3;
-                            minor = 0;
+                            if (Directory.Exists(Path.Combine(installRoot, "v3.5")))
+                            {
+                                major = 3;
+                                minor = 5;
+                            }
+                            else if (Directory.Exists(Path.Combine(installRoot, "v3.0")))
+                            {
+                                major = 3;
+                                minor = 0;
+                            }
                         }
                     }
                 }
+                else if (major == 4 && Type.GetType("System.Reflection.AssemblyMetadataAttribute") is not null)
+                {
+                    minor = 5;
+                }
+                else if (major > 4)
+                {
+                    runtime = Runtime.NetCore;
+                }
             }
-            else if (major == 4 && Type.GetType("System.Reflection.AssemblyMetadataAttribute") is not null)
-            {
-                minor = 5;
-            }
+            else
+                throw new Exception("Platform is not recognized");
 
             var currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
 
@@ -312,7 +319,7 @@ namespace NUnit.Engine.Services
             _availableRuntimes = new List<RuntimeFramework>();
             _availableX86Runtimes = new List<RuntimeFramework>();
 
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            if (Platform.IsWindows)
             {
                 var netFxRuntimes = NetFxRuntimeLocator.FindRuntimes();
                 _availableRuntimes.AddRange(netFxRuntimes);
@@ -381,4 +388,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif

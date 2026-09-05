@@ -99,7 +99,6 @@ namespace NUnit.ConsoleRunner
             Assert.That(settings.GetValueOrDefault(legacySetting), Is.EqualTo("X=5;Y=7"));
         }
 
-#if NETFRAMEWORK
         [Test]
         public void WhenDebugging_NumberOfTestWorkersDefaultsToZero()
         {
@@ -119,7 +118,6 @@ namespace NUnit.ConsoleRunner
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.DebugTests), Is.EqualTo(true));
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.NumberOfTestWorkers), Is.EqualTo(3));
         }
-#endif
 
         [Test]
         public void WhenNoOptionsAreSpecified_PackageContainsOnlyThreeSettings()

@@ -379,36 +379,36 @@ namespace NUnit.ConsoleRunner
             this.Add("config=", "{NAME} of a project configuration to load (e.g.: Debug).",
                 v => ActiveConfig = parser.RequiredValue(v, "--config"));
 
-            this.AddNetFxOnlyOption("configfile=", "{NAME} of configuration file to use for this run.",
-                NetFxOnlyOption("configfile=", v => ConfigurationFile = parser.RequiredValue(v, "--configfile")));
+            this.Add("configfile=", "{NAME} of configuration file to use for this run.",
+                v => ConfigurationFile = parser.RequiredValue(v, "--configfile"));
 
             // How to Run Tests
-            this.AddNetFxOnlyOption("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
-                NetFxOnlyOption("framework=", v => RuntimeFramework = parser.RequiredValue(v, "--framework")));
+            this.Add("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
+                v => RuntimeFramework = parser.RequiredValue(v, "--framework"));
 
-            this.AddNetFxOnlyOption("x86", "Run tests in an x86 process on 64 bit systems",
-                NetFxOnlyOption("x86", v => RunAsX86 = !string.IsNullOrEmpty(v)));
+            this.Add("x86", "Run tests in an x86 process on 64 bit systems",
+                v => RunAsX86 = !string.IsNullOrEmpty(v));
 
             this.Add("dispose-runners", "Dispose each test runner after it has finished running its tests.",
                 v => DisposeRunners = !string.IsNullOrEmpty(v));
 
-            this.AddNetFxOnlyOption("shadowcopy", "Shadow copy test files",
-                NetFxOnlyOption("shadowcopy", v => ShadowCopyFiles = !string.IsNullOrEmpty(v)));
+            this.Add("shadowcopy", "Shadow copy test files",
+                v => ShadowCopyFiles = !string.IsNullOrEmpty(v));
 
-            this.AddNetFxOnlyOption("loaduserprofile", "Load user profile in test runner processes",
-                NetFxOnlyOption("loaduserprofile", v => LoadUserProfile = !string.IsNullOrEmpty(v)));
+            this.Add("loaduserprofile", "Load user profile in test runner processes",
+                v => LoadUserProfile = !string.IsNullOrEmpty(v));
 
             this.Add("skipnontestassemblies", "Skip any non-test assemblies specified, without error.",
                 v => SkipNonTestAssemblies = !string.IsNullOrEmpty(v));
 
-            this.AddNetFxOnlyOption("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit. See note below.",
-                NetFxOnlyOption("agents=", v => _maxAgents = parser.RequiredInt(v, "--agents")));
+            this.Add("agents=", "Specify the maximum {NUMBER} of test assembly agents to run at one time. If not specified, there is no limit. See note below.",
+                v => _maxAgents = parser.RequiredInt(v, "--agents"));
 
-            this.AddNetFxOnlyOption("debug", "Launch debugger to debug tests.",
-                NetFxOnlyOption("debug", v => DebugTests = !string.IsNullOrEmpty(v)));
+            this.Add("debug", "Launch debugger to debug tests.",
+                v => DebugTests = !string.IsNullOrEmpty(v));
 
-            this.AddNetFxOnlyOption("pause", "Pause before running to allow attaching a debugger.",
-                NetFxOnlyOption("pause", v => PauseBeforeRun = !string.IsNullOrEmpty(v)));
+            this.Add("pause", "Pause before running to allow attaching a debugger.",
+                v => PauseBeforeRun = !string.IsNullOrEmpty(v));
 
             this.Add("list-extensions", "List all extension points and the extensions for each.",
                 v => ListExtensions = !string.IsNullOrEmpty(v));
@@ -416,39 +416,15 @@ namespace NUnit.ConsoleRunner
             this.Add("list-resolution-stats", "Display usage of each ResolutionStrategy in loading .NET Core assemblies.",
                 v => ListResolutionStats = !string.IsNullOrEmpty(v));
 
-            this.AddNetFxOnlyOption("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
-                NetFxOnlyOption("set-principal-policy=", v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal")));
+            this.Add("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
+                v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
 
 #if DEBUG
-            this.AddNetFxOnlyOption("debug-agent", "Launch debugger in nunit-agent when it starts.",
-                NetFxOnlyOption("debug-agent", v => DebugAgent = !string.IsNullOrEmpty(v)));
+            this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",
+                v => DebugAgent = !string.IsNullOrEmpty(v));
             this.Add("debug-console", "Launch debugger in nunit-console when it starts.",
                 v => DebugConsole = !string.IsNullOrEmpty(v));
 #endif
-        }
-
-        private void AddNetFxOnlyOption(string prototype, string description, Action<string> action)
-        {
-#if NETFRAMEWORK
-            var isHidden = false;
-#else
-            var isHidden = true;
-#endif
-            this.Add(prototype, description, action, isHidden);
-        }
-
-#if NETFRAMEWORK
-        private static Action<string> NetFxOnlyOption(string optionName, Action<string> action) => action;
-#else
-        private Action<string> NetFxOnlyOption(string optionName, Action<string> action)
-        {
-            return s => ErrorMessages.Add($"The {optionName} option is not available on this platform.");
-        }
-#endif
-
-        private static void CheckOptionCombinations()
-        {
-            // Add any validation of option combinations here
         }
 
         private int _nesting = 0;
