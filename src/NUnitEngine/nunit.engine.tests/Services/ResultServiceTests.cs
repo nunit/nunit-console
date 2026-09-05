@@ -52,7 +52,6 @@ namespace NUnit.Engine.Services
             return writer.GetType().Name;
         }
 
-#if NETFRAMEWORK
         [Test]
         public void CanGetWriterUser()
         {
@@ -75,6 +74,5 @@ namespace NUnit.Engine.Services
                 () => _resultService.GetResultWriter("user", null),
                 Throws.TypeOf<ArgumentNullException>());
         }
-#endif
     }
 }

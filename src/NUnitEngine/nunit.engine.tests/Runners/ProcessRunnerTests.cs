@@ -6,7 +6,6 @@
 // running the tests. To do so, uncomment the following #define.
 //#define TESTAGENCY_INTEGRATION
 
-#if NETFRAMEWORK
 using System;
 using System.IO;
 using NUnit.Common;
@@ -205,4 +204,3 @@ namespace NUnit.Engine.Runners
         }
     }
 }
-#endif

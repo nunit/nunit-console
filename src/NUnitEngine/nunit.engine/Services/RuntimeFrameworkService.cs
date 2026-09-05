@@ -259,6 +259,10 @@ namespace NUnit.Engine.Services
                 {
                     minor = 5;
                 }
+                else if (major > 4)
+                {
+                    runtime = Runtime.NetCore;
+                }
             }
             else
                 throw new Exception("Platform is not recognized");

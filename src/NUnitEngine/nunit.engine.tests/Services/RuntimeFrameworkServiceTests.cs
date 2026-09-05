@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,11 +12,14 @@ namespace NUnit.Engine.Services
     {
         private RuntimeFrameworkService _runtimeService;
 
-        // We can do this because we currently only build under NETFRAMEWORK
         private static Runtime _currentRuntime =
             Type.GetType("Mono.Runtime", false) is not null
                 ? Runtime.Mono
+#if NETFRAMEWORK
                 : Runtime.Net;
+#else
+                : Runtime.NetCore;
+#endif
 
         // TODO: We cast IRuntimeFramework to RuntimeFramework in several
         // places here. Ideally, we should deal with the interfaces but
@@ -142,7 +144,7 @@ namespace NUnit.Engine.Services
             Assume.That(_runtimeService.IsAvailable("net-4.0", false));
             Assume.That(_runtimeService.IsAvailable("net-4.0", true));
 
-            var topLevelPackage = new TestPackage(new string[] { "a.dll", "b.dll" });
+            var topLevelPackage = new TestPackage(["a.dll", "b.dll"]);
 
             var net20Package = topLevelPackage.SubPackages[0];
             net20Package.Settings.Add(SettingDefinitions.ImageRuntimeVersion.WithValue("2.0"));
@@ -166,4 +168,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif
