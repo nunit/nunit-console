@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,16 +24,21 @@ namespace NUnit.Engine.TestHelpers
 
             foreach (var dependencyName in dependencies)
             {
+#if NETFRAMEWORK
                 var dependency = Assembly.ReflectionOnlyLoad(dependencyName.FullName);
-
-                if (!dependency.GlobalAssemblyCache && r.Add(Path.GetFullPath(dependency.Location)))
-                {
+                if (dependency.GlobalAssemblyCache)
+                    continue;
+#else
+                // ReflectionOnlyLoad isn't available on .NET Core / .NET 5+. Load the assembly into the
+                // default context for inspection instead, and skip assemblies without a physical location.
+                var dependency = Assembly.Load(dependencyName);
+#endif
+                var location = dependency.Location;
+                if (string.IsNullOrEmpty(location) && r.Add(Path.GetFullPath(location)))
                     dependencies.Recurse(dependency.GetReferencedAssemblies());
-                }
             }
 
             return r;
         }
     }
 }
-#endif

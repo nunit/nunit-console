@@ -22,10 +22,8 @@ namespace NUnit.ConsoleRunner
             var services = new ServiceContext();
             services.Add(new TestRunnerFactory());
             services.Add(new ExtensionService());
-#if NETFRAMEWORK
             services.Add(new RuntimeFrameworkService());
             services.Add(new TestAgency());
-#endif
 
             var package = new TestPackage(fullname);
             package.AddSetting("ProcessModel", "InProcess");
