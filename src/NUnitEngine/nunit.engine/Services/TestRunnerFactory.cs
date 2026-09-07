@@ -94,11 +94,7 @@ namespace NUnit.Engine.Services
                             return new SkippedAssemblyTestRunner(assemblyPath);
                 }
 
-#if NETFRAMEWORK
             return new ProcessRunner(ServiceContext, package);
-#else
-            return new LocalTestRunner(package);
-#endif
         }
     }
 }

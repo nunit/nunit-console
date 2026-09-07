@@ -104,7 +104,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
                 yield return new TestRunnerFactoryData(
                     "SingleExistingAssembly",
                     new TestPackage(EXISTING_ASSEMBLY).SubPackages[0],
-                    RunnerResult.LocalTestRunner);
+                    RunnerResult.ProcessRunner);
 
                 yield return new TestRunnerFactoryData(
                     "SingleMissingAssembly",

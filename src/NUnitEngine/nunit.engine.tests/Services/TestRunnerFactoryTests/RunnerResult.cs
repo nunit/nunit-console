@@ -11,7 +11,6 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
     {
 #if NETFRAMEWORK
         public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
-        public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
         public static RunnerResult MultipleTestProcessRunner(int numProcesses) =>
             new RunnerResult(
                 typeof(MultipleTestProcessRunner),
@@ -29,6 +28,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             return new RunnerResult(typeof(AggregatingTestRunner), subRunners);
         }
 #endif
+        public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
         public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
         public static RunnerResult InvalidAssemblyTestRunner => new RunnerResult(typeof(InvalidAssemblyTestRunner));

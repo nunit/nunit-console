@@ -21,9 +21,9 @@ public static class KnownExtensions
     public static ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.3-beta.1");
     public static ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.0-beta.2");
+        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.0-beta.2.1");
 
-    private static ExtensionSpecifier[] BundledAgents =>
+    public static ExtensionSpecifier[] BundledAgents =>
     [
         Net462PluggableAgent,
         Net80PluggableAgent,

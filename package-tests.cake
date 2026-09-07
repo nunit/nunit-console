@@ -42,8 +42,10 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
 AddToBothLists(new PackageTest(1, "Net10Test")
 {
     Description = "Run mock-assembly.dll under .NET 10.0",
-    Arguments = "testdata/net10.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0")
+    Arguments = "testdata/net10.0/mock-assembly.dll --trace:Debug",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0"),
+    // TODO: Remove this once the bundled agents are installed automatically.
+    ExtensionsNeeded = KnownExtensions.BundledAgents
 });
 
 AddToBothLists(new PackageTest(1, "Net90Test")
@@ -375,18 +377,11 @@ StandardRunnerTests.Add(new PackageTest(1, "Net90WPFTest")
 // TESTS OF EXTENSION LISTING
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
+AddToBothLists(new PackageTest(1, "NoExtensionsInstalled")
 {
     Description = "List Extensions shows only our agent launchers",
     Arguments = "--list-extensions",
-    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.Net80AgentLauncher", exactly: 1) }
-});
-
-NetCoreRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
-{
-    Description = "List Extensions shows none installed",
-    Arguments = "--list-extensions",
-    ExpectedOutput = new[] { DoesNotContain("Extension:") }
+    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.Net10AgentLauncher", exactly: 1) }
 });
 
 StandardRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
