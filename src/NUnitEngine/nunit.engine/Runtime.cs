@@ -68,6 +68,8 @@ namespace NUnit.Engine
 
         public abstract bool Matches(Runtime targetRuntime);
 
+        public abstract string GetTFM(Version version);
+
         public virtual bool Supports(Version runtime, Version target)
         {
             // We assume that Major versions must match.
@@ -86,6 +88,13 @@ namespace NUnit.Engine
             public override string FrameworkIdentifier => FrameworkIdentifiers.NetFramework;
 
             public override string ToString() => "Net";
+
+            public override string GetTFM(Version version)
+            {
+                string v = version.ToString(version.Build == 0 ? 2 : 3);
+                return "net" + v.Replace(".", string.Empty);
+            }
+
             public override bool Matches(Runtime targetRuntime) => targetRuntime is NetFrameworkRuntime;
 
             public override bool Supports(Version runtime, Version target)
@@ -115,6 +124,11 @@ namespace NUnit.Engine
             public override string FrameworkIdentifier => FrameworkIdentifiers.NetCoreApp;
 
             public override string ToString() => "NetCore";
+
+            public override string GetTFM(Version version) =>
+                version.Major < 5
+                    ? "netcoreapp" + version.ToString(2)
+                    : "net" + version.ToString(2);
 
             public override bool Matches(Runtime targetRuntime) => targetRuntime is NetCoreRuntime;
 

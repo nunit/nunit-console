@@ -1,24 +1,18 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#define USE_WORK_ITEM_TRACKER
-
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Timers;
 using System.Xml;
 using NUnit.Common;
 using NUnit.Engine.Services;
-
-#if NETFRAMEWORK
-using System.Text;
-#else
-using System.IO;
 using TestCentric.Metadata;
-#endif
 
 namespace NUnit.Engine.Runners
 {
@@ -45,17 +39,13 @@ namespace NUnit.Engine.Runners
         private ITestEngineRunner? _engineRunner;
         private readonly IServiceLocator _services;
         private readonly ExtensionService _extensionService;
-#if NETFRAMEWORK
         private readonly IRuntimeFrameworkService _runtimeService;
-#endif
         private readonly IProjectService _projectService;
         private ITestRunnerFactory _testRunnerFactory;
         private bool _disposed;
 
         private TestEventDispatcher _eventDispatcher = new TestEventDispatcher();
-#if USE_WORK_ITEM_TRACKER
         private WorkItemTracker _workItemTracker = new WorkItemTracker();
-#endif
 
         private int _testRunTimeout;
         private Timer? _testRunTimer;
@@ -72,9 +62,7 @@ namespace NUnit.Engine.Runners
             // Get references to the services we use
             _projectService = _services.GetService<IProjectService>();
             _testRunnerFactory = _services.GetService<ITestRunnerFactory>();
-#if NETFRAMEWORK
             _runtimeService = _services.GetService<IRuntimeFrameworkService>();
-#endif
             _extensionService = _services.GetService<ExtensionService>();
 
             _testRunTimeout = package.Settings.GetValueOrDefault(SettingDefinitions.TestRunTimeout);
@@ -84,12 +72,10 @@ namespace NUnit.Engine.Runners
             // each contained assembly.
             EnsurePackagesAreExpanded(package);
 
-#if NETFRAMEWORK
             // Last chance to catch invalid settings in package,
             // in case the client runner missed them. Currently,
             // there is nothing to check for the .NET 8.0 build.
             ValidatePackageSettings(package);
-#endif
 
             TestPackage = package;
         }
@@ -271,12 +257,11 @@ namespace NUnit.Engine.Runners
             {
                 var leafPackages = TestPackage.Select(p => !p.HasSubPackages);
 
-#if NETFRAMEWORK
                 // Analyze each TestPackage, adding settings that describe
                 // each contained assembly, including it's target runtime.
                 foreach (var assemblyPackage in leafPackages)
                     _runtimeService.SelectRuntimeFramework(assemblyPackage);
-#else
+#if OLD_NET_CORE_CODE
                 var package = leafPackages[0];
                 string packageName = package.FullName ?? string.Empty;
 
@@ -401,7 +386,6 @@ namespace NUnit.Engine.Runners
                 && _projectService.CanLoadFrom(package.FullName);
         }
 
-#if NETFRAMEWORK
         // Any Errors thrown from this method indicate that the client
         // runner is putting invalid values into the package.
         private void ValidatePackageSettings(TestPackage package)
@@ -421,7 +405,6 @@ namespace NUnit.Engine.Runners
             if (sb.Length > 0)
                 throw new NUnitEngineException($"The following errors were detected in the TestPackage:\n{sb}");
         }
-#endif
 
         /// <summary>
         /// Unload any loaded TestPackage.

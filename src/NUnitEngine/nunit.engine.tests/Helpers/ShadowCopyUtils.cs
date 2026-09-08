@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,16 +24,19 @@ namespace NUnit.Engine.TestHelpers
 
             foreach (var dependencyName in dependencies)
             {
-                var dependency = Assembly.ReflectionOnlyLoad(dependencyName.FullName);
+                // ReflectionOnlyLoad isn't available on .NET Core / .NET 5+. Load the assembly into the
+                // default context for inspection instead, and skip assemblies without a physical location.
+                //var dependency = Assembly.Load(dependencyName);
+                var resolver = new PathAssemblyResolver(AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).Select(a => a.Location));
+                var mlc = new MetadataLoadContext(resolver, dependencyName.FullName);
+                var dependency = mlc.LoadFromAssemblyName(dependencyName);
 
-                if (!dependency.GlobalAssemblyCache && r.Add(Path.GetFullPath(dependency.Location)))
-                {
+                var location = dependency.Location;
+                if (string.IsNullOrEmpty(location) && r.Add(Path.GetFullPath(location)))
                     dependencies.Recurse(dependency.GetReferencedAssemblies());
-                }
             }
 
             return r;
         }
     }
 }
-#endif

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>NUnit.ConsoleRunner</id>
-    <title>NUnit Console Runner Version 4 (No Extensions)</title>
+    <title>NUnit Console Runner Version 4</title>
     <version>$version$</version>
     <authors>Charlie Poole, Rob Prouse</authors>
     <owners>Charlie Poole, Rob Prouse</owners>

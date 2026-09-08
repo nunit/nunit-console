@@ -151,7 +151,6 @@ namespace NUnit.ConsoleRunner
         [TestCase("NoResultSpecified", "noresult")]
         [TestCase("ListExtensions", "list-extensions")]
         [TestCase("ListResolutionStats", "list-resolution-stats")]
-#if NETFRAMEWORK
         [TestCase("RunAsX86", "x86")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase(FrameworkPackageSettings.DebugTests, "debug")]
@@ -160,7 +159,6 @@ namespace NUnit.ConsoleRunner
 #if DEBUG
         [TestCase("DebugAgent", "debug-agent")]
         [TestCase("DebugConsole", "debug-console")]
-#endif
 #endif
         public void CanRecognizeBooleanOptions(string propertyName, string pattern)
         {
@@ -203,13 +201,11 @@ namespace NUnit.ConsoleRunner
         [TestCase(FrameworkPackageSettings.InternalTraceLevel, "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase(FrameworkPackageSettings.DefaultTestNamePattern, "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
-#if NETFRAMEWORK
-       // We can't predict which runtimes are available on the test machine, so we don't
+        // We can't predict which runtimes are available on the test machine, so we don't
         // test for any good or bad values. TODO: Create a fake list of availble runtimes.
         [TestCase("RuntimeFramework", "framework", new string[0], new string[0])]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0])]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
-#endif
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)
         {
             string[] prototypes = pattern.Split('|');
@@ -257,9 +253,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("DefaultTestCaseTimeout", "testCaseTimeout")]
         [TestCase(FrameworkPackageSettings.RandomSeed, "seed")]
         [TestCase(FrameworkPackageSettings.NumberOfTestWorkers, "workers")]
-#if NETFRAMEWORK
         [TestCase("MaxAgents", "agents")]
-#endif
         public void CanRecognizeIntOptions(string propertyName, string pattern)
         {
             string[] prototypes = pattern.Split('|');
@@ -286,9 +280,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("--extensionDirectory")]
         [TestCase("--enable")]
         [TestCase("--disable")]
-#if NETFRAMEWORK
         [TestCase("--framework")]
-#endif
         public void MissingValuesAreReported(string option)
         {
             ConsoleOptions options = ConsoleMocks.Options(option + "=");

@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,10 +64,18 @@ namespace NUnit.Engine
         private static readonly char[] RuntimeFrameworkSeparator = ['-'];
 
         /// <summary>
-        /// Gets the unique Id for this runtime, such as "net-4.5"
+        /// Gets the unique Id for this runtime, such as "net-4.6.2"
         /// </summary>
         public string Id => Runtime.ToString().ToLower() + "-" + FrameworkVersion.ToString();
 
+        /// <summary>
+        /// Gets the Target Framework Moniker (TFM) for this runtime, such as "net462"
+        /// </summary>
+        public string TFM => Runtime.GetTFM(FrameworkVersion);
+
+        /// <summary>
+        /// Gets the FrameworkName for this runtime, such as ".NETFramework,Version=v4.6.2"
+        /// </summary>
         public FrameworkName FrameworkName { get; }
 
         /// <summary>
@@ -196,4 +203,3 @@ namespace NUnit.Engine
         }
     }
 }
-#endif

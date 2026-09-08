@@ -17,6 +17,7 @@
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="NUnit.Analyzers" />
     <PackageReference Include="NUnit.Agent.Core" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">

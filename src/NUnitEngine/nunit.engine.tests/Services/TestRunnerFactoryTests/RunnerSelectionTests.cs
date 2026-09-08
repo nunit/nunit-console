@@ -21,9 +21,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
         {
             _services = new ServiceContext();
             _services.Add(new ExtensionService());
-#if NETFRAMEWORK
             _services.Add(new RuntimeFrameworkService());
-#endif
 
             var projectService = new FakeProjectService();
             ((IService)projectService).StartService();
@@ -42,12 +40,10 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             _services.Add(fakeRuntimeService);
             Assert.That(((IService)fakeRuntimeService).Status, Is.EqualTo(ServiceStatus.Started));
 
-#if NETFRAMEWORK
             var testAgency = new TestAgency();
             _services.Add(testAgency);
             ((IService)testAgency).StartService();
             Assert.That(testAgency.Status, Is.EqualTo(ServiceStatus.Started));
-#endif
         }
 
         [OneTimeTearDown]

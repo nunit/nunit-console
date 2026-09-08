@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK && NYI
+#if NYI
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

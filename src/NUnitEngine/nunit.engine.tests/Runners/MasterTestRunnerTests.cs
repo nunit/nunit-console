@@ -56,7 +56,6 @@ namespace NUnit.Engine.Runners
         //    _engineRunner.Received().Load();
         //}
 
-#if NETFRAMEWORK
         //[Test]
         //public void Reload()
         //{
@@ -102,6 +101,5 @@ namespace NUnit.Engine.Runners
 
             _engineRunner.Received().RequestStop();
         }
-#endif
     }
 }

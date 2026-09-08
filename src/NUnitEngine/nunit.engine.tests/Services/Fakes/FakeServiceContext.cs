@@ -27,10 +27,8 @@ namespace NUnit.Engine.Services
         // TODO: Try to eliminate the need for using the ExtensionService class
         public ExtensionService? ExtensionService { get; set; }
         public IProjectService? ProjectService { get; set; }
-#if NETFRAMEWORK
         public IRuntimeFrameworkService? RuntimeFrameworkService { get; set; }
         public ITestAgency? TestAgency { get; set; }
-#endif
 
         private readonly Lazy<IResultService> _resultService =
             new(() => Substitute.For<IResultService, IService>());
@@ -43,12 +41,8 @@ namespace NUnit.Engine.Services
 #pragma warning disable CS0436 // Type conflicts with imported type
         [MemberNotNull(
 #pragma warning restore CS0436 // Type conflicts with imported type
-#if NETFRAMEWORK
             nameof(TestFilterService), nameof(ExtensionService), nameof(ProjectService),
             nameof(RuntimeFrameworkService), nameof(TestAgency))]
-#else
-            nameof(TestFilterService), nameof(ExtensionService), nameof(ProjectService))]
-#endif
         public void Initialize()
         {
             if (TestFilterService is null)
@@ -60,14 +54,12 @@ namespace NUnit.Engine.Services
             if (ProjectService is null)
                 ProjectService = Substitute.For<IProjectService, IService>();
             Add((IService)ProjectService);
-#if NETFRAMEWORK
             if (RuntimeFrameworkService is null)
                 RuntimeFrameworkService = Substitute.For<IRuntimeFrameworkService, IService>();
             Add((IService)RuntimeFrameworkService);
             if (TestAgency is null)
                 TestAgency = Substitute.For<ITestAgency, IAvailableRuntimes, IService>();
             Add((IService)TestAgency);
-#endif
             Add((IService)ResultService);
             Add((IService)TestRunnerFactory);
 

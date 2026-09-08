@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System.Diagnostics;
 using NUnit.Engine.TestHelpers;
 using NUnit.Framework;
@@ -26,4 +25,3 @@ namespace NUnit.Engine.Integration
         }
     }
 }
-#endif

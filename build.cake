@@ -1,5 +1,5 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.12
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.18
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -79,7 +79,7 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
 // NUnit.ConsoleRunner uses a nuspec file to specify the bundled pluggable agents
 PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     id: "NUnit.ConsoleRunner",
-    source: BuildSettings.NuGetDirectory + "runners/nunit.console-runner.nuspec",
+    source: BuildSettings.NuGetDirectory + "runners/NUnit.ConsoleRunner.nuspec",
     description: RUNNER_DESCRIPTION,
     checks: new PackageCheck[] {
         HasDependencies(KnownExtensions.BundledNuGetAgents)

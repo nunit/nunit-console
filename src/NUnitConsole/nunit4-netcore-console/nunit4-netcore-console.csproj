@@ -61,9 +61,16 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="NUnit.Extensibility" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit.Extensibility" />
+    <PackageReference Include="NUnit.Extension.Net462PluggableAgent" />
+    <PackageReference Include="NUnit.Extension.Net80PluggableAgent" />
+    <PackageReference Include="NUnit.Extension.Net90PluggableAgent" />
+    <PackageReference Include="NUnit.Extension.Net10PluggableAgent" />
   </ItemGroup>
 
 </Project>

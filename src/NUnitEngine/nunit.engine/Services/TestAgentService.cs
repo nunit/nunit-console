@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 
@@ -14,7 +13,7 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentService));
 
-        private IList<ITestAgentProvider> _providers = new List<ITestAgentProvider>();
+        private readonly List<ITestAgentProvider> _providers = new List<ITestAgentProvider>();
 
         #region ITestAgentInfo Implementation
 
@@ -132,4 +131,3 @@ namespace NUnit.Engine.Services
         #endregion
     }
 }
-#endif
