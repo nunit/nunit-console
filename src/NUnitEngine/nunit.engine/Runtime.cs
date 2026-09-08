@@ -1,7 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
-using System.IO.MemoryMappedFiles;
 using NUnit.Common;
 
 namespace NUnit.Engine
@@ -92,9 +91,7 @@ namespace NUnit.Engine
 
             public override string GetTFM(Version version)
             {
-                string v = version.ToString(3);
-                if (v.EndsWith(".0"))
-                    v = v.Substring(0, v.Length - 2);
+                string v = version.ToString(version.Build == 0 ? 2 : 3);
                 return "net" + v.Replace(".", string.Empty);
             }
 

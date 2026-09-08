@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -265,7 +264,7 @@ namespace NUnit.Engine.Services
                 }
             }
             else
-                throw new Exception("Platform is not recognized");
+                throw new NotSupportedException("Platform is not recognized");
 
             var currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
 

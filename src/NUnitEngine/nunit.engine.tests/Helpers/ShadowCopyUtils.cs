@@ -24,15 +24,13 @@ namespace NUnit.Engine.TestHelpers
 
             foreach (var dependencyName in dependencies)
             {
-#if NETFRAMEWORK
-                var dependency = Assembly.ReflectionOnlyLoad(dependencyName.FullName);
-                if (dependency.GlobalAssemblyCache)
-                    continue;
-#else
                 // ReflectionOnlyLoad isn't available on .NET Core / .NET 5+. Load the assembly into the
                 // default context for inspection instead, and skip assemblies without a physical location.
-                var dependency = Assembly.Load(dependencyName);
-#endif
+                //var dependency = Assembly.Load(dependencyName);
+                var resolver = new PathAssemblyResolver(AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).Select(a => a.Location));
+                var mlc = new MetadataLoadContext(resolver, dependencyName.FullName);
+                var dependency = mlc.LoadFromAssemblyName(dependencyName);
+
                 var location = dependency.Location;
                 if (string.IsNullOrEmpty(location) && r.Add(Path.GetFullPath(location)))
                     dependencies.Recurse(dependency.GetReferencedAssemblies());
