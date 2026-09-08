@@ -16,7 +16,7 @@
 		<PackageVersion Include="NUnitLite" Version="4.6.1" />
         <PackageVersion Include="NUnit.Analyzers" Version="4.14.0" />
         <PackageVersion Include="NUnit.Agent.Core" Version="4.0.0-beta.5.6" />
-        <PackageVersion Include="NUnit.Engine.Api" Version="4.0.0-beta.8.7" />
+        <PackageVersion Include="NUnit.Engine.Api" Version="4.0.0-beta.8.8" />
         <PackageVersion Include="NUnit.Extensibility" Version="4.0.0-beta.4.5" />
         <PackageVersion Include="NUnit.Extensibility.Api" Version="4.0.0-beta.4.5" />
         <PackageVersion Include="NUnit.Extension.Net462PluggableAgent" Version="4.1.3-beta.1" />
