@@ -30,15 +30,6 @@ namespace NUnit.Engine.Services
         /// </summary>
         public IRuntimeFramework CurrentFramework { get; private set; }
 
-        private static string? MonoPrefix;
-
-        /// <summary>
-        /// The path to the mono executable, if we are running on Mono.
-        /// </summary>
-        public static string MonoExePath => MonoPrefix is not null && Environment.OSVersion.Platform == PlatformID.Win32NT
-                    ? Path.Combine(MonoPrefix, "bin/mono.exe")
-                    : "mono";
-
         /// <summary>
         /// Gets a list of available X64 runtimes.
         /// </summary>
@@ -59,8 +50,7 @@ namespace NUnit.Engine.Services
         {
             Guard.ArgumentNotNullOrEmpty(name);
 
-            if (!RuntimeFramework.TryParse(name, out RuntimeFramework? requestedFramework))
-                throw new NUnitEngineException("Invalid or unknown framework requested: " + name);
+            RuntimeFramework requestedFramework = RuntimeFramework.FromTFM(name);
 
             var runtimes = needX86 ? _availableX86Runtimes : _availableRuntimes;
             foreach (var framework in runtimes)
@@ -74,7 +64,9 @@ namespace NUnit.Engine.Services
 
         private static bool FrameworksMatch(RuntimeFramework requested, RuntimeFramework available)
         {
-            if (!RuntimesMatch(requested.Runtime, available.Runtime))
+            var requestedIdentifier = requested.FrameworkName.Identifier;
+            var availableIdentifier = available.FrameworkName.Identifier;
+            if (requestedIdentifier != availableIdentifier)
                 return false;
 
             var requestedVersion = requested.FrameworkVersion;
@@ -87,20 +79,6 @@ namespace NUnit.Engine.Services
                    requestedVersion.Minor == availableVersion.Minor &&
                    (requestedVersion.Build < 0 || availableVersion.Build < 0 || requestedVersion.Build == availableVersion.Build) &&
                    (requestedVersion.Revision < 0 || availableVersion.Revision < 0 || requestedVersion.Revision == availableVersion.Revision);
-        }
-
-        private static bool RuntimesMatch(Runtime requested, Runtime available)
-        {
-            if (requested == available)
-                return true;
-
-            if (requested == Runtime.Net && available == Runtime.Mono)
-                return true;
-
-            if (requested == Runtime.Mono && available == Runtime.Net)
-                return true;
-
-            return false;
         }
 
         /// <summary>
@@ -124,8 +102,7 @@ namespace NUnit.Engine.Services
 
             if (frameworkSetting.Length > 0)
             {
-                if (!RuntimeFramework.TryParse(frameworkSetting, out RuntimeFramework? requestedFramework))
-                    throw new NUnitEngineException("Invalid or unknown framework requested: " + frameworkSetting);
+                RuntimeFramework requestedFramework = RuntimeFramework.FromTFM(frameworkSetting);
 
                 log.Debug($"Requested framework for {package.Name} is {requestedFramework}");
 
@@ -141,13 +118,13 @@ namespace NUnit.Engine.Services
 
             string imageTargetFrameworkNameSetting =
                 package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
-            Runtime targetRuntime;
+            string targetIdentifier;
             Version targetVersion;
 
             if (string.IsNullOrEmpty(imageTargetFrameworkNameSetting))
             {
                 // Assume .NET Framework
-                targetRuntime = Runtime.Net;
+                targetIdentifier = FrameworkIdentifiers.NetFramework;
                 var trialVersion = new Version(package.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion));
                 targetVersion = new Version(trialVersion.Major, trialVersion.Minor);
             }
@@ -158,15 +135,15 @@ namespace NUnit.Engine.Services
                 switch (frameworkName.Identifier)
                 {
                     case ".NETFramework":
-                        targetRuntime = Runtime.Net;
+                        targetIdentifier = FrameworkIdentifiers.NetFramework;
                         targetVersion = frameworkName.Version;
                         break;
                     case ".NETCoreApp":
-                        targetRuntime = Runtime.NetCore;
+                        targetIdentifier = FrameworkIdentifiers.NetCoreApp;
                         targetVersion = frameworkName.Version;
                         break;
                     case ".NETStandard":
-                        targetRuntime = Runtime.NetCore;
+                        targetIdentifier = FrameworkIdentifiers.NetCoreApp;
                         targetVersion = new Version(3, 1);
                         break;
                     case "Unmanaged":
@@ -177,14 +154,14 @@ namespace NUnit.Engine.Services
                 }
             }
 
-            if (!IsAvailable(new RuntimeFramework(targetRuntime, targetVersion).Id, runAsX86))
+            if (!IsAvailable(new RuntimeFramework(targetIdentifier, targetVersion).TFM, runAsX86))
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
-                if (targetVersion < CurrentFramework.FrameworkVersion)
-                    targetVersion = CurrentFramework.FrameworkVersion;
+                if (targetVersion < CurrentFramework.FrameworkName.Version)
+                    targetVersion = CurrentFramework.FrameworkName.Version;
             }
 
-            RuntimeFramework targetFramework = new RuntimeFramework(targetRuntime, targetVersion);
+            RuntimeFramework targetFramework = new RuntimeFramework(targetIdentifier, targetVersion);
             package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(targetFramework.FrameworkName.ToString()));
 
             log.Debug($"Test will use {targetFramework} for {package.Name}");
@@ -209,29 +186,12 @@ namespace NUnit.Engine.Services
 
         private static RuntimeFramework GetCurrentFramework()
         {
-            Type? monoRuntimeType = Type.GetType("Mono.Runtime", throwOnError: false);
-
-            Runtime runtime = monoRuntimeType is not null
-                ? Runtime.Mono
-                : Runtime.Net;
+            string identifier = FrameworkIdentifiers.NetFramework;
 
             int major = Environment.Version.Major;
             int minor = Environment.Version.Minor;
 
-            if (monoRuntimeType is not null)
-            {
-                switch (major)
-                {
-                    case 1:
-                        minor = 0;
-                        break;
-                    case 2:
-                        major = 3;
-                        minor = 5;
-                        break;
-                }
-            }
-            else if (Platform.IsWindows)
+            if (Platform.IsWindows)
             {
                 if (major == 2)
                 {
@@ -260,36 +220,13 @@ namespace NUnit.Engine.Services
                 }
                 else if (major > 4)
                 {
-                    runtime = Runtime.NetCore;
+                    identifier = FrameworkIdentifiers.NetCoreApp;
                 }
             }
             else
                 throw new NotSupportedException("Platform is not recognized");
 
-            var currentFramework = new RuntimeFramework(runtime, new Version(major, minor));
-
-            if (monoRuntimeType is not null)
-            {
-                MonoPrefix = GetMonoPrefixFromAssembly(monoRuntimeType.Assembly);
-
-                MethodInfo? getDisplayNameMethod = monoRuntimeType.GetMethod(
-                    "GetDisplayName", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.ExactBinding);
-                if (getDisplayNameMethod is not null)
-                {
-                    string displayName = (string)getDisplayNameMethod.Invoke(null, Array.Empty<object>())!;
-
-                    int space = displayName.IndexOf(' ');
-                    if (space >= 3) // Minimum length of a version
-                    {
-                        string version = displayName.Substring(0, space);
-                        displayName = "Mono " + version;
-                    }
-                    else
-                        displayName = "Mono " + displayName;
-
-                    currentFramework.DisplayName = displayName;
-                }
-            }
+            var currentFramework = new RuntimeFramework(identifier, new Version(major, minor));
 
             return currentFramework;
         }

@@ -2,8 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+using System.Runtime.Versioning;
 using NUnit.Common;
 
 namespace NUnit.Engine.Services.RuntimeLocators
@@ -19,7 +18,8 @@ namespace NUnit.Engine.Services.RuntimeLocators
                 if (!alreadyFound.Contains(runtime.Version))
                 {
                     alreadyFound.Add(runtime.Version);
-                    yield return new RuntimeFramework(Runtime.NetCore, runtime.Version);
+                    var frameworkName = new FrameworkName(FrameworkIdentifiers.NetCoreApp, runtime.Version);
+                    yield return new RuntimeFramework(frameworkName);
                 }
             }
         }

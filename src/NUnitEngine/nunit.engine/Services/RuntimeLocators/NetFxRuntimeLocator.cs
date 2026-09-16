@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
+using NUnit.Common;
 
 namespace NUnit.Engine.Services.RuntimeLocators
 {
@@ -12,6 +13,8 @@ namespace NUnit.Engine.Services.RuntimeLocators
 #endif
     public static class NetFxRuntimeLocator
     {
+        private const string NETFX = FrameworkIdentifiers.NetFramework;
+
         // Note: this method cannot be generalized past V4, because (a)  it has
         // specific code for detecting .NET 4.5 and (b) we don't know what
         // microsoft will do in the future
@@ -46,7 +49,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
                         else if (CheckInstallDword(versionKey))
                         {
                             // Versions 1.1, 2.0, 3.0 and 3.5 are possible here
-                            yield return new RuntimeFramework(Runtime.Net, new Version(name.Substring(1, 3)));
+                            yield return new RuntimeFramework(NETFX, new Version(name.Substring(1, 3)));
                         }
                     }
                 }
@@ -61,7 +64,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
                 yield break;
 
             foreach (var build in key.GetValueNames())
-                yield return new RuntimeFramework(Runtime.Net, new Version("1.0." + build));
+                yield return new RuntimeFramework(NETFX, new Version("1.0." + build));
         }
 
         private struct MinimumRelease
@@ -100,12 +103,12 @@ namespace NUnit.Engine.Services.RuntimeLocators
 
                 if (CheckInstallDword(profileKey))
                 {
-                    yield return new RuntimeFramework(Runtime.Net, new Version(4, 0), profile);
+                    yield return new RuntimeFramework(NETFX, new Version(4, 0), profile);
 
                     var release = (int)profileKey.GetValue("Release", 0);
                     foreach (var entry in ReleaseTable)
                         if (release >= entry.Release)
-                            yield return new RuntimeFramework(Runtime.Net, entry.Version);
+                            yield return new RuntimeFramework(NETFX, entry.Version);
 
                     yield break;     //If full profile found don't check for client profile
                 }

@@ -10,15 +10,15 @@ namespace NUnit.Engine.Services
 {
     public class RuntimeFrameworkServiceTests
     {
-        private RuntimeFrameworkService _runtimeService;
+        private RuntimeFrameworkService? _runtimeService;
 
         private static Runtime _currentRuntime =
-            Type.GetType("Mono.Runtime", false) is not null
-                ? Runtime.Mono
+            //Type.GetType("Mono.Runtime", false) is not null
+            //    ? Runtime.Mono
 #if NETFRAMEWORK
-                : Runtime.Net;
+                Runtime.Net;
 #else
-                : Runtime.NetCore;
+                Runtime.NetCore;
 #endif
 
         // TODO: We cast IRuntimeFramework to RuntimeFramework in several
@@ -37,14 +37,14 @@ namespace NUnit.Engine.Services
         [TearDown]
         public void StopService()
         {
-            _runtimeService.StopService();
-            _runtimeService.Dispose();
+            _runtimeService?.StopService();
+            _runtimeService?.Dispose();
         }
 
         [Test]
         public void ServiceIsStarted()
         {
-            Assert.That(_runtimeService.Status, Is.EqualTo(ServiceStatus.Started));
+            Assert.That(_runtimeService?.Status, Is.EqualTo(ServiceStatus.Started));
         }
 
 #if DEBUG
@@ -62,7 +62,7 @@ namespace NUnit.Engine.Services
             Assert.That(File.Exists(assemblyPath), $"File does not exist: {assemblyPath}");
             var package = new TestPackage(assemblyPath).SubPackages[0];
 
-            _runtimeService.SelectRuntimeFramework(package);
+            _runtimeService?.SelectRuntimeFramework(package);
 
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName), Is.EqualTo(expectedFrameworkName));
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86), Is.EqualTo(runAsX86));
@@ -71,40 +71,41 @@ namespace NUnit.Engine.Services
         [Test]
         public void CanGetCurrentFramework()
         {
-            var framework = _runtimeService.CurrentFramework as RuntimeFramework;
+            var framework = _runtimeService?.CurrentFramework as RuntimeFramework;
             Assert.That(framework, Is.Not.Null);
-            Assert.That(framework.Runtime, Is.EqualTo(_currentRuntime));
+            Assert.That(framework!.FrameworkName.Identifier, Is.EqualTo(_currentRuntime.FrameworkIdentifier));
         }
 
         [Test]
         public void AvailableFrameworks()
         {
-            var available = _runtimeService.AvailableRuntimes;
-            Assert.That(available.Count, Is.GreaterThan(0));
-            foreach (var framework in available)
+            var available = _runtimeService?.AvailableRuntimes;
+            Assert.That(available?.Count, Is.GreaterThan(0));
+            foreach (var framework in available!)
                 Console.WriteLine("Available: {0}", framework.DisplayName);
         }
 
         [Test]
         public void CurrentFrameworkMustBeAvailable()
         {
-            var current = _runtimeService.CurrentFramework;
+            // TODO: Eliminate the cast once the interface is updated to include the TFM property
+            var current = _runtimeService?.CurrentFramework as RuntimeFramework;
             Assert.That(current, Is.Not.Null);
-            Console.WriteLine("Current framework is {0} ({1})", current.DisplayName, current.Id);
-            Assert.That(_runtimeService.IsAvailable(current.Id, false), "{current} not available");
+            Console.WriteLine("Current framework is {0} ({1})", current!.DisplayName, current.TFM);
+            Assert.That(_runtimeService!.IsAvailable(current.TFM, false), "{current} not available");
         }
 
         [Test]
         public void AvailableFrameworksList_IncludesCurrentFramework()
         {
-            var current = _runtimeService.CurrentFramework as RuntimeFramework;
+            var current = _runtimeService?.CurrentFramework as RuntimeFramework;
             Assert.That(current, Is.Not.Null);
 
-            foreach (var framework in _runtimeService.AvailableRuntimes)
+            foreach (var framework in _runtimeService!.AvailableRuntimes)
             {
                 RuntimeFramework? runtimeFramework = framework as RuntimeFramework;
                 Assert.That(runtimeFramework, Is.Not.Null);
-                if (current.Supports(runtimeFramework))
+                if (current!.Supports(runtimeFramework!))
                     return;
             }
 
@@ -115,7 +116,7 @@ namespace NUnit.Engine.Services
         public void AvailableFrameworksList_ContainsNoDuplicates()
         {
             var names = new List<string>();
-            foreach (var framework in _runtimeService.AvailableRuntimes)
+            foreach (var framework in _runtimeService!.AvailableRuntimes)
                 names.Add(framework.DisplayName);
             Assert.That(names, Is.Unique);
         }
@@ -131,7 +132,7 @@ namespace NUnit.Engine.Services
             package.AddSetting(SettingDefinitions.ImageRuntimeVersion.WithValue($"{majorVersion}.{minorVersion}"));
             package.AddSetting(SettingDefinitions.RequestedRuntimeFramework.WithValue(requested));
 
-            _runtimeService.SelectRuntimeFramework(package);
+            _runtimeService!.SelectRuntimeFramework(package);
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework), Is.EqualTo(requested));
         }
 
@@ -139,10 +140,10 @@ namespace NUnit.Engine.Services
         public void RuntimeFrameworkIsSetForSubpackages()
         {
             //Runtime Service verifies that requested frameworks are available, therefore this test can only currently be run on platforms with both CLR v2 and v4 available
-            Assume.That(_runtimeService.IsAvailable("net-2.0", false));
-            Assume.That(_runtimeService.IsAvailable("net-2.0", true));
-            Assume.That(_runtimeService.IsAvailable("net-4.0", false));
-            Assume.That(_runtimeService.IsAvailable("net-4.0", true));
+            Assume.That(_runtimeService!.IsAvailable("net20", false));
+            Assume.That(_runtimeService!.IsAvailable("net20", true));
+            Assume.That(_runtimeService!.IsAvailable("net40", false));
+            Assume.That(_runtimeService!.IsAvailable("net40", true));
 
             var topLevelPackage = new TestPackage(["a.dll", "b.dll"]);
 

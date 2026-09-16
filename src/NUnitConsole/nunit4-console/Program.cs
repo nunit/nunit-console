@@ -39,6 +39,9 @@ namespace NUnit.ConsoleRunner
 
             try
             {
+                // NOTE: This throws for errors in the general format of options,
+                // such as missing required values. It does not throw for specific
+                // errors in the values themselves, which are handled below.
                 Options.Parse(Options.PreParse(args));
             }
             catch (OptionException ex)
@@ -53,6 +56,8 @@ namespace NUnit.ConsoleRunner
                 Debugger.Launch();
 #endif
 
+            // TODO: Should validation be moved to the options processing and
+            // the actual application to the ConsoleRunner class?
             if (!string.IsNullOrEmpty(Options.ConsoleEncoding))
             {
                 try
@@ -82,6 +87,7 @@ namespace NUnit.ConsoleRunner
                 if (Options.ShowVersion)
                     return ConsoleRunner.OK;
 
+                // Warning and error messages are generated during option parsing. We display them here.
                 if (Options.WarningMessages.Count > 0)
                 {
                     foreach (string message in Options.WarningMessages)
@@ -98,28 +104,37 @@ namespace NUnit.ConsoleRunner
                     return ConsoleRunner.INVALID_ARG;
                 }
 
-                using (ITestEngine engine = new TestEngine())
+                using (TestEngine engine = new TestEngine())
                 {
-                    if (Options.RuntimeFrameworkSpecified)
-                    {
-                        if (engine.Services.TryGetService<IAvailableRuntimes>(out var availableRuntimes))
-                        {
-                            bool runtimeAvailable = false;
-                            var runtimes = Options.RunAsX86 ? availableRuntimes.AvailableX86Runtimes : availableRuntimes.AvailableRuntimes;
-                            foreach (var runtime in runtimes)
-                            {
-                                if (runtimeAvailable = runtime.Id == Options.RuntimeFramework)
-                                    break;
-                            }
+                    engine.Initialize();
 
-                            if (!runtimeAvailable)
-                                WriteErrorMessage("Unavailable runtime framework requested: " + Options.RuntimeFramework);
-                        }
-                        else
+                    // Perform additional validation checks that requre the engine
+                    if (Options.RuntimeFrameworkSpecified)
+                        if (!VerifyFrameworkOption(Options.RuntimeFramework))
+                            return ConsoleRunner.INVALID_ARG;
+
+                    bool VerifyFrameworkOption(string tfm)
+                    {
+                        RuntimeFramework requestedRuntime;
+                        try
                         {
-                            WriteErrorMessage("Unable to acquire AvailableRuntimeService from engine");
-                            return ConsoleRunner.UNEXPECTED_ERROR;
+                            requestedRuntime = RuntimeFramework.FromTFM(tfm);
                         }
+                        catch (ArgumentException ex)
+                        {
+                            WriteErrorMessage(ex.Message);
+                            return false;
+                        }
+
+                        var availableRuntimes = engine.Services.GetService<IAvailableRuntimes>();
+                        foreach (RuntimeFramework availableRuntime in availableRuntimes.AvailableRuntimes)
+                        {
+                            if (availableRuntime.TFM == requestedRuntime.TFM)
+                                return true;
+                        }
+
+                        WriteErrorMessage($"The {Options.RuntimeFramework} runtime is not available on this machine");
+                        return false;
                     }
 
                     if (Options.WorkDirectory is not null)

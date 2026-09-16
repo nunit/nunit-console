@@ -306,6 +306,20 @@ namespace NUnit.Engine.Services
 
                     foreach (var node in _extensionService.GetExtensionNodes(AGENT_LAUNCHERS_PATH))
                         _launcherNodes.Add(node);
+
+                    _launcherNodes.Sort((l1, l2) =>
+                    {
+                        var s1 = l1.GetValues("TargetFramework").FirstOrDefault();
+                        var fn1 = s1 is not null ? new FrameworkName(s1) : GetLauncherInstance(l1).AgentInfo.TargetRuntime;
+                        var s2 = l2.GetValues("TargetFramework").FirstOrDefault();
+                        var fn2 = s2 is not null ? new FrameworkName(s2) : GetLauncherInstance(l2).AgentInfo.TargetRuntime;
+
+                        int result = fn1.Identifier.CompareTo(fn2.Identifier);
+                        if (result == 0)
+                            result = fn1.Version.CompareTo(fn2.Version);
+
+                        return result;
+                    });
                 }
 
                 return _launcherNodes;
@@ -365,27 +379,39 @@ namespace NUnit.Engine.Services
             // Check to see if a specific agent was selected
             string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
             bool specificAgentRequested = !string.IsNullOrEmpty(requestedAgent);
+            string requestedRuntime = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedFrameworkName);
+            bool specificRuntimeRequested = !string.IsNullOrEmpty(requestedRuntime);
 
-            foreach (var node in _extensionService.GetExtensionNodes<IAgentLauncher>())
+            foreach (var node in LauncherNodes)
             {
                 if (specificAgentRequested && node.TypeName != requestedAgent)
                     continue;
 
-                if (CanCreateAgent(node, package))
+                if (specificRuntimeRequested)
                 {
-                    var launcher = GetLauncherInstance(node);
-
-                    var launcherName = launcher.GetType().Name;
-                    log.Info($"Selected launcher {launcherName}");
-                    package.Settings.Set(SettingDefinitions.SelectedAgentName.WithValue(launcherName));
-                    return launcher.CreateAgent(agentId, agencyUrl, package);
+                    var requestedFrameworkName = new FrameworkName(requestedRuntime);
+                    var runtimes = node.GetValues("TargetFramework");
+                    if (!runtimes.Any() || new RuntimeFramework(runtimes.First()).FrameworkName != requestedFrameworkName)
+                        continue;
                 }
+
+                if (!CanCreateAgent(node, package))
+                    continue;
+
+                var launcher = GetLauncherInstance(node);
+
+                var launcherName = launcher.GetType().Name;
+                log.Info($"Selected launcher {launcherName}");
+                package.Settings.Set(SettingDefinitions.SelectedAgentName.WithValue(launcherName));
+                return launcher.CreateAgent(agentId, agencyUrl, package);
             }
 
             if (specificAgentRequested)
                 throw new NUnitEngineException($"The requested launcher {requestedAgent} cannot load package {package.Name}");
+            else if (specificRuntimeRequested)
+                throw new NUnitEngineException($"No agent available to run {package.Name} under {requestedRuntime}");
             else
-                throw new NUnitEngineException($"No agent available for TestPackage {package.Name}");
+                throw new NUnitEngineException($"No agent available for {package.Name}");
         }
 
         private static bool CanCreateAgent(ExtensionNode node, TestPackage package)
@@ -395,7 +421,7 @@ namespace NUnit.Engine.Services
             var runtimes = node.GetValues("TargetFramework");
 
             // If there is no property, we have to instantiate it to check.
-            if (runtimes.Any())
+            if (!runtimes.Any())
             {
                 var launcher = GetLauncherInstance(node);
                 return launcher is not null && launcher.CanCreateAgent(package);

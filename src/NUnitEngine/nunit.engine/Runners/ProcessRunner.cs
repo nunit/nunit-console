@@ -144,7 +144,22 @@ namespace NUnit.Engine.Runners
             {
                 CreateAgentAndRunnerIfNeeded();
 
-                return _remoteRunner.Run(listener, filter);
+                var result = _remoteRunner.Run(listener, filter);
+                var doc = result.Xml.OwnerDocument.ShouldNotBeNull();
+                var resultSettings = result.Xml.SelectSingleNode("settings");
+
+                if (resultSettings is not null)
+                {
+                    foreach (var packageSetting in TestPackage.Settings)
+                    {
+                        var setting = doc.CreateElement("setting");
+                        setting.AddAttribute("name", packageSetting.Name);
+                        setting.AddAttribute("value", packageSetting.Value?.ToString() ?? string.Empty);
+                        resultSettings.AppendChild(setting);
+                    }
+                }
+
+                return result;
             }
             catch (Exception e)
             {

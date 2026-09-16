@@ -5,8 +5,9 @@
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
     <AssemblyName>nunit-netcore-console</AssemblyName>
     <TargetFrameworks>net8.0</TargetFrameworks>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <InternalsVisibleTo Include="nunit4-console.tests, PublicKey=$(NUnitPublicKey)" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
@@ -48,6 +49,7 @@
     <Compile Include="..\nunit4-console\Options\Options.cs" Link="Options\Options.cs" />
     <Compile Include="..\nunit4-console\Options\OutputSpecification.cs" Link="Options\OutputSpecification.cs" />
     <Compile Include="..\nunit4-console\Options\TestNameParser.cs" Link="Options\TestNameParser.cs" />
+    <Compile Include="..\nunit4-console\Program.cs" Link="Program.cs" />
     <Compile Include="..\nunit4-console\RequiredExtensionException.cs" Link="RequiredExtensionException.cs" />
     <Compile Include="..\nunit4-console\TestEventHandler.cs" Link="TestEventHandler.cs" />
     <Compile Include="..\nunit4-console\Utilities\SaveConsoleOutput.cs" Link="Utilities\SaveConsoleOutput.cs" />
