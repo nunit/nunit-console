@@ -6,10 +6,10 @@ using NUnit.Common;
 namespace NUnit.Engine
 {
     /// <summary>
-    /// Runtime class represents a specific Runtime, which may be
-    /// available in one or more versions. To define new Runtimes,
-    /// add a new member to the RuntimeType enum and then update
-    /// the SetProperties method in this class.
+    /// Runtime abstract class represents a specific Runtime, which may be
+    /// available in one or more versions. To define new Runtimes, derive
+    /// a new nested class and add a static property holding a singleton
+    /// instance of that class.
     /// </summary>
     public abstract class Runtime
     {
@@ -21,8 +21,8 @@ namespace NUnit.Engine
         /// <summary>Microsoft .NET Framework</summary>
         public static Runtime Net { get; } = new NetFrameworkRuntime();
 
-        /// <summary>Mono</summary>
-        public static Runtime Mono { get; } = new MonoRuntime();
+        ///// <summary>Mono</summary>
+        //public static Runtime Mono { get; } = new MonoRuntime();
 
         /// <summary>NetCore</summary>
         public static Runtime NetCore { get; } = new NetCoreRuntime();
@@ -33,8 +33,6 @@ namespace NUnit.Engine
             {
                 case "net":
                     return Runtime.Net;
-                case "mono":
-                    return Runtime.Mono;
                 case "netcore":
                     return Runtime.NetCore;
                 default:
@@ -84,14 +82,14 @@ namespace NUnit.Engine
 
         private class NetFrameworkRuntime : Runtime
         {
-            public override string DisplayName => ".NET";
+            public override string DisplayName => ".NET Framework";
             public override string FrameworkIdentifier => FrameworkIdentifiers.NetFramework;
 
             public override string ToString() => "Net";
 
             public override string GetTFM(Version version)
             {
-                string v = version.ToString(version.Build == 0 ? 2 : 3);
+                string v = version.ToString(version.Build <= 0 ? 2 : 3);
                 return "net" + v.Replace(".", string.Empty);
             }
 
@@ -103,18 +101,6 @@ namespace NUnit.Engine
                 return base.Supports(runtime, target) ||
                     (runtime.Major == 3 && (target.Major == 2 || target.Major == 3) &&
                     runtime.Minor >= target.Minor);
-            }
-        }
-
-        private class MonoRuntime : NetFrameworkRuntime
-        {
-            public override string DisplayName => "Mono";
-
-            public override string ToString() => "Mono";
-
-            public override bool Supports(Version runtime, Version target)
-            {
-                return base.Supports(runtime, target) || runtime.Major >= 4 && target.Major == 4;
             }
         }
 

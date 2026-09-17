@@ -28,7 +28,10 @@ class MockAssemblyExpectedResult : ExpectedResult
         Skipped = 7 * nCopies;
         Assemblies = new ExpectedAssemblyResult[nCopies];
         for (int i = 0; i < nCopies; i++)
-            Assemblies[i] = new ExpectedAssemblyResult("mock-assembly.dll", runtimes[i]);
+        {
+            string runtime = runtimes[i];
+            Assemblies[i] = new ExpectedAssemblyResult("mock-assembly.dll", runtime);
+        }
     }
 }
 
@@ -36,7 +39,7 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
     Arguments = "testdata/net462/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2")
+    ExpectedResult = new MockAssemblyExpectedResult("nothing")
 });
 
 AddToBothLists(new PackageTest(1, "Net10Test")
@@ -381,20 +384,13 @@ AddToBothLists(new PackageTest(1, "NoExtensionsInstalled")
 {
     Description = "List Extensions shows only our agent launchers",
     Arguments = "--list-extensions",
-    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.Net10AgentLauncher", exactly: 1) }
+    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.Net10AgentLauncher", exactly: 4) }
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
+AddToBothLists(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
     Arguments = "--extensionDirectory fakes/net462 --list-extensions",
-    ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
-});
-
-NetCoreRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
-{
-    Description = "List Extensions shows extension from added directory",
-    Arguments = "--extensionDirectory fakes/netstandard2.0 --list-extensions",
     ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
 });
 

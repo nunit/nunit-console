@@ -1,13 +1,11 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
-using Microsoft.Win32;
 
 namespace NUnit.Engine
 {
@@ -18,43 +16,64 @@ namespace NUnit.Engine
     [Serializable]
     public sealed class RuntimeFramework : IRuntimeFramework
     {
-        #region Constructors
+        private Runtime _runtime;
+
+        #region Construction
 
         /// <summary>
-        /// Construct from a Runtime and Version.
+        /// Construct from a FrameworkName.
         /// </summary>
-        /// <param name="runtime">A Runtime instance</param>
-        /// <param name="version">The Version of the framework</param>
-        public RuntimeFramework(Runtime runtime, Version version)
-            : this(runtime, version, null)
+        /// <param name="frameworkName">A FrameworkName</param>
+        public RuntimeFramework(FrameworkName frameworkName)
+        {
+            _runtime = Runtime.FromFrameworkIdentifier(frameworkName.Identifier);
+            FrameworkName = frameworkName;
+            DisplayName = $"{_runtime.DisplayName} {FrameworkVersion}";
+            if (!string.IsNullOrEmpty(Profile) && Profile != "Full")
+                DisplayName += " - " + Profile;
+        }
+
+        public RuntimeFramework(string frameworkName)
+            : this(new FrameworkName(frameworkName))
         {
         }
 
-        /// <summary>
-        /// Construct from a Runtime, Version and profile.
-        /// </summary>
-        /// <param name="runtime">A Runtime instance.</param>
-        /// <param name="version">The Version of the framework.</param>
-        /// <param name="profile">A string representing the profile of the framework. Null if unspecified.</param>
-        public RuntimeFramework(Runtime runtime, Version version, string? profile)
+        public RuntimeFramework(string identifier, Version version, string? profile = null)
+            : this(new FrameworkName(identifier, version, profile))
         {
-            Guard.ArgumentNotNull(runtime);
-            Guard.ArgumentValid(IsValidFrameworkVersion(version), $"{version} is not a valid framework version", nameof(version));
-
-            Runtime = runtime;
-            FrameworkVersion = version;
-
-            Profile = profile;
-
-            DisplayName = GetDefaultDisplayName(runtime, FrameworkVersion, profile);
-
-            FrameworkName = new FrameworkName(runtime.FrameworkIdentifier, FrameworkVersion);
         }
 
-        private static bool IsValidFrameworkVersion(Version v)
+        public static RuntimeFramework FromTFM(string tfm)
         {
-            // All known framework versions have either two components or three
-            return v.Major > 0 && v.Minor >= 0 && v.Build >= -1 && v.Revision == -1;
+            Guard.ArgumentNotNullOrEmpty(tfm, nameof(tfm));
+
+            int digit = tfm.IndexOfAny(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
+            Guard.ArgumentValid(digit >= 0, $"Invalid or unsupported TFM: {tfm}", nameof(tfm));
+
+            string prefix = tfm.Substring(0, digit);
+            string vpart = tfm.Substring(digit);
+
+            switch (prefix)
+            {
+                case "net":
+                    if (vpart.Contains('.'))
+                        return new RuntimeFramework(FrameworkIdentifiers.NetCoreApp, new Version(vpart));
+                    else
+                    {
+                        if (vpart.Length == 2)
+                            vpart = vpart.Insert(1, ".");
+                        else if (vpart.Length == 3)
+                            vpart = vpart.Insert(1, ".").Insert(3, ".");
+                        else
+                            throw new ArgumentException($"Invalid or unsupported TFM: {tfm}", nameof(tfm));
+
+                        return new RuntimeFramework(FrameworkIdentifiers.NetFramework, new Version(vpart));
+                    }
+                case "netcoreapp":
+                    return new RuntimeFramework(FrameworkIdentifiers.NetCoreApp, new Version(vpart));
+                default:
+                    throw new ArgumentException($"Invalid or unsupported TFM: {tfm}");
+            }
         }
 
         #endregion
@@ -66,88 +85,41 @@ namespace NUnit.Engine
         /// <summary>
         /// Gets the unique Id for this runtime, such as "net-4.6.2"
         /// </summary>
-        public string Id => Runtime.ToString().ToLower() + "-" + FrameworkVersion.ToString();
+        public string Id => _runtime.ToString().ToLower() + "-" + FrameworkVersion.ToString();
+
+        /// <summary>
+        /// Returns the Display name for this framework
+        /// </summary>
+        // TODO: Determine if we can remove this property.
+        public string DisplayName { get; }
+
+        /// <summary>
+        /// The framework version for this runtime framework
+        /// </summary>
+        public Version FrameworkVersion => FrameworkName.Version;
+
+        /// <summary>
+        /// The Profile for this framework, where relevant.
+        /// May be the empty string and will have different
+        /// sets of values for each Runtime.
+        /// </summary>
+        public string Profile => FrameworkName.Profile;
+
+        #endregion
+
+        #region Implementation of new IRuntimeFramework interface
 
         /// <summary>
         /// Gets the Target Framework Moniker (TFM) for this runtime, such as "net462"
         /// </summary>
-        public string TFM => Runtime.GetTFM(FrameworkVersion);
+        public string TFM => _runtime.GetTFM(FrameworkVersion);
 
         /// <summary>
         /// Gets the FrameworkName for this runtime, such as ".NETFramework,Version=v4.6.2"
         /// </summary>
         public FrameworkName FrameworkName { get; }
 
-        /// <summary>
-        /// The type of this runtime framework
-        /// </summary>
-        public Runtime Runtime { get; }
-
-        /// <summary>
-        /// The framework version for this runtime framework
-        /// </summary>
-        public Version FrameworkVersion { get; private set; }
-
-        /// <summary>
-        /// The Profile for this framework, where relevant.
-        /// May be null and will have different sets of
-        /// values for each Runtime.
-        /// </summary>
-        public string? Profile { get; private set; }
-
-        /// <summary>
-        /// Returns the Display name for this framework
-        /// </summary>
-        public string DisplayName { get; set; }
-
         #endregion
-
-        /// <summary>
-        /// Parses a string representing a RuntimeFramework.
-        /// The string may be just a RuntimeType name or just
-        /// a Version or a hyphenated RuntimeType-Version or
-        /// a Version prefixed by 'v'.
-        /// </summary>
-        public static RuntimeFramework Parse(string s)
-        {
-            Guard.ArgumentNotNullOrEmpty(s);
-
-            string[] parts = s.Split(RuntimeFrameworkSeparator);
-            Guard.ArgumentValid(parts.Length == 2 && parts[0].Length > 0 && parts[1].Length > 0, "RuntimeFramework id not in correct format", nameof(s));
-
-            var runtime = Runtime.Parse(parts[0]);
-            var version = new Version(parts[1]);
-            return new RuntimeFramework(runtime, version);
-        }
-
-        public static bool TryParse(string s, [NotNullWhen(true)] out RuntimeFramework? runtimeFramework)
-        {
-            try
-            {
-                runtimeFramework = Parse(s);
-                return true;
-            }
-            catch
-            {
-                runtimeFramework = null;
-                return false;
-            }
-        }
-
-        public static RuntimeFramework FromFrameworkName(string frameworkName)
-        {
-            return FromFrameworkName(new FrameworkName(frameworkName));
-        }
-
-        public static RuntimeFramework FromFrameworkName(FrameworkName frameworkName)
-        {
-            return new RuntimeFramework(Runtime.FromFrameworkIdentifier(frameworkName.Identifier), frameworkName.Version, frameworkName.Profile);
-        }
-
-        /// <summary>
-        /// Overridden to return the short name of the framework
-        /// </summary>
-        public override string ToString() => Id;
 
         /// <summary>
         /// Returns true if the current framework matches the
@@ -162,44 +134,15 @@ namespace NUnit.Engine
         /// <returns><c>true</c> on match, otherwise <c>false</c></returns>
         public bool Supports(RuntimeFramework target)
         {
-            if (!Runtime.Matches(target.Runtime))
+            if (!_runtime.Matches(target._runtime))
                 return false;
 
-            return Runtime.Supports(this.FrameworkVersion, target.FrameworkVersion);
+            return _runtime.Supports(this.FrameworkVersion, target.FrameworkVersion);
         }
 
         public bool CanLoad(IRuntimeFramework requested)
         {
-            return FrameworkVersion >= requested.FrameworkVersion;
-        }
-
-        private static string GetDefaultDisplayName(Runtime runtime, Version version, string? profile)
-        {
-            string displayName = $"{runtime.DisplayName} {version}";
-
-            if (!string.IsNullOrEmpty(profile) && profile != "Full")
-                displayName += " - " + profile;
-
-            return displayName;
-        }
-
-        private static string GetMonoPrefixFromAssembly(Assembly assembly)
-        {
-            string prefix = assembly.Location;
-
-            // In all normal mono installations, there will be sufficient
-            // levels to complete the four iterations. But just in case
-            // files have been copied to some non-standard place, we check.
-            for (int i = 0; i < 4; i++)
-            {
-                string? dir = Path.GetDirectoryName(prefix);
-                if (string.IsNullOrEmpty(dir))
-                    break;
-
-                prefix = dir;
-            }
-
-            return prefix;
+            return FrameworkVersion >= requested.FrameworkName.Version;
         }
     }
 }

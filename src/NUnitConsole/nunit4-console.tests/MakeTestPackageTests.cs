@@ -50,7 +50,9 @@ namespace NUnit.ConsoleRunner
 #else
         [TestCase("--x86", "RunAsX86", true)]
         [TestCase("--shadowcopy", "ShadowCopyFiles", true)]
-        [TestCase("--framework=net-4.6.2", "RequestedRuntimeFramework", "net-4.6.2")]
+        [TestCase("--framework=net462", "RequestedRuntimeFramework", "net462")]
+        [TestCase("--framework=netcoreapp3.1", "RequestedRuntimeFramework", "netcoreapp3.1")]
+        [TestCase("--framework=net10.0", "RequestedRuntimeFramework", "net10.0")]
         [TestCase("--configfile=mytest.config", "ConfigurationFile", "mytest.config")]
         [TestCase("--agents=5", "MaxAgents", 5)]
         [TestCase("--debug", FrameworkPackageSettings.DebugTests, true)]

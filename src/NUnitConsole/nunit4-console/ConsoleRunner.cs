@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using System.Runtime.CompilerServices;
 
 namespace NUnit.ConsoleRunner
 {
@@ -57,6 +58,7 @@ namespace NUnit.ConsoleRunner
         private readonly IResultService _resultService;
         private readonly ITestFilterService _filterService;
         private readonly IExtensionService _extensionService;
+        private readonly IAvailableRuntimes _availableRuntimes;
 
         private readonly ExtendedTextWriter _outWriter;
 
@@ -87,6 +89,9 @@ namespace NUnit.ConsoleRunner
 
             _filterService = _engine.Services.GetService<ITestFilterService>();
             Guard.OperationValid(_filterService is not null, "Internal Error: TestFilterService was not found");
+
+            _availableRuntimes = _engine.Services.GetService<IAvailableRuntimes>();
+            Guard.OperationValid(_availableRuntimes is not null, "Internal Error: AvailableRuntimes was not found");
 
             _workDirectory = options.WorkDirectory ?? Directory.GetCurrentDirectory();
 
@@ -135,6 +140,8 @@ namespace NUnit.ConsoleRunner
         /// </summary>
         public int Execute()
         {
+            // Some options may be valid but require specific features
+            // of the engine to be present. We check for that here.
             if (!VerifyEngineSupport(_options))
                 return INVALID_ARG;
 
@@ -170,7 +177,7 @@ namespace NUnit.ConsoleRunner
         {
             _outWriter.WriteLine(ColorStyle.SectionHeader, "Test Files");
             foreach (string file in _options.InputFiles)
-                _outWriter.WriteLine(ColorStyle.Default, INDENT4 + file);
+                _outWriter.WriteLine(ColorStyle.Default, INDENT4 + Path.GetFullPath(file));
             _outWriter.WriteLine();
         }
 
@@ -658,27 +665,58 @@ namespace NUnit.ConsoleRunner
 
         private bool VerifyEngineSupport(ConsoleOptions options)
         {
-            foreach (var spec in options.ResultOutputSpecifications)
-            {
-                bool available = false;
+            if (!ResultFormatsValid(options))
+                return false;
 
-                foreach (var format in _resultService.Formats)
-                {
-                    if (spec.Format == format)
-                    {
-                        available = true;
-                        break;
-                    }
-                }
-
-                if (!available)
-                {
-                    Console.WriteLine("Unknown result format: {0}", spec.Format);
-                    return false;
-                }
-            }
+            if (options.RuntimeFrameworkSpecified && !RuntimeFrameworkAvailable(options.RuntimeFramework))
+                return false;
 
             return true;
+        }
+
+        private bool ResultFormatsValid(ConsoleOptions options)
+        {
+            bool allOK = true;
+            foreach (var spec in options.ResultOutputSpecifications)
+            {
+                bool specOK = false;
+                foreach (var format in _resultService.Formats)
+                    if (spec.Format == format)
+                    {
+                        specOK = true;
+                        break;
+                    }
+
+                if (!specOK)
+                    Console.WriteLine("Unknown result format: {0}", spec.Format);
+
+                allOK &= specOK;
+            }
+
+            return allOK;
+        }
+
+        private bool RuntimeFrameworkAvailable(string tfm)
+        {
+            //RuntimeFramework requestedRuntime;
+            //try
+            //{
+            //    requestedRuntime = RuntimeFramework.FromTFM(tfm);
+            //}
+            //catch (ArgumentException ex)
+            //{
+            //    _outWriter.WriteLine(ColorStyle.Error, ex.Message);
+            //    return false;
+            //}
+
+            foreach (RuntimeFramework availableRuntime in _availableRuntimes.AvailableRuntimes)
+            {
+                if (availableRuntime.TFM == tfm)
+                    return true;
+            }
+
+            _outWriter.WriteLine(ColorStyle.Error, $"The {tfm} runtime is not available on this machine");
+            return false;
         }
     }
 }

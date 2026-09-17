@@ -152,6 +152,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("ListExtensions", "list-extensions")]
         [TestCase("ListResolutionStats", "list-resolution-stats")]
         [TestCase("RunAsX86", "x86")]
+        [TestCase("RunUnderMono", "mono")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase(FrameworkPackageSettings.DebugTests, "debug")]
         [TestCase(FrameworkPackageSettings.PauseBeforeRun, "pause")]
@@ -201,9 +202,12 @@ namespace NUnit.ConsoleRunner
         [TestCase(FrameworkPackageSettings.InternalTraceLevel, "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" }, new string[] { "JUNK" })]
         [TestCase(FrameworkPackageSettings.DefaultTestNamePattern, "test-name-format", new string[] { "{m}{a}" }, new string[0])]
         [TestCase("ConsoleEncoding", "encoding", new string[] { "utf-8", "ascii", "unicode" }, new string[0])]
-        // We can't predict which runtimes are available on the test machine, so we don't
-        // test for any good or bad values. TODO: Create a fake list of availble runtimes.
-        [TestCase("RuntimeFramework", "framework", new string[0], new string[0])]
+        // We can't predict which runtimes are available on the test machine,
+        // so we only test for a recognizable format. Testing for availability
+        // has to happen later, in the Consolerunner.
+        [TestCase("RuntimeFramework", "framework",
+            new string[] { "net35", "net462", "net48", "netcoreapp2.1", "netcoreapp3.1", "net8.0", "net10.0", "net99.9" },
+            new string[] { "junk", "net", "net4", "net4.6.2", "netcore-4.6.2", "netcoreapp", "netcoreapp31", "net80", "net100.0" })]
         [TestCase("ConfigurationFile", "configfile", new string[] { "mytest.config" }, new string[0])]
         [TestCase("PrincipalPolicy", "set-principal-policy", new string[] { "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal" }, new string[] { "JUNK" })]
         public void CanRecognizeStringOptions(string propertyName, string pattern, string[] goodValues, string[] badValues)

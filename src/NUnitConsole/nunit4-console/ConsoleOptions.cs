@@ -21,6 +21,8 @@ namespace NUnit.ConsoleRunner
     {
         private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
         private const string DEFAULT_TRACE_LEVEL = "Warning";
+        private const string VALID_TFM_PATTERN =
+            @"^(net[1-4]\d\d?|netcoreapp[2-3]\.\d|(net[5-9]|net\d\d)\.\d)$";
 
         /// <summary>
         /// An abstraction of the file system
@@ -169,6 +171,8 @@ namespace NUnit.ConsoleRunner
         // How to Run Tests
 
         public string? RuntimeFramework { get; private set; }
+
+        public bool RunUnderMono { get; private set; }
 
         [MemberNotNullWhen(true, nameof(RuntimeFramework))]
         public bool RuntimeFrameworkSpecified
@@ -383,8 +387,18 @@ namespace NUnit.ConsoleRunner
                 v => ConfigurationFile = parser.RequiredValue(v, "--configfile"));
 
             // How to Run Tests
-            this.Add("framework=", "{FRAMEWORK} type/version to use for tests.\nExamples: mono, net-3.5, v4.0, 2.0, mono-4.0. If not specified, tests will run under the framework they are compiled with.",
-                v => RuntimeFramework = parser.RequiredValue(v, "--framework"));
+            this.Add("framework=", "{FRAMEWORK} target runtime to use for tests in the form of a TFM, e.g. net462, netcoreapp3.1, net8.0. If not specified, tests will run using the target runtime for which they were compiled, if available, or the best installed version, if not.",
+                v =>
+                {
+                    var tfm = parser.RequiredValue(v, "--framework");
+                    if (!Regex.IsMatch(tfm, VALID_TFM_PATTERN))
+                        ErrorMessages.Add("Invalid framework: " + tfm);
+                    else
+                        RuntimeFramework = tfm;
+                });
+
+            this.Add("mono", "Run tests using the Mono implementation of the .NET Framework.",
+                v => RunUnderMono = !string.IsNullOrEmpty(v));
 
             this.Add("x86", "Run tests in an x86 process on 64 bit systems",
                 v => RunAsX86 = !string.IsNullOrEmpty(v));
