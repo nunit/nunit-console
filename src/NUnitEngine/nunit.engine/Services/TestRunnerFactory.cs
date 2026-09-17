@@ -58,13 +58,10 @@ namespace NUnit.Engine.Services
             // subpackages, which will either be assemblies or unknown file types.
             var leafPackages = package.Select(p => !p.HasSubPackages);
 
-#if NETFRAMEWORK
-            // TODO: Currently, the .NET Core runner doesn't support multiple assemblies.
-            // We therefore only properly deal with the situation where a single assembly
-            // package is provided. This could change. :-)
+            // For multiple files, use AggregatingTestRunner
             if (leafPackages.Count > 1)
                 return new AggregatingTestRunner(ServiceContext, package);
-#endif
+
             // Find a runner for the first or only leaf package
             package = leafPackages[0];
 

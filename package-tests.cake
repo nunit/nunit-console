@@ -15,40 +15,20 @@ void AddToBothLists(PackageTest test)
 // RUN MOCK-ASSEMBLY UNDER EACH RUNTIME
 //////////////////////////////////////////////////////////////////////
 
-class MockAssemblyExpectedResult : ExpectedResult
-{
-    public MockAssemblyExpectedResult(params string[] runtimes) : base("Failed")
-    {
-        int nCopies = runtimes.Length;
-        Total = 37 * nCopies;
-        Passed = 23 * nCopies;
-        Failed = 5 * nCopies;
-        Warnings = 1 * nCopies;
-        Inconclusive = 1 * nCopies;
-        Skipped = 7 * nCopies;
-        Assemblies = new ExpectedAssemblyResult[nCopies];
-        for (int i = 0; i < nCopies; i++)
-        {
-            string runtime = runtimes[i];
-            Assemblies[i] = new ExpectedAssemblyResult("mock-assembly.dll", runtime);
-        }
-    }
-}
-
-StandardRunnerTests.Add(new PackageTest(1, "Net462Test")
+AddToBothLists(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
     Arguments = "testdata/net462/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult("nothing")
+    ExpectedResult = new MockAssemblyExpectedResult("nothing"),
+    // TODO: Remove this once the bundled agents are installed automatically.
+    ExtensionsNeeded = KnownExtensions.BundledAgents
 });
 
 AddToBothLists(new PackageTest(1, "Net10Test")
 {
     Description = "Run mock-assembly.dll under .NET 10.0",
     Arguments = "testdata/net10.0/mock-assembly.dll --trace:Debug",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0"),
-    // TODO: Remove this once the bundled agents are installed automatically.
-    ExtensionsNeeded = KnownExtensions.BundledAgents
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0")
 });
 
 AddToBothLists(new PackageTest(1, "Net90Test")
@@ -87,17 +67,8 @@ const string DOTNET_EXE_X86 = @"C:\Program Files (x86)\dotnet\dotnet.exe";
 // TODO: Remove the limitation to Windows
 bool dotnetX86Available = IsRunningOnWindows() && System.IO.File.Exists(DOTNET_EXE_X86);
 
-class MockAssemblyX86ExpectedResult : MockAssemblyExpectedResult
-{
-    public MockAssemblyX86ExpectedResult(params string[] runtimes) : base(runtimes)
-    {
-        for (int i = 0; i < runtimes.Length; i++)
-            Assemblies[i] = new ExpectedAssemblyResult("mock-assembly-x86.dll", runtimes[i]);
-    }
-}
-
 // X86 is always available for .NET Framework
-StandardRunnerTests.Add(new PackageTest(1, "Net462X86Test")
+AddToBothLists(new PackageTest(1, "Net462X86Test")
 {
     Description = "Run mock-assembly-x86.dll under .NET 4.6.2",
     Arguments = "testdata/net462/mock-assembly-x86.dll",
@@ -106,14 +77,14 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462X86Test")
 
 if (dotnetX86Available)
 {
-    StandardRunnerTests.Add(new PackageTest(1, "Net80X86Test")
+    AddToBothLists(new PackageTest(1, "Net80X86Test")
     {
         Description = "Run mock-assembly-x86.dll under .NET 8.0",
         Arguments = "testdata/net8.0/mock-assembly-x86.dll",
         ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-8.0")
     });
 
-    StandardRunnerTests.Add(new PackageTest(1, "Net60X86Test")
+    AddToBothLists(new PackageTest(1, "Net60X86Test")
     {
         Description = "Run mock-assembly-x86.dll under .NET 6.0",
         Arguments = "testdata/net6.0/mock-assembly-x86.dll",
@@ -123,14 +94,14 @@ if (dotnetX86Available)
     // TODO: Make tests run on all build platforms
     if (!BuildSystem.IsRunningOnGitHubActions)
     {
-        StandardRunnerTests.Add(new PackageTest(1, "Net90X86Test")
+        AddToBothLists(new PackageTest(1, "Net90X86Test")
         {
             Description = "Run mock-assembly-x86.dll under .NET 9.0",
             Arguments = "testdata/net9.0/mock-assembly-x86.dll",
             ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-9.0")
         });
 
-        StandardRunnerTests.Add(new PackageTest(1, "Net70X86Test")
+        AddToBothLists(new PackageTest(1, "Net70X86Test")
         {
             Description = "Run mock-assembly-x86.dll under .NET 7.0",
             Arguments = "testdata/net7.0/mock-assembly-x86.dll",
@@ -145,21 +116,21 @@ if (dotnetX86Available)
 
 // TODO: Remove agents arg when current bug is fixed.
 
-StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462Test")
+AddToBothLists(new PackageTest(1, "Net462PlusNet462Test")
 {
     Description = "Run two copies of mock-assembly together",
     Arguments = "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-4.6.2")
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "Net60PlusNet80Test")
+AddToBothLists(new PackageTest(1, "Net60PlusNet80Test")
 {
     Description = "Run mock-assembly under .NET6.0, 8.0 and 9.0 together",
     Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net9.0/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-9.0")
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet60Test")
+AddToBothLists(new PackageTest(1, "Net462PlusNet60Test")
 {
     Description = "Run mock-assembly under .Net Framework 4.6.2 and .Net 6.0 together",
     Arguments = "testdata/net462/mock-assembly.dll testdata/net6.0/mock-assembly.dll",
@@ -170,7 +141,7 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet60Test")
 // TEST WITH MISSING AND INVALID FILES
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(1, "NonExistentTest")
+AddToBothLists(new PackageTest(1, "NonExistentTest")
 {
     Description = "Run non-existent unknown.dll",
     Arguments = "unknown.dll",
@@ -180,7 +151,7 @@ StandardRunnerTests.Add(new PackageTest(1, "NonExistentTest")
     }
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "InValidFileTypeTest")
+AddToBothLists(new PackageTest(1, "InValidFileTypeTest")
 {
     Description = "Run file with an invalid file type",
     Arguments = "testdata/net462/mock-assembly.pdb",
@@ -190,7 +161,7 @@ StandardRunnerTests.Add(new PackageTest(1, "InValidFileTypeTest")
     }
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNonExistentTest")
+AddToBothLists(new PackageTest(1, "Net462PlusNonExistentTest")
 {
     Description = "Run mock-assembly and non-existent unknown.dll together",
     Arguments = "testdata/net462/mock-assembly.dll unknown.dll",
@@ -204,7 +175,7 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNonExistentTest")
 // TEST OLDER VERSIONS OF NUNIT SWITCHING API IF NEEDED
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(1, "NUnit30Test")
+AddToBothLists(new PackageTest(1, "NUnit30Test")
 {
     Description = "Run a test under NUnit 3.0 using 2009 API",
     Arguments = "testdata/NUnit3.0/net462/NUnit3.0.dll",
@@ -214,7 +185,7 @@ StandardRunnerTests.Add(new PackageTest(1, "NUnit30Test")
     }
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "NUnit301Test")
+AddToBothLists(new PackageTest(1, "NUnit301Test")
 {
     Description = "Run a test under NUnit 3.0.1 using 2009 API",
     Arguments = "testdata/NUnit3.0.1/net462/NUnit3.0.1.dll",
@@ -224,7 +195,7 @@ StandardRunnerTests.Add(new PackageTest(1, "NUnit301Test")
     }
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "NUnit32Test")
+AddToBothLists(new PackageTest(1, "NUnit32Test")
 {
     Description = "Run a test under NUnit 3.2 using 20018 API",
     Arguments = "testdata/NUnit3.2/net462/NUnit3.2.dll",
@@ -234,7 +205,7 @@ StandardRunnerTests.Add(new PackageTest(1, "NUnit32Test")
     }
 });
 
-StandardRunnerTests.Add(new PackageTest(1, "NUnit310Test")
+AddToBothLists(new PackageTest(1, "NUnit310Test")
 {
     Description = "Run a test under NUnit 3.10 using 2018 API",
     Arguments = "testdata/NUnit3.10/net462/NUnit3.10.dll",
@@ -334,7 +305,7 @@ AddToBothLists(new PackageTest(1, "Net80WindowsFormsTest")
 });
 
 // This won't work under the .NET 8.0 runner
-StandardRunnerTests.Add(new PackageTest(1, "Net90WindowsFormsTest")
+AddToBothLists(new PackageTest(1, "Net90WindowsFormsTest")
 {
     Description = "Run test using windows forms under .NET 9.0",
     Arguments = "testdata/net9.0-windows/windows-test.dll",
@@ -369,7 +340,7 @@ AddToBothLists(new PackageTest(1, "Net80WPFTest")
 });
 
 // This won't work under the .NET 8.0 runner
-StandardRunnerTests.Add(new PackageTest(1, "Net90WPFTest")
+AddToBothLists(new PackageTest(1, "Net90WPFTest")
 {
     Description = "Run test using WPF under .NET 9.0",
     Arguments = "testdata/net9.0-windows/WpfTest.dll",
@@ -406,33 +377,7 @@ AddToBothLists(new PackageTest(1, "SpecificExtensionInstalled")
 // TEST OF ASSEMBLY RESOLUTION STATISTICS
 //////////////////////////////////////////////////////////////////////
 
-// TODO: Standard runner tests will not work until agents are updated.
-
-//StandardRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Explore")
-//{
-//    Description = "Display Assembly resolution statistics with Explore output",
-//    // TODO: Should either fix recipe to detect alternate name in spec and map it to the
-//    // work directory or fix console runner to use work directory in this situation.
-//    Arguments = "testdata/net8.0-windows/windows-test.dll --explore:../../package/results/nuget/NUnit.ConsoleRunner/ListResolutionStatistics_Explore/TestResult.xml --list-resolution-stats",
-//    ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-8.0") } }
-//    //ExpectedOutput = new[] {
-//    //    Contains("Assembly Resolution Statistics"),
-//    //    Contains("windows-test.dll"),
-//    //    Contains("Not Available")
-//});
-
-StandardRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
-{
-    Description = "Display Assembly resolution statistics with Run output",
-    Arguments = "testdata/net8.0-windows/windows-test.dll --list-resolution-stats",
-    ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-8.0") } }
-    //ExpectedOutput = new[] {
-    //    Contains("Assembly Resolution Statistics"),
-    //    Contains("windows-test.dll"),
-    //    Contains("Not Available")
-});
-
-NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Explore")
+AddToBothLists(new PackageTest(1, "ListResolutionStatistics_Explore")
 {
     Description = "Display Assembly resolution statistics with Explore output",
     Arguments = "testdata/net8.0-windows/windows-test.dll --explore:LoadResult.xml --list-resolution-stats",
@@ -447,7 +392,7 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Explore")
     }
 });
 
-NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
+AddToBothLists(new PackageTest(1, "ListResolutionStatistics_Run")
 {
     Description = "Display Assembly resolution statistics with Run output",
     Arguments = "testdata/net8.0-windows/windows-test.dll --list-resolution-stats",
@@ -477,7 +422,7 @@ NetCoreRunnerTests.Add(new PackageTest(1, "ListResolutionStatistics_Run")
 // are ported. Most extensions will require an update to work under V4.
 
 //NUnit Project Loader Tests
-StandardRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
+AddToBothLists(new PackageTest(1, "NUnitProjectTest1")
 {
     Description = "Run NUnit project with mock-assembly.dll built for .NET 4.6.2 and 6.0",
     Arguments = "../../MixedTests.nunit --config=Release",
@@ -485,16 +430,16 @@ StandardRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
     ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
 });
 
-//NetCoreRunnerTests.Add(new PackageTest(1, "NUnitProjectTest")
-//{
-//    Description = "Run NUnit project with mock-assembly.dll built for .NET 6.0 and 8.0",
-//    Arguments = "../../NetCoreTests.nunit --config=Release",
-//    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
-//    ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
-//});
+AddToBothLists(new PackageTest(1, "NUnitProjectTest2")
+{
+    Description = "Run NUnit project with mock-assembly.dll built for .NET 6.0 and 8.0",
+    Arguments = "../../NetCoreTests.nunit --config=Release",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0"),
+    ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader }
+});
 
 // V2 Result Writer Tests
-StandardRunnerTests.Add(new PackageTest(1, "V2ResultWriterTest_Net462")
+AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net462")
 {
     Description = "Run mock-assembly under .NET 4.6.2 and produce V2 output",
     Arguments = "testdata/net462/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
@@ -550,7 +495,7 @@ AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net60")
 //});
 
 // TeamCity Event Listener Test
-StandardRunnerTests.Add(new PackageTest(1, "TeamCityListenerTest")
+AddToBothLists(new PackageTest(1, "TeamCityListenerTest")
 {
     Description = "Run mock-assembly with --teamcity enabled",
     Arguments = "testdata/net462/mock-assembly.dll --enable NUnit.Engine.Listeners.TeamCityEventListener",
@@ -597,7 +542,7 @@ StandardRunnerTests.Add(new PackageTest(1, "TeamCityListenerTest")
 // SPECIAL CASES
 //////////////////////////////////////////////////////////////////////
 
-StandardRunnerTests.Add(new PackageTest(1, "InvalidTestNameTest_Net462")
+AddToBothLists(new PackageTest(1, "InvalidTestNameTest_Net462")
 {
     Description = "Ensure we handle invalid test names correctly under .NET 4.6.2",
     Arguments = "testdata/net462/InvalidTestNames.dll",
@@ -705,3 +650,35 @@ var AgentCoreTests = new List<PackageTest>()
     }
 };
 
+//////////////////////////////////////////////////////////////////////
+// GENERATE EXPECTED RESULT FOR MOCK-ASSEMBLY
+//////////////////////////////////////////////////////////////////////
+
+class MockAssemblyExpectedResult : ExpectedResult
+{
+    public MockAssemblyExpectedResult(params string[] runtimes) : base("Failed")
+    {
+        int nCopies = runtimes.Length;
+        Total = 37 * nCopies;
+        Passed = 23 * nCopies;
+        Failed = 5 * nCopies;
+        Warnings = 1 * nCopies;
+        Inconclusive = 1 * nCopies;
+        Skipped = 7 * nCopies;
+        Assemblies = new ExpectedAssemblyResult[nCopies];
+        for (int i = 0; i < nCopies; i++)
+        {
+            string runtime = runtimes[i];
+            Assemblies[i] = new ExpectedAssemblyResult("mock-assembly.dll", runtime);
+        }
+    }
+}
+
+class MockAssemblyX86ExpectedResult : MockAssemblyExpectedResult
+{
+    public MockAssemblyX86ExpectedResult(params string[] runtimes) : base(runtimes)
+    {
+        for (int i = 0; i < runtimes.Length; i++)
+            Assemblies[i] = new ExpectedAssemblyResult("mock-assembly-x86.dll", runtimes[i]);
+    }
+}
