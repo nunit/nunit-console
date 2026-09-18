@@ -84,13 +84,6 @@ if (dotnetX86Available)
         ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-8.0")
     });
 
-    AddToBothLists(new PackageTest(1, "Net60X86Test")
-    {
-        Description = "Run mock-assembly-x86.dll under .NET 6.0",
-        Arguments = "testdata/net6.0/mock-assembly-x86.dll",
-        ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
-    });
-
     // TODO: Make tests run on all build platforms
     if (!BuildSystem.IsRunningOnGitHubActions)
     {
@@ -107,6 +100,14 @@ if (dotnetX86Available)
             Arguments = "testdata/net7.0/mock-assembly-x86.dll",
             ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-7.0")
         });
+
+        AddToBothLists(new PackageTest(1, "Net60X86Test")
+        {
+            Description = "Run mock-assembly-x86.dll under .NET 6.0",
+            Arguments = "testdata/net6.0/mock-assembly-x86.dll",
+            ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
+        });
+
     }
 }
 

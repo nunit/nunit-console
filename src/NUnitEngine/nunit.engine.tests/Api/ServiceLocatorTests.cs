@@ -45,7 +45,7 @@ namespace NUnit.Engine.Api
         [Test]
         public void GetService_ThrowsWhenServiceIsNotFound()
         {
-            var ex = Assert.Throws(typeof(NUnitEngineException), () => _testEngine.Services.GetService<InvalidService>());
+            var ex = Assert.Throws<NUnitEngineException>(() => _testEngine.Services.GetService<InvalidService>());
             Assert.That(ex.Message, Contains.Substring("Unable to acquire InvalidService"));
         }
 
