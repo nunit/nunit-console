@@ -1,5 +1,5 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.20
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.21
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -47,7 +47,7 @@ PackageDefinition NUnitEnginePackage = new NuGetPackage(
     {
         HasFiles("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.engine.dll"),
-        HasDirectory("lib/net8.0").WithFile("nunit.engine.dll"),
+        HasDirectory("lib/net10.0").WithFile("nunit.engine.dll"),
         HasDependency("NUnit.Engine.Api"),
         HasDependency("NUnit.Common"),
         HasDependency("NUnit.Extensibility")
@@ -55,7 +55,7 @@ PackageDefinition NUnitEnginePackage = new NuGetPackage(
     symbols: new PackageCheck[]
     {
         HasDirectory("lib/net462").WithFile("nunit.engine.pdb"),
-        HasDirectory("lib/net8.0").WithFile("nunit.engine.pdb")
+        HasDirectory("lib/net10.0").WithFile("nunit.engine.pdb")
     });
 // TODO: Revise AgentSelector and reinstate tests
 //testRunner: new AgentSelector(
@@ -68,10 +68,9 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     checks: new PackageCheck[]
     {
         HasFiles("nunit.exe"),
-        HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net8.0/any").WithFiles(
+        HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net10.0/any").WithFiles(
             "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-            "nunit.engine.dll", "nunit.agent.core.dll", "testcentric.metadata.dll",
-            "Microsoft.Extensions.DependencyModel.dll")
+            "nunit.engine.dll", "testcentric.metadata.dll")
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);

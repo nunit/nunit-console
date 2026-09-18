@@ -464,7 +464,7 @@ namespace NUnit.ConsoleRunner
                     continue;
                 }
 
-                var filename = arg.Substring(1, arg.Length - 1);
+                var filename = arg.Substring(1);
                 if (string.IsNullOrEmpty(filename))
                 {
                     ErrorMessages.Add("You must include a file name after @.");

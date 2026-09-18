@@ -140,7 +140,11 @@ namespace NUnit.ConsoleRunner
                     if (Options.WorkDirectory is not null)
                         engine.WorkDirectory = Options.WorkDirectory;
 
+#if NETFRAMEWORK
                     engine.InternalTraceLevel = (InternalTraceLevel)Enum.Parse(typeof(InternalTraceLevel), Options.InternalTraceLevel);
+#else
+                    engine.InternalTraceLevel = Enum.Parse<InternalTraceLevel>(Options.InternalTraceLevel);
+#endif
 
                     try
                     {

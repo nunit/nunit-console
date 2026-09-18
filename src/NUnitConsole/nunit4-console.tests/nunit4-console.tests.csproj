@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <RootNamespace>NUnit.ConsoleRunner</RootNamespace>
-    <TargetFrameworks>net462;net8.0</TargetFrameworks>
+    <TargetFrameworks>net462;net10.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <StartupObject>NUnit.Engine.Tests.Program</StartupObject>
   </PropertyGroup>
@@ -39,7 +39,7 @@
     <ProjectReference Include="..\..\TestData\mock-assembly\mock-assembly.csproj" />
     <ProjectReference Include="..\..\NUnitEngine\nunit.engine\nunit.engine.csproj" />
     <ProjectReference Condition="'$(TargetFramework)'=='net462'" Include="..\nunit4-console\nunit4-console.csproj" />
-    <ProjectReference Condition="'$(TargetFramework)'=='net8.0'" Include="..\nunit4-netcore-console\nunit4-netcore-console.csproj" />
+    <ProjectReference Condition="'$(TargetFramework)'=='net10.0'" Include="..\nunit4-netcore-console\nunit4-netcore-console.csproj" />
     <ProjectReference Include="..\..\NUnitCommon\nunit.common\nunit.common.csproj" />
   </ItemGroup>
   
