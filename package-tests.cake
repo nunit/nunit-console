@@ -84,6 +84,13 @@ if (dotnetX86Available)
         ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-8.0")
     });
 
+    AddToBothLists(new PackageTest(1, "Net10X86Test")
+    {
+        Description = "Run mock-assembly-x86.dll under .NET 10.0",
+        Arguments = "testdata/net10.0/mock-assembly-x86.dll",
+        ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-10.0")
+    });
+
     // TODO: Make tests run on all build platforms
     if (!BuildSystem.IsRunningOnGitHubActions)
     {
@@ -124,11 +131,11 @@ AddToBothLists(new PackageTest(1, "Net462PlusNet462Test")
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-4.6.2")
 });
 
-AddToBothLists(new PackageTest(1, "Net60PlusNet80Test")
+AddToBothLists(new PackageTest(1, "Net60PlusNet80PlusNet10Test")
 {
-    Description = "Run mock-assembly under .NET6.0, 8.0 and 9.0 together",
-    Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net9.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-9.0")
+    Description = "Run mock-assembly under .NET6.0, 8.0 and 10.0 together",
+    Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net10.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-10.0")
 });
 
 AddToBothLists(new PackageTest(1, "Net462PlusNet60Test")
@@ -252,7 +259,6 @@ AddToBothLists(new PackageTest(1, "Net80AspNetCoreTest")
     }
 });
 
-// This works under the .NET 8.0 runner but the test is minimal
 AddToBothLists(new PackageTest(1, "Net90AspNetCoreTest")
 {
     Description = "Run test using AspNetCore targeting .NET 9.0",
@@ -266,6 +272,22 @@ AddToBothLists(new PackageTest(1, "Net90AspNetCoreTest")
         Inconclusive = 0,
         Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-9.0") }
+    }
+});
+
+AddToBothLists(new PackageTest(1, "Net10AspNetCoreTest")
+{
+    Description = "Run test using AspNetCore targeting .NET 10.0",
+    Arguments = "testdata/net10.0/aspnetcore-test.dll",
+    ExpectedResult = new ExpectedResult("Passed")
+    {
+        Total = 2,
+        Passed = 2,
+        Failed = 0,
+        Warnings = 0,
+        Inconclusive = 0,
+        Skipped = 0,
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("aspnetcore-test.dll", "netcore-10.0") }
     }
 });
 
@@ -305,7 +327,6 @@ AddToBothLists(new PackageTest(1, "Net80WindowsFormsTest")
     }
 });
 
-// This won't work under the .NET 8.0 runner
 AddToBothLists(new PackageTest(1, "Net90WindowsFormsTest")
 {
     Description = "Run test using windows forms under .NET 9.0",
@@ -319,6 +340,22 @@ AddToBothLists(new PackageTest(1, "Net90WindowsFormsTest")
         Inconclusive = 0,
         Skipped = 0,
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-9.0") }
+    }
+});
+
+AddToBothLists(new PackageTest(1, "Net10WindowsFormsTest")
+{
+    Description = "Run test using windows forms under .NET 10.0",
+    Arguments = "testdata/net10.0-windows/windows-test.dll",
+    ExpectedResult = new ExpectedResult("Passed")
+    {
+        Total = 2,
+        Passed = 2,
+        Failed = 0,
+        Warnings = 0,
+        Inconclusive = 0,
+        Skipped = 0,
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("windows-test.dll", "netcore-10.0") }
     }
 });
 
@@ -340,12 +377,18 @@ AddToBothLists(new PackageTest(1, "Net80WPFTest")
     ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-8.0") } }
 });
 
-// This won't work under the .NET 8.0 runner
 AddToBothLists(new PackageTest(1, "Net90WPFTest")
 {
     Description = "Run test using WPF under .NET 9.0",
     Arguments = "testdata/net9.0-windows/WpfTest.dll",
     ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-9.0") } }
+});
+
+AddToBothLists(new PackageTest(1, "Net10WPFTest")
+{
+    Description = "Run test using WPF under .NET 10.0",
+    Arguments = "testdata/net10.0-windows/WpfTest.dll",
+    ExpectedResult = new ExpectedResult("Passed") { Assemblies = new[] { new ExpectedAssemblyResult("WpfTest.dll", "netcore-10.0") } }
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -449,11 +492,11 @@ AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net462")
     ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
 });
 
-AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net60")
+AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net10")
 {
-    Description = "Run mock-assembly under .NET 6.0 and produce V2 output",
-    Arguments = "testdata/net6.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
-    ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0"),
+    Description = "Run mock-assembly under .NET 10.0 and produce V2 output",
+    Arguments = "testdata/net10.0/mock-assembly.dll --result=TestResult.xml --result=NUnit2TestResult.xml;format=nunit2",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0"),
     // TODO: Check that V2 result file was created
     ExtensionsNeeded = new[] { KnownExtensions.NUnitV2ResultWriter }
 });
@@ -495,12 +538,20 @@ AddToBothLists(new PackageTest(1, "V2ResultWriterTest_Net60")
 //    ExtensionsNeeded = new[] { Extensions.VSProjectLoader }
 //});
 
-// TeamCity Event Listener Test
-AddToBothLists(new PackageTest(1, "TeamCityListenerTest")
+// TeamCity Event Listener Tests
+AddToBothLists(new PackageTest(1, "TeamCityListenerTest_Net462")
 {
     Description = "Run mock-assembly with --teamcity enabled",
     Arguments = "testdata/net462/mock-assembly.dll --enable NUnit.Engine.Listeners.TeamCityEventListener",
     ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2"),
+    ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener }
+});
+
+AddToBothLists(new PackageTest(1, "TeamCityListenerTest_Net10")
+{
+    Description = "Run mock-assembly with --teamcity enabled",
+    Arguments = "testdata/net10.0/mock-assembly.dll --enable NUnit.Engine.Listeners.TeamCityEventListener",
+    ExpectedResult = new MockAssemblyExpectedResult("netcore-10.0"),
     ExtensionsNeeded = new[] { KnownExtensions.TeamCityEventListener }
 });
 
@@ -582,6 +633,19 @@ AddToBothLists(new PackageTest(1, "InvalidTestNameTest_Net80")
     }
 });
 
+AddToBothLists(new PackageTest(1, "InvalidTestNameTest_Net10")
+{
+    Description = "Ensure we handle invalid test names correctly under .NET 10.0",
+    Arguments = "testdata/net10.0/InvalidTestNames.dll",
+    ExpectedResult = new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[]
+        {
+            new ExpectedAssemblyResult("InvalidTestNames.dll", "netcore-10.0")
+        }
+    }
+});
+
 AddToBothLists(new PackageTest(1, "AppContextBaseDirectory_NET80")
 {
     Description = "Test Setting the BaseDirectory to match test assembly location under .NET 8.0",
@@ -589,6 +653,16 @@ AddToBothLists(new PackageTest(1, "AppContextBaseDirectory_NET80")
     ExpectedResult = new ExpectedResult("Passed")
     {
         Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-8.0") }
+    }
+});
+
+AddToBothLists(new PackageTest(1, "AppContextBaseDirectory_NET10")
+{
+    Description = "Test Setting the BaseDirectory to match test assembly location under .NET 10.0",
+    Arguments = "testdata/net10.0/AppContextTest.dll",
+    ExpectedResult = new ExpectedResult("Passed")
+    {
+        Assemblies = new ExpectedAssemblyResult[] { new ExpectedAssemblyResult("AppContextTest.dll", "netcore-10.0") }
     }
 });
 
