@@ -44,6 +44,8 @@ namespace NUnit.Engine.Runners
         private ITestRunnerFactory _testRunnerFactory;
         private bool _disposed;
 
+        private bool _disposeRunners;
+
         private TestEventDispatcher _eventDispatcher = new TestEventDispatcher();
         private WorkItemTracker _workItemTracker = new WorkItemTracker();
 
@@ -78,6 +80,7 @@ namespace NUnit.Engine.Runners
             ValidatePackageSettings(package);
 
             TestPackage = package;
+            _disposeRunners = TestPackage.Settings.GetValueOrDefault(SettingDefinitions.DisposeRunners);
         }
 
         /// <summary>
@@ -114,6 +117,9 @@ namespace NUnit.Engine.Runners
         {
             LoadResult = AdjustResultForProjects(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);
 
+            if (_disposeRunners)
+                _engineRunner = null;
+
             return LoadResult.Xml;
         }
 
@@ -134,6 +140,9 @@ namespace NUnit.Engine.Runners
         public XmlNode Reload()
         {
             LoadResult = AdjustResultForProjects(GetEngineRunner().Reload()).MakeTestRunResult(TestPackage);
+
+            if (_disposeRunners)
+                _engineRunner = null;
 
             return LoadResult.Xml;
         }
@@ -520,6 +529,9 @@ namespace NUnit.Engine.Runners
             IsTestRunning = false;
 
             _eventDispatcher.OnTestEvent(finalResult.Xml.OuterXml);
+
+            if (_disposeRunners)
+                _engineRunner = null;
 
             return finalResult;
         }

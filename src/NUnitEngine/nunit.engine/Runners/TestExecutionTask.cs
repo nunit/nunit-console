@@ -27,7 +27,7 @@ namespace NUnit.Engine.Runners
             {
                 _result = _runner.Run(_listener, _filter);
             }
-            catch (Exception ex)
+            catch (NUnitEngineUnloadException ex)
             {
                 _unloadException = ex;
             }
