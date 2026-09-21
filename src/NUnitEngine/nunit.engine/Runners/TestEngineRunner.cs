@@ -12,7 +12,9 @@ namespace NUnit.Engine.Runners
     /// </summary>
     public abstract class TestEngineRunner : ITestEngineRunner
     {
-        public TestEngineRunner(IServiceLocator services, TestPackage package)
+        protected bool _disposeRunners;
+
+        public TestEngineRunner(IServiceLocator services, TestPackage package, bool disposeRunners = false)
         {
             Guard.ArgumentNotNull(services, nameof(package));
             Guard.ArgumentNotNull(package, nameof(package));
@@ -23,6 +25,8 @@ namespace NUnit.Engine.Runners
                 : package;
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
+
+            _disposeRunners = disposeRunners;
         }
 
         /// <summary>

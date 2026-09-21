@@ -225,7 +225,17 @@ namespace NUnit.Engine.Runners
         public XmlNode Explore(TestFilter filter)
         {
             if (LoadResult is null)
-                LoadResult = AdjustResultForProjects(GetEngineRunner().Explore(filter)).MakeTestRunResult(TestPackage);
+            {
+                // Separate calls to allow easy debugging.
+                // First Explore the tests getting a result with separate XML for each assembly
+                var initialResult = GetEngineRunner().Explore(filter);
+
+                // Next adjust the results adding aggregate layers for each project
+                var adjustedResult = AdjustResultForProjects(initialResult);
+
+                // Finally, create a single top-level aggregate result
+                LoadResult = adjustedResult.MakeTestRunResult(TestPackage);
+            }
 
             return LoadResult.Xml;
         }

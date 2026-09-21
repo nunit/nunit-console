@@ -146,32 +146,32 @@ namespace NUnit.Engine.Runners
 
             if (LevelOfParallelism <= 1)
             {
-                RunTestsSequentially(listener, filter, results, disposeRunners);
+                RunTestsSequentially(listener, filter, results);
             }
             else
             {
-                RunTestsInParallel(listener, filter, results, disposeRunners);
+                RunTestsInParallel(listener, filter, results);
             }
 
             if (disposeRunners)
-                Runners.Clear();
+                _runners = null;
 
             return ResultHelper.Merge(results);
         }
 
-        private void RunTestsSequentially(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
+        private void RunTestsSequentially(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results)
         {
             log.Debug("Running test assemblies sequentially.");
 
             foreach (ITestEngineRunner runner in Runners)
             {
-                var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
+                var task = new TestExecutionTask(runner, listener, filter);
                 task.Execute();
                 LogResultsFromTask(task, results, _unloadExceptions);
             }
         }
 
-        private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results, bool disposeRunners)
+        private void RunTestsInParallel(ITestEventListener listener, TestFilter filter, List<TestEngineResult> results)
         {
             log.Debug("Running test assemblies in parallel.");
 
@@ -180,7 +180,7 @@ namespace NUnit.Engine.Runners
 
             foreach (ITestEngineRunner runner in Runners)
             {
-                var task = new TestExecutionTask(runner, listener, filter, disposeRunners);
+                var task = new TestExecutionTask(runner, listener, filter);
                 tasks.Add(task);
                 workerPool.Enqueue(task);
             }

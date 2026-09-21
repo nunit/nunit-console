@@ -23,7 +23,7 @@ namespace NUnit.Engine.Runners
         private ITestAgent? _agent;
         private ITestEngineRunner? _remoteRunner;
 
-        public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public ProcessRunner(IServiceLocator services, TestPackage package, bool disposeRunners = false) : base(services, package, disposeRunners)
         {
             _agency = Services.GetService<TestAgency>();
 
@@ -48,6 +48,11 @@ namespace NUnit.Engine.Runners
             {
                 log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
+            }
+            finally
+            {
+                if (_disposeRunners)
+                    Dispose();
             }
         }
 
@@ -165,6 +170,11 @@ namespace NUnit.Engine.Runners
             {
                 log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
+            }
+            finally
+            {
+                if (_disposeRunners)
+                    Dispose();
             }
         }
 
