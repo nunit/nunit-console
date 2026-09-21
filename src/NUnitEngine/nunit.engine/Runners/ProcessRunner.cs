@@ -23,7 +23,7 @@ namespace NUnit.Engine.Runners
         private ITestAgent? _agent;
         private ITestEngineRunner? _remoteRunner;
 
-        public ProcessRunner(IServiceLocator services, TestPackage package, bool disposeRunners = false) : base(services, package, disposeRunners)
+        public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
             _agency = Services.GetService<TestAgency>();
 
