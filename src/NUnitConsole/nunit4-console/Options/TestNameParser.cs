@@ -8,7 +8,7 @@ namespace NUnit.ConsoleRunner.Options
     /// TestNameParser is used to parse the arguments to the
     /// -run option, separating testnames at the correct point.
     /// </summary>
-    public class TestNameParser
+    internal class TestNameParser
     {
         /// <summary>
         /// Parse the -run argument and return an array of arguments

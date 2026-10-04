@@ -14,7 +14,7 @@ namespace NUnit.ConsoleRunner
     /// <summary>
     /// This class provides the entry point for the console runner.
     /// </summary>
-    public class Program
+    internal class Program
     {
         //static Logger log = InternalTrace.GetLogger(typeof(Runner));
         private static readonly ConsoleOptions Options = new ConsoleOptions(new FileSystem());
