@@ -10,7 +10,7 @@ namespace NUnit.ConsoleRunner.Options
     /// OutputSpecification encapsulates a file output path and format
     /// for use in saving the results of a run.
     /// </summary>
-    public class OutputSpecification
+    internal class OutputSpecification
     {
         private static readonly char[] SemicolonSeparator = [';'];
         private static readonly char[] EqualsSeparator = ['='];

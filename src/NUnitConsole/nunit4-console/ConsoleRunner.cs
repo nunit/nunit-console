@@ -64,7 +64,7 @@ namespace NUnit.ConsoleRunner
 
         private readonly string _workDirectory;
 
-        public ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
+        internal ConsoleRunner(ITestEngine engine, ConsoleOptions options, ExtendedTextWriter writer)
         {
             Guard.ArgumentNotNull(_engine = engine);
             Guard.ArgumentNotNull(_options = options);
@@ -506,8 +506,7 @@ namespace NUnit.ConsoleRunner
             return _resultService.GetResultWriter(spec.Format, spec.Transform);
         }
 
-        // This is public static for ease of testing
-        public static TestPackage MakeTestPackage(ConsoleOptions options)
+        internal static TestPackage MakeTestPackage(ConsoleOptions options)
         {
             TestPackage package = new TestPackage(options.InputFiles);
 

@@ -9,7 +9,7 @@ namespace NUnit.ConsoleRunner
     /// with a command-line option that requires a particular extension and
     /// that extension has not been installed.
     /// </summary>
-    public class RequiredExtensionException : Exception
+    internal class RequiredExtensionException : Exception
     {
         private static string BuildMessage(string extensionName) => $"Required extension '{extensionName}' is not installed.";
 

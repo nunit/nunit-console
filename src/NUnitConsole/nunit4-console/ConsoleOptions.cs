@@ -17,7 +17,7 @@ namespace NUnit.ConsoleRunner
     /// Options <see cref="OptionSet"/> class and provides a central location
     /// for defining and parsing options.
     /// </summary>
-    public class ConsoleOptions : OptionSet
+    internal class ConsoleOptions : OptionSet
     {
         private static readonly string CURRENT_DIRECTORY_ON_ENTRY = Directory.GetCurrentDirectory();
         private const string DEFAULT_TRACE_LEVEL = "Warning";
@@ -141,7 +141,7 @@ namespace NUnit.ConsoleRunner
         public string InternalTraceLevel { get; private set; } = DEFAULT_TRACE_LEVEL;
 
         private readonly List<OutputSpecification> resultOutputSpecifications = new List<OutputSpecification>();
-        public IList<OutputSpecification> ResultOutputSpecifications
+        internal IList<OutputSpecification> ResultOutputSpecifications
         {
             get
             {
@@ -158,7 +158,7 @@ namespace NUnit.ConsoleRunner
 
         public bool NoResultSpecified { get; private set; }
 
-        public IList<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
+        internal IList<OutputSpecification> ExploreOutputSpecifications { get; } = new List<OutputSpecification>();
 
         public string? ActiveConfig { get; private set; }
 
