@@ -7,7 +7,7 @@ using System.Text;
 
 namespace NUnit.Engine
 {
-    public enum TokenKind
+    internal enum TokenKind
     {
         Eof,
         Word,
