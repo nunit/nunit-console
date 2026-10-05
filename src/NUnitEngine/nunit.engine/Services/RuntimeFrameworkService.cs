@@ -12,7 +12,7 @@ using TestCentric.Metadata;
 
 namespace NUnit.Engine.Services
 {
-    public class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
+    internal class RuntimeFrameworkService : Service, IRuntimeFrameworkService, IAvailableRuntimes
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RuntimeFrameworkService));
 

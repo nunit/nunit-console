@@ -13,7 +13,7 @@ namespace NUnit.Engine.Services
     /// maintains them in a database. It can return extension nodes or
     /// actual extension objects on request.
     /// </summary>
-    public class ExtensionService : Service, IExtensionService
+    internal class ExtensionService : Service, IExtensionService
     {
         private const string ENGINE_TYPE_EXTENSION_PATH = "/NUnit/Engine/TypeExtensions/";
 

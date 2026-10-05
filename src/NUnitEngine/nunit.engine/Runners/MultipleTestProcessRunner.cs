@@ -9,7 +9,7 @@ namespace NUnit.Engine.Runners
     /// MultipleTestProcessRunner runs tests using separate
     /// Processes for each assembly.
     /// </summary>
-    public class MultipleTestProcessRunner : AggregatingTestRunner
+    internal class MultipleTestProcessRunner : AggregatingTestRunner
     {
         private int _processorCount;
 

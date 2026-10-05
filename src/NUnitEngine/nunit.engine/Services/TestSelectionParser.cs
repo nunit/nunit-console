@@ -26,7 +26,7 @@ namespace NUnit.Engine
     /// the filter as a tree of nodes, which is then walked to produce
     /// final output using an XmlWriter.
     /// </remarks>
-    public class TestSelectionParser
+    internal class TestSelectionParser
     {
         private readonly Tokenizer _tokenizer;
 

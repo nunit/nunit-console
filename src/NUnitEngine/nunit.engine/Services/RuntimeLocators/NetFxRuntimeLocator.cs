@@ -11,7 +11,7 @@ namespace NUnit.Engine.Services.RuntimeLocators
 #if !NETFRAMEWORK
     [SupportedOSPlatform("windows")]
 #endif
-    public static class NetFxRuntimeLocator
+    internal static class NetFxRuntimeLocator
     {
         private const string NETFX = FrameworkIdentifiers.NetFramework;
 

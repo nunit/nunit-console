@@ -8,7 +8,7 @@ using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    public class ResultService : Service, IResultService
+    internal class ResultService : Service, IResultService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ResultService));
 

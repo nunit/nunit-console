@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace NUnit.Engine
 {
-    public class TestFilterBuilder : ITestFilterBuilder
+    internal class TestFilterBuilder : ITestFilterBuilder
     {
         private List<string> _testList = new List<string>();
         private string? _whereClause;

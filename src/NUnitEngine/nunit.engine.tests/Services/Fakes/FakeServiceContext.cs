@@ -21,7 +21,7 @@ namespace NUnit.Engine.Services
     /// currently an exception: the actual class is used because the
     /// current engine code relies on several non-interface methods.
     /// </remarks>
-    public class FakeServiceContext : ServiceContext
+    internal class FakeServiceContext : ServiceContext
     {
         public ITestFilterService? TestFilterService { get; set; }
         // TODO: Try to eliminate the need for using the ExtensionService class

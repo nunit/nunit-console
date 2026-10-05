@@ -6,7 +6,7 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    public class TestCaseResultWriter : IResultWriter
+    internal class TestCaseResultWriter : IResultWriter
     {
         public void CheckWritability(string outputPath)
         {

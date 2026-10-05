@@ -19,7 +19,7 @@ namespace NUnit.Engine.Services
     /// The TestAgency class provides RemoteTestAgents
     /// on request and tracks their status.
     /// </summary>
-    public class TestAgency : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency
+    internal class TestAgency : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 

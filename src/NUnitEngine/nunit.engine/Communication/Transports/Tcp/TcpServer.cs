@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace NUnit.Engine.Communication.Transports.Tcp
 {
-    public class TcpServer
+    internal class TcpServer
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TcpServer));
 

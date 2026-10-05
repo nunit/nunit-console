@@ -10,7 +10,7 @@ namespace NUnit.Engine.Services
     /// already inherit from a different class and can't use this, which
     /// is why we define the IService interface as well.
     /// </summary>
-    public abstract class Service : IService, IDisposable
+    internal abstract class Service : IService, IDisposable
     {
         /// <summary>
         /// The ServiceContext

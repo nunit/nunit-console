@@ -5,7 +5,7 @@ namespace NUnit.Engine.Services
     /// <summary>
     /// Enumeration used to report AgentStatus
     /// </summary>
-    public enum AgentStatus
+    internal enum AgentStatus
     {
         /// <summary>
         /// Agent is in the process of starting and we are waiting for it to be ready.

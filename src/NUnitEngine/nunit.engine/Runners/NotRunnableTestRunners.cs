@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 
 namespace NUnit.Engine.Runners
 {
-    public abstract class NotRunnableTestRunner : ITestEngineRunner
+    internal abstract class NotRunnableTestRunner : ITestEngineRunner
     {
         private const string LOAD_RESULT_FORMAT =
             "<test-suite type='{0}' id='{1}' name='{2}' fullname='{3}' testcasecount='0' runstate='{4}'>" +
@@ -147,7 +147,7 @@ namespace NUnit.Engine.Runners
         }
     }
 
-    public class InvalidAssemblyTestRunner : NotRunnableTestRunner
+    internal class InvalidAssemblyTestRunner : NotRunnableTestRunner
     {
         public InvalidAssemblyTestRunner(string assemblyPath, string message)
             : base(assemblyPath, message)
@@ -158,7 +158,7 @@ namespace NUnit.Engine.Runners
         }
     }
 
-    public class UnmanagedExecutableTestRunner : NotRunnableTestRunner
+    internal class UnmanagedExecutableTestRunner : NotRunnableTestRunner
     {
         public UnmanagedExecutableTestRunner(string assemblyPath)
             : base(assemblyPath, "Unmanaged libraries or applications are not supported")
@@ -169,7 +169,7 @@ namespace NUnit.Engine.Runners
         }
     }
 
-    public class SkippedAssemblyTestRunner : NotRunnableTestRunner
+    internal class SkippedAssemblyTestRunner : NotRunnableTestRunner
     {
         public SkippedAssemblyTestRunner(string assemblyPath)
             : base(assemblyPath, "Skipping non-test assembly")

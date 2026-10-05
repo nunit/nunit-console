@@ -15,7 +15,7 @@ namespace NUnit.Engine.Services
     /// runner for a given package to be loaded and run either in a
     /// separate process or within the same process.
     /// </summary>
-    public class TestRunnerFactory : Service, ITestRunnerFactory
+    internal class TestRunnerFactory : Service, ITestRunnerFactory
     {
         private IProjectService? _projectService;
 

@@ -2,7 +2,7 @@
 
 namespace NUnit.Engine.Runners
 {
-    public interface ITestExecutionTask
+    internal interface ITestExecutionTask
     {
         void Execute();
     }

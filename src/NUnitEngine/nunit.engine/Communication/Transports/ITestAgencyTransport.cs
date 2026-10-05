@@ -6,7 +6,7 @@ namespace NUnit.Engine.Communication.Transports
     /// The ITestAgencyTransport interface is implemented by a
     /// class providing communication for a TestAgency.
     /// </summary>
-    public interface ITestAgencyTransport
+    internal interface ITestAgencyTransport
     {
         string ServerUrl { get; }
         bool Start();

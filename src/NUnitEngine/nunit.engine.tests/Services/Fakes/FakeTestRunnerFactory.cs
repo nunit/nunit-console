@@ -4,7 +4,7 @@ using System;
 
 namespace NUnit.Engine.Services
 {
-    public class FakeTestRunnerFactory : Service, ITestRunnerFactory
+    internal class FakeTestRunnerFactory : Service, ITestRunnerFactory
     {
         private ITestEngineRunner _testEngineRunner;
 
