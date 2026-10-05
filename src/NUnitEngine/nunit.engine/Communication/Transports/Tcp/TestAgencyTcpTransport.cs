@@ -10,7 +10,7 @@ namespace NUnit.Engine.Communication.Transports.Tcp
     /// TestAgencyTcpTransport uses the TCP protocol to connect a
     /// TestAgency with its agents.
     /// </summary>
-    public class TestAgencyTcpTransport : ITestAgencyTransport, ITestAgency, IDisposable
+    internal class TestAgencyTcpTransport : ITestAgencyTransport, ITestAgency, IDisposable
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgencyTcpTransport));
 

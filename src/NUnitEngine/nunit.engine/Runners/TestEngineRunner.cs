@@ -10,7 +10,7 @@ namespace NUnit.Engine.Runners
     /// TestEngineRunner is the base class for all TestEngineRunners
     /// within the NUnit Engine itself.
     /// </summary>
-    public abstract class TestEngineRunner : ITestEngineRunner
+    internal abstract class TestEngineRunner : ITestEngineRunner
     {
         public TestEngineRunner(IServiceLocator services, TestPackage package)
         {

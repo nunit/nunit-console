@@ -11,7 +11,7 @@ namespace NUnit.Engine.Runners
     /// <summary>
     /// ProcessRunner loads and runs a set of tests in a single agent process.
     /// </summary>
-    public class ProcessRunner : TestEngineRunner
+    internal class ProcessRunner : TestEngineRunner
     {
         // ProcessRunner is given a TestPackage containing a single assembly.
         // It loads and runs the test assembly in a single remote agent process.

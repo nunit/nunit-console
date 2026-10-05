@@ -7,7 +7,7 @@ using NUnit.Common;
 
 namespace NUnit.Engine.Services.RuntimeLocators
 {
-    public static class NetCoreRuntimeLocator
+    internal static class NetCoreRuntimeLocator
     {
         public static IEnumerable<RuntimeFramework> FindRuntimes(bool forX86)
         {

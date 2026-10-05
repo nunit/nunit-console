@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace NUnit.Engine.Runners
 {
-    public class ParallelTaskWorkerPool
+    internal class ParallelTaskWorkerPool
     {
         private readonly object _taskLock = new object();
         private readonly Queue<ITestExecutionTask> _tasks;
@@ -25,7 +25,7 @@ namespace NUnit.Engine.Runners
             _threads = new List<Thread>();
         }
 
-        public void Enqueue(ITestExecutionTask task)
+        internal void Enqueue(ITestExecutionTask task)
         {
             Guard.OperationValid(!_isRunning, "Can only enqueue tasks before starting the queue");
 

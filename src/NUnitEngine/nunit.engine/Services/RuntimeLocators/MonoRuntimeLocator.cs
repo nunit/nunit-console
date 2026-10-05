@@ -8,7 +8,7 @@ using System.Text;
 
 namespace NUnit.Engine.Services.RuntimeLocators
 {
-    public static class MonoRuntimeLocator
+    internal static class MonoRuntimeLocator
     {
         //public static IEnumerable<RuntimeFramework> FindRuntimes()
         //{

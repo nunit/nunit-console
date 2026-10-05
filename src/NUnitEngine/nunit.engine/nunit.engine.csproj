@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="nunit.engine.tests, PublicKey=$(NUnitPublicKey)" />
+    <InternalsVisibleTo Include="nunit4-console.tests, PublicKey=$(NUnitPublicKey)" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2, PublicKey=$(NSubstitutePublicKey)" />
   </ItemGroup>
 

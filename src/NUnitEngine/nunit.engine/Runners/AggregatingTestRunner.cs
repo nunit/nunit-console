@@ -21,7 +21,7 @@ namespace NUnit.Engine.Runners
     /// </remarks>
     /// <remarks>
     /// </remarks>
-    public class AggregatingTestRunner : TestEngineRunner
+    internal class AggregatingTestRunner : TestEngineRunner
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(AggregatingTestRunner));
 

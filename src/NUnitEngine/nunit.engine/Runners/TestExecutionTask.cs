@@ -4,7 +4,7 @@ using System;
 
 namespace NUnit.Engine.Runners
 {
-    public class TestExecutionTask : ITestExecutionTask
+    internal class TestExecutionTask : ITestExecutionTask
     {
         private readonly ITestEngineRunner _runner;
         private readonly ITestEventListener _listener;
