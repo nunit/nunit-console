@@ -2,7 +2,7 @@
 
 namespace NUnit.Engine.Services
 {
-    public class TestFilterService : Service, ITestFilterService
+    internal class TestFilterService : Service, ITestFilterService
     {
         public ITestFilterBuilder GetTestFilterBuilder()
         {

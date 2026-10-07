@@ -7,7 +7,7 @@ using System.Text;
 
 namespace NUnit.Engine
 {
-    public enum TokenKind
+    internal enum TokenKind
     {
         Eof,
         Word,
@@ -15,7 +15,7 @@ namespace NUnit.Engine
         Symbol
     }
 
-    public class Token
+    internal class Token
     {
         public Token(TokenKind kind) : this(kind, string.Empty)
         {
@@ -77,7 +77,7 @@ namespace NUnit.Engine
     /// quoted strings. This is sufficient for the simple DSL we use to
     /// select which tests to run.
     /// </summary>
-    public class Tokenizer
+    internal class Tokenizer
     {
         private string _input;
         private int _index;

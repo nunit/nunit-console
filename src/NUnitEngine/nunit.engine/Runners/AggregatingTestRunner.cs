@@ -19,7 +19,7 @@ namespace NUnit.Engine.Runners
     /// combination of projects and assemblies. In all cases, it extracts a list of the
     /// actual assemblies to be run and creates a separate runner for each of them.
     /// </remarks>
-    public class AggregatingTestRunner : TestEngineRunner
+    internal class AggregatingTestRunner : TestEngineRunner
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(AggregatingTestRunner));
 

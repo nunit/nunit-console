@@ -14,7 +14,7 @@ namespace NUnit.Engine.Services
     /// <summary>
     /// Summary description for ProjectService.
     /// </summary>
-    public class ProjectService : Service, IProjectService
+    internal class ProjectService : Service, IProjectService
     {
         private readonly Dictionary<string, ExtensionNode> _extensionIndex = new Dictionary<string, ExtensionNode>();
         private ExtensionService? _extensionService;

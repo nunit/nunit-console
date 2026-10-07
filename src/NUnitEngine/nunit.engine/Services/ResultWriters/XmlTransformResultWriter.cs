@@ -8,7 +8,7 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services
 {
-    public class XmlTransformResultWriter : IResultWriter
+    internal class XmlTransformResultWriter : IResultWriter
     {
         private string? _xsltFile;
         private readonly XslCompiledTransform _transform = new XslCompiledTransform();

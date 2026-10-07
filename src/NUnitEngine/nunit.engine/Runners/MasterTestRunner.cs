@@ -21,7 +21,7 @@ namespace NUnit.Engine.Runners
     /// is the user-facing representation of a test runner. It uses
     /// various internal runners to load and run tests for the user.
     /// </summary>
-    public class MasterTestRunner : ITestRunner
+    internal class MasterTestRunner : ITestRunner
     {
         // MasterTestRunner is the only runner that is passed back
         // to users asking for an ITestRunner. The actual details of

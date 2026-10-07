@@ -9,7 +9,7 @@ namespace NUnit.Engine.Services
     /// Service providing agents of all three types. Currently, only LocalProcess agents
     /// are implemented, so this class is not used and we call the TestAgency directly.
     /// </summary>
-    public class TestAgentService : Service, ITestAgentInfo, ITestAgentProvider
+    internal class TestAgentService : Service, ITestAgentInfo, ITestAgentProvider
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentService));
 
