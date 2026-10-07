@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +13,8 @@ namespace NUnit.Engine.Runners
     /// </summary>
     internal abstract class TestEngineRunner : ITestEngineRunner
     {
+        protected bool _disposeRunners;
+
         public TestEngineRunner(IServiceLocator services, TestPackage package)
         {
             Guard.ArgumentNotNull(services, nameof(package));
@@ -23,6 +26,8 @@ namespace NUnit.Engine.Runners
                 : package;
             Services = services;
             TestRunnerFactory = Services.GetService<ITestRunnerFactory>();
+
+            _disposeRunners = TestPackage.Settings.GetValueOrDefault(SettingDefinitions.DisposeRunners);
         }
 
         /// <summary>

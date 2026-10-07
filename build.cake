@@ -57,10 +57,9 @@ PackageDefinition NUnitEnginePackage = new NuGetPackage(
         HasDirectory("lib/net462").WithFile("nunit.engine.pdb"),
         HasDirectory("lib/net10.0").WithFile("nunit.engine.pdb")
     });
-// TODO: Revise AgentSelector and reinstate tests
-//testRunner: new AgentSelector(
-//    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
-//tests: EngineTests),
+    // TODO: Revise AgentSelector and reinstate tests
+    //testRunner: new AgentSelector(BuildSettings.NuGetTestDirectory),
+    //tests: EngineTests);
 
 PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     id: "NUnit.ConsoleRunner.NetCore",
