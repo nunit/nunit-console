@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Runtime;
 using System.Text;
 using System.Timers;
 using System.Xml;
@@ -109,7 +110,6 @@ namespace NUnit.Engine.Runners
         /// for consumption by clients.
         /// </summary>
         /// <returns>An XmlNode representing the loaded assembly.</returns>
-        [MemberNotNull("LoadResult")]
         public XmlNode Load()
         {
             LoadResult = AdjustResultForProjects(GetEngineRunner().Load()).MakeTestRunResult(TestPackage);

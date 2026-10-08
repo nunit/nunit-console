@@ -12,12 +12,12 @@ namespace NUnit.Engine.Runners
     [TestFixture(1)]
     [TestFixture(2)]
     [TestFixture(8)]
-    public class MultipleTestProcessRunnerTests
+    public class AggregatingTestRunnerTests
     {
         private int _processorCount;
         private ServiceContext _serviceContext;
 
-        public MultipleTestProcessRunnerTests(int processorCount)
+        public AggregatingTestRunnerTests(int processorCount)
         {
             _processorCount = processorCount;
         }
@@ -53,7 +53,7 @@ namespace NUnit.Engine.Runners
             var package = new TestPackage(assemblies);
             if (maxAgents > 0)
                 package.AddSetting(SettingDefinitions.MaxAgents.WithValue(maxAgents));
-            var runner = new MultipleTestProcessRunner(_serviceContext, package, _processorCount);
+            var runner = new AggregatingTestRunner(_serviceContext, package, _processorCount);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
         }
 
@@ -61,7 +61,7 @@ namespace NUnit.Engine.Runners
         public void CheckLevelOfParallelism_SingleAssembly()
         {
             var package = new TestPackage(["junk.dll"]);
-            Assert.That(new MultipleTestProcessRunner(_serviceContext, package, _processorCount).LevelOfParallelism, Is.EqualTo(1));
+            Assert.That(new AggregatingTestRunner(_serviceContext, package, _processorCount).LevelOfParallelism, Is.EqualTo(1));
         }
 
         [TestCase(1, 0, 1)]
@@ -82,7 +82,7 @@ namespace NUnit.Engine.Runners
                 package.SubPackages[0].AddSubPackage(new TestPackage($"test{i}.dll"));
             if (maxAgents > 0)
                 package.AddSetting(SettingDefinitions.MaxAgents.WithValue(maxAgents));
-            var runner = new MultipleTestProcessRunner(_serviceContext, package, _processorCount);
+            var runner = new AggregatingTestRunner(_serviceContext, package, _processorCount);
             Assert.That(runner.LevelOfParallelism, Is.EqualTo(expected));
         }
     }
