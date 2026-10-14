@@ -223,6 +223,10 @@ namespace NUnit.Engine.Services
                     identifier = FrameworkIdentifiers.NetCoreApp;
                 }
             }
+            else if (major > 4)
+            {
+                identifier = FrameworkIdentifiers.NetCoreApp;
+            }
             else
                 throw new NotSupportedException("Platform is not recognized");
 
