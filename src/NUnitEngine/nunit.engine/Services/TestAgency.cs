@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -32,7 +33,7 @@ namespace NUnit.Engine.Services
         private ExtensionService? _extensionService;
 
         // Index used to retrieve the agentId of a terminated process
-        private readonly Dictionary<Process, Guid> _agentProcessIndex = new Dictionary<Process, Guid>();
+        private readonly ConcurrentDictionary<Process, Guid> _agentProcessIndex = new ConcurrentDictionary<Process, Guid>();
 
         // Transports used for various target runtimes
         private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
@@ -167,7 +168,11 @@ namespace NUnit.Engine.Services
             log.Debug("Command line: \"{0}\" {1}", agentProcess.StartInfo.FileName, agentProcess.StartInfo.Arguments);
 
             _agentStore.AddAgent(agentId, agentProcess);
-            _agentProcessIndex.Add(agentProcess, agentId);
+            _agentProcessIndex.TryAdd(agentProcess, agentId);
+
+            // An agent can exit before its process is added to the index.
+            if (agentProcess.HasExited)
+                OnAgentExit(agentProcess);
 
             log.Debug($"Waiting for agent {agentId:B} to register");
 
@@ -181,7 +186,7 @@ namespace NUnit.Engine.Services
 
             // Wait for agent registration based on the agent actually getting processor time to avoid falling over
             // under process starvation.
-            while (waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds && !agentProcess.HasExited)
+            while (!agentProcess.HasExited && waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds)
             {
                 Thread.Sleep(pollTime);
 
@@ -192,6 +197,10 @@ namespace NUnit.Engine.Services
                     return agent;
                 }
             }
+
+            if (agentProcess.HasExited)
+                throw new NUnitEngineException($"Unable to acquire remote process agent (exit code {agentProcess.ExitCode}). " +
+                    GetAgentExitMessage(agentProcess.ExitCode));
 
             throw new NUnitEngineException("Unable to acquire remote process agent");
         }
@@ -334,44 +343,57 @@ namespace NUnit.Engine.Services
         private void OnAgentExit(Process process)
         {
             if (_agentProcessIndex.TryGetValue(process, out var agentId))
-            {
                 _agentStore.MarkTerminated(agentId);
+        }
 
-                string errorMsg;
+        internal string? GetAgentExitMessage(Guid agentId)
+        {
+            if (!_agentStore.TryGetAgentProcess(agentId, out var process))
+                return null;
 
-                switch (process.ExitCode)
-                {
-                    case AgentExitCodes.OK:
-                        return;
-                    case AgentExitCodes.PARENT_PROCESS_TERMINATED:
-                        errorMsg = "Remote test agent believes agency process has exited.";
-                        break;
-                    case AgentExitCodes.UNEXPECTED_EXCEPTION:
-                        errorMsg = "Unhandled exception on remote test agent. " +
-                                   "To debug, try using --trace=debug to output logs.";
-                        break;
-                    case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
-                        errorMsg = "Failed to start remote test agent.";
-                        break;
-                    case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
-                        errorMsg = "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
-                        break;
-                    case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
-                        errorMsg = "Debugger could not be started on remote agent as not available on platform.";
-                        break;
-                    case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
-                        errorMsg = "Remote test agent unable to locate agency process.";
-                        break;
-                    default:
-                        errorMsg = $"Remote test agent exited with non-zero exit code {process.ExitCode}";
-                        break;
-                }
+            try
+            {
+                // A broken connection may be observed just before the native process exits.
+                // Bound the diagnostic wait and do not hold the store lock while waiting.
+                if (!process.WaitForExit(1000))
+                    return null;
 
-                throw new NUnitEngineException(errorMsg);
+                int exitCode = process.ExitCode;
+                string message = $"Remote test agent exited with exit code {exitCode}.";
+                return exitCode == AgentExitCodes.OK ? message : message + " " + GetAgentExitMessage(exitCode);
+            }
+            catch (InvalidOperationException)
+            {
+                // A missing native association must not replace the original run failure.
+                return null;
             }
         }
 
-        private Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
+        internal static string GetAgentExitMessage(int exitCode)
+        {
+            switch (exitCode)
+            {
+                case AgentExitCodes.OK:
+                    return "Remote test agent exited before registering.";
+                case AgentExitCodes.PARENT_PROCESS_TERMINATED:
+                    return "Remote test agent believes agency process has exited.";
+                case AgentExitCodes.UNEXPECTED_EXCEPTION:
+                    return "Unhandled exception on remote test agent. " +
+                           "To debug, try using --trace=debug to output logs.";
+                case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
+                    return "Failed to start remote test agent.";
+                case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
+                    return "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
+                case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
+                    return "Debugger could not be started on remote agent as not available on platform.";
+                case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
+                    return "Remote test agent unable to locate agency process.";
+                default:
+                    return $"Remote test agent exited with non-zero exit code {exitCode}";
+            }
+        }
+
+        internal virtual Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
         {
             if (_extensionService is null)
                 throw new InvalidOperationException("The field '_extensionService' must be non null when calling this method");

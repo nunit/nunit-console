@@ -83,6 +83,21 @@ namespace NUnit.Engine.Services
             }
         }
 
+        public bool TryGetAgentProcess(Guid agentId, [NotNullWhen(true)] out Process? process)
+        {
+            lock (LOCK)
+            {
+                if (_agentIndex.TryGetValue(agentId, out var record))
+                {
+                    process = record.Process;
+                    return true;
+                }
+
+                process = null;
+                return false;
+            }
+        }
+
         // Internal for use by our tests, which may not actually create a process
         internal void MarkTerminated(Guid agentId)
         {
