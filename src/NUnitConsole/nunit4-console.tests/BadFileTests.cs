@@ -26,7 +26,7 @@ namespace NUnit.ConsoleRunner
             services.Add(new TestAgency());
 
             var package = new TestPackage(fullname);
-            package.AddSetting("ProcessModel", "InProcess");
+            package.AddSetting("ProcessModel", "InProcess", true);
 
             var runner = new MasterTestRunner(services, package);
 

@@ -59,15 +59,15 @@ namespace NUnit.Engine.Services
             TestPackage tempPackage = project.GetTestPackage(activeConfig);
 
             // Add info about the configurations to the project package
-            tempPackage.AddSetting(SettingDefinitions.ActiveConfig.WithValue(activeConfig));
-            tempPackage.AddSetting(SettingDefinitions.ConfigNames.WithValue(string.Join(";", project.ConfigNames.ToArray())));
+            tempPackage.AddSetting(SettingDefinitions.ActiveConfig.WithValue(activeConfig), true);
+            tempPackage.AddSetting(SettingDefinitions.ConfigNames.WithValue(string.Join(";", project.ConfigNames.ToArray())), true);
 
             // The original package held overrides, so don't change them, but
             // do apply any settings specified within the project itself.
             foreach (var setting in tempPackage.Settings)
             {
                 if (!package.Settings.HasSetting(setting.Name)) // Don't override settings from command line
-                    package.Settings.Add(setting);
+                    package.AddSetting(setting, false);
             }
 
             foreach (var subPackage in tempPackage.SubPackages)
@@ -80,7 +80,7 @@ namespace NUnit.Engine.Services
             {
                 var packageConfig = Path.ChangeExtension(path, ".config");
                 if (File.Exists(packageConfig))
-                    package.Settings.Add(SettingDefinitions.ConfigurationFile.WithValue(packageConfig));
+                    package.AddSetting(SettingDefinitions.ConfigurationFile.WithValue(packageConfig), false);
             }
         }
 

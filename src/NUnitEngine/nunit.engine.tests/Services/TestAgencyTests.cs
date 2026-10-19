@@ -56,7 +56,7 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("test-assembly.dll");
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
-                new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()));
+                new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()), true);
             Assert.That(_testAgency.GetAgentsForPackage(package).Select(a => a.AgentName), Is.EquivalentTo(new[] { NET462AGENT }));
         }
 
@@ -65,7 +65,7 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("test-assembly.dll");
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
-                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()));
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
             Assert.That(_testAgency.GetAgentsForPackage(package).Select(a => a.AgentName), Is.EquivalentTo(new[] { NET80AGENT }));
         }
 
@@ -74,9 +74,9 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("test1.dll", "test2.dll");
             package.SubPackages[0].AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
-                new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()));
+                new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()), true);
             package.SubPackages[1].AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
-                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()));
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
             Assert.That(_testAgency.GetAgentsForPackage(package), Is.Empty);
         }
     }

@@ -14,7 +14,7 @@ var BothRunnerTests = new ListWrapper(StandardRunnerTests, NetCoreRunnerTests);
 BothRunnerTests.Add(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
-    Arguments = "testdata/net462/mock-assembly.dll",
+    Arguments = "testdata/net462/mock-assembly.dll --debug-agent",
     ExpectedResult = new MockAssemblyExpectedResult(".NETFramework,Version=v4.6.2"),
     // TODO: Remove this once the bundled agents are installed automatically.
     ExtensionsNeeded = KnownExtensions.BundledAgents
