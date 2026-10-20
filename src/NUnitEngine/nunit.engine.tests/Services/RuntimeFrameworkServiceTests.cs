@@ -76,6 +76,22 @@ namespace NUnit.Engine.Services
             Assert.That(framework!.FrameworkName.Identifier, Is.EqualTo(_currentRuntime.FrameworkIdentifier));
         }
 
+        /// <summary>
+        /// Verifies the compatibility profile reported by a real Mono host.
+        /// The existing availability tests also require that profile to be registered.
+        /// </summary>
+        [Test]
+        public void MonoUsesFrameworkCompatibilityProfile()
+        {
+            if (Type.GetType("Mono.Runtime", false) is null)
+                Assert.Ignore("Requires an actual Mono host.");
+
+            var framework = _runtimeService!.CurrentFramework;
+            Assert.That(framework.FrameworkName.Identifier, Is.EqualTo(FrameworkIdentifiers.NetFramework));
+            Assert.That(framework.FrameworkName.Version.Major, Is.EqualTo(Environment.Version.Major));
+            Assert.That(framework.FrameworkName.Version, Is.EqualTo(new Version(4, 5)));
+        }
+
         [Test]
         public void AvailableFrameworks()
         {
