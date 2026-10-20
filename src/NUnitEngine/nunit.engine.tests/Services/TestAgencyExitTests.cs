@@ -83,7 +83,7 @@ namespace NUnit.Engine.Services
             process.StartInfo.RedirectStandardInput = delay < 0;
             using var agency = new ExitTestAgency(process, delay < 0);
             var package = new TestPackage("test-assembly.dll");
-            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(".NETCoreApp,Version=v10.0"));
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(".NETCoreApp,Version=v10.0"), true);
 
             try
             {
