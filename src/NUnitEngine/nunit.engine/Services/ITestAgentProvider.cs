@@ -7,15 +7,19 @@ namespace NUnit.Engine.Services
     /// <summary>
     /// An object implementing ITestAgentProvider is able to provide
     /// test agents, which satisfy the criteria specified in a TestPackage.
-    /// The interface is used by the engine itself to locate agents.
+    /// The engine loads implementations through /NUnit/Engine/AgentProviders.
+    /// Capability queries do not acquire execution ownership. An acquired agent
+    /// remains associated with its provider until ReleaseAgent succeeds.
     /// </summary>
-    internal interface ITestAgentProvider : ITestAgentInfo
+    public interface ITestAgentProvider : ITestAgentInfo
     {
         /// <summary>
         /// Returns true if an agent can be found, which is suitable
         /// for running the provided test package.
         /// </summary>
         /// <param name="package">A TestPackage</param>
+        /// <returns>True if the provider can supply a compatible agent.</returns>
+        /// <remarks>Capability queries must not acquire execution ownership.</remarks>
         bool IsAgentAvailable(TestPackage package);
 
         /// <summary>
@@ -24,7 +28,8 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="package">The test package to be run</param>
         /// <returns>An ITestAgent</returns>
-        /// <exception cref="ArgumentException">If no agent is available.</exception>
+        /// <exception cref="ArgumentException">If the package is invalid.</exception>
+        /// <exception cref="InvalidOperationException">If no compatible agent is available.</exception>
         ITestAgent GetAgent(TestPackage package);
 
         /// <summary>
@@ -35,9 +40,13 @@ namespace NUnit.Engine.Services
         /// If agent was never provided by the factory or was previously released.
         /// </exception>
         /// <remarks>
-        /// Disposing an agent also releases it. However, this should not
-        /// normally be done by the client, but by the source that created
-        /// the agent in the first place.
+        /// Return the agent through the same provider which acquired it so that
+        /// ownership bookkeeping remains consistent. A stop request, a closed
+        /// connection or disposal of a runner is not confirmation of release.
+        /// If release fails, retain ownership until the provider can reconcile it.
+        /// The provider defines how it stops its agent. Successful release alone
+        /// does not prove that external deployment files can be deleted safely;
+        /// remote providers must confirm execution has stopped before allowing cleanup.
         /// </remarks>
         void ReleaseAgent(ITestAgent agent);
     }

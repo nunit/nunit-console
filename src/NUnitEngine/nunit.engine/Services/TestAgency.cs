@@ -20,7 +20,7 @@ namespace NUnit.Engine.Services
     /// The TestAgency class provides RemoteTestAgents
     /// on request and tracks their status.
     /// </summary>
-    internal class TestAgency : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency
+    internal class TestAgency : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency, IAgentExitDiagnostics
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
@@ -344,6 +344,11 @@ namespace NUnit.Engine.Services
         {
             if (_agentProcessIndex.TryGetValue(process, out var agentId))
                 _agentStore.MarkTerminated(agentId);
+        }
+
+        string? IAgentExitDiagnostics.GetAgentExitMessage(ITestAgent agent)
+        {
+            return GetAgentExitMessage(agent.Id);
         }
 
         internal string? GetAgentExitMessage(Guid agentId)
