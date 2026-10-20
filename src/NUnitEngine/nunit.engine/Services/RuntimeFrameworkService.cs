@@ -110,8 +110,8 @@ namespace NUnit.Engine.Services
                     throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
 
                 var frameworkName = requestedFramework.FrameworkName.ToString();
-                package.Settings.Set(SettingDefinitions.RequestedFrameworkName.WithValue(frameworkName));
-                package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(frameworkName));
+                package.ApplySetting(SettingDefinitions.RequestedFrameworkName.WithValue(frameworkName), false);
+                package.ApplySetting(SettingDefinitions.TargetFrameworkName.WithValue(frameworkName), false);
             }
 
             log.Debug($"No specific framework requested for {package.Name}");
@@ -147,7 +147,7 @@ namespace NUnit.Engine.Services
                         targetVersion = new Version(3, 1);
                         break;
                     case "Unmanaged":
-                        package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"));
+                        package.ApplySetting(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"), false);
                         return;
                     default:
                         throw new NUnitEngineException("Unsupported Target Framework: " + imageTargetFrameworkNameSetting);
@@ -162,7 +162,7 @@ namespace NUnit.Engine.Services
             }
 
             RuntimeFramework targetFramework = new RuntimeFramework(targetIdentifier, targetVersion);
-            package.Settings.Set(SettingDefinitions.TargetFrameworkName.WithValue(targetFramework.FrameworkName.ToString()));
+            package.ApplySetting(SettingDefinitions.TargetFrameworkName.WithValue(targetFramework.FrameworkName.ToString()), false);
 
             log.Debug($"Test will use {targetFramework} for {package.Name}");
         }
@@ -295,26 +295,26 @@ namespace NUnit.Engine.Services
                     if (targetVersion.Major > 0)
                     {
                         log.Debug($"Assembly {assemblyPath} uses version {targetVersion}");
-                        package.Settings.Set(SettingDefinitions.ImageRuntimeVersion.WithValue(targetVersion.ToString()));
+                        package.ApplySetting(SettingDefinitions.ImageRuntimeVersion.WithValue(targetVersion.ToString()), false);
                     }
 
                     if (assembly.TryGetFrameworkName(out string frameworkName))
                     {
                         log.Debug($"Assembly {assemblyPath} targets {frameworkName}");
-                        package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue(frameworkName));
+                        package.ApplySetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(frameworkName), false);
                     }
 
                     if (assembly.RequiresX86())
                     {
                         // If assembly requires X86, it MUST be run as X86, so we apply both settings
-                        package.Settings.Set(SettingDefinitions.ImageRequiresX86.WithValue(true));
-                        package.Settings.Set(SettingDefinitions.RunAsX86.WithValue(true));
+                        package.ApplySetting(SettingDefinitions.ImageRequiresX86.WithValue(true), false);
+                        package.ApplySetting(SettingDefinitions.RunAsX86.WithValue(true), false);
                         log.Debug($"Assembly {assemblyPath} will be run x86");
                     }
 
                     if (assembly.HasAttribute("NUnit.Framework.TestAssemblyDirectoryResolveAttribute"))
                     {
-                        package.Settings.Set(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver.WithValue(true));
+                        package.ApplySetting(SettingDefinitions.ImageRequiresDefaultAppDomainAssemblyResolver.WithValue(true), false);
                         log.Debug($"Assembly {assemblyPath} requires default app domain assembly resolver");
                     }
                 }
@@ -323,7 +323,7 @@ namespace NUnit.Engine.Services
             {
                 // "Unmanaged" is not a valid framework identifier but we handle it upstream
                 // using UnmanagedCodeTestRunner, which doesn't actually try to run it.
-                package.Settings.Set(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"));
+                package.ApplySetting(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"), false);
             }
         }
     }

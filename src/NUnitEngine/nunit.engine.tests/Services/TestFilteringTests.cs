@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+// TODO: Move this fixture to NUnit.Agent.Core.Tests or re-implement without use of NUnitFrameworkDriver
+#if false
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -72,3 +74,4 @@ namespace NUnit.Engine.Services
         }
     }
 }
+#endif

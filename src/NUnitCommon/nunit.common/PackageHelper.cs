@@ -38,7 +38,7 @@ namespace NUnit.Engine
 
             // Write Settings
             if (package.Settings.Count != 0)
-                WriteSettings(package.Settings, xmlWriter);
+                WriteSettings(package, xmlWriter);
 
             // Write any SubPackages recursively
             foreach (TestPackage subPackage in package.SubPackages)
@@ -47,8 +47,9 @@ namespace NUnit.Engine
             xmlWriter.WriteEndElement();
         }
 
-        private static void WriteSettings(PackageSettings packageSettings, XmlWriter xmlWriter)
+        private static void WriteSettings(TestPackage package, XmlWriter xmlWriter)
         {
+            var packageSettings = package.Settings;
             xmlWriter.WriteStartElement("Settings");
 
             foreach (PackageSetting setting in packageSettings)
@@ -136,7 +137,7 @@ namespace NUnit.Engine
                             switch (xmlReader.Name)
                             {
                                 case "Settings":
-                                    package.Settings.ReadSettings(xmlReader);
+                                    package.ReadSettings(xmlReader);
                                     break;
 
                                 case "TestPackage":
@@ -159,8 +160,10 @@ namespace NUnit.Engine
             return package;
         }
 
-        private static void ReadSettings(this PackageSettings packageSettings, XmlReader xmlReader)
+        private static void ReadSettings(this TestPackage package, XmlReader xmlReader)
         {
+            var packageSettings = package.Settings;
+
             while (xmlReader.MoveToNextAttribute())
             {
                 var name = xmlReader.Name;
@@ -176,7 +179,7 @@ namespace NUnit.Engine
                             // NYI
                             break;
                         case nameof(SettingDefinitions.LOAD):
-                            packageSettings.Add(SettingDefinitions.LOAD.WithValue(value.Split([';'])));
+                            package.AddSetting(SettingDefinitions.LOAD.WithValue(value.Split([';'])), false);
                             break;
                         case nameof(SettingDefinitions.TestParametersDictionary):
                             var doc = new XmlDocument();
@@ -184,19 +187,19 @@ namespace NUnit.Engine
                             var dict = new Dictionary<string, string>();
                             foreach (XmlNode node in doc.SelectNodes("parms/parm").ShouldNotBeNull())
                                 dict.Add(node.GetAttribute("key").ShouldNotBeNull(), node.GetAttribute("value").ShouldNotBeNull());
-                            packageSettings.Add(SettingDefinitions.TestParametersDictionary.WithValue(dict));
+                            package.AddSetting(SettingDefinitions.TestParametersDictionary.WithValue(dict), false);
                             break;
                         default:
                             switch (settingDefinition.ValueType)
                             {
                                 case Type t when t.IsAssignableFrom(typeof(string)):
-                                    packageSettings.Add(name, value);
+                                    package.AddSetting(name, value, false);
                                     break;
                                 case Type t when t.IsAssignableFrom(typeof(bool)):
-                                    packageSettings.Add(name, bool.Parse(value));
+                                    package.AddSetting(name, bool.Parse(value), false);
                                     break;
                                 case Type t when t.IsAssignableFrom(typeof(int)):
-                                    packageSettings.Add(name, int.Parse(value));
+                                    package.AddSetting(name, int.Parse(value), false);
                                     break;
                                 default:
                                     // Setting doesn't match the expected type, ignore or throw an exception?
@@ -210,11 +213,11 @@ namespace NUnit.Engine
                     // We assume that a setting that parses as a bool or an int
                     // is intended as that type, otherwise we use string.
                     if (bool.TryParse(value, out var flag))
-                        packageSettings.Add(name, flag);
+                        package.AddSetting(name, flag, false);
                     else if (int.TryParse(value, out var num))
-                        packageSettings.Add(name, num);
+                        package.AddSetting(name, num, false);
                     else
-                        packageSettings.Add(name, value);
+                        package.AddSetting(name, value, false);
                 }
             }
 

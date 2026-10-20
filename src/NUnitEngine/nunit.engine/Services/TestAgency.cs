@@ -424,7 +424,7 @@ namespace NUnit.Engine.Services
 
                 var launcherName = launcher.GetType().Name;
                 log.Info($"Selected launcher {launcherName}");
-                package.Settings.Set(SettingDefinitions.SelectedAgentName.WithValue(launcherName));
+                package.ApplySetting(SettingDefinitions.SelectedAgentName.WithValue(launcherName), false);
                 return launcher.CreateAgent(agentId, agencyUrl, package);
             }
 

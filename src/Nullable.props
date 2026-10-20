@@ -14,7 +14,7 @@
 
   <ItemGroup Condition="'$(ExposedInternals)' != 'true'">
     <PackageReference Include="IsExternalInit" PrivateAssets="all" />
-    <PackageReference Include="Nullable" PrivateAssets="all" />
+    <PackageReference Include="Nullable" PrivateAssets="all" Condition="$(TargetFramework.StartsWith('net4')) OR $(TargetFramework.StartsWith('netstandard'))" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4')) OR $(TargetFramework.StartsWith('netstandard'))">

@@ -62,6 +62,18 @@ PackageDefinition NUnitEnginePackage = new NuGetPackage(
 //    BuildSettings.NuGetTestDirectory + $"NUnit.Engine.{BuildSettings.PackageVersion}/agents"),
 //tests: EngineTests),
 
+// NUnit.ConsoleRunner uses a nuspec file to specify the bundled pluggable agents
+PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
+    id: "NUnit.ConsoleRunner",
+    source: BuildSettings.NuGetDirectory + "runners/NUnit.ConsoleRunner.nuspec",
+    description: RUNNER_DESCRIPTION,
+    checks: new PackageCheck[] {
+        HasDependencies(KnownExtensions.BundledNuGetAgents)
+    },
+    testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
+        + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
+    tests: StandardRunnerTests);
+
 PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     id: "NUnit.ConsoleRunner.NetCore",
     source: BuildSettings.SourceDirectory + "NUnitConsole/nunit4-netcore-console/nunit4-netcore-console.csproj",
@@ -75,25 +87,13 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);
 
-// NUnit.ConsoleRunner uses a nuspec file to specify the bundled pluggable agents
-PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
-    id: "NUnit.ConsoleRunner",
-    source: BuildSettings.NuGetDirectory + "runners/NUnit.ConsoleRunner.nuspec",
-    description: RUNNER_DESCRIPTION,
-    checks: new PackageCheck[] {
-        HasDependencies(KnownExtensions.BundledNuGetAgents)
-    },
-    testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
-        + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
-    tests: StandardRunnerTests);
-
 // Add all packages to BuildSettings in order they should be build.
 // Dependencies must precede all the packages that depend on them.
 BuildSettings.Packages.AddRange(new PackageDefinition[] {
     NUnitCommonPackage,
     NUnitEnginePackage,
-    NUnitConsoleRunnerDotNetToolPackage,
     NUnitConsoleRunnerNuGetPackage,
+    NUnitConsoleRunnerDotNetToolPackage
 });
 
 Task("BuildPackages")

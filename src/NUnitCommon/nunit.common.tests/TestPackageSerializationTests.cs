@@ -29,12 +29,12 @@ namespace NUnit.Engine.Internal
 
             // Add settings intended for top level and both subpackages.
             // All these settings are non-standard, defined by the user.
-            TEST_PACKAGE.AddSetting("foo", "bar");
-            TEST_PACKAGE.AddSetting("num", 42);
-            TEST_PACKAGE.AddSetting("critical", true);
+            TEST_PACKAGE.AddSetting("foo", "bar", true);
+            TEST_PACKAGE.AddSetting("num", 42, true);
+            TEST_PACKAGE.AddSetting("critical", true, true);
 
             // Add a setting to the first subpackage only
-            SUBPACKAGE1.AddSetting("cpu", "x86");
+            SUBPACKAGE1.AddSetting("cpu", "x86", false);
 
             // Multi-line for ease of editing only
             EXPECTED_XML = $"""
@@ -102,7 +102,7 @@ namespace NUnit.Engine.Internal
             Assert.That(setting.Value, Is.AssignableTo(definition.ValueType));
 
             var oldPackage = new TestPackage("test.dll").SubPackages[0];
-            oldPackage.AddSetting(setting);
+            oldPackage.AddSetting(setting, true);
             var xml = oldPackage.ToXml();
 
             // Check the XML we just created is what we expect

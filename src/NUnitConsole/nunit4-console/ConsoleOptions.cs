@@ -433,12 +433,10 @@ namespace NUnit.ConsoleRunner
             this.Add("set-principal-policy=", "Set PrincipalPolicy for the test domain.",
                 v => PrincipalPolicy = parser.RequiredValue(v, "--set-principal-policy", "UnauthenticatedPrincipal", "NoPrincipal", "WindowsPrincipal"));
 
-#if DEBUG
             this.Add("debug-agent", "Launch debugger in nunit-agent when it starts.",
                 v => DebugAgent = !string.IsNullOrEmpty(v));
             this.Add("debug-console", "Launch debugger in nunit-console when it starts.",
                 v => DebugConsole = !string.IsNullOrEmpty(v));
-#endif
         }
 
         private int _nesting = 0;

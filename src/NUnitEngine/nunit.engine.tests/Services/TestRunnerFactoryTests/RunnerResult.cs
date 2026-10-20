@@ -9,12 +9,9 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
 {
     public class RunnerResult
     {
+// TODO: Remove #if statement
 #if NETFRAMEWORK
-        public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
-        public static RunnerResult MultipleTestProcessRunner(int numProcesses) =>
-            new RunnerResult(
-                typeof(MultipleTestProcessRunner),
-                GetSubRunners(RunnerResult.ProcessRunner, numProcesses));
+        //public static RunnerResult TestDomainRunner => new RunnerResult(typeof(TestDomainRunner));
         public static RunnerResult AggregatingTestRunner(int numSubRunners) =>
             RunnerResult.AggregatingTestRunner(RunnerResult.ProcessRunner, numSubRunners);
 
@@ -29,7 +26,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
         }
 #endif
         public static RunnerResult ProcessRunner => new RunnerResult(typeof(ProcessRunner));
-        public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
+        //public static RunnerResult LocalTestRunner => new RunnerResult(typeof(LocalTestRunner));
 
         public static RunnerResult InvalidAssemblyTestRunner => new RunnerResult(typeof(InvalidAssemblyTestRunner));
 

@@ -23,6 +23,8 @@ namespace NUnit.Engine.Runners
     /// </remarks>
     internal class AggregatingTestRunner : TestEngineRunner
     {
+        private int _processorCount;
+
         private static readonly Logger log = InternalTrace.GetLogger(typeof(AggregatingTestRunner));
 
         // TODO: Determine whether AggregatingTestRunner needs to create an XML result
@@ -38,7 +40,13 @@ namespace NUnit.Engine.Runners
         // Public for testing purposes
         public virtual int LevelOfParallelism
         {
-            get { return 1; }
+            get
+            {
+                var maxAgents = TestPackage.Settings.HasSetting(SettingDefinitions.MaxAgents)
+                    ? TestPackage.Settings.GetValueOrDefault(SettingDefinitions.MaxAgents)
+                    : _processorCount;
+                return Math.Min(TestPackages.Count, maxAgents);
+            }
         }
 
         // Exposed for use by tests
@@ -61,9 +69,11 @@ namespace NUnit.Engine.Runners
             }
         }
 
-        public AggregatingTestRunner(IServiceLocator services, TestPackage package) : base(services, package)
+        public AggregatingTestRunner(IServiceLocator services, TestPackage package, int processorCount = 0) : base(services, package)
         {
             Guard.ArgumentValid(TestRunnerFactory is not null, "TestRunnerFactory service not available", nameof(services));
+
+            _processorCount = processorCount;
         }
 
         /// <summary>

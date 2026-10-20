@@ -128,9 +128,9 @@ namespace NUnit.Engine.Services
         public void EngineOptionPreferredOverImageTarget(string framework, int majorVersion, int minorVersion, string requested)
         {
             var package = new TestPackage("test");
-            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(framework));
-            package.AddSetting(SettingDefinitions.ImageRuntimeVersion.WithValue($"{majorVersion}.{minorVersion}"));
-            package.AddSetting(SettingDefinitions.RequestedRuntimeFramework.WithValue(requested));
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(framework), true);
+            package.AddSetting(SettingDefinitions.ImageRuntimeVersion.WithValue($"{majorVersion}.{minorVersion}"), true);
+            package.AddSetting(SettingDefinitions.RequestedRuntimeFramework.WithValue(requested), true);
 
             _runtimeService!.SelectRuntimeFramework(package);
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework), Is.EqualTo(requested));
@@ -148,9 +148,9 @@ namespace NUnit.Engine.Services
             var topLevelPackage = new TestPackage(["a.dll", "b.dll"]);
 
             var net20Package = topLevelPackage.SubPackages[0];
-            net20Package.Settings.Add(SettingDefinitions.ImageRuntimeVersion.WithValue("2.0"));
+            net20Package.AddSetting(SettingDefinitions.ImageRuntimeVersion.WithValue("2.0"), false);
             var net40Package = topLevelPackage.SubPackages[1];
-            net40Package.Settings.Add(SettingDefinitions.ImageRuntimeVersion.WithValue("4.0"));
+            net40Package.AddSetting(SettingDefinitions.ImageRuntimeVersion.WithValue("4.0"), false);
 
             _runtimeService.SelectRuntimeFramework(topLevelPackage);
 
