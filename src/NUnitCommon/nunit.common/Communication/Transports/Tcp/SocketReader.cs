@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using NUnit.Engine.Communication.Messages;
 using NUnit.Engine.Communication.Protocols;
@@ -40,6 +41,9 @@ namespace NUnit.Engine.Communication.Transports.Tcp
             while (_msgQueue.Count == 0)
             {
                 int n = _socket.Receive(_buffer);
+                if (n == 0)
+                    throw new EndOfStreamException("The remote endpoint closed the connection.");
+
                 var bytes = new byte[n];
                 Array.Copy(_buffer, 0, bytes, 0, n);
                 foreach (var message in _wireProtocol.Decode(bytes))

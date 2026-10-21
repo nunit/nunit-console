@@ -298,6 +298,10 @@ namespace NUnit.Engine.Runners
 
         private TestEngineResult CreateFailedResult(Exception e)
         {
+            string? agentExitMessage = _agent is not null ? _agency.GetAgentExitMessage(_agent.Id) : null;
+            if (agentExitMessage is not null)
+                e = new NUnitEngineException(agentExitMessage, e);
+
             var suite = XmlHelper.CreateTopLevelElement("test-suite");
             XmlHelper.AddAttribute(suite, "type", "Assembly");
             XmlHelper.AddAttribute(suite, "id", TestPackage.ID);
