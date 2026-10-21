@@ -182,11 +182,49 @@ namespace NUnit.Engine.Services
             _second.DidNotReceiveWithAnyArgs().GetAgent(default!);
         }
 
-        [Test]
-        public void EmptyProviderSelectionIsAnError()
+        [TestCase("")]
+        [TestCase(" ")]
+        [TestCase(42)]
+        public void InvalidProviderSelectionIsAnError(object selection)
         {
-            _package.AddSetting("RequestedAgentProvider", string.Empty, true);
+            _package.AddSetting(new PackageSetting<object>("RequestedAgentProvider", selection), true);
             Assert.That(() => _service.IsAgentAvailable(_package), Throws.TypeOf<NUnitEngineException>());
+        }
+
+        [Test]
+        public void ExplicitProviderSelectionBypassesEarlierCompatibleProvider()
+        {
+            var selected = new SelectedProvider(_second);
+            using var service = new TestAgentService(_first, selected);
+            var context = new ServiceContext();
+            context.Add(service);
+            service.StartService();
+            var agent = Substitute.For<ITestAgent>();
+            _first.IsAgentAvailable(_package).Returns(true);
+            _second.IsAgentAvailable(_package).Returns(true);
+            _second.GetAgent(_package).Returns(agent);
+            _package.AddSetting("RequestedAgentProvider", typeof(SelectedProvider).FullName!, true);
+
+            Assert.That(service.GetAgent(_package), Is.SameAs(agent));
+            service.ReleaseAgent(agent);
+
+            _first.DidNotReceiveWithAnyArgs().IsAgentAvailable(default!);
+            _first.DidNotReceiveWithAnyArgs().GetAgent(default!);
+            _second.Received(1).ReleaseAgent(agent);
+        }
+
+        [Test]
+        public void AmbiguousExplicitProviderSelectionIsAnError()
+        {
+            using var service = new TestAgentService(new SelectedProvider(_first), new SelectedProvider(_second));
+            var context = new ServiceContext();
+            context.Add(service);
+            service.StartService();
+            _package.AddSetting("RequestedAgentProvider", typeof(SelectedProvider).FullName!, true);
+
+            Assert.That(() => service.GetAgent(_package), Throws.TypeOf<NUnitEngineException>());
+            _first.DidNotReceiveWithAnyArgs().GetAgent(default!);
+            _second.DidNotReceiveWithAnyArgs().GetAgent(default!);
         }
 
         [Test]
@@ -277,6 +315,26 @@ namespace NUnit.Engine.Services
 
             service.ReleaseAgent(agent);
             ((IAgentExitDiagnostics)owner).DidNotReceiveWithAnyArgs().GetAgentExitMessage(default!);
+        }
+
+        private sealed class SelectedProvider : ITestAgentProvider
+        {
+            private readonly ITestAgentProvider _inner;
+
+            public SelectedProvider(ITestAgentProvider inner)
+            {
+                _inner = inner;
+            }
+
+            public IList<TestAgentInfo> AvailableAgents => _inner.AvailableAgents;
+
+            public IList<TestAgentInfo> GetAgentsForPackage(TestPackage package) => _inner.GetAgentsForPackage(package);
+
+            public bool IsAgentAvailable(TestPackage package) => _inner.IsAgentAvailable(package);
+
+            public ITestAgent GetAgent(TestPackage package) => _inner.GetAgent(package);
+
+            public void ReleaseAgent(ITestAgent agent) => _inner.ReleaseAgent(agent);
         }
 
         private ITestAgent AcquireFrom(ITestAgentProvider provider)
