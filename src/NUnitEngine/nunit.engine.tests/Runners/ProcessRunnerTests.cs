@@ -30,6 +30,11 @@ namespace NUnit.Engine.Runners
         private TestPackage _package;
         private ProcessRunner _processRunner;
         private ITestEngineRunner? _remoteRunner;
+#if !TESTAGENCY_INTEGRATION
+        private ITestAgentProvider _agentProvider;
+        private IAgentExitDiagnostics _agentDiagnostics;
+        private ITestAgent _agent;
+#endif
 
         private string _runtimeDir = "net462";
 
@@ -58,7 +63,7 @@ namespace NUnit.Engine.Runners
 #if TESTAGENCY_INTEGRATION
             // We actually run the test
             var agency = new TestAgency() { ServiceContext = context };
-            context.GetService<TestAgency>().Returns(agency);
+            context.GetService<ITestAgentProvider>().Returns(agency);
             agency.StartService();
 #else
             // Create Substitutes for All Components
@@ -74,10 +79,12 @@ namespace NUnit.Engine.Runners
             var agent = Substitute.For<ITestAgent>();
             agent.CreateRunner(_package).ReturnsForAnyArgs(_remoteRunner);
 
-            var agency = Substitute.For<TestAgency>();
-            agency.GetAgent(_package).ReturnsForAnyArgs(agent);
+            _agentProvider = Substitute.For<ITestAgentProvider, IAgentExitDiagnostics>();
+            _agentDiagnostics = (IAgentExitDiagnostics)_agentProvider;
+            _agent = agent;
+            _agentProvider.GetAgent(_package).ReturnsForAnyArgs(agent);
 
-            context.GetService<TestAgency>().Returns(agency);
+            context.GetService<ITestAgentProvider>().Returns(_agentProvider);
 #endif
 
             _processRunner = new ProcessRunner(context, _package);
@@ -181,6 +188,51 @@ namespace NUnit.Engine.Runners
             Assert.That(result.GetAttribute("inconclusive", 0), Is.EqualTo(MockAssembly.Inconclusive));
         }
 #else
+        [TestCase(null)]
+        [TestCase("Native agent exited with exit code 42")]
+        public void RunPreservesOriginalFailureAndOptionalProviderDiagnostic(string? diagnostic)
+        {
+            _agentDiagnostics.GetAgentExitMessage(_agent).Returns(diagnostic);
+            _remoteRunner!.Run(this, TestFilter.Empty).Returns(_ => throw new IOException("original connection failure"));
+
+            TestEngineResult result = _processRunner.Run(this, TestFilter.Empty);
+
+            Assert.That(result.Xml.GetAttribute("result"), Is.EqualTo("Failed"));
+            string message = result.Xml.SelectSingleNode("failure/message")!.InnerText;
+            Assert.That(message, Does.Contain("original connection failure"));
+            if (diagnostic is not null)
+                Assert.That(message, Does.Contain(diagnostic));
+        }
+
+        [Test]
+        public void DisposeReleasesAgentThroughItsProviderOnce()
+        {
+            _processRunner.ForceRemoteRunnerCreation();
+            _processRunner.Dispose();
+            _processRunner.Dispose();
+
+            _agentProvider.Received(1).ReleaseAgent(_agent);
+            _agent.DidNotReceive().Stop();
+        }
+
+        [Test]
+        public void DisposeWithoutAcquiringAgentDoesNotRelease()
+        {
+            _processRunner.Dispose();
+
+            _agentProvider.DidNotReceiveWithAnyArgs().ReleaseAgent(default!);
+        }
+
+        [Test]
+        public void DisposeReleasesAgentWhenUnloadFails()
+        {
+            _processRunner.ForceRemoteRunnerCreation();
+            _remoteRunner!.When(runner => runner.Unload()).Do(_ => throw new InvalidOperationException("unload failed"));
+
+            Assert.That(() => _processRunner.Dispose(), Throws.TypeOf<NUnitEngineUnloadException>());
+            _agentProvider.Received(1).ReleaseAgent(_agent);
+        }
+
         [Test]
         public void RequestStop()
         {
@@ -200,7 +252,7 @@ namespace NUnit.Engine.Runners
 
         public void OnTestEvent(string report)
         {
-             // Do nothing
+            // Do nothing
         }
     }
 }

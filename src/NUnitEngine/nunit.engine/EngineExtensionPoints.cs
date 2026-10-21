@@ -15,3 +15,6 @@ using NUnit.Extensibility;
     Description = "Supplies a driver to run tests that use a specific test framework.")]
 [assembly: ExtensionPoint("/NUnit/Engine/Services", typeof(NUnit.Engine.IService),
     Description = "Provides a service within the engine and possibly externally as well.")]
+
+[assembly: ExtensionPoint("/NUnit/Engine/AgentProviders", typeof(NUnit.Engine.Services.ITestAgentProvider),
+    Description = "Provides agents for additional execution backends.")]

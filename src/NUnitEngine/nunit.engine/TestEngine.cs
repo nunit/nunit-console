@@ -73,6 +73,9 @@ namespace NUnit.Engine
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
                 Services.Add(new RuntimeFrameworkService());
+                // Register the coordinator first so interface lookups include all providers.
+                // It records the agency during startup; agents are acquired after all services start.
+                Services.Add(new TestAgentService());
                 Services.Add(new TestAgency());
                 Services.Add(new ResultService());
                 Services.Add(new TestRunnerFactory());

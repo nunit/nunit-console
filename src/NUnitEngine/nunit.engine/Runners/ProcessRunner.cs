@@ -18,14 +18,14 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private readonly TestAgency _agency;
+        private readonly ITestAgentProvider _agentProvider;
 
         private ITestAgent? _agent;
         private ITestEngineRunner? _remoteRunner;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-            _agency = Services.GetService<TestAgency>();
+            _agentProvider = Services.GetService<ITestAgentProvider>();
 
             // Ensure that the TestPackage represents an assembly.
             Guard.ArgumentValid(!TestPackage.HasSubPackages, $"{GetType().Name} requires a package with a single assembly", nameof(package));
@@ -250,14 +250,14 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent is not null && _agency.IsAgentActive(_agent.Id, out _))
+                if (_agent is not null)
                 {
                     try
                     {
                         log.Debug("Stopping remote agent");
-                        _agent.Stop();
+                        _agentProvider.ReleaseAgent(_agent);
                     }
-                    catch (NUnitEngineUnloadException ex) when (unloadException is not null)
+                    catch (Exception ex) when (unloadException is not null)
                     {
                         // Both kinds of errors, throw exception with combined message
                         throw new NUnitEngineUnloadException(ExceptionHelper.BuildMessage(unloadException) + Environment.NewLine + ex.Message);
@@ -269,7 +269,7 @@ namespace NUnit.Engine.Runners
                 }
 
                 if (unloadException is not null) // Add message line indicating we managed to stop agent anyway
-                    throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
+                    throw new NUnitEngineUnloadException("Agent was released successfully after unload error.", unloadException);
             }
         }
 
@@ -282,7 +282,7 @@ namespace NUnit.Engine.Runners
                 bool debug = TestPackage.Settings.GetValueOrDefault(SettingDefinitions.DebugAgent) ||
                              TestPackage.Settings.GetValueOrDefault(SettingDefinitions.PauseBeforeRun);
 
-                _agent = _agency.GetAgent(TestPackage);
+                _agent = _agentProvider.GetAgent(TestPackage);
             }
 
             if (_remoteRunner is null)
@@ -292,13 +292,15 @@ namespace NUnit.Engine.Runners
         // Used for testing
         internal void ForceRemoteRunnerCreation()
         {
-            _agent = _agency.GetAgent(TestPackage);
+            _agent = _agentProvider.GetAgent(TestPackage);
             _remoteRunner = _agent.CreateRunner(TestPackage);
         }
 
         private TestEngineResult CreateFailedResult(Exception e)
         {
-            string? agentExitMessage = _agent is not null ? _agency.GetAgentExitMessage(_agent.Id) : null;
+            string? agentExitMessage = _agent is not null
+                ? (_agentProvider as IAgentExitDiagnostics)?.GetAgentExitMessage(_agent)
+                : null;
             if (agentExitMessage is not null)
                 e = new NUnitEngineException(agentExitMessage, e);
 
