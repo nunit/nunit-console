@@ -8,6 +8,9 @@ namespace NUnit.Engine.Tests
     {
         private static int Main(string[] args)
         {
+            if (args.Length > 0 && args[0] == "--test-provider-server")
+                return TestHelpers.ProviderServerHost.Run(args);
+
             if (args.Length > 0 && args[0] == "--agent-exit-probe")
                 return Services.TestAgencyExitTests.RunProbe(args);
 
