@@ -67,6 +67,15 @@ namespace NUnit.Engine.Services
             }
         }
 
+        public bool IsAgentActive(Guid agentId)
+        {
+            lock (LOCK)
+            {
+                return _agentIndex.TryGetValue(agentId, out var record)
+                    && record.Status != AgentStatus.Terminated;
+            }
+        }
+
         public bool IsAgentActive(Guid agentId, [NotNullWhen(true)] out Process? process)
         {
             lock (LOCK)
