@@ -290,7 +290,7 @@ namespace NUnit.Engine.Services
             throw new NUnitEngineException("Internal Error: Expected an IAgentLancher");
         }
 
-        private Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
+        internal virtual Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
         {
             // Check to see if a specific agent was selected
             string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
