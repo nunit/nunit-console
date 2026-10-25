@@ -1,5 +1,4 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
-
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -81,16 +80,17 @@ namespace NUnit.Engine.Services
                 EnableRaisingEvents = enableEvents
             };
             process.StartInfo.RedirectStandardInput = delay < 0;
-            using var agency = new ExitTestAgency(process, delay < 0);
+            using var agency = new TestAgency();
+            var provider = new ExitTestAgentProvider(agency, process, delay < 0);
             var package = new TestPackage("test-assembly.dll");
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(".NETCoreApp,Version=v10.0"), true);
 
             try
             {
-                agency.GetAgent(package);
+                provider.GetAgent(package);
                 if (delay < 0)
                 {
-                    agency.Registration!.GetAwaiter().GetResult();
+                    provider.Registration!.GetAwaiter().GetResult();
                     if (delay == -2)
                         process.Kill();
                     else
@@ -108,13 +108,13 @@ namespace NUnit.Engine.Services
                         return 5;
 
                     Thread.Sleep(250);
-                    if (agency.IsAgentActive(agency.AgentId, out _))
+                    if (agency._agentStore.IsAgentActive(provider.AgentId, out _))
                     {
                         Console.Error.WriteLine("Exited agent is still active.");
                         return 4;
                     }
 
-                    string? message = agency.GetAgentExitMessage(agency.AgentId);
+                    string? message = agency.GetAgentExitMessage(provider.AgentId);
                     if (message is null || !message.Contains("exit code " + process.ExitCode))
                     {
                         Console.Error.WriteLine("Registered agent exit diagnostic was lost.");
@@ -122,7 +122,7 @@ namespace NUnit.Engine.Services
                     }
 
                     process.Dispose();
-                    if (agency.GetAgentExitMessage(agency.AgentId) is not null)
+                    if (agency.GetAgentExitMessage(provider.AgentId) is not null)
                     {
                         Console.Error.WriteLine("Disposed process produced an exit diagnostic.");
                         return 7;
@@ -196,13 +196,15 @@ namespace NUnit.Engine.Services
             };
         }
 
-        private sealed class ExitTestAgency : TestAgency
+        private sealed class ExitTestAgentProvider : LocalProcessAgentProvider
         {
+            private readonly TestAgency _agency;
             private readonly Process _process;
             private readonly bool _register;
 
-            public ExitTestAgency(Process process, bool register)
+            public ExitTestAgentProvider(TestAgency agency, Process process, bool register) : base(agency)
             {
+                _agency = agency;
                 _process = process;
                 _register = register;
             }
@@ -210,8 +212,6 @@ namespace NUnit.Engine.Services
             public Task? Registration { get; private set; }
 
             public Guid AgentId { get; private set; }
-
-            internal override string TcpEndPoint => "tcp://unused";
 
             internal override Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
             {
@@ -227,7 +227,7 @@ namespace NUnit.Engine.Services
                         {
                             try
                             {
-                                Register(agent);
+                                _agency.Register(agent);
                                 return;
                             }
                             catch (ArgumentException)

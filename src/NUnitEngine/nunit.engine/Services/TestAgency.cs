@@ -24,16 +24,11 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgency));
 
-        private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
-        private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
-        private const string AGENT_LAUNCHERS_PATH = "/NUnit/Engine/AgentLaunchers";
+        private readonly List<ITestAgentProvider> _providers = new List<ITestAgentProvider>();
 
-        private readonly AgentStore _agentStore = new AgentStore();
+        internal readonly AgentStore _agentStore = new AgentStore();
 
-        private ExtensionService? _extensionService;
-
-        // Index used to retrieve the agentId of a terminated process
-        private readonly ConcurrentDictionary<Process, Guid> _agentProcessIndex = new ConcurrentDictionary<Process, Guid>();
+        internal ExtensionService? _extensionService;
 
         // Transports used for various target runtimes
         private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
@@ -51,8 +46,6 @@ namespace NUnit.Engine.Services
 
         #region ITestAgentInfo Implementation
 
-        private List<TestAgentInfo>? _availableAgents;
-
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.
         /// </summary>
@@ -60,26 +53,12 @@ namespace NUnit.Engine.Services
         {
             get
             {
-                if (_availableAgents is null)
-                {
-                    _availableAgents = new List<TestAgentInfo>();
+                var agents = new List<TestAgentInfo>();
 
-                    foreach (var node in LauncherNodes)
-                    {
-                        string agentName = node.TypeName;
-                        TestAgentType agentType = TestAgentType.LocalProcess;
-                        string? targetFramework = node.GetValues("TargetFramework").FirstOrDefault();
-                        // We try to avoid instantiating the agent to determine its target runtime,
-                        // which may be specified as a property of the extension node.
-                        var targetFrameworkName = targetFramework is not null
-                            ? new FrameworkName(targetFramework)
-                            : GetLauncherInstance(node).AgentInfo.TargetRuntime;
+                foreach (var provider in _providers)
+                    agents.AddRange(provider.AvailableAgents);
 
-                        _availableAgents.Add(new TestAgentInfo(agentName, agentType, targetFrameworkName));
-                    }
-                }
-
-                return _availableAgents;
+                return agents;
             }
         }
 
@@ -94,33 +73,10 @@ namespace NUnit.Engine.Services
         /// </returns>
         public IList<TestAgentInfo> GetAgentsForPackage(TestPackage targetPackage)
         {
-            Guard.ArgumentNotNull(targetPackage, nameof(targetPackage));
-
-            // This method is primarily intended for use in implementing a command-line
-            // option to allow selection of the agent to be used for a test run. Because
-            // the option would apply to all assemblies being run, any agents returned
-            // must be able to run all assemblies.
-
-            // Initialize lists with ALL available agents
-            var validAgentNames = new HashSet<string>(AvailableAgents.Select(info => info.AgentName));
-
-            // Look at each included assembly package to see if any names should be removed
-            foreach (var assemblyPackage in targetPackage.Select(p => p.IsAssemblyPackage))
-            {
-                // Collect names of agents that work for each assembly
-                var agentsForAssembly = new HashSet<string>();
-                foreach (var node in LauncherNodes)
-                {
-                    if (CanCreateAgent(node, assemblyPackage))
-                        agentsForAssembly.Add(node.TypeName);
-                }
-
-                // Remove agents from final result if they don't work for this assembly
-                validAgentNames.IntersectWith(agentsForAssembly);
-            }
-
-            // Finish up by excluding all unsuitable entries from the List of available agents.
-            return AvailableAgents.Where(info => validAgentNames.Contains(info.AgentName)).ToList();
+            var agents = new List<TestAgentInfo>();
+            foreach (var agentSource in _providers)
+                agents.AddRange(agentSource.GetAgentsForPackage(targetPackage));
+            return agents;
         }
 
         #endregion
@@ -134,12 +90,9 @@ namespace NUnit.Engine.Services
         /// <param name="package">A TestPackage</param>
         public bool IsAgentAvailable(TestPackage package)
         {
-            foreach (var node in LauncherNodes)
-            {
-                if (CanCreateAgent(node, package))
+            foreach (var agentSource in _providers)
+                if (agentSource.IsAgentAvailable(package))
                     return true;
-            }
-
             return false;
         }
 
@@ -155,56 +108,32 @@ namespace NUnit.Engine.Services
         {
             // Target Runtime must be specified by this point
             string runtimeSetting = package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName);
-            Guard.OperationValid(runtimeSetting.Length > 0, "LaunchAgentProcess called with no target runtime specified");
+            Guard.OperationValid(runtimeSetting.Length > 0, "GetAgent called with no target runtime specified");
 
-            var targetRuntime = new FrameworkName(runtimeSetting);
-            var agentId = Guid.NewGuid();
-            var agentProcess = CreateAgentProcess(agentId, TcpEndPoint, package);
-
-            agentProcess.Exited += (sender, e) => OnAgentExit(agentProcess);
-
-            agentProcess.Start();
-            log.Debug("Launched Agent process {0} - see nunit-agent_{0}.log", agentProcess.Id);
-            log.Debug("Command line: \"{0}\" {1}", agentProcess.StartInfo.FileName, agentProcess.StartInfo.Arguments);
-
-            _agentStore.AddAgent(agentId, agentProcess);
-            _agentProcessIndex.TryAdd(agentProcess, agentId);
-
-            // An agent can exit before its process is added to the index.
-            if (agentProcess.HasExited)
-                OnAgentExit(agentProcess);
-
-            log.Debug($"Waiting for agent {agentId:B} to register");
-
-            const int pollTime = 200;
-
-            // Increase the timeout to give time to attach a debugger
-            bool debug = package.Settings.GetValueOrDefault(SettingDefinitions.DebugAgent) ||
-                         package.Settings.GetValueOrDefault(SettingDefinitions.PauseBeforeRun);
-
-            int waitTime = debug ? DEBUG_TIMEOUT : NORMAL_TIMEOUT;
-
-            // Wait for agent registration based on the agent actually getting processor time to avoid falling over
-            // under process starvation.
-            while (!agentProcess.HasExited && waitTime > agentProcess.TotalProcessorTime.TotalMilliseconds)
-            {
-                Thread.Sleep(pollTime);
-
-                if (_agentStore.IsReady(agentId, out var agent))
+            foreach (var agentSource in _providers)
+                if (agentSource.IsAgentAvailable(package))
                 {
-                    log.Debug($"Returning new agent {agentId:B}");
-
+                    var agent = agentSource.GetAgent(package);
+                    log.Debug($"Returning agent {agent.Id:B}");
                     return agent;
                 }
-            }
 
-            if (agentProcess.HasExited)
-                throw new NUnitEngineException($"Unable to acquire remote process agent (exit code {agentProcess.ExitCode}). " +
-                    GetAgentExitMessage(agentProcess.ExitCode));
-
-            throw new NUnitEngineException("Unable to acquire remote process agent");
+            throw new InvalidOperationException("No available agent matches the TestPackage");
         }
 
+        /// <summary>
+        /// Releases the test agent back to the provider. Only the provider knows what to do
+        /// with the agent, which may include terminating it or keeping it alive for future use.
+        /// </summary>
+        /// <param name="agent">An agent previously provided by a call to GetAgent.</param>
+        /// <exception cref="InvalidOperationException">
+        /// If agent was never provided by the factory or was previously released.
+        /// </exception>
+        /// <remarks>
+        /// Disposing an agent also releases it. However, this should not
+        /// normally be done by the client, but by the source that created
+        /// the agent in the first place.
+        /// </remarks>
         /// <summary>
         /// Releases the test agent back to the supplier, which provided it.
         /// </summary>
@@ -219,44 +148,9 @@ namespace NUnit.Engine.Services
         /// </remarks>
         public void ReleaseAgent(ITestAgent agent)
         {
-            Process? process;
-
-            if (_agentStore.IsAgentActive(agent.Id, out process))
-                try
-                {
-                    log.Debug("Stopping remote agent");
-                    agent.Stop();
-                }
-                catch (SocketException se)
-                {
-                    int exitCode;
-
-                    try
-                    {
-                        exitCode = process.ExitCode;
-                    }
-                    catch (NotSupportedException)
-                    {
-                        exitCode = -17;
-                    }
-
-                    if (exitCode == 0)
-                    {
-                        log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
-                    }
-                    else
-                    {
-                        var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
-                        log.Error(stopError);
-
-                        throw;
-                    }
-                }
-                catch (Exception e)
-                {
-                    var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e);
-                    log.Error(stopError);
-                }
+            // TODO: save the source rather than trying all sources
+            foreach (var agentSource in _providers)
+                agentSource.ReleaseAgent(agent);
         }
 
         #endregion
@@ -271,9 +165,7 @@ namespace NUnit.Engine.Services
 
         #endregion
 
-        #region IService Implementation
-
-        // TODO: it would be better if we had a list of transports to start and stop!
+        #region Service Overrides
 
         public override void StopService()
         {
@@ -288,6 +180,12 @@ namespace NUnit.Engine.Services
             try
             {
                 _extensionService = ServiceContext.GetService<ExtensionService>().ShouldNotBeNull();
+                if (_providers.Count == 0)
+                {
+                    _providers.Add(new LocalProcessAgentProvider(this));
+                    _providers.Add(new RemoteProcessAgentProvider(this));
+                    _providers.Add(new InProcessAgentProvider(this));
+                }
 
                 _tcpTransport.Start();
 
@@ -302,48 +200,9 @@ namespace NUnit.Engine.Services
 
         #endregion
 
-        private List<ExtensionNode>? _launcherNodes;
-        private List<ExtensionNode> LauncherNodes
+        internal bool IsAgentActive(Guid agentId)
         {
-            get
-            {
-                if (_launcherNodes is null)
-                {
-                    Guard.OperationValid(_extensionService is not null, "LauncherNodes property may not be accessed before TestAgency service is started");
-
-                    _launcherNodes = new List<ExtensionNode>();
-
-                    foreach (var node in _extensionService.GetExtensionNodes(AGENT_LAUNCHERS_PATH))
-                        _launcherNodes.Add(node);
-
-                    _launcherNodes.Sort((l1, l2) =>
-                    {
-                        var s1 = l1.GetValues("TargetFramework").FirstOrDefault();
-                        var fn1 = s1 is not null ? new FrameworkName(s1) : GetLauncherInstance(l1).AgentInfo.TargetRuntime;
-                        var s2 = l2.GetValues("TargetFramework").FirstOrDefault();
-                        var fn2 = s2 is not null ? new FrameworkName(s2) : GetLauncherInstance(l2).AgentInfo.TargetRuntime;
-
-                        int result = fn1.Identifier.CompareTo(fn2.Identifier);
-                        if (result == 0)
-                            result = fn1.Version.CompareTo(fn2.Version);
-
-                        return result;
-                    });
-                }
-
-                return _launcherNodes;
-            }
-        }
-
-        internal bool IsAgentActive(Guid agentId, [NotNullWhen(true)] out Process? process)
-        {
-            return _agentStore.IsAgentActive(agentId, out process);
-        }
-
-        private void OnAgentExit(Process process)
-        {
-            if (_agentProcessIndex.TryGetValue(process, out var agentId))
-                _agentStore.MarkTerminated(agentId);
+            return _agentStore.IsAgentActive(agentId);
         }
 
         internal string? GetAgentExitMessage(Guid agentId)
@@ -391,93 +250,6 @@ namespace NUnit.Engine.Services
                 default:
                     return $"Remote test agent exited with non-zero exit code {exitCode}";
             }
-        }
-
-        internal virtual Process CreateAgentProcess(Guid agentId, string agencyUrl, TestPackage package)
-        {
-            if (_extensionService is null)
-                throw new InvalidOperationException("The field '_extensionService' must be non null when calling this method");
-
-            // Check to see if a specific agent was selected
-            string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
-            bool specificAgentRequested = !string.IsNullOrEmpty(requestedAgent);
-            string requestedRuntime = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedFrameworkName);
-            bool specificRuntimeRequested = !string.IsNullOrEmpty(requestedRuntime);
-
-            foreach (var node in LauncherNodes)
-            {
-                if (specificAgentRequested && node.TypeName != requestedAgent)
-                    continue;
-
-                if (specificRuntimeRequested)
-                {
-                    var requestedFrameworkName = new FrameworkName(requestedRuntime);
-                    var runtimes = node.GetValues("TargetFramework");
-                    if (!runtimes.Any() || new RuntimeFramework(runtimes.First()).FrameworkName != requestedFrameworkName)
-                        continue;
-                }
-
-                if (!CanCreateAgent(node, package))
-                    continue;
-
-                var launcher = GetLauncherInstance(node);
-
-                var launcherName = launcher.GetType().Name;
-                log.Info($"Selected launcher {launcherName}");
-                package.ApplySetting(SettingDefinitions.SelectedAgentName.WithValue(launcherName), false);
-                return launcher.CreateAgent(agentId, agencyUrl, package);
-            }
-
-            if (specificAgentRequested)
-                throw new NUnitEngineException($"The requested launcher {requestedAgent} cannot load package {package.Name}");
-            else if (specificRuntimeRequested)
-                throw new NUnitEngineException($"No agent available to run {package.Name} under {requestedRuntime}");
-            else
-                throw new NUnitEngineException($"No agent available for {package.Name}");
-        }
-
-        private static bool CanCreateAgent(ExtensionNode node, TestPackage package)
-        {
-            // Newer implementations use a TargetFramework property to avoid
-            // intantiating any agents, which will not be used.
-            var runtimes = node.GetValues("TargetFramework");
-
-            // If there is no property, we have to instantiate it to check.
-            if (!runtimes.Any())
-            {
-                var launcher = GetLauncherInstance(node);
-                return launcher is not null && launcher.CanCreateAgent(package);
-            }
-
-            // The property is present, so no instantiation is needed.
-            var agentTarget = new FrameworkName(runtimes.First());
-            log.Debug($"Agent {node.TypeName} targets {agentTarget}");
-            var packageTargetSetting =
-                package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
-
-            if (!string.IsNullOrEmpty(packageTargetSetting))
-            {
-                var packageTarget = new FrameworkName(packageTargetSetting);
-                return agentTarget.Identifier == packageTarget.Identifier
-                    && agentTarget.Version.Major >= packageTarget.Version.Major;
-            }
-
-            var packageRuntimeVersion =
-                package.Settings.GetValueOrDefault(SettingDefinitions.ImageRuntimeVersion);
-            if (!string.IsNullOrEmpty(packageRuntimeVersion))
-                return agentTarget.Identifier == FrameworkIdentifiers.NetFramework &&
-                    new Version(packageRuntimeVersion).Major <= agentTarget.Version.Major;
-
-            return false;
-        }
-
-        private static IAgentLauncher GetLauncherInstance(ExtensionNode node)
-        {
-            var launcher = node.ExtensionObject as IAgentLauncher;
-            if (launcher is not null)
-                return launcher;
-
-            throw new NUnitEngineException("Internal Error: Expected an IAgentLancher");
         }
     }
 }
