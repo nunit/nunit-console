@@ -180,9 +180,12 @@ namespace NUnit.Engine.Services
             try
             {
                 _extensionService = ServiceContext.GetService<ExtensionService>().ShouldNotBeNull();
-                _providers.Add(new LocalProcessAgentProvider(this));
-                _providers.Add(new RemoteProcessAgentProvider(this));
-                _providers.Add(new InProcessAgentProvider(this));
+                if (_providers.Count == 0)
+                {
+                    _providers.Add(new LocalProcessAgentProvider(this));
+                    _providers.Add(new RemoteProcessAgentProvider(this));
+                    _providers.Add(new InProcessAgentProvider(this));
+                }
 
                 _tcpTransport.Start();
 
