@@ -26,6 +26,10 @@ namespace NUnit.Engine.Services
 
         private readonly List<ITestAgentProvider> _providers = new List<ITestAgentProvider>();
 
+        // Native-process registration remains in AgentStore. This index records
+        // which provider owns each acquired agent, including agents without a local process.
+        private readonly Dictionary<Guid, AgentOwnership> _agentOwners = new Dictionary<Guid, AgentOwnership>();
+
         internal readonly AgentStore _agentStore = new AgentStore();
 
         internal ExtensionService? _extensionService;
@@ -42,6 +46,16 @@ namespace NUnit.Engine.Services
         public TestAgency(string uri, int port)
         {
             _tcpTransport = new TestAgencyTcpTransport(this, port);
+        }
+
+        /// <summary>
+        /// Initializes an agency with explicitly supplied agent providers.
+        /// The default providers are installed on service startup only when none were supplied.
+        /// </summary>
+        /// <param name="providers">The providers to consult, in selection order.</param>
+        internal TestAgency(IEnumerable<ITestAgentProvider> providers) : this()
+        {
+            _providers.AddRange(providers);
         }
 
         #region ITestAgentInfo Implementation
@@ -114,6 +128,8 @@ namespace NUnit.Engine.Services
                 if (agentSource.IsAgentAvailable(package))
                 {
                     var agent = agentSource.GetAgent(package);
+                    lock (_agentOwners)
+                        _agentOwners.Add(agent.Id, new AgentOwnership(agent, agentSource));
                     log.Debug($"Returning agent {agent.Id:B}");
                     return agent;
                 }
@@ -130,27 +146,30 @@ namespace NUnit.Engine.Services
         /// If agent was never provided by the factory or was previously released.
         /// </exception>
         /// <remarks>
-        /// Disposing an agent also releases it. However, this should not
-        /// normally be done by the client, but by the source that created
-        /// the agent in the first place.
+        /// Ownership is removed only after the provider confirms release. A failed
+        /// release may be retried through the same agency. Requests for one agent
+        /// are serialized without holding the ownership index lock during provider I/O.
+        /// Virtual to allow substitution of agents and providers in runner tests.
         /// </remarks>
-        /// <summary>
-        /// Releases the test agent back to the supplier, which provided it.
-        /// </summary>
-        /// <param name="agent">An agent previously provided by a call to GetAgent.</param>
-        /// <exception cref="InvalidOperationException">
-        /// If agent was never provided by the factory or was previously released.
-        /// </exception>
-        /// <remarks>
-        /// Disposing an agent also releases it. However, this should not
-        /// normally be done by the client, but by the source that created
-        /// the agent in the first place.
-        /// </remarks>
-        public void ReleaseAgent(ITestAgent agent)
+        public virtual void ReleaseAgent(ITestAgent agent)
         {
-            // TODO: save the source rather than trying all sources
-            foreach (var agentSource in _providers)
-                agentSource.ReleaseAgent(agent);
+            AgentOwnership ownership;
+            lock (_agentOwners)
+            {
+                if (!_agentOwners.TryGetValue(agent.Id, out ownership!) || !ReferenceEquals(ownership.Agent, agent))
+                    throw new InvalidOperationException("The agent was not acquired from this agency or was already released.");
+            }
+
+            lock (ownership)
+            {
+                if (ownership.Released)
+                    throw new InvalidOperationException("The agent was already released.");
+
+                ownership.Provider.ReleaseAgent(agent);
+                ownership.Released = true;
+                lock (_agentOwners)
+                    _agentOwners.Remove(agent.Id);
+            }
         }
 
         #endregion
@@ -202,7 +221,29 @@ namespace NUnit.Engine.Services
 
         internal bool IsAgentActive(Guid agentId)
         {
-            return _agentStore.IsAgentActive(agentId);
+            // A known native exit must not be hidden by the outstanding ownership record.
+            if (_agentStore.TryGetAgentProcess(agentId, out _))
+                return _agentStore.IsAgentActive(agentId);
+
+            lock (_agentOwners)
+                return _agentOwners.ContainsKey(agentId);
+        }
+
+        /// <summary>
+        /// Retains the exact acquired reference and its originating provider until release succeeds.
+        /// A remote reference is active ownership, not proof that its server remains reachable.
+        /// </summary>
+        private sealed class AgentOwnership
+        {
+            internal AgentOwnership(ITestAgent agent, ITestAgentProvider provider)
+            {
+                Agent = agent;
+                Provider = provider;
+            }
+
+            internal ITestAgent Agent { get; }
+            internal ITestAgentProvider Provider { get; }
+            internal bool Released { get; set; }
         }
 
         internal string? GetAgentExitMessage(Guid agentId)
