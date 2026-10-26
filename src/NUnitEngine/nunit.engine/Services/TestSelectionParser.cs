@@ -175,46 +175,34 @@ namespace NUnit.Engine
         private Token GetTestName()
         {
             var result = Expect(TokenKind.String, TokenKind.Word);
-            var sb = new StringBuilder();
 
+            // A quoted value is exact. The tokenizer has already removed its
+            // delimiters and processed any escaped characters.
             if (result.Kind == TokenKind.String)
+                return result;
+
+            // Word Token - check to see if it's followed by a left parenthesis
+            if (_tokenizer.LookAhead != LPAREN)
+                return result;
+
+            // We have a "Word" token followed by a left parenthesis
+            // This may be a testname entered without quotes or one
+            // using double quotes, which were removed by the shell.
+
+            var sb = new StringBuilder(result.Text);
+            var token = NextToken();
+
+            while (token != EOF)
             {
-                var inQuotes = false;
-                var inEscape = false;
-                foreach (var ch in result.Text)
-                {
-                    if (ch == ' ' && !inQuotes)
-                        continue;
-                    sb.Append(ch);
-                    inQuotes = (!inQuotes && ch == '"') || (inQuotes && ch != '"') || (inQuotes && ch == '"' && inEscape);
-                    inEscape = inQuotes && !inEscape && ch == '\\';
-                }
-            }
-            else
-            {
-                // Word Token - check to see if it's followed by a left parenthesis
-                if (_tokenizer.LookAhead != LPAREN)
-                    return result;
+                bool isString = token.Kind == TokenKind.String;
 
-                // We have a "Word" token followed by a left parenthesis
-                // This may be a testname entered without quotes or one
-                // using double quotes, which were removed by the shell.
+                if (isString)
+                    sb.Append('"');
+                sb.Append(token.Text);
+                if (isString)
+                    sb.Append('"');
 
-                sb = new StringBuilder(result.Text);
-                var token = NextToken();
-
-                while (token != EOF)
-                {
-                    bool isString = token.Kind == TokenKind.String;
-
-                    if (isString)
-                        sb.Append('"');
-                    sb.Append(token.Text);
-                    if (isString)
-                        sb.Append('"');
-
-                    token = NextToken();
-                }
+                token = NextToken();
             }
 
             return new Token(TokenKind.String, sb.ToString());

@@ -68,6 +68,29 @@ namespace NUnit.Engine.Services
             Assert.DoesNotThrow(() => doc.LoadXml(output));
         }
 
+        [TestCase("test == 'Repro.TupleOnly.Tuple((PROJECT, GLOBAL))'", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("test == \"Repro.TupleOnly.Tuple((PROJECT, GLOBAL))\"", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("test == /Repro.TupleOnly.Tuple((PROJECT, GLOBAL))/", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("test == 'Repro.Shapes.SpaceBeforeParen (Case 1)'", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("test == \"Repro.Shapes.SpaceBeforeParen (Case 1)\"", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("test == /Repro.Shapes.SpaceBeforeParen (Case 1)/", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("test == ' Leading and trailing  spaces '", " Leading and trailing  spaces ")]
+        [TestCase("test == 'Tab\tand space'", "Tab\tand space")]
+        [TestCase("test == 'Repro.Shapes.StringArg(\"a b\")'", "Repro.Shapes.StringArg(\"a b\")")]
+        [TestCase("test == 'Repro.Shapes.TwoEnums(PROJECT,GLOBAL)'", "Repro.Shapes.TwoEnums(PROJECT,GLOBAL)")]
+        [TestCase("test != 'Case 1'", "Case 1")]
+        [TestCase("name == 'Case 1'", "Case 1")]
+        [TestCase("cat == 'Slow tests'", "Slow tests")]
+        [TestCase("Owner == 'Jane Smith'", "Jane Smith")]
+        [TestCase("cat =~ 'Slow tests'", "Slow tests")]
+        public void QuotedValuesPreserveWhitespace(string input, string value)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(TestSelectionParser.Parse(input));
+
+            Assert.That(doc.DocumentElement!.InnerText, Is.EqualTo(value));
+        }
+
         [TestCase(null!, typeof(ArgumentNullException))]
         [TestCase("", typeof(TestSelectionParserException))]
         [TestCase("   ", typeof(TestSelectionParserException))]
