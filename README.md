@@ -18,7 +18,7 @@ The latest stable release of the NUnit Console is [available on NuGet](https://w
 
 The Console/Engine are available in various packages:
 - [NUnit.ConsoleRunner](https://www.nuget.org/packages/NUnit.ConsoleRunner/): The NUnit Console itself, with no extensions. Also available as a [Chocolatey package](https://community.chocolatey.org/packages/nunit-console-runner).
-- [NUnit.ConsoleRunner.NetCore](https://www.nuget.org/packages/NUnit.ConsoleRunner.NetCore/): A version of the runner built for .NET 10, which runs .NET Core tests in process.
+- [NUnit.ConsoleRunner.NetCore](https://www.nuget.org/packages/NUnit.ConsoleRunner.NetCore/): A version of the runner built for .NET 10.
 - [NUnit.Console](https://www.nuget.org/packages/NUnit.Console/): The NUnit Console, with key extensions additionally packaged.
 - [NUnit.Engine](https://www.nuget.org/packages/NUnit.Engine/) & [NUnit.Engine.Api](https://www.nuget.org/packages/NUnit.Engine.Api/): Packages intended for custom runners integrating directly with the NUnit Engine. 
 
