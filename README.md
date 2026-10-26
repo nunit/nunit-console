@@ -17,12 +17,12 @@ The NUnit Console Runner and Engine are used for executing NUnit tests with a wi
 The latest stable release of the NUnit Console is [available on NuGet](https://www.nuget.org/packages/NUnit.ConsoleRunner/), [Chocolatey](https://chocolatey.org/packages/nunit-console-runner), or can be [downloaded from GitHub](https://github.com/nunit/nunit-console/releases). Pre-release builds are [available on MyGet](https://www.myget.org/feed/nunit/package/nuget/NUnit.ConsoleRunner).
 
 The Console/Engine are available in various packages:
-- [NUnit.ConsoleRunner](https://www.nuget.org/packages/NUnit.ConsoleRunner/): The NUnit Console itself, with no extensions. Also available as a [Chocolatey package](https://community.chocolatey.org/packages/nunit-console-runner).
-- [NUnit.ConsoleRunner.NetCore](https://www.nuget.org/packages/NUnit.ConsoleRunner.NetCore/): A version of the runner built for .NET 10.
-- [NUnit.Console](https://www.nuget.org/packages/NUnit.Console/): The NUnit Console, with key extensions additionally packaged.
+- [NUnit.ConsoleRunner](https://www.nuget.org/packages/NUnit.ConsoleRunner/): The NUnit Console itself, with no extensions. It uses the NUnit engine and pluggable agents to execute tests. Also available as a [Chocolatey package](https://community.chocolatey.org/packages/nunit-console-runner).
+- [NUnit.ConsoleRunner.NetCore](https://www.nuget.org/packages/NUnit.ConsoleRunner.NetCore/): A version of the runner built for .NET 10, also using the NUnit engine and pluggable agents to execute tests.
 - [NUnit.Engine](https://www.nuget.org/packages/NUnit.Engine/) & [NUnit.Engine.Api](https://www.nuget.org/packages/NUnit.Engine.Api/): Packages intended for custom runners integrating directly with the NUnit Engine. 
 
 Development builds of all packages are available from our MyGet feed at https://www.myget.org/feed/Packages/nunit
+
 ## Documentation
 
 Documentation for all NUnit projects are available at [https://docs.nunit.org/](https://docs.nunit.org/).
@@ -35,7 +35,7 @@ Contributors to version 4.0 include [Charlie Poole](https://github.com/CharliePo
 
 The previous version 3.0 was created by [Charlie Poole](https://github.com/CharliePoole), [Rob Prouse](https://github.com/rprouse), [Simone Busoli](https://github.com/simoneb), [Neil Colvin](https://github.com/oznetmaster) and numerous community contributors.
 
-Earlier versions of NUnit were developed by Charlie Poole, James W. Newkirk, Alexei A. Vorontsov, Michael C. Two and Philip A. Craig.
+Earlier versions of NUnit were developed by James W. Newkirk, Alexei A. Vorontsov, Michael C. Two and Charlie Poole (version 2.0), and Philip A. Craig (version 1.0).
 
 A complete list of contributors since the nunit-console repository was created can be [found on GitHub](https://github.com/nunit/nunit-console/graphs/contributors).
 
