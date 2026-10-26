@@ -13,7 +13,7 @@ See also [Building and testing for Linux on a Windows machine](#building-and-tes
 ## Prerequisites
 
 - Visual Studio 2022 or newer to build on Windows
-- .NET 8.0 or newer
+- .NET 10.0 or newer
 
 ## Solution Build
 
