@@ -1,18 +1,18 @@
 # Localhost agent-provider test server
 
-This is an initial implementation for nunit/nunit-console#1921, based on
-`main` at `6ee68b3658f22bc8450ef85326adec20e8c82b35`. It is deliberately in
-the engine test assembly. No production engine, Console, API, Common or agent
-source changes are needed, and neither #1919 nor API PR #22 is required to
-compile or run it.
+This is an initial implementation for nunit/nunit-console#1921, updated to
+`main` at `3af18b34bc32a349ce9dd649fbd09714dbc7ff4f`, including the provider
+refactor in #1924. It is deliberately in the engine test assembly. No production
+engine, Console, API, Common or agent source changes are needed, and no unpublished
+API package or provider-extension registration is required to compile or run it.
 
 The server implements the current internal `ITestAgentProvider` contract. Its
-real-agent mode delegates to the existing `TestAgency`, which finds standard
-pluggable launchers through `ExtensionService`. A test client implements the
-same contract over TCP. The route is test client -> provider server -> existing
-local agency -> standard agent -> NUnit framework. The public launcher packages
-are copied under the test output directory; no machine-wide installation or
-private package feed is required.
+real-agent mode delegates to `TestAgency`, whose `LocalProcessAgentProvider` finds
+standard pluggable launchers through `ExtensionService`. A test client implements
+the same contract over TCP. The route is test client -> provider server ->
+`TestAgency` -> `LocalProcessAgentProvider` -> standard agent -> NUnit framework.
+The public launcher packages are copied under the test output directory; no
+machine-wide installation or private package feed is required.
 
 ## Running the tests
 
@@ -79,7 +79,9 @@ This is a trusted-loopback test server. It supplies no network authentication,
 remote machine discovery, installation, deployment, persistent service management
 or target-selection UI. It is not added to published runtime packages.
 
-After #1919, the real-provider creation site in `ProviderServerHost` can be adapted
-to the agreed `TestAgentService` boundary. Production `RemoteProcessTestAgency`
-and provider-proxy integration remain separate work. This test server establishes
-an executable contract and test cases without freezing that unfinished design.
+`ProviderServerHost` uses the `TestAgency` coordinator retained by #1924. Its
+real-agent receipt helper reads the internal agent store only to record the local
+agent's native process and confirm its exit; this is not a process requirement on
+the provider contract. Production `RemoteProcessAgentProvider` and provider-proxy
+integration remain separate work. This test server establishes an executable
+contract and test cases without freezing that unfinished design.

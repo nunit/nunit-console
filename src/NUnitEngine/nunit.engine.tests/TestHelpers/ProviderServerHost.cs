@@ -85,7 +85,7 @@ namespace NUnit.Engine.TestHelpers
             public ITestAgent GetAgent(TestPackage package)
             {
                 var agent = _agency.GetAgent(package);
-                if (!_agency.IsAgentActive(agent.Id, out var process))
+                if (!_agency._agentStore.IsAgentActive(agent.Id, out var process))
                     throw new InvalidOperationException("The acquired test agent has no active native process.");
                 _processes.Add(agent.Id, process);
                 var record = new XElement("agent", new XAttribute("id", agent.Id),

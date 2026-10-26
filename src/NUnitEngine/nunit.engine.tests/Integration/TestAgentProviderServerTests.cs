@@ -19,8 +19,8 @@ using NUnit.Framework;
 namespace NUnit.Engine.Integration
 {
     /// <summary>
-    /// Runs the provider server in a child process. No tests depend on the
-    /// TestAgentService refactor, a remote machine, hardware, or private packages.
+    /// Runs the provider server in a child process. No tests require production
+    /// remote-provider integration, a remote machine, hardware, or private packages.
     /// </summary>
     [NonParallelizable]
     public sealed class TestAgentProviderServerTests : IntegrationTests
