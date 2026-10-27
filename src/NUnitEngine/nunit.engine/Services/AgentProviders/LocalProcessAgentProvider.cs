@@ -172,14 +172,29 @@ namespace NUnit.Engine.Services
         /// Stops a locally owned agent when its process is still active.
         /// </summary>
         /// <remarks>
-        /// This preserves the active-process check and Stop exception propagation
-        /// previously performed directly by ProcessRunner.Dispose. The runner
-        /// remains responsible for combining unload and stop failures.
+        /// A socket failure is accepted only when the local process has already exited
+        /// successfully. Other stop failures are logged and propagated so the agency
+        /// retains ownership for a later release attempt. The runner remains responsible
+        /// for combining unload and stop failures.
         /// </remarks>
         public void ReleaseAgent(ITestAgent agent)
         {
-            if (_agentStore.IsAgentActive(agent.Id))
-                agent.Stop();
+            if (_agentStore.IsAgentActive(agent.Id, out Process? process))
+                try
+                {
+                    log.Debug("Stopping local agent");
+                    agent.Stop();
+                }
+                // If querying process state fails, the filter leaves the original stop failure intact.
+                catch (SocketException) when (process.HasExited && process.ExitCode == 0)
+                {
+                    log.Warning("Agent connection was forcibly closed after the local process exited successfully.");
+                }
+                catch (Exception e)
+                {
+                    log.Error("Failed to stop the local agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e));
+                    throw;
+                }
         }
 
         #endregion
