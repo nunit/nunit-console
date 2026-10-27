@@ -75,6 +75,29 @@ namespace NUnit.Engine.Services.Tests
                 "<filter><test>My.Test.Name&lt;T&gt;(&quot;abc&quot;)</test></filter>"));
         }
 
+        [TestCase("'", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("\"", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("/", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("'", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("\"", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("/", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("'", " Leading and trailing  spaces ")]
+        [TestCase("'", "Repro.Shapes.StringArg(\"a b\")")]
+        [TestCase("'", "Repro.Shapes.TwoEnums(PROJECT,GLOBAL)")]
+        public void SelectWherePreservesQuotedTestName(string quote, string testName)
+        {
+            builder.SelectWhere("test == " + quote + testName + quote);
+            TestFilter filter = builder.GetFilter();
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(filter.Text);
+
+            Assert.That(doc.SelectSingleNode("/filter/test")!.InnerText, Is.EqualTo(testName));
+
+            TestFilterBuilder exactNameBuilder = new TestFilterBuilder();
+            exactNameBuilder.AddTest(testName);
+            Assert.That(filter.Text, Is.EqualTo(exactNameBuilder.GetFilter().Text));
+        }
+
         [Test]
         public void OneTestAndWhereClause()
         {

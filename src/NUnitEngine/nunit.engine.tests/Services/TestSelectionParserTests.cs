@@ -31,6 +31,29 @@ namespace NUnit.Engine.Tests
             Assert.That(_parser.Parse(input), Is.EqualTo(output));
         }
 
+        [TestCase("test == 'Repro.TupleOnly.Tuple((PROJECT, GLOBAL))'", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("test == \"Repro.TupleOnly.Tuple((PROJECT, GLOBAL))\"", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("test == /Repro.TupleOnly.Tuple((PROJECT, GLOBAL))/", "Repro.TupleOnly.Tuple((PROJECT, GLOBAL))")]
+        [TestCase("test == 'Repro.Shapes.SpaceBeforeParen (Case 1)'", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("test == \"Repro.Shapes.SpaceBeforeParen (Case 1)\"", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("test == /Repro.Shapes.SpaceBeforeParen (Case 1)/", "Repro.Shapes.SpaceBeforeParen (Case 1)")]
+        [TestCase("test == ' Leading and trailing  spaces '", " Leading and trailing  spaces ")]
+        [TestCase("test == 'Tab\tand space'", "Tab\tand space")]
+        [TestCase("test == 'Repro.Shapes.StringArg(\"a b\")'", "Repro.Shapes.StringArg(\"a b\")")]
+        [TestCase("test == 'Repro.Shapes.TwoEnums(PROJECT,GLOBAL)'", "Repro.Shapes.TwoEnums(PROJECT,GLOBAL)")]
+        [TestCase("test != 'Case 1'", "Case 1")]
+        [TestCase("name == 'Case 1'", "Case 1")]
+        [TestCase("cat == 'Slow tests'", "Slow tests")]
+        [TestCase("Owner == 'Jane Smith'", "Jane Smith")]
+        [TestCase("cat =~ 'Slow tests'", "Slow tests")]
+        public void QuotedValuesPreserveWhitespace(string input, string value)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(_parser.Parse(input));
+
+            Assert.That(doc.DocumentElement!.InnerText, Is.EqualTo(value));
+        }
+
         [TestCase(null, typeof(ArgumentNullException))]
         [TestCase("", typeof(TestSelectionParserException))]
         [TestCase("   ", typeof(TestSelectionParserException))]
@@ -71,15 +94,15 @@ namespace NUnit.Engine.Tests
             new TestCaseData("test='My.Test.Fixture.Method(\"abc\\'s\")'", "<test>My.Test.Fixture.Method(&quot;abc&apos;s&quot;)</test>"),
             new TestCaseData("test='My.Test.Fixture.Method(\"x&y&z\")'", "<test>My.Test.Fixture.Method(&quot;x&amp;y&amp;z&quot;)</test>"),
             new TestCaseData("test='My.Test.Fixture.Method(\"<xyz>\")'", "<test>My.Test.Fixture.Method(&quot;&lt;xyz&gt;&quot;)</test>"),
-            new TestCaseData("test=='Issue1510.TestSomething ( Option1 , \"ABC\" ) '", "<test>Issue1510.TestSomething(Option1,&quot;ABC&quot;)</test>"),
-            new TestCaseData("test=='Issue1510.TestSomething ( Option1 , \"A B C\" ) '", "<test>Issue1510.TestSomething(Option1,&quot;A B C&quot;)</test>"),
+            new TestCaseData("test=='Issue1510.TestSomething ( Option1 , \"ABC\" ) '", "<test>Issue1510.TestSomething ( Option1 , &quot;ABC&quot; ) </test>"),
+            new TestCaseData("test=='Issue1510.TestSomething ( Option1 , \"A B C\" ) '", "<test>Issue1510.TestSomething ( Option1 , &quot;A B C&quot; ) </test>"),
             new TestCaseData("test=/My.Test.Fixture.Method(42)/", "<test>My.Test.Fixture.Method(42)</test>"),
             new TestCaseData("test=/My.Test.Fixture.Method(\"xyz\")/", "<test>My.Test.Fixture.Method(&quot;xyz&quot;)</test>"),
             new TestCaseData("test=/My.Test.Fixture.Method(\"abc\\'s\")/", "<test>My.Test.Fixture.Method(&quot;abc&apos;s&quot;)</test>"),
             new TestCaseData("test=/My.Test.Fixture.Method(\"x&y&z\")/", "<test>My.Test.Fixture.Method(&quot;x&amp;y&amp;z&quot;)</test>"),
             new TestCaseData("test=/My.Test.Fixture.Method(\"<xyz>\")/", "<test>My.Test.Fixture.Method(&quot;&lt;xyz&gt;&quot;)</test>"),
-            new TestCaseData("test==/Issue1510.TestSomething ( Option1 , \"ABC\" ) /", "<test>Issue1510.TestSomething(Option1,&quot;ABC&quot;)</test>"),
-            new TestCaseData("test==/Issue1510.TestSomething ( Option1 , \"A B C\" ) /", "<test>Issue1510.TestSomething(Option1,&quot;A B C&quot;)</test>"),
+            new TestCaseData("test==/Issue1510.TestSomething ( Option1 , \"ABC\" ) /", "<test>Issue1510.TestSomething ( Option1 , &quot;ABC&quot; ) </test>"),
+            new TestCaseData("test==/Issue1510.TestSomething ( Option1 , \"A B C\" ) /", "<test>Issue1510.TestSomething ( Option1 , &quot;A B C&quot; ) </test>"),
             new TestCaseData("test=My.Test.Fixture.Method(42)", "<test>My.Test.Fixture.Method(42)</test>"),
             new TestCaseData("test=My.Test.Fixture.Method(\"xyz\")", "<test>My.Test.Fixture.Method(&quot;xyz&quot;)</test>"),
             new TestCaseData("test=My.Test.Fixture.Method(\"abc\\'s\")", "<test>My.Test.Fixture.Method(&quot;abc&apos;s&quot;)</test>"),
