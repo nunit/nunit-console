@@ -229,7 +229,7 @@ namespace NUnit.Engine.Runners
         protected override void Dispose(bool disposing)
         {
             // Disposal has to perform two actions, unloading the runner and
-            // stopping the agent. Both must be tried even if one fails so
+            // returning the agent to its provider. Both must be tried even if one fails so
             // there can be up to two independent errors to be reported
             // through an NUnitEngineException. We do that by combining messages.
             if (!_disposed && disposing)
@@ -250,12 +250,12 @@ namespace NUnit.Engine.Runners
                     log.Error(ExceptionHelper.BuildMessageAndStackTrace(ex));
                 }
 
-                if (_agent is not null && _agency.IsAgentActive(_agent.Id))
+                if (_agent is not null)
                 {
                     try
                     {
-                        log.Debug("Stopping remote agent");
-                        _agent.Stop();
+                        log.Debug("Returning agent to its provider");
+                        _agency.ReleaseAgent(_agent);
                     }
                     catch (NUnitEngineUnloadException ex) when (unloadException is not null)
                     {
@@ -268,8 +268,8 @@ namespace NUnit.Engine.Runners
                     }
                 }
 
-                if (unloadException is not null) // Add message line indicating we managed to stop agent anyway
-                    throw new NUnitEngineUnloadException("Agent Process was terminated successfully after error.", unloadException);
+                if (unloadException is not null)
+                    throw new NUnitEngineUnloadException("The agent was released after an error while unloading the runner.", unloadException);
             }
         }
 

@@ -168,49 +168,32 @@ namespace NUnit.Engine.Services
             throw new NUnitEngineException("Unable to acquire remote process agent");
         }
 
+        /// <summary>
+        /// Stops a locally owned agent when its process is still active.
+        /// </summary>
+        /// <remarks>
+        /// A socket failure is accepted only when the local process has already exited
+        /// successfully. Other stop failures are logged and propagated so the agency
+        /// retains ownership for a later release attempt. The runner remains responsible
+        /// for combining unload and stop failures.
+        /// </remarks>
         public void ReleaseAgent(ITestAgent agent)
         {
             if (_agentStore.IsAgentActive(agent.Id, out Process? process))
                 try
                 {
-                    log.Debug("Stopping remote agent");
+                    log.Debug("Stopping local agent");
                     agent.Stop();
                 }
-                catch (SocketException se)
+                // If querying process state fails, the filter leaves the original stop failure intact.
+                catch (SocketException) when (process.HasExited && process.ExitCode == 0)
                 {
-                    int exitCode;
-
-                    try
-                    {
-                        exitCode = process.ExitCode;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // The process has not exited yet. We can't get the exit code, but we know the connection was forcibly closed.
-                        exitCode = -16;
-                    }
-                    catch (NotSupportedException)
-                    {
-                        // The process is running on a remote computer. We can't get the exit code, but we know the connection was forcibly closed.
-                        exitCode = -17;
-                    }
-
-                    if (exitCode == 0)
-                    {
-                        log.Warning("Agent connection was forcibly closed. Exit code was 0, so agent shutdown OK");
-                    }
-                    else
-                    {
-                        var stopError = $"Agent connection was forcibly closed. Exit code was {exitCode}. {Environment.NewLine}{ExceptionHelper.BuildMessageAndStackTrace(se)}";
-                        log.Error(stopError);
-
-                        throw;
-                    }
+                    log.Warning("Agent connection was forcibly closed after the local process exited successfully.");
                 }
                 catch (Exception e)
                 {
-                    var stopError = "Failed to stop the remote agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e);
-                    log.Error(stopError);
+                    log.Error("Failed to stop the local agent." + Environment.NewLine + ExceptionHelper.BuildMessageAndStackTrace(e));
+                    throw;
                 }
         }
 

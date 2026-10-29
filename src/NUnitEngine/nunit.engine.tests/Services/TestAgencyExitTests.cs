@@ -163,7 +163,7 @@ namespace NUnit.Engine.Services
             return int.Parse(args[1], CultureInfo.InvariantCulture);
         }
 
-        private static ProcessStartInfo CreateStartInfo(string mode, int exitCode, bool enableEvents, int delay)
+        internal static ProcessStartInfo CreateStartInfo(string mode, int exitCode, bool enableEvents, int delay)
         {
             string assemblyPath = typeof(TestAgencyExitTests).Assembly.Location;
             var arguments = new StringBuilder();
