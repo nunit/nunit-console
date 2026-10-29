@@ -73,9 +73,9 @@ namespace NUnit.Engine.Runners
             // each contained assembly.
             EnsurePackagesAreExpanded(package);
 
-            // Last chance to catch invalid settings in package,
-            // in case the client runner missed them. Currently,
-            // there is nothing to check for the .NET 8.0 build.
+            // Catch invalid settings missed by the client runner. Runtime syntax is
+            // validated for every request; coordinator availability applies when
+            // the package includes a locally executed assembly.
             ValidatePackageSettings(package);
 
             TestPackage = package;
@@ -397,8 +397,20 @@ namespace NUnit.Engine.Runners
 
             if (frameworkSetting.Length > 0)
             {
-                // Check requested framework is actually available
-                if (!_runtimeService.IsAvailable(frameworkSetting, runAsX86))
+                // A root request may apply to remote-only project children without a
+                // remote setting on the project itself. Any local child still requires
+                // the existing coordinator availability check.
+                bool remoteOnly = true;
+                foreach (var leaf in package.Select(p => !p.HasSubPackages))
+                    if (RemoteAgentSettings.RequestedType(leaf) != TestAgentType.RemoteProcess)
+                    {
+                        remoteOnly = false;
+                        break;
+                    }
+
+                if (remoteOnly)
+                    RuntimeFramework.FromTFM(frameworkSetting); // Validate syntax without requiring a local installation.
+                else if (!_runtimeService.IsAvailable(frameworkSetting, runAsX86))
                     sb.Append($"\n* The requested framework {frameworkSetting} is unknown or not available.\n");
             }
 

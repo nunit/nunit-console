@@ -2,7 +2,7 @@
 
 // Normally, these tests are run as unit tests. No process is actually launched
 // but we verify that the proper calls are made. When making changes to the code,
-// it may be convenient to actually use TestAgency and launch agent processes,
+// it may be convenient to actually use TestAgentService and launch agent processes,
 // running the tests. To do so, uncomment the following #define.
 //#define TESTAGENCY_INTEGRATION
 
@@ -57,8 +57,8 @@ namespace NUnit.Engine.Runners
 
 #if TESTAGENCY_INTEGRATION
             // We actually run the test
-            var agency = new TestAgency() { ServiceContext = context };
-            context.GetService<TestAgency>().Returns(agency);
+            var agency = new TestAgentService() { ServiceContext = context };
+            context.GetService<TestAgentService>().Returns(agency);
             agency.StartService();
 #else
             // Create Substitutes for All Components

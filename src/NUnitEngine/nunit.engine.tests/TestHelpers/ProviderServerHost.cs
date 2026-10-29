@@ -27,7 +27,7 @@ namespace NUnit.Engine.TestHelpers
             {
                 using var engine = new TestEngine { InternalTraceLevel = InternalTraceLevel.Off };
                 ITestAgentProvider provider;
-                if (args[2] == "fake")
+                if (args[2] == "fake" || args[2] == "fake-drop-acquisition")
                 {
                     var fake = new ControlledProvider();
                     provider = fake;
@@ -44,7 +44,7 @@ namespace NUnit.Engine.TestHelpers
                     provider = new ObservedProvider(agency, Path.GetDirectoryName(args[1])!);
                 }
 
-                using var server = new TestAgentProviderServer(provider);
+                using var server = new TestAgentProviderServer(provider, args[2] == "fake-drop-acquisition");
                 server.Start();
                 using (var process = Process.GetCurrentProcess())
                     File.WriteAllText(args[1] + ".tmp", new XElement("ready", new XAttribute("port", server.EndPoint.Port),
@@ -113,7 +113,7 @@ namespace NUnit.Engine.TestHelpers
 
         /// <summary>
         /// A deterministic provider for transport faults and cancellation, independent
-        /// of the release cadence of pluggable agent packages. Real-agent cases use TestAgency.
+        /// of the release cadence of pluggable agent packages. Real-agent cases use TestAgentService.
         /// </summary>
         private sealed class ControlledProvider : ITestAgentProvider
         {

@@ -17,7 +17,7 @@ namespace NUnit.Engine.Services
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(InProcessAgentProvider));
 
-        // The TestAgency instance for which we are providing local process agents.
+        // The TestAgentService instance for which we are providing local process agents.
         private TestAgentService _agency;
 
         public InProcessAgentProvider(TestAgentService agency)
