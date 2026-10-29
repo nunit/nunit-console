@@ -18,6 +18,8 @@
     <PackageReference Include="NUnit.Analyzers" />
     <PackageReference Include="NUnit.Agent.Core" />
     <PackageReference Include="System.Reflection.MetadataLoadContext" />
+    <PackageReference Include="NUnit.Extension.Net10PluggableAgent" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="NUnit.Extension.Net462PluggableAgent" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462'">
@@ -34,6 +36,14 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Include="$(PkgNUnit_Extension_Net10PluggableAgent)/tools/**/*">
+      <Link>provider-test-tools/net10/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(PkgNUnit_Extension_Net462PluggableAgent)/tools/**/*">
+      <Link>provider-test-tools/net462/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="EngineTests.nunit">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
