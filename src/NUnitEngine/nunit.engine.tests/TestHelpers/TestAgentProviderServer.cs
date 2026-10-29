@@ -69,10 +69,10 @@ namespace NUnit.Engine.TestHelpers
                 return _provider.GetAgent(package);
         }
 
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             lock (_providerLock)
-                _provider.ReleaseAgent(agent);
+                _provider.ReturnAgent(agent);
         }
 
         private void AcceptConnections()
@@ -190,7 +190,7 @@ namespace NUnit.Engine.TestHelpers
                 switch (code)
                 {
                     case ProviderConnection.ReleaseAgent:
-                        ReleaseAgent(lease.Agent);
+                        ReturnAgent(lease.Agent);
                         lease.Released = true;
                         return string.Empty;
                     case MessageCode.StartAgent:
@@ -255,7 +255,7 @@ namespace NUnit.Engine.TestHelpers
                 throw new TimeoutException("Provider requests did not stop; agent ownership is retained.");
             foreach (var pair in _agents.ToArray())
             {
-                ReleaseAgent(pair.Value.Agent);
+                ReturnAgent(pair.Value.Agent);
                 _agents.TryRemove(pair.Key, out _);
             }
         }

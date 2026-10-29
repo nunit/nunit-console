@@ -177,7 +177,7 @@ namespace NUnit.Engine.Services
         /// retains ownership for a later release attempt. The runner remains responsible
         /// for combining unload and stop failures.
         /// </remarks>
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             if (_agentStore.IsAgentActive(agent.Id, out Process? process))
                 try

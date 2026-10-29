@@ -57,19 +57,19 @@ namespace NUnit.Engine.Services
         {
             _agency.GetAgent(_package);
 
-            _agency.ReleaseAgent(_agent);
+            _agency.ReturnAgent(_agent);
 
-            _owner.Received(1).ReleaseAgent(_agent);
-            _other.DidNotReceiveWithAnyArgs().ReleaseAgent(default!);
+            _owner.Received(1).ReturnAgent(_agent);
+            _other.DidNotReceiveWithAnyArgs().ReturnAgent(default!);
             Assert.That(_agency.IsAgentActive(_agent.Id), Is.False);
         }
 
         [Test]
         public void UnknownAgentIsNotSentToAnyProvider()
         {
-            Assert.That(() => _agency.ReleaseAgent(_agent), Throws.InvalidOperationException);
-            _owner.DidNotReceiveWithAnyArgs().ReleaseAgent(default!);
-            _other.DidNotReceiveWithAnyArgs().ReleaseAgent(default!);
+            Assert.That(() => _agency.ReturnAgent(_agent), Throws.InvalidOperationException);
+            _owner.DidNotReceiveWithAnyArgs().ReturnAgent(default!);
+            _other.DidNotReceiveWithAnyArgs().ReturnAgent(default!);
         }
 
         [Test]
@@ -79,19 +79,19 @@ namespace NUnit.Engine.Services
             var foreign = Substitute.For<ITestAgent>();
             foreign.Id.Returns(_agent.Id);
 
-            Assert.That(() => _agency.ReleaseAgent(foreign), Throws.InvalidOperationException);
+            Assert.That(() => _agency.ReturnAgent(foreign), Throws.InvalidOperationException);
             Assert.That(_agency.IsAgentActive(_agent.Id), Is.True);
-            _owner.DidNotReceiveWithAnyArgs().ReleaseAgent(default!);
+            _owner.DidNotReceiveWithAnyArgs().ReturnAgent(default!);
         }
 
         [Test]
         public void DuplicateReleaseDoesNotReachProviderTwice()
         {
             _agency.GetAgent(_package);
-            _agency.ReleaseAgent(_agent);
+            _agency.ReturnAgent(_agent);
 
-            Assert.That(() => _agency.ReleaseAgent(_agent), Throws.InvalidOperationException);
-            _owner.Received(1).ReleaseAgent(_agent);
+            Assert.That(() => _agency.ReturnAgent(_agent), Throws.InvalidOperationException);
+            _owner.Received(1).ReturnAgent(_agent);
         }
 
         [Test]
@@ -99,20 +99,20 @@ namespace NUnit.Engine.Services
         {
             _agency.GetAgent(_package);
             int attempts = 0;
-            _owner.When(provider => provider.ReleaseAgent(_agent)).Do(_ =>
+            _owner.When(provider => provider.ReturnAgent(_agent)).Do(_ =>
             {
                 if (++attempts == 1)
                     throw new InvalidOperationException("Release acknowledgement was lost.");
             });
 
-            Assert.That(() => _agency.ReleaseAgent(_agent), Throws.InvalidOperationException);
+            Assert.That(() => _agency.ReturnAgent(_agent), Throws.InvalidOperationException);
             Assert.That(_agency.IsAgentActive(_agent.Id), Is.True);
 
-            _agency.ReleaseAgent(_agent);
+            _agency.ReturnAgent(_agent);
 
             Assert.That(attempts, Is.EqualTo(2));
             Assert.That(_agency.IsAgentActive(_agent.Id), Is.False);
-            _other.DidNotReceiveWithAnyArgs().ReleaseAgent(default!);
+            _other.DidNotReceiveWithAnyArgs().ReturnAgent(default!);
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace NUnit.Engine.Services
             _agency.GetAgent(_package);
             using var entered = new ManualResetEventSlim();
             using var finish = new ManualResetEventSlim();
-            _owner.When(provider => provider.ReleaseAgent(_agent)).Do(_ =>
+            _owner.When(provider => provider.ReturnAgent(_agent)).Do(_ =>
             {
                 entered.Set();
                 if (!finish.Wait(TimeSpan.FromSeconds(5)))
@@ -143,7 +143,7 @@ namespace NUnit.Engine.Services
             Assert.That(Task.WaitAll(new Task[] { first, second! }, TimeSpan.FromSeconds(5)), Is.True);
             Assert.That(first.Result, Is.Null);
             Assert.That(second!.Result, Is.TypeOf<InvalidOperationException>());
-            _owner.Received(1).ReleaseAgent(_agent);
+            _owner.Received(1).ReturnAgent(_agent);
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace NUnit.Engine.Services
                 : new NUnitEngineUnloadException("The agent could not stop.");
             _agent.When(agent => agent.Stop()).Do(_ => throw failure);
 
-            Assert.That(Assert.Catch(() => localProvider.ReleaseAgent(_agent)), Is.SameAs(failure));
+            Assert.That(Assert.Catch(() => localProvider.ReturnAgent(_agent)), Is.SameAs(failure));
         }
 
         [Test]
@@ -200,7 +200,7 @@ namespace NUnit.Engine.Services
             _agency._agentStore.MarkTerminated(_agent.Id);
             var localProvider = new LocalProcessAgentProvider(_agency);
 
-            localProvider.ReleaseAgent(_agent);
+            localProvider.ReturnAgent(_agent);
 
             _agent.DidNotReceive().Stop();
         }
@@ -217,7 +217,7 @@ namespace NUnit.Engine.Services
             using (var runner = new ProcessRunner(services, _package))
                 Assert.That(runner.CountTestCases(TestFilter.Empty), Is.EqualTo(42));
 
-            _owner.Received(1).ReleaseAgent(_agent);
+            _owner.Received(1).ReturnAgent(_agent);
             _agent.DidNotReceive().Stop();
             Assert.That(_agency.IsAgentActive(_agent.Id), Is.False);
         }
@@ -226,7 +226,7 @@ namespace NUnit.Engine.Services
         {
             try
             {
-                _agency.ReleaseAgent(_agent);
+                _agency.ReturnAgent(_agent);
                 return null;
             }
             catch (Exception exception)

@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services
                 $"No agents are available for package {package.Name}.\r\nGetAgent should not be called when IsAgentAvailable returns false.");
         }
 
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             // TODO: Close any open tests, dispose resources, keep the agent available for reuse.
         }

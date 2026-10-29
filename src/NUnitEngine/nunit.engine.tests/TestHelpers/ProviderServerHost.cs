@@ -95,11 +95,11 @@ namespace NUnit.Engine.TestHelpers
                 return agent;
             }
 
-            public void ReleaseAgent(ITestAgent agent)
+            public void ReturnAgent(ITestAgent agent)
             {
                 var record = XElement.Load(RecordPath(agent));
                 var process = _processes[agent.Id];
-                _agency.ReleaseAgent(agent);
+                _agency.ReturnAgent(agent);
                 if (!process.WaitForExit(10000))
                     throw new TimeoutException("The released test agent process did not exit.");
                 record.SetAttributeValue("exitCode", process.ExitCode);
@@ -176,7 +176,7 @@ namespace NUnit.Engine.TestHelpers
             private static string PackagePath(TestPackage package) => string.IsNullOrEmpty(package.FullName)
                 ? string.Join(";", package.SubPackages.Select(PackagePath)) : package.FullName;
 
-            public void ReleaseAgent(ITestAgent agent)
+            public void ReturnAgent(ITestAgent agent)
             {
                 if (!_releaseFailures.TryGetValue(agent.Id, out bool fail))
                     throw new InvalidOperationException("Unknown agent.");

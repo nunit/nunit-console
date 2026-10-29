@@ -102,11 +102,11 @@ namespace NUnit.Engine.Integration
             var other = new TestAgentProviderProxy(_endpoint);
             Assert.That(agent.Start(), Is.True);
             Assert.That(provider.ActiveAgentCount, Is.EqualTo(1));
-            Assert.That(() => other.ReleaseAgent(agent), Throws.InvalidOperationException);
+            Assert.That(() => other.ReturnAgent(agent), Throws.InvalidOperationException);
             Assert.That(provider.ActiveAgentCount, Is.EqualTo(1));
-            provider.ReleaseAgent(agent);
+            provider.ReturnAgent(agent);
             Assert.That(provider.ActiveAgentCount, Is.Zero);
-            Assert.That(() => provider.ReleaseAgent(agent), Throws.InvalidOperationException);
+            Assert.That(() => provider.ReturnAgent(agent), Throws.InvalidOperationException);
             Assert.That(() => agent.Start(), Throws.InvalidOperationException);
         }
 
@@ -115,9 +115,9 @@ namespace NUnit.Engine.Integration
         {
             var provider = StartServer();
             var agent = provider.GetAgent(new TestPackage("retry.dll"));
-            Assert.That(() => provider.ReleaseAgent(agent), Throws.TypeOf<NUnitEngineException>().With.Message.Contains("Release failed once"));
+            Assert.That(() => provider.ReturnAgent(agent), Throws.TypeOf<NUnitEngineException>().With.Message.Contains("Release failed once"));
             Assert.That(provider.ActiveAgentCount, Is.EqualTo(1));
-            provider.ReleaseAgent(agent);
+            provider.ReturnAgent(agent);
             Assert.That(provider.ActiveAgentCount, Is.Zero);
         }
 
@@ -134,7 +134,7 @@ namespace NUnit.Engine.Integration
                 Assert.That(connection.Receive().Code, Is.EqualTo(ProviderConnection.Error));
             }
             Assert.That(provider.ActiveAgentCount, Is.EqualTo(1));
-            provider.ReleaseAgent(agent);
+            provider.ReturnAgent(agent);
             Assert.That(provider.ActiveAgentCount, Is.Zero);
         }
 
@@ -173,7 +173,7 @@ namespace NUnit.Engine.Integration
             Assert.That(result.EngineResult.Xml.Attributes!["label"]!.Value, Is.EqualTo("Cancelled"));
             Assert.That(events.Reports, Has.Some.Contains("Provider server event"));
             runner.Dispose();
-            provider.ReleaseAgent(agent);
+            provider.ReturnAgent(agent);
             Assert.That(provider.ActiveAgentCount, Is.Zero);
         }
 
@@ -195,7 +195,7 @@ namespace NUnit.Engine.Integration
             Assert.That(result.EngineResult.Xml.Attributes!["result"]!.Value, Is.EqualTo("Failed"));
             Assert.That(result.EngineResult.Xml.Attributes!["label"]!.Value, Is.EqualTo("Error"));
             // Connection loss is not release confirmation. There is no agent process in this controlled-provider case.
-            Assert.That(() => provider.ReleaseAgent(agent), Throws.Exception);
+            Assert.That(() => provider.ReturnAgent(agent), Throws.Exception);
         }
 
         [TestCase("NUnit.TestData.Singletons.OneTestCase.TestCase", "Passed")]
@@ -240,7 +240,7 @@ namespace NUnit.Engine.Integration
             }
             finally
             {
-                provider.ReleaseAgent(agent);
+                provider.ReturnAgent(agent);
             }
             Assert.That(provider.ActiveAgentCount, Is.Zero);
             var receipt = XElement.Load(Path.Combine(_directory, "agent-" + agent.Id + ".xml"));

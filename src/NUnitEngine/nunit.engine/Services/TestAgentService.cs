@@ -90,23 +90,12 @@ namespace NUnit.Engine.Services
             throw new InvalidOperationException("No available agent matches the TestPackage");
         }
 
-        /// <summary>
-        /// Releases the test agent back to the supplier, which provided it.
-        /// </summary>
-        /// <param name="agent">An agent previously provided by a call to GetAgent.</param>
-        /// <exception cref="InvalidOperationException">
-        /// If agent was never provided by the factory or was previously released.
-        /// </exception>
-        /// <remarks>
-        /// Disposing an agent also releases it. However, this should not
-        /// normally be done by the client, but by the source that created
-        /// the agent in the first place.
-        /// </remarks>
-        public void ReleaseAgent(ITestAgent agent)
+        /// <inheritdoc/>
+        public void ReturnAgent(ITestAgent agent)
         {
             // TODO: save the source rather than trying all sources
             foreach (var agentSource in _providers)
-                agentSource.ReleaseAgent(agent);
+                agentSource.ReturnAgent(agent);
         }
 
         #endregion

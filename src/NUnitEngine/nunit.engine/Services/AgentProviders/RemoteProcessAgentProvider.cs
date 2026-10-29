@@ -63,7 +63,7 @@ namespace NUnit.Engine.Services
                 $"No remote agents are available for package {package.Name}.\r\nGetAgent should not be called when IsAgentAvailable returns false.");
         }
 
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             // Currently does nothing
         }

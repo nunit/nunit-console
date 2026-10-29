@@ -138,20 +138,20 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Releases the test agent back to the provider. Only the provider knows what to do
-        /// with the agent, which may include terminating it or keeping it alive for future use.
+        /// Returns the exact acquired agent to its originating provider.
         /// </summary>
-        /// <param name="agent">An agent previously provided by a call to GetAgent.</param>
+        /// <param name="agent">An agent previously acquired by a call to GetAgent.</param>
         /// <exception cref="InvalidOperationException">
-        /// If agent was never provided by the factory or was previously released.
+        /// If the agent was not acquired from this agency or was previously returned.
         /// </exception>
         /// <remarks>
-        /// Ownership is removed only after the provider confirms release. A failed
-        /// release may be retried through the same agency. Requests for one agent
+        /// Ownership is removed only after the provider confirms the return. If returning
+        /// fails, the originating provider association is retained for further attempts.
+        /// This does not guarantee that repeating a failed call is harmless. Requests for one agent
         /// are serialized without holding the ownership index lock during provider I/O.
         /// Virtual to allow substitution of agents and providers in runner tests.
         /// </remarks>
-        public virtual void ReleaseAgent(ITestAgent agent)
+        public virtual void ReturnAgent(ITestAgent agent)
         {
             AgentOwnership ownership;
             lock (_agentOwners)
@@ -165,7 +165,7 @@ namespace NUnit.Engine.Services
                 if (ownership.Released)
                     throw new InvalidOperationException("The agent was already released.");
 
-                ownership.Provider.ReleaseAgent(agent);
+                ownership.Provider.ReturnAgent(agent);
                 ownership.Released = true;
                 lock (_agentOwners)
                     _agentOwners.Remove(agent.Id);

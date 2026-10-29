@@ -255,7 +255,7 @@ namespace NUnit.Engine.Runners
                     try
                     {
                         log.Debug("Returning agent to its provider");
-                        _agency.ReleaseAgent(_agent);
+                        _agency.ReturnAgent(_agent);
                     }
                     catch (NUnitEngineUnloadException ex) when (unloadException is not null)
                     {
