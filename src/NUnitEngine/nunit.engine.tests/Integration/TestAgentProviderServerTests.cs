@@ -23,7 +23,6 @@ namespace NUnit.Engine.Integration
     /// remote-provider integration, a remote machine, hardware, or private packages.
     /// </summary>
     [NonParallelizable]
-    [Ignore("Unexplained errors")]
     public sealed class TestAgentProviderServerTests : IntegrationTests
     {
         private string _directory = null!;
