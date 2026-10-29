@@ -73,7 +73,7 @@ namespace NUnit.Engine
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
                 Services.Add(new RuntimeFrameworkService());
-                Services.Add(new TestAgency());
+                Services.Add(new TestAgentService());
                 Services.Add(new ResultService());
                 Services.Add(new TestRunnerFactory());
             }

@@ -18,9 +18,9 @@ namespace NUnit.Engine.Services
         private static readonly Logger log = InternalTrace.GetLogger(typeof(InProcessAgentProvider));
 
         // The TestAgency instance for which we are providing local process agents.
-        private TestAgency _agency;
+        private TestAgentService _agency;
 
-        public InProcessAgentProvider(TestAgency agency)
+        public InProcessAgentProvider(TestAgentService agency)
         {
             _agency = agency;
         }
@@ -72,7 +72,7 @@ namespace NUnit.Engine.Services
                 $"No agents are available for package {package.Name}.\r\nGetAgent should not be called when IsAgentAvailable returns false.");
         }
 
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             // TODO: Close any open tests, dispose resources, keep the agent available for reuse.
         }

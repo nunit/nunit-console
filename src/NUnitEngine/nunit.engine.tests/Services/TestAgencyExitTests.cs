@@ -59,13 +59,13 @@ namespace NUnit.Engine.Services
         [TestCase(42, "exit code 42")]
         public void PreservesAgentExitDiagnostic(int exitCode, string diagnostic)
         {
-            Assert.That(TestAgency.GetAgentExitMessage(exitCode), Does.Contain(diagnostic));
+            Assert.That(TestAgentService.GetAgentExitMessage(exitCode), Does.Contain(diagnostic));
         }
 
         [Test]
         public void UnknownAgentHasNoExitDiagnostic()
         {
-            using var agency = new TestAgency();
+            using var agency = new TestAgentService();
             Assert.That(agency.GetAgentExitMessage(Guid.NewGuid()), Is.Null);
         }
 
@@ -80,7 +80,7 @@ namespace NUnit.Engine.Services
                 EnableRaisingEvents = enableEvents
             };
             process.StartInfo.RedirectStandardInput = delay < 0;
-            using var agency = new TestAgency();
+            using var agency = new TestAgentService();
             var provider = new ExitTestAgentProvider(agency, process, delay < 0);
             var package = new TestPackage("test-assembly.dll");
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(".NETCoreApp,Version=v10.0"), true);
@@ -198,11 +198,11 @@ namespace NUnit.Engine.Services
 
         private sealed class ExitTestAgentProvider : LocalProcessAgentProvider
         {
-            private readonly TestAgency _agency;
+            private readonly TestAgentService _agency;
             private readonly Process _process;
             private readonly bool _register;
 
-            public ExitTestAgentProvider(TestAgency agency, Process process, bool register) : base(agency)
+            public ExitTestAgentProvider(TestAgentService agency, Process process, bool register) : base(agency)
             {
                 _agency = agency;
                 _process = process;

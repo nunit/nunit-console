@@ -12,7 +12,7 @@ namespace NUnit.Engine.Services
     public class TestAgencyTests
     {
         private ExtensionService _extensionService;
-        private TestAgency _testAgency;
+        private TestAgentService _testAgency;
         private ServiceContext _services;
 
         private const string NET462AGENT = "Net462Agent";
@@ -26,7 +26,7 @@ namespace NUnit.Engine.Services
             _services.Add(new FakeRuntimeService());
             _extensionService = new ExtensionService();
             _services.Add(_extensionService);
-            _testAgency = new TestAgency();
+            _testAgency = new TestAgentService();
             _services.Add(_testAgency);
             _services.ServiceManager.StartServices();
         }

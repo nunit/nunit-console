@@ -43,7 +43,7 @@ namespace NUnit.Engine.TestHelpers
             new Agent(this, Guid.Parse(Call(ProviderConnection.GetAgent, data: package.ToXml())));
 
         /// <summary>Confirms release through the originating server before marking the client reference released.</summary>
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             if (agent is not Agent remote || !ReferenceEquals(remote.Provider, this) || remote.Released)
                 throw new InvalidOperationException("The agent was not acquired from this provider or was already released.");

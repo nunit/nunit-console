@@ -18,14 +18,14 @@ namespace NUnit.Engine.Runners
 
         private static readonly Logger log = InternalTrace.GetLogger(typeof(ProcessRunner));
 
-        private readonly TestAgency _agency;
+        private readonly TestAgentService _agency;
 
         private ITestAgent? _agent;
         private ITestEngineRunner? _remoteRunner;
 
         public ProcessRunner(IServiceLocator services, TestPackage package) : base(services, package)
         {
-            _agency = Services.GetService<TestAgency>();
+            _agency = Services.GetService<TestAgentService>();
 
             // Ensure that the TestPackage represents an assembly.
             Guard.ArgumentValid(!TestPackage.HasSubPackages, $"{GetType().Name} requires a package with a single assembly", nameof(package));
@@ -255,7 +255,7 @@ namespace NUnit.Engine.Runners
                     try
                     {
                         log.Debug("Returning agent to its provider");
-                        _agency.ReleaseAgent(_agent);
+                        _agency.ReturnAgent(_agent);
                     }
                     catch (NUnitEngineUnloadException ex) when (unloadException is not null)
                     {
