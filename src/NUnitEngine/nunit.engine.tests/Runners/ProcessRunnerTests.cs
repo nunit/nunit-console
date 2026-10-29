@@ -74,10 +74,10 @@ namespace NUnit.Engine.Runners
             var agent = Substitute.For<ITestAgent>();
             agent.CreateRunner(_package).ReturnsForAnyArgs(_remoteRunner);
 
-            var agency = Substitute.For<TestAgency>();
+            var agency = Substitute.For<TestAgentService>();
             agency.GetAgent(_package).ReturnsForAnyArgs(agent);
 
-            context.GetService<TestAgency>().Returns(agency);
+            context.GetService<TestAgentService>().Returns(agency);
 #endif
 
             _processRunner = new ProcessRunner(context, _package);

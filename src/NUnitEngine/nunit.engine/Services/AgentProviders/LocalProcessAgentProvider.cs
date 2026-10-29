@@ -27,7 +27,7 @@ namespace NUnit.Engine.Services
         private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
 
         // The TestAgency instance for which we are providing local process agents.
-        private TestAgency _agency;
+        private TestAgentService _agency;
 
         // The AgentStore instance used to track agents and their processes.
         private AgentStore _agentStore;
@@ -35,7 +35,7 @@ namespace NUnit.Engine.Services
         // Index used to retrieve the agentId of a terminated process
         internal readonly ConcurrentDictionary<Process, Guid> _agentProcessIndex = new ConcurrentDictionary<Process, Guid>();
 
-        public LocalProcessAgentProvider(TestAgency agency)
+        public LocalProcessAgentProvider(TestAgentService agency)
         {
             _agency = agency;
             _agentStore = agency._agentStore;
@@ -163,7 +163,7 @@ namespace NUnit.Engine.Services
 
             if (agentProcess.HasExited)
                 throw new NUnitEngineException($"Unable to acquire remote process agent (exit code {agentProcess.ExitCode}). " +
-                    TestAgency.GetAgentExitMessage(agentProcess.ExitCode));
+                    TestAgentService.GetAgentExitMessage(agentProcess.ExitCode));
 
             throw new NUnitEngineException("Unable to acquire remote process agent");
         }
@@ -177,7 +177,7 @@ namespace NUnit.Engine.Services
         /// retains ownership for a later release attempt. The runner remains responsible
         /// for combining unload and stop failures.
         /// </remarks>
-        public void ReleaseAgent(ITestAgent agent)
+        public void ReturnAgent(ITestAgent agent)
         {
             if (_agentStore.IsAgentActive(agent.Id, out Process? process))
                 try

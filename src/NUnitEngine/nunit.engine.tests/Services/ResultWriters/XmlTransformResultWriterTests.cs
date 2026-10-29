@@ -23,7 +23,7 @@ namespace NUnit.Engine.Services.ResultWriters
 
             var serviceContext = new ServiceContext();
             serviceContext.Add(new TestRunnerFactory());
-            serviceContext.Add(new TestAgency());
+            serviceContext.Add(new TestAgentService());
             serviceContext.Add(new ExtensionService());
             serviceContext.Add(new FakeRuntimeService());
 

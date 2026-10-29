@@ -20,7 +20,7 @@ namespace NUnit.Engine.Services
         private ITestAgent _agent;
         private ITestEngineRunner _remoteRunner;
         private ITestAgentProvider _owner;
-        private TestAgency _agency;
+        private TestAgentService _agency;
         private Process? _process;
         private bool _processStarted;
         private Exception? _stopFailure;
@@ -41,9 +41,9 @@ namespace NUnit.Engine.Services
             _owner = Substitute.For<ITestAgentProvider>();
             _owner.IsAgentAvailable(_package).Returns(true);
             _owner.GetAgent(_package).Returns(_agent);
-            _agency = new TestAgency(new[] { _owner });
+            _agency = new TestAgentService(new[] { _owner });
             var localProvider = new LocalProcessAgentProvider(_agency);
-            _owner.When(provider => provider.ReleaseAgent(_agent)).Do(_ => localProvider.ReleaseAgent(_agent));
+            _owner.When(provider => provider.ReturnAgent(_agent)).Do(_ => localProvider.ReturnAgent(_agent));
             _agent.When(agent => agent.Stop()).Do(_ =>
             {
                 if (_stopFailure is not null)
@@ -82,8 +82,8 @@ namespace NUnit.Engine.Services
             Assert.That(() => Release(throughRunner), Throws.Nothing);
 
             _agent.Received(1).Stop();
-            Assert.That(() => _agency.ReleaseAgent(_agent), Throws.InvalidOperationException);
-            _owner.Received(1).ReleaseAgent(_agent);
+            Assert.That(() => _agency.ReturnAgent(_agent), Throws.InvalidOperationException);
+            _owner.Received(1).ReturnAgent(_agent);
         }
 
         [TestCase(false)]
@@ -143,7 +143,7 @@ namespace NUnit.Engine.Services
             var failure = Assert.Throws<NUnitEngineUnloadException>(() => runner.Dispose());
 
             Assert.That(failure!.InnerException, Is.SameAs(unloadFailure));
-            Assert.That(() => _agency.ReleaseAgent(_agent), Throws.InvalidOperationException);
+            Assert.That(() => _agency.ReturnAgent(_agent), Throws.InvalidOperationException);
         }
 
         [Test]
@@ -159,8 +159,8 @@ namespace NUnit.Engine.Services
 
             Assert.That(failure!.Message, Does.Contain(unloadFailure.Message).And.Contain(_stopFailure.Message));
             _stopFailure = null;
-            _agency.ReleaseAgent(_agent);
-            _owner.Received(2).ReleaseAgent(_agent);
+            _agency.ReturnAgent(_agent);
+            _owner.Received(2).ReturnAgent(_agent);
         }
 
         private void AssertFailureAndRetry(bool throughRunner)
@@ -168,10 +168,10 @@ namespace NUnit.Engine.Services
             Assert.That(Assert.Catch(() => Release(throughRunner)), Is.SameAs(_stopFailure));
 
             _stopFailure = null;
-            _agency.ReleaseAgent(_agent);
+            _agency.ReturnAgent(_agent);
 
-            _owner.Received(2).ReleaseAgent(_agent);
-            Assert.That(() => _agency.ReleaseAgent(_agent), Throws.InvalidOperationException);
+            _owner.Received(2).ReturnAgent(_agent);
+            Assert.That(() => _agency.ReturnAgent(_agent), Throws.InvalidOperationException);
         }
 
         private void Release(bool throughRunner)
@@ -184,14 +184,14 @@ namespace NUnit.Engine.Services
             else
             {
                 _agency.GetAgent(_package);
-                _agency.ReleaseAgent(_agent);
+                _agency.ReturnAgent(_agent);
             }
         }
 
         private ProcessRunner CreateRunner()
         {
             var services = Substitute.For<IServiceLocator>();
-            services.GetService<TestAgency>().Returns(_agency);
+            services.GetService<TestAgentService>().Returns(_agency);
             var runner = new ProcessRunner(services, _package);
             Assert.That(runner.CountTestCases(TestFilter.Empty), Is.EqualTo(42));
             return runner;

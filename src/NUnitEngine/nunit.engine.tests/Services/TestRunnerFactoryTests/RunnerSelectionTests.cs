@@ -40,7 +40,7 @@ namespace NUnit.Engine.Services.TestRunnerFactoryTests
             _services.Add(fakeRuntimeService);
             Assert.That(((IService)fakeRuntimeService).Status, Is.EqualTo(ServiceStatus.Started));
 
-            var testAgency = new TestAgency();
+            var testAgency = new TestAgentService();
             _services.Add(testAgency);
             ((IService)testAgency).StartService();
             Assert.That(testAgency.Status, Is.EqualTo(ServiceStatus.Started));

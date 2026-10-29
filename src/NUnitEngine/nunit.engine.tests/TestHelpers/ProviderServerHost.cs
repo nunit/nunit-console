@@ -40,7 +40,7 @@ namespace NUnit.Engine.TestHelpers
                     File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "test-server.addins"), launcher);
                     extensions.FindExtensionAssemblies(Environment.CurrentDirectory);
                     extensions.InstallExtensions();
-                    var agency = engine.Services.GetService<TestAgency>();
+                    var agency = engine.Services.GetService<TestAgentService>();
                     provider = new ObservedProvider(agency, Path.GetDirectoryName(args[1])!);
                 }
 
@@ -66,11 +66,11 @@ namespace NUnit.Engine.TestHelpers
         /// </summary>
         private sealed class ObservedProvider : ITestAgentProvider
         {
-            private readonly TestAgency _agency;
+            private readonly TestAgentService _agency;
             private readonly string _directory;
             private readonly Dictionary<Guid, Process> _processes = new Dictionary<Guid, Process>();
 
-            internal ObservedProvider(TestAgency agency, string directory)
+            internal ObservedProvider(TestAgentService agency, string directory)
             {
                 _agency = agency;
                 _directory = directory;
@@ -95,11 +95,11 @@ namespace NUnit.Engine.TestHelpers
                 return agent;
             }
 
-            public void ReleaseAgent(ITestAgent agent)
+            public void ReturnAgent(ITestAgent agent)
             {
                 var record = XElement.Load(RecordPath(agent));
                 var process = _processes[agent.Id];
-                _agency.ReleaseAgent(agent);
+                _agency.ReturnAgent(agent);
                 if (!process.WaitForExit(10000))
                     throw new TimeoutException("The released test agent process did not exit.");
                 record.SetAttributeValue("exitCode", process.ExitCode);
@@ -176,7 +176,7 @@ namespace NUnit.Engine.TestHelpers
             private static string PackagePath(TestPackage package) => string.IsNullOrEmpty(package.FullName)
                 ? string.Join(";", package.SubPackages.Select(PackagePath)) : package.FullName;
 
-            public void ReleaseAgent(ITestAgent agent)
+            public void ReturnAgent(ITestAgent agent)
             {
                 if (!_releaseFailures.TryGetValue(agent.Id, out bool fail))
                     throw new InvalidOperationException("Unknown agent.");

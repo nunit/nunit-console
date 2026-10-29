@@ -4,7 +4,6 @@
     <RootNamespace>NUnit.Engine</RootNamespace>
     <TargetFrameworks>net462;net10.0</TargetFrameworks>
   </PropertyGroup>
-
   <ItemGroup>
     <InternalsVisibleTo Include="nunit.engine.tests, PublicKey=$(NUnitPublicKey)" />
     <InternalsVisibleTo Include="nunit4-console.tests, PublicKey=$(NUnitPublicKey)" />
