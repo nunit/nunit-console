@@ -88,6 +88,12 @@ namespace NUnit.Engine.Services
         /// and a string representing the selected runtime is returned.
         /// </summary>
         /// <param name="package">A TestPackage representing an assembly</param>
+        /// <remarks>
+        /// A remote request carries assembly/runtime constraints to the selected backend.
+        /// Its target is not required to be installed in the coordinator, and coordinator
+        /// fallback must not change it. This does not guarantee backend availability: the
+        /// remote provider and its launcher remain responsible for satisfying the request.
+        /// </remarks>
         public void SelectRuntimeFramework(TestPackage package)
         {
             Guard.ArgumentValid(!package.HasSubPackages,
@@ -97,6 +103,7 @@ namespace NUnit.Engine.Services
             if (package.IsAssemblyPackage)
                 ApplyImageData(package);
 
+            bool remote = RemoteAgentSettings.RequestedType(package) == TestAgentType.RemoteProcess;
             string frameworkSetting = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework);
             bool runAsX86 = package.Settings.GetValueOrDefault(SettingDefinitions.RunAsX86);
 
@@ -106,7 +113,7 @@ namespace NUnit.Engine.Services
 
                 log.Debug($"Requested framework for {package.Name} is {requestedFramework}");
 
-                if (!IsAvailable(frameworkSetting, runAsX86))
+                if (!remote && !IsAvailable(frameworkSetting, runAsX86))
                     throw new NUnitEngineException("Requested framework is not available: " + frameworkSetting);
 
                 var frameworkName = requestedFramework.FrameworkName.ToString();
@@ -147,6 +154,8 @@ namespace NUnit.Engine.Services
                         targetVersion = new Version(3, 1);
                         break;
                     case "Unmanaged":
+                        if (remote)
+                            throw new NUnitEngineException("Remote execution of unmanaged assemblies is not supported.");
                         package.ApplySetting(SettingDefinitions.ImageTargetFrameworkName.WithValue("Unmanaged,Version=0.0"), false);
                         return;
                     default:
@@ -154,7 +163,12 @@ namespace NUnit.Engine.Services
                 }
             }
 
-            if (!IsAvailable(new RuntimeFramework(targetIdentifier, targetVersion).TFM, runAsX86))
+            // An explicit remote runtime is a backend constraint, not a coordinator
+            // installation preference. Keep it after validating the assembly image.
+            if (remote && frameworkSetting.Length > 0)
+                return;
+
+            if (!remote && !IsAvailable(new RuntimeFramework(targetIdentifier, targetVersion).TFM, runAsX86))
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
                 if (targetVersion < CurrentFramework.FrameworkName.Version)

@@ -28,10 +28,12 @@ namespace NUnit.Engine.TestHelpers
         private readonly ConcurrentDictionary<Socket, Task> _requests = new ConcurrentDictionary<Socket, Task>();
         private Task? _acceptLoop;
         private volatile bool _stopping;
+        private readonly bool _dropAcquisitionResponse;
 
-        internal TestAgentProviderServer(ITestAgentProvider provider)
+        internal TestAgentProviderServer(ITestAgentProvider provider, bool dropAcquisitionResponse = false)
         {
             _provider = provider;
+            _dropAcquisitionResponse = dropAcquisitionResponse;
         }
 
         internal IPEndPoint EndPoint => (IPEndPoint)_listener.LocalEndpoint;
@@ -141,6 +143,10 @@ namespace NUnit.Engine.TestHelpers
                         var agent = GetAgent(PackageHelper.FromXml(data));
                         if (!_agents.TryAdd(agent.Id, new Lease(owner, agent)))
                             throw new InvalidOperationException("The provider returned an agent that is already leased.");
+                        // Deterministic transport fault: retain the lease but lose its reply.
+                        // Only the explicitly selected controlled-provider test mode enables it.
+                        if (_dropAcquisitionResponse)
+                            return;
                         result = agent.Id.ToString();
                         break;
                     default:

@@ -26,7 +26,7 @@ namespace NUnit.Engine.Services
         private const int NORMAL_TIMEOUT = 30000;               // 30 seconds
         private const int DEBUG_TIMEOUT = NORMAL_TIMEOUT * 10;  // 5 minutes
 
-        // The TestAgency instance for which we are providing local process agents.
+        // The TestAgentService instance for which we are providing local process agents.
         private TestAgentService _agency;
 
         // The AgentStore instance used to track agents and their processes.
@@ -79,6 +79,9 @@ namespace NUnit.Engine.Services
         {
             Guard.ArgumentNotNull(package, nameof(package));
 
+            if (!RemoteAgentSettings.AllowsLocalProcess(package))
+                return Array.Empty<TestAgentInfo>();
+
             // This method is primarily intended for use in implementing a command-line
             // option to allow selection of the agent to be used for a test run. Because
             // the option would apply to all assemblies being run, any agents returned
@@ -112,6 +115,9 @@ namespace NUnit.Engine.Services
 
         public bool IsAgentAvailable(TestPackage package)
         {
+            if (!RemoteAgentSettings.AllowsLocalProcess(package))
+                return false;
+
             foreach (var node in LauncherNodes)
                 if (CanCreateAgent(node, package))
                     return true;
@@ -206,7 +212,7 @@ namespace NUnit.Engine.Services
             {
                 if (_launcherNodes is null)
                 {
-                    Guard.OperationValid(_agency._extensionService is not null, "LauncherNodes property may not be accessed before TestAgency service is started");
+                    Guard.OperationValid(_agency._extensionService is not null, "LauncherNodes property may not be accessed before TestAgentService service is started");
 
                     _launcherNodes = [.. _agency._extensionService.GetExtensionNodes(AGENT_LAUNCHERS_PATH)];
 

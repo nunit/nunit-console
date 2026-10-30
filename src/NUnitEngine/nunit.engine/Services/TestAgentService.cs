@@ -17,7 +17,7 @@ using NUnit.Extensibility;
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// The TestAgency class provides RemoteTestAgents
+    /// The TestAgentService class provides RemoteTestAgents
     /// on request and tracks their status.
     /// </summary>
     internal class TestAgentService : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency
@@ -138,16 +138,16 @@ namespace NUnit.Engine.Services
         }
 
         /// <summary>
-        /// Releases the test agent back to the provider. Only the provider knows what to do
-        /// with the agent, which may include terminating it or keeping it alive for future use.
+        /// Returns the exact acquired agent to its originating provider.
         /// </summary>
-        /// <param name="agent">An agent previously provided by a call to GetAgent.</param>
+        /// <param name="agent">An agent previously acquired by a call to GetAgent.</param>
         /// <exception cref="InvalidOperationException">
-        /// If agent was never provided by the factory or was previously released.
+        /// If the agent was not acquired from this agency or was previously returned.
         /// </exception>
         /// <remarks>
-        /// Ownership is removed only after the provider confirms release. A failed
-        /// release may be retried through the same agency. Requests for one agent
+        /// Ownership is removed only after the provider confirms the return. If returning
+        /// fails, the originating provider association is retained for further attempts.
+        /// This does not guarantee that repeating a failed call is harmless. Requests for one agent
         /// are serialized without holding the ownership index lock during provider I/O.
         /// Virtual to allow substitution of agents and providers in runner tests.
         /// </remarks>
@@ -202,7 +202,7 @@ namespace NUnit.Engine.Services
                 if (_providers.Count == 0)
                 {
                     _providers.Add(new LocalProcessAgentProvider(this));
-                    _providers.Add(new RemoteProcessAgentProvider(this));
+                    _providers.Add(new RemoteProcessAgentProvider());
                     _providers.Add(new InProcessAgentProvider(this));
                 }
 
