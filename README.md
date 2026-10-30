@@ -2,6 +2,13 @@
 
 The NUnit Console Runner and Engine are used for executing NUnit tests with a wide variety of options. Version 4, the next major release, is currently in beta, with many new features. The primary package, `NUnit.ConsoleRunner`, contains the Console Runner and the NUnit Engine, which is used to execute tests. The following table shows the latest NuGet releases, including pre-releases for the Console Runner, Engine, and all support packages and agents. Packages on NuGet are also on Myget, but MyGet includes additonal intermediate releases used in the development process.
 
+<div style="position: absolute; left: 40em; max-width: 30em; border: 2px solid black">
+    <p style="font-weight: bold; text-align: center; background-color: #e0e0e0; border-bottom: 2px solid black; padding: 8px">Note to V4 Developerment Team</p>
+    <p style="text-wrap: wrap; padding: 0 8px;">The values in the table show the latest versions of each package.</p>
+    <p style="text-wrap: wrap; padding: 0 8px;">Depending on the particular package, we may wish to use the latest stable verson, the latest nuget pre-release or the latest myget pre-release.</p>
+    <p style="text-wrap: wrap; padding: 0 8px;">Work is underway to allow enable automatic version selection in our scripts, but for now it's up to us.</p>
+</div>
+
 |  | Latest Versions |  |
 | ---: | --- | --- |
 | ![Static Badge](https://img.shields.io/badge/Console,%20Common%20and%20Engine--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.ConsoleRunner.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.ConsoleRunner?label=myget)
