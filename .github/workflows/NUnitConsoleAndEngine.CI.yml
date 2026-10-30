@@ -5,7 +5,13 @@ on:
   push:
     branches:  
       - main
+    paths-ignore:
+      - '**/*.txt'
+      - '**/*.md'
   pull_request:
+    paths-ignore:
+      - '**/*.txt'
+      - '**/*.md'
   release:
 
 env:

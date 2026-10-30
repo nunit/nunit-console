@@ -1,6 +1,6 @@
 # NUnit 4 Console and Engine
 
-The NUnit Console Runner and Engine are used for executing NUnit tests with a wide variety of options. Version 4, the next major release, is currently in beta, with many new features. The primary package, `NUnit.ConsoleRunner`, contains the Console Runner and the NUnit Engine, which is used to execute tests. The following table shows the latest stable (nuget) and development (myget) versions of the Console Runner and Engine, as well as the support packages and agents.
+The NUnit Console Runner and Engine are used for executing NUnit tests with a wide variety of options. Version 4, the next major release, is currently in beta, with many new features. The primary package, `NUnit.ConsoleRunner`, contains the Console Runner and the NUnit Engine, which is used to execute tests. The following table shows the latest NuGet releases, including pre-releases for the Console Runner, Engine, and all support packages and agents. Packages on NuGet are also on Myget, but MyGet includes additonal intermediate releases used in the development process.
 
 |  | Latest Versions |  |
 | ---: | --- | --- |
