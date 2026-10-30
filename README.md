@@ -1,8 +1,17 @@
 # NUnit 4 Console and Engine
 
-[![Follow NUnit](https://img.shields.io/twitter/follow/nunit.svg?style=social)](https://twitter.com/nunit) [![Slack](https://img.shields.io/badge/chat-on%20Slack-brightgreen)](https://join.slack.com/t/nunit/shared_invite/zt-jz58jw68-Led8y3WH4n2a~Y5WjuOpKA)
+The NUnit Console Runner and Engine are used for executing NUnit tests with a wide variety of options. Version 4, the next major release, is currently in beta, with many new features. The primary package, `NUnit.ConsoleRunner`, contains the Console Runner and the NUnit Engine, which is used to execute tests. The following table shows the latest NuGet releases, including pre-releases for the Console Runner, Engine, and all support packages and agents. Packages on NuGet are also on Myget, but MyGet includes additonal intermediate releases used in the development process.
 
-The NUnit Console Runner and Engine are used for executing NUnit tests with a wide variety of options. Version 4 is the latest major release, with many new features.
+|  | Latest Versions |  |
+| ---: | --- | --- |
+| ![Static Badge](https://img.shields.io/badge/Console,%20Common%20and%20Engine--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.ConsoleRunner.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.ConsoleRunner?label=myget)
+| ![Static Badge](https://img.shields.io/badge/Engine%20API--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Engine.Api.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Engine.Api?label=myget)
+| ![Static Badge](https://img.shields.io/badge/Extensibility%20and%20Extensibility%20API--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Extensibility.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Extensibility?label=myget)
+| ![Static Badge](https://img.shields.io/badge/Agent%20Core--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Agent.Core.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Agent.Core?label=myget)
+| ![Static Badge](https://img.shields.io/badge/.NET%204.6.2%20Agent--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Extension.Net462PluggableAgent.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Extension.Net462PluggableAgent?label=myget)
+| ![Static Badge](https://img.shields.io/badge/.NET%208.0%20Agent--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Extension.Net80PluggableAgent.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Extension.Net80PluggableAgent?label=myget)
+| ![Static Badge](https://img.shields.io/badge/.NET%209.0%20Agent--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Extension.Net90PluggableAgent.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Extension.Net90PluggableAgent?label=myget)
+| ![Static Badge](https://img.shields.io/badge/.NET%2010.0%20Agent--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Extension.Net10PluggableAgent.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Extension.Net10PluggableAgent?label=myget)
 
 ## Table of Contents
 
