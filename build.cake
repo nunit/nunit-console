@@ -1,6 +1,6 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.21
-// Comment out above line and uncomment below for local tests of recipe changes
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.5.2
+//Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Load additional cake files
@@ -32,7 +32,7 @@ PackageDefinition NUnitCommonPackage = new NuGetPackage(
         HasFile("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.common.dll"),
         HasDirectory("lib/netstandard2.0").WithFile("nunit.common.dll"),
-        HasDependency("NUnit.Engine.Api")
+        HasDependency("NUnit.Engine.Api").LatestDevBuild
     },
     symbols: new PackageCheck[]
     {
@@ -48,9 +48,9 @@ PackageDefinition NUnitEnginePackage = new NuGetPackage(
         HasFiles("LICENSE.txt"),
         HasDirectory("lib/net462").WithFile("nunit.engine.dll"),
         HasDirectory("lib/net10.0").WithFile("nunit.engine.dll"),
-        HasDependency("NUnit.Engine.Api"),
-        HasDependency("NUnit.Common"),
-        HasDependency("NUnit.Extensibility")
+        HasDependency("NUnit.Engine.Api").LatestDevBuild,
+        HasDependency("NUnit.Common"), // No version check as we build this here
+        HasDependency("NUnit.Extensibility").LatestDevBuild
     },
     symbols: new PackageCheck[]
     {
@@ -68,7 +68,12 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     source: BuildSettings.NuGetDirectory + "runners/NUnit.ConsoleRunner.nuspec",
     description: RUNNER_DESCRIPTION,
     checks: new PackageCheck[] {
-        HasDependencies(KnownExtensions.BundledNuGetAgents)
+        HasFiles("LICENSE.txt", "NOTICES.txt", "nunit_256.png"),
+        HasDirectory("tools").WithFiles("nunit-console.exe", "nunit-console.exe.config", "nunit.engine.api.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll", "nunit.engine.dll", "testcentric.metadata.dll"),
+        HasDependency(KnownExtensions.Net462PluggableAgent.LatestStableRelease.NuGetPackage),
+        HasDependency(KnownExtensions.Net80PluggableAgent.LatestStableRelease.NuGetPackage),
+        HasDependency(KnownExtensions.Net90PluggableAgent.LatestStableRelease.NuGetPackage),
+        HasDependency(KnownExtensions.Net10PluggableAgent.LatestStableRelease.NuGetPackage)
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
