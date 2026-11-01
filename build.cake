@@ -70,10 +70,10 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     checks: new PackageCheck[] {
         HasFiles("LICENSE.txt", "NOTICES.txt", "nunit_256.png"),
         HasDirectory("tools").WithFiles("nunit-console.exe", "nunit-console.exe.config", "nunit.engine.api.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll", "nunit.engine.dll", "testcentric.metadata.dll"),
-        HasDependency(KnownExtensions.Net462PluggableAgent.LatestStableRelease.NuGetPackage),
-        HasDependency(KnownExtensions.Net80PluggableAgent.LatestStableRelease.NuGetPackage),
-        HasDependency(KnownExtensions.Net90PluggableAgent.LatestStableRelease.NuGetPackage),
-        HasDependency(KnownExtensions.Net10PluggableAgent.LatestStableRelease.NuGetPackage)
+        HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestStableRelease,
+        HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestStableRelease,
+        HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestStableRelease,
+        HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestStableRelease
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
