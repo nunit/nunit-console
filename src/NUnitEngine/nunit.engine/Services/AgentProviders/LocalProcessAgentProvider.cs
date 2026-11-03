@@ -229,6 +229,10 @@ namespace NUnit.Engine.Services
             }
         }
 
+        /// <summary>
+        /// Checks launcher metadata against the selected execution runtime, falling back
+        /// to the assembly target only when runtime selection has not yet occurred.
+        /// </summary>
         internal static bool CanCreateAgent(ExtensionNode node, TestPackage package)
         {
             // Newer implementations use a TargetFramework property to avoid
@@ -246,7 +250,9 @@ namespace NUnit.Engine.Services
             var agentTarget = new FrameworkName(runtimes.First());
             log.Debug($"Agent {node.TypeName} targets {agentTarget}");
             var packageTargetSetting =
-                package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+                package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName);
+            if (string.IsNullOrEmpty(packageTargetSetting))
+                packageTargetSetting = package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
 
             if (!string.IsNullOrEmpty(packageTargetSetting))
             {
