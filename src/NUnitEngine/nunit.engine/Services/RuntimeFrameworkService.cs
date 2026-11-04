@@ -223,6 +223,13 @@ namespace NUnit.Engine.Services
                     identifier = FrameworkIdentifiers.NetCoreApp;
                 }
             }
+            else if (Platform.IsMono && major == 4)
+            {
+                // Mono reports a CLR compatibility version, not its product version.
+                // Use the same .NET Framework profile check as on Windows.
+                if (Type.GetType("System.Reflection.AssemblyMetadataAttribute") is not null)
+                    minor = 5;
+            }
             else if (major > 4)
             {
                 identifier = FrameworkIdentifiers.NetCoreApp;
@@ -266,7 +273,17 @@ namespace NUnit.Engine.Services
                 _availableX86Runtimes.AddRange(netFxRuntimes);
             }
 
-            //FindDefaultMonoFramework();
+            if (Platform.IsMono)
+            {
+                // Only the current profile is known to be available. Do not infer
+                // other installed profiles or a separate x86 Mono installation.
+                var currentFramework = (RuntimeFramework)CurrentFramework;
+                if (!_availableRuntimes.Exists(runtime => FrameworksMatch(currentFramework, runtime)))
+                    _availableRuntimes.Add(currentFramework);
+                if (IntPtr.Size == 4 && !_availableX86Runtimes.Exists(runtime => FrameworksMatch(currentFramework, runtime)))
+                    _availableX86Runtimes.Add(currentFramework);
+            }
+
             _availableRuntimes.AddRange(NetCoreRuntimeLocator.FindRuntimes(forX86: false));
             _availableX86Runtimes.AddRange(NetCoreRuntimeLocator.FindRuntimes(forX86: true));
         }
