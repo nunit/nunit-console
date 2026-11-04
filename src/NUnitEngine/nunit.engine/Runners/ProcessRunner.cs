@@ -49,6 +49,11 @@ namespace NUnit.Engine.Runners
                 log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
             }
+            finally
+            {
+                if (_disposeRunners)
+                    Dispose();
+            }
         }
 
         /// <summary>
@@ -165,6 +170,11 @@ namespace NUnit.Engine.Runners
             {
                 log.Error("Failed to run remote tests {0}", ExceptionHelper.BuildMessageAndStackTrace(e));
                 return CreateFailedResult(e);
+            }
+            finally
+            {
+                if (_disposeRunners)
+                    Dispose();
             }
         }
 
