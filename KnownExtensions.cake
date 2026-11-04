@@ -14,22 +14,25 @@ public static class KnownExtensions
         "NUnit.Extension.NUnitV2ResultWriter", "nunit-extension-nunit-v2-result-writer", "4.0.0-beta.2");
     public static ExtensionSpecifier TeamCityEventListener = new ExtensionSpecifier(
         "NUnit.Extension.TeamCityEventListener", "nunit-extension-teamcity-event-listener", "1.0.9");
-    public static ExtensionSpecifier Net462PluggableAgent = new ExtensionSpecifier(
+
+    // Pluggable Agents for different target frameworks. Versions specified are the latest
+    // production releases of each agent, which can be modified in build.cake
+    public static readonly ExtensionSpecifier Net462PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.3");
-    public static ExtensionSpecifier Net80PluggableAgent = new ExtensionSpecifier(
+    public static readonly ExtensionSpecifier Net80PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.4");
-    public static ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
+    public static readonly ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.3");
-    public static ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
+    public static readonly ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.0");
 
-    public static ExtensionSpecifier[] BundledAgents =>
-    [
+    public static readonly ExtensionSpecifier[] BundledAgents = new ExtensionSpecifier[]
+    {
         Net462PluggableAgent,
         Net80PluggableAgent,
         Net90PluggableAgent,
         Net10PluggableAgent
-    ];
+    };
 
     public static IEnumerable<PackageReference> BundledNuGetAgents =>
         BundledAgents.Select(a => a.NuGetPackage);

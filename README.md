@@ -11,6 +11,7 @@ The NUnit Console Runner and Engine are used for executing NUnit tests with a wi
 
 |  | Latest Versions |  |
 | ---: | --- | --- |
+| ![Static Badge](https://img.shields.io/badge/NUnit%20Cake%20Recipe%20(build%20script)--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Cake.Recipe.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Cake.Recipe?label=myget)
 | ![Static Badge](https://img.shields.io/badge/Console,%20Common%20and%20Engine--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.ConsoleRunner.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.ConsoleRunner?label=myget)
 | ![Static Badge](https://img.shields.io/badge/Engine%20API--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Engine.Api.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Engine.Api?label=myget)
 | ![Static Badge](https://img.shields.io/badge/Extensibility%20and%20Extensibility%20API--black?labelColor=black&color=black) | ![NuGet Version](https://img.shields.io/nuget/vpre/NUnit.Extensibility.svg) | ![MyGet Version](https://img.shields.io/myget/nunit/vpre/NUnit.Extensibility?label=myget)
