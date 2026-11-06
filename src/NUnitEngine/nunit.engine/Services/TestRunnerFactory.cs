@@ -67,6 +67,12 @@ namespace NUnit.Engine.Services
 
             string assemblyPath = package.FullName.ShouldNotBeNull();
 
+            // A remote package names a file in the backend's filesystem. File
+            // existence and assembly inspection must be performed there, rather
+            // than requiring an unrelated copy on the frontend machine.
+            if (RemoteAgentSettings.RequestedType(package) == TestAgentType.RemoteProcess)
+                return new ProcessRunner(ServiceContext, package);
+
             if (!File.Exists(assemblyPath))
                 return new InvalidAssemblyTestRunner(assemblyPath, $"File not found: {assemblyPath}");
             if (!PathUtils.IsAssemblyFileType(assemblyPath))
