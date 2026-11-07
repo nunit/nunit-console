@@ -32,7 +32,8 @@ namespace NUnit.Engine.Drivers.Tests
         public void CurrentFrameworkDoesNotPretendToSupportForcedStop()
         {
             var controller = new CurrentController();
-            Assert.Throws<NotSupportedException>(() => CreateDriver(controller).StopRun(true));
+            var exception = Assert.Throws<NotSupportedException>(() => CreateDriver(controller).StopRun(true));
+            Assert.That(exception.Message, Does.Contain("cooperative stop only"));
             Assert.That(controller.Called, Is.False);
         }
 

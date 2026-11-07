@@ -167,11 +167,13 @@ namespace NUnit.Engine.Drivers
         /// <summary>
         /// Cancel the ongoing test run. If no  test is running, the call is ignored.
         /// </summary>
-        /// <param name="force">If true, cancel any ongoing test threads, otherwise wait for them to complete.</param>
+        /// <param name="force">Whether to forward a forced-stop request to a framework with the Boolean stop API.</param>
         /// <remarks>
         /// NUnit 5 exposes a parameterless cooperative stop. A forced stop cannot be
         /// performed through that API and remains the caller's responsibility.
         /// NUnit 3 and 4 retain their Boolean stop argument without modification.
+        /// Modern .NET does not support aborting test threads through that argument.
+        /// Call StopRun(false) to request cooperative cancellation.
         /// </remarks>
         public void StopRun(bool force)
         {
