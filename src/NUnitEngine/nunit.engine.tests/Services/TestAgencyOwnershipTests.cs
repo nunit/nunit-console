@@ -206,6 +206,7 @@ namespace NUnit.Engine.Services
         }
 
         [Test]
+        [Category("Integration")]
         public void RunnerDisposalReturnsAgentToProviderWithoutStoppingItDirectly()
         {
             var remoteRunner = Substitute.For<ITestEngineRunner>();

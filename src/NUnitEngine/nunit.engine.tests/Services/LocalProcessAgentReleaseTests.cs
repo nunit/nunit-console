@@ -14,6 +14,7 @@ namespace NUnit.Engine.Services
     /// Exercises local shutdown exceptions through provider ownership and runner disposal,
     /// using controlled child processes to distinguish confirmed exit from lost communication.
     /// </summary>
+    [Category("Integration")]
     public class LocalProcessAgentReleaseTests
     {
         private TestPackage _package;

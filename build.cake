@@ -6,6 +6,9 @@
 // Load additional cake files
 #load package-tests.cake
 #load KnownExtensions.cake
+#load test-suites.cake
+
+var testSuiteRunner = new TestSuiteRunner();
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -13,7 +16,22 @@ BuildSettings.Initialize(
     title: "NUnit Console and Engine",
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.slnx",
+    unitTestRunner: testSuiteRunner,
     exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs", "CallerArgumentExpressionAttribute.cs" });
+
+foreach (string suite in new[] { "Unit", "Integration", "Acceptance", "PendingAcceptance" })
+{
+    Task("Test" + suite)
+        .Description("Run the " + suite + " test suite")
+        .IsDependentOn("Build")
+        .WithCriteria(() => !CommandLineOptions.NoTests)
+        .Does(() => testSuiteRunner.RunSuite(suite));
+}
+
+Task("TestAll")
+    .Description("Run required regressions and report pending acceptance tests")
+    .IsDependentOn("Test")
+    .IsDependentOn("TestPendingAcceptance");
 
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE DEFINITIONS

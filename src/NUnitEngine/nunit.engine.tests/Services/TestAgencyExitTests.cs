@@ -14,6 +14,7 @@ namespace NUnit.Engine.Services
 {
     public class TestAgencyExitTests
     {
+        [Category("Integration")]
         [TestCase(42, false, -1)]
         [TestCase(42, true, -1)]
         [TestCase(42, false, -2)]
