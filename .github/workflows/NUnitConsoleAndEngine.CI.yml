@@ -50,7 +50,7 @@ jobs:
         run: dotnet tool restore
 
       - name: 🔨 Build, Test, Package and Publish (Cake script decides)
-        run: dotnet cake --target=ContinuousIntegration --configuration=Release #--verbosity=diagnostic
+        run: dotnet cake --target=TestAll --target=ContinuousIntegration --configuration=Release #--verbosity=diagnostic
 
       # Upload packages
       - name: 💾 Upload build artifacts
