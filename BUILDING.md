@@ -67,20 +67,32 @@ build, package and publication target, so pending progress is reported before
 publication. A failing required suite stops the build;
 pending failures are reported as warnings and retained in their XML reports.
 
-Use `Integration` for tests crossing component boundaries or launching processes,
-and `Acceptance` for feature-level scenarios. Uncategorized tests remain in the
-unit selection. In mixed fixtures, apply categories to individual methods rather
-than moving small unit tests into the broader suite. This initial classification
+NUnit permits arbitrary category names. This repository uses the following
+standard conventions to select test suites:
+
+* Unit tests have none of the `Integration`, `Acceptance` or `PendingAcceptance`
+  categories. Other category names do not remove a test from the unit selection.
+* `Integration` identifies tests crossing component boundaries or launching
+  processes.
+* `Acceptance` identifies feature-level scenarios. `Integration` and `Acceptance`
+  are mutually exclusive: choose the scope that describes the test.
+* `PendingAcceptance` is an additional marker on an `Acceptance` test for an
+  explicitly unfinished feature, not a separate test scope. Such tests carry
+  both categories and run in the pending progress suite rather than the required
+  acceptance suite. Do not combine this marker with `Integration`.
+
+In mixed fixtures, apply categories to individual methods rather than moving
+small unit tests into the broader suite. This initial classification
 covers the agency exit, ownership and local-process release tests; it is not an
 exhaustive reclassification of every existing fixture.
 
 Test scope and feature maturity are separate. Completed behavior, including
 implemented beta features, remains required regression coverage regardless of
-its category. A test for an explicitly unfinished feature may additionally use
-`PendingAcceptance`, with a `Description` linking its tracking issue and explaining
-the missing behavior. Do not mark an existing regression pending merely because
-it fails during a refactoring. Update assertions which unnecessarily constrain
-the implementation while retaining coverage of the supported behavior.
+its category. A pending acceptance test must have a `Description` linking its
+tracking issue and explaining the missing behavior. Do not mark an existing
+regression pending merely because it fails during a refactoring. Update
+assertions which unnecessarily constrain the implementation while retaining
+coverage of the supported behavior.
 
 When a feature becomes supported, remove `PendingAcceptance` and keep its
 acceptance scenarios as required regressions. Before a beta or final release,
