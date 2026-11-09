@@ -14,7 +14,9 @@ namespace NUnit.Engine.Services
     /// </summary>
     public class MissingRuntimeFallbackTests
     {
-        /// <summary>An unavailable preferred runtime must not select a launcher unable to run its replacement.</summary>
+        /// <summary>
+        /// The launcher must support the selected runtime when the assembly's target is unavailable.
+        /// </summary>
         [TestCase(6, false)]
         [TestCase(6, true)]
         [TestCase(7, false)]
