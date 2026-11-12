@@ -38,6 +38,8 @@
   <ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
     <!-- Build the executable for process-level tests without referencing its implementation. -->
     <ProjectReference Include="../../NUnitServer/nunit-test-server/nunit-test-server.csproj" ReferenceOutputAssembly="false" />
+    <!-- Exercise the real registration gate without adding another test project. -->
+    <Compile Include="../../NUnitServer/nunit-test-server/RemoteProviderServer.cs" Link="TestHelpers/RemoteProviderServer.cs" />
   </ItemGroup>
   
   <ItemGroup>

@@ -103,7 +103,7 @@ namespace NUnit.Remote.Hosting
                 }
 
                 // Register before starting so disposal cannot miss an accepted request.
-                var start = new TaskCompletionSource<bool>();
+                var start = CreateRequestRegistrationGate();
                 var task = Task.Run(async () =>
                 {
                     await start.Task;
@@ -120,6 +120,13 @@ namespace NUnit.Remote.Hosting
                 start.SetResult(true);
             }
         }
+
+        /// <summary>
+        /// Creates a registration gate whose release cannot run a synchronous request
+        /// on the accept loop. The loop must remain available for concurrent stop requests.
+        /// </summary>
+        internal static TaskCompletionSource<bool> CreateRequestRegistrationGate() =>
+            new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         private void Handle(Socket socket)
         {
