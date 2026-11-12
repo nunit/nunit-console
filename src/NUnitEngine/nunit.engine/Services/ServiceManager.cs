@@ -52,6 +52,22 @@ namespace NUnit.Engine.Services
             log.Debug("Added " + service.GetType().Name);
         }
 
+        /// <summary>
+        /// Gets a snapshot of all registered services assignable to the requested type.
+        /// This does not use or alter the cache for single-service lookups.
+        /// </summary>
+        /// <typeparam name="T">The reference type of services to retrieve.</typeparam>
+        /// <returns>Matching services in registration order, or an empty collection.</returns>
+        public IEnumerable<T> GetServices<T>()
+            where T : class
+        {
+            var matches = new List<T>();
+            foreach (IService service in _services)
+                if (service is T match)
+                    matches.Add(match);
+            return matches;
+        }
+
         public void StartServices()
         {
             foreach (IService service in _services)
