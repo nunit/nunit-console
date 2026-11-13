@@ -1,5 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
-#if false
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,7 +41,7 @@ namespace NUnit.Engine.TestHelpers
                     extensions.FindExtensionAssemblies(Environment.CurrentDirectory);
                     extensions.InstallExtensions();
                     var agency = engine.Services.GetService<TestAgentService>();
-                    provider = new ObservedProvider(agency, Path.GetDirectoryName(args[1])!);
+                    provider = new ObservedProvider(agency, engine.Services.GetService<LocalProcessAgentProvider>(), Path.GetDirectoryName(args[1])!);
                 }
 
                 using var server = new TestAgentProviderServer(provider);
@@ -67,14 +67,21 @@ namespace NUnit.Engine.TestHelpers
         private sealed class ObservedProvider : ITestAgentProvider
         {
             private readonly TestAgentService _agency;
+            private readonly LocalProcessAgentProvider _localProvider;
             private readonly string _directory;
             private readonly Dictionary<Guid, Process> _processes = new Dictionary<Guid, Process>();
 
-            internal ObservedProvider(TestAgentService agency, string directory)
+            internal ObservedProvider(TestAgentService agency, LocalProcessAgentProvider localProvider, string directory)
             {
                 _agency = agency;
+                _localProvider = localProvider;
                 _directory = directory;
+                // This wrapper shares the child engine's lifetime and preserves
+                // its own provider identity when forwarding a native exit.
+                _localProvider.AgentExited += (_, args) => AgentExited?.Invoke(this, args);
             }
+
+            public event AgentExitedEventHandler? AgentExited;
 
             public bool IsAgentAvailable(TestPackage package) => _agency.IsAgentAvailable(package);
 
@@ -85,7 +92,7 @@ namespace NUnit.Engine.TestHelpers
             public ITestAgent GetAgent(TestPackage package)
             {
                 var agent = _agency.GetAgent(package);
-                if (!_agency._agentStore.IsAgentActive(agent.Id, out var process))
+                if (!LocalProcessAgentTestAccess.GetStore(_localProvider).IsAgentActive(agent.Id, out var process))
                     throw new InvalidOperationException("The acquired test agent has no active native process.");
                 _processes.Add(agent.Id, process);
                 var record = new XElement("agent", new XAttribute("id", agent.Id),
@@ -113,12 +120,17 @@ namespace NUnit.Engine.TestHelpers
 
         /// <summary>
         /// A deterministic provider for transport faults and cancellation, independent
-        /// of the release cadence of pluggable agent packages. Real-agent cases use TestAgency.
+        /// of the release cadence of pluggable agent packages. Real-agent cases use registered provider services.
         /// </summary>
         private sealed class ControlledProvider : ITestAgentProvider
         {
             private readonly Dictionary<Guid, bool> _releaseFailures = new Dictionary<Guid, bool>();
             private readonly Dictionary<Guid, ManualResetEventSlim> _stopSignals = new Dictionary<Guid, ManualResetEventSlim>();
+
+            // Controlled agents have no native process and do not exit by themselves.
+#pragma warning disable CS0067
+            public event AgentExitedEventHandler? AgentExited;
+#pragma warning restore CS0067
 
             public IList<TestAgentInfo> AvailableAgents => new List<TestAgentInfo>
             {
@@ -192,4 +204,3 @@ namespace NUnit.Engine.TestHelpers
         }
     }
 }
-#endif
