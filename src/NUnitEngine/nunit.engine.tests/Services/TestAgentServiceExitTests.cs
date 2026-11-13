@@ -1,6 +1,5 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if false
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -14,7 +13,11 @@ using NSubstitute;
 
 namespace NUnit.Engine.Services
 {
-    public class TestAgenServiceExitTests
+    /// <summary>
+    /// Exercises native exit reporting through registered local-provider services.
+    /// Potentially fatal callbacks execute only in isolated probe processes.
+    /// </summary>
+    public class TestAgentServiceExitTests
     {
         [Category("Integration")]
         [TestCase(42, false, -1)]
@@ -44,6 +47,7 @@ namespace NUnit.Engine.Services
             if (!probe.WaitForExit(30000))
             {
                 probe.Kill();
+                probe.WaitForExit(5000);
                 Assert.Fail("The isolated acquisition probe did not finish within 30 seconds.");
             }
 
@@ -62,16 +66,25 @@ namespace NUnit.Engine.Services
         [TestCase(42, "exit code 42")]
         public void PreservesAgentExitDiagnostic(int exitCode, string diagnostic)
         {
-            Assert.That(TestAgentService.GetAgentExitMessage(exitCode), Does.Contain(diagnostic));
+            Assert.That(LocalProcessAgentProvider.GetAgentExitMessage(exitCode), Does.Contain(diagnostic));
         }
 
         [Test]
         public void UnknownAgentHasNoExitDiagnostic()
         {
-            using var agency = new TestAgentService();
+            var services = new ServiceContext();
+            using var manager = services.ServiceManager;
+            var agency = new TestAgentService();
+            services.Add(agency);
+            manager.StartServices();
+
             Assert.That(agency.GetAgentExitMessage(Guid.NewGuid()), Is.Null);
         }
 
+        /// <summary>
+        /// Acquires a controlled child through the coordinator and verifies diagnostics
+        /// without exposing the parent test runner to an unhandled exit callback.
+        /// </summary>
         internal static int RunProbe(string[] args)
         {
             int exitCode = int.Parse(args[1], CultureInfo.InvariantCulture);
@@ -83,14 +96,20 @@ namespace NUnit.Engine.Services
                 EnableRaisingEvents = enableEvents
             };
             process.StartInfo.RedirectStandardInput = delay < 0;
-            using var agency = new TestAgentService();
-            var provider = new ExitTestAgentProvider(agency, process, delay < 0);
+            var services = new ServiceContext();
+            using var manager = services.ServiceManager;
+            services.Add(Substitute.For<ExtensionService>());
+            var provider = new ExitTestAgentProvider(process, delay < 0);
+            services.Add(provider);
+            var agency = new TestAgentService();
+            services.Add(agency);
+            manager.StartServices();
             var package = new TestPackage("test-assembly.dll");
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(".NETCoreApp,Version=v10.0"), true);
 
             try
             {
-                provider.GetAgent(package);
+                var agent = agency.GetAgent(package);
                 if (delay < 0)
                 {
                     provider.Registration!.GetAwaiter().GetResult();
@@ -111,7 +130,7 @@ namespace NUnit.Engine.Services
                         return 5;
 
                     Thread.Sleep(250);
-                    if (agency._agentStore.IsAgentActive(provider.AgentId, out _))
+                    if (TestHelpers.LocalProcessAgentTestAccess.GetStore(provider).IsAgentActive(provider.AgentId, out _))
                     {
                         Console.Error.WriteLine("Exited agent is still active.");
                         return 4;
@@ -124,8 +143,18 @@ namespace NUnit.Engine.Services
                         return 6;
                     }
 
+                    // Native termination does not discharge the coordinator's return obligation.
+                    if (!agency.IsAgentActive(agent.Id))
+                    {
+                        Console.Error.WriteLine("Native exit lost the originating provider.");
+                        return 8;
+                    }
+                    agency.ReturnAgent(agent);
+                    if (agency.IsAgentActive(agent.Id))
+                        return 9;
+
                     process.Dispose();
-                    if (agency.GetAgentExitMessage(provider.AgentId) is not null)
+                    if (provider.GetAgentExitMessage(provider.AgentId) is not null)
                     {
                         Console.Error.WriteLine("Disposed process produced an exit diagnostic.");
                         return 7;
@@ -154,6 +183,21 @@ namespace NUnit.Engine.Services
                 Console.WriteLine("Agent exit observed: " + exitCode);
                 return 0;
             }
+            finally
+            {
+                try
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                        process.WaitForExit(5000);
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    // The registered-agent case has already disposed its process association.
+                }
+            }
         }
 
         internal static int RunChild(string[] args)
@@ -168,7 +212,7 @@ namespace NUnit.Engine.Services
 
         internal static ProcessStartInfo CreateStartInfo(string mode, int exitCode, bool enableEvents, int delay)
         {
-            string assemblyPath = typeof(TestAgenServiceExitTests).Assembly.Location;
+            string assemblyPath = typeof(TestAgentServiceExitTests).Assembly.Location;
             var arguments = new StringBuilder();
 #if NETFRAMEWORK
             bool mono = Type.GetType("Mono.Runtime") is not null;
@@ -199,18 +243,18 @@ namespace NUnit.Engine.Services
             };
         }
 
-        private sealed class ExitTestAgentProvider : LocalProcessAgentProvider
+        private sealed class ExitTestAgentProvider : LocalProcessAgentProvider, ITestAgentProvider
         {
-            private readonly TestAgentService _agency;
             private readonly Process _process;
             private readonly bool _register;
 
-            public ExitTestAgentProvider(TestAgentService agency, Process process, bool register) : base(agency)
+            public ExitTestAgentProvider(Process process, bool register)
             {
-                _agency = agency;
                 _process = process;
                 _register = register;
             }
+
+            bool ITestAgentProvider.IsAgentAvailable(TestPackage package) => true;
 
             public Task? Registration { get; private set; }
 
@@ -230,7 +274,7 @@ namespace NUnit.Engine.Services
                         {
                             try
                             {
-                                _agency.Register(agent);
+                                Register(agent);
                                 return;
                             }
                             catch (ArgumentException)
@@ -248,4 +292,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif
