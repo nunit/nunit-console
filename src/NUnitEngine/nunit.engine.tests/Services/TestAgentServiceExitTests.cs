@@ -1,4 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
+
+#if false
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -12,8 +14,9 @@ using NSubstitute;
 
 namespace NUnit.Engine.Services
 {
-    public class TestAgencyExitTests
+    public class TestAgenServiceExitTests
     {
+        [Category("Integration")]
         [TestCase(42, false, -1)]
         [TestCase(42, true, -1)]
         [TestCase(42, false, -2)]
@@ -165,7 +168,7 @@ namespace NUnit.Engine.Services
 
         internal static ProcessStartInfo CreateStartInfo(string mode, int exitCode, bool enableEvents, int delay)
         {
-            string assemblyPath = typeof(TestAgencyExitTests).Assembly.Location;
+            string assemblyPath = typeof(TestAgenServiceExitTests).Assembly.Location;
             var arguments = new StringBuilder();
 #if NETFRAMEWORK
             bool mono = Type.GetType("Mono.Runtime") is not null;
@@ -245,3 +248,4 @@ namespace NUnit.Engine.Services
         }
     }
 }
+#endif

@@ -1,11 +1,14 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.5.8
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.5.9
 //Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Load additional cake files
 #load package-tests.cake
 #load KnownExtensions.cake
+#load test-suites.cake
+
+var testSuiteRunner = new TestSuiteRunner();
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -13,7 +16,22 @@ BuildSettings.Initialize(
     title: "NUnit Console and Engine",
     githubRepository: "nunit-console",
     solutionFile: "NUnitConsole.slnx",
+    unitTestRunner: testSuiteRunner,
     exemptFiles: new[] { "Options.cs", "ProcessUtils.cs", "ProcessUtilsTests.cs", "CallerArgumentExpressionAttribute.cs" });
+
+foreach (string suite in new[] { "Unit", "Integration", "Acceptance", "PendingAcceptance" })
+{
+    Task("Test" + suite)
+        .Description("Run the " + suite + " test suite")
+        .IsDependentOn("Build")
+        .WithCriteria(() => !CommandLineOptions.NoTests)
+        .Does(() => testSuiteRunner.RunSuite(suite));
+}
+
+Task("TestAll")
+    .Description("Run required regressions and report pending acceptance tests")
+    .IsDependentOn("Test")
+    .IsDependentOn("TestPendingAcceptance");
 
 //////////////////////////////////////////////////////////////////////
 // INDIVIDUAL PACKAGE DEFINITIONS
@@ -70,10 +88,11 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     checks: new PackageCheck[] {
         HasFiles("LICENSE.txt", "NOTICES.txt", "nunit_256.png"),
         HasDirectory("tools").WithFiles("nunit-console.exe", "nunit-console.exe.config", "nunit.engine.api.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll", "nunit.engine.dll", "testcentric.metadata.dll"),
-        HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestStableRelease,
-        HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestStableRelease,
-        HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestStableRelease,
-        HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestStableRelease
+        HasDependencies(KnownExtensions.BundledNuGetAgents)
+        //HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestDevBuild
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
@@ -86,8 +105,15 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     {
         HasFiles("nunit.exe"),
         HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net10.0/any").WithFiles(
-            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-            "nunit.engine.dll", "testcentric.metadata.dll")
+            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config", "nunit-netcore-console.exe",
+            "nunit-netcore-console.runtimeconfig.json", "DotnetToolSettings.xml",
+            "NUnit.Common.dll", "NUnit.Engine.Api.dll", "nunit.engine.dll", 
+            "NUnit.Extensibility.Api.dll", "NUnit.Extensibility.dll", "TestCentric.Metadata.dll"),
+        //HasDependencies(KnownExtensions.BundledNuGetAgents)
+        //HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestDevBuild
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);

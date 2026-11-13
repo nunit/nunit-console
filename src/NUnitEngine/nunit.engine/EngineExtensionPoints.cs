@@ -4,7 +4,9 @@ using NUnit.Extensibility;
 
 // ExtensionPoints supported by the engine
 [assembly: ExtensionPoint("/NUnit/Engine/AgentLaunchers", typeof(NUnit.Engine.Extensibility.IAgentLauncher),
-    Description = "Launches an Agent Process for supported target runtimes")]
+    Description = "Launches a local Agent Process for supported target runtimes")]
+[assembly: ExtensionPoint("/NUnit/Engine/InProcessAgents", typeof(NUnit.Engine.ITestAgent),
+    Description = "Creates an in-process agent for supported target runtimes")]
 [assembly: ExtensionPoint("/NUnit/Engine/ProjectLoaders", typeof(NUnit.Engine.Extensibility.IProjectLoader),
     Description = "Recognizes and loads assemblies from various types of project formats.")]
 [assembly: ExtensionPoint("/NUnit/Engine/ResultWriters", typeof(NUnit.Engine.Extensibility.IResultWriter),

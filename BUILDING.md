@@ -40,6 +40,70 @@ For development purposes, the usual commands to run are...
  * `build -t Package` to compile, create packages and test them.
  * `build -t Test -t Package` to compile, unit test and create and test packages.
 
+### Selecting development test suites
+
+Tests remain in their existing assemblies. Use these script targets when working
+on a particular layer (examples use the Windows command-line wrapper):
+
+| Command | Selection | Failure policy |
+| --- | --- | --- |
+| `build -t TestUnit` | Tests without Integration, Acceptance or PendingAcceptance categories | Required |
+| `build -t TestIntegration` | Integration tests, excluding pending work | Required |
+| `build -t TestAcceptance` | Acceptance tests, excluding pending work | Required |
+| `build -t TestPendingAcceptance` | Explicitly pending acceptance tests | Test failures are reported; execution/report errors fail |
+| `build -t Test` | All tests except pending acceptance work | Required; used by CI |
+| `build -t TestAll` | Required tests, followed by pending acceptance reporting | Required regressions still fail the build |
+
+After compiling, append `--nobuild` to use the existing binaries. Multiple targets
+may be combined, for example `build -t TestUnit -t TestIntegration --nobuild`.
+Each selection is restored afterward, so a development target cannot narrow a
+subsequent `Test` target in the same invocation. The existing `--notests` option
+continues to suppress test execution.
+
+NUnit XML reports are written separately for each configuration, selection,
+runtime and assembly under `packages/results/tests/`. CI already uploads this
+directory with its other test results. CI requests `TestAll` before its normal
+build, package and publication target, so pending progress is reported before
+publication. A failing required suite stops the build;
+pending failures are reported as warnings and retained in their XML reports.
+
+NUnit permits arbitrary category names. This repository uses the following
+standard conventions to select test suites:
+
+* Unit tests have none of the `Integration`, `Acceptance` or `PendingAcceptance`
+  categories. Other category names do not remove a test from the unit selection.
+* `Integration` identifies tests crossing component boundaries or launching
+  processes.
+* `Acceptance` identifies feature-level scenarios. `Integration` and `Acceptance`
+  are mutually exclusive: choose the scope that describes the test.
+* `PendingAcceptance` is an additional marker on an `Acceptance` test for an
+  explicitly unfinished feature, not a separate test scope. Such tests carry
+  both categories and run in the pending progress suite rather than the required
+  acceptance suite. Do not combine this marker with `Integration`.
+
+In mixed fixtures, apply categories to individual methods rather than moving
+small unit tests into the broader suite. This initial classification
+covers the agency exit, ownership and local-process release tests; it is not an
+exhaustive reclassification of every existing fixture.
+
+Test scope and feature maturity are separate. Completed behavior, including
+implemented beta features, remains required regression coverage regardless of
+its category. A pending acceptance test must have a `Description` linking its
+tracking issue and explaining the missing behavior. Do not mark an existing
+regression pending merely because it fails during a refactoring. Update
+assertions which unnecessarily constrain the implementation while retaining
+coverage of the supported behavior.
+
+When a feature becomes supported, remove `PendingAcceptance` and keep its
+acceptance scenarios as required regressions. Before a beta or final release,
+review pending cases against the advertised feature set: no supported capability
+may depend on pending tests being excluded. Unimplemented proposals may remain
+pending only if they are explicitly outside that release's supported scope.
+
+The existing acceptance-folder fixture which checks that an engine can be
+instantiated inside a test remains a unit test. Existing ignored or explicit
+tests retain their existing behavior; categories do not enable them.
+
 ### Building and testing for Linux on a Windows machine
 
 > _**NOTE:** Instructions in this section have not yet been verified on the latest build of the console and engine.

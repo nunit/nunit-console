@@ -46,6 +46,16 @@ namespace NUnit.Engine.Services
             return null;
         }
 
+        public List<T> GetServices<T>()
+            where T : class
+        {
+            var services = new List<T>();
+            foreach (IService service in _services)
+                if (service is T typedService)
+                    services.Add(typedService);
+            return services;
+        }
+
         public void AddService(IService service)
         {
             _services.Add(service);

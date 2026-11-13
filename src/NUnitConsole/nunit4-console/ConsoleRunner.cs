@@ -413,9 +413,8 @@ namespace NUnit.ConsoleRunner
 
         private void DisplayExtension(IExtensionNode node)
         {
-            _outWriter.Write(INDENT6 + "Extension: ");
-            _outWriter.Write(ColorStyle.Value, $"{node.TypeName}");
-            _outWriter.WriteLine(node.Enabled ? string.Empty : " (Disabled)");
+            var extensionInfo = node.Enabled ? node.TypeName : node.TypeName + " (Disabled)";
+            _outWriter.WriteLabelLine(INDENT6 + "Extension: ", extensionInfo);
 
             _outWriter.Write(INDENT8 + "Version: ");
             _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());

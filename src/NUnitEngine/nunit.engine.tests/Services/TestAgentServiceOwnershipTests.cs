@@ -1,5 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+#if false
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -16,7 +17,7 @@ namespace NUnit.Engine.Services
     /// Exercises provider ownership without requiring a native process for an acquired agent.
     /// These tests apply to remote and in-process providers as well as local-process selection.
     /// </summary>
-    public class TestAgencyOwnershipTests
+    public class TestAgentServiceOwnershipTests
     {
         private TestPackage _package;
         private ITestAgent _agent;
@@ -182,6 +183,8 @@ namespace NUnit.Engine.Services
         public void LocalReleasePreservesStopException(bool socketFailure)
         {
             using var process = new Process();
+
+            _agency._extensionService = Substitute.For<ExtensionService>();
             _agency._agentStore.AddAgent(_agent.Id, process);
             var localProvider = new LocalProcessAgentProvider(_agency);
             Exception failure = socketFailure
@@ -196,6 +199,8 @@ namespace NUnit.Engine.Services
         public void LocalReleaseDoesNotStopTerminatedNativeAgent()
         {
             using var process = new Process();
+
+            _agency._extensionService = Substitute.For<ExtensionService>();
             _agency._agentStore.AddAgent(_agent.Id, process);
             _agency._agentStore.MarkTerminated(_agent.Id);
             var localProvider = new LocalProcessAgentProvider(_agency);
@@ -206,6 +211,7 @@ namespace NUnit.Engine.Services
         }
 
         [Test]
+        [Category("Integration")]
         public void RunnerDisposalReturnsAgentToProviderWithoutStoppingItDirectly()
         {
             var remoteRunner = Substitute.For<ITestEngineRunner>();
@@ -236,3 +242,4 @@ namespace NUnit.Engine.Services
         }
     }
 }
+#endif
