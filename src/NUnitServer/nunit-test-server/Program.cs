@@ -44,9 +44,7 @@ namespace NUnit.Remote.Hosting
                 var installed = extensions.Extensions.ToArray();
                 if (args.Length == 2)
                 {
-                    string allowed = Path.TrimEndingDirectorySeparator(Path.GetFullPath(args[1])) + Path.DirectorySeparatorChar;
-                    var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-                    if (installed.Any(extension => !Path.GetFullPath(extension.AssemblyPath).StartsWith(allowed, comparison)))
+                    if (installed.Any(extension => !ExtensionPath.IsWithinDirectory(args[1], extension.AssemblyPath)))
                         throw new InvalidOperationException("An extension was discovered outside the staged launcher root.");
                 }
                 var provider = engine.Services.GetService<ITestAgentProvider>()

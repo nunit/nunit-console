@@ -40,6 +40,7 @@
     <ProjectReference Include="../../NUnitServer/nunit-test-server/nunit-test-server.csproj" ReferenceOutputAssembly="false" />
     <!-- Exercise the real registration gate without adding another test project. -->
     <Compile Include="../../NUnitServer/nunit-test-server/RemoteProviderServer.cs" Link="TestHelpers/RemoteProviderServer.cs" />
+    <Compile Include="../../NUnitServer/nunit-test-server/ExtensionPath.cs" Link="TestHelpers/ExtensionPath.cs" />
   </ItemGroup>
   
   <ItemGroup>

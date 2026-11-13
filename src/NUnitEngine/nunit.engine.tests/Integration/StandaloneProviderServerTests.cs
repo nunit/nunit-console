@@ -148,6 +148,43 @@ namespace NUnit.Engine.Integration
         public void PublicEngineDiscoversAndRunsExactTest(string name, string expected)
         {
             StartReady();
+            AssertEngineRunsExactTest(name, expected);
+        }
+
+        /// <summary>Windows' extended runtime path must not reject a correctly staged long-path launcher.</summary>
+        [TestCase(false)]
+        [TestCase(true)]
+        [Platform("Win")]
+        public void ServerAcceptsExtendedExtensionPathsFromALongDeploymentPath(bool extendedAllowedRoot)
+        {
+            string originalHost = _hostDirectory;
+            string originalTools = _tools;
+            // CreateProcess requires a short working directory. Only the host and
+            // launcher locations need long paths to reproduce the runtime spelling.
+            string longRoot = Path.Combine(_directory + "-long", new string('a', 80), new string('b', 80), new string('c', 80));
+            _hostDirectory = Path.Combine(longRoot, "server");
+            _tools = Path.Combine(longRoot, "agents");
+            TestContext.Out.WriteLine("Long-path staging: " + longRoot);
+            CopyDirectory(originalHost, _hostDirectory);
+            CopyDirectory(originalTools, _tools);
+            // Session deployments use relative addins. An absolute entry would
+            // hide the extended prefix introduced by AppContext.BaseDirectory.
+            File.WriteAllText(Path.Combine(_hostDirectory, "server.addins"),
+                "../agents/net8.0/nunit-agent-launcher-net10.dll");
+            Assert.That(_hostDirectory.Length, Is.GreaterThan(260), "The actual process must exercise a long deployment path.");
+
+            StartReady(extendedAllowedRoot ? @"\\?\" + _tools : _tools);
+            var ready = XElement.Load(_receipt);
+            Assert.That(ready.Elements("extension").Any(extension =>
+                ((string)extension.Attribute("assembly")!).StartsWith(@"\\?\", StringComparison.Ordinal)), Is.True,
+                "The test must exercise runtime-generated extended paths, not just a long string.");
+            var response = Call(RemoteAgentConnection.ListAgents, Guid.NewGuid(), Guid.Empty);
+            Assert.That(response.Code, Is.EqualTo(MessageCode.CommandResult));
+            Assert.That(XElement.Parse(response.Data!).Elements("agent").Count(), Is.EqualTo(1));
+        }
+
+        private void AssertEngineRunsExactTest(string name, string expected)
+        {
             var package = Package();
             string definition = Path.Combine(_directory, "server.xml");
             new XElement("nunit-remote-server", new XAttribute("name", "standalone"),
@@ -214,9 +251,9 @@ namespace NUnit.Engine.Integration
             _stderr = _host.StandardError.ReadToEndAsync();
         }
 
-        private void StartReady()
+        private void StartReady(string? allowedRoot = null)
         {
-            Start(_receipt, _tools);
+            Start(_receipt, allowedRoot ?? _tools);
             var deadline = Stopwatch.StartNew();
             while (!File.Exists(_receipt) && !_host!.HasExited && deadline.ElapsedMilliseconds < 15000)
                 Thread.Sleep(20);
