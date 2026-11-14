@@ -13,16 +13,12 @@ using System.Threading.Tasks;
 
 namespace NUnit.Engine.Services
 {
-    internal class RemoteProcessAgentProvider : ITestAgentProvider
+    internal class RemoteProcessAgentProvider : Service, ITestAgentProvider
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteProcessAgentProvider));
 
-        // The TestAgency instance for which we are providing local process agents.
-        private TestAgentService _agency;
-
-        public RemoteProcessAgentProvider(TestAgentService agency)
+        public RemoteProcessAgentProvider()
         {
-            _agency = agency;
         }
 
         #region ITestAgentInfo Implementation

@@ -40,6 +40,7 @@
     <File Path="NOTICES.txt" />
     <File Path="NuGet.config" />
     <File Path="nunit.ico" />
+    <File Path="NUnitEngineAndAgents.md" />
     <File Path="nunit_256.png" />
     <File Path="package-tests.cake" />
     <File Path="README.md" />
@@ -48,7 +49,9 @@
     <File Path="src/StyleCop.Analyzers.globalconfig" />
     <File Path="VERSIONING.md" />
   </Folder>
-  <Folder Name="/Solution Items/.config/" />
+  <Folder Name="/Solution Items/.config/">
+    <File Path=".config/dotnet-tools.json" />
+  </Folder>
   <Folder Name="/Solution Items/.github/">
     <File Path=".github/dependabot.yml" />
   </Folder>

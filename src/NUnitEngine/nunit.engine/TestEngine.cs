@@ -73,6 +73,9 @@ namespace NUnit.Engine
                 Services.Add(new ExtensionService());
                 Services.Add(new ProjectService());
                 Services.Add(new RuntimeFrameworkService());
+                Services.Add(new LocalProcessAgentProvider());
+                Services.Add(new RemoteProcessAgentProvider());
+                Services.Add(new InProcessAgentProvider());
                 Services.Add(new TestAgentService());
                 Services.Add(new ResultService());
                 Services.Add(new TestRunnerFactory());

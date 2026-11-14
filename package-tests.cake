@@ -14,7 +14,7 @@ var BothRunnerTests = new ListWrapper(StandardRunnerTests, NetCoreRunnerTests);
 BothRunnerTests.Add(new PackageTest(1, "Net462Test")
 {
     Description = "Run mock-assembly.dll under .NET 4.6.2",
-    Arguments = "testdata/net462/mock-assembly.dll --debug-agent",
+    Arguments = "testdata/net462/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult(".NETFramework,Version=v4.6.2"),
     // TODO: Remove this once the bundled agents are installed automatically.
     ExtensionsNeeded = KnownExtensions.BundledAgents
@@ -23,7 +23,7 @@ BothRunnerTests.Add(new PackageTest(1, "Net462Test")
 BothRunnerTests.Add(new PackageTest(1, "Net10Test")
 {
     Description = "Run mock-assembly.dll under .NET 10.0",
-    Arguments = "testdata/net10.0/mock-assembly.dll --trace:Debug",
+    Arguments = "testdata/net10.0/mock-assembly.dll",
     ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v10.0")
 });
 
@@ -710,13 +710,13 @@ var AgentCoreTests = new List<PackageTest>()
     new PackageTest(1, "Net462AgentTest")
     {
         Description = "Run mock-assembly.dll under .NET 4.6.2",
-        Arguments = "testdata/net462/mock-assembly.dll --trace:Debug",
+        Arguments = "testdata/net462/mock-assembly.dll",
         ExpectedResult = new MockAssemblyExpectedResult(".NETFramework,Version=v4.6.2")
     },
     new PackageTest(1, "Net80AgentTest")
     {
         Description = "Run mock-assembly.dll under .NET 8.0",
-        Arguments = "testdata/net8.0/mock-assembly.dll --trace:Debug",
+        Arguments = "testdata/net8.0/mock-assembly.dll",
         ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v8.0")
     }
 };
