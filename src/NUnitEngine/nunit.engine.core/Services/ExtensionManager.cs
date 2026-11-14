@@ -165,6 +165,14 @@ namespace NUnit.Engine.Services
         {
             log.Info($"FindExtensionAssemblies called for host {hostAssembly.FullName}");
 
+            // An assembly that was not loaded from a file, such as one packed inside an
+            // Android APK, has no folders around it to search for extensions.
+            if (string.IsNullOrEmpty(hostAssembly.Location))
+            {
+                log.Info("  Host assembly has no location, so there are no extension directories to search");
+                return;
+            }
+
             bool isChocolateyPackage = System.IO.File.Exists(Path.Combine(Path.GetDirectoryName(hostAssembly.Location)!, "VERIFICATION.txt"));
             string[] extensionPatterns = isChocolateyPackage
                 ? new[] { "nunit-extension-*/**/tools/", "nunit-extension-*/**/tools/*/" }
