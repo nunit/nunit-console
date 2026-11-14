@@ -437,6 +437,35 @@ namespace NUnit.Engine.Internal.Tests
         }
 
         [Test]
+        public void GetDirectories_Word_SkipsDirectoryThatCannotBeListed()
+        {
+            // On Android the extension scan walks up through folders such as /data/user/0,
+            // which the app may not list. Those folders should add no matches, not fail the scan.
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools");
+            this.GetFakeDirectory("tools", "frobuscator").GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(_ => throw new System.UnauthorizedAccessException());
+            this.GetFakeDirectory("tools", "metamorphosator").GetDirectories("tests", SIO.SearchOption.TopDirectoryOnly).Returns(new[] { this.GetFakeDirectory("tools", "metamorphosator", "tests") });
+            var expected = new[] { this.GetFakeDirectory("tools", "metamorphosator", "tests") };
+
+            var actual = finder.GetDirectories(baseDir, "*/tests");
+
+            Assert.That(actual, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void GetDirectories_Greedy_SkipsDirectoryThatCannotBeListed()
+        {
+            var finder = new DirectoryFinder(this.fileSystem);
+            var baseDir = this.GetFakeDirectory("tools", "frobuscator");
+            baseDir.GetDirectories("*", SIO.SearchOption.AllDirectories).Returns(_ => throw new System.UnauthorizedAccessException());
+            var expected = new[] { baseDir };
+
+            var actual = finder.GetDirectories(baseDir, "**");
+
+            Assert.That(actual, Is.EquivalentTo(expected));
+        }
+
+        [Test]
         public void GetDirectories_StartDirectoryIsNull()
         {
             var finder = new DirectoryFinder(Substitute.For<IFileSystem>());

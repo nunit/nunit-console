@@ -2,8 +2,10 @@
 
 using NUnit.Common;
 using NUnit.Engine.Internal.FileSystemAccess;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace NUnit.Engine.Internal
 {
@@ -102,17 +104,29 @@ namespace NUnit.Engine.Internal
                     // ** means zero or more intervening directories, so we
                     // add the directory itself to start out.
                     newList.Add(dir);
-                    var subDirs = dir.GetDirectories("*", SearchOption.AllDirectories);
-                    if (subDirs.Any()) newList.AddRange(subDirs);
+                    newList.AddRange(GetSubDirectories(dir, "*", SearchOption.AllDirectories));
                 }
                 else
                 {
-                    var subDirs = dir.GetDirectories(pattern, SearchOption.TopDirectoryOnly);
-                    if (subDirs.Any()) newList.AddRange(subDirs);
+                    newList.AddRange(GetSubDirectories(dir, pattern, SearchOption.TopDirectoryOnly));
                 }
             }
 
             return newList;
+        }
+
+        // A directory we may not list, such as /data/user/0 above an Android app's own
+        // folder, has nothing we can use, so it contributes no matches rather than an error.
+        private static IEnumerable<IDirectory> GetSubDirectories(IDirectory dir, string pattern, SearchOption searchOption)
+        {
+            try
+            {
+                return dir.GetDirectories(pattern, searchOption);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Enumerable.Empty<IDirectory>();
+            }
         }
     }
 }
