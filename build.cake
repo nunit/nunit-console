@@ -109,6 +109,7 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
             "nunit-netcore-console.runtimeconfig.json", "DotnetToolSettings.xml",
             "NUnit.Common.dll", "NUnit.Engine.Api.dll", "nunit.engine.dll", 
             "NUnit.Extensibility.Api.dll", "NUnit.Extensibility.dll", "TestCentric.Metadata.dll"),
+        // TODO: Fix recipe so dependency check works for DotNetToolPackage. Issue #141
         //HasDependencies(KnownExtensions.BundledNuGetAgents)
         //HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestDevBuild,
         //HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestDevBuild,

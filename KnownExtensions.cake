@@ -22,7 +22,7 @@ public static class KnownExtensions
     public static readonly ExtensionSpecifier Net80PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.5-alpha.0.1");
     public static readonly ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.4-alpha.0.1");
+        "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.4-alpha.0.4");
     public static ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.1-alpha.0.1");
 
@@ -30,7 +30,7 @@ public static class KnownExtensions
     {
         Net462PluggableAgent,
         Net80PluggableAgent,
-        //Net90PluggableAgent,
+        Net90PluggableAgent,
         Net10PluggableAgent
     };
 
