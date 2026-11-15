@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14</LangVersion>
+    <RootNamespace>NUnit.Remote.Hosting</RootNamespace>
+    <AssemblyTitle>NUnit Test Server</AssemblyTitle>
+    <Description>Explicitly started loopback server for the provisional remote provider.</Description>
+    <OutputPath>../../../bin/$(Configuration)/server/</OutputPath>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../NUnitEngine/nunit.engine/nunit.engine.csproj" />
+    <!-- Keep both ends on one provisional protocol source until its package home is agreed. -->
+    <Compile Include="../../NUnitEngine/nunit.engine/Services/AgentProviders/RemoteAgentConnection.cs" Link="Protocol/RemoteAgentConnection.cs" />
+  </ItemGroup>
+</Project>

@@ -17,6 +17,11 @@
     </Project>
     <Project Path="src/NUnitEngine/nunit.engine/nunit.engine.csproj" />
   </Folder>
+  <Folder Name="/NUnitServer/">
+    <File Path="src/NUnitServer/Directory.Build.props" />
+    <Project Path="src/NUnitServer/nunit-test-server/nunit-test-server.csproj" />
+    <File Path="src/NUnitServer/README.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />

@@ -34,6 +34,14 @@
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
+    <!-- Build the executable for process-level tests without referencing its implementation. -->
+    <ProjectReference Include="../../NUnitServer/nunit-test-server/nunit-test-server.csproj" ReferenceOutputAssembly="false" />
+    <!-- Exercise the real registration gate without adding another test project. -->
+    <Compile Include="../../NUnitServer/nunit-test-server/RemoteProviderServer.cs" Link="TestHelpers/RemoteProviderServer.cs" />
+    <Compile Include="../../NUnitServer/nunit-test-server/ExtensionPath.cs" Link="TestHelpers/ExtensionPath.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <Content Include="$(PkgNUnit_Extension_Net10PluggableAgent)/tools/**/*">
