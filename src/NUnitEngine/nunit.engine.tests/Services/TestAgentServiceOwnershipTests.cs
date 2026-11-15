@@ -1,9 +1,6 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-#if false
 using System;
-using System.Diagnostics;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Common;
@@ -23,7 +20,8 @@ namespace NUnit.Engine.Services
         private ITestAgent _agent;
         private ITestAgentProvider _owner;
         private ITestAgentProvider _other;
-        private TestAgentService _agency;
+        private TestAgentService _agency => _services.GetService<TestAgentService>();
+        private ServiceContext _services;
 
         [SetUp]
         public void SetUp()
@@ -32,17 +30,22 @@ namespace NUnit.Engine.Services
             _package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(".NETCoreApp,Version=v10.0"), false);
             _agent = Substitute.For<ITestAgent>();
             _agent.Id.Returns(Guid.NewGuid());
-            _owner = Substitute.For<ITestAgentProvider>();
+            _owner = Substitute.For<ITestAgentProvider, IService>();
             _owner.IsAgentAvailable(_package).Returns(true);
             _owner.GetAgent(_package).Returns(_agent);
-            _other = Substitute.For<ITestAgentProvider>();
-            _agency = new TestAgentService(new[] { _other, _owner });
+            _other = Substitute.For<ITestAgentProvider, IService>();
+            _services = new ServiceContext();
+            _services.Add((IService)Substitute.For<ITestRunnerFactory, IService>());
+            _services.Add((IService)_other);
+            _services.Add((IService)_owner);
+            _services.Add(new TestAgentService());
+            _services.ServiceManager.StartServices();
         }
 
         [TearDown]
         public void TearDown()
         {
-            _agency.Dispose();
+            _services.ServiceManager.Dispose();
         }
 
         [Test]
@@ -50,7 +53,7 @@ namespace NUnit.Engine.Services
         {
             Assert.That(_agency.GetAgent(_package), Is.SameAs(_agent));
             Assert.That(_agency.IsAgentActive(_agent.Id), Is.True);
-            Assert.That(_agency._agentStore.TryGetAgentProcess(_agent.Id, out _), Is.False);
+            Assert.That(_agency.GetAgentExitMessage(_agent.Id), Is.Null);
         }
 
         [Test]
@@ -168,59 +171,13 @@ namespace NUnit.Engine.Services
         }
 
         [Test]
-        public void KnownTerminatedNativeAgentDoesNotBecomeActiveFromOwnership()
-        {
-            using var process = new Process();
-            _agency._agentStore.AddAgent(_agent.Id, process);
-            _agency.GetAgent(_package);
-            _agency._agentStore.MarkTerminated(_agent.Id);
-
-            Assert.That(_agency.IsAgentActive(_agent.Id), Is.False);
-        }
-
-        [TestCase(false)]
-        [TestCase(true)]
-        public void LocalReleasePreservesStopException(bool socketFailure)
-        {
-            using var process = new Process();
-
-            _agency._extensionService = Substitute.For<ExtensionService>();
-            _agency._agentStore.AddAgent(_agent.Id, process);
-            var localProvider = new LocalProcessAgentProvider(_agency);
-            Exception failure = socketFailure
-                ? new SocketException((int)SocketError.ConnectionReset)
-                : new NUnitEngineUnloadException("The agent could not stop.");
-            _agent.When(agent => agent.Stop()).Do(_ => throw failure);
-
-            Assert.That(Assert.Catch(() => localProvider.ReturnAgent(_agent)), Is.SameAs(failure));
-        }
-
-        [Test]
-        public void LocalReleaseDoesNotStopTerminatedNativeAgent()
-        {
-            using var process = new Process();
-
-            _agency._extensionService = Substitute.For<ExtensionService>();
-            _agency._agentStore.AddAgent(_agent.Id, process);
-            _agency._agentStore.MarkTerminated(_agent.Id);
-            var localProvider = new LocalProcessAgentProvider(_agency);
-
-            localProvider.ReturnAgent(_agent);
-
-            _agent.DidNotReceive().Stop();
-        }
-
-        [Test]
         [Category("Integration")]
         public void RunnerDisposalReturnsAgentToProviderWithoutStoppingItDirectly()
         {
             var remoteRunner = Substitute.For<ITestEngineRunner>();
             remoteRunner.CountTestCases(TestFilter.Empty).Returns(42);
             _agent.CreateRunner(_package).Returns(remoteRunner);
-            var services = Substitute.For<IServiceLocator>();
-            services.GetService<TestAgentService>().Returns(_agency);
-
-            using (var runner = new ProcessRunner(services, _package))
+            using (var runner = new ProcessRunner(_services, _package))
                 Assert.That(runner.CountTestCases(TestFilter.Empty), Is.EqualTo(42));
 
             _owner.Received(1).ReturnAgent(_agent);
@@ -242,4 +199,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif

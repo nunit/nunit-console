@@ -1,9 +1,10 @@
 // Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
-#if false
+
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 using NUnit.Common;
+using NUnit.Engine.TestHelpers;
 using NUnit.Engine.Runners;
 using NUnit.Framework;
 using NSubstitute;
@@ -21,7 +22,9 @@ namespace NUnit.Engine.Services
         private ITestAgent _agent;
         private ITestEngineRunner _remoteRunner;
         private ITestAgentProvider _owner;
-        private TestAgentService _agency;
+        private TestAgentService _agency => _services.GetService<TestAgentService>();
+        private ServiceContext _services;
+        private LocalProcessAgentProvider _localProvider => _services.GetService<LocalProcessAgentProvider>();
         private Process? _process;
         private bool _processStarted;
         private Exception? _stopFailure;
@@ -39,12 +42,17 @@ namespace NUnit.Engine.Services
             _remoteRunner = Substitute.For<ITestEngineRunner>();
             _remoteRunner.CountTestCases(TestFilter.Empty).Returns(42);
             _agent.CreateRunner(_package).Returns(_remoteRunner);
-            _owner = Substitute.For<ITestAgentProvider>();
+            _owner = Substitute.For<ITestAgentProvider, IService>();
             _owner.IsAgentAvailable(_package).Returns(true);
             _owner.GetAgent(_package).Returns(_agent);
-            _agency = new TestAgentService(new[] { _owner });
-            var localProvider = new LocalProcessAgentProvider(_agency);
-            _owner.When(provider => provider.ReturnAgent(_agent)).Do(_ => localProvider.ReturnAgent(_agent));
+            _services = new ServiceContext();
+            _services.Add((IService)Substitute.For<ITestRunnerFactory, IService>());
+            _services.Add(Substitute.For<ExtensionService>());
+            _services.Add(new LocalProcessAgentProvider());
+            _services.Add((IService)_owner);
+            _services.Add(new TestAgentService());
+            _services.ServiceManager.StartServices();
+            _owner.When(provider => provider.ReturnAgent(_agent)).Do(_ => _localProvider.ReturnAgent(_agent));
             _agent.When(agent => agent.Stop()).Do(_ =>
             {
                 if (_stopFailure is not null)
@@ -69,7 +77,7 @@ namespace NUnit.Engine.Services
                 }
                 _process?.Dispose();
                 _remoteRunner.Dispose();
-                _agency.Dispose();
+                _services.ServiceManager.Dispose();
             }
         }
 
@@ -126,7 +134,7 @@ namespace NUnit.Engine.Services
         public void UnavailableProcessStateDoesNotReplaceStopFailure(bool throughRunner)
         {
             _process = new Process();
-            _agency._agentStore.AddAgent(_agent.Id, _process);
+            LocalProcessAgentTestAccess.GetStore(_localProvider).AddAgent(_agent.Id, _process);
             _stopFailure = new SocketException((int)SocketError.ConnectionReset);
 
             AssertFailureAndRetry(throughRunner);
@@ -164,6 +172,48 @@ namespace NUnit.Engine.Services
             _owner.Received(2).ReturnAgent(_agent);
         }
 
+        [Test]
+        public void NativeTerminationLeavesOwnershipUntilReturn()
+        {
+            using var process = new Process();
+            var store = LocalProcessAgentTestAccess.GetStore(_localProvider);
+            store.AddAgent(_agent.Id, process);
+            _agency.GetAgent(_package);
+            store.MarkTerminated(_agent.Id);
+
+            Assert.That(store.IsAgentActive(_agent.Id), Is.False);
+            Assert.That(_agency.IsAgentActive(_agent.Id), Is.True);
+            _agency.ReturnAgent(_agent);
+            Assert.That(_agency.IsAgentActive(_agent.Id), Is.False);
+            _agent.DidNotReceive().Stop();
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void LocalReleasePreservesStopException(bool socketFailure)
+        {
+            using var process = new Process();
+            LocalProcessAgentTestAccess.GetStore(_localProvider).AddAgent(_agent.Id, process);
+            _stopFailure = socketFailure
+                ? new SocketException((int)SocketError.ConnectionReset)
+                : new NUnitEngineUnloadException("The agent could not stop.");
+
+            Assert.That(Assert.Catch(() => _localProvider.ReturnAgent(_agent)), Is.SameAs(_stopFailure));
+        }
+
+        [Test]
+        public void LocalReleaseDoesNotStopTerminatedNativeAgent()
+        {
+            using var process = new Process();
+            var store = LocalProcessAgentTestAccess.GetStore(_localProvider);
+            store.AddAgent(_agent.Id, process);
+            store.MarkTerminated(_agent.Id);
+
+            _localProvider.ReturnAgent(_agent);
+
+            _agent.DidNotReceive().Stop();
+        }
+
         private void AssertFailureAndRetry(bool throughRunner)
         {
             Assert.That(Assert.Catch(() => Release(throughRunner)), Is.SameAs(_stopFailure));
@@ -191,21 +241,19 @@ namespace NUnit.Engine.Services
 
         private ProcessRunner CreateRunner()
         {
-            var services = Substitute.For<IServiceLocator>();
-            services.GetService<TestAgentService>().Returns(_agency);
-            var runner = new ProcessRunner(services, _package);
+            var runner = new ProcessRunner(_services, _package);
             Assert.That(runner.CountTestCases(TestFilter.Empty), Is.EqualTo(42));
             return runner;
         }
 
         private void StartChild(int exitCode, bool keepRunning)
         {
-            var startInfo = TestAgenServiceExitTests.CreateStartInfo("--agent-exit-child", exitCode, false, -1);
+            var startInfo = TestAgentServiceExitTests.CreateStartInfo("--agent-exit-child", exitCode, false, -1);
             startInfo.RedirectStandardInput = true;
             _process = new Process { StartInfo = startInfo };
             Assert.That(_process.Start(), Is.True);
             _processStarted = true;
-            _agency._agentStore.AddAgent(_agent.Id, _process);
+            LocalProcessAgentTestAccess.GetStore(_localProvider).AddAgent(_agent.Id, _process);
             // Retain the store's starting state to exercise shutdown before its exit callback updates the record.
             if (!keepRunning)
                 FinishChild();
@@ -221,4 +269,3 @@ namespace NUnit.Engine.Services
         }
     }
 }
-#endif
