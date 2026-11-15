@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Services
@@ -71,6 +72,27 @@ namespace NUnit.Engine.Services
         {
             IService? service = _serviceManager.GetServiceOrNull(typeof(IFakeService));
             Assert.That(service, Is.SameAs(_fakeService));
+        }
+
+        [Test]
+        public void GetServicesReturnsAllCompatibleRegistrations()
+        {
+            var second = new FakeService();
+            _context.Add(second);
+            Assert.That(_context.GetServices<IFakeService>(), Is.EquivalentTo(new[] { _fakeService, second }));
+            Assert.That(_context.GetServices<IExtensionService>(), Has.Exactly(1).TypeOf<ExtensionService>());
+            Assert.That(_context.GetServices<IService>().ToArray(), Has.Length.EqualTo(3));
+        }
+
+        [Test]
+        public void GetServicesDoesNotReplaceCachedSingleService()
+        {
+            IFakeService first = _context.GetService<IFakeService>();
+            _context.Add(new FakeService());
+            Assert.That(_context.GetServices<IFakeService>().ToArray(), Has.Length.EqualTo(2));
+            Assert.That(_context.GetService<IFakeService>(), Is.SameAs(first));
+            Assert.That(_context.TryGetService<IFakeService>(out var service), Is.True);
+            Assert.That(service, Is.SameAs(first));
         }
     }
 }
