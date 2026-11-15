@@ -13,16 +13,12 @@ using System.Threading.Tasks;
 
 namespace NUnit.Engine.Services
 {
-    internal class RemoteProcessAgentProvider : ITestAgentProvider
+    internal class RemoteProcessAgentProvider : Service, ITestAgentProvider
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(RemoteProcessAgentProvider));
 
-        // The TestAgency instance for which we are providing local process agents.
-        private TestAgentService _agency;
-
-        public RemoteProcessAgentProvider(TestAgentService agency)
+        public RemoteProcessAgentProvider()
         {
-            _agency = agency;
         }
 
         #region ITestAgentInfo Implementation
@@ -50,6 +46,10 @@ namespace NUnit.Engine.Services
         #endregion
 
         #region ITestAgentProvider Implementation
+
+#pragma warning disable CS0067 // The event is required by the interface but is not used by this provider.
+        public event AgentExitedEventHandler? AgentExited;
+#pragma warning restore CS0067
 
         public bool IsAgentAvailable(TestPackage package)
         {

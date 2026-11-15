@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Engine.Services;
 
@@ -45,6 +46,12 @@ namespace NUnit.Engine
             where T : class
         {
             return (service = (T?)ServiceManager.GetServiceOrNull(typeof(T))) is not null;
+        }
+
+        public IEnumerable<T> GetServices<T>()
+            where T : class
+        {
+            return ServiceManager.GetServices<T>();
         }
     }
 }

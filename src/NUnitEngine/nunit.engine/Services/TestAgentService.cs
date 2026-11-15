@@ -13,52 +13,30 @@ using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// The TestAgency class provides RemoteTestAgents
-    /// on request and tracks their status.
+    /// The TestAgentService class coordinates the various agent providers by
+    /// delegating agent acquisition and release to the appropriate provider,
+    /// aggregating provider results and tracking which provider owns each agent.
     /// </summary>
-    internal class TestAgentService : Service, ITestAgentInfo, ITestAgentProvider, ITestAgency
+    internal class TestAgentService : Service, ITestAgentService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentService));
 
         private readonly List<ITestAgentProvider> _providers = new List<ITestAgentProvider>();
 
-        // Native-process registration remains in AgentStore. This index records
-        // which provider owns each acquired agent, including agents without a local process.
+        // Index recording which provider owns each acquired agent.
         private readonly Dictionary<Guid, AgentOwnership> _agentOwners = new Dictionary<Guid, AgentOwnership>();
 
-        internal readonly AgentStore _agentStore = new AgentStore();
-
-        internal ExtensionService? _extensionService;
-
-        // Transports used for various target runtimes
-        private TestAgencyTcpTransport _tcpTransport; // .NET Standard 2.0
-
-        internal virtual string TcpEndPoint => _tcpTransport.ServerUrl;
-
-        public TestAgentService() : this("TestAgency", 0)
+        public TestAgentService()
         {
         }
 
-        public TestAgentService(string uri, int port)
-        {
-            _tcpTransport = new TestAgencyTcpTransport(this, port);
-        }
-
-        /// <summary>
-        /// Initializes an agency with explicitly supplied agent providers.
-        /// The default providers are installed on service startup only when none were supplied.
-        /// </summary>
-        /// <param name="providers">The providers to consult, in selection order.</param>
-        internal TestAgentService(IEnumerable<ITestAgentProvider> providers) : this()
-        {
-            _providers.AddRange(providers);
-        }
-
-        #region ITestAgentInfo Implementation
+        #region ITestAgentService Implementation
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.
@@ -92,10 +70,6 @@ namespace NUnit.Engine.Services
                 agents.AddRange(agentSource.GetAgentsForPackage(targetPackage));
             return agents;
         }
-
-        #endregion
-
-        #region ITestAgentProvider Implementation
 
         /// <summary>
         /// Returns true if an agent can be found, which is suitable
@@ -172,14 +146,16 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        #region ITestAgency Implementation
-
-        public void Register(ITestAgent agent)
+        /// <summary>
+        /// Returns true if the specified agent is currently active,
+        /// i.e. owned by one of the providers.
+        /// </summary>
+        /// <param name="agentId">The ID of the agent to check.</param>
+        /// <returns>True if the agent is active; otherwise, false.</returns>
+        public bool IsAgentActive(Guid agentId)
         {
-            log.Debug($"Registered agent {agent.Id:B}");
-            _agentStore.Register(agent);
+            lock (_agentOwners)
+                return _agentOwners.ContainsKey(agentId);
         }
 
         #endregion
@@ -188,7 +164,6 @@ namespace NUnit.Engine.Services
 
         public override void StopService()
         {
-            _tcpTransport.Stop();
             base.StopService();
         }
 
@@ -198,17 +173,13 @@ namespace NUnit.Engine.Services
 
             try
             {
-                _extensionService = ServiceContext.GetService<ExtensionService>().ShouldNotBeNull();
-                if (_providers.Count == 0)
+                // Enumerate all ITestagentProvider services, excluding this instance.
+                _providers.Clear();
+                foreach (var provider in ServiceContext.GetServices<ITestAgentProvider>())
                 {
-                    _providers.Add(new LocalProcessAgentProvider(this));
-                    _providers.Add(new RemoteProcessAgentProvider(this));
-                    _providers.Add(new InProcessAgentProvider(this));
+                    provider.AgentExited += OnAgentExit;
+                    _providers.Add(provider);
                 }
-
-                _tcpTransport.Start();
-
-                base.StartService();
             }
             catch
             {
@@ -217,17 +188,31 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        internal bool IsAgentActive(Guid agentId)
+        private void OnAgentExit(object sender, AgentExitedEventArgs e)
         {
-            // A known native exit must not be hidden by the outstanding ownership record.
-            if (_agentStore.TryGetAgentProcess(agentId, out _))
-                return _agentStore.IsAgentActive(agentId);
+            var sb = new StringBuilder($"Agent {e.Agent.Id:B} exited unexpectedly.");
+            if (e.ExitCode is not null)
+                sb.Append($" Native process exit code: {e.ExitCode}.");
+            if (!string.IsNullOrEmpty(e.Message))
+                sb.AppendLine($"{e.Message}");
+            string message = sb.ToString();
 
             lock (_agentOwners)
-                return _agentOwners.ContainsKey(agentId);
+            {
+                if (!_agentOwners.TryGetValue(e.Agent.Id, out var ownership)
+                    || !ReferenceEquals(ownership.Provider, sender)
+                    || !ReferenceEquals(ownership.Agent, e.Agent))
+                    return;
+
+                // This may run on a process-exit callback thread. Retain the
+                // diagnostic for the runner and ownership until return succeeds.
+                ownership.ExitMessage = message;
+            }
+
+            log.Error(message);
         }
+
+        #endregion
 
         /// <summary>
         /// Retains the exact acquired reference and its originating provider until release succeeds.
@@ -244,53 +229,26 @@ namespace NUnit.Engine.Services
             internal ITestAgent Agent { get; }
             internal ITestAgentProvider Provider { get; }
             internal bool Released { get; set; }
+            internal string? ExitMessage { get; set; }
         }
 
         internal string? GetAgentExitMessage(Guid agentId)
         {
-            if (!_agentStore.TryGetAgentProcess(agentId, out var process))
-                return null;
-
-            try
+            AgentOwnership ownership;
+            lock (_agentOwners)
             {
-                // A broken connection may be observed just before the native process exits.
-                // Bound the diagnostic wait and do not hold the store lock while waiting.
-                if (!process.WaitForExit(1000))
+                if (!_agentOwners.TryGetValue(agentId, out ownership!))
                     return null;
 
-                int exitCode = process.ExitCode;
-                string message = $"Remote test agent exited with exit code {exitCode}.";
-                return exitCode == AgentExitCodes.OK ? message : message + " " + GetAgentExitMessage(exitCode);
+                if (ownership.ExitMessage is not null)
+                    return ownership.ExitMessage;
             }
-            catch (InvalidOperationException)
-            {
-                // A missing native association must not replace the original run failure.
-                return null;
-            }
-        }
 
-        internal static string GetAgentExitMessage(int exitCode)
-        {
-            switch (exitCode)
-            {
-                case AgentExitCodes.OK:
-                    return "Remote test agent exited before registering.";
-                case AgentExitCodes.PARENT_PROCESS_TERMINATED:
-                    return "Remote test agent believes agency process has exited.";
-                case AgentExitCodes.UNEXPECTED_EXCEPTION:
-                    return "Unhandled exception on remote test agent. " +
-                           "To debug, try using --trace=debug to output logs.";
-                case AgentExitCodes.FAILED_TO_START_REMOTE_AGENT:
-                    return "Failed to start remote test agent.";
-                case AgentExitCodes.DEBUGGER_SECURITY_VIOLATION:
-                    return "Debugger could not be started on remote agent due to System.Security.Permissions.UIPermission not being set.";
-                case AgentExitCodes.DEBUGGER_NOT_IMPLEMENTED:
-                    return "Debugger could not be started on remote agent as not available on platform.";
-                case AgentExitCodes.UNABLE_TO_LOCATE_AGENCY:
-                    return "Remote test agent unable to locate agency process.";
-                default:
-                    return $"Remote test agent exited with non-zero exit code {exitCode}";
-            }
+            // The local diagnostic can wait for native exit; do not hold the
+            // ownership index lock while calling the provider.
+            return ownership.Provider is LocalProcessAgentProvider localProvider
+                ? localProvider.GetAgentExitMessage(agentId)
+                : null;
         }
     }
 }

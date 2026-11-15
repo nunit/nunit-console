@@ -1,5 +1,5 @@
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.5.8
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.5.9
 //Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -88,10 +88,11 @@ PackageDefinition NUnitConsoleRunnerNuGetPackage = new NuGetPackage(
     checks: new PackageCheck[] {
         HasFiles("LICENSE.txt", "NOTICES.txt", "nunit_256.png"),
         HasDirectory("tools").WithFiles("nunit-console.exe", "nunit-console.exe.config", "nunit.engine.api.dll", "nunit.extensibility.dll", "nunit.extensibility.api.dll", "nunit.common.dll", "nunit.engine.dll", "testcentric.metadata.dll"),
-        HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestStableRelease,
-        HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestStableRelease,
-        HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestStableRelease,
-        HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestStableRelease
+        HasDependencies(KnownExtensions.BundledNuGetAgents)
+        //HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestDevBuild
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory
         + $"NUnit.ConsoleRunner.{BuildSettings.PackageVersion}/tools/nunit-console.exe"),
@@ -104,8 +105,16 @@ PackageDefinition NUnitConsoleRunnerDotNetToolPackage = new DotNetToolPackage(
     {
         HasFiles("nunit.exe"),
         HasDirectory(".store/nunit.consolerunner.netcore/**/tools/net10.0/any").WithFiles(
-            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config",
-            "nunit.engine.dll", "testcentric.metadata.dll")
+            "nunit-netcore-console.dll", "nunit-netcore-console.dll.config", "nunit-netcore-console.exe",
+            "nunit-netcore-console.runtimeconfig.json", "DotnetToolSettings.xml",
+            "NUnit.Common.dll", "NUnit.Engine.Api.dll", "nunit.engine.dll", 
+            "NUnit.Extensibility.Api.dll", "NUnit.Extensibility.dll", "TestCentric.Metadata.dll"),
+        // TODO: Fix recipe so dependency check works for DotNetToolPackage. Issue #141
+        //HasDependencies(KnownExtensions.BundledNuGetAgents)
+        //HasDependency(KnownExtensions.Net462PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net80PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net90PluggableAgent.NuGetPackage).LatestDevBuild,
+        //HasDependency(KnownExtensions.Net10PluggableAgent.NuGetPackage).LatestDevBuild
     },
     testRunner: new ConsoleRunnerSelfTester(BuildSettings.NuGetTestDirectory + "nunit.exe"),
     tests: NetCoreRunnerTests);
