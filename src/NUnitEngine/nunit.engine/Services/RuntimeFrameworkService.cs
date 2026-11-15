@@ -157,8 +157,11 @@ namespace NUnit.Engine.Services
             if (!IsAvailable(new RuntimeFramework(targetIdentifier, targetVersion).TFM, runAsX86))
             {
                 log.Debug("Preferred version {0} is not installed or this NUnit installation does not support it", targetVersion);
-                if (targetVersion < CurrentFramework.FrameworkName.Version)
-                    targetVersion = CurrentFramework.FrameworkName.Version;
+                // A host version is a fallback only within the selected runtime family.
+                // Otherwise retain the target for the normal agent-availability checks.
+                var currentFramework = CurrentFramework.FrameworkName;
+                if (targetIdentifier == currentFramework.Identifier && targetVersion < currentFramework.Version)
+                    targetVersion = currentFramework.Version;
             }
 
             RuntimeFramework targetFramework = new RuntimeFramework(targetIdentifier, targetVersion);
