@@ -60,6 +60,10 @@ namespace NUnit.Engine.Services
 
         #region ITestAgentProvider Implementation
 
+#pragma warning disable CS0067 // The event is required by the interface but is not used by this provider.
+        public event AgentExitedEventHandler? AgentExited;
+#pragma warning restore CS0067
+
         public bool IsAgentAvailable(TestPackage package)
             => false;
 

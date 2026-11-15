@@ -13,28 +13,30 @@ using NUnit.Common;
 using NUnit.Engine.Communication.Transports.Tcp;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace NUnit.Engine.Services
 {
     /// <summary>
-    /// The TestAgency class provides RemoteTestAgents
-    /// on request and tracks their status.
+    /// The TestAgentService class coordinates the various agent providers by
+    /// delegating agent acquisition and release to the appropriate provider,
+    /// aggregating provider results and tracking which provider owns each agent.
     /// </summary>
-    internal class TestAgentService : Service, ITestAgentInfo, ITestAgentProvider
+    internal class TestAgentService : Service, ITestAgentService
     {
         private static readonly Logger log = InternalTrace.GetLogger(typeof(TestAgentService));
 
         private readonly List<ITestAgentProvider> _providers = new List<ITestAgentProvider>();
 
-        // Native-process registration remains in AgentStore. This index records
-        // which provider owns each acquired agent, including agents without a local process.
+        // Index recording which provider owns each acquired agent.
         private readonly Dictionary<Guid, AgentOwnership> _agentOwners = new Dictionary<Guid, AgentOwnership>();
 
         public TestAgentService()
         {
         }
 
-        #region ITestAgentInfo Implementation
+        #region ITestAgentService Implementation
 
         /// <summary>
         /// Gets a list containing <see cref="TestAgentInfo"/> for all available agents.
@@ -68,10 +70,6 @@ namespace NUnit.Engine.Services
                 agents.AddRange(agentSource.GetAgentsForPackage(targetPackage));
             return agents;
         }
-
-        #endregion
-
-        #region ITestAgentProvider Implementation
 
         /// <summary>
         /// Returns true if an agent can be found, which is suitable
@@ -148,6 +146,18 @@ namespace NUnit.Engine.Services
             }
         }
 
+        /// <summary>
+        /// Returns true if the specified agent is currently active,
+        /// i.e. owned by one of the providers.
+        /// </summary>
+        /// <param name="agentId">The ID of the agent to check.</param>
+        /// <returns>True if the agent is active; otherwise, false.</returns>
+        public bool IsAgentActive(Guid agentId)
+        {
+            lock (_agentOwners)
+                return _agentOwners.ContainsKey(agentId);
+        }
+
         #endregion
 
         #region Service Overrides
@@ -164,9 +174,12 @@ namespace NUnit.Engine.Services
             try
             {
                 // Enumerate all ITestagentProvider services, excluding this instance.
+                _providers.Clear();
                 foreach (var provider in ServiceContext.GetServices<ITestAgentProvider>())
-                    if (provider != this)
-                        _providers.Add(provider);
+                {
+                    provider.AgentExited += OnAgentExit;
+                    _providers.Add(provider);
+                }
             }
             catch
             {
@@ -175,13 +188,31 @@ namespace NUnit.Engine.Services
             }
         }
 
-        #endregion
-
-        internal bool IsAgentActive(Guid agentId)
+        private void OnAgentExit(object sender, AgentExitedEventArgs e)
         {
+            var sb = new StringBuilder($"Agent {e.Agent.Id:B} exited unexpectedly.");
+            if (e.ExitCode is not null)
+                sb.Append($" Native process exit code: {e.ExitCode}.");
+            if (!string.IsNullOrEmpty(e.Message))
+                sb.AppendLine($"{e.Message}");
+            string message = sb.ToString();
+
             lock (_agentOwners)
-                return _agentOwners.ContainsKey(agentId);
+            {
+                if (!_agentOwners.TryGetValue(e.Agent.Id, out var ownership)
+                    || !ReferenceEquals(ownership.Provider, sender)
+                    || !ReferenceEquals(ownership.Agent, e.Agent))
+                    return;
+
+                // This may run on a process-exit callback thread. Retain the
+                // diagnostic for the runner and ownership until return succeeds.
+                ownership.ExitMessage = message;
+            }
+
+            log.Error(message);
         }
+
+        #endregion
 
         /// <summary>
         /// Retains the exact acquired reference and its originating provider until release succeeds.
@@ -198,15 +229,26 @@ namespace NUnit.Engine.Services
             internal ITestAgent Agent { get; }
             internal ITestAgentProvider Provider { get; }
             internal bool Released { get; set; }
+            internal string? ExitMessage { get; set; }
         }
 
         internal string? GetAgentExitMessage(Guid agentId)
         {
-            if (_agentOwners.TryGetValue(agentId, out var ownership))
-                if (ownership.Provider is LocalProcessAgentProvider localProvider)
-                    return localProvider.GetAgentExitMessage(agentId);
+            AgentOwnership ownership;
+            lock (_agentOwners)
+            {
+                if (!_agentOwners.TryGetValue(agentId, out ownership!))
+                    return null;
 
-            return null;
+                if (ownership.ExitMessage is not null)
+                    return ownership.ExitMessage;
+            }
+
+            // The local diagnostic can wait for native exit; do not hold the
+            // ownership index lock while calling the provider.
+            return ownership.Provider is LocalProcessAgentProvider localProvider
+                ? localProvider.GetAgentExitMessage(agentId)
+                : null;
         }
     }
 }

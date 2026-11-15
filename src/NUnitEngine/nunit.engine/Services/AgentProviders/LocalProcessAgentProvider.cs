@@ -125,6 +125,8 @@ namespace NUnit.Engine.Services
 
         #region ITestAgentProvider Implementation
 
+        public event AgentExitedEventHandler? AgentExited;
+
         /// <summary>
         /// Returns true if an agent can be found, which is suitable
         /// for running the provided test package.
@@ -387,11 +389,20 @@ namespace NUnit.Engine.Services
 
         internal void OnAgentExit(Process process)
         {
-            if (_agentProcessIndex.TryGetValue(process, out var agentId))
+            if (_agentProcessIndex.TryGetValue(process, out var agentId) &&
+                _agentStore.IsReady(agentId, out var agent))
+            {
                 _agentStore.MarkTerminated(agentId);
 
-            if (process.HasExited && process.ExitCode != 0)
-                throw new NUnitEngineException(GetAgentExitMessage(process.ExitCode));
+                if (process.HasExited && process.ExitCode != 0)
+                    FireAgentExitedEvent(agent, GetAgentExitMessage(process.ExitCode), process.ExitCode);
+            }
+        }
+
+        private void FireAgentExitedEvent(ITestAgent agent, string? message, int exitCode)
+        {
+            var args = new AgentExitedEventArgs(agent, message, exitCode);
+            AgentExited?.Invoke(this, args);
         }
 
         internal string? GetAgentExitMessage(Guid agentId)

@@ -35,6 +35,10 @@ namespace NUnit.Engine.TestHelpers
         public IList<TestAgentInfo> GetAgentsForPackage(TestPackage package) =>
             ReadAgents(Call(ProviderConnection.FindAgents, data: package.ToXml()));
 
+#pragma warning disable CS0067 // The event is required by the interface but is not used by this provider.
+        public event AgentExitedEventHandler? AgentExited;
+#pragma warning restore CS0067
+
         public bool IsAgentAvailable(TestPackage package) =>
             bool.Parse(Call(ProviderConnection.IsAvailable, data: package.ToXml()));
 

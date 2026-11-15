@@ -9,6 +9,7 @@ using System.Runtime.Versioning;
 using NSubstitute;
 using NUnit.Common;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace NUnit.Engine.Services
 {
@@ -43,6 +44,9 @@ namespace NUnit.Engine.Services
         public void CreateServiceContext()
         {
             var localProvider = Substitute.For<ITestAgentProvider, IService>();
+            // NOTE: This code simulatesthe behavior expected of the
+            // local provider, which is not being tested here. At some point
+            // we may want to use the actual providers in this fixture.
             localProvider.AvailableAgents.Returns([NET462_INFO, NET80_INFO, NET90_INFO, NET10_INFO]);
             localProvider.GetAgentsForPackage(Arg.Any<TestPackage>()).Returns(
                 callInfo =>
@@ -53,9 +57,50 @@ namespace NUnit.Engine.Services
                         return Array.Empty<TestAgentInfo>();
 
                     var imageTargetFramework = new FrameworkName(imageTargetFrameworkName);
+                    if (imageTargetFramework.Identifier.Equals(FrameworkIdentifiers.NetFramework))
+                        return [NET462_INFO];
+                    else
+                        switch (imageTargetFramework.Version.Major)
+                        {
+                            case < 8:
+                                return [NET80_INFO, NET90_INFO, NET10_INFO];
+                            case 9:
+                                return [NET90_INFO, NET10_INFO];
+                            case 10:
+                                return [NET10_INFO];
+                            default:
+                                return Array.Empty<TestAgentInfo>();
+                        }
+                });
+            localProvider.IsAgentAvailable(Arg.Any<TestPackage>()).Returns(
+                callInfo =>
+                {
+                    var package = callInfo.Arg<TestPackage>();
+                    var imageTargetFrameworkName = package.Settings.GetValueOrDefault(SettingDefinitions.ImageTargetFrameworkName);
+                    if (string.IsNullOrEmpty(imageTargetFrameworkName))
+                        return false;
+                    var imageTargetFramework = new FrameworkName(imageTargetFrameworkName);
                     return imageTargetFramework.Identifier.Equals(FrameworkIdentifiers.NetFramework)
-                        ? [NET462_INFO]
-                        : [NET80_INFO, NET90_INFO, NET10_INFO];
+                        || imageTargetFramework.Version.Major <= 10;
+                });
+            localProvider.GetAgent(Arg.Any<TestPackage>()).Returns(
+                callInfo =>
+                {
+                    var package = callInfo.Arg<TestPackage>();
+                    var targetFrameworkName = package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName);
+                    if (string.IsNullOrEmpty(targetFrameworkName))
+                        throw new InvalidOperationException("No target framework specified");
+                    var targetFramework = new FrameworkName(targetFrameworkName);
+                    if (targetFramework.Identifier.Equals(FrameworkIdentifiers.NetFramework))
+                        return Substitute.For<ITestAgent>();
+                    else
+                        switch (targetFramework.Version.Major)
+                        {
+                            case < 10:
+                                return Substitute.For<ITestAgent>();
+                            default:
+                                throw new InvalidOperationException($"No agent available for {targetFramework}");
+                        }
                 });
 
             var remoteProvider = Substitute.For<ITestAgentProvider, IService>();
@@ -83,6 +128,17 @@ namespace NUnit.Engine.Services
         public void ServiceIsStarted()
         {
             Assert.That(_testAgentService.Status, Is.EqualTo(ServiceStatus.Started));
+            Assert.That(_services.GetService<TestAgentService>(), Is.SameAs(_testAgentService));
+            Assert.That(_services.GetService<ITestAgentService>(), Is.SameAs(_testAgentService));
+            Assert.That(_services.GetService<ITestAgentInfo>(), Is.Not.SameAs(_testAgentService));
+            Assert.That(_services.GetService<ITestAgentProvider>(), Is.Not.SameAs(_testAgentService));
+        }
+
+        [Test]
+        public void ServiceIsStopped()
+        {
+            _services.ServiceManager.StopServices();
+            Assert.That(_testAgentService.Status, Is.EqualTo(ServiceStatus.Stopped));
         }
 
         [Test]
@@ -92,24 +148,35 @@ namespace NUnit.Engine.Services
                 Is.EquivalentTo([NET462AGENT, NET80AGENT, NET90AGENT, NET10AGENT, INPROCESSAGENT]));
         }
 
-        [Test]
-        public void GetAgentsForPackage_Net462()
+        [TestCaseSource(nameof(SupportedRuntimes))]
+        public void GetAgentsForPackage(FrameworkName runtime)
         {
             var package = new TestPackage("test-assembly.dll");
-            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(
-                new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)).ToString()), true);
-            Assert.That(_testAgentService.GetAgentsForPackage(package).Select(a => a.AgentName), Is.EquivalentTo(
-                new[] { NET462AGENT }));
-        }
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(runtime.ToString()), true);
+            if (runtime.Identifier.Equals(FrameworkIdentifiers.NetFramework))
+                Assert.That(_testAgentService.GetAgentsForPackage(package).Select(a => a.AgentName),
+                    Is.EquivalentTo([NET462AGENT]));
+            else
+            {
+                string[] expectedAgents = Array.Empty<string>();
+                switch (runtime.Version.Major)
+                {
+                    case < 8:
+                        expectedAgents = [NET80AGENT, NET90AGENT, NET10AGENT];
+                        break;
+                    case 9:
+                        expectedAgents = [NET90AGENT, NET10AGENT];
+                        break;
+                    case 10:
+                        expectedAgents = [NET10AGENT];
+                        break;
+                    default:
+                        break;
+                }
 
-        [Test]
-        public void GetAgentsForPackage_Net80()
-        {
-            var package = new TestPackage("test-assembly.dll");
-            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(
-                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
-            Assert.That(_testAgentService.GetAgentsForPackage(package).Select(a => a.AgentName),
-                Is.EquivalentTo([NET80AGENT, NET90AGENT, NET10AGENT]));
+                Assert.That(_testAgentService.GetAgentsForPackage(package).Select(a => a.AgentName),
+                    Is.EquivalentTo(expectedAgents));
+            }
         }
 
         [Test]
@@ -122,5 +189,96 @@ namespace NUnit.Engine.Services
                 new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
             Assert.That(_testAgentService.GetAgentsForPackage(package).Select(a => a.AgentName), Is.Empty);
         }
+
+        [TestCaseSource(nameof(SupportedRuntimes))]
+        public void IsAgentAvailable_ReturnsTrueForAvailableAgent(FrameworkName runtime)
+        {
+            var package = new TestPackage("test-assembly.dll");
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(runtime.ToString()), true);
+            Assert.That(_testAgentService.IsAgentAvailable(package), Is.True);
+        }
+
+        [Test]
+        public void IsAgentAvailable_ReturnsFalseForUnavailableAgent()
+        {
+            var package = new TestPackage("test-assembly.dll");
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(11, 0, 0)).ToString()), true);
+            Assert.That(_testAgentService.IsAgentAvailable(package), Is.False);
+        }
+
+        [TestCaseSource(nameof(SupportedRuntimes))]
+        public void GetAgent_ReturnsAgentForAvailableAgent(FrameworkName runtime)
+        {
+            var package = new TestPackage("test-assembly.dll");
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(runtime.ToString()), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
+            var agent = _testAgentService.GetAgent(package);
+            Assert.That(agent, Is.Not.Null);
+        }
+
+        [Test]
+        public void GetAgent_ThrowsForUnavailableAgent()
+        {
+            var package = new TestPackage("test-assembly.dll");
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(11, 0, 0)).ToString()), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(11, 0, 0)).ToString()), true);
+            Assert.That(() => _testAgentService.GetAgent(package), Throws.InvalidOperationException);
+        }
+
+        [Test]
+        public void ReturnAgent_SucceedsForOwnedAgent()
+        {
+            var package = new TestPackage("test-assembly.dll");
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
+            var agent = _testAgentService.GetAgent(package);
+            Assert.That(_testAgentService.IsAgentActive(agent.Id), Is.True);
+            Assert.That(() => _testAgentService.ReturnAgent(agent), Throws.Nothing);
+            Assert.That(_testAgentService.IsAgentActive(agent.Id), Is.False);
+        }
+
+        [Test]
+        public void ReturnAgent_ThrowsForUnownedAgent()
+        {
+            var package = new TestPackage("test-assembly.dll");
+
+            // Get an agent and verify that we own it
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(
+                new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)).ToString()), true);
+            var agent = _testAgentService.GetAgent(package);
+            Assert.That(_testAgentService.IsAgentActive(agent.Id), Is.True);
+
+            // Now create a new agent that we don't own and verify that we don't own it
+            var unownedAgent = Substitute.For<ITestAgent>();
+            unownedAgent.Id.Returns(Guid.NewGuid());
+            Assert.That(_testAgentService.IsAgentActive(unownedAgent.Id), Is.False);
+            // Trying to return it throws an exception
+            Assert.That(() => _testAgentService.ReturnAgent(unownedAgent), Throws.InvalidOperationException);
+
+            // Verify that we still own the agent we originally created
+            Assert.That(_testAgentService.IsAgentActive(agent.Id), Is.True);
+        }
+
+        private static FrameworkName[] SupportedRuntimes => new[]
+        {
+            // We have actual agents for these frameworks
+            new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 6, 2)),
+            new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(8, 0, 0)),
+            new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(9, 0, 0)),
+            new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(10, 0, 0)),
+            // A selection of runtimes with compatible agents
+            new FrameworkName(FrameworkIdentifiers.NetFramework, new Version(4, 0, 0)),
+            new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(3, 1, 0)),
+            new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(5, 0, 0)),
+            new FrameworkName(FrameworkIdentifiers.NetCoreApp, new Version(7, 0, 0))
+        };
     }
 }

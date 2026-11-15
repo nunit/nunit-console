@@ -63,6 +63,20 @@ namespace NUnit.Engine.TestHelpers
                 return _provider.IsAgentAvailable(package);
         }
 
+        public event AgentExitedEventHandler? AgentExited
+        {
+            add
+            {
+                lock (_providerLock)
+                    _provider.AgentExited += value;
+            }
+            remove
+            {
+                lock (_providerLock)
+                    _provider.AgentExited -= value;
+            }
+        }
+
         public ITestAgent GetAgent(TestPackage package)
         {
             lock (_providerLock)
