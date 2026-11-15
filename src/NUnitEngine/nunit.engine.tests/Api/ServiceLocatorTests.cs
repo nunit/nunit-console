@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Api
@@ -55,6 +56,23 @@ namespace NUnit.Engine.Api
             InvalidService? service;
             Assert.That(_testEngine.Services.TryGetService<InvalidService>(out service), Is.False);
             Assert.That(service, Is.Null);
+        }
+
+        [TestCase(TypeArgs = new[] { typeof(IResultService) })]
+        [TestCase(TypeArgs = new[] { typeof(ITestRunnerFactory) })]
+        public void GetServicesReturnsStartedService<T>()
+            where T : class
+        {
+            T[] services = _testEngine.Services.GetServices<T>().ToArray();
+            Assert.That(services, Has.Length.EqualTo(1));
+            Assert.That(services[0], Is.SameAs(_testEngine.Services.GetService<T>()));
+            Assert.That(((IService)services[0]).Status, Is.EqualTo(ServiceStatus.Started));
+        }
+
+        [Test]
+        public void GetServicesReturnsEmptyWhenServiceIsNotFound()
+        {
+            Assert.That(_testEngine.Services.GetServices<InvalidService>(), Is.Empty);
         }
 
         internal class InvalidService
