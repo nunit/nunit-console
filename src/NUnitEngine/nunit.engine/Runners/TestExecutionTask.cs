@@ -10,13 +10,11 @@ namespace NUnit.Engine.Runners
         private readonly ITestEventListener _listener;
         private readonly TestFilter _filter;
         private volatile TestEngineResult? _result;
-        private readonly bool _disposeRunner;
         private bool _hasExecuted = false;
         private Exception? _unloadException;
 
-        public TestExecutionTask(ITestEngineRunner runner, ITestEventListener listener, TestFilter filter, bool disposeRunner)
+        public TestExecutionTask(ITestEngineRunner runner, ITestEventListener listener, TestFilter filter)
         {
-            _disposeRunner = disposeRunner;
             _filter = filter;
             _listener = listener;
             _runner = runner;
@@ -29,17 +27,9 @@ namespace NUnit.Engine.Runners
             {
                 _result = _runner.Run(_listener, _filter);
             }
-            finally
+            catch (NUnitEngineUnloadException ex)
             {
-                try
-                {
-                    if (_disposeRunner)
-                        _runner.Dispose();
-                }
-                catch (Exception e)
-                {
-                    _unloadException = e;
-                }
+                _unloadException = ex;
             }
         }
 
