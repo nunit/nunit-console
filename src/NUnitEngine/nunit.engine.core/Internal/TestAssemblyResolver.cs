@@ -32,7 +32,15 @@ namespace NUnit.Engine.Internal
         {
             _loadContext = loadContext;
             _basePath = Path.GetDirectoryName(testAssemblyPath);
-            _assemblyDependencyResolver = new AssemblyDependencyResolver(testAssemblyPath);
+            // Mobile runtimes (Android, iOS) do not support AssemblyDependencyResolver. There is
+            // no deps.json to read there, so the other resolution strategies are all we need.
+            try
+            {
+                _assemblyDependencyResolver = new AssemblyDependencyResolver(testAssemblyPath);
+            }
+            catch (PlatformNotSupportedException)
+            {
+            }
 #if NET8_0_OR_GREATER
             AppContext.SetData("APP_CONTEXT_BASE_DIRECTORY", _basePath);
 #endif
@@ -84,7 +92,7 @@ namespace NUnit.Engine.Internal
 
         private Assembly OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
-            var runtimeResolverPath = _assemblyDependencyResolver.ResolveAssemblyToPath(assemblyName);
+            var runtimeResolverPath = _assemblyDependencyResolver?.ResolveAssemblyToPath(assemblyName);
             if (!string.IsNullOrEmpty(runtimeResolverPath) && File.Exists(runtimeResolverPath))
             {
                 var loadedAssembly = _loadContext.LoadFromAssemblyPath(runtimeResolverPath);

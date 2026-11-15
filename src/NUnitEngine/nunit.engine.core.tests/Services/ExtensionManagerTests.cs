@@ -152,6 +152,20 @@ namespace NUnit.Engine.Services
         }
 
         [Test]
+        public void FindExtensionAssemblies_HostAssemblyHasNoLocation()
+        {
+            // On Android, Release builds pack assemblies inside the APK, so the engine
+            // has no Location. An assembly loaded from bytes is the same on desktop.
+            var bytes = File.ReadAllBytes(Path.Combine(THIS_ASSEMBLY_DIRECTORY, "mock-assembly.dll"));
+            var hostAssembly = Assembly.Load(bytes);
+            Assume.That(hostAssembly.Location, Is.Empty);
+
+            var manager = new ExtensionManager();
+
+            Assert.That(() => manager.FindExtensionAssemblies(hostAssembly), Throws.Nothing);
+        }
+
+        [Test]
         public void SkipsGracefullyLoadingOtherFrameworkExtensionAssembly()
         {
             //May be null on mono
