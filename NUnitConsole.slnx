@@ -22,6 +22,9 @@
     <Project Path="src/NUnitServer/nunit-test-server/nunit-test-server.csproj" />
     <File Path="src/NUnitServer/README.md" />
   </Folder>
+  <Folder Name="/NUnitRemote/">
+    <Project Path="src/NUnitRemote/RemoteSession/RemoteSession.csproj" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitattributes" />
