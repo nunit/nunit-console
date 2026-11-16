@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/NUnitRemote/RemoteSession/RemoteSession.csproj" />
+  <Project Path="src/NUnitRemote/RemoteSessionRunner/RemoteSessionRunner.csproj" />
+</Solution>

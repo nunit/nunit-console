@@ -1,0 +1,22 @@
+{
+  "deployment": {
+    "deploymentRoot": "C:/NUnitRemote/sessions",
+    "evidenceDirectory": "C:/NUnitRemote/evidence/run-001",
+    "hostDirectory": "C:/NUnitRemote/inputs/server",
+    "hostAssemblyRelativePath": "nunit-test-server.dll",
+    "packageDirectory": "C:/NUnitRemote/inputs/tests",
+    "assemblyRelativePath": "Example.Tests.dll",
+    "launchers": [
+      {
+        "name": "net9",
+        "toolsDirectory": "C:/NUnitRemote/inputs/net90-agent/tools",
+        "launcherRelativePath": "net10.0/nunit-agent-launcher-net90.dll"
+      }
+    ],
+    "dotnetExecutable": "C:/Program Files/dotnet/dotnet.exe",
+    "startupTimeout": "00:00:15",
+    "shutdownTimeout": "00:00:35"
+  },
+  "filterXml": "<filter />",
+  "runTimeoutMilliseconds": 30000
+}
