@@ -117,12 +117,12 @@ namespace NUnit.Engine.Services
         /// </summary>
         /// <param name="agent">An agent previously provided by a call to GetAgent.</param>
         /// <exception cref="InvalidOperationException">
-        /// If agent was never provided by the factory or was previously released.
+        /// If the agent was never acquired, was already released, or another return is in progress.
         /// </exception>
         /// <remarks>
         /// Ownership is removed only after the provider confirms release. A failed
-        /// release may be retried through the same agency. Requests for one agent
-        /// are serialized without holding the ownership index lock during provider I/O.
+        /// release may be retried through the same agency. An overlapping return is
+        /// rejected without holding bookkeeping locks during provider I/O or callbacks.
         /// Virtual to allow substitution of agents and providers in runner tests.
         /// </remarks>
         public virtual void ReturnAgent(ITestAgent agent)
@@ -130,19 +130,22 @@ namespace NUnit.Engine.Services
             AgentOwnership ownership;
             lock (_agentOwners)
             {
-                if (!_agentOwners.TryGetValue(agent.Id, out ownership!) || !ReferenceEquals(ownership.Agent, agent))
-                    throw new InvalidOperationException("The agent was not acquired from this agency or was already released.");
+                if (!_agentOwners.TryGetValue(agent.Id, out ownership!) || !ReferenceEquals(ownership.Agent, agent)
+                    || ownership.Returning)
+                    throw new InvalidOperationException("The agent is not owned or a return is already in progress.");
+                ownership.Returning = true;
             }
 
-            lock (ownership)
+            try
             {
-                if (ownership.Released)
-                    throw new InvalidOperationException("The agent was already released.");
-
                 ownership.Provider.ReturnAgent(agent);
-                ownership.Released = true;
                 lock (_agentOwners)
                     _agentOwners.Remove(agent.Id);
+            }
+            finally
+            {
+                lock (_agentOwners)
+                    ownership.Returning = false;
             }
         }
 
@@ -228,7 +231,7 @@ namespace NUnit.Engine.Services
 
             internal ITestAgent Agent { get; }
             internal ITestAgentProvider Provider { get; }
-            internal bool Released { get; set; }
+            internal bool Returning { get; set; }
             internal string? ExitMessage { get; set; }
         }
 
