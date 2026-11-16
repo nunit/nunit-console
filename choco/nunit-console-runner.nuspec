@@ -85,6 +85,8 @@
     <file src = "$BIN_DIR$agents/net10.0/nunit.engine.core.dll" target="tools/agents/net10.0" />
     <file src = "$BIN_DIR$agents/net10.0/testcentric.engine.metadata.dll" target="tools/agents/net10.0" />
     <file src = "$BIN_DIR$agents/net10.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net10.0" />
+    <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
+    <file src = "VERIFICATION.txt" target = "tools/agents/net10.0" />
 
     <file src = "$BIN_DIR$agents/net11.0/nunit-agent.dll" target="tools/agents/net11.0" />
     <file src = "$BIN_DIR$agents/net11.0/nunit-agent.dll.config" target="tools/agents/net11.0" />
@@ -96,6 +98,6 @@
     <file src = "$BIN_DIR$agents/net11.0/testcentric.engine.metadata.dll" target="tools/agents/net11.0" />
     <file src = "$BIN_DIR$agents/net11.0/Microsoft.Extensions.DependencyModel.dll" target="tools/agents/net11.0" />
     <!-- File used by ExtensionManager to indicate this is a chocolatey installation -->
-    <file src = "VERIFICATION.txt" target = "tools/agents/net10.0" />
+    <file src = "VERIFICATION.txt" target = "tools/agents/net11.0" />
   </files>
 </package>
