@@ -69,6 +69,11 @@
   <!-- Keep the .NET Framework test host independent of the modern session library. -->
   <ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
     <ProjectReference Include="../../NUnitRemote/RemoteSession/RemoteSession.csproj" />
+    <ProjectReference Include="../../TestData/SessionHostProbe/SessionHostProbe.csproj" ReferenceOutputAssembly="false" />
+    <Content Include="../../../bin/$(Configuration)/session-host-probe/net10.0/SessionHostProbe.dll;../../../bin/$(Configuration)/session-host-probe/net10.0/SessionHostProbe.deps.json;../../../bin/$(Configuration)/session-host-probe/net10.0/SessionHostProbe.runtimeconfig.json">
+      <Link>session-host-probe/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'!='net10.0'">
     <Compile Remove="RemoteSession/**/*.cs" />
