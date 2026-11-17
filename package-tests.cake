@@ -46,6 +46,13 @@ public static class PackageTests
             ExpectedResult=new MockAssemblyExpectedResult("net-4.6.2")
         });
 
+        AllLists.Add(new PackageTest(1, "Net11Test")
+        {
+            Description = "Run mock-assembly.dll targeting .NET 11.0",
+            Arguments = "testdata/net11.0/mock-assembly.dll",
+            ExpectedResult = new MockAssemblyExpectedResult("netcore-11.0")
+        });
+
         AllLists.Add(new PackageTest(1, "Net10Test")
         {
             Description = "Run mock-assembly.dll targeting .NET 10.0",
@@ -152,11 +159,11 @@ public static class PackageTests
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-4.6.2")
         });
 
-        StandardAndZipLists.Add(new PackageTest(1, "Net60PlusNet80PlusNet10Test")
+        StandardAndZipLists.Add(new PackageTest(1, "Net60PlusNet80PlusNet10PlusNet11Test")
         {
-            Description = "Run mock-assembly targeting .NET6.0 and 8.0 together",
-            Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net10.0/mock-assembly.dll",
-            ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-10.0")
+            Description = "Run mock-assembly targeting .NET6.0, 8.0, 10.0, and 11.0 together",
+            Arguments = "testdata/net6.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll testdata/net10.0/mock-assembly.dll testdata/net11.0/mock-assembly.dll",
+            ExpectedResult = new MockAssemblyExpectedResult("netcore-6.0", "netcore-8.0", "netcore-10.0", "netcore-11.0")
         });
 
         StandardAndZipLists.Add(new PackageTest(1, "Net462PlusNet60Test")
@@ -334,7 +341,7 @@ public static class PackageTests
         {
             Description = "Run mock-assembly using the .csproj file",
             Arguments = "../../src/TestData/mock-assembly/mock-assembly.csproj --config=Release",
-            ExpectedResult = new MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0", "netcore-9.0", "netcore-10.0"),
+            ExpectedResult = new MockAssemblyExpectedResult("net462", "netcore-3.1", "netcore-6.0", "netcore-7.0", "netcore-8.0", "netcore-9.0", "netcore-10.0", "netcore-11.0"),
             ExtensionsNeeded = new[] { Extensions.VSProjectLoader }
         });
 
