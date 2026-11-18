@@ -413,20 +413,14 @@ namespace NUnit.ConsoleRunner
 
         private void DisplayExtension(IExtensionNode node)
         {
-            var extensionInfo = node.Enabled ? node.TypeName : node.TypeName + " (Disabled)";
+            var extensionInfo = $"{node.TypeName} {node.AssemblyVersion}";
             _outWriter.WriteLabelLine(INDENT6 + "Extension: ", extensionInfo);
 
-            _outWriter.Write(INDENT8 + "Version: ");
-            _outWriter.WriteLine(ColorStyle.Value, node.AssemblyVersion.ToString());
-
-            _outWriter.Write(INDENT8 + "Framework: ");
-            _outWriter.WriteLine(ColorStyle.Value, node.AssemblyTargetFramework.ToString());
-
             _outWriter.Write(INDENT8 + "Status: ");
-            _outWriter.WriteLine(ColorStyle.Value, node.Status.ToString());
+            _outWriter.WriteLine(ColorStyle.Value, $"{node.Status}, {(node.Enabled ? "Enabled" : "Disabled")}");
 
-            _outWriter.Write(INDENT8 + "Enabled: ");
-            _outWriter.WriteLine(ColorStyle.Value, node.Enabled.ToString());
+            _outWriter.Write(INDENT8 + "Runtime: ");
+            _outWriter.WriteLine(ColorStyle.Value, node.AssemblyTargetFramework.ToString());
 
             _outWriter.Write(INDENT8 + "Path: ");
             _outWriter.WriteLine(ColorStyle.Value, node.AssemblyPath);
