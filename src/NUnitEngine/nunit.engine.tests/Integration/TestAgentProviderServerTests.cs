@@ -284,9 +284,11 @@ namespace NUnit.Engine.Integration
             _server.Start();
             _stdout = _server.StandardOutput.ReadToEndAsync();
             _stderr = _server.StandardError.ReadToEndAsync();
-            Assert.That(SpinWait.SpinUntil(() => File.Exists(ready) || _server.HasExited, 15000), Is.True, "Server readiness deadline exceeded.");
+            XElement? receipt = null;
+            Assert.That(SpinWait.SpinUntil(() => _server.HasExited ||
+                (receipt = ProviderServerReadiness.ReadIfAvailable(ready)) is not null, 15000), Is.True, "Server readiness deadline exceeded.");
             Assert.That(_server.HasExited, Is.False, _server.HasExited ? Output() : string.Empty);
-            var record = XElement.Load(ready);
+            var record = receipt ?? throw new InvalidOperationException("Server readiness completed without a readable receipt.");
             Assert.That((int)record.Attribute("pid")!, Is.EqualTo(_server.Id));
             _endpoint = new IPEndPoint(IPAddress.Loopback, (int)record.Attribute("port")!);
             return new TestAgentProviderProxy(_endpoint);
