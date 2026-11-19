@@ -9,38 +9,39 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
+
+using NUnit.Common;
 using NUnit.Engine.Extensibility;
 using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services
 {
+    /// <summary>
+    /// InProcessAgentProvider provides a single in-process agent targeting
+    /// either net462 or net10.0. These two target versions match the two targets
+    /// used by the NUnit engine and console runner. More flexible targeting is
+    /// a desirable feature, which may be introduced at a later time.
+    /// </summary>
     internal class InProcessAgentProvider : Service, ITestAgentProvider
     {
+#if NETFRAMEWORK
+        private static bool IS_NETFX_BUILD = true;
+#else
+        private static bool IS_NETFX_BUILD = false;
+#endif
+
+        private static readonly FrameworkName AGENT_RUNTIME = IS_NETFX_BUILD
+            ? new FrameworkName(".NETFramework", new Version(4, 6, 2))
+            : new FrameworkName(".NETCoreApp", new Version(10, 0));
+
         private static readonly Logger log = InternalTrace.GetLogger(typeof(InProcessAgentProvider));
 
         private const string INPROCESS_AGENTS_PATH = "/NUnit/Engine/InProcessAgents";
         private static readonly Guid INPROCESS_AGENT_ID = Guid.NewGuid();
 
         private ExtensionService? _extensionService;
-        private TestAgentInfo _agentInfo;
-
-        /// <summary>
-        /// InProcessAgentProvider provides a single in-process agent targeting
-        /// either net462 or net10.0. These two target versions match the two targets
-        /// used by the NUnit engine and console runner. More flexible targeting is
-        /// a desirable feature, which may be introduced at a later time.
-        /// </summary>
-        public InProcessAgentProvider()
-        {
-            _agentInfo = new TestAgentInfo(
-                "InProcessAgent",
-                TestAgentType.InProcess,
-#if NETFRAMEWORK
-                new FrameworkName(".NETFramework,Version=v4.6.2"));
-#else
-                new FrameworkName(".NETCoreApp,Version=v10.0"));
-#endif
-        }
+        private TestAgentInfo _agentInfo = new TestAgentInfo(
+            "InProcessAgent", TestAgentType.InProcess, AGENT_RUNTIME);
 
         #region ITestAgentInfo Implementation
 
@@ -65,7 +66,10 @@ namespace NUnit.Engine.Services
 #pragma warning restore CS0067
 
         public bool IsAgentAvailable(TestPackage package)
-            => false;
+        {
+            var targetFramework = new FrameworkName((string)package.Settings.GetSetting(SettingDefinitions.TargetFrameworkName.Name));
+            return targetFramework.Identifier.Equals(AGENT_RUNTIME.Identifier);
+        }
 
         public ITestAgent GetAgent(TestPackage package)
         {
@@ -80,7 +84,7 @@ namespace NUnit.Engine.Services
 
         #endregion
 
-        #region
+        #region Service Overrides
 
         public override void StartService()
         {
