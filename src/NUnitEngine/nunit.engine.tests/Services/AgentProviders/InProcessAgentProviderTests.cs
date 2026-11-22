@@ -12,12 +12,13 @@ using NUnit.Common;
 
 namespace NUnit.Engine.Services
 {
+    [TestFixture]
     public class InProcessAgentProviderTests
     {
 #if NETFRAMEWORK
-        private static bool IS_NETFX_BUILD = true;
+        private const bool IS_NETFX_BUILD = true;
 #else
-        private static bool IS_NETFX_BUILD = false;
+        private const bool IS_NETFX_BUILD = false;
 #endif
 
         private static readonly FrameworkName AGENT_RUNTIME = IS_NETFX_BUILD
@@ -45,11 +46,44 @@ namespace NUnit.Engine.Services
             new TestCaseData(".NETCoreApp,Version=25.0", false),
         ];
 
+        private InProcessAgentProvider _provider;
+        [SetUp]
+        public void Setup()
+        {
+            var context = new ServiceContext();
+            _provider = new InProcessAgentProvider();
+
+            var extensionService = new ExtensionService();
+            context.Add(extensionService);
+            context.Add(_provider);
+            context.ServiceManager.StartServices();
+
+            // As in ConsoleRunner: StartServices only locates candidate assemblies;
+            // extensions are not attached to their extension points until installed.
+            extensionService.InstallExtensions();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _provider.Dispose();
+        }
+
         [Test]
+        public void StartService_WithoutExtensionService_ThrowsAndSetsErrorStatus()
+        {
+            var context = new ServiceContext();
+            var provider = new InProcessAgentProvider();
+            context.Add(provider);
+
+            Assert.That(() => provider.StartService(), Throws.TypeOf<NUnitEngineException>());
+            Assert.That(provider.Status, Is.EqualTo(ServiceStatus.Error));
+        }
+
+        [Test, Order(1)]
         public void AvailableAgents_ReturnsSingleAgent()
         {
-            var provider = new InProcessAgentProvider();
-            var agents = provider.AvailableAgents;
+            var agents = _provider.AvailableAgents;
             Assert.That(agents, Has.Count.EqualTo(1));
             Assert.That(agents[0].AgentType, Is.EqualTo(TestAgentType.InProcess));
             Assert.That(agents[0].TargetRuntime, Is.EqualTo(AGENT_RUNTIME));
@@ -59,10 +93,10 @@ namespace NUnit.Engine.Services
         public void GetAgentsForPackage_ReturnsAgentInfoForCompatiblePackage(string targetRuntime, bool isCompatible)
         {
             var package = new TestPackage("dummy.dll");
-            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(targetRuntime), true);
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(targetRuntime), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
 
-            var provider = new InProcessAgentProvider();
-            var agents = provider.GetAgentsForPackage(package);
+            var agents = _provider.GetAgentsForPackage(package);
             if (isCompatible)
             {
                 Assert.That(agents, Has.Count.EqualTo(1));
@@ -79,44 +113,74 @@ namespace NUnit.Engine.Services
         public void IsAgentAvailable_ReturnsTrueForCompatiblePackage(string targetRuntime, bool isCompatible)
         {
             var package = new TestPackage("dummy.dll");
-            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME), true);
-            var provider = new InProcessAgentProvider();
-            Assert.That(provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(targetRuntime), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
         }
 
+        // TODO: Remove the Platform restriction once the net462 agent provides an in-process agent.
+        // NUnit can't select a specific .NET Core version, but net10.0 is our only .NET Core build.
         [TestCaseSource(nameof(TargetRuntimes))]
+        [Platform("NetCore", Reason = "In-process agent is not yet implemented for net462")]
         public void GetAgent_ReturnsAgentForCompatiblePackage(string targetRuntime, bool isCompatible)
         {
             var package = new TestPackage("dummy.dll");
             package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(targetRuntime), true);
-            var provider = new InProcessAgentProvider();
-            //Assert.That(provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
 
             if (isCompatible)
             {
-                package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.ToString()), true);
-                Assert.That(provider.GetAgent(package), Is.Not.Null);
+                package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+                Assert.That(_provider.GetAgent(package), Is.Not.Null);
             }
             else
-                Assert.That(() => provider.GetAgent(package), Throws.InvalidOperationException);
+                Assert.That(() => _provider.GetAgent(package), Throws.InvalidOperationException);
         }
 
-        [TestCaseSource(nameof(TargetRuntimes))]
+        [TestCase("InProcessAgent", true)]
+        [TestCase("SomeOtherAgent", false)]
+        public void IsAgentAvailable_RespectsRequestedAgentName(string requestedAgent, bool expected)
+        {
+            var package = CreateCompatiblePackage();
+            package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue(requestedAgent), true);
+
+            Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(expected));
+        }
+
+        // TODO: Remove the Platform restriction once the net462 agent provides an in-process agent.
+        [Test]
+        [Platform("NetCore", Reason = "In-process agent is not yet implemented for net462")]
+        public void GetAgent_SetsSelectedAgentName()
+        {
+            var package = CreateCompatiblePackage();
+
+            _provider.GetAgent(package);
+
+            Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.SelectedAgentName), Is.EqualTo("InProcessAgent"));
+        }
+
+        private static TestPackage CreateCompatiblePackage()
+        {
+            var package = new TestPackage("dummy.dll").SubPackages[0];
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            return package;
+        }
+
+        //[TestCaseSource(nameof(TargetRuntimes))]
         public void ReturnAgent_DoesNotThrow(string targetRuntime, bool isCompatible)
         {
             var package = new TestPackage("dummy.dll");
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(targetRuntime), true);
-            var provider = new InProcessAgentProvider();
-            Assert.That(provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
+            Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
 
             //if (isCompatible)
             //{
-            //    var agent = provider.GetAgent(package);
-            //    Assert.That(() => provider.ReturnAgent(agent), Throws.Nothing);
+            //    var agent = _provider.GetAgent(package);
+            //    Assert.That(() => _provider.ReturnAgent(agent), Throws.Nothing);
             //}
             //else
             //{
-            //    Assert.That(() => provider.GetAgent(package), Throws.InvalidOperationException);
+            //    Assert.That(() => _provider.GetAgent(package), Throws.InvalidOperationException);
             //}
         }
     }

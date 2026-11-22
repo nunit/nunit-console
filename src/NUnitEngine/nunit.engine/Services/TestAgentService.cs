@@ -73,11 +73,15 @@ namespace NUnit.Engine.Services
 
         /// <summary>
         /// Returns true if an agent can be found, which is suitable
-        /// for running the provided test package.
+        /// for running the provided test package. If the package requests
+        /// an agent by name, only the provider of that agent is consulted.
         /// </summary>
         /// <param name="package">A TestPackage</param>
         public bool IsAgentAvailable(TestPackage package)
         {
+            if (TryGetRequestedAgentName(package, out string? requestedAgent))
+                return FindProviderForAgent(requestedAgent)?.IsAgentAvailable(package) ?? false;
+
             foreach (var agentSource in _providers)
                 if (agentSource.IsAgentAvailable(package))
                     return true;
@@ -86,11 +90,12 @@ namespace NUnit.Engine.Services
 
         /// <summary>
         /// Return an agent, which best matches the criteria defined
-        /// in a TestPackage.
+        /// in a TestPackage. If the package requests an agent by name,
+        /// only the provider of that agent is consulted.
         /// </summary>
         /// <param name="package">The test package to be run</param>
         /// <returns>An ITestAgent</returns>
-        /// <exception cref="ArgumentException">If no agent is available.</exception>
+        /// <exception cref="InvalidOperationException">If no suitable agent is available.</exception>
         /// <remarks>Virtual to allow substitution of agents in testing.</remarks>
         public virtual ITestAgent GetAgent(TestPackage package)
         {
@@ -98,17 +103,60 @@ namespace NUnit.Engine.Services
             string runtimeSetting = package.Settings.GetValueOrDefault(SettingDefinitions.TargetFrameworkName);
             Guard.OperationValid(runtimeSetting.Length > 0, "GetAgent called with no target runtime specified");
 
+            if (TryGetRequestedAgentName(package, out string? requestedAgent))
+            {
+                var provider = FindProviderForAgent(requestedAgent)
+                    ?? throw new InvalidOperationException($"No agent named '{requestedAgent}' is available.");
+
+                // No fallback to other providers: the user asked for this agent specifically.
+                if (!provider.IsAgentAvailable(package))
+                    throw new InvalidOperationException($"Agent '{requestedAgent}' cannot run package {package.Name}.");
+
+                return AcquireAgent(provider, package);
+            }
+
             foreach (var agentSource in _providers)
                 if (agentSource.IsAgentAvailable(package))
-                {
-                    var agent = agentSource.GetAgent(package);
-                    lock (_agentOwners)
-                        _agentOwners.Add(agent.Id, new AgentOwnership(agent, agentSource));
-                    log.Debug($"Returning agent {agent.Id:B}");
-                    return agent;
-                }
+                    return AcquireAgent(agentSource, package);
 
             throw new InvalidOperationException("No available agent matches the TestPackage");
+        }
+
+        private ITestAgent AcquireAgent(ITestAgentProvider provider, TestPackage package)
+        {
+            var agent = provider.GetAgent(package);
+            lock (_agentOwners)
+                _agentOwners.Add(agent.Id, new AgentOwnership(agent, provider));
+            log.Debug($"Returning agent {agent.Id:B}");
+            return agent;
+        }
+
+        private static bool TryGetRequestedAgentName(TestPackage package, [NotNullWhen(true)] out string? agentName)
+        {
+            agentName = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
+            return !string.IsNullOrEmpty(agentName);
+        }
+
+        /// <summary>
+        /// Returns the provider that publishes an agent with the given name, using an
+        /// exact match. If more than one provider publishes the name, the first wins.
+        /// </summary>
+        private ITestAgentProvider? FindProviderForAgent(string agentName)
+        {
+            ITestAgentProvider? found = null;
+
+            foreach (var provider in _providers)
+            {
+                if (!provider.AvailableAgents.Any(info => info.AgentName == agentName))
+                    continue;
+
+                if (found is null)
+                    found = provider;
+                else
+                    log.Warning($"Agent name '{agentName}' is published by more than one provider. Using {found.GetType().Name}.");
+            }
+
+            return found;
         }
 
         /// <summary>

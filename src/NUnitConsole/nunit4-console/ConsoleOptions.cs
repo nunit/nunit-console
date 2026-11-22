@@ -184,6 +184,8 @@ namespace NUnit.ConsoleRunner
 
         public bool RunAsX86 { get; private set; }
 
+        public bool RunInProcess { get; private set; }
+
         public bool DisposeRunners { get; private set; }
 
         public bool ShadowCopyFiles { get; private set; }
@@ -402,6 +404,9 @@ namespace NUnit.ConsoleRunner
 
             this.Add("x86", "Run tests in an x86 process on 64 bit systems",
                 v => RunAsX86 = !string.IsNullOrEmpty(v));
+
+            this.Add("inprocess", "Run tests in the console process, using the in-process agent, rather than in a separate agent process.",
+                v => RunInProcess = !string.IsNullOrEmpty(v));
 
             this.Add("dispose-runners", "Dispose each test runner after it has finished running its tests.",
                 v => DisposeRunners = !string.IsNullOrEmpty(v));

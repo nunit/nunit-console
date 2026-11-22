@@ -27,6 +27,18 @@ BothRunnerTests.Add(new PackageTest(1, "Net10Test")
     ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v10.0")
 });
 
+// The in-process agent runs in the runner's own process, so only the .NET 10 runner can
+// use it for a net10.0 assembly. Its result must show that the in-process agent was used.
+NetCoreRunnerTests.Add(new PackageTest(1, "Net10InProcessTest")
+{
+    Description = "Run mock-assembly.dll under .NET 10.0 using the in-process agent",
+    Arguments = "testdata/net10.0/mock-assembly.dll --inprocess",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v10.0")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", ".NETCoreApp,Version=v10.0", "InProcessAgent") }
+    }
+});
+
 BothRunnerTests.Add(new PackageTest(1, "Net90Test")
 {
     Description = "Run mock-assembly.dll under .NET 9.0",

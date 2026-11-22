@@ -45,6 +45,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("--workers=0", FrameworkPackageSettings.NumberOfTestWorkers, 0)]
         [TestCase("--mainthread", FrameworkPackageSettings.RunOnMainThread, true)]
         [TestCase("--skipnontestassemblies", "SkipNonTestAssemblies", true)]
+        [TestCase("--inprocess", "RequestedAgentName", "InProcessAgent")]
 #if NETCOREAPP
         [TestCase("--list-resolution-stats", "ListResolutionStats", true)]
 #else

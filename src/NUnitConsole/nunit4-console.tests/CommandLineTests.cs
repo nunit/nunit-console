@@ -152,6 +152,7 @@ namespace NUnit.ConsoleRunner
         [TestCase("ListExtensions", "list-extensions")]
         [TestCase("ListResolutionStats", "list-resolution-stats")]
         [TestCase("RunAsX86", "x86")]
+        [TestCase("RunInProcess", "inprocess")]
         [TestCase("RunUnderMono", "mono")]
         [TestCase("ShadowCopyFiles", "shadowcopy")]
         [TestCase(FrameworkPackageSettings.DebugTests, "debug")]

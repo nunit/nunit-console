@@ -31,6 +31,15 @@
     <ProjectReference Include="..\nunit.engine\nunit.engine.csproj" />
   </ItemGroup>
   
+  <!-- Stage the net10 agent where ExtensionManager's upward search finds it,
+       so the in-process agent extension is discovered as in an installed console. -->
+  <ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
+    <Content Include="$(PkgNUnit_Extension_Net10PluggableAgent)/tools/**/*">
+      <Link>NUnit.Extension.Net10PluggableAgent/tools/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
