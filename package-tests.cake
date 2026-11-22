@@ -39,6 +39,17 @@ NetCoreRunnerTests.Add(new PackageTest(1, "Net10InProcessTest")
     }
 });
 
+// Assemblies using versions of .NET Core should also run in-process using the in-process agent.
+NetCoreRunnerTests.Add(new PackageTest(1, "Net60InProcessTest")
+{
+    Description = "Run .NET 6.0 mock-assembly.dll under .NET 10.0 using the in-process agent",
+    Arguments = "testdata/net6.0/mock-assembly.dll --inprocess",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v10.0")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", ".NETCoreApp,Version=v6.0", "InProcessAgent") }
+    }
+});
+
 BothRunnerTests.Add(new PackageTest(1, "Net90Test")
 {
     Description = "Run mock-assembly.dll under .NET 9.0",
