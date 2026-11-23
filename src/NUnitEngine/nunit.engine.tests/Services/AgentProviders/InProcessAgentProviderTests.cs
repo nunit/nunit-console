@@ -118,10 +118,7 @@ namespace NUnit.Engine.Services
             Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
         }
 
-        // TODO: Remove the Platform restriction once the net462 agent provides an in-process agent.
-        // NUnit can't select a specific .NET Core version, but net10.0 is our only .NET Core build.
         [TestCaseSource(nameof(TargetRuntimes))]
-        [Platform("NetCore", Reason = "In-process agent is not yet implemented for net462")]
         public void GetAgent_ReturnsAgentForCompatiblePackage(string targetRuntime, bool isCompatible)
         {
             var package = new TestPackage("dummy.dll");
@@ -146,9 +143,7 @@ namespace NUnit.Engine.Services
             Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(expected));
         }
 
-        // TODO: Remove the Platform restriction once the net462 agent provides an in-process agent.
         [Test]
-        [Platform("NetCore", Reason = "In-process agent is not yet implemented for net462")]
         public void GetAgent_SetsSelectedAgentName()
         {
             var package = CreateCompatiblePackage();
@@ -156,6 +151,34 @@ namespace NUnit.Engine.Services
             _provider.GetAgent(package);
 
             Assert.That(package.Settings.GetValueOrDefault(SettingDefinitions.SelectedAgentName), Is.EqualTo("InProcessAgent"));
+        }
+
+        // Runs a real assembly through the in-process agent, as the console does with --inprocess.
+        // Creating the agent isn't enough: on .NET Framework the driver also crosses an AppDomain boundary.
+        [Test]
+        public void GetAgent_RunnerLoadsAndRunsMockAssembly()
+        {
+            string tfm = IS_NETFX_BUILD ? "net462" : "net10.0";
+            string assemblyPath = System.IO.Path.GetFullPath($"testdata/{tfm}/mock-assembly.dll");
+            var package = new TestPackage(assemblyPath).SubPackages[0];
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+
+            var agent = _provider.GetAgent(package);
+            using var runner = agent.CreateRunner(package);
+
+            var loadResult = runner.Load();
+            Assert.That(loadResult.Xml.Name, Is.EqualTo("test-suite").Or.EqualTo("test-run"), loadResult.Xml.OuterXml);
+
+            var runResult = runner.Run(new NullListener(), TestFilter.Empty);
+            Assert.That(runResult.Xml.GetAttribute("total"), Is.Not.Null.And.Not.EqualTo("0"), runResult.Xml.OuterXml);
+        }
+
+        private sealed class NullListener : ITestEventListener
+        {
+            public void OnTestEvent(string report)
+            {
+            }
         }
 
         private static TestPackage CreateCompatiblePackage()

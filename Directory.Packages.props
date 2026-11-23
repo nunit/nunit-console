@@ -19,7 +19,7 @@
         <PackageVersion Include="NUnit.Engine.Api" Version="4.0.0-beta.101.5" />
         <PackageVersion Include="NUnit.Extensibility" Version="4.0.0-beta.6" />
         <PackageVersion Include="NUnit.Extensibility.Api" Version="4.0.0-beta.6" />
-        <PackageVersion Include="NUnit.Extension.Net462PluggableAgent" Version="4.1.4-alpha.0.2" />
+        <PackageVersion Include="NUnit.Extension.Net462PluggableAgent" Version="4.1.4-alpha.1.2" />
         <PackageVersion Include="NUnit.Extension.Net80PluggableAgent" Version="4.1.5-alpha.0.2" />
         <PackageVersion Include="NUnit.Extension.Net90PluggableAgent" Version="4.1.4-alpha.0.4" />
         <PackageVersion Include="NUnit.Extension.Net10PluggableAgent" Version="4.0.1-alpha.0.4" />

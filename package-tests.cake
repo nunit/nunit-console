@@ -50,6 +50,17 @@ NetCoreRunnerTests.Add(new PackageTest(1, "Net60InProcessTest")
     }
 });
 
+// Likewise, only the .NET Framework runner can run a net462 assembly in-process.
+StandardRunnerTests.Add(new PackageTest(1, "Net462InProcessTest")
+{
+    Description = "Run mock-assembly.dll under .NET 4.6.2 using the in-process agent",
+    Arguments = "testdata/net462/mock-assembly.dll --inprocess",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETFramework,Version=v4.6.2")
+    {
+        Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", ".NETFramework,Version=v4.6.2", "InProcessAgent") }
+    }
+});
+
 BothRunnerTests.Add(new PackageTest(1, "Net90Test")
 {
     Description = "Run mock-assembly.dll under .NET 9.0",

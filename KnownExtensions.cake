@@ -18,7 +18,7 @@ public static class KnownExtensions
     // Pluggable Agents for different target frameworks. Versions specified are the latest
     // production releases of each agent, which can be modified in build.cake
     public static readonly ExtensionSpecifier Net462PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.4-alpha.0.2");
+        "NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.4-alpha.1.2");
     public static readonly ExtensionSpecifier Net80PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.5-alpha.0.2");
     public static readonly ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
