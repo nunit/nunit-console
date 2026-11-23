@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 
 using NUnit.Common;
@@ -98,8 +98,9 @@ namespace NUnit.Engine.Services
             if (_agent is null)
             {
                 Guard.OperationValid(_extensionService is not null, "ExtensionService is not available.");
-                var node = _extensionService.GetExtensionNodes(INPROCESS_AGENTS_PATH).FirstOrDefault()
-                    ?? throw new InvalidOperationException($"No in-process agent extension is installed at {INPROCESS_AGENTS_PATH}.");
+                // Several pluggable agents may provide in-process agents; use the one built for our runtime.
+                var node = SelectAgentNode(_extensionService.GetExtensionNodes(INPROCESS_AGENTS_PATH), AGENT_RUNTIME)
+                    ?? throw new InvalidOperationException($"No in-process agent extension for {AGENT_RUNTIME} is installed at {INPROCESS_AGENTS_PATH}.");
 
                 object extension;
                 try
@@ -125,6 +126,43 @@ namespace NUnit.Engine.Services
         public void ReturnAgent(ITestAgent agent)
         {
             // TODO: Close any open tests, dispose resources, keep the agent available for reuse.
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Selects the in-process agent node whose TargetFramework property matches
+        /// the given runtime, or null if none does.
+        /// </summary>
+        internal static T? SelectAgentNode<T>(IEnumerable<T> nodes, FrameworkName runtime)
+            where T : class, IExtensionNode
+        {
+            foreach (var node in nodes)
+            {
+                foreach (var value in node.GetValues("TargetFramework"))
+                {
+                    if (TryParseFrameworkName(value, out var framework) && framework.Equals(runtime))
+                        return node;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool TryParseFrameworkName(string value, [NotNullWhen(true)] out FrameworkName? framework)
+        {
+            try
+            {
+                framework = new FrameworkName(value);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                framework = null;
+                return false;
+            }
         }
 
         #endregion
