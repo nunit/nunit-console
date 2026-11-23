@@ -20,11 +20,11 @@ public static class KnownExtensions
     public static readonly ExtensionSpecifier Net462PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.4-alpha.0.2");
     public static readonly ExtensionSpecifier Net80PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.5-alpha.0.1");
+        "NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.5-alpha.0.2");
     public static readonly ExtensionSpecifier Net90PluggableAgent = new ExtensionSpecifier(
         "NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.4-alpha.0.4");
     public static ExtensionSpecifier Net10PluggableAgent = new ExtensionSpecifier(
-        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.1-alpha.0.3");
+        "NUnit.Extension.Net10PluggableAgent", "nunit-extension-net10-pluggable-agent", "4.0.1-alpha.0.4");
 
     public static readonly ExtensionSpecifier[] BundledAgents = new ExtensionSpecifier[]
     {
@@ -53,7 +53,7 @@ Task("InstallChocolateyAgents")
     .Description("Installs just the Chocolatey agents we bundle with the GUI runner in the BIN  directory for testing.")
     .Does(() =>
     {
-        foreach (var agent in KnownExtensions.BundledNuGetAgents)
+        foreach (var agent in KnownExtensions.BundledChocolateyAgents)
             agent.Install(BuildSettings.ProjectDirectory + "bin");
     });
 

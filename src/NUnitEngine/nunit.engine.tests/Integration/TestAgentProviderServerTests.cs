@@ -206,7 +206,7 @@ namespace NUnit.Engine.Integration
             string tools = Path.Combine(TestContext.CurrentContext.TestDirectory, "provider-test-tools", "net462", "net462");
             string runtime = ".NETFramework,Version=v4.6.2";
 #else
-            string tools = Path.Combine(TestContext.CurrentContext.TestDirectory, "provider-test-tools", "net10", "net8.0");
+            string tools = Path.Combine(TestContext.CurrentContext.TestDirectory, "provider-test-tools", "net10", "net10.0");
             string runtime = ".NETCoreApp,Version=v10.0";
 #endif
             var provider = StartServer(tools);
