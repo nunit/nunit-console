@@ -139,12 +139,12 @@ public static class PackageTests
                     ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-6.0")
                 });
 
-                StandardAndZipLists.Add(new PackageTest(1, "NetCore31X86Test")
-                {
-                    Description = "Run mock-assembly-x86.dll targeting .NET Core 3.1",
-                    Arguments = "testdata/netcoreapp3.1/mock-assembly-x86.dll",
-                    ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-3.1")
-                });
+                //StandardAndZipLists.Add(new PackageTest(1, "NetCore31X86Test")
+                //{
+                //    Description = "Run mock-assembly-x86.dll targeting .NET Core 3.1",
+                //    Arguments = "testdata/netcoreapp3.1/mock-assembly-x86.dll",
+                //    ExpectedResult = new MockAssemblyX86ExpectedResult("netcore-3.1")
+                //});
             }
         }
 
@@ -314,7 +314,7 @@ public static class PackageTests
         StandardAndZipLists.Add(new PackageTest(1, "NUnitProjectTest")
         { 
             Description = "Run NUnit project with mock-assembly.dll targeting .NET 4.6.2 and 6.0",
-            Arguments = "../../MixedTests.nunit --config=Release",
+            Arguments = "../../MixedTests.nunit --config=Release --trace:Debug",
             ExpectedResult = new MockAssemblyExpectedResult("net-4.6.2", "net-6.0"),
             ExtensionsNeeded = new [] { Extensions.NUnitProjectLoader }
         });

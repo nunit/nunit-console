@@ -90,6 +90,18 @@ namespace NUnit.Engine.Internal
             _loadContext.Resolving -= OnResolving;
         }
 
+        public Assembly Resolve(AssemblyLoadContext context, AssemblyName assemblyName)
+        {
+            return OnResolving(context, assemblyName);
+        }
+
+        public void DisplayResolutionStats()
+        {
+            log.Info("Assembly Resolution Stats:");
+            foreach (var strategy in ResolutionStrategies)
+                log.Info($"  {strategy.Name} - Calls: {strategy.Calls} Resolved: {strategy.Resolved}");
+        }
+
         private Assembly OnResolving(AssemblyLoadContext loadContext, AssemblyName assemblyName)
         {
             var runtimeResolverPath = _assemblyDependencyResolver?.ResolveAssemblyToPath(assemblyName);
@@ -104,8 +116,14 @@ namespace NUnit.Engine.Internal
             }
 
             foreach (var strategy in ResolutionStrategies)
+            {
+                strategy.Calls++;
                 if (strategy.TryToResolve(loadContext, assemblyName, out Assembly loadedAssembly))
+                {
+                    strategy.Resolved++;
                     return loadedAssembly;
+                }
+            }
 
             // Load assemblies that are dependencies, and in the same folder as the test assembly,
             // but are not fully specified in test assembly deps.json file. This happens when the
@@ -132,6 +150,10 @@ namespace NUnit.Engine.Internal
 
     public abstract class ResolutionStrategy
     {
+        public string Name => GetType().Name;
+        public int Calls { get; set; }
+        public int Resolved { get; set; }
+
         public abstract bool TryToResolve(
             AssemblyLoadContext loadContext, AssemblyName assemblyName, out Assembly loadedAssembly);
     }
