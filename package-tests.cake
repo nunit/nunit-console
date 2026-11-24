@@ -61,6 +61,60 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462InProcessTest")
     }
 });
 
+// Several assemblies run in-process, each with its own in-process agent.
+NetCoreRunnerTests.Add(new PackageTest(1, "Net10PlusNet80InProcessTest")
+{
+    Description = "Run .NET 10.0 and 8.0 mock-assembly.dll together using the in-process agent",
+    Arguments = "testdata/net10.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll --inprocess",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v10.0", ".NETCoreApp,Version=v8.0")
+    {
+        Assemblies = new[] {
+            new ExpectedAssemblyResult("mock-assembly.dll", ".NETCoreApp,Version=v10.0", "InProcessAgent"),
+            new ExpectedAssemblyResult("mock-assembly.dll", ".NETCoreApp,Version=v8.0", "InProcessAgent") }
+    }
+});
+
+StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462InProcessTest")
+{
+    Description = "Run two copies of .NET 4.6.2 mock-assembly.dll together using the in-process agent",
+    Arguments = "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll --inprocess",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETFramework,Version=v4.6.2", ".NETFramework,Version=v4.6.2")
+    {
+        Assemblies = new[] {
+            new ExpectedAssemblyResult("mock-assembly.dll", ".NETFramework,Version=v4.6.2", "InProcessAgent"),
+            new ExpectedAssemblyResult("mock-assembly.dll", ".NETFramework,Version=v4.6.2", "InProcessAgent") }
+    }
+});
+
+// Exploring in-process must discover every assembly. Each copy of mock-assembly lists FailingTest once.
+NetCoreRunnerTests.Add(new PackageTest(1, "Net10InProcessExploreTest")
+{
+    Description = "Explore .NET 10.0 mock-assembly.dll using the in-process agent",
+    Arguments = "testdata/net10.0/mock-assembly.dll --inprocess --explore",
+    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", exactly: 1) }
+});
+
+NetCoreRunnerTests.Add(new PackageTest(1, "Net10PlusNet80InProcessExploreTest")
+{
+    Description = "Explore .NET 10.0 and 8.0 mock-assembly.dll together using the in-process agent",
+    Arguments = "testdata/net10.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll --inprocess --explore",
+    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", atleast: 2, exactly: 2) }
+});
+
+StandardRunnerTests.Add(new PackageTest(1, "Net462InProcessExploreTest")
+{
+    Description = "Explore .NET 4.6.2 mock-assembly.dll using the in-process agent",
+    Arguments = "testdata/net462/mock-assembly.dll --inprocess --explore",
+    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", exactly: 1) }
+});
+
+StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462InProcessExploreTest")
+{
+    Description = "Explore two copies of .NET 4.6.2 mock-assembly.dll together using the in-process agent",
+    Arguments = "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll --inprocess --explore",
+    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", atleast: 2, exactly: 2) }
+});
+
 BothRunnerTests.Add(new PackageTest(1, "Net90Test")
 {
     Description = "Run mock-assembly.dll under .NET 9.0",

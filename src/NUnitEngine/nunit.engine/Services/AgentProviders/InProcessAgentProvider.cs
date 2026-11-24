@@ -32,7 +32,6 @@ namespace NUnit.Engine.Services
         // Runners request this agent by name via the RequestedAgentName setting.
         // The console's --inprocess option depends on it, so don't change it lightly.
         private const string AGENT_NAME = "InProcessAgent";
-        private static readonly Guid INPROCESS_AGENT_ID = Guid.NewGuid();
 
         private static readonly IList<TestAgentInfo> NO_AGENTS = new List<TestAgentInfo>().AsReadOnly();
 
@@ -40,7 +39,6 @@ namespace NUnit.Engine.Services
         private readonly IList<TestAgentInfo> _availableAgents;
 
         private ExtensionService? _extensionService;
-        private ITestAgent? _agent;
 
         public InProcessAgentProvider()
         {
@@ -69,8 +67,9 @@ namespace NUnit.Engine.Services
 
         public bool IsAgentAvailable(TestPackage package)
         {
+            // Running in-process changes the process boundary, so it must be requested explicitly.
             string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
-            if (!string.IsNullOrEmpty(requestedAgent) && requestedAgent != AGENT_NAME)
+            if (requestedAgent != AGENT_NAME)
                 return false;
 
             if (package.Settings.GetSetting(SettingDefinitions.ImageTargetFrameworkName.Name) is not string name)
@@ -95,32 +94,30 @@ namespace NUnit.Engine.Services
                 throw new InvalidOperationException(
                     $"No agents are available for package {package.Name}. GetAgent should not be called when IsAgentAvailable returns false.");
 
-            if (_agent is null)
+            Guard.OperationValid(_extensionService is not null, "ExtensionService is not available.");
+            // Several pluggable agents may provide in-process agents; use the one built for our runtime.
+            var node = SelectAgentNode(_extensionService.GetExtensionNodes(INPROCESS_AGENTS_PATH), AGENT_RUNTIME)
+                ?? throw new InvalidOperationException($"No in-process agent extension for {AGENT_RUNTIME} is installed at {INPROCESS_AGENTS_PATH}.");
+
+            object extension;
+            try
             {
-                Guard.OperationValid(_extensionService is not null, "ExtensionService is not available.");
-                // Several pluggable agents may provide in-process agents; use the one built for our runtime.
-                var node = SelectAgentNode(_extensionService.GetExtensionNodes(INPROCESS_AGENTS_PATH), AGENT_RUNTIME)
-                    ?? throw new InvalidOperationException($"No in-process agent extension for {AGENT_RUNTIME} is installed at {INPROCESS_AGENTS_PATH}.");
-
-                object extension;
-                try
-                {
-                    // In-process agents take their agent id as a constructor argument.
-                    extension = node.CreateExtensionObject(INPROCESS_AGENT_ID);
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException(
-                        $"Extension {node.TypeName} at {INPROCESS_AGENTS_PATH} could not be created.", ex);
-                }
-
-                _agent = extension as ITestAgent ?? throw new InvalidOperationException(
-                    $"Extension {node.TypeName} at {INPROCESS_AGENTS_PATH} does not implement ITestAgent.");
+                // In-process agents take their agent id as a constructor argument. Each package
+                // (one per assembly) gets its own agent, so each needs its own id.
+                extension = node.CreateExtensionObject(Guid.NewGuid());
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Extension {node.TypeName} at {INPROCESS_AGENTS_PATH} could not be created.", ex);
             }
 
-            log.Info($"Selected agent {AGENT_NAME}");
+            var agent = extension as ITestAgent ?? throw new InvalidOperationException(
+                $"Extension {node.TypeName} at {INPROCESS_AGENTS_PATH} does not implement ITestAgent.");
+
+            log.Info($"Selected agent {AGENT_NAME} ({agent.Id})");
             package.ApplySetting(SettingDefinitions.SelectedAgentName.WithValue(AGENT_NAME), false);
-            return _agent;
+            return agent;
         }
 
         public void ReturnAgent(ITestAgent agent)

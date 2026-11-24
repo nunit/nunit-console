@@ -129,6 +129,21 @@ namespace NUnit.ConsoleRunner
             Assert.That(options.ErrorMessages, Is.EqualTo(expectedErrors));
         }
 
+        // The console only runs as AnyCPU, so it can't host an x86 run in its own process.
+        [Test]
+        public void InProcessWithX86_IsRejected()
+        {
+            var options = ConsoleMocks.Options("test.dll", "--inprocess", "--x86");
+            Assert.That(options.ErrorMessages, Is.EquivalentTo(new List<string> { "The --inprocess and --x86 options cannot be used together." }));
+        }
+
+        [Test]
+        public void InProcessWithOneAssembly_IsAccepted()
+        {
+            var options = ConsoleMocks.Options("test.dll", "--inprocess");
+            Assert.That(options.ErrorMessages, Is.Empty);
+        }
+
         [Test]
         public void NoInputFiles()
         {

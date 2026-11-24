@@ -94,6 +94,7 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("dummy.dll");
             package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(targetRuntime), true);
+            package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue("InProcessAgent"), true);
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
 
             var agents = _provider.GetAgentsForPackage(package);
@@ -114,6 +115,7 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("dummy.dll");
             package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(targetRuntime), true);
+            package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue("InProcessAgent"), true);
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
             Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(isCompatible));
         }
@@ -123,6 +125,7 @@ namespace NUnit.Engine.Services
         {
             var package = new TestPackage("dummy.dll");
             package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(targetRuntime), true);
+            package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue("InProcessAgent"), true);
 
             if (isCompatible)
             {
@@ -137,10 +140,35 @@ namespace NUnit.Engine.Services
         [TestCase("SomeOtherAgent", false)]
         public void IsAgentAvailable_RespectsRequestedAgentName(string requestedAgent, bool expected)
         {
-            var package = CreateCompatiblePackage();
+            var package = new TestPackage("dummy.dll").SubPackages[0];
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
             package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue(requestedAgent), true);
 
             Assert.That(_provider.IsAgentAvailable(package), Is.EqualTo(expected));
+        }
+
+        // Running in-process changes the process boundary, so it must be requested explicitly.
+        // A compatible package that doesn't name the agent must not get it.
+        [Test]
+        public void IsAgentAvailable_ReturnsFalseWhenNotRequested()
+        {
+            var package = new TestPackage("dummy.dll").SubPackages[0];
+            package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+
+            Assert.That(_provider.IsAgentAvailable(package), Is.False);
+        }
+
+        // Each assembly in a multi-assembly run gets its own agent, so agent ids must not repeat.
+        [Test]
+        public void GetAgent_ReturnsUniqueAgentEachTime()
+        {
+            var agent1 = _provider.GetAgent(CreateCompatiblePackage());
+            var agent2 = _provider.GetAgent(CreateCompatiblePackage());
+
+            Assert.That(agent2, Is.Not.SameAs(agent1));
+            Assert.That(agent2.Id, Is.Not.EqualTo(agent1.Id));
         }
 
         [Test]
@@ -161,6 +189,7 @@ namespace NUnit.Engine.Services
             string tfm = IS_NETFX_BUILD ? "net462" : "net10.0";
             string assemblyPath = System.IO.Path.GetFullPath($"testdata/{tfm}/mock-assembly.dll");
             var package = new TestPackage(assemblyPath).SubPackages[0];
+            package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue("InProcessAgent"), true);
             package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
 
@@ -186,6 +215,7 @@ namespace NUnit.Engine.Services
             var package = new TestPackage("dummy.dll").SubPackages[0];
             package.AddSetting(SettingDefinitions.ImageTargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
             package.AddSetting(SettingDefinitions.TargetFrameworkName.WithValue(AGENT_RUNTIME.FullName), true);
+            package.AddSetting(SettingDefinitions.RequestedAgentName.WithValue("InProcessAgent"), true);
             return package;
         }
 
