@@ -134,9 +134,20 @@ namespace NUnit.Engine.Services
         /// <param name="package">A TestPackage</param>
         public bool IsAgentAvailable(TestPackage package)
         {
+            // If a specific agent was requested, only that launcher counts, so that
+            // a request for an agent from another provider is not claimed here.
+            string requestedAgent = package.Settings.GetValueOrDefault(SettingDefinitions.RequestedAgentName);
+            bool specificAgentRequested = !string.IsNullOrEmpty(requestedAgent);
+
             foreach (var node in LauncherNodes)
+            {
+                if (specificAgentRequested && node.TypeName != requestedAgent)
+                    continue;
+
                 if (CanCreateAgent(node, package))
                     return true;
+            }
+
             return false;
         }
 

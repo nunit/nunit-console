@@ -43,6 +43,13 @@ namespace NUnit.ConsoleRunner
                 // such as missing required values. It does not throw for specific
                 // errors in the values themselves, which are handled below.
                 Options.Parse(Options.PreParse(args));
+
+                // The console runs only as AnyCPU, so it can't run x86 tests in its own process.
+                if (Options.RunInProcess && Options.RunAsX86)
+                {
+                    WriteErrorMessage("The --inprocess and --x86 options cannot be used together.");
+                    return ConsoleRunner.INVALID_ARG;
+                }
             }
             catch (OptionException ex)
             {
