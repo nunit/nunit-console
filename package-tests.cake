@@ -27,6 +27,38 @@ BothRunnerTests.Add(new PackageTest(1, "Net10Test")
     ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v10.0")
 });
 
+BothRunnerTests.Add(new PackageTest(1, "Net90Test")
+{
+    Description = "Run mock-assembly.dll under .NET 9.0",
+    Arguments = "testdata/net9.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v9.0")
+});
+
+BothRunnerTests.Add(new PackageTest(1, "Net80Test")
+{
+    Description = "Run mock-assembly.dll under .NET 8.0",
+    Arguments = "testdata/net8.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v8.0")
+});
+
+BothRunnerTests.Add(new PackageTest(1, "Net70Test")
+{
+    Description = "Run mock-assembly.dll under .NET 7.0",
+    Arguments = "testdata/net7.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v7.0")
+});
+
+BothRunnerTests.Add(new PackageTest(1, "Net60Test")
+{
+    Description = "Run mock-assembly.dll under .NET 6.0",
+    Arguments = "testdata/net6.0/mock-assembly.dll",
+    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v6.0")
+});
+
+//////////////////////////////////////////////////////////////////////
+// INPROCESS TESTS
+//////////////////////////////////////////////////////////////////////
+
 // The in-process agent runs in the runner's own process, so only the .NET 10 runner can
 // use it for a net10.0 assembly. Its result must show that the in-process agent was used.
 NetCoreRunnerTests.Add(new PackageTest(1, "Net10InProcessTest")
@@ -98,7 +130,7 @@ NetCoreRunnerTests.Add(new PackageTest(1, "Net10PlusNet80InProcessExploreTest")
 {
     Description = "Explore .NET 10.0 and 8.0 mock-assembly.dll together using the in-process agent",
     Arguments = "testdata/net10.0/mock-assembly.dll testdata/net8.0/mock-assembly.dll --inprocess --explore",
-    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", atleast: 2, exactly: 2) }
+    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", exactly: 2) }
 });
 
 StandardRunnerTests.Add(new PackageTest(1, "Net462InProcessExploreTest")
@@ -112,35 +144,14 @@ StandardRunnerTests.Add(new PackageTest(1, "Net462PlusNet462InProcessExploreTest
 {
     Description = "Explore two copies of .NET 4.6.2 mock-assembly.dll together using the in-process agent",
     Arguments = "testdata/net462/mock-assembly.dll testdata/net462/mock-assembly.dll --inprocess --explore",
-    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", atleast: 2, exactly: 2) }
+    ExpectedOutput = new[] { Contains("NUnit.TestData.Assemblies.MockTestFixture.FailingTest", exactly: 2) }
 });
 
-BothRunnerTests.Add(new PackageTest(1, "Net90Test")
+BothRunnerTests.Add(new PackageTest(1, "InProcessPlusX86IsNotAccepted")
 {
-    Description = "Run mock-assembly.dll under .NET 9.0",
-    Arguments = "testdata/net9.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v9.0")
-});
-
-BothRunnerTests.Add(new PackageTest(1, "Net80Test")
-{
-    Description = "Run mock-assembly.dll under .NET 8.0",
-    Arguments = "testdata/net8.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v8.0")
-});
-
-BothRunnerTests.Add(new PackageTest(1, "Net70Test")
-{
-    Description = "Run mock-assembly.dll under .NET 7.0",
-    Arguments = "testdata/net7.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v7.0")
-});
-
-BothRunnerTests.Add(new PackageTest(1, "Net60Test")
-{
-    Description = "Run mock-assembly.dll under .NET 6.0",
-    Arguments = "testdata/net6.0/mock-assembly.dll",
-    ExpectedResult = new MockAssemblyExpectedResult(".NETCoreApp,Version=v6.0")
+    Description = "Specifying --inprocess and --x86 is invalid",
+    Arguments = "dummy.dll --inprocess --x86",
+    ExpectedReturnCode = -1
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -483,14 +494,27 @@ BothRunnerTests.Add(new PackageTest(1, "NoExtensionsInstalled")
 {
     Description = "List Extensions shows only our agent launchers",
     Arguments = "--list-extensions",
-    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.Net10AgentLauncher", exactly: 4) }
+    ExpectedOutput = new[] { Contains("Extension: NUnit.Engine.Agents.", exactly: 5) }
 });
 
-BothRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
+StandardRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
 {
     Description = "List Extensions shows extension from added directory",
     Arguments = "--extensionDirectory fakes/net462 --list-extensions",
-    ExpectedOutput = new[] { Contains("Extension:", exactly: 5) }
+    ExpectedOutput = new[] {
+        Contains("Extension: NUnit.Engine.Agents.", exactly: 5),
+        Contains("Extension: NUnit.Engine.Fakes.", exactly: 8)
+    }
+});
+
+NetCoreRunnerTests.Add(new PackageTest(1, "ExtensionsInstalledFromAddedDirectory")
+{
+    Description = "List Extensions shows extension from added directory",
+    Arguments = "--extensionDirectory fakes/netstandard2.0 --list-extensions",
+    ExpectedOutput = new[] {
+        Contains("Extension: NUnit.Engine.Agents.", exactly: 5),
+        Contains("Extension: NUnit.Engine.Fakes.", exactly: 8)
+    }
 });
 
 BothRunnerTests.Add(new PackageTest(1, "SpecificExtensionInstalled")

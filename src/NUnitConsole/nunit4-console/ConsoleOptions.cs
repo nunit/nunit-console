@@ -39,10 +39,6 @@ namespace NUnit.ConsoleRunner
             if (args is not null)
                 Parse(args);
 
-            // The console runs only as AnyCPU, so it can't run x86 tests in its own process.
-            if (RunInProcess && RunAsX86)
-                ErrorMessages.Add("The --inprocess and --x86 options cannot be used together.");
-
             ResultReporterSettings = new ResultReporterSettings()
             {
                 OmitExplicitTests = OmitExplicitTests,

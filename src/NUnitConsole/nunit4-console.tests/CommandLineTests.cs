@@ -130,15 +130,15 @@ namespace NUnit.ConsoleRunner
         }
 
         // The console only runs as AnyCPU, so it can't host an x86 run in its own process.
-        [Test]
-        public void InProcessWithX86_IsRejected()
+        [Test, Ignore("The check is no longer made in the constructor. Keeping this in case we put it back.")]
+        public void ConstructorWithInProcessAndX86_IsRejected()
         {
             var options = ConsoleMocks.Options("test.dll", "--inprocess", "--x86");
             Assert.That(options.ErrorMessages, Is.EquivalentTo(new List<string> { "The --inprocess and --x86 options cannot be used together." }));
         }
 
         [Test]
-        public void InProcessWithOneAssembly_IsAccepted()
+        public void ConstructorWithInProcessAndOneAssembly_IsAccepted()
         {
             var options = ConsoleMocks.Options("test.dll", "--inprocess");
             Assert.That(options.ErrorMessages, Is.Empty);
@@ -181,8 +181,9 @@ namespace NUnit.ConsoleRunner
         {
             string[] prototypes = pattern.Split('|');
 
-            PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.That(property.PropertyType, Is.EqualTo(typeof(bool)), $"Property '{propertyName}' is wrong type");
+            PropertyInfo? property = GetPropertyInfo(propertyName);
+            Assert.That(property, Is.Not.Null, $"Property '{propertyName}' not found");
+            Assert.That(property!.PropertyType, Is.EqualTo(typeof(bool)), $"Property '{propertyName}' is wrong type");
 
             foreach (string option in prototypes)
             {
@@ -230,8 +231,9 @@ namespace NUnit.ConsoleRunner
         {
             string[] prototypes = pattern.Split('|');
 
-            PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.That(property.PropertyType, Is.EqualTo(typeof(string)));
+            PropertyInfo? property = GetPropertyInfo(propertyName);
+            Assert.That(property, Is.Not.Null, $"Property '{propertyName}' not found");
+            Assert.That(property!.PropertyType, Is.EqualTo(typeof(string)));
 
             foreach (string option in prototypes)
             {
@@ -256,8 +258,9 @@ namespace NUnit.ConsoleRunner
         [TestCase(FrameworkPackageSettings.InternalTraceLevel, "trace", new string[] { "Off", "Error", "Warning", "Info", "Debug", "Verbose" })]
         public void CanRecognizeLowerCaseOptionValues(string propertyName, string optionName, string[] canonicalValues)
         {
-            PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.That(property.PropertyType, Is.EqualTo(typeof(string)));
+            PropertyInfo? property = GetPropertyInfo(propertyName);
+            Assert.That(property, Is.Not.Null, $"Property '{propertyName}' not found");
+            Assert.That(property!.PropertyType, Is.EqualTo(typeof(string)));
 
             foreach (string canonicalValue in canonicalValues)
             {
@@ -278,8 +281,9 @@ namespace NUnit.ConsoleRunner
         {
             string[] prototypes = pattern.Split('|');
 
-            PropertyInfo property = GetPropertyInfo(propertyName);
-            Assert.That(property.PropertyType, Is.EqualTo(typeof(int)));
+            PropertyInfo? property = GetPropertyInfo(propertyName);
+            Assert.That(property, Is.Not.Null, $"Property '{propertyName}' not found");
+            Assert.That(property!.PropertyType, Is.EqualTo(typeof(int)));
 
             foreach (string option in prototypes)
             {
@@ -769,14 +773,14 @@ namespace NUnit.ConsoleRunner
             return fileSystem;
         }
 
-        private static FieldInfo GetFieldInfo(string fieldName)
+        private static FieldInfo? GetFieldInfo(string fieldName)
         {
             FieldInfo? field = typeof(ConsoleOptions).GetField(fieldName);
             Assert.That(field, Is.Not.Null, $"The field '{fieldName}' is not defined");
             return field;
         }
 
-        private static PropertyInfo GetPropertyInfo(string propertyName)
+        private static PropertyInfo? GetPropertyInfo(string propertyName)
         {
             PropertyInfo? property = typeof(ConsoleOptions).GetProperty(propertyName);
             Assert.That(property, Is.Not.Null, $"The property '{propertyName}' is not defined");
