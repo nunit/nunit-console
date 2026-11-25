@@ -209,7 +209,6 @@ if (dotnetX86Available)
             Arguments = "testdata/net6.0/mock-assembly-x86.dll",
             ExpectedResult = new MockAssemblyX86ExpectedResult(".NETCoreApp,Version=v6.0")
         });
-
     }
 }
 
@@ -793,7 +792,10 @@ BothRunnerTests.Add(new PackageTest(1, "UnmanagedAssemblyTest")
 // When either of these packages is moved to a separate repository, the tests will
 // become more meaningful and will then be expanded.
 
-// Tests for NUnit.Engine package
+//////////////////////////////////////////////////////////////////////
+// TESTS FOR NUNIT ENGINE PACKAGE
+//////////////////////////////////////////////////////////////////////
+
 var EngineTests = new List<PackageTest>()
 {
     new PackageTest(1, "Net462AgentTest")
@@ -816,7 +818,10 @@ var EngineTests = new List<PackageTest>()
     }
 };
 
-// Tests for NUnit.Agent.Core package
+//////////////////////////////////////////////////////////////////////
+// TESTS FOR NUNIT AGENT CORE PACKAGE
+//////////////////////////////////////////////////////////////////////
+
 var AgentCoreTests = new List<PackageTest>()
 {
     new PackageTest(1, "Net462AgentTest")
